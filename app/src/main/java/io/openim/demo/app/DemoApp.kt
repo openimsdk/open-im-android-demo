@@ -1,6 +1,8 @@
 package io.openim.demo.app
 
 import android.app.Application
+import android.content.Context
+import androidx.multidex.MultiDex
 import cn.alvince.zanpakuto.core.C
 
 /**
@@ -9,6 +11,11 @@ import cn.alvince.zanpakuto.core.C
  * @author alvince.zy@gmail.com
  */
 class DemoApp : Application() {
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base)
+        MultiDex.install(base)
+    }
 
     override fun onCreate() {
         super.onCreate()

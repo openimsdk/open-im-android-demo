@@ -11,6 +11,6 @@ import io.openim.demo.home.binder.HomeNavItemVm
 import io.openim.demo.home.widget.BottomNavigationView
 
 @BindingAdapter("items")
-fun BottomNavigationView.bindItems(items: List<HomeNavItemVm>) {
+fun BottomNavigationView.bindItems(items: List<HomeNavItemVm>?) {
 
 }
