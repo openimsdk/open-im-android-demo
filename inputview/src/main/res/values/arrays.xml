@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="emoji_types">
+        <item>黄脸</item>
+        <item>人物</item>
+        <item>自然</item>
+        <item>食物</item>
+        <item>旅行</item>
+        <item>活动</item>
+        <item>物体</item>
+        <item>符号</item>
+        <item>旗帜</item>
+    </string-array>
+    <string-array name="emoji_types_en">
+        <item>face</item>
+        <item>person</item>
+        <item>nature</item>
+        <item>food</item>
+        <item>travel</item>
+        <item>activity</item>
+        <item>object</item>
+        <item>symbol</item>
+        <item>flag</item>
+    </string-array>
+
+    <integer-array name="record_volume_array">
+        <item>@mipmap/icon_volume_0</item>
+        <item>@mipmap/icon_volume_1</item>
+        <item>@mipmap/icon_volume_3</item>
+        <item>@mipmap/icon_volume_5</item>
+        <item>@mipmap/icon_volume_7</item>
+        <item>@mipmap/icon_volume_9</item>
+    </integer-array>
+</resources>

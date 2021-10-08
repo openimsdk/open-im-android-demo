@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_symbols_emoji_type_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/container_divider1"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:visibility="gone">
+
+    <ImageView
+        android:id="@+id/ib_symbols_emoji_type_back"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@color/key_bg_symbol_bg"
+        android:paddingRight="5dp"
+        android:scaleType="center"
+        android:src="@mipmap/revert" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_symbols_emoji_type"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/key_bg_symbol_bg" />
+
+    <ImageView
+        android:id="@+id/iv_symbols_emoji_type_delete"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@color/key_bg_symbol_bg"
+        android:paddingLeft="5dp"
+        android:scaleType="center"
+        android:src="@mipmap/delete_icon" />
+</LinearLayout>

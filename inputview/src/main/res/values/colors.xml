@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="grey">#ededed</color>
+    <color name="transparent">#00000000</color>
+    <color name="color_111F2C">#111F2C</color>
+    <color name="color_666666">#666666</color>
+    <color name="color_F3F3F3">#F3F3F3</color>
+    <color name="color_CCCCCC">#CCCCCC</color>
+    <color name="color_C6C6C6">#C6C6C6</color>
+    <color name="color_F6F6F6">#f6f6f6</color>
+    <color name="color_999999">#999999</color>
+    <color name="color_ff6666">#ff6666</color>
+    <color name="color_E5E5E5">#E5E5E5</color>
+    <color name="color_555555">#555555</color>
+    <color name="color_77777">#777777</color>
+    <color name="color_FF3B30">#FF3B30</color>
+    <color name="color_3D3D3D">#3D3D3D</color>
+    <color name="color_E6E6E6">#E6E6E6</color>
+    <color name="color_3A86F7">#3A86F7</color>
+    <color name="color_008DFF">#008DFF</color>
+    <color name="color_1677FF">#1677FF</color>
+    <color name="color_F05252">#F05252</color>
+    <color name="color_9A9A9A">#9A9A9A</color>
+    <color name="color_E2E2E2">#E2E2E2</color>
+    <color name="color_191919">#191919</color>
+    <color name="color_ffbbbbbb">#ffbbbbbb</color>
+    <color name="color_ff333333">#ff333333</color>
+    <color name="color_3333333">#333333</color>
+    <color name="grey_text">#BBBBBB</color>
+    <color name="color_BE0A0B">#BE0A0B</color>
+    <color name="color_76797F">#76797f</color>
+    <color name="color_EB5231">#EB5231</color>
+    <color name="friends_head_tv_color_nor">#FF666666</color>
+    <color name="color_f6f7f8">#fff6f7f8</color>
+    <color name="color_f7f7f7">#F7F7F7</color>
+
+    <color name="container_divider1">#eeeff1</color>
+    <color name="key_bg_function_bg">#d1d1d1</color>
+    <color name="key_bg_symbol_bg">#d1d1d1</color>
+    <color name="key_bg_normal_bg">#fdfdfe</color>
+    <color name="key_bg_normal_pressed">#ababab</color>
+</resources>

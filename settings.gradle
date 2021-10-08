@@ -12,3 +12,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "OpenIM Demo"
 include ':app'
+include ':inputview'

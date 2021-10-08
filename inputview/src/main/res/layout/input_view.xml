@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?><!--  输入框主体开始  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/inputLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:background="#F2F4F5"
+    android:minHeight="48dp"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/iv_voice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginLeft="14dp"
+        android:padding="5dp"
+        android:src="@mipmap/ic_read_voice" />
+
+    <cn.mtjsoft.inputview.view.LongPressTextView
+        android:id="@+id/long_press_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/shap_white_bg_radius8"
+        android:gravity="center"
+        android:minHeight="36dp"
+        android:text="@string/press_record"
+        android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/et_chat_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="6dp"
+        android:layout_weight="1"
+        android:background="@drawable/shap_white_bg_radius8"
+        android:gravity="left|center_vertical"
+        android:maxLines="4"
+        android:minHeight="36dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:textSize="16sp"
+        android:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/iv_emoji"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginRight="10dp"
+        android:padding="5dp"
+        android:src="@mipmap/ic_emjio"
+        android:tag="0" />
+
+    <TextView
+        android:id="@+id/bt_chat_send"
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="14dp"
+        android:background="@drawable/btn_normal"
+        android:gravity="center"
+        android:padding="0px"
+        android:text="@string/chat_send_message"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/iv_add_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginRight="14dp"
+        android:padding="5dp"
+        android:src="@mipmap/ic_add_image"
+        android:visibility="visible" />
+
+</LinearLayout>

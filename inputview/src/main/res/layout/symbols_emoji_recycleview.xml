@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/gv_symbols_emoji"
+    android:layout_width="match_parent"
+    android:layout_height="253dp"
+    android:background="@color/key_bg_function_bg"
+    android:fadeScrollbars="true"
+    android:scrollbarStyle="outsideOverlay"
+    android:scrollbars="vertical"
+    android:visibility="gone" />
