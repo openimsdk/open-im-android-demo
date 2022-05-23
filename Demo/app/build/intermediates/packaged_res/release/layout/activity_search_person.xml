@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+        
+    
+                 
+                           
+                                                        
+           
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F8F8F8"
+        tools:context=".ui.search.SearchPersonActivity" android:tag="layout/activity_search_person_0">
+
+        <LinearLayout
+            android:id="@+id/sink"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <io.openim.android.ouicore.widget.SearchView
+                    android:layout_width="0dp"
+                    android:id="@+id/searchView"
+                    android:layout_height="41dp"
+                    android:layout_marginLeft="22dp"
+                    android:layout_marginTop="7dp"
+                    android:layout_marginRight="17dp"
+                    android:layout_marginBottom="7dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="17dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="17dp"
+                    android:paddingBottom="8dp"
+                    android:text="取消"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/notFind"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:gravity="center"
+                android:visibility="gone"
+                android:text="@string/not_find_user"
+                android:textColor="#ff666666"
+                android:textSize="14sp"
+                />
+        </LinearLayout>
+
+
+    </LinearLayout>
+         

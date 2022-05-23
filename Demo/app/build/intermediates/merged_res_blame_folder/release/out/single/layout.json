@@ -1,0 +1,46 @@
+[
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeReleaseResources/stripped.dir/layout/activity_add_friend.xml",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/activity_add_friend.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeReleaseResources/stripped.dir/layout/activity_register.xml",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/activity_register.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeReleaseResources/stripped.dir/layout/activity_main.xml",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/activity_main.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeReleaseResources/stripped.dir/layout/activity_search_person.xml",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/activity_search_person.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeReleaseResources/stripped.dir/layout/blank_fragment.xml",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/blank_fragment.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeReleaseResources/stripped.dir/layout/layout_add_action.xml",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/layout_add_action.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeReleaseResources/stripped.dir/layout/layout_login.xml",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/layout_login.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeReleaseResources/stripped.dir/layout/activity_send_verify.xml",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/activity_send_verify.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeReleaseResources/stripped.dir/layout/activity_login.xml",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/activity_login.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeReleaseResources/stripped.dir/layout/layout_search_item.xml",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/layout_search_item.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeReleaseResources/stripped.dir/layout/activity_person_detail.xml",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/activity_person_detail.xml"
+    }
+]

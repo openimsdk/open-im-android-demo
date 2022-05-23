@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+        
+
+    
+
+                 
+                           
+                                                        
+           
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F6F6F6"
+        android:orientation="vertical"
+        tools:context=".ui.search.SendVerifyActivity" android:tag="layout/activity_send_verify_0">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/comm_title_high"
+            app:cardElevation="8dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal" android:tag="binding_1">
+
+                <include
+                    android:id="@+id/back"
+                    layout="@layout/view_back" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/friend_verify"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <Button
+                    android:id="@+id/send"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/send" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="22dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="发送添加好友申请"
+            android:textColor="#ff666666"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/hail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:minHeight="122dp"
+            android:paddingLeft="22dp"
+            android:paddingTop="14dp"
+            android:gravity="top"
+            android:paddingRight="22dp"
+            android:paddingBottom="14dp"
+            android:tag="binding_2"          />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="22dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="备注名"
+            android:textColor="#ff666666"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/remark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:minHeight="48dp"
+            android:paddingLeft="22dp"
+            android:paddingTop="14dp"
+            android:paddingRight="22dp"
+            android:paddingBottom="14dp"
+            android:tag="binding_3"            />
+    </LinearLayout>
+         

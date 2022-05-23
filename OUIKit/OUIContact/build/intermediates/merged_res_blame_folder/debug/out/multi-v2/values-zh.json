@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/incremental/mergeDebugResources/merged.dir/values-zh/values-zh.xml",
+            "map": [
+                {
+                    "source": "/Users/wj/.gradle/caches/transforms-3/13c8e6284d152ce1c4f4b3cc2c45e294/transformed/jetified-x-1.3.2/res/values-zh/values-zh.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6",
+                        "startColumns": "4,4,4,4,4",
+                        "startOffsets": "55,117,174,236,306",
+                        "endColumns": "61,56,61,69,55",
+                        "endOffsets": "112,169,231,301,357"
+                    }
+                }
+            ]
+        }
+    ]
+}

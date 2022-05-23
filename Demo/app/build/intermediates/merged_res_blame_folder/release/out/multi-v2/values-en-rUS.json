@@ -1,0 +1,60 @@
+{
+    "logs": [
+        {
+            "outputFile": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeReleaseResources/merged.dir/values-en-rUS/values-en-rUS.xml",
+            "map": [
+                {
+                    "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUICore/build/intermediates/packaged_res/release/values-en-rUS/values-en-rUS.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "55,97,139,185,227,273,317",
+                        "endColumns": "41,41,45,41,45,43,47",
+                        "endOffsets": "92,134,180,222,268,312,360"
+                    },
+                    "to": {
+                        "startLines": "8,17,29,34,35,37,39",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "313,699,1238,1452,1494,1575,1660",
+                        "endColumns": "41,41,45,41,45,43,47",
+                        "endOffsets": "350,736,1279,1489,1535,1614,1703"
+                    }
+                },
+                {
+                    "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/packaged_res/release/values-en-rUS/values-en-rUS.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,97,133,168",
+                        "endColumns": "41,35,34,40",
+                        "endOffsets": "92,128,163,204"
+                    },
+                    "to": {
+                        "startLines": "28,32,36,38",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "1196,1375,1540,1619",
+                        "endColumns": "41,35,34,40",
+                        "endOffsets": "1233,1406,1570,1655"
+                    }
+                },
+                {
+                    "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/values-en-rUS/strings.xml",
+                    "from": {
+                        "startLines": "19,25,2,27,26,12,28,22,14,11,7,4,10,15,16,21,3,24,8,9,13,6,5,17,20,18,23",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "819,1067,55,1159,1111,493,1197,942,591,444,277,146,408,636,683,892,99,1018,325,365,542,225,183,726,854,766,977",
+                        "endColumns": "34,43,43,37,47,48,46,34,44,48,47,36,35,46,42,49,46,48,39,42,48,51,41,39,37,52,40",
+                        "endOffsets": "849,1106,94,1192,1154,537,1239,972,631,488,320,178,439,678,721,937,141,1062,360,403,586,272,220,761,887,814,1013"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,30,31,33",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,90,134,178,216,264,355,402,437,482,531,579,616,652,741,784,834,881,930,970,1013,1062,1114,1156,1284,1322,1411",
+                        "endColumns": "34,43,43,37,47,48,46,34,44,48,47,36,35,46,42,49,46,48,39,42,48,51,41,39,37,52,40",
+                        "endOffsets": "85,129,173,211,259,308,397,432,477,526,574,611,647,694,779,829,876,925,965,1008,1057,1109,1151,1191,1317,1370,1447"
+                    }
+                }
+            ]
+        }
+    ]
+}

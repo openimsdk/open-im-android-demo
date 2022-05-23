@@ -1,0 +1,62 @@
+[
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/layout_activity_debug.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/layout/activity_debug.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/layout_layout_contact_item.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/layout/layout_contact_item.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/mipmap-xxxhdpi_ic_more.png.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/mipmap-xxxhdpi/ic_more.png"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/layout_layout_msg.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/layout/layout_msg.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/layout_layout_loading_small.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/layout/layout_loading_small.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/layout_dialog_input_edit.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/layout/dialog_input_edit.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/drawable_sty_radius_30_red.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/drawable/sty_radius_30_red.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/layout_fragment_contact_list.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/layout/fragment_contact_list.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/layout_layout_msg_txt_left.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/layout/layout_msg_txt_left.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/mipmap-xxxhdpi_ic_phone.png.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/mipmap-xxxhdpi/ic_phone.png"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/layout_layout_msg_txt_right.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/layout/layout_msg_txt_right.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/mipmap-xxxhdpi_ic_back2.png.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/mipmap-xxxhdpi/ic_back2.png"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/drawable_sty_radius_unright_30.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/drawable/sty_radius_unright_30.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/drawable_sty_radius_unleft_30.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/drawable/sty_radius_unleft_30.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_res/debug/layout_activity_chat.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/res/layout/activity_chat.xml"
+    }
+]

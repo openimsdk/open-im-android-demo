@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add">添加</string>
+    <string name="add_friend">添加好友</string>
+    <string name="app_name">OpenIM</string>
+    <string name="detail">详情</string>
+    <string name="disassociate">解除好友关系</string>
+    <string name="forgot_password">忘记密码</string>
+    <string name="friend_verify">好友验证</string>
+    <string name="id">ID号</string>
+    <string name="input_mail">请输入邮箱</string>
+    <string name="input_password">请输入密码</string>
+    <string name="input_phone">请输入手机号码</string>
+    <string name="login">登录</string>
+    <string name="mail">邮箱</string>
+    <string name="mail_register">邮箱注册</string>
+    <string name="new_user">新用户注册</string>
+    <string name="not_find_user">无法找到该用户</string>
+    <string name="open_im">欢迎使用OpenIM</string>
+    <string name="openim_call">OpenIM电话</string>
+    <string name="password">密码</string>
+    <string name="phone_num">手机号码</string>
+    <string name="phone_register">手机号注册</string>
+    <string name="protocol">《服务协议》，《隐私权政策》</string>
+    <string name="read">我已阅读并同意：</string>
+    <string name="register">注册</string>
+    <string name="search">搜索</string>
+    <string name="search_by_id">通过用户ID号搜索添加</string>
+    <string name="send_msg">发消息</string>
+    <style name="SplashTheme" parent="@android:style/Theme.NoTitleBar.Fullscreen">
+        <item name="android:background">@drawable/launch_background</item>
+    </style>
+    <declare-styleable name="FullscreenAttrs">
+        <attr format="color" name="fullscreenBackgroundColor"/>
+        <attr format="color" name="fullscreenTextColor"/>
+    </declare-styleable>
+</resources>

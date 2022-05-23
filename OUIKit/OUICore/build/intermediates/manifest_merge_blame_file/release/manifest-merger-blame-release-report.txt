@@ -1,0 +1,18 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="io.openim.android.ouicore" >
+4
+5    <uses-sdk
+6        android:minSdkVersion="21"
+6-->/Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUICore/src/main/AndroidManifest.xml
+7        android:targetSdkVersion="32" />
+7-->/Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUICore/src/main/AndroidManifest.xml
+8
+9    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+9-->/Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUICore/src/main/AndroidManifest.xml:5:5-79
+9-->/Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUICore/src/main/AndroidManifest.xml:5:22-76
+10    <uses-permission android:name="android.permission.INTERNET" />
+10-->/Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUICore/src/main/AndroidManifest.xml:6:5-67
+10-->/Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUICore/src/main/AndroidManifest.xml:6:22-64
+11
+12</manifest>

@@ -1,0 +1,19 @@
+<lint-module
+    format="1"
+    dir="/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app"
+    name=":app"
+    type="APP"
+    maven="Demo:app:"
+    gradle="7.1.3"
+    buildFolder="build"
+    bootClassPath="/Users/wj/Library/Android/sdk/platforms/android-32/android.jar:/Users/wj/Library/Android/sdk/build-tools/30.0.3/core-lambda-stubs.jar"
+    javaSourceLevel="1.8"
+    compileTarget="android-32"
+    neverShrinking="true">
+  <lintOptions
+      abortOnError="true"
+      absolutePaths="true"
+      checkReleaseBuilds="true"
+      explainIssues="true"/>
+  <variant name="release"/>
+</lint-module>
