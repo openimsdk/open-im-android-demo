@@ -14,14 +14,14 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.sdk.models.Message;
 
-public class MessageAdapter  extends RecyclerView.Adapter {
+public class MessageAdapter extends RecyclerView.Adapter {
 
     List<Message> messages;
     //自己的userId
     public static String OWN_ID;
 
     public MessageAdapter() {
-        OWN_ID= LoginCertificate.getCache(BaseApp.instance()).userID;
+        OWN_ID = LoginCertificate.getCache(BaseApp.instance()).userID;
     }
 
     public void setMessages(List<Message> messages) {
@@ -36,22 +36,23 @@ public class MessageAdapter  extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return MessageViewHolder.createViewHolder(parent,viewType);
+        return MessageViewHolder.createViewHolder(parent, viewType);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Message message=messages.get(position);
-        switch (getItemViewType(position)){
-            case Constant.MsgType.TXT:
-                ((MessageViewHolder.TXTView)holder).bindData(message,position);
-                break;
+        Message message = messages.get(position);
 
+        if (getItemViewType(position) != Constant.LOADING) {
+            MessageViewHolder.MsgViewHolder msgViewHolder = (MessageViewHolder.MsgViewHolder) holder;
+            msgViewHolder.bindData(message,position);
         }
+
+
     }
 
     @Override
     public int getItemCount() {
-        return null==messages?0:messages.size();
+        return null == messages ? 0 : messages.size();
     }
 }

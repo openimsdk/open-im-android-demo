@@ -16,6 +16,7 @@
     <string name="friday">星期五</string>
     <string name="monday">星期一</string>
     <string name="saturday">星期六</string>
+    <string name="send">发送</string>
     <string name="sunday">星期日</string>
     <string name="thursday">星期四</string>
     <string name="tuesday">星期二</string>
@@ -57,6 +58,13 @@
     <style name="dialog_tran2" parent="dialog_tran">
         <item name="android:backgroundDimEnabled">true</item>
     </style>
+    <declare-styleable name="CodeEditText">
+        <attr format="integer" name="strokeLength"/>
+        <attr format="dimension" name="strokeWidth"/>
+        <attr format="dimension" name="strokeHeight"/>
+        <attr format="dimension" name="strokePadding"/>
+        <attr format="reference" name="strokeBackground"/>
+    </declare-styleable>
     <declare-styleable name="customize">
         <attr name="android:clickable"/>
         <attr name="android:hint"/>

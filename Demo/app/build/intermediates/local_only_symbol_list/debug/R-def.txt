@@ -7,12 +7,15 @@ drawable ic_launcher_foreground
 drawable launch_background
 drawable selector_checkbox
 drawable selector_open_eyes
+id accountTv
 id addFriend
 id avatar
 id back
 id call
 id cancel
 id clear
+id codeEditText
+id countdown
 id edt1
 id edt2
 id eyes
@@ -34,6 +37,7 @@ id protocol
 id recyclerView
 id registerTv
 id remark
+id resend
 id searchView
 id send
 id sendMsg
@@ -48,6 +52,7 @@ layout activity_person_detail
 layout activity_register
 layout activity_search_person
 layout activity_send_verify
+layout activity_verification_code
 layout blank_fragment
 layout layout_add_action
 layout layout_login
@@ -57,7 +62,6 @@ mipmap ic_add_friend
 mipmap ic_add_friend2
 mipmap ic_add_friend3
 mipmap ic_back
-mipmap ic_back2
 mipmap ic_call
 mipmap ic_chat
 mipmap ic_check_select
@@ -71,6 +75,7 @@ mipmap ic_open_eye
 mipmap ic_splash
 string add
 string add_friend
+string after
 string app_name
 string detail
 string disassociate
@@ -80,6 +85,7 @@ string id
 string input_mail
 string input_password
 string input_phone
+string input_verification_code
 string login
 string mail
 string mail_register
@@ -93,9 +99,12 @@ string phone_register
 string protocol
 string read
 string register
+string resend_verification_code
 string search
 string search_by_id
 string send_msg
+string verification_code_send_mail
+string verification_code_send_phone
 style SplashTheme
 style ThemeOverlay.Demo.FullscreenContainer
 style Theme.Demo

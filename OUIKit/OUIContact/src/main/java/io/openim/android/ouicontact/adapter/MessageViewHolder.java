@@ -28,9 +28,8 @@ import io.openim.android.sdk.models.Message;
 public class MessageViewHolder {
 
     public static RecyclerView.ViewHolder createViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if (viewType == Constant.LOADING)
-            return new LoadingView(LayoutLoadingSmallBinding.inflate(inflater, parent, false));
+            return new LoadingView(parent);
 
         if (viewType == Constant.MsgType.TXT)
             return new TXTView(parent);
@@ -40,8 +39,9 @@ public class MessageViewHolder {
 
     //加载中...
     public static class LoadingView extends RecyclerView.ViewHolder {
-        public LoadingView(LayoutLoadingSmallBinding viewBinding) {
-            super(viewBinding.getRoot());
+        public LoadingView(ViewGroup parent) {
+            super(LayoutLoadingSmallBinding.inflate(LayoutInflater.from(parent.getContext()),
+                parent, false).getRoot());
         }
     }
 
@@ -93,7 +93,7 @@ public class MessageViewHolder {
         }
 
         public static View buildRoot(ViewGroup parent) {
-           return LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_msg,parent, false);
+            return LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_msg, parent, false);
         }
 
         abstract int getLeftInflatedId();
@@ -110,8 +110,8 @@ public class MessageViewHolder {
         protected boolean isOwn = false;
 
         //绑定数据
-        public void bindData(Message message,int position) {
-            if (isOwn =message.getSendID().equals(OWN_ID)) {
+        public void bindData(Message message, int position) {
+            if (isOwn = message.getSendID().equals(OWN_ID)) {
                 if (leftIsInflated)
                     left.setVisibility(View.GONE);
                 if (rightIsInflated)

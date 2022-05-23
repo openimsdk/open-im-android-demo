@@ -64,7 +64,7 @@ public class SearchVM extends BaseViewModel {
 
             @Override
             public void onSuccess(String data) {
-                Toast.makeText(context, "发送成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "发送成功", Toast.LENGTH_SHORT).show();
                 hail.setValue("-1");
             }
         }, searchContent, hail.getValue());

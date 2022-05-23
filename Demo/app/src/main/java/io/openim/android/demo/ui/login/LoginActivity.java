@@ -1,6 +1,8 @@
 package io.openim.android.demo.ui.login;
 
 
+import static io.openim.android.ouicore.utils.Constant.VM;
+
 import android.content.Intent;
 
 import io.openim.android.demo.ui.main.MainActivity;
@@ -36,9 +38,8 @@ public class LoginActivity extends BaseActivity<LoginVM> implements LoginVM.View
         setLightStatus();
         SinkHelper.get(this).setTranslucentStatus(null);
 
-        bindVM(LoginVM.class);
+        bindVM(LoginVM.class,true);
         view.loginContent.setLoginVM(vm);
-
 
         click();
         listener();
@@ -79,7 +80,7 @@ public class LoginActivity extends BaseActivity<LoginVM> implements LoginVM.View
         view.loginContent.clear.setOnClickListener(v -> view.loginContent.edt1.setText(""));
         view.loginContent.eyes.setOnCheckedChangeListener((buttonView, isChecked) -> view.loginContent.edt2.setTransformationMethod(isChecked ? HideReturnsTransformationMethod.getInstance() : PasswordTransformationMethod.getInstance()));
         view.protocol.setOnCheckedChangeListener((buttonView, isChecked) -> submitEnabled());
-        view.loginContent.registerTv.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class).putExtra(RegisterActivity.IS_PHONE, vm.isPhone.getValue())));
+        view.loginContent.registerTv.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
 
         view.submit.setOnClickListener(v -> {
             vm.login();
@@ -97,12 +98,23 @@ public class LoginActivity extends BaseActivity<LoginVM> implements LoginVM.View
     }
 
     @Override
-    public void loginErr(String msg) {
+    public void err(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void succ(Object o) {
+
     }
 
     @Override
     public void initDate() {
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        removeCacheVM();
     }
 }

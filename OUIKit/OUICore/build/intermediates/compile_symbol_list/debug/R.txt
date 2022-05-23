@@ -1,3 +1,8 @@
+int attr strokeBackground 0x0
+int attr strokeHeight 0x0
+int attr strokeLength 0x0
+int attr strokePadding 0x0
+int attr strokeWidth 0x0
 int color black 0x0
 int color black_overlay 0x0
 int color light_blue_600 0x0
@@ -11,6 +16,7 @@ int color teal_200 0x0
 int color teal_700 0x0
 int color white 0x0
 int dimen comm_title_high 0x0
+int drawable bg_edit_vercode 0x0
 int drawable sty_radius_4_f0f0f0 0x0
 int id back 0x0
 int id editText 0x0
@@ -19,11 +25,13 @@ int layout layout_search 0x0
 int layout view_back 0x0
 int layout view_dividing_line 0x0
 int layout view_waitdilog 0x0
+int mipmap ic_back2 0x0
 int mipmap ic_my_friend 0x0
 int mipmap ic_search 0x0
 int string friday 0x0
 int string monday 0x0
 int string saturday 0x0
+int string send 0x0
 int string sunday 0x0
 int string thursday 0x0
 int string tuesday 0x0
@@ -33,6 +41,12 @@ int style Theme_Demo 0x0
 int style Widget_Theme_Demo_ButtonBar_Fullscreen 0x0
 int style dialog_tran 0x0
 int style dialog_tran2 0x0
+int[] styleable CodeEditText { 0x0, 0x0, 0x0, 0x0, 0x0 }
+int styleable CodeEditText_strokeBackground 0
+int styleable CodeEditText_strokeHeight 1
+int styleable CodeEditText_strokeLength 2
+int styleable CodeEditText_strokePadding 3
+int styleable CodeEditText_strokeWidth 4
 int[] styleable customize { 0x10100e5, 0x1010150 }
 int styleable customize_android_clickable 0
 int styleable customize_android_hint 1

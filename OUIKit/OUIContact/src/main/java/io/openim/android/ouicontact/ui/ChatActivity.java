@@ -69,7 +69,7 @@ public class ChatActivity extends BaseActivity<ChatVM> implements  ChatVM.ViewAc
         linearLayoutManager.setReverseLayout(true);
 
         view.recyclerView.setLayoutManager(linearLayoutManager);
-        view.recyclerView.addItemDecoration(new DefaultItemDecoration(this.getResources().getColor(android.R.color.transparent), 1, Common.dp2px(12)));
+        view.recyclerView.addItemDecoration(new DefaultItemDecoration(this.getResources().getColor(android.R.color.transparent), 1, Common.dp2px(16)));
         messageAdapter = new MessageAdapter();
         vm.setMessageAdapter(messageAdapter);
         view.recyclerView.setAdapter(messageAdapter);

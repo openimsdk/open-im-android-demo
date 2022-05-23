@@ -4,12 +4,16 @@
         "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp"
     },
     {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/mipmap-xxxhdpi_ic_add_friend3.png.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/mipmap-xxxhdpi/ic_add_friend3.png"
+    },
+    {
         "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/drawable_ic_launcher_background.xml.flat",
         "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/drawable/ic_launcher_background.xml"
     },
     {
-        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/mipmap-xxxhdpi_ic_add_friend3.png.flat",
-        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/mipmap-xxxhdpi/ic_add_friend3.png"
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/layout_layout_add_action.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/layout_add_action.xml"
     },
     {
         "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/mipmap-xxxhdpi_ic_check_select.png.flat",
@@ -18,10 +22,6 @@
     {
         "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/mipmap-xxxhdpi_ic_back.png.flat",
         "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/mipmap-xxxhdpi/ic_back.png"
-    },
-    {
-        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/layout_layout_add_action.xml.flat",
-        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/layout_add_action.xml"
     },
     {
         "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/mipmap-xhdpi_ic_launcher_round.webp.flat",
@@ -108,20 +108,16 @@
         "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/mipmap-xxxhdpi/ic_chat.png"
     },
     {
-        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/mipmap-hdpi_ic_launcher.webp.flat",
-        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/mipmap-hdpi/ic_launcher.webp"
-    },
-    {
         "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/mipmap-xxxhdpi_ic_add_friend2.png.flat",
         "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/mipmap-xxxhdpi/ic_add_friend2.png"
     },
     {
-        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/drawable_selector_checkbox.xml.flat",
-        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/drawable/selector_checkbox.xml"
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/mipmap-hdpi/ic_launcher.webp"
     },
     {
-        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/mipmap-xxxhdpi_ic_back2.png.flat",
-        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/mipmap-xxxhdpi/ic_back2.png"
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/drawable_selector_checkbox.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/drawable/selector_checkbox.xml"
     },
     {
         "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
@@ -166,6 +162,10 @@
     {
         "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/drawable-anydpi-v24_ic_launcher_foreground.xml.flat",
         "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/generated/res/pngs/debug/drawable-anydpi-v24/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/layout_activity_verification_code.xml.flat",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/activity_verification_code.xml"
     },
     {
         "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/merged_res/debug/mipmap-xxxhdpi_ic_open_eye.png.flat",

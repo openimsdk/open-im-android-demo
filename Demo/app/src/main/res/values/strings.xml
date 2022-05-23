@@ -26,5 +26,10 @@
     <string name="disassociate">解除好友关系</string>
     <string name="detail">详情</string>
     <string name="friend_verify">好友验证</string>
+    <string name="verification_code_send_mail">验证码已发送至邮箱</string>
+    <string name="verification_code_send_phone">验证码已发送至手机</string>
+    <string name="input_verification_code">请输入验证码</string>
+    <string name="resend_verification_code">重发验证码</string>
+    <string name="after">后</string>
 
 </resources>

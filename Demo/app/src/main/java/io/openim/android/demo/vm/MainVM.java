@@ -23,11 +23,11 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     protected void viewCreate() {
         IMEvent.getInstance().addConnListener(this);
 
-        loginCertificate = LoginCertificate.getCache(context);
+        loginCertificate = LoginCertificate.getCache(getContext());
         OpenIMClient.getInstance().login(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-                    IView.loginErr(error);
+                    IView.err(error);
             }
 
             @Override
@@ -44,7 +44,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
                     public void onSuccess(UserInfo data) {
                         // 返回当前登录用户的资料
                         loginCertificate.nickname = data.getNickname();
-                        loginCertificate.cache(context);
+                        loginCertificate.cache(getContext());
                         nickname.setValue(loginCertificate.nickname);
                     }
                 });

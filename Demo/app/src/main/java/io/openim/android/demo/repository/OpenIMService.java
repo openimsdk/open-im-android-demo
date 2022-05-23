@@ -11,8 +11,16 @@ import retrofit2.http.POST;
 ;
 
 
-public interface OpenIMService{
-
+public interface OpenIMService {
     @POST("/demo/login")
     Observable<ResponseBody> login(@Body RequestBody requestBody);
+
+    @POST("/demo/password")
+    Observable<ResponseBody> register(@Body RequestBody requestBody);
+
+    @POST("/demo/password")
+    Observable<ResponseBody> getVerificationCode(@Body RequestBody requestBody);
+
+    @POST("/demo/password")
+    Observable<ResponseBody> checkVerificationCode(@Body RequestBody requestBody);
 }

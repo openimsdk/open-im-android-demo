@@ -1,5 +1,10 @@
 R_DEF: Internal format may change without notice
 local
+attr? strokeBackground
+attr? strokeHeight
+attr? strokeLength
+attr? strokePadding
+attr? strokeWidth
 color black
 color black_overlay
 color light_blue_600
@@ -13,6 +18,7 @@ color teal_200
 color teal_700
 color white
 dimen comm_title_high
+drawable bg_edit_vercode
 drawable sty_radius_4_f0f0f0
 id back
 id editText
@@ -21,11 +27,13 @@ layout layout_search
 layout view_back
 layout view_dividing_line
 layout view_waitdilog
+mipmap ic_back2
 mipmap ic_my_friend
 mipmap ic_search
 string friday
 string monday
 string saturday
+string send
 string sunday
 string thursday
 string tuesday
@@ -35,4 +43,5 @@ style Theme.Demo
 style Widget.Theme.Demo.ButtonBar.Fullscreen
 style dialog_tran
 style dialog_tran2
+styleable CodeEditText strokeLength strokeWidth strokeHeight strokePadding strokeBackground
 styleable customize android:clickable android:hint

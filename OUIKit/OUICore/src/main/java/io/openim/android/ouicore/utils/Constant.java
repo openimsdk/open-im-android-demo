@@ -1,6 +1,7 @@
 package io.openim.android.ouicore.utils;
 
 public class Constant {
+
     public static final String DEFAULT_IP = "121.37.25.71";
 
     //IM sdk api地址
@@ -9,7 +10,7 @@ public class Constant {
     public static final String APP_AUTH_URL = "http://" + DEFAULT_IP + ":10004";
     //web socket
     public static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":10001";
-
+    public static final String VM = "vm";
 
     public static class Event {
         //已读数量变化

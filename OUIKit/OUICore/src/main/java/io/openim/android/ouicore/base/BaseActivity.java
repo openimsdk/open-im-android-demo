@@ -1,6 +1,9 @@
 package io.openim.android.ouicore.base;
 
+import static io.openim.android.ouicore.utils.Constant.VM;
+
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,12 +17,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.SinkHelper;
 
 
 public class BaseActivity<T extends BaseViewModel> extends AppCompatActivity implements IView {
 
     protected T vm;
+    private String VMCanonicalName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,8 +38,17 @@ public class BaseActivity<T extends BaseViewModel> extends AppCompatActivity imp
 
     protected void bindVM(Class<T> vm) {
         this.vm = new ViewModelProvider(this).get(vm);
+        VMCanonicalName = this.vm.getClass().getCanonicalName();
         this.vm.setContext(this);
         this.vm.setIView(this);
+    }
+
+    protected void bindVM(Class<T> vm, boolean shareToCache) {
+        bindVM(vm);
+        if (shareToCache && !BaseApp.viewModels.containsKey(VMCanonicalName)) {
+            BaseApp.viewModels.put(VMCanonicalName, this.vm);
+        }
+
     }
 
     protected void setLightStatus() {
@@ -55,6 +69,18 @@ public class BaseActivity<T extends BaseViewModel> extends AppCompatActivity imp
 
     public void setTouchClearFocus(boolean touchClearFocus) {
         this.touchClearFocus = touchClearFocus;
+    }
+
+
+    public void bindVMByCache(Class<T> vm) {
+        String key = vm.getCanonicalName();
+        if (BaseApp.viewModels.containsKey(key))
+            this.vm = (T) BaseApp.viewModels.get(key);
+    }
+
+    public void removeCacheVM() {
+        String key = vm.getClass().getCanonicalName();
+        BaseApp.viewModels.remove(key);
     }
 
     /**

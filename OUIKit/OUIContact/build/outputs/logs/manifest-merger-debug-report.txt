@@ -1,35 +1,35 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml:2:1-10:12
-INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml:2:1-10:12
-INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml:2:1-10:12
+ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml:2:1-10:12
+INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml:2:1-10:12
+INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml:2:1-10:12
 	package
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml:3:5-43
-		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml
-		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml:3:5-43
+		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml
+		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml
 	xmlns:android
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml:2:11-69
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml:2:11-69
 application
-ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml:5:5-9:19
+ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml:5:5-9:19
 	android:theme
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml:5:18-51
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml:5:18-51
 activity#io.openim.android.ouicontact.ui.ChatActivity
-ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml:6:9-8:40
+ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml:6:9-8:40
 	android:exported
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml:8:13-37
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml:8:13-37
 	android:name
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml:7:13-44
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml:7:13-44
 uses-sdk
-INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml
-INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml
-INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml
-INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml
+INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml
+INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml
+INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml
+INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml
 	android:targetSdkVersion
-		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml
-		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml
+		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml
+		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml
-		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/src/main/AndroidManifest.xml
+		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml
+		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/src/main/AndroidManifest.xml

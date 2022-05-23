@@ -1,11 +1,12 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-44:12
-INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-44:12
-INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-44:12
-INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-44:12
-MERGED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-15:12
+ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-47:12
+INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-47:12
+INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-47:12
+INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-47:12
+MERGED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-15:12
 MERGED from [:OUICore] /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUICore/build/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-12:12
+MERGED from [com.github.Wynsbin:VerificationCodeInputView:1.0.2] /Users/wj/.gradle/caches/transforms-3/723eab791b898464ccf2725cc77431d4/transformed/jetified-VerificationCodeInputView-1.0.2/AndroidManifest.xml:2:1-11:12
 MERGED from [androidx.databinding:databinding-adapters:7.1.3] /Users/wj/.gradle/caches/transforms-3/8b39fba5b0f71f18bd8866375ad31073/transformed/databinding-adapters-7.1.3/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.databinding:databinding-runtime:7.1.3] /Users/wj/.gradle/caches/transforms-3/24d86367d6d131aafb91c9d62a44e681/transformed/databinding-runtime-7.1.3/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.databinding:viewbinding:7.1.3] /Users/wj/.gradle/caches/transforms-3/f7da5741e1bad5a5b65960363aecbe92/transformed/jetified-viewbinding-7.1.3/AndroidManifest.xml:17:1-24:12
@@ -63,27 +64,27 @@ MERGED from [androidx.print:print:1.0.0] /Users/wj/.gradle/caches/transforms-3/5
 MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/wj/.gradle/caches/transforms-3/9e495b0e9f7cb70c1ccd9a8c2fa3dac5/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.annotation:annotation-experimental:1.0.0] /Users/wj/.gradle/caches/transforms-3/f24394015edec8364633047ef63f25f7/transformed/jetified-annotation-experimental-1.0.0/AndroidManifest.xml:17:1-24:12
 MERGED from [io.openim:core-sdk:2.0.8.1] /Users/wj/.gradle/caches/transforms-3/684c38cf26fe8ba0be3b62476d0130cf/transformed/jetified-core-sdk-2.0.8.1/AndroidManifest.xml:1:1-2:50
-INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-44:12
-INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-44:12
-INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-44:12
+INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-47:12
+INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-47:12
+INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-47:12
 	package
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:3:5-37
 		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml
 		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml
 	android:versionName
 		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-44:12
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-47:12
 		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml
 	android:versionCode
 		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-44:12
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:1-47:12
 		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml
 	xmlns:android
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:2:11-69
 application
-ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:5:5-42:19
-MERGED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:5-13:19
-MERGED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:5-13:19
+ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:5:5-45:19
+MERGED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:5-13:19
+MERGED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:5-13:19
 MERGED from [com.google.android.material:material:1.4.0] /Users/wj/.gradle/caches/transforms-3/df6ea8679774a514a8fa7722b490163e/transformed/material-1.4.0/AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.4.0] /Users/wj/.gradle/caches/transforms-3/df6ea8679774a514a8fa7722b490163e/transformed/material-1.4.0/AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.0.4] /Users/wj/.gradle/caches/transforms-3/4a79dd0cd2da24927a671af35ef95423/transformed/constraintlayout-2.0.4/AndroidManifest.xml:9:5-20
@@ -103,7 +104,7 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/wj/.
 	android:label
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:9:9-41
 	android:icon
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:8:9-43
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:8:9-41
 	android:allowBackup
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:7:9-35
 	android:theme
@@ -112,72 +113,80 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/wj/.
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:12:9-44
 	android:name
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:6:9-40
-activity#io.openim.android.demo.ui.search.SendVerifyActivity
+activity#io.openim.android.demo.ui.login.VerificationCodeActivity
 ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:13:9-15:40
 	android:exported
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:15:13-37
 	android:name
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:14:13-57
-activity#io.openim.android.demo.ui.search.PersonDetailActivity
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:14:13-62
+activity#io.openim.android.demo.ui.search.SendVerifyActivity
 ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:16:9-18:40
 	android:exported
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:18:13-37
 	android:name
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:17:13-59
-activity#io.openim.android.demo.ui.search.SearchPersonActivity
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:17:13-57
+activity#io.openim.android.demo.ui.search.PersonDetailActivity
 ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:19:9-21:40
 	android:exported
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:21:13-37
 	android:name
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:20:13-59
-activity#io.openim.android.demo.ui.search.AddFriendActivity
+activity#io.openim.android.demo.ui.search.SearchPersonActivity
 ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:22:9-24:40
 	android:exported
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:24:13-37
 	android:name
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:23:13-56
-activity#io.openim.android.demo.ui.login.RegisterActivity
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:23:13-59
+activity#io.openim.android.demo.ui.search.AddFriendActivity
 ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:25:9-27:40
 	android:exported
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:27:13-37
 	android:name
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:26:13-54
-activity#io.openim.android.demo.ui.login.LoginActivity
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:26:13-56
+activity#io.openim.android.demo.ui.login.RegisterActivity
 ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:28:9-30:40
 	android:exported
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:30:13-37
 	android:name
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:29:13-51
-activity#io.openim.android.demo.SplashActivity
-ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:31:9-40:20
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:29:13-54
+activity#io.openim.android.demo.ui.login.LoginActivity
+ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:31:9-33:40
 	android:exported
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:33:13-36
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:33:13-37
+	android:name
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:32:13-51
+activity#io.openim.android.demo.SplashActivity
+ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:34:9-43:20
+	android:exported
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:36:13-36
 	android:theme
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:34:13-47
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:37:13-47
 	android:name
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:32:13-43
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:35:13-43
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:35:13-39:29
+ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:38:13-42:29
 action#android.intent.action.MAIN
-ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:36:17-69
+ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:39:17-69
 	android:name
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:36:25-66
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:39:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:38:17-77
+ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:41:17-77
 	android:name
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:38:27-74
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:41:27-74
 activity#io.openim.android.demo.ui.main.MainActivity
-ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:41:9-58
+ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:44:9-58
 	android:name
-		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:41:19-55
+		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml:44:19-55
 uses-sdk
 INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml
 INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml
-MERGED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
-MERGED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
 MERGED from [:OUICore] /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUICore/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
 MERGED from [:OUICore] /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUICore/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [com.github.Wynsbin:VerificationCodeInputView:1.0.2] /Users/wj/.gradle/caches/transforms-3/723eab791b898464ccf2725cc77431d4/transformed/jetified-VerificationCodeInputView-1.0.2/AndroidManifest.xml:7:5-9:41
+MERGED from [com.github.Wynsbin:VerificationCodeInputView:1.0.2] /Users/wj/.gradle/caches/transforms-3/723eab791b898464ccf2725cc77431d4/transformed/jetified-VerificationCodeInputView-1.0.2/AndroidManifest.xml:7:5-9:41
 MERGED from [androidx.databinding:databinding-adapters:7.1.3] /Users/wj/.gradle/caches/transforms-3/8b39fba5b0f71f18bd8866375ad31073/transformed/databinding-adapters-7.1.3/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.databinding:databinding-adapters:7.1.3] /Users/wj/.gradle/caches/transforms-3/8b39fba5b0f71f18bd8866375ad31073/transformed/databinding-adapters-7.1.3/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.databinding:databinding-runtime:7.1.3] /Users/wj/.gradle/caches/transforms-3/24d86367d6d131aafb91c9d62a44e681/transformed/databinding-runtime-7.1.3/AndroidManifest.xml:20:5-22:41
@@ -303,11 +312,11 @@ INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/An
 		ADDED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml
 		INJECTED from /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/AndroidManifest.xml
 activity#io.openim.android.ouicontact.ui.ChatActivity
-ADDED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:10:9-12:40
+ADDED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:10:9-12:40
 	android:exported
-		ADDED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:12:13-37
+		ADDED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:12:13-37
 	android:name
-		ADDED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:11:13-72
+		ADDED from [:OUIContact] /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/build/intermediates/merged_manifest/debug/AndroidManifest.xml:11:13-72
 uses-permission#android.permission.ACCESS_NETWORK_STATE
 ADDED from [:OUICore] /Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUICore/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:5-79
 	android:name

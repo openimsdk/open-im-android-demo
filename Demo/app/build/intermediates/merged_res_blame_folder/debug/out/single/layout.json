@@ -36,12 +36,12 @@
         "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/activity_main.xml"
     },
     {
-        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeDebugResources/stripped.dir/layout/activity_search.xml",
-        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/activity_search.xml"
-    },
-    {
         "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeDebugResources/stripped.dir/layout/activity_person_detail.xml",
         "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/activity_person_detail.xml"
+    },
+    {
+        "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeDebugResources/stripped.dir/layout/activity_verification_code.xml",
+        "source": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/src/main/res/layout/activity_verification_code.xml"
     },
     {
         "merged": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/app/build/intermediates/incremental/mergeDebugResources/stripped.dir/layout/blank_fragment.xml",

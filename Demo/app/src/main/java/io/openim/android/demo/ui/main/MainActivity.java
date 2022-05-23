@@ -82,7 +82,12 @@ public class MainActivity extends BaseActivity<MainVM> implements LoginVM.ViewAc
     }
 
     @Override
-    public void loginErr(String msg) {
+    public void err(String msg) {
+
+    }
+
+    @Override
+    public void succ(Object o) {
 
     }
 

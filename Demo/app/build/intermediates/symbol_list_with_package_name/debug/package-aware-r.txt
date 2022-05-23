@@ -804,7 +804,11 @@ attr state_lifted
 attr statusBarBackground
 attr statusBarForeground
 attr statusBarScrim
+attr strokeBackground
 attr strokeColor
+attr strokeHeight
+attr strokeLength
+attr strokePadding
 attr strokeWidth
 attr subMenuArrow
 attr submitBackground
@@ -946,6 +950,22 @@ attr ttcIndex
 attr useCompatPadding
 attr useMaterialThemeColors
 attr values
+attr vciv_et_background
+attr vciv_et_cursor_color
+attr vciv_et_cursor_height
+attr vciv_et_cursor_width
+attr vciv_et_foucs_background
+attr vciv_et_height
+attr vciv_et_inputType
+attr vciv_et_number
+attr vciv_et_spacing
+attr vciv_et_text_color
+attr vciv_et_text_size
+attr vciv_et_underline_default_color
+attr vciv_et_underline_focus_color
+attr vciv_et_underline_height
+attr vciv_et_underline_show
+attr vciv_et_width
 attr verticalOffset
 attr viewInflaterClass
 attr visibilityMode
@@ -1703,6 +1723,7 @@ drawable abc_textfield_search_material
 drawable abc_vector_test
 drawable avd_hide_password
 drawable avd_show_password
+drawable bg_edit_vercode
 drawable btn_checkbox_checked_mtrl
 drawable btn_checkbox_checked_to_unchecked_mtrl_animation
 drawable btn_checkbox_unchecked_mtrl
@@ -1767,6 +1788,8 @@ drawable sty_radius_unright_30
 drawable test_custom_background
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
+drawable vciv_et_cursor
+drawable vciv_paste_bg
 id ALT
 id BOTTOM_END
 id BOTTOM_START
@@ -1815,6 +1838,7 @@ id accessibility_custom_action_6
 id accessibility_custom_action_7
 id accessibility_custom_action_8
 id accessibility_custom_action_9
+id accountTv
 id action0
 id action_bar
 id action_bar_activity_content
@@ -1887,9 +1911,9 @@ id clear_text
 id clip_horizontal
 id clip_vertical
 id clockwise
+id codeEditText
 id collapseActionView
 id confirm_button
-id confrim_btn
 id container
 id content
 id content2
@@ -1897,6 +1921,7 @@ id contentPanel
 id contiguous
 id coordinator
 id cos
+id countdown
 id counterclockwise
 id custom
 id customPanel
@@ -1941,7 +1966,6 @@ id endToStart
 id end_padder
 id enterAlways
 id enterAlwaysCollapsed
-id et_input_message
 id exitUntilCollapsed
 id expand_activities_button
 id expanded_menu
@@ -2077,6 +2101,8 @@ id notFind
 id notification_background
 id notification_main_column
 id notification_main_column_container
+id number
+id numberPassword
 id off
 id on
 id onAttachStateChangeListener
@@ -2110,13 +2136,12 @@ id rectangles
 id recyclerView
 id registerTv
 id remark
+id resend
 id reverseSawtooth
 id right
 id rightToLeft
 id right_icon
 id right_side
-id rl_inputdlg_view
-id rl_outside_view
 id root
 id rounded
 id row_index_key
@@ -2205,6 +2230,7 @@ id test_radiobutton_app_button_tint
 id text
 id text2
 id textEnd
+id textPassword
 id textSpacerNoButtons
 id textSpacerNoTitle
 id textStart
@@ -2330,6 +2356,7 @@ layout activity_person_detail
 layout activity_register
 layout activity_search_person
 layout activity_send_verify
+layout activity_verification_code
 layout blank_fragment
 layout custom_dialog
 layout design_bottom_navigation_item
@@ -2347,7 +2374,6 @@ layout design_navigation_menu
 layout design_navigation_menu_item
 layout design_text_input_end_icon
 layout design_text_input_start_icon
-layout dialog_input_edit
 layout fragment_contact_list
 layout layout_add_action
 layout layout_contact_item
@@ -2491,6 +2517,7 @@ string abc_shareactionprovider_share_with_application
 string abc_toolbar_collapse_description
 string add
 string add_friend
+string after
 string app_name
 string appbar_scrolling_view_behavior
 string bottom_sheet_behavior
@@ -2515,6 +2542,7 @@ string id
 string input_mail
 string input_password
 string input_phone
+string input_verification_code
 string item_view_role_description
 string login
 string mail
@@ -2591,6 +2619,7 @@ string protocol
 string read
 string register
 string remove
+string resend_verification_code
 string saturday
 string search
 string search_by_id
@@ -2603,6 +2632,8 @@ string thursday
 string top
 string tuesday
 string typing
+string verification_code_send_mail
+string verification_code_send_phone
 string wednesday
 string x_recycler_click_load_more
 string x_recycler_data_empty
@@ -3376,6 +3407,7 @@ styleable ChipGroup checkedChip chipSpacing chipSpacingHorizontal chipSpacingVer
 styleable CircularProgressIndicator indicatorDirectionCircular indicatorInset indicatorSize
 styleable ClockFaceView clockFaceBackgroundColor clockNumberTextColor
 styleable ClockHandView clockHandColor materialCircleRadius selectorSize
+styleable CodeEditText strokeWidth strokeBackground strokeHeight strokeLength strokePadding
 styleable CollapsingToolbarLayout collapsedTitleGravity collapsedTitleTextAppearance contentScrim expandedTitleGravity expandedTitleMargin expandedTitleMarginBottom expandedTitleMarginEnd expandedTitleMarginStart expandedTitleMarginTop expandedTitleTextAppearance extraMultilineHeightEnabled forceApplySystemWindowInsetTop maxLines scrimAnimationDuration scrimVisibleHeightTrigger statusBarScrim title titleCollapseMode titleEnabled toolbarId
 styleable CollapsingToolbarLayout_Layout layout_collapseMode layout_collapseParallaxMultiplier
 styleable ColorStateListItem android_color android_alpha alpha
@@ -3479,6 +3511,7 @@ styleable Tooltip android_textAppearance android_padding android_layout_margin a
 styleable Transform android_transformPivotX android_transformPivotY android_translationX android_translationY android_scaleX android_scaleY android_rotation android_rotationX android_rotationY android_translationZ android_elevation
 styleable Transition android_id autoTransition constraintSetEnd constraintSetStart duration layoutDuringTransition motionInterpolator pathMotionArc staggered transitionDisable transitionFlags
 styleable Variant constraints region_heightLessThan region_heightMoreThan region_widthLessThan region_widthMoreThan
+styleable VerificationCodeInputView vciv_et_background vciv_et_cursor_color vciv_et_cursor_height vciv_et_cursor_width vciv_et_foucs_background vciv_et_height vciv_et_inputType vciv_et_number vciv_et_spacing vciv_et_text_color vciv_et_text_size vciv_et_underline_default_color vciv_et_underline_focus_color vciv_et_underline_height vciv_et_underline_show vciv_et_width
 styleable View android_theme android_focusable paddingEnd paddingStart theme
 styleable ViewBackgroundHelper android_background backgroundTint backgroundTintMode
 styleable ViewPager2 android_orientation

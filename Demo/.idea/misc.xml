@@ -3,8 +3,22 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../../layout/custom_preview.xml" value="0.21851851851851853" />
+        <entry key="../OUIKit/OUIContact/src/main/res/drawable/sty_radius_30_red.xml" value="0.241" />
+        <entry key="../OUIKit/OUIContact/src/main/res/layout/activity_chat.xml" value="0.1" />
+        <entry key="../OUIKit/OUIContact/src/main/res/layout/layout_loading_small.xml" value="0.15487382483918852" />
+        <entry key="../OUIKit/OUIContact/src/main/res/layout/layout_msg.xml" value="0.15487382483918852" />
+        <entry key="../OUIKit/OUIContact/src/main/res/layout/layout_msg_txt_left.xml" value="0.15487382483918852" />
+        <entry key="../OUIKit/OUIContact/src/main/res/layout/layout_msg_txt_right.xml" value="0.15487382483918852" />
+        <entry key="../OUIKit/OUICore/src/main/res/drawable/bg_edit_vercode.xml" value="0.1205" />
+        <entry key="../OUIKit/OUICore/src/main/res/drawable/sty_radius_4_f0f0f0.xml" value="0.1205" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1205" />
+        <entry key="app/src/main/res/drawable/launch_background.xml" value="0.1205" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_register.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_verification_code.xml" value="0.2" />
       </map>
     </option>
   </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK" />
 </project>

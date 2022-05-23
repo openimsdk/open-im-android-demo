@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingComponent;
 import androidx.databinding.ViewDataBinding;
 import io.openim.android.demo.databinding.ActivityLoginBindingImpl;
 import io.openim.android.demo.databinding.ActivityMainBindingImpl;
+import io.openim.android.demo.databinding.ActivityRegisterBindingImpl;
 import io.openim.android.demo.databinding.ActivitySearchPersonBindingImpl;
 import io.openim.android.demo.databinding.ActivitySendVerifyBindingImpl;
 import io.openim.android.demo.databinding.LayoutLoginBindingImpl;
@@ -26,17 +27,20 @@ public class DataBinderMapperImpl extends DataBinderMapper {
 
   private static final int LAYOUT_ACTIVITYMAIN = 2;
 
-  private static final int LAYOUT_ACTIVITYSEARCHPERSON = 3;
+  private static final int LAYOUT_ACTIVITYREGISTER = 3;
 
-  private static final int LAYOUT_ACTIVITYSENDVERIFY = 4;
+  private static final int LAYOUT_ACTIVITYSEARCHPERSON = 4;
 
-  private static final int LAYOUT_LAYOUTLOGIN = 5;
+  private static final int LAYOUT_ACTIVITYSENDVERIFY = 5;
 
-  private static final SparseIntArray INTERNAL_LAYOUT_ID_LOOKUP = new SparseIntArray(5);
+  private static final int LAYOUT_LAYOUTLOGIN = 6;
+
+  private static final SparseIntArray INTERNAL_LAYOUT_ID_LOOKUP = new SparseIntArray(6);
 
   static {
     INTERNAL_LAYOUT_ID_LOOKUP.put(io.openim.android.demo.R.layout.activity_login, LAYOUT_ACTIVITYLOGIN);
     INTERNAL_LAYOUT_ID_LOOKUP.put(io.openim.android.demo.R.layout.activity_main, LAYOUT_ACTIVITYMAIN);
+    INTERNAL_LAYOUT_ID_LOOKUP.put(io.openim.android.demo.R.layout.activity_register, LAYOUT_ACTIVITYREGISTER);
     INTERNAL_LAYOUT_ID_LOOKUP.put(io.openim.android.demo.R.layout.activity_search_person, LAYOUT_ACTIVITYSEARCHPERSON);
     INTERNAL_LAYOUT_ID_LOOKUP.put(io.openim.android.demo.R.layout.activity_send_verify, LAYOUT_ACTIVITYSENDVERIFY);
     INTERNAL_LAYOUT_ID_LOOKUP.put(io.openim.android.demo.R.layout.layout_login, LAYOUT_LAYOUTLOGIN);
@@ -62,6 +66,12 @@ public class DataBinderMapperImpl extends DataBinderMapper {
             return new ActivityMainBindingImpl(component, view);
           }
           throw new IllegalArgumentException("The tag for activity_main is invalid. Received: " + tag);
+        }
+        case  LAYOUT_ACTIVITYREGISTER: {
+          if ("layout/activity_register_0".equals(tag)) {
+            return new ActivityRegisterBindingImpl(component, view);
+          }
+          throw new IllegalArgumentException("The tag for activity_register is invalid. Received: " + tag);
         }
         case  LAYOUT_ACTIVITYSEARCHPERSON: {
           if ("layout/activity_search_person_0".equals(tag)) {
@@ -120,30 +130,33 @@ public class DataBinderMapperImpl extends DataBinderMapper {
 
   @Override
   public List<DataBinderMapper> collectDependencies() {
-    ArrayList<DataBinderMapper> result = new ArrayList<DataBinderMapper>(2);
+    ArrayList<DataBinderMapper> result = new ArrayList<DataBinderMapper>(3);
     result.add(new androidx.databinding.library.baseAdapters.DataBinderMapperImpl());
+    result.add(new com.wynsbin.vciv.DataBinderMapperImpl());
     result.add(new io.openim.android.ouicontact.DataBinderMapperImpl());
     return result;
   }
 
   private static class InnerBrLookup {
-    static final SparseArray<String> sKeys = new SparseArray<String>(5);
+    static final SparseArray<String> sKeys = new SparseArray<String>(6);
 
     static {
-      sKeys.put(1, "MainVM");
-      sKeys.put(2, "SearchVM");
+      sKeys.put(1, "LoginVM");
+      sKeys.put(2, "MainVM");
+      sKeys.put(3, "SearchVM");
       sKeys.put(0, "_all");
-      sKeys.put(3, "chatVM");
-      sKeys.put(4, "loginVM");
+      sKeys.put(4, "chatVM");
+      sKeys.put(5, "loginVM");
     }
   }
 
   private static class InnerLayoutIdLookup {
-    static final HashMap<String, Integer> sKeys = new HashMap<String, Integer>(5);
+    static final HashMap<String, Integer> sKeys = new HashMap<String, Integer>(6);
 
     static {
       sKeys.put("layout/activity_login_0", io.openim.android.demo.R.layout.activity_login);
       sKeys.put("layout/activity_main_0", io.openim.android.demo.R.layout.activity_main);
+      sKeys.put("layout/activity_register_0", io.openim.android.demo.R.layout.activity_register);
       sKeys.put("layout/activity_search_person_0", io.openim.android.demo.R.layout.activity_search_person);
       sKeys.put("layout/activity_send_verify_0", io.openim.android.demo.R.layout.activity_send_verify);
       sKeys.put("layout/layout_login_0", io.openim.android.demo.R.layout.layout_login);

@@ -8,10 +8,8 @@ id back
 id badge
 id call
 id card
-id confrim_btn
 id content
 id content2
-id et_input_message
 id fragment_container
 id indicator
 id input
@@ -23,14 +21,11 @@ id more
 id nickName
 id recyclerView
 id right
-id rl_inputdlg_view
-id rl_outside_view
 id root
 id send
 id time
 layout activity_chat
 layout activity_debug
-layout dialog_input_edit
 layout fragment_contact_list
 layout layout_contact_item
 layout layout_loading_small
@@ -40,6 +35,5 @@ layout layout_msg_txt_right
 mipmap ic_more
 mipmap ic_phone
 string remove
-string send
 string top
 string typing

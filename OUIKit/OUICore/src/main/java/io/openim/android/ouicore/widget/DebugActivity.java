@@ -24,19 +24,18 @@ public class DebugActivity extends FragmentActivity implements OnBase<String> {
         super.onCreate(savedInstanceState);
         IM.initSdk(this);
 
-        LoginCertificate loginCertificate= new LoginCertificate();
-        loginCertificate.userID="a@qq.com";
-        loginCertificate.nickname="a@qq.com";
-        loginCertificate.token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVSUQiOiJhQHFxLmNvbSIsIlBsYXRmb3JtIjoiQW5kcm9pZCIsImV4cCI6MTk2ODE0MTY5NSwibmJmIjoxNjUyNzgxNjk1LCJpYXQiOjE2NTI3ODE2OTV9.Xi4KvkbDiRvKhg1OK0Q0M5DV070Pa3reyXlHUmm011I";
-
+        LoginCertificate loginCertificate = new LoginCertificate();
+        loginCertificate.userID = "a@qq.com";
+        loginCertificate.nickname = "a@qq.com";
+        loginCertificate.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVSUQiOiJhQHFxLmNvbSIsIlBsYXRmb3JtIjoiQW5kcm9pZCIsImV4cCI6MTk2ODYzOTQxOSwibmJmIjoxNjUzMjc5NDE5LCJpYXQiOjE2NTMyNzk0MTl9.XAfKwQ-KDhLBn96FYgH52-OWEZjN3buCgiLxn6wlAhg";
         loginCertificate.cache(this);
-        OpenIMClient.getInstance().login(this,loginCertificate.userID,loginCertificate.token);
+        OpenIMClient.getInstance().login(this, loginCertificate.userID, loginCertificate.token);
     }
 
 
     @Override
     public void onError(int code, String error) {
-        L.e("登录失败---"+error);
+        L.e("登录失败---" + error);
 
     }
 

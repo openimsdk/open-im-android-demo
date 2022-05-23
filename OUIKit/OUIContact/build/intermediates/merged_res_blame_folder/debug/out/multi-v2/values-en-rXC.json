@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/Demo/OUIContact/build/intermediates/incremental/mergeDebugResources/merged.dir/values-en-rXC/values-en-rXC.xml",
+            "outputFile": "/Library/tuoyun/Worklist/Open-IM-Android-Demo/OUIKit/OUIContact/build/intermediates/incremental/mergeDebugResources/merged.dir/values-en-rXC/values-en-rXC.xml",
             "map": [
                 {
                     "source": "/Users/wj/.gradle/caches/transforms-3/a1605265a276ccaf05dba118648041ac/transformed/core-1.5.0/res/values-en-rXC/values-en-rXC.xml",

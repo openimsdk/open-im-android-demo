@@ -7,10 +7,8 @@ int id back 0x0
 int id badge 0x0
 int id call 0x0
 int id card 0x0
-int id confrim_btn 0x0
 int id content 0x0
 int id content2 0x0
-int id et_input_message 0x0
 int id fragment_container 0x0
 int id indicator 0x0
 int id input 0x0
@@ -22,14 +20,11 @@ int id more 0x0
 int id nickName 0x0
 int id recyclerView 0x0
 int id right 0x0
-int id rl_inputdlg_view 0x0
-int id rl_outside_view 0x0
 int id root 0x0
 int id send 0x0
 int id time 0x0
 int layout activity_chat 0x0
 int layout activity_debug 0x0
-int layout dialog_input_edit 0x0
 int layout fragment_contact_list 0x0
 int layout layout_contact_item 0x0
 int layout layout_loading_small 0x0
@@ -39,6 +34,5 @@ int layout layout_msg_txt_right 0x0
 int mipmap ic_more 0x0
 int mipmap ic_phone 0x0
 int string remove 0x0
-int string send 0x0
 int string top 0x0
 int string typing 0x0

@@ -1,16 +1,25 @@
 package io.openim.android.ouicore.base;
 
+import android.app.Activity;
 import android.content.Context;
 
 import androidx.lifecycle.ViewModel;
 
-public class BaseViewModel<T extends IView>  extends ViewModel {
-    protected Context context;
+import java.io.Serializable;
+import java.lang.ref.SoftReference;
+
+public class BaseViewModel<T extends IView> extends ViewModel {
+    public SoftReference<Context> context;
     protected T IView;
 
-    public void setContext(Context context) {
-        this.context = context;
+    public Context getContext() {
+        return context.get();
     }
+
+    public void setContext(Context context) {
+        this.context = new SoftReference<>(context);
+    }
+
     public void setIView(T iView) {
         this.IView = iView;
     }
@@ -18,6 +27,8 @@ public class BaseViewModel<T extends IView>  extends ViewModel {
     //视图销毁时
     protected void viewDestroy() {
     }
+
     //视图已构建
-    protected void viewCreate(){}
+    protected void viewCreate() {
+    }
 }

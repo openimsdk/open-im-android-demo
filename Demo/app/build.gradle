@@ -62,7 +62,8 @@ dependencies {
     implementation 'com.alibaba:arouter-api:1.5.2'
     annotationProcessor 'com.alibaba:arouter-compiler:1.5.2'
 
-
+    implementation 'com.github.Wynsbin:VerificationCodeInputView:1.0.2'
+    
     api project(':OUICore')
     if(!isModule){
         implementation project(':OUIContact')
