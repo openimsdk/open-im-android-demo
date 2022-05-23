@@ -1,0 +1,48 @@
+
+pluginManagement {
+    repositories {
+        maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/google' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/gradle-plugin' }
+        maven {
+            allowInsecureProtocol = true
+            url 'http://121.37.25.71:8081/repository/maven2/'
+        }
+        maven {
+            url "https://jitpack.io"
+        }
+//        gradlePluginPortal()
+//        google()
+//        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/google' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/gradle-plugin' }
+        maven {
+            allowInsecureProtocol = true
+            url 'http://121.37.25.71:8081/repository/maven2/'
+        }
+        maven {
+            url "https://jitpack.io"
+        }
+//        google()
+//        mavenCentral()
+    }
+}
+rootProject.name = "Demo"
+include ':app'
+
+include ':OpenIM-SDK'
+project(':OpenIM-SDK').projectDir = new File(settingsDir, '../Open-IM-SDK-Android/OpenIM-SDK')
+
+include ':OUICore'
+project(':OUICore').projectDir = new File(settingsDir, '../OUIKit/OUICore')
+
+include ':OUIContact'
+project(':OUIContact').projectDir = new File(settingsDir, '../OUIKit/OUIContact')

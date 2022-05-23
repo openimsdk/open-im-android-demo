@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../OUIKit/OUIContact/src/main/res/layout/activity_chat.xml" value="0.1265625" />
+        <entry key="../OUIKit/OUIContact/src/main/res/layout/dialog_input_edit.xml" value="0.18" />
+        <entry key="../OUIKit/OUIContact/src/main/res/layout/layout_contact_item.xml" value="0.1828125" />
+        <entry key="../OUIKit/OUIContact/src/main/res/layout/layout_loading_small.xml" value="0.12864583333333332" />
+        <entry key="app/src/main/res/layout/activity_send_verify.xml" value="0.15462962962962962" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK" />
+</project>
