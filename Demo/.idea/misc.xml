@@ -3,66 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="../../../../../layout/custom_preview.xml" value="1.0" />
-        <entry key="../OUIKit/OUICore/src/main/res/drawable/sty_radius_30_red.xml" value="0.1" />
-        <entry key="../OUIKit/OUICore/src/main/res/layout/layout_search.xml" value="0.1" />
-        <entry key="../OUIKit/OUICore/src/main/res/layout/view_back.xml" value="0.10885700148441366" />
-        <entry key="../OUIKit/OUICore/src/main/res/layout/view_dividing_line.xml" value="0.15487382483918852" />
-        <entry key="../OUIKit/OUICore/src/main/res/layout/view_waitdilog.xml" value="0.15338882282996433" />
-        <entry key="OUIContact/src/main/res/drawable/sty_radius_30_red.xml" value="0.145" />
-        <entry key="OUIContact/src/main/res/drawable/sty_radius_unleft_30.xml" value="0.145" />
-        <entry key="OUIContact/src/main/res/drawable/sty_radius_unright_30.xml" value="0.1" />
-        <entry key="OUIContact/src/main/res/layout/activity_chat.xml" value="0.13712374581939799" />
-        <entry key="OUIContact/src/main/res/layout/activity_debug.xml" value="0.23107411811335712" />
-        <entry key="OUIContact/src/main/res/layout/contact_list_fragment.xml" value="0.23998020781791193" />
-        <entry key="OUIContact/src/main/res/layout/dialog_input_edit.xml" value="0.24177566389219182" />
-        <entry key="OUIContact/src/main/res/layout/fragment_contact_list.xml" value="0.1" />
-        <entry key="OUIContact/src/main/res/layout/layout_contact_item.xml" value="0.1" />
-        <entry key="OUIContact/src/main/res/layout/layout_loading_small.xml" value="0.1" />
-        <entry key="OUIContact/src/main/res/layout/layout_msg.xml" value="0.1" />
-        <entry key="OUIContact/src/main/res/layout/layout_msg_txt.xml" value="0.1" />
-        <entry key="OUIContact/src/main/res/layout/layout_msg_txt_left.xml" value="0.22" />
-        <entry key="OUIContact/src/main/res/layout/layout_msg_txt_right.xml" value="0.14" />
-        <entry key="OUIContact/src/main/res/layout/layout_txt.xml" value="0.13211281543790204" />
-        <entry key="OUIContact/src/main/res/layout/view_waitdilog.xml" value="0.1" />
-        <entry key="app/src/main/res/drawable-en-rUS/ic_launcher_background.xml" value="0.1445" />
-        <entry key="app/src/main/res/drawable-en-rUS/launch_background.xml" value="0.1445" />
-        <entry key="app/src/main/res/drawable/checkbox_selector.xml" value="0.241" />
-        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
-        <entry key="app/src/main/res/drawable/launch_background.xml" value="0.1445" />
-        <entry key="app/src/main/res/drawable/selector_open_eyes.xml" value="0.253" />
-        <entry key="app/src/main/res/layout/activity_add_friend.xml" value="0.15487382483918852" />
-        <entry key="app/src/main/res/layout/activity_login.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_person_detail.xml" value="0.2" />
-        <entry key="app/src/main/res/layout/activity_register.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/activity_search.xml" value="0.18" />
-        <entry key="app/src/main/res/layout/activity_search_person.xml" value="0.17" />
-        <entry key="app/src/main/res/layout/activity_send_verify.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/activity_splash.xml" value="0.30833333333333335" />
-        <entry key="app/src/main/res/layout/blank_fragment.xml" value="0.1807372175980975" />
-        <entry key="app/src/main/res/layout/fragment_mail.xml" value="0.39001189060642094" />
-        <entry key="app/src/main/res/layout/fragment_phone.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/layout_add_action.xml" value="0.21759809750297265" />
-        <entry key="app/src/main/res/layout/layout_login.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/layout_search_item.xml" value="0.25" />
-        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1445" />
-        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1445" />
-        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_splash.xml" value="0.1445" />
+        <entry key="../OUIKit/OUIContact/src/main/res/layout/activity_chat.xml" value="0.1265625" />
+        <entry key="../OUIKit/OUIContact/src/main/res/layout/dialog_input_edit.xml" value="0.18" />
+        <entry key="../OUIKit/OUIContact/src/main/res/layout/layout_contact_item.xml" value="0.1828125" />
+        <entry key="../OUIKit/OUIContact/src/main/res/layout/layout_loading_small.xml" value="0.12864583333333332" />
+        <entry key="app/src/main/res/layout/activity_send_verify.xml" value="0.15462962962962962" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
-    <output url="file://$PROJECT_DIR$/build/classes" />
-  </component>
-  <component name="ProjectType">
-    <option name="id" value="Android" />
-  </component>
-  <component name="VisualizationToolProject">
-    <option name="state">
-      <ProjectState>
-        <option name="scale" value="0.5" />
-      </ProjectState>
-    </option>
-  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK" />
 </project>

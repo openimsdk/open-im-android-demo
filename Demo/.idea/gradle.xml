@@ -7,12 +7,13 @@
         <option name="testRunner" value="GRADLE" />
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="11" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/../OUIKit/OUIContact" />
             <option value="$PROJECT_DIR$/../OUIKit/OUICore" />
-            <option value="$PROJECT_DIR$/../OUIKit/ouicontact" />
             <option value="$PROJECT_DIR$/../Open-IM-SDK-Android/OpenIM-SDK" />
           </set>
         </option>

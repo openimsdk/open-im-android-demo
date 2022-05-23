@@ -45,4 +45,4 @@ include ':OUICore'
 project(':OUICore').projectDir = new File(settingsDir, '../OUIKit/OUICore')
 
 include ':OUIContact'
-project(':OUIContact').projectDir = new File(settingsDir, '../OUIKit/ouicontact')
+project(':OUIContact').projectDir = new File(settingsDir, '../OUIKit/OUIContact')

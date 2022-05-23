@@ -3,7 +3,7 @@
 
 ext {
     //模块单独运行
-    isModule=true
+    isModule=false
 
     //android 配置
     androidConfig = [
