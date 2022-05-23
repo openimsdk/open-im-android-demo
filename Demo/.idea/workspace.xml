@@ -374,5 +374,10 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="整理文件" />
+    <option name="LAST_COMMIT_MESSAGE" value="整理文件" />
   </component>
 </project>
