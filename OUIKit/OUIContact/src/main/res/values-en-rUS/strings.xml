@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="remove">Remove</string>
+    <string name="top">置顶</string>
+    <string name="typing">正在输入…</string>
+    <string name="send">发送</string>
+</resources>

@@ -1,0 +1,23 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+
+ext {
+    //模块单独运行
+    isModule=true
+
+    //android 配置
+    androidConfig = [
+            minSdk     : 21,
+            targetSdk  : 32,
+            compileSdk : 32,
+            versionCode: 1,
+            versionName: "1.0",
+            abiFilters : ['armeabi-v7a', 'arm64-v8a']
+    ]
+
+    applicationId = [
+            "app" : "io.openim.android.demo",
+            "OuiContact" : "io.openim.android.ouicontact",
+    ]
+
+}

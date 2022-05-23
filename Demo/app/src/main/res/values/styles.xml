@@ -1,0 +1,6 @@
+<resources>
+    <style name="SplashTheme" parent="@android:style/Theme.NoTitleBar.Fullscreen">
+        <item name="android:background">@drawable/launch_background</item>
+    </style>
+
+</resources>
