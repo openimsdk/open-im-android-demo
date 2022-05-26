@@ -44,5 +44,8 @@ project(':OpenIM-SDK').projectDir = new File(settingsDir, '../Open-IM-SDK-Androi
 include ':OUICore'
 project(':OUICore').projectDir = new File(settingsDir, '../OUIKit/OUICore')
 
+include ':OUIConversation'
+project(':OUIConversation').projectDir = new File(settingsDir, '../OUIKit/OUIConversation')
+
+include ':OUIGroup'
 include ':OUIContact'
-project(':OUIContact').projectDir = new File(settingsDir, '../OUIKit/OUIContact')

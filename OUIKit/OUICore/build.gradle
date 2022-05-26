@@ -8,6 +8,10 @@ android {
     viewBinding {
         enabled = true
     }
+    dataBinding{
+        enabled = true
+    }
+
     defaultConfig {
         minSdk rootProject.ext.androidConfig.minSdk
         targetSdk rootProject.ext.androidConfig.targetSdk

@@ -1,32 +1,33 @@
 package io.openim.android.demo.ui.search;
 
-import static io.openim.android.ouicontact.utils.Constant.K_USER_ID;
 
-import androidx.appcompat.app.AppCompatActivity;
+import static io.openim.android.ouicore.utils.Constant.ID;
 
 import android.os.Bundle;
 
-import io.openim.android.demo.R;
+import com.alibaba.android.arouter.facade.annotation.Route;
+
 import io.openim.android.demo.databinding.ActivitySendVerifyBinding;
 import io.openim.android.demo.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 
-public class SendVerifyActivity extends BaseActivity<SearchVM> {
-
-    private ActivitySendVerifyBinding view;
+@Route(path = Routes.Main.SEND_VERIFY)
+public class SendVerifyActivity extends BaseActivity<SearchVM, ActivitySendVerifyBinding> {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        view = ActivitySendVerifyBinding.inflate(getLayoutInflater());
-        setLightStatus();
-        SinkHelper.get(this).setTranslucentStatus(view.getRoot());
-        setContentView(view.getRoot());
-
         bindVM(SearchVM.class);
         super.onCreate(savedInstanceState);
+        bindViewDataBinding(ActivitySendVerifyBinding.inflate(getLayoutInflater()));
+        view.setSearchVM(vm);
 
-        vm.searchContent = getIntent().getStringExtra(K_USER_ID);
+        setLightStatus();
+        SinkHelper.get(this).setTranslucentStatus(view.getRoot());
+
+        vm.searchContent = getIntent().getStringExtra(ID);
+        vm.isPerson = getIntent().getBooleanExtra(io.openim.android.ouicore.utils.Constant.IS_PERSON, true);
         listener();
         click();
     }

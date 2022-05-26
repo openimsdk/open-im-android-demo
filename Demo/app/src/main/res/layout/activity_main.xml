@@ -9,8 +9,7 @@
 
     </data>
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -58,8 +57,7 @@
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:visibility="invisible"
-                    >
+                    android:visibility="invisible">
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -89,10 +87,61 @@
 
         </androidx.cardview.widget.CardView>
 
-        <FrameLayout
-            android:id="@+id/fragment_container"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:id="@+id/fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="60dp" />
+
+            <com.lihang.ShadowLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                app:hl_shadowColor="#2a000000"
+                app:hl_shadowLimit="8dp"
+                app:hl_bottomShow="false"
+                android:layout_marginLeft="-8dp"
+                android:layout_marginRight="-8dp"
+                >
+
+                <RadioGroup
+                    android:id="@+id/menuGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:paddingTop="5dp"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/men1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:button="@null"
+                        android:drawableTop="@mipmap/ic_logo"
+                        android:gravity="center"
+                        android:textColor="#ff1b72ec"
+                        android:textSize="10sp"
+                        android:text="OpenIM" />
+
+                    <RadioButton
+                        android:id="@+id/men2"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:button="@null"
+                        android:drawableTop="@mipmap/ic_newsletter"
+                        android:gravity="center"
+                        android:textColor="#ff1b72ec"
+                        android:textSize="10sp"
+                        android:text="@string/address_book" />
+                </RadioGroup>
+            </com.lihang.ShadowLayout>
+        </RelativeLayout>
+
 
     </LinearLayout>
 </layout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.CreateGroupActivity">
+
+        <com.lwkandroid.widget.indexbar.IndexBar
+            android:id="@+id/indexBar"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            app:bg_color_normal="@android:color/transparent"
+            app:bg_color_pressed="#10000000"
+            app:text_color_normal="#3c3c3c"
+            app:text_color_pressed="#000093"
+            app:text_size_normal="14sp"
+            app:text_size_pressed="16sp" />
+    </RelativeLayout>
+</layout>
+

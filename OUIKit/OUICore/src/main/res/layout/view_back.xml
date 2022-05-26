@@ -6,5 +6,6 @@
     android:layout_centerVertical="true"
     android:layout_marginLeft="15dp"
     android:paddingLeft="8dp"
+    android:onClick="toBack"
     android:paddingRight="8dp"
     android:src="@mipmap/ic_back2" />

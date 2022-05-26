@@ -10,7 +10,7 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
 /**
- * Created by WJ on 2017/11/6.
+ * Created Parameter
  */
 public class Parameter {
     private LinkedHashMap<String, RequestBody> linkedHashMap;

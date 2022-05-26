@@ -5,8 +5,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
+import android.widget.RadioGroup;
 
-import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -15,26 +16,29 @@ import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
 import io.openim.android.demo.databinding.LayoutAddActionBinding;
 import io.openim.android.demo.ui.login.LoginActivity;
-import io.openim.android.demo.ui.search.AddFriendActivity;
+import io.openim.android.demo.ui.search.AddConversActivity;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.demo.vm.MainVM;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 
-public class MainActivity extends BaseActivity<MainVM> implements LoginVM.ViewAction {
-    ActivityMainBinding view;
+public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
 
+    private int mCurrentTabIndex;
+    private BaseFragment lastFragment, conversationListFragment, contactFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        view = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(view.getRoot());
+        bindVM(MainVM.class);
+        super.onCreate(savedInstanceState);
+        bindViewDataBinding(ActivityMainBinding.inflate(getLayoutInflater()));
+
         setLightStatus();
         SinkHelper.get(this).setTranslucentStatus(view.getRoot());
-        bindVM(MainVM.class);
+
         view.setMainVM(vm);
-        super.onCreate(savedInstanceState);
 
         vm.visibility.observe(this, v -> view.isOnline.setVisibility(v));
         click();
@@ -42,19 +46,32 @@ public class MainActivity extends BaseActivity<MainVM> implements LoginVM.ViewAc
 
     private void click() {
         showPopupWindow();
+        view.menuGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.men1)
+                    switchFragment(conversationListFragment);
+                if (checkedId == R.id.men2)
+                    switchFragment(contactFragment);
+            }
+        });
     }
 
     private void showPopupWindow() {
         view.addFriend.setOnClickListener(v -> {
             //初始化一个PopupWindow，width和height都是WRAP_CONTENT
             PopupWindow popupWindow = new PopupWindow(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             LayoutAddActionBinding view = LayoutAddActionBinding.inflate(getLayoutInflater());
-            view.addFriend.setOnClickListener(c->{
+            view.addFriend.setOnClickListener(c -> {
                 popupWindow.dismiss();
-                startActivity(new Intent(this, AddFriendActivity.class));
+                startActivity(new Intent(this, AddConversActivity.class));
             });
-
+            view.addGroup.setOnClickListener(c -> {
+                popupWindow.dismiss();
+                startActivity(new Intent(this, AddConversActivity.class)
+                    .putExtra(AddConversActivity.IS_PERSON, false));
+            });
             //设置PopupWindow的视图内容
             popupWindow.setContentView(view.getRoot());
             //点击空白区域PopupWindow消失，这里必须先设置setBackgroundDrawable，否则点击无反应
@@ -93,9 +110,43 @@ public class MainActivity extends BaseActivity<MainVM> implements LoginVM.ViewAc
 
     @Override
     public void initDate() {
-        Fragment contactListFragment = (Fragment) ARouter.getInstance().build(Routes.Contact.CONTACT_LIST).navigation();
-        if (null != contactListFragment)
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, contactListFragment).commit();
+        conversationListFragment = (BaseFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
+        contactFragment = (BaseFragment) ARouter.getInstance().build(Routes.Contact.HOME).navigation();
+
+        if (null != contactFragment) {
+            contactFragment.setPage(2);
+            switchFragment(contactFragment);
+        }
+
+        if (null != conversationListFragment) {
+            conversationListFragment.setPage(1);
+            switchFragment(conversationListFragment);
+        }
+
+//        getSupportFragmentManager().beginTransaction()
+//            .add(R.id.fragment_container, contactListFragment).commit();
+    }
+
+
+    /**
+     * 切换Fragment
+     */
+    private void switchFragment(BaseFragment fragment) {
+        try {
+            if (fragment != null && !fragment.isVisible() && mCurrentTabIndex != fragment.getPage()) {
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                if (!fragment.isAdded()) {
+                    transaction.add(R.id.fragment_container, fragment);
+                }
+                if (lastFragment != null) {
+                    transaction.hide(lastFragment);
+                }
+                transaction.show(fragment).commit();
+                lastFragment = fragment;
+                mCurrentTabIndex = lastFragment.getPage();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -2,7 +2,6 @@ package io.openim.android.ouicore.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,6 +9,8 @@ import androidx.annotation.Nullable;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+
+import io.openim.android.ouicore.R;
 
 public class AvatarImage extends androidx.appcompat.widget.AppCompatImageView {
     public AvatarImage(@NonNull Context context) {
@@ -25,13 +26,17 @@ public class AvatarImage extends androidx.appcompat.widget.AppCompatImageView {
     }
 
     public void load(String url) {
+        load(url, false);
+    }
+
+    public void load(String url, boolean isGroup) {
         if (null == url || url.isEmpty() || url.contains("ic_avatar")) {
-            setImageDrawable(getContext().getDrawable(io.openim.android.ouicore.R.mipmap.ic_my_friend));
+            setImageDrawable(getContext().getDrawable(isGroup ? R.mipmap.ic_my_group : io.openim.android.ouicore.R.mipmap.ic_my_friend));
         } else {
             Glide.with(getContext())
-                    .load(url)
-                    .centerCrop()
-                    .apply(RequestOptions.bitmapTransform(new RoundedCorners(10))).into(this);
+                .load(url)
+                .centerCrop()
+                .apply(RequestOptions.bitmapTransform(new RoundedCorners(10))).into(this);
         }
     }
 }

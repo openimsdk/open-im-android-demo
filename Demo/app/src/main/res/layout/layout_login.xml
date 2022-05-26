@@ -113,6 +113,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/phone_register"
+                    android:padding="4dp"
                     android:textColor="#ff1d6bed"
                     android:textSize="12sp" />
 

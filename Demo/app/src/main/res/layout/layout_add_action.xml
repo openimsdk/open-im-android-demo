@@ -12,33 +12,61 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:minHeight="100dp"
-
         app:cardCornerRadius="6dp"
         app:cardElevation="8dp">
-
         <LinearLayout
-            android:id="@+id/addFriend"
             android:layout_width="match_parent"
-            android:layout_height="44dp"
+            android:orientation="vertical"
             android:layout_marginTop="10dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+            android:layout_marginBottom="10dp"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/addFriend"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="15dp"
-                android:src="@mipmap/ic_add_friend" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
+                    android:src="@mipmap/ic_add_friend" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="添加好友"
-                android:textColor="#ff333333"
-                android:textSize="14sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="添加好友"
+                    android:textColor="#ff333333"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/addGroup"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
+                    android:src="@mipmap/ic_group" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_group"
+                    android:textColor="#ff333333"
+                    android:textSize="14sp" />
+            </LinearLayout>
         </LinearLayout>
+
 
     </androidx.cardview.widget.CardView>
 </LinearLayout>

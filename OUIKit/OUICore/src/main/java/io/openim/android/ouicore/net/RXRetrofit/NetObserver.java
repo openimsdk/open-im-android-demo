@@ -62,6 +62,7 @@ public abstract class NetObserver<T> implements Observer<T> {
 
     @Override
     public void onError(@NonNull Throwable e) {
+        onComplete();
         if (!isConnected()) {
             e = new NetworkException();
         }

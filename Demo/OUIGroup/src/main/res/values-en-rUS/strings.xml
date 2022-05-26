@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="apply_join">申请加入该群</string>
+    <string name="group_id">群ID号</string>
+    <string name="member">群成员</string>
+</resources>

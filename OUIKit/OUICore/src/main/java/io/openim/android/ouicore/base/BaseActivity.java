@@ -1,9 +1,7 @@
 package io.openim.android.ouicore.base;
 
-import static io.openim.android.ouicore.utils.Constant.VM;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,43 +9,61 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModel;
+import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.ViewModelProvider;
 
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.utils.SinkHelper;
 
 
-public class BaseActivity<T extends BaseViewModel> extends AppCompatActivity implements IView {
+public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> extends AppCompatActivity implements IView {
 
     protected T vm;
-    private String VMCanonicalName;
+    protected A view;
+    private String vmCanonicalName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        getSupportActionBar().hide();
         super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
         if (null != vm) {
             vm.viewCreate();
         }
     }
 
+    protected void bindViewDataBinding(A viewDataBinding) {
+        bindViewDataBinding(viewDataBinding, true);
+    }
+
+    protected void bindViewDataBinding(A viewDataBinding, boolean lifecycleOwner) {
+        view = viewDataBinding;
+        setContentView(view.getRoot());
+        if (lifecycleOwner) {
+            view.setLifecycleOwner(this);
+        }
+    }
 
     protected void bindVM(Class<T> vm) {
         this.vm = new ViewModelProvider(this).get(vm);
-        VMCanonicalName = this.vm.getClass().getCanonicalName();
-        this.vm.setContext(this);
-        this.vm.setIView(this);
+        vmCanonicalName = this.vm.getClass().getCanonicalName();
+        bind();
     }
 
-    protected void bindVM(Class<T> vm, boolean shareToCache) {
+    protected void bindVM(Class<T> vm, boolean shareVM) {
         bindVM(vm);
-        if (shareToCache && !BaseApp.viewModels.containsKey(VMCanonicalName)) {
-            BaseApp.viewModels.put(VMCanonicalName, this.vm);
+        if (shareVM && !BaseApp.viewModels.containsKey(vmCanonicalName)) {
+            BaseApp.viewModels.put(vmCanonicalName, this.vm);
         }
+    }
+
+    private void bind() {
+        if (null == this.vm) return;
+        this.vm.setContext(this);
+        this.vm.setIView(this);
 
     }
 
@@ -58,9 +74,9 @@ public class BaseActivity<T extends BaseViewModel> extends AppCompatActivity imp
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (null != vm) {
+    protected void onPause() {
+        super.onPause();
+        if (isFinishing() && null != vm) {
             vm.viewDestroy();
         }
     }
@@ -74,14 +90,24 @@ public class BaseActivity<T extends BaseViewModel> extends AppCompatActivity imp
 
     public void bindVMByCache(Class<T> vm) {
         String key = vm.getCanonicalName();
-        if (BaseApp.viewModels.containsKey(key))
+        if (BaseApp.viewModels.containsKey(key)) {
             this.vm = (T) BaseApp.viewModels.get(key);
+            bind();
+        }
     }
 
     public void removeCacheVM() {
         String key = vm.getClass().getCanonicalName();
         BaseApp.viewModels.remove(key);
+        vm.context.clear();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bind();
+    }
+
 
     /**
      * 点击非获取焦点EditText隐藏键盘
@@ -102,5 +128,28 @@ public class BaseActivity<T extends BaseViewModel> extends AppCompatActivity imp
             }
         }
         return super.dispatchTouchEvent(ev);
+    }
+
+    /**
+     * 沉侵式状态栏
+     */
+    public void sink() {
+        setLightStatus();
+        SinkHelper.get(this).setTranslucentStatus(view.getRoot());
+    }
+
+    @Override
+    public void onError(String error) {
+
+    }
+
+    @Override
+    public void onSuccess(String body) {
+
+    }
+
+    @Override
+    public void toast(String tips) {
+        Toast.makeText(this, tips, Toast.LENGTH_SHORT).show();
     }
 }

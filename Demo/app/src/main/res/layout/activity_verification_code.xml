@@ -1,93 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical"
-    android:paddingLeft="32dp"
-    android:paddingRight="32dp"
-    tools:context=".ui.login.VerificationCodeActivity">
+<layout>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:onClick="back"
-        android:layout_marginBottom="50dp"
-        android:src="@mipmap/ic_back" />
+    <data>
 
-    <TextView
-        android:id="@+id/tips"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/verification_code_send_phone"
-        android:textColor="#ff333333"
-        android:textSize="26sp"
-        android:textStyle="bold" />
+        <variable
+            name="LoginVM"
+            type="io.openim.android.demo.vm.LoginVM" />
 
-    <TextView
-        android:id="@+id/accountTv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="1792345745@qq.com"
-        android:textColor="#ff1d6bed"
-        android:textSize="16sp" />
+        <import type="io.openim.android.ouicore.base.BaseApp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:text="@string/input_verification_code"
-        android:textColor="#ff333333"
-        android:textSize="14sp" />
+        <import type="io.openim.android.demo.R" />
 
-    <io.openim.android.ouicore.widget.CodeEditText
-        android:layout_width="wrap_content"
-        android:id="@+id/codeEditText"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:inputType="number"
-        android:textSize="17dp"
-        android:textStyle="bold"
-        app:strokeBackground="@drawable/bg_edit_vercode"
-        app:strokeHeight="45dp"
-        app:strokeLength="6"
-        app:strokePadding="12dp"
-        app:strokeWidth="45dp" />
+        <import type="android.view.View" />
+    </data>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_height="wrap_content">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        tools:context=".ui.login.VerificationCodeActivity">
 
-        <TextView
-            android:id="@+id/countdown"
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="27 S"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="50dp"
+            android:onClick="back"
+            android:src="@mipmap/ic_back" />
+
+        <TextView
+            android:id="@+id/tips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{LoginVM.isPhone?BaseApp.instance().getString(R.string.verification_code_send_phone):BaseApp.instance().getString(R.string.verification_code_send_mail)}"
+            android:textColor="#ff333333"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/accountTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@={LoginVM.account}"
             android:textColor="#ff1d6bed"
-            android:textSize="12sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/after"
-            android:layout_marginRight="4dp"
+            android:layout_marginTop="25dp"
+            android:text="@string/input_verification_code"
             android:textColor="#ff333333"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/resend"
+        <io.openim.android.ouicore.widget.CodeEditText
+            android:id="@+id/codeEditText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/resend_verification_code"
-            android:textColor="#ff333333"
-            android:textSize="12sp" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:inputType="number"
+            android:textSize="17dp"
+            android:textStyle="bold"
+            app:strokeBackground="@drawable/bg_edit_vercode"
+            app:strokeHeight="45dp"
+            app:strokeLength="6"
+            app:strokePadding="12dp"
+            app:strokeWidth="45dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:id="@+id/countdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{LoginVM.countdown.toString()+'s'}"
+                android:textColor="#ff1d6bed"
+                android:visibility="@{LoginVM.countdown==0?View.GONE:View.VISIBLE}"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:text="@string/after"
+                android:textColor="#ff333333"
+                android:textSize="12sp"
+                android:visibility="@{LoginVM.countdown==0?View.GONE:View.VISIBLE}" />
+
+            <TextView
+                android:id="@+id/resend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/resend_verification_code"
+                android:textColor="#ff333333"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+
     </LinearLayout>
-
-
-</LinearLayout>
+</layout>

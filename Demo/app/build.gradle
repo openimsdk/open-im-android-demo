@@ -63,9 +63,12 @@ dependencies {
     annotationProcessor 'com.alibaba:arouter-compiler:1.5.2'
 
     implementation 'com.github.Wynsbin:VerificationCodeInputView:1.0.2'
+    implementation 'com.github.lihangleo2:ShadowLayout:2.0.1'
     
     api project(':OUICore')
     if(!isModule){
+        implementation project(':OUIConversation')
+        implementation project(':OUIGroup')
         implementation project(':OUIContact')
     }
 }

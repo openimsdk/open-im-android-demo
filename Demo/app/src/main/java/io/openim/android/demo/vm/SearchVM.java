@@ -11,19 +11,25 @@ import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendshipInfo;
+import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 public class SearchVM extends BaseViewModel {
 
+    public MutableLiveData<List<GroupInfo>> groupsInfo = new MutableLiveData<>();
     public MutableLiveData<List<UserInfo>> userInfo = new MutableLiveData<>();
     public MutableLiveData<List<FriendshipInfo>> friendshipInfo = new MutableLiveData<>();
 
     public MutableLiveData<String> hail = new MutableLiveData<>();
     public MutableLiveData<String> remark = new MutableLiveData<>();
+    //用户 或群组id
     public String searchContent = "";
 
+    //y 搜索人 n 搜索群
+    public boolean isPerson = false;
 
-    public void search() {
+
+    public void searchPerson() {
         List<String> uidList = new ArrayList<>(); // 用户ID集合
         uidList.add(searchContent);
         OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
@@ -37,6 +43,7 @@ public class SearchVM extends BaseViewModel {
                 userInfo.setValue(data);
             }
         }, uidList);
+
     }
 
     public void checkFriend(List<UserInfo> data) {
@@ -56,7 +63,7 @@ public class SearchVM extends BaseViewModel {
     }
 
     public void addFriend() {
-        OpenIMClient.getInstance().friendshipManager.addFriend(new OnBase<String>() {
+        OnBase<String> callBack = new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
 
@@ -67,7 +74,33 @@ public class SearchVM extends BaseViewModel {
                 Toast.makeText(getContext(), "发送成功", Toast.LENGTH_SHORT).show();
                 hail.setValue("-1");
             }
-        }, searchContent, hail.getValue());
+        };
+        if (isPerson)
+            OpenIMClient.getInstance().friendshipManager.addFriend(callBack, searchContent, hail.getValue());
+        else
+            OpenIMClient.getInstance().groupManager.joinGroup(callBack, searchContent, hail.getValue());
     }
 
+    public void search() {
+        if (isPerson)
+            searchPerson();
+        else
+            searchGroup();
+    }
+
+    private void searchGroup() {
+        List<String> groupIds = new ArrayList<>(); // 群ID集合
+        groupIds.add(searchContent);
+        OpenIMClient.getInstance().groupManager.getGroupsInfo(new OnBase<List<GroupInfo>>() {
+            @Override
+            public void onError(int code, String error) {
+
+            }
+
+            @Override
+            public void onSuccess(List<GroupInfo> data) {
+                groupsInfo.setValue(data);
+            }
+        }, groupIds);
+    }
 }

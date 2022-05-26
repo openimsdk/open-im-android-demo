@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.openim.android.ouiconversation">
+
+    <application android:theme="@style/Theme.Demo">
+        <activity
+            android:name="io.openim.android.ouiconversation.ui.ChatActivity"
+            android:exported="false" />
+    </application>
+</manifest>

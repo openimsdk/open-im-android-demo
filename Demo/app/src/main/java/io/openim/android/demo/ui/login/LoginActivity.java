@@ -1,8 +1,5 @@
 package io.openim.android.demo.ui.login;
 
-
-import static io.openim.android.ouicore.utils.Constant.VM;
-
 import android.content.Intent;
 
 import io.openim.android.demo.ui.main.MainActivity;
@@ -23,24 +20,19 @@ import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityLoginBinding;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.utils.SinkHelper;
 
-public class LoginActivity extends BaseActivity<LoginVM> implements LoginVM.ViewAction {
-
-    ActivityLoginBinding view;
+public class LoginActivity extends BaseActivity<LoginVM,ActivityLoginBinding> implements LoginVM.ViewAction {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        view = ActivityLoginBinding.inflate(getLayoutInflater());
-        setContentView(view.getRoot());
+        bindVM(LoginVM.class, true);
+        bindViewDataBinding(ActivityLoginBinding.inflate(getLayoutInflater()));
         setLightStatus();
         SinkHelper.get(this).setTranslucentStatus(null);
 
-        bindVM(LoginVM.class,true);
         view.loginContent.setLoginVM(vm);
-
         click();
         listener();
     }
@@ -67,7 +59,6 @@ public class LoginActivity extends BaseActivity<LoginVM> implements LoginVM.View
         });
         vm.account.observe(this, v -> submitEnabled());
         vm.pwd.observe(this, v -> submitEnabled());
-
     }
 
     private void click() {
@@ -110,11 +101,5 @@ public class LoginActivity extends BaseActivity<LoginVM> implements LoginVM.View
     @Override
     public void initDate() {
 
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        removeCacheVM();
     }
 }

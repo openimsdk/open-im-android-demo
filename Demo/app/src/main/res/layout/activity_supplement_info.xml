@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <variable
+            name="LoginVM"
+            type="io.openim.android.demo.vm.LoginVM" />
+    </data>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.login.SupplementInfoActivity">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="32dp"
+            android:paddingTop="48dp"
+            android:paddingRight="32dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/welcome"
+                android:textColor="#ff333333"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="20dp"
+                android:text="@string/password"
+                android:textColor="#ff000000"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@android:color/transparent"
+                android:hint="登陆密码用于登陆OpenIM账号"
+                android:inputType="textPassword"
+                android:text="@={LoginVM.pwd}"
+                android:textColor="#ff333333"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="20dp"
+                android:text="@string/name"
+                android:textColor="#ff000000"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/nickName"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@android:color/transparent"
+                android:hint="@string/input_name"
+                android:text="@={LoginVM.nickName}"
+                android:textColor="#ff333333"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:enabled="@{LoginVM.nickName.length()!=0 &amp;&amp; LoginVM.pwd.length()!=0}"
+            android:onClick="@{(v)->LoginVM.register()}"
+            android:text="@string/join_im"
+            android:textColor="#ffffffff"
+            android:textSize="18sp" />
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="2" />
+    </LinearLayout>
+
+</layout>

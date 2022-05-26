@@ -11,6 +11,9 @@
         android:theme="@style/Theme.Demo"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ui.login.SupplementInfoActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.login.VerificationCodeActivity"
             android:exported="false" />
         <activity
@@ -20,10 +23,10 @@
             android:name=".ui.search.PersonDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.search.SearchPersonActivity"
+            android:name=".ui.search.SearchConversActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.search.AddFriendActivity"
+            android:name=".ui.search.AddConversActivity"
             android:exported="false" />
         <activity
             android:name=".ui.login.RegisterActivity"
@@ -41,7 +44,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.main.MainActivity" />
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:launchMode="singleTask" />
     </application>
 
 </manifest>

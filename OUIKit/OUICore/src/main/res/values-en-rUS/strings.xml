@@ -8,4 +8,12 @@
     <string name="friday">Friday</string>
     <string name="saturday">Saturday</string>
     <string name="send">Send</string>
+    <string name="network_unavailable_tips">请检查网络是否可用！</string>
+
+    <string name="group_notice">群通知</string>
+    <string name="apply__join">申请加入</string>
+    <string name="reason">申请理由：</string>
+    <string name="agree">同意</string>
+    <string name="rejected">已拒绝</string>
+    <string name="agreeed">同意</string>
 </resources>

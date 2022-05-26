@@ -17,6 +17,10 @@ public class BaseViewModel<T extends IView> extends ViewModel {
     }
 
     public void setContext(Context context) {
+        if (null != this.context) {
+            this.context.clear();
+            this.context = null;
+        }
         this.context = new SoftReference<>(context);
     }
 
@@ -26,6 +30,7 @@ public class BaseViewModel<T extends IView> extends ViewModel {
 
     //视图销毁时
     protected void viewDestroy() {
+
     }
 
     //视图已构建

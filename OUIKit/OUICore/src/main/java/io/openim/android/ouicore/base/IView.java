@@ -1,9 +1,15 @@
 package io.openim.android.ouicore.base;
 
+import android.widget.Toast;
+
 /**
  * View
  */
+public interface IView {
+    void onError(String error);
 
-public interface IView  {
+    void onSuccess(String body);
+
+    void toast(String tips);
 
 }

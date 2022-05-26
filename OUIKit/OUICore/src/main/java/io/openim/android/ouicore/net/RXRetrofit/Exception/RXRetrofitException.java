@@ -5,8 +5,7 @@ public class RXRetrofitException extends Exception {
 
     private static final long serialVersionUID = 114946L;
 
-    public RXRetrofitException() {
-    }
+    public RXRetrofitException() {}
 
     public RXRetrofitException(String message) {
         super(message);
