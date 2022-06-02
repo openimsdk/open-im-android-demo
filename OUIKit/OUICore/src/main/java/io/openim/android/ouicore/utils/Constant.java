@@ -1,5 +1,7 @@
 package io.openim.android.ouicore.utils;
 
+import io.openim.android.ouicore.im.IM;
+
 public class Constant {
     public static final String DEFAULT_IP = "121.37.25.71";
 
@@ -9,6 +11,13 @@ public class Constant {
     public static final String APP_AUTH_URL = "http://" + DEFAULT_IP + ":10004";
     //web socket
     public static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":10001";
+
+    //存储音频的文件夹
+    public static final String AUDIODIR = IM.getStorageDir() + "/audio/";
+    //视频存储文件夹
+    public static final String VIDEODIR = IM.getStorageDir() + "/video/";
+    //图片存储文件夹
+    public static final String PICTUREDIR = IM.getStorageDir() + "/picture/";
 
 
     public static class Event {
@@ -26,4 +35,13 @@ public class Constant {
     public static final String GROUP_ID = "group_id";
     public static final String IS_PERSON = "is_person";
 
+    /**
+     * 发送状态
+     */
+    public static class Send_State {
+        //发送中...
+        public static final int SENDING = 1;
+        //发送失败
+        public static final int SEND_FAILED = 3;
+    }
 }

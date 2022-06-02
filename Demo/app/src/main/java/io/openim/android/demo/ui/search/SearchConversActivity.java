@@ -61,7 +61,7 @@ public class SearchConversActivity extends BaseActivity<SearchVM, ActivitySearch
         view.recyclerView.setAdapter(recyclerViewAdapter);
 
         vm.userInfo.observe(this, v -> {
-            if (vm.searchContent.isEmpty()) return;
+            if (vm.searchContent.isEmpty()||null==v) return;
             List<String> userIDs = new ArrayList<>();
             for (UserInfo userInfo : v) {
                 userIDs.add(userInfo.getUserID());

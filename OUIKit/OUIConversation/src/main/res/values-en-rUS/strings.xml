@@ -3,4 +3,9 @@
     <string name="remove">Remove</string>
     <string name="top">置顶</string>
     <string name="typing">正在输入…</string>
+    <string name="unsupported_type">暂不支持的消息类型</string>
+    <string name="touch_say">按住说话</string>
+    <string name="let_go">松开取消</string>
+    <string name="speech_to_txt">转文字</string>
+    <string name="let_send">松手发送</string>
 </resources>

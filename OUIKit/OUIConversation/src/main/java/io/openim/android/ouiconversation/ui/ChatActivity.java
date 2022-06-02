@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
@@ -24,6 +25,7 @@ import io.openim.android.ouiconversation.utils.Constant;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 
@@ -67,6 +69,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     @SuppressLint("ClickableViewAccessibility")
     private void initView(String name) {
+        view.inputGroup.setChatVM(vm);
+
         view.nickName.setText(name);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         //倒叙
@@ -76,6 +80,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.recyclerView.setLayoutManager(linearLayoutManager);
         view.recyclerView.addItemDecoration(new DefaultItemDecoration(this.getResources().getColor(android.R.color.transparent), 1, Common.dp2px(16)));
         messageAdapter = new MessageAdapter();
+        messageAdapter.bindRecyclerView(view.recyclerView);
+
         vm.setMessageAdapter(messageAdapter);
         view.recyclerView.setAdapter(messageAdapter);
         vm.messages.observe(this, v -> {
@@ -84,46 +90,35 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             messageAdapter.notifyDataSetChanged();
         });
         view.recyclerView.setOnTouchListener((v, event) -> {
-            view.input.clearFocus();
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (imm != null) {
-                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-            }
+            view.inputGroup.clearFocus();
+            Common.hideKeyboard(this,v);
+            view.inputGroup.setExpandHide();
             return false;
         });
-
-        view.send.setOnClickListener(v -> {
-            vm.sendMsg();
-            view.input.setText("");
-        });
-
     }
 
 
     //记录原始窗口高度
     private int mWindowHeight = 0;
 
-    private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
-        @Override
-        public void onGlobalLayout() {
-            Rect r = new Rect();
-            //获取当前窗口实际的可见区域
-            getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
-            int height = r.height();
-            if (mWindowHeight == 0) {
-                //一般情况下，这是原始的窗口高度
-                mWindowHeight = height;
+    private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener = () -> {
+        Rect r = new Rect();
+        //获取当前窗口实际的可见区域
+        getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
+        int height = r.height();
+        if (mWindowHeight == 0) {
+            //一般情况下，这是原始的窗口高度
+            mWindowHeight = height;
+        } else {
+            RelativeLayout.LayoutParams inputLayoutParams = (RelativeLayout.LayoutParams) view.inputGroup.getLayoutParams();
+            if (mWindowHeight == height) {
+                inputLayoutParams.bottomMargin = 0;
             } else {
-                RelativeLayout.LayoutParams inputLayoutParams = (RelativeLayout.LayoutParams) view.inputGroup.getLayoutParams();
-                if (mWindowHeight == height) {
-                    inputLayoutParams.bottomMargin = 0;
-                } else {
-                    //两次窗口高度相减，就是软键盘高度
-                    int softKeyboardHeight = mWindowHeight - height;
-                    inputLayoutParams.bottomMargin = softKeyboardHeight;
-                }
-                view.inputGroup.setLayoutParams(inputLayoutParams);
+                //两次窗口高度相减，就是软键盘高度
+                int softKeyboardHeight = mWindowHeight - height;
+                inputLayoutParams.bottomMargin = softKeyboardHeight;
             }
+            view.inputGroup.setLayoutParams(inputLayoutParams);
         }
     };
 
@@ -144,7 +139,11 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             }
         });
     }
-
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        view.inputGroup.dispatchTouchEvent(event);
+        return super.dispatchTouchEvent(event);
+    }
 
     @Override
     public void scrollToPosition(int position) {

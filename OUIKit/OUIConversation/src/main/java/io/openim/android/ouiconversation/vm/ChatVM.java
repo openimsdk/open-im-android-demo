@@ -31,7 +31,6 @@ import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.ReadReceiptInfo;
-import io.reactivex.internal.util.ListAddBiConsumer;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener {
     public MutableLiveData<List<Message>> messages = new MutableLiveData<>(new ArrayList<>());
@@ -80,9 +79,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
      */
     private void markReaded(List<String> msgIDs) {
         if (isSingleChat)
-            OpenIMClient.getInstance().messageManager.markC2CMessageAsRead(null, otherSideID, msgIDs);
+            OpenIMClient.getInstance().messageManager.markC2CMessageAsRead(null, otherSideID, null == msgIDs ? new ArrayList<>() : msgIDs);
         else
-            OpenIMClient.getInstance().messageManager.markGroupMessageAsRead(null, groupID, msgIDs);
+            OpenIMClient.getInstance().messageManager.markGroupMessageAsRead(null, groupID, null == msgIDs ? new ArrayList<>() : msgIDs);
     }
 
 
@@ -173,8 +172,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             if (TextUtils.isEmpty(msg.getSendID()) || !msg.getSendID().equals(otherSideID)) return;
         } else if (TextUtils.isEmpty(msg.getGroupID()) || !msg.getGroupID().equals(groupID)) return;
 
+        boolean isTyp = msg.getContentType() == Constant.MsgType.TYPING;
         if (isSingleChat) {
-            boolean isTyp = msg.getContentType() == Constant.MsgType.TYPING;
             if (msg.getSendID().equals(otherSideID)) {
                 UIHandler.post(() -> typing.set(isTyp));
                 if (isTyp) {
@@ -183,22 +182,22 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 }
             }
         }
-        if (msg.getContentType() == Constant.MsgType.TXT) {
+        if (!isTyp) {
             messages.getValue().add(0, msg);
             UIHandler.post(() -> {
                 IView.scrollToPosition(0);
                 messageAdapter.notifyItemInserted(0);
             });
-        }
-        //清除列表小红点
-        markReaded(null);
-        //标记本条消息已读
-        if (isSingleChat) {
-            List<String> ids = new ArrayList<>();
-            ids.add(msg.getClientMsgID());
-            markReaded(ids);
-        }
 
+            //清除列表小红点
+            markReaded(null);
+            //标记本条消息已读
+            if (isSingleChat) {
+                List<String> ids = new ArrayList<>();
+                ids.add(msg.getClientMsgID());
+                markReaded(ids);
+            }
+        }
     }
 
     @Override
@@ -216,16 +215,13 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     }
 
-    public void sendMsg() {
-        final Message msg = OpenIMClient.getInstance().messageManager.createTextMessage(inputMsg.getValue());
+    public void sendMsg(Message msg) {
         messages.getValue().add(0, msg);
         messageAdapter.notifyItemInserted(0);
 
         IView.scrollToPosition(0);
-        inputMsg.setValue("");
 
         List<Message> megs = messages.getValue();
-        int index = megs.indexOf(msg);
         OfflinePushInfo offlinePushInfo = new OfflinePushInfo();  // 离线推送的消息备注；不为null
         OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
             @Override
@@ -241,8 +237,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             @Override
             public void onSuccess(Message message) {
                 // 返回新的消息体；替换发送传入的，不然扯回消息会有bug
+                int index = megs.indexOf(msg);
                 megs.add(index, message);
                 megs.remove(index + 1);
+                messageAdapter.notifyItemChanged(index);
             }
         }, msg, otherSideID, groupID, offlinePushInfo);
 

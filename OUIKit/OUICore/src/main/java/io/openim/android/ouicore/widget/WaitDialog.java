@@ -17,8 +17,9 @@ import com.wang.avi.indicators.LineScalePulseOutIndicator;
 
 
 import io.openim.android.ouicore.R;
+import io.openim.android.ouicore.base.BaseDialog;
 
-public class WaitDialog extends Dialog implements DialogInterface {
+public class WaitDialog extends BaseDialog {
 
     private View mainView;
     private AVLoadingIndicatorView indicatorView;
@@ -30,26 +31,6 @@ public class WaitDialog extends Dialog implements DialogInterface {
         initView();
     }
 
-    @Override
-    public void show() {
-        try {
-            if (!isShowing())
-                super.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void dismiss() {
-        try {
-            if (isShowing())
-                super.dismiss();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
     public void setNotDismiss() {
         setCancelable(false);

@@ -20,7 +20,14 @@
         <item name="maxWidth">16dp</item>
         <item name="minHeight">16dp</item>
         <item name="maxHeight">16dp</item>
-        <item name="indicatorName">BallPulseIndicator</item>
+        <item name="indicatorName">BallSpinFadeLoaderIndicator</item>
+    </style>
+    <style name="AVLoadingIndicatorView.Small3">
+        <item name="minWidth">14dp</item>
+        <item name="maxWidth">14dp</item>
+        <item name="minHeight">14dp</item>
+        <item name="maxHeight">14dp</item>
+        <item name="indicatorName">BallSpinFadeLoaderIndicator</item>
     </style>
 
 

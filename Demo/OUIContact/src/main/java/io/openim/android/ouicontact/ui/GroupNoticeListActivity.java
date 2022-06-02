@@ -30,12 +30,17 @@ public class GroupNoticeListActivity extends BaseActivity<ContactVM, ActivityGro
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        bindVM(ContactVM.class,true);
+        bindVM(ContactVM.class, true);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityGroupNoticeListBinding.inflate(getLayoutInflater()));
+        sink();
 
         initView();
         vm.getRecvGroupApplicationList();
+    }
+
+    public void toBack(View v) {
+        finish();
     }
 
     private void initView() {
@@ -50,18 +55,18 @@ public class GroupNoticeListActivity extends BaseActivity<ContactVM, ActivityGro
 
                 holder.v.getRoot().setOnClickListener(null);
                 holder.v.handle.setBackgroundColor(getResources().getColor(android.R.color.white));
-                if(data.getHandleResult()==0){
+                if (data.getHandleResult() == 0) {
                     holder.v.handle.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_3_stroke_418ae5);
                     holder.v.handle.setText(getString(io.openim.android.ouicore.R.string.agree));
 
                     holder.v.getRoot().setOnClickListener(v -> {
                         vm.applyDetail.setValue(data);
-                        startActivity(new Intent(GroupNoticeListActivity.this,GroupNoticeDetailActivity.class));
+                        startActivity(new Intent(GroupNoticeListActivity.this, GroupNoticeDetailActivity.class));
                     });
-                }else if (data.getHandleResult()==-1){
+                } else if (data.getHandleResult() == -1) {
                     holder.v.handle.setText(getString(io.openim.android.ouicore.R.string.rejected));
                     holder.v.handle.setTextColor(Color.parseColor("#999999"));
-                }else {
+                } else {
                     holder.v.handle.setText(getString(io.openim.android.ouicore.R.string.agreeed));
                     holder.v.handle.setTextColor(Color.parseColor("#999999"));
                 }

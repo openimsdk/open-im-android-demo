@@ -15,6 +15,8 @@ import io.openim.android.sdk.models.Message;
 
 public class MessageAdapter extends RecyclerView.Adapter {
 
+    private RecyclerView recyclerView;
+
     List<Message> messages;
     //自己的userId
     public static String OWN_ID;
@@ -44,14 +46,24 @@ public class MessageAdapter extends RecyclerView.Adapter {
 
         if (getItemViewType(position) != Constant.LOADING) {
             MessageViewHolder.MsgViewHolder msgViewHolder = (MessageViewHolder.MsgViewHolder) holder;
-            msgViewHolder.bindData(message,position);
+            msgViewHolder.bindData(message, position);
+            msgViewHolder.setMessageAdapter(this);
+            if (null != recyclerView)
+                msgViewHolder.bindRecyclerView(recyclerView);
         }
-
 
     }
 
     @Override
     public int getItemCount() {
         return null == messages ? 0 : messages.size();
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void bindRecyclerView(RecyclerView recyclerView) {
+        this.recyclerView = recyclerView;
     }
 }

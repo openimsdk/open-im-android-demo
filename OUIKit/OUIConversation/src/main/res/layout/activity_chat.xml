@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <data>
+
         <variable
             name="chatVM"
             type="io.openim.android.ouiconversation.vm.ChatVM" />
+
         <import type="android.view.View" />
     </data>
 
@@ -41,6 +44,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
+                    android:gravity="center"
                     android:orientation="vertical">
 
                     <TextView
@@ -95,37 +99,12 @@
             android:paddingLeft="22dp"
             android:paddingRight="22dp" />
 
-        <LinearLayout
+
+        <io.openim.android.ouiconversation.widget.BottomInputCote
             android:id="@+id/inputGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="#E8F2FF"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:layout_alignParentBottom="true" />
 
-            <EditText
-                android:id="@+id/input"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="12dp"
-                android:layout_marginBottom="10dp"
-                android:layout_weight="1"
-                android:background="@color/white"
-                android:maxHeight="80dp"
-                android:minHeight="32dp"
-                android:text="@={chatVM.inputMsg}" />
-
-            <Button
-                android:id="@+id/send"
-                android:layout_width="wrap_content"
-                android:enabled="true"
-                android:theme="@style/Theme.Demo"
-                android:layout_height="wrap_content"
-                android:text="@string/send" />
-        </LinearLayout>
     </RelativeLayout>
 </layout>

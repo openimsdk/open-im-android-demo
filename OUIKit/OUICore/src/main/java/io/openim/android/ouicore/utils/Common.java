@@ -4,7 +4,11 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
+
+import androidx.fragment.app.FragmentTransaction;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -12,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Comparator;
 
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.sdk.models.ConversationInfo;
 
@@ -46,5 +51,13 @@ public class Common {
         float scale = BaseApp.instance().getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
     }
+    //收起键盘
+    public static void hideKeyboard(Context context, View v) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        }
+    }
+
 }
 

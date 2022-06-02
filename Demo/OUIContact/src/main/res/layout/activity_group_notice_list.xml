@@ -22,7 +22,6 @@
                 android:orientation="horizontal">
 
                 <include
-                    android:id="@+id/back"
                     layout="@layout/view_back" />
 
                 <TextView

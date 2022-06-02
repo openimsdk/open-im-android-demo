@@ -1,15 +1,14 @@
 package io.openim.android.ouicore.base;
 
-import android.app.Activity;
+
 import android.content.Context;
 
 import androidx.lifecycle.ViewModel;
 
-import java.io.Serializable;
-import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 
 public class BaseViewModel<T extends IView> extends ViewModel {
-    public SoftReference<Context> context;
+    public WeakReference<Context> context;
     protected T IView;
 
     public Context getContext() {
@@ -21,7 +20,7 @@ public class BaseViewModel<T extends IView> extends ViewModel {
             this.context.clear();
             this.context = null;
         }
-        this.context = new SoftReference<>(context);
+        this.context = new WeakReference<>(context);
     }
 
     public void setIView(T iView) {

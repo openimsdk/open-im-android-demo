@@ -6,19 +6,21 @@ import android.content.Context;
 import androidx.multidex.MultiDex;
 
 
+
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.openim.android.demo.utils.Constant;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.im.IM;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.net.RXRetrofit.HttpConfig;
 import io.openim.android.ouicore.net.RXRetrofit.N;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.sdk.OpenIMClient;
 
 
@@ -32,7 +34,10 @@ public class DemoApplication extends BaseApp {
 
         MultiDex.install(this);
         //im 初始化
-        IM.initSdk(this);
+        IM.initSdk();
+        //音频播放
+        SPlayer.init(this);
+        SPlayer.instance().setCacheDirPath(Constant.AUDIODIR);
 
         //ARouter init
         ARouter.openLog();

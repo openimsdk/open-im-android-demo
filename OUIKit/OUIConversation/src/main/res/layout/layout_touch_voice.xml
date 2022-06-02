@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#99000000">
+
+    <LinearLayout
+        android:id="@+id/recordTips"
+        android:layout_width="match_parent"
+        android:layout_height="125dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="100dp"
+        android:visibility="visible"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/sty_radius_6_white"
+            android:gravity="center">
+
+            <io.openim.android.ouicore.widget.RecordWaveView
+                android:id="@+id/recordWaveView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp" />
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-13dp"
+            android:src="@mipmap/ic_triangle" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/cancelTips"
+        android:layout_width="104dp"
+        android:layout_height="125dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="30dp"
+        android:layout_alignParentStart="true"
+        android:visibility="gone"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/sty_radius_6_red"
+            android:gravity="center">
+
+            <io.openim.android.ouicore.widget.RecordWaveView
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:id="@+id/cancelRecordWaveView"
+                android:layout_marginRight="20dp"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-13dp"
+            android:src="@mipmap/ic_triangle_red" />
+    </LinearLayout>
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/voice"
+        android:layout_marginLeft="35dp"
+        android:layout_marginBottom="25dp"
+        android:src="@mipmap/ic_chat_cancel" />
+
+    <LinearLayout
+        android:id="@+id/voiceCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/voice"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/let_go"
+            android:textColor="#ffbebebe"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_chat_cancel2" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/voice"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="35dp"
+        android:layout_marginBottom="25dp"
+        android:src="@mipmap/ic_chat_speech" />
+
+    <LinearLayout
+        android:id="@+id/speechTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/voice"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/speech_to_txt"
+            android:textColor="#ffbebebe"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_chat_speech2" />
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/sendTips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/voice"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
+        android:text="@string/let_send"
+        android:textColor="#ffbebebe"
+        android:textSize="14sp" />
+    <RelativeLayout
+        android:id="@+id/voice"
+        android:layout_width="match_parent"
+        android:layout_height="129dp"
+        android:layout_alignParentBottom="true"
+        android:background="@mipmap/bg_chat_voice"
+        android:gravity="center_horizontal">
+
+        <ImageView
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_chat_horn" />
+    </RelativeLayout>
+</RelativeLayout>

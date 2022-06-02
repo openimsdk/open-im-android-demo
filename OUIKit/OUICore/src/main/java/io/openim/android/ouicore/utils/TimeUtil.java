@@ -21,8 +21,8 @@ public class TimeUtil {
                 BaseApp.instance().getString(R.string.friday),
                 BaseApp.instance().getString(R.string.saturday)};
         String hourTimeFormat = "HH:mm";
-        String monthTimeFormat = "M:d: HH:mm";
-        String yearTimeFormat = "yyyy:M:d HH:mm";
+        String monthTimeFormat = "M/d HH:mm";
+        String yearTimeFormat = "yyyy/M/d HH:mm";
         try {
             Calendar todayCalendar = Calendar.getInstance();
             Calendar calendar = Calendar.getInstance();
