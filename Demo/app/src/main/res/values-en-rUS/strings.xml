@@ -33,7 +33,7 @@
     <string name="input_verification_code">请输入验证码</string>
     <string name="resend_verification_code">重发验证码</string>
     <string name="after">后</string>
-    <string name="send_succ">发送成功</string>
+
     <string name="name">你的姓名</string>
     <string name="input_name">请填写真实姓名</string>
     <string name="welcome">欢迎使用OpenIM</string>

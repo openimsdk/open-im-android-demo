@@ -37,11 +37,14 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgAudioRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgBinding;
 
 
+import io.openim.android.ouiconversation.databinding.LayoutMsgFileLeftBinding;
+import io.openim.android.ouiconversation.databinding.LayoutMsgFileRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgImgLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgImgRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
 import io.openim.android.ouiconversation.utils.Constant;
+import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.voice.listener.PlayerListener;
@@ -64,6 +67,9 @@ public class MessageViewHolder {
 
         if (viewType == Constant.MsgType.VIDEO)
             return new VideoView(parent);
+
+        if (viewType == Constant.MsgType.FILE)
+            return new FileView(parent);
 
         return new TXTView(parent);
     }
@@ -369,4 +375,47 @@ public class MessageViewHolder {
             });
         }
     }
+
+
+    public static class FileView extends MessageViewHolder.MsgViewHolder{
+
+        public FileView(ViewGroup itemView) {
+            super(itemView);
+        }
+
+        @Override
+        int getLeftInflatedId() {
+            return R.layout.layout_msg_file_left;
+        }
+
+        @Override
+        int getRightInflatedId() {
+            return R.layout.layout_msg_file_right;
+        }
+
+        @Override
+        void bindLeft(View itemView, Message message) {
+            LayoutMsgFileLeftBinding view =LayoutMsgFileLeftBinding.bind(itemView);
+
+            view.avatar.load(message.getSenderFaceUrl());
+            view.title.setText(message.getFileElem().getFileName());
+            Long size=message.getFileElem().getFileSize();
+            view.size.setText(ByteUtil.bytes2kb(size)+"");
+
+            view.sendState.setSendState(message.getStatus());
+        }
+
+        @Override
+        void bindRight(View itemView, Message message) {
+            LayoutMsgFileRightBinding view =LayoutMsgFileRightBinding.bind(itemView);
+
+            view.avatar2.load(message.getSenderFaceUrl());
+            view.title2.setText(message.getFileElem().getFileName());
+            Long size=message.getFileElem().getFileSize();
+            view.size2.setText(ByteUtil.bytes2kb(size)+"");
+
+            view.sendState2.setSendState(message.getStatus());
+        }
+    }
+
 }

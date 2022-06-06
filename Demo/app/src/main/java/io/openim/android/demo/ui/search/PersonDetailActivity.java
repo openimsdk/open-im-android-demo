@@ -41,7 +41,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     private void click() {
         view.sendMsg.setOnClickListener(v -> ARouter.getInstance().build(Routes.Conversation.CHAT)
                 .withString(ID, vm.searchContent)
-                .withString(Constant.K_NAME, vm.userInfo.getValue().get(0).getNickname())
+                .withString(io.openim.android.ouicore.utils.Constant.K_NAME, vm.userInfo.getValue().get(0).getNickname())
                 .navigation());
 
 

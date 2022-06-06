@@ -17,6 +17,7 @@ import io.openim.android.ouicore.utils.L;
 
 public class SearchView extends LinearLayout {
     boolean clickable = true;
+    String hint;
 
     public SearchView(Context context) {
         super(context);
@@ -28,6 +29,7 @@ public class SearchView extends LinearLayout {
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.customize);
         try {
             clickable = array.getBoolean(R.styleable.customize_android_clickable, true);
+            hint = array.getString(R.styleable.customize_android_hint);
         } finally {
             array.recycle();
         }
@@ -45,6 +47,8 @@ public class SearchView extends LinearLayout {
         setBackground(getResources().getDrawable(R.drawable.sty_radius_4_f0f0f0));
         inflate(getContext(), R.layout.layout_search, this);
         editText = findViewById(R.id.editText);
+        if (null != hint)
+            editText.setHint(hint);
     }
 
     public EditText getEditText() {

@@ -4,6 +4,12 @@
 
     <application>
         <activity
+            android:name=".ui.FriendRequestDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.NewFriendActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.GroupNoticeListActivity"
             android:exported="false" />
         <activity

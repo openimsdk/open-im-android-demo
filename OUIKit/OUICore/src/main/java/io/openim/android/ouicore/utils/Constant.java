@@ -12,6 +12,11 @@ public class Constant {
     //web socket
     public static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":10001";
 
+
+    public static  final String K_NAME = "name";
+
+    public static  final String CONVERSATION_ID = "conversationID";
+
     //存储音频的文件夹
     public static final String AUDIODIR = IM.getStorageDir() + "/audio/";
     //视频存储文件夹

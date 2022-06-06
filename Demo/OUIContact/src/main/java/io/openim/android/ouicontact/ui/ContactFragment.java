@@ -39,12 +39,22 @@ public class ContactFragment extends BaseFragment<ContactVM> {
             vm.dotNum.setValue(0);
             startActivity(new Intent(getActivity(),GroupNoticeListActivity.class));
         });
+
+        view.newFriendNotice.setOnClickListener(v->{
+            vm.friendDotNum.setValue(0);
+            startActivity(new Intent(getActivity(),NewFriendActivity.class));
+        });
+
     }
 
     private void initView() {
         vm.dotNum.observe(getActivity(),v->{
             view.badge.badge.setVisibility(v==0?View.GONE:View.VISIBLE);
             view.badge.badge.setText(v+"");
+        });
+        vm.friendDotNum.observe(getActivity(),v->{
+            view.newFriendNoticeBadge.badge.setVisibility(v==0?View.GONE:View.VISIBLE);
+            view.newFriendNoticeBadge.badge.setText(v+"");
         });
     }
 }

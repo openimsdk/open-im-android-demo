@@ -87,7 +87,6 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                             break;
                         case 2:
                             gotoSelectFile();
-
                             break;
                     }
                 });
@@ -123,15 +122,21 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                 .start();
         }
     }
+
     private final ActivityResultLauncher<Intent> fileLauncher = registerForActivityResult(
         new ActivityResultContracts.StartActivityForResult(),
         result -> {
             if (result.getResultCode() == Activity.RESULT_OK) {
                 Intent data = result.getData();
-                Uri uri=data.getData();
-                if (null!=uri){
-                    String filePath=GetFilePathFromUri.getFileAbsolutePath(getContext(),uri);
-                    L.e("");
+                if (null != data) {
+                    Uri uri = data.getData();
+                    if (null != uri) {
+                        String filePath = GetFilePathFromUri.getFileAbsolutePath(getContext(), uri);
+                        if (null != filePath){
+                            Message msg=OpenIMClient.getInstance().messageManager.createFileMessageFromFullPath(filePath, new File(filePath).getName());
+                            vm.sendMsg(msg);
+                        }
+                    }
                 }
             }
         });

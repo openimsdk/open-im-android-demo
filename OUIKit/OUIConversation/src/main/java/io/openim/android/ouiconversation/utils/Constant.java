@@ -1,8 +1,7 @@
 package io.openim.android.ouiconversation.utils;
 
 public class Constant {
-    public static  final String K_NAME = "name";
-    public static  final String CONVERSATION_ID = "conversationID";
+
     //加载中
     public static final int LOADING=201;
 

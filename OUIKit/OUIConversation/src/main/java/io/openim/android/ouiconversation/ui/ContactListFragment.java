@@ -3,9 +3,9 @@ package io.openim.android.ouiconversation.ui;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
-import static io.openim.android.ouiconversation.utils.Constant.K_NAME;
 import static io.openim.android.ouicore.utils.Constant.GROUP_ID;
 import static io.openim.android.ouicore.utils.Constant.ID;
+import static io.openim.android.ouicore.utils.Constant.K_NAME;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

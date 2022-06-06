@@ -11,25 +11,33 @@ import io.openim.android.ouicore.utils.L;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnGroupListener;
+import io.openim.android.sdk.models.FriendApplicationInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class ContactVM extends BaseViewModel implements OnGroupListener {
-    //红点数量
+    //群红点数量
     public MutableLiveData<Integer> dotNum = new MutableLiveData<>(0);
+    //好友通知红点
+    public MutableLiveData<Integer> friendDotNum = new MutableLiveData<>(0);
 
     //申请列表
     public MutableLiveData<List<GroupApplicationInfo>> groupApply = new MutableLiveData<>();
+    //好友申请列表
+    public MutableLiveData<List<FriendApplicationInfo>> friendApply = new MutableLiveData<>();
 
     //申请详情
-    public MutableLiveData<GroupApplicationInfo> applyDetail = new MutableLiveData<>();
+    public MutableLiveData<GroupApplicationInfo> groupDetail = new MutableLiveData<>();
+    //好友申请详情
+    public MutableLiveData<FriendApplicationInfo> friendDetail = new MutableLiveData<>();
 
 
     @Override
     protected void viewCreate() {
         super.viewCreate();
         IMEvent.getInstance().addGroupListener(this);
+
     }
 
     @Override
@@ -38,8 +46,25 @@ public class ContactVM extends BaseViewModel implements OnGroupListener {
         IMEvent.getInstance().removeGroupListener(this);
     }
 
-    //申请列表
+    //个人申请列表
+    public void getRecvFriendApplicationList() {
+        OpenIMClient.getInstance().friendshipManager.getRecvFriendApplicationList(new OnBase<List<FriendApplicationInfo>>() {
+            @Override
+            public void onError(int code, String error) {
+
+            }
+
+            @Override
+            public void onSuccess(List<FriendApplicationInfo> data) {
+                if (!data.isEmpty())
+                    friendApply.setValue(data);
+            }
+        });
+    }
+
+    //群申请列表
     public void getRecvGroupApplicationList() {
+
         OpenIMClient.getInstance().groupManager.getRecvGroupApplicationList(new OnBase<List<GroupApplicationInfo>>() {
             @Override
             public void onError(int code, String error) {
@@ -57,25 +82,38 @@ public class ContactVM extends BaseViewModel implements OnGroupListener {
     private OnBase onBase = new OnBase<String>() {
         @Override
         public void onError(int code, String error) {
-             IView.toast(error);
+            IView.toast(error);
         }
 
         @Override
         public void onSuccess(String data) {
-            getRecvGroupApplicationList();
+            if (null != groupDetail)
+                getRecvGroupApplicationList();
+            if (null != friendDetail)
+                getRecvFriendApplicationList();
             IView.onSuccess(null);
         }
     };
 
-    //通过
-    public void pass() {
-        OpenIMClient.getInstance().groupManager.acceptGroupApplication(onBase, applyDetail.getValue().getGroupID(), applyDetail.getValue().getUserID(), "");
+    //好友通过
+    public void friendPass() {
+        OpenIMClient.getInstance().friendshipManager.acceptFriendApplication(onBase, friendDetail.getValue().getFromUserID(), "");
     }
 
 
-    //拒绝
+    //好友拒绝
+    public void friendRefuse() {
+        OpenIMClient.getInstance().friendshipManager.refuseFriendApplication(onBase, friendDetail.getValue().getFromUserID(), "");
+    }
+
+    //群通过
+    public void pass() {
+        OpenIMClient.getInstance().groupManager.acceptGroupApplication(onBase, groupDetail.getValue().getGroupID(), groupDetail.getValue().getUserID(), "");
+    }
+
+    //群拒绝
     public void refuse() {
-        OpenIMClient.getInstance().groupManager.acceptGroupApplication(onBase, applyDetail.getValue().getGroupID(), applyDetail.getValue().getUserID(), "");
+        OpenIMClient.getInstance().groupManager.acceptGroupApplication(onBase, groupDetail.getValue().getGroupID(), groupDetail.getValue().getUserID(), "");
     }
 
     @Override

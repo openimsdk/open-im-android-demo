@@ -60,7 +60,7 @@ public class GroupNoticeListActivity extends BaseActivity<ContactVM, ActivityGro
                     holder.v.handle.setText(getString(io.openim.android.ouicore.R.string.agree));
 
                     holder.v.getRoot().setOnClickListener(v -> {
-                        vm.applyDetail.setValue(data);
+                        vm.groupDetail.setValue(data);
                         startActivity(new Intent(GroupNoticeListActivity.this, GroupNoticeDetailActivity.class));
                     });
                 } else if (data.getHandleResult() == -1) {

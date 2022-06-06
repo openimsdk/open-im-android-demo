@@ -39,7 +39,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         //userId 与 GROUP_ID 互斥
         String userId = getIntent().getStringExtra(ID);
         String groupId = getIntent().getStringExtra(GROUP_ID);
-        String name = getIntent().getStringExtra(Constant.K_NAME);
+        String name = getIntent().getStringExtra(io.openim.android.ouicore.utils.Constant.K_NAME);
         bindVM(ChatVM.class);
         if (null != userId)
             vm.otherSideID = userId;

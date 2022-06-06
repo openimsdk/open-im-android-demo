@@ -48,7 +48,7 @@ public class SearchConversActivity extends BaseActivity<SearchVM, ActivitySearch
         view.searchView.getEditText().setFocusable(true);
         view.searchView.getEditText().setFocusableInTouchMode(true);
         view.searchView.getEditText().requestFocus();
-        view.searchView.getEditText().setHint(vm.isPerson ? R.string.search_by_id : R.string.search_group_by_id);
+        view.searchView.getEditText().setHint(vm.isPerson ? io.openim.android.ouicore.R.string.search_by_id : R.string.search_group_by_id);
         view.searchView.getEditText().setOnKeyListener((v, keyCode, event) -> {
             vm.searchContent = view.searchView.getEditText().getText().toString();
             vm.search();

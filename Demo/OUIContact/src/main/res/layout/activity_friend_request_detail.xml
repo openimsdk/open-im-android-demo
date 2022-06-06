@@ -1,43 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <data>
+
         <variable
             name="ContactVM"
             type="io.openim.android.ouicontact.vm.ContactVM" />
     </data>
+
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white"
         android:orientation="vertical"
-        tools:context=".ui.GroupNoticeDetailActivity"
-        tools:ignore="MissingDefaultResource">
+        tools:context=".ui.FriendRequestDetailActivity">
 
-
-        <RelativeLayout
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="@dimen/comm_title_high"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            app:cardElevation="8dp">
 
-            <include
-                android:id="@+id/back"
-                layout="@layout/view_back" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/comm_title_high"
+                android:gravity="center_vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/group_notice"
-                android:textColor="#ff333333"
-                android:textSize="18sp" />
+                <include layout="@layout/view_back" />
 
-        </RelativeLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/new_friend_request"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="21dp"
+            android:layout_marginTop="37dp"
             android:orientation="vertical"
             android:paddingLeft="22dp"
             android:paddingRight="22dp">
@@ -45,22 +50,22 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="37dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <io.openim.android.ouicore.widget.AvatarImage
-                    android:layout_width="48dp"
                     android:id="@+id/avatar"
+                    android:layout_width="48dp"
                     android:layout_height="48dp"
+                    android:layout_marginRight="15dp"
                     android:src="@mipmap/ic_my_friend" />
 
                 <TextView
+                    android:id="@+id/nickName"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
                     android:layout_weight="1"
-                    android:text="@{ContactVM.groupDetail.nickname}"
+                    android:text="@{ContactVM.friendDetail.fromNickname}"
                     android:textColor="#ff333333"
                     android:textSize="20sp" />
 
@@ -75,84 +80,69 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="33dp"
                 android:background="@drawable/sty_radius_6_eeeeee"
+                android:minHeight="124dp"
                 android:orientation="vertical"
-                android:paddingLeft="18dp"
-                android:paddingTop="16dp"
-                android:paddingRight="18dp"
-                android:paddingBottom="16dp">
+                android:padding="18dp">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/apply_join"
-                        android:textColor="#ff333333"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@{' '+ContactVM.groupDetail.groupName}"
-                        android:textColor="#5496EB"
-                        android:textSize="12sp" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/hil"
+                    android:layout_width="286dp"
+                    android:layout_height="20dp"
+                    android:text="@{ContactVM.friendDetail.reqMsg}"
+                    android:textColor="#ff333333"
+                    android:textSize="14sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:text="@string/reason"
-                    android:textColor="#ff666666"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@{ContactVM.groupDetail.reqMsg}"
-                    android:textColor="#ff666666"
-                    android:textSize="12sp" />
+                    android:layout_marginTop="5dp"
+                    android:text="回复"
+                    android:textColor="#ff1b6bed"
+                    android:textSize="16sp" />
             </LinearLayout>
-
 
         </LinearLayout>
 
         <include
             layout="@layout/view_dividing_line"
             android:layout_width="match_parent"
-            android:layout_height="12dp" />
+            android:layout_height="24dp"
+            android:layout_marginTop="38dp" />
 
         <TextView
+            android:id="@+id/accept"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/pass"
+            android:onClick="@{(v)->ContactVM.friendPass()}"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:text="通过好友申请"
             android:textColor="#ff1b61d6"
-            android:onClick="@{(v)->ContactVM.pass()}"
             android:textSize="18sp" />
 
         <include
             layout="@layout/view_dividing_line"
             android:layout_width="match_parent"
-            android:layout_height="12dp" />
+            android:layout_height="11dp" />
 
         <TextView
-
+            android:id="@+id/reject"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/Fail"
+            android:onClick="@{(v)->ContactVM.friendRefuse()}"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:text="拒绝好友申请"
             android:textColor="#ff999999"
-            android:onClick="@{(v)->ContactVM.refuse()}"
             android:textSize="18sp" />
+
         <include
             layout="@layout/view_dividing_line"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="0dp"
+            android:layout_weight="1" />
     </LinearLayout>
 </layout>
 

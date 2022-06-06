@@ -6,13 +6,71 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/newFriendNotice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="22dp"
+        android:paddingTop="10dp"
+        android:paddingRight="22dp"
+        android:paddingBottom="10dp">
+
+        <io.openim.android.ouicore.widget.AvatarImage
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@mipmap/ic_friend_add" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="18dp"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="@string/new_friend"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <include
+                    android:id="@+id/newFriendNoticeBadge"
+                    layout="@layout/view_badge"
+                    android:visibility="visible" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="6dp"
+                    android:src="@mipmap/ic_right" />
+
+            </LinearLayout>
+
+            <include layout="@layout/view_dividing_line" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/groupNotice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingTop="10dp"
         android:paddingLeft="22dp"
+        android:paddingTop="10dp"
         android:paddingRight="22dp"
         android:paddingBottom="10dp">
 
@@ -45,9 +103,9 @@
                     android:textSize="18sp" />
 
                 <include
-                    android:visibility="visible"
                     android:id="@+id/badge"
-                    layout="@layout/view_badge" />
+                    layout="@layout/view_badge"
+                    android:visibility="visible" />
 
                 <ImageView
                     android:layout_width="wrap_content"
