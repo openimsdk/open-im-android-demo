@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
@@ -51,6 +52,7 @@ public class Common {
         float scale = BaseApp.instance().getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
     }
+
     //收起键盘
     public static void hideKeyboard(Context context, View v) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -58,6 +60,14 @@ public class Common {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
     }
-
+    /**
+     * 判断是否是字母
+     * @param str 传入字符串
+     * @return 是字母返回true，否则返回false
+     */
+    public static boolean isAlpha(String str) {
+        if(TextUtils.isEmpty(str)) return false;
+        return str.matches("[a-zA-Z]+");
+    }
 }
 

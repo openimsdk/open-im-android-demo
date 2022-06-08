@@ -8,7 +8,7 @@ import android.widget.Toast;
 public interface IView {
     void onError(String error);
 
-    void onSuccess(String body);
+    void onSuccess(Object body);
 
     void toast(String tips);
 

@@ -28,6 +28,7 @@ public class GroupDetailActivity extends BaseActivity<GroupVM, ActivityGroupDeta
     protected void onCreate(Bundle savedInstanceState) {
         bindVM(GroupVM.class);
         vm.groupId = getIntent().getStringExtra(Constant.GROUP_ID);
+        vm.getGroupsInfo();
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityGroupDetailBinding.inflate(getLayoutInflater()));
         view.setGroupVM(vm);

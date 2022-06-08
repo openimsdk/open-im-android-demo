@@ -16,6 +16,9 @@ public abstract class RecyclerViewAdapter<T, V extends RecyclerView.ViewHolder> 
     private List<T> items;
     private Class<V> viewHolder;
 
+    public RecyclerViewAdapter() {
+    }
+
     public RecyclerViewAdapter(Class<V> viewHolder) {
         this.viewHolder = viewHolder;
     }
@@ -23,6 +26,10 @@ public abstract class RecyclerViewAdapter<T, V extends RecyclerView.ViewHolder> 
     public void setItems(List<T> items) {
         this.items = items;
         notifyDataSetChanged();
+    }
+
+    public List<T> getItems() {
+        return items;
     }
 
     @NonNull

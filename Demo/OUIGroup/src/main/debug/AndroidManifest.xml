@@ -4,7 +4,7 @@
 
     <application android:theme="@style/Theme.Demo">
         <activity
-            android:name=".ui.CreateGroupActivity"
+            android:name=".ui.InitiateGroupActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

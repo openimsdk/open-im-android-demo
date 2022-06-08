@@ -144,7 +144,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     }
 
     @Override
-    public void onSuccess(String body) {
+    public void onSuccess(Object body) {
 
     }
 

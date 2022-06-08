@@ -25,7 +25,7 @@ public class FriendRequestDetailActivity extends BaseActivity<ContactVM, Activit
     }
 
     @Override
-    public void onSuccess(String body) {
+    public void onSuccess(Object body) {
         super.onSuccess(body);
         finish();
         Toast.makeText(this, getString(io.openim.android.ouicore.R.string.send_succ), Toast.LENGTH_SHORT).show();

@@ -55,7 +55,7 @@ public class BaseFragment<T extends BaseViewModel> extends Fragment implements I
     }
 
     @Override
-    public void onSuccess(String body) {
+    public void onSuccess(Object body) {
 
     }
 

@@ -63,6 +63,11 @@ dependencies {
     api 'com.github.lwj1994:Matisse:0.5.3-20220115'
     api 'com.yanzhenjie:permission:2.0.3'
 
+    api 'com.github.promeg:tinypinyin:2.0.3'
+    api 'com.github.promeg:tinypinyin-lexicons-android-cncity:2.0.3'
+
+    api 'com.yanzhenjie.recyclerview:x:1.3.2'
+
     api project(':OpenIM-SDK')
 
 }

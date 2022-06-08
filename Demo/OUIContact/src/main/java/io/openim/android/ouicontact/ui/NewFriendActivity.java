@@ -53,6 +53,10 @@ public class NewFriendActivity extends BaseActivity<ContactVM, ActivityNewFriend
         view.searchView.setOnClickListener(v -> {
         });
         view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
+
+
         adapter = new RecyclerViewAdapter<FriendApplicationInfo, ViewHo>(ViewHo.class) {
 
             @Override
@@ -75,7 +79,6 @@ public class NewFriendActivity extends BaseActivity<ContactVM, ActivityNewFriend
                     holder.view.handle.setText(getString(io.openim.android.ouicore.R.string.rejected));
                     holder.view.handle.setTextColor(Color.parseColor("#999999"));
                 } else {
-
                     holder.view.handle.setText(getString(io.openim.android.ouicore.R.string.hil));
                     holder.view.getRoot().setOnClickListener(v -> ARouter.getInstance().build(Routes.Conversation.CHAT)
                         .withString(ID, data.getFromUserID())

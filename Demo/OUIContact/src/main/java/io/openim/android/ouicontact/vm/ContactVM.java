@@ -10,40 +10,41 @@ import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.listener.OnFriendshipListener;
 import io.openim.android.sdk.listener.OnGroupListener;
+import io.openim.android.sdk.models.BlacklistInfo;
 import io.openim.android.sdk.models.FriendApplicationInfo;
+import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
-public class ContactVM extends BaseViewModel implements OnGroupListener {
+public class ContactVM extends BaseViewModel implements OnGroupListener, OnFriendshipListener {
     //群红点数量
     public MutableLiveData<Integer> dotNum = new MutableLiveData<>(0);
     //好友通知红点
     public MutableLiveData<Integer> friendDotNum = new MutableLiveData<>(0);
-
     //申请列表
     public MutableLiveData<List<GroupApplicationInfo>> groupApply = new MutableLiveData<>();
     //好友申请列表
     public MutableLiveData<List<FriendApplicationInfo>> friendApply = new MutableLiveData<>();
-
     //申请详情
     public MutableLiveData<GroupApplicationInfo> groupDetail = new MutableLiveData<>();
     //好友申请详情
     public MutableLiveData<FriendApplicationInfo> friendDetail = new MutableLiveData<>();
 
-
     @Override
     protected void viewCreate() {
         super.viewCreate();
         IMEvent.getInstance().addGroupListener(this);
-
+        IMEvent.getInstance().addFriendListener(this);
     }
 
     @Override
     protected void viewDestroy() {
         super.viewDestroy();
         IMEvent.getInstance().removeGroupListener(this);
+        IMEvent.getInstance().removeFriendListener(this);
     }
 
     //个人申请列表
@@ -163,6 +164,51 @@ public class ContactVM extends BaseViewModel implements OnGroupListener {
 
     @Override
     public void onJoinedGroupDeleted(GroupInfo info) {
+
+    }
+
+    @Override
+    public void onBlacklistAdded(BlacklistInfo u) {
+
+    }
+
+    @Override
+    public void onBlacklistDeleted(BlacklistInfo u) {
+
+    }
+
+    @Override
+    public void onFriendApplicationAccepted(FriendApplicationInfo u) {
+
+    }
+
+    @Override
+    public void onFriendApplicationAdded(FriendApplicationInfo u) {
+            friendDotNum.setValue(friendDotNum.getValue() + 1);
+    }
+
+    @Override
+    public void onFriendApplicationDeleted(FriendApplicationInfo u) {
+
+    }
+
+    @Override
+    public void onFriendApplicationRejected(FriendApplicationInfo u) {
+
+    }
+
+    @Override
+    public void onFriendInfoChanged(FriendInfo u) {
+
+    }
+
+    @Override
+    public void onFriendAdded(FriendInfo u) {
+
+    }
+
+    @Override
+    public void onFriendDeleted(FriendInfo u) {
 
     }
 }

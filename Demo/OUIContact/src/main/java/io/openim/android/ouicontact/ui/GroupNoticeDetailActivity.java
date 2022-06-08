@@ -26,7 +26,7 @@ public class GroupNoticeDetailActivity extends BaseActivity<ContactVM, ActivityG
     }
 
     @Override
-    public void onSuccess(String body) {
+    public void onSuccess(Object body) {
         finish();
     }
 }

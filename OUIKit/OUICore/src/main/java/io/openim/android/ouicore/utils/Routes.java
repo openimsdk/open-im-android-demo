@@ -18,6 +18,8 @@ public class Routes {
     public static class Group {
         //搜索详情
         public final static String DETAIL = "/group/GroupDetailActivity";
+        //创建群组
+        public final static String CREATE_GROUP = "/group/CreateGroupActivity";
     }
 
     //关系链

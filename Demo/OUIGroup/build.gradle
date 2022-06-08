@@ -64,6 +64,7 @@ dependencies {
     annotationProcessor 'com.alibaba:arouter-compiler:1.5.2'
 
     implementation 'com.lwkandroid.library:IndexBar:1.0.3'
+    implementation 'com.github.maogedadada:SortLetter-Master:1.0.9'
 
-
+    implementation project(':OUICore')
 }

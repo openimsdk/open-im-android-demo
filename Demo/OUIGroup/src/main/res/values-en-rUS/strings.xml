@@ -3,4 +3,6 @@
     <string name="apply_join">申请加入该群</string>
     <string name="group_id">群ID号</string>
     <string name="member">群成员</string>
+    <string name="complete_creation">完成创建</string>
+    <string name="create_succ">创建成功</string>
 </resources>

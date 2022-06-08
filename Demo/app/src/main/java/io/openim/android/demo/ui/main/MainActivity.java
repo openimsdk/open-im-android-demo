@@ -72,6 +72,10 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
                 startActivity(new Intent(this, AddConversActivity.class)
                     .putExtra(AddConversActivity.IS_PERSON, false));
             });
+            view.createGroup.setOnClickListener(c -> {
+                popupWindow.dismiss();
+                ARouter.getInstance().build(Routes.Group.CREATE_GROUP).navigation();
+            });
             //设置PopupWindow的视图内容
             popupWindow.setContentView(view.getRoot());
             //点击空白区域PopupWindow消失，这里必须先设置setBackgroundDrawable，否则点击无反应
