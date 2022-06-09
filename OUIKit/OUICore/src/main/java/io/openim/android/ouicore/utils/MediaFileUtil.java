@@ -1,9 +1,15 @@
 package io.openim.android.ouicore.utils;
 
+import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Random;
 
 public class MediaFileUtil {
     private static String sFileExtensions;
@@ -141,24 +147,48 @@ public class MediaFileUtil {
         }
         return false;
     }
+
     /**
      * 获取 视频 或 音频 时长
+     *
      * @param path 视频 或 音频 文件路径
      * @return 时长 毫秒值
      */
-    public static long getDuration(String path){
+    public static long getDuration(String path) {
         android.media.MediaMetadataRetriever mmr = new android.media.MediaMetadataRetriever();
-        long duration=0;
+        long duration = 0;
         try {
-            if (path!= null) {
+            if (path != null) {
                 mmr.setDataSource(path);
             }
             String time = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-            duration= Long.parseLong(time);
+            duration = Long.parseLong(time);
         } catch (Exception ex) {
         } finally {
             mmr.release();
         }
         return duration;
+    }
+
+    public static String saveBitmap(Bitmap bitmap, String dir) {
+        try {
+            File dirFile = new File(dir);
+            if (!dirFile.exists()) {              //如果不存在，那就建立这个文件夹
+                dirFile.mkdirs();
+            }
+            int random = new Random().nextInt(100) + 1;
+            File file = new File(dir, random + ".jpg");
+            FileOutputStream fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+            fos.close();
+            bitmap.recycle();
+            return  file.getAbsolutePath();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

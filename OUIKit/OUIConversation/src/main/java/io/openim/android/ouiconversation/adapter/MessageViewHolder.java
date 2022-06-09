@@ -2,6 +2,7 @@ package io.openim.android.ouiconversation.adapter;
 
 import static io.openim.android.ouiconversation.adapter.MessageAdapter.OWN_ID;
 
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
@@ -43,6 +44,7 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgImgLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgImgRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
+import io.openim.android.ouiconversation.ui.PreviewActivity;
 import io.openim.android.ouiconversation.utils.Constant;
 import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.L;
@@ -216,6 +218,7 @@ public class MessageViewHolder {
                 .into(v.content2);
 
             v.sendState2.setSendState(message.getStatus());
+            toPreview(v.content2, url);
         }
 
         @Override
@@ -228,6 +231,12 @@ public class MessageViewHolder {
                 .into(v.content);
 
             v.sendState.setSendState(message.getStatus());
+            toPreview(v.content, url);
+        }
+
+        void toPreview(View view, String url) {
+            view.setOnClickListener(v -> view.getContext().startActivity(
+                new Intent(view.getContext(), PreviewActivity.class).putExtra(PreviewActivity.MEDIA_URL, url)));
         }
     }
 
@@ -357,9 +366,7 @@ public class MessageViewHolder {
             Glide.with(itemView.getContext())
                 .load(message.getVideoElem().getSnapshotPath())
                 .into(view.content);
-            view.contentGroup.setOnClickListener(v -> {
-
-            });
+            toPreview(view.contentGroup,message.getVideoElem().getVideoUrl(),message.getVideoElem().getSnapshotPath());
         }
 
         @Override
@@ -370,14 +377,19 @@ public class MessageViewHolder {
             Glide.with(itemView.getContext())
                 .load(message.getVideoElem().getSnapshotUrl())
                 .into(view.content2);
-            view.contentGroup2.setOnClickListener(v -> {
+            toPreview(view.contentGroup2,message.getVideoElem().getVideoUrl(),message.getVideoElem().getSnapshotPath());
+        }
 
-            });
+        void toPreview(View view, String url, String firstFrameUrl) {
+            view.setOnClickListener(v -> view.getContext().startActivity(
+                new Intent(view.getContext(), PreviewActivity.class)
+                    .putExtra(PreviewActivity.MEDIA_URL, url)
+                    .putExtra(PreviewActivity.FIRST_FRAME, firstFrameUrl)));
         }
     }
 
 
-    public static class FileView extends MessageViewHolder.MsgViewHolder{
+    public static class FileView extends MessageViewHolder.MsgViewHolder {
 
         public FileView(ViewGroup itemView) {
             super(itemView);
@@ -395,24 +407,24 @@ public class MessageViewHolder {
 
         @Override
         void bindLeft(View itemView, Message message) {
-            LayoutMsgFileLeftBinding view =LayoutMsgFileLeftBinding.bind(itemView);
+            LayoutMsgFileLeftBinding view = LayoutMsgFileLeftBinding.bind(itemView);
 
             view.avatar.load(message.getSenderFaceUrl());
             view.title.setText(message.getFileElem().getFileName());
-            Long size=message.getFileElem().getFileSize();
-            view.size.setText(ByteUtil.bytes2kb(size)+"");
+            Long size = message.getFileElem().getFileSize();
+            view.size.setText(ByteUtil.bytes2kb(size) + "");
 
             view.sendState.setSendState(message.getStatus());
         }
 
         @Override
         void bindRight(View itemView, Message message) {
-            LayoutMsgFileRightBinding view =LayoutMsgFileRightBinding.bind(itemView);
+            LayoutMsgFileRightBinding view = LayoutMsgFileRightBinding.bind(itemView);
 
             view.avatar2.load(message.getSenderFaceUrl());
             view.title2.setText(message.getFileElem().getFileName());
-            Long size=message.getFileElem().getFileSize();
-            view.size2.setText(ByteUtil.bytes2kb(size)+"");
+            Long size = message.getFileElem().getFileSize();
+            view.size2.setText(ByteUtil.bytes2kb(size) + "");
 
             view.sendState2.setSendState(message.getStatus());
         }

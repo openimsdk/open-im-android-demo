@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -23,6 +24,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.FutureTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 import com.zhihu.matisse.Matisse;
@@ -33,6 +39,7 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.FragmentInputExpandBinding;
@@ -42,8 +49,10 @@ import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.Message;
@@ -132,8 +141,8 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                     Uri uri = data.getData();
                     if (null != uri) {
                         String filePath = GetFilePathFromUri.getFileAbsolutePath(getContext(), uri);
-                        if (null != filePath){
-                            Message msg=OpenIMClient.getInstance().messageManager.createFileMessageFromFullPath(filePath, new File(filePath).getName());
+                        if (null != filePath) {
+                            Message msg = OpenIMClient.getInstance().messageManager.createFileMessageFromFullPath(filePath, new File(filePath).getName());
                             vm.sendMsg(msg);
                         }
                     }
@@ -146,10 +155,24 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
             if (result.getResultCode() == Activity.RESULT_OK) {
                 Intent data = result.getData();
                 List<String> files = Matisse.obtainPathResult(data);
+
                 for (String file : files) {
                     Message msg = OpenIMClient.getInstance().messageManager.createTextMessage("[" + getString(R.string.unsupported_type) + "]");
                     if (MediaFileUtil.isImageType(file)) {
                         msg = OpenIMClient.getInstance().messageManager.createImageMessageFromFullPath(file);
+                    }
+                    if (MediaFileUtil.isVideoType(file)) {
+                        Glide.with(this).asBitmap().load(file).into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                              String firstFame=MediaFileUtil.saveBitmap(resource, Constant.PICTUREDIR);
+                                long duration = MediaFileUtil.getDuration(file);
+                                Message msg = OpenIMClient.getInstance().messageManager
+                                    .createVideoMessageFromFullPath(file, MediaFileUtil.getFileType(file).mimeType, duration, firstFame);
+                                vm.sendMsg(msg);
+                            }
+                        });
+                        return;
                     }
                     vm.sendMsg(msg);
                 }

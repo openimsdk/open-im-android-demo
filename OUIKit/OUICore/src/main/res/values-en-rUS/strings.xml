@@ -21,7 +21,7 @@
     <string name="agreeed">同意</string>
     <string name="album">相册</string>
     <string name="shoot">拍摄</string>
-    <string name="camera_punch_failed">相机打卡失败</string>
+    <string name="camera_punch_failed">相机打开失败</string>
     <string name="camera_permission_failed">无法获取摄像头权限</string>
     <string name="file">文件</string>
     <string name="new_friend">新的好友</string>

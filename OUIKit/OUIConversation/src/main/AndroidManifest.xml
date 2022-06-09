@@ -3,13 +3,18 @@
     package="io.openim.android.ouiconversation">
 
     <uses-permission android:name="android.permission.FLASHLIGHT" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <application android:theme="@style/Theme.Demo">
+        <activity
+            android:name=".ui.PreviewActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.ShootActivity"
             android:exported="false" />
