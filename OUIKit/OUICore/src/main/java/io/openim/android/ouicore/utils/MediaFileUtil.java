@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.UUID;
 
 public class MediaFileUtil {
     private static String sFileExtensions;
@@ -176,7 +177,7 @@ public class MediaFileUtil {
             if (!dirFile.exists()) {              //如果不存在，那就建立这个文件夹
                 dirFile.mkdirs();
             }
-            int random = new Random().nextInt(100) + 1;
+           String random = UUID.randomUUID().toString();
             File file = new File(dir, random + ".jpg");
             FileOutputStream fos = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
