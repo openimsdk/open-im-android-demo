@@ -67,6 +67,13 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
     //权限
     boolean hasStorage, hasShoot;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        hasStorage = AndPermission.hasPermissions(this, Permission.Group.STORAGE);
+        hasShoot = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.RECORD_AUDIO);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -76,9 +83,6 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
     }
 
     private void init() {
-        hasStorage = AndPermission.hasPermissions(this, Permission.Group.STORAGE);
-        hasShoot = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.RECORD_AUDIO);
-
         v.getRoot().setLayoutManager(new GridLayoutManager(getContext(), 4));
         RecyclerViewAdapter adapter = new RecyclerViewAdapter<Object, ExpandHolder>(ExpandHolder.class) {
 

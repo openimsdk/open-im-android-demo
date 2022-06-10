@@ -1,5 +1,7 @@
 package io.openim.android.ouiconversation.vm;
 
+import static io.openim.android.ouicore.utils.Common.UIHandler;
+
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         IMEvent.getInstance().addAdvanceMsgListener(this);
         undataConversation();
 
+        UIHandler.postDelayed(this::undataConversation,5*1000);
     }
 
     private void undataConversation() {
@@ -42,6 +45,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
             @Override
             public void onSuccess(List<ConversationInfo> data) {
+                L.e("-----------"+data.size());
                 conversations.getValue().clear();
                 for (ConversationInfo datum : data) {
                     conversations.getValue().add(new MsgConversation(GsonHel.fromJson(datum.getLatestMsg(), Message.class), datum));

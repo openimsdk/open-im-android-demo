@@ -224,8 +224,12 @@ public class MessageViewHolder {
         @Override
         void bindRight(View itemView, Message message) {
             LayoutMsgImgRightBinding v = LayoutMsgImgRightBinding.bind(itemView);
-            String url = message.getPictureElem().getSourcePath();
-
+            String url = message.getPictureElem().getSourcePicture().getUrl();
+            if (messageAdapter.hasStorage) {
+                String filePath = message.getPictureElem().getSourcePath();
+                if (new File(filePath).exists())
+                    url = filePath;
+            }
             Glide.with(itemView.getContext())
                 .load(url)
                 .into(v.content);
@@ -363,10 +367,18 @@ public class MessageViewHolder {
             LayoutMsgImgRightBinding view = LayoutMsgImgRightBinding.bind(itemView);
             view.sendState.setSendState(message.getStatus());
             view.videoPlay.setVisibility(View.VISIBLE);
+
+            String snapshotUrl = message.getVideoElem().getSnapshotUrl();
+            if (messageAdapter.hasStorage||null==snapshotUrl) {
+                String filePath = message.getVideoElem().getSnapshotPath();
+                if (new File(filePath).exists())
+                    snapshotUrl = filePath;
+            }
+
             Glide.with(itemView.getContext())
-                .load(message.getVideoElem().getSnapshotPath())
+                .load(snapshotUrl)
                 .into(view.content);
-            toPreview(view.contentGroup,message.getVideoElem().getVideoUrl(),message.getVideoElem().getSnapshotPath());
+            toPreview(view.contentGroup, message.getVideoElem().getVideoUrl(), snapshotUrl);
         }
 
         @Override
@@ -377,7 +389,7 @@ public class MessageViewHolder {
             Glide.with(itemView.getContext())
                 .load(message.getVideoElem().getSnapshotUrl())
                 .into(view.content2);
-            toPreview(view.contentGroup2,message.getVideoElem().getVideoUrl(),message.getVideoElem().getSnapshotPath());
+            toPreview(view.contentGroup2, message.getVideoElem().getVideoUrl(), message.getVideoElem().getSnapshotUrl());
         }
 
         void toPreview(View view, String url, String firstFrameUrl) {
