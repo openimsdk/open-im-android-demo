@@ -16,7 +16,6 @@
     <string name="mail_register">邮箱注册</string>
     <string name="new_user">新用户注册</string>
     <string name="register">注册</string>
-    <string name="search_by_id">通过用户ID号搜索添加</string>
     <string name="add">添加</string>
     <string name="search">搜索</string>
     <string name="not_find_user">无法找到该用户</string>
