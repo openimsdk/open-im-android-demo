@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:paddingLeft="13dp"
     android:paddingTop="20dp"
+    android:background="@color/white"
     android:paddingRight="13dp"
     android:paddingBottom="20dp"
     android:overScrollMode="never">

@@ -12,6 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
+        android:focusableInTouchMode="true"
+        android:tag="layout/layout_input_cote_0"
         android:orientation="vertical">
 
         <LinearLayout
@@ -28,13 +30,13 @@
                 android:id="@+id/voice"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:button="@null"
-                android:paddingLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:drawableLeft="@drawable/selector_chat_checkbox" />
+                android:button="@null"
+                android:drawableLeft="@drawable/selector_chat_checkbox"
+                android:paddingLeft="10dp" />
 
             <EditText
-                android:id="@+id/input"
+                android:id="@+id/chatInput"
                 android:layout_width="0dp"
                 android:layout_height="35dp"
                 android:layout_weight="1"
@@ -54,23 +56,24 @@
                 android:visibility="gone" />
 
             <ImageView
-                android:id="@+id/more"
+                android:id="@+id/chatMore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
-                android:layout_marginRight="6dp"
-
-                android:padding="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:clickable="true"
+                android:padding="7dp"
                 android:src="@mipmap/ic_chat_add" />
 
             <Button
-                android:id="@+id/send"
+                android:id="@+id/chatSend"
                 android:layout_width="63dp"
                 android:layout_height="wrap_content"
                 android:enabled="true"
                 android:text="@string/send"
+                android:visibility="visible"
                 android:textSize="14sp"
-                android:theme="@style/Theme.Demo" />
+                />
         </LinearLayout>
 
         <FrameLayout

@@ -161,7 +161,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                 List<String> files = Matisse.obtainPathResult(data);
 
                 for (String file : files) {
-                    Message msg = OpenIMClient.getInstance().messageManager.createTextMessage("[" + getString(R.string.unsupported_type) + "]");
+                    Message msg = null;
                     if (MediaFileUtil.isImageType(file)) {
                         msg = OpenIMClient.getInstance().messageManager.createImageMessageFromFullPath(file);
                     }
@@ -169,7 +169,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                         Glide.with(this).asBitmap().load(file).into(new SimpleTarget<Bitmap>() {
                             @Override
                             public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                              String firstFame=MediaFileUtil.saveBitmap(resource, Constant.PICTUREDIR);
+                                String firstFame = MediaFileUtil.saveBitmap(resource, Constant.PICTUREDIR);
                                 long duration = MediaFileUtil.getDuration(file);
                                 Message msg = OpenIMClient.getInstance().messageManager
                                     .createVideoMessageFromFullPath(file, MediaFileUtil.getFileType(file).mimeType, duration, firstFame);
@@ -178,6 +178,8 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                         });
                         return;
                     }
+                    if (null == msg)
+                        msg = OpenIMClient.getInstance().messageManager.createTextMessage("[" + getString(R.string.unsupported_type) + "]");
                     vm.sendMsg(msg);
                 }
             }

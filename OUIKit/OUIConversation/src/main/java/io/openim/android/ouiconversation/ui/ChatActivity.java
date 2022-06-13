@@ -8,6 +8,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
@@ -23,6 +24,7 @@ import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouiconversation.databinding.ActivityChatBinding;
 import io.openim.android.ouiconversation.utils.Constant;
 import io.openim.android.ouiconversation.vm.ChatVM;
+import io.openim.android.ouiconversation.widget.BottomInputCote;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
@@ -33,6 +35,7 @@ import io.openim.android.ouicore.utils.SinkHelper;
 public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> implements ChatVM.ViewAction {
 
     private MessageAdapter messageAdapter;
+    private BottomInputCote bottomInputCote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +62,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
         setTouchClearFocus(false);
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
+
     }
 
     @Override
@@ -69,7 +73,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     @SuppressLint("ClickableViewAccessibility")
     private void initView(String name) {
-        view.inputGroup.setChatVM(vm);
+        bottomInputCote = new BottomInputCote(this, view.layoutInputCote);
+        bottomInputCote.setChatVM(vm);
 
         view.nickName.setText(name);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -90,13 +95,12 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             messageAdapter.notifyDataSetChanged();
         });
         view.recyclerView.setOnTouchListener((v, event) -> {
-            view.inputGroup.clearFocus();
-            Common.hideKeyboard(this,v);
-            view.inputGroup.setExpandHide();
+            bottomInputCote.clearFocus();
+            Common.hideKeyboard(this, v);
+            bottomInputCote.setExpandHide();
             return false;
         });
     }
-
 
     //记录原始窗口高度
     private int mWindowHeight = 0;
@@ -110,7 +114,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             //一般情况下，这是原始的窗口高度
             mWindowHeight = height;
         } else {
-            RelativeLayout.LayoutParams inputLayoutParams = (RelativeLayout.LayoutParams) view.inputGroup.getLayoutParams();
+            RelativeLayout.LayoutParams inputLayoutParams = (RelativeLayout.LayoutParams) view.layoutInputCote.getRoot().getLayoutParams();
             if (mWindowHeight == height) {
                 inputLayoutParams.bottomMargin = 0;
             } else {
@@ -118,7 +122,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 int softKeyboardHeight = mWindowHeight - height;
                 inputLayoutParams.bottomMargin = softKeyboardHeight;
             }
-            view.inputGroup.setLayoutParams(inputLayoutParams);
+            view.layoutInputCote.getRoot().setLayoutParams(inputLayoutParams);
         }
     };
 
@@ -139,9 +143,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             }
         });
     }
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        view.inputGroup.dispatchTouchEvent(event);
+        bottomInputCote.dispatchTouchEvent(event);
         return super.dispatchTouchEvent(event);
     }
 

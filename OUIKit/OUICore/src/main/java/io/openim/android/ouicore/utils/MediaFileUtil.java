@@ -40,8 +40,9 @@ public class MediaFileUtil {
     private static final int FILE_TYPE_PNG = 33;
     private static final int FILE_TYPE_BMP = 34;
     private static final int FILE_TYPE_WBMP = 35;
+    private static final int FILE_TYPE_WEBP = 36;
     private static final int FIRST_IMAGE_FILE_TYPE = FILE_TYPE_JPEG;
-    private static final int LAST_IMAGE_FILE_TYPE = FILE_TYPE_WBMP;
+    private static final int LAST_IMAGE_FILE_TYPE = FILE_TYPE_WEBP;
 
     public static class MediaFileType {
 
@@ -85,6 +86,7 @@ public class MediaFileUtil {
         addFileType("PNG", FILE_TYPE_PNG, "image/png");
         addFileType("BMP", FILE_TYPE_BMP, "image/x-ms-bmp");
         addFileType("WBMP", FILE_TYPE_WBMP, "image/vnd.wap.wbmp");
+        addFileType("WEBP", FILE_TYPE_WEBP, "image/webp");
 
 
         // compute file extensions list for native Media Scanner
