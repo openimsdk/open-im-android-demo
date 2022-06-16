@@ -54,24 +54,28 @@ import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
+import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.Message;
 
 
 public class InputExpandFragment extends BaseFragment<ChatVM> {
-    public List<Integer> menuIcons = Arrays.asList(R.mipmap.ic_chat_photo, R.mipmap.ic_chat_shoot, R.mipmap.ic_chat_menu_file);
+    public List<Integer> menuIcons = Arrays.asList(R.mipmap.ic_chat_photo, R.mipmap.ic_chat_shoot, R.mipmap.ic_chat_menu_file,
+        R.mipmap.ic_chat_location);
     public List<String> menuTitles = Arrays.asList(BaseApp.instance().getString(io.openim.android.ouicore.R.string.album),
-        BaseApp.instance().getString(io.openim.android.ouicore.R.string.shoot), BaseApp.instance().getString(io.openim.android.ouicore.R.string.file));
+        BaseApp.instance().getString(io.openim.android.ouicore.R.string.shoot), BaseApp.instance().getString(io.openim.android.ouicore.R.string.file),
+        BaseApp.instance().getString(io.openim.android.ouicore.R.string.location));
 
     FragmentInputExpandBinding v;
     //权限
-    boolean hasStorage, hasShoot;
+    boolean hasStorage, hasShoot, hasLocation;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        hasStorage = AndPermission.hasPermissions(this, Permission.Group.STORAGE);
-        hasShoot = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.RECORD_AUDIO);
+        hasStorage = AndPermission.hasPermissions(getActivity(), Permission.Group.STORAGE);
+        hasShoot = AndPermission.hasPermissions(getActivity(), Permission.CAMERA, Permission.RECORD_AUDIO);
+        hasLocation = AndPermission.hasPermissions(getActivity(), Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
     }
 
     @Nullable
@@ -101,12 +105,46 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                         case 2:
                             gotoSelectFile();
                             break;
+                        case 3:
+                            gotoShareLocation();
+                            break;
                     }
                 });
             }
         };
         v.getRoot().setAdapter(adapter);
         adapter.setItems(menuIcons);
+    }
+
+    private final ActivityResultLauncher<Intent> shareLocationLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() != Activity.RESULT_OK) return;
+        Bundle resultBundle = result.getData().getBundleExtra("result");
+        if (null == resultBundle) return;
+
+        Double latitude=resultBundle.getDouble("latitude");
+        Double longitude=resultBundle.getDouble("longitude");
+        String description=resultBundle.getString("description");
+        Message message=OpenIMClient.getInstance().messageManager.createLocationMessage(latitude,longitude,description);
+        vm.sendMsg(message);
+    });
+
+    //分享位置
+    @SuppressLint("WrongConstant")
+    private void gotoShareLocation() {
+        if (hasLocation) {
+            shareLocationLauncher.launch(new Intent(getActivity(), WebViewActivity.class).putExtra(WebViewActivity.ACTION,
+                WebViewActivity.LOCATION));
+        } else {
+            AndPermission.with(this).runtime().permission(Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION)
+                .onDenied(data -> {
+                })
+                .onGranted(data -> {
+                    hasLocation = true;
+                    shareLocationLauncher.launch(new Intent(getActivity(), WebViewActivity.class).putExtra(WebViewActivity.ACTION,
+                        WebViewActivity.LOCATION));
+                }).start();
+        }
+
     }
 
     private void gotoSelectFile() {

@@ -4,8 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_centerVertical="true"
-    android:layout_marginLeft="15dp"
-    android:paddingLeft="8dp"
+    android:layout_marginLeft="12dp"
     android:onClick="toBack"
-    android:paddingRight="8dp"
+    android:padding="8dp"
     android:src="@mipmap/ic_back2" />

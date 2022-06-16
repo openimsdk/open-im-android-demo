@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <io.openim.android.ouicore.widget.AvatarImage
+            android:id="@+id/avatar"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@mipmap/ic_my_friend" />
+
+        <LinearLayout
+            android:layout_width="222dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:background="@drawable/sty_radius_6_stroke_e6e6e6"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginRight="12dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="成都市中小企业服务中心"
+                android:textColor="#ff333333"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:text="四川省成都市武侯区府城大道西段…"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="#ff999999"
+                android:textSize="12sp" />
+
+            <io.openim.android.ouicore.widget.RoundImageView
+                android:id="@+id/map"
+                android:layout_width="222dp"
+                android:layout_height="80dp"
+                android:radius="6dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="centerCrop" />
+        </LinearLayout>
+
+        <io.openim.android.ouiconversation.widget.SendStateView
+            android:id="@+id/sendState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dp" />
+
+
+    </LinearLayout>
+
+</FrameLayout>

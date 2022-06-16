@@ -30,4 +30,5 @@
     <string name="hil">打招呼</string>
     <string name="create_group">发起群聊</string>
     <string name="create_group_tips">取个群名称方便后续搜索</string>
+    <string name="location">位置</string>
 </resources>

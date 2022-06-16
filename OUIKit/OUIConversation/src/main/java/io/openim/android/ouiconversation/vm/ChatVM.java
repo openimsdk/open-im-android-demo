@@ -19,8 +19,10 @@ import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouiconversation.utils.Constant;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
+import io.openim.android.ouicore.entity.LocationInfo;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.sdk.OpenIMClient;
@@ -117,6 +119,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
             @Override
             public void onSuccess(List<Message> data) {
+                for (Message datum : data) {
+                    buildExInfo(datum);
+                }
                 List<Message> list = messages.getValue();
                 if (data.isEmpty()) {
                     if (!messages.getValue().isEmpty()) {
@@ -153,8 +158,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     //发送消息已读回执
     public void sendMsgReadReceipt(int firstVisiblePosition, int lastVisiblePosition) {
-        int size=messages.getValue().size();
-        if (size>firstVisiblePosition||size<lastVisiblePosition)return;
+        int size = messages.getValue().size();
+        if (size > firstVisiblePosition || size < lastVisiblePosition) return;
 
         List<Message> megs = messages.getValue().subList(firstVisiblePosition, lastVisiblePosition);
         List<String> msgIds = new ArrayList<>();
@@ -186,7 +191,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
         }
         if (!isTyp) {
-            messages.getValue().add(0, msg);
+            messages.getValue().add(0, buildExInfo(msg));
             UIHandler.post(() -> {
                 IView.scrollToPosition(0);
                 messageAdapter.notifyItemInserted(0);
@@ -218,8 +223,25 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     }
 
+    /**
+     * 解析扩展信息 避免在bindView时解析造成卡顿
+     *
+     * @param msg
+     */
+    private Message buildExInfo(Message msg) {
+        try {
+            if (msg.getContentType() == Constant.MsgType.LOCATION)
+                msg.setExt(GsonHel.fromJson(msg.getLocationElem().getDescription(), LocationInfo.class));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return msg;
+    }
+
     public void sendMsg(Message msg) {
-        messages.getValue().add(0, msg);
+        messages.getValue().add(0, buildExInfo(msg));
         messageAdapter.notifyItemInserted(0);
 
         IView.scrollToPosition(0);
@@ -241,7 +263,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             public void onSuccess(Message message) {
                 // 返回新的消息体；替换发送传入的，不然扯回消息会有bug
                 int index = megs.indexOf(msg);
-                megs.add(index, message);
+                megs.add(index, buildExInfo(message));
                 megs.remove(index + 1);
                 messageAdapter.notifyItemChanged(index);
             }

@@ -42,10 +42,13 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgFileLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgFileRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgImgLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgImgRightBinding;
+import io.openim.android.ouiconversation.databinding.LayoutMsgLocation1Binding;
+import io.openim.android.ouiconversation.databinding.LayoutMsgLocation2Binding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
 import io.openim.android.ouiconversation.ui.PreviewActivity;
 import io.openim.android.ouiconversation.utils.Constant;
+import io.openim.android.ouicore.entity.LocationInfo;
 import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.voice.SPlayer;
@@ -72,6 +75,9 @@ public class MessageViewHolder {
 
         if (viewType == Constant.MsgType.FILE)
             return new FileView(parent);
+
+        if (viewType == Constant.MsgType.LOCATION)
+            return new LocationView(parent);
 
         return new TXTView(parent);
     }
@@ -369,7 +375,7 @@ public class MessageViewHolder {
             view.videoPlay.setVisibility(View.VISIBLE);
 
             String snapshotUrl = message.getVideoElem().getSnapshotUrl();
-            if (messageAdapter.hasStorage||null==snapshotUrl) {
+            if (messageAdapter.hasStorage || null == snapshotUrl) {
                 String filePath = message.getVideoElem().getSnapshotPath();
                 if (new File(filePath).exists())
                     snapshotUrl = filePath;
@@ -438,6 +444,53 @@ public class MessageViewHolder {
             Long size = message.getFileElem().getFileSize();
             view.size2.setText(ByteUtil.bytes2kb(size) + "");
 
+            view.sendState2.setSendState(message.getStatus());
+        }
+    }
+
+    public static class LocationView extends MessageViewHolder.MsgViewHolder {
+
+        public LocationView(ViewGroup itemView) {
+            super(itemView);
+        }
+
+        @Override
+        int getLeftInflatedId() {
+            return R.layout.layout_msg_location1;
+        }
+
+        @Override
+        int getRightInflatedId() {
+            return R.layout.layout_msg_location2;
+        }
+
+        @Override
+        void bindLeft(View itemView, Message message) {
+            LayoutMsgLocation1Binding view = LayoutMsgLocation1Binding.bind(itemView);
+            try {
+                LocationInfo locationInfo = (LocationInfo) message.getExt();
+                view.title.setText(locationInfo.name);
+                view.address.setText(locationInfo.addr);
+                Glide.with(itemView.getContext())
+                    .load(locationInfo.url)
+                    .into(view.map);
+            } catch (Exception e) {
+            }
+            view.sendState.setSendState(message.getStatus());
+        }
+
+        @Override
+        void bindRight(View itemView, Message message) {
+            LayoutMsgLocation2Binding view = LayoutMsgLocation2Binding.bind(itemView);
+            try {
+                LocationInfo locationInfo = (LocationInfo) message.getExt();
+                view.title2.setText(locationInfo.name);
+                view.address2.setText(locationInfo.addr);
+                Glide.with(itemView.getContext())
+                    .load(locationInfo.url)
+                    .into(view.map2);
+            } catch (Exception e) {
+            }
             view.sendState2.setSendState(message.getStatus());
         }
     }
