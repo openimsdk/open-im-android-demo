@@ -37,6 +37,7 @@ public class SearchConversActivity extends BaseActivity<SearchVM, ActivitySearch
         bindVMByCache(SearchVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivitySearchPersonBinding.inflate(getLayoutInflater()));
+        view.setSearchVM(vm);
 
         setLightStatus();
         SinkHelper.get(this).setTranslucentStatus(view.sink);

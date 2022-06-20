@@ -31,4 +31,9 @@
     <string name="create_group">发起群聊</string>
     <string name="create_group_tips">取个群名称方便后续搜索</string>
     <string name="location">位置</string>
+    <string name="sure">确定</string>
+    <string name="my_location">我的位置</string>
+    <string name="picture">图片</string>
+    <string name="voice">语音</string>
+    <string name="video">视频</string>
 </resources>

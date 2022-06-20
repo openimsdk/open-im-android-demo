@@ -36,6 +36,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private MessageAdapter messageAdapter;
     private BottomInputCote bottomInputCote;
+    private int repeat = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +80,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.nickName.setText(name);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         //倒叙
-        linearLayoutManager.setStackFromEnd(false);
+        linearLayoutManager.setStackFromEnd(true);
         linearLayoutManager.setReverseLayout(true);
 
         view.recyclerView.setLayoutManager(linearLayoutManager);
@@ -100,6 +101,13 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             bottomInputCote.setExpandHide();
             return false;
         });
+        view.recyclerView.post(() -> scrollToPosition(0));
+        view.recyclerView.addOnLayoutChangeListener((v, i, i1, i2, i3, i4, i5, i6, i7) -> {
+            if (i3 < i7) { // bottom < oldBottom
+                scrollToPosition(0);
+            }
+        });
+
     }
 
     //记录原始窗口高度

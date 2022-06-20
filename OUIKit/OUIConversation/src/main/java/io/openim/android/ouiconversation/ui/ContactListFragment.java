@@ -33,6 +33,7 @@ import java.util.List;
 
 import io.openim.android.ouiconversation.R;
 
+import io.openim.android.ouiconversation.adapter.MessageViewHolder;
 import io.openim.android.ouiconversation.databinding.FragmentContactListBinding;
 import io.openim.android.ouiconversation.databinding.LayoutContactItemBinding;
 import io.openim.android.ouiconversation.vm.ContactListVM;
@@ -46,6 +47,8 @@ import io.openim.android.ouicore.utils.TimeUtil;
 @Route(path = Routes.Conversation.CONTACT_LIST)
 public class ContactListFragment extends BaseFragment<ContactListVM> implements ContactListVM.ViewAction {
 
+    private long mLastClickTime;
+    private long timeInterval = 700;
 
     private FragmentContactListBinding view;
 
@@ -100,6 +103,11 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
         });
         view.recyclerView.setOnItemClickListener((view, position) -> {
+            long nowTime = System.currentTimeMillis();
+            if (nowTime - mLastClickTime < timeInterval)
+                return;
+            mLastClickTime = nowTime;
+
             MsgConversation msgConversation = vm.conversations.getValue().get(position);
             Intent intent = new Intent(getContext(), ChatActivity.class)
                 .putExtra(K_NAME, msgConversation.conversationInfo.getShowName());
@@ -164,7 +172,32 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
             viewHolder.viewBinding.avatar.load(msgConversation.conversationInfo.getFaceURL(), msgConversation.conversationInfo.getConversationType() == Constant.SessionType.GROUP_CHAT);
             viewHolder.viewBinding.nickName.setText(msgConversation.conversationInfo.getShowName());
-            viewHolder.viewBinding.lastMsg.setText(msgConversation.lastMsg.getContent());
+
+            String lastMsg = "";
+            switch (msgConversation.lastMsg.getContentType()) {
+                default:
+                    lastMsg = msgConversation.lastMsg.getNotificationElem().getDefaultTips();
+                    break;
+                case io.openim.android.ouiconversation.utils.Constant.MsgType.TXT:
+                    lastMsg = msgConversation.lastMsg.getContent();
+                    break;
+                case io.openim.android.ouiconversation.utils.Constant.MsgType.PICTURE:
+                    lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.picture) + "]";
+                    break;
+                case io.openim.android.ouiconversation.utils.Constant.MsgType.VOICE:
+                    lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.voice) + "]";
+                    break;
+                case io.openim.android.ouiconversation.utils.Constant.MsgType.VIDEO:
+                    lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.video) + "]";
+                    break;
+                case io.openim.android.ouiconversation.utils.Constant.MsgType.FILE:
+                    lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.file) + "]";
+                    break;
+                case io.openim.android.ouiconversation.utils.Constant.MsgType.LOCATION:
+                    lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.location) + "]";
+                    break;
+            }
+            viewHolder.viewBinding.lastMsg.setText(lastMsg);
             viewHolder.viewBinding.badge.badge.setVisibility(msgConversation.conversationInfo.getUnreadCount() != 0 ? View.VISIBLE : View.GONE);
             viewHolder.viewBinding.badge.badge.setText(msgConversation.conversationInfo.getUnreadCount() + "");
             viewHolder.viewBinding.time.setText(TimeUtil.getTimeString(msgConversation.conversationInfo.getLatestMsgSendTime()));

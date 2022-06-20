@@ -56,10 +56,6 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         removeCacheVM();
     }
 
-    private void toBack(View view) {
-        finish();
-    }
-
     private void initView() {
         setLightStatus();
         SinkHelper.get(this).setTranslucentStatus(view.getRoot());

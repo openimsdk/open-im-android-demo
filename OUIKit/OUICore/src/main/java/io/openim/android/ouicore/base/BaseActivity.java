@@ -80,7 +80,9 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
             vm.viewDestroy();
         }
     }
-
+    public void toBack(View view) {
+        finish();
+    }
     boolean touchClearFocus = true;
 
     public void setTouchClearFocus(boolean touchClearFocus) {

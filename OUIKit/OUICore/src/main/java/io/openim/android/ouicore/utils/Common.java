@@ -76,6 +76,7 @@ public class Common {
 
     /**
      * 设置全屏
+     *
      * @param activity
      */
     public static void setFullScreen(Activity activity) {

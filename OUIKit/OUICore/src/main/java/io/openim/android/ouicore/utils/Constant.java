@@ -4,6 +4,7 @@ import io.openim.android.ouicore.im.IM;
 
 public class Constant {
     public static final String DEFAULT_IP = "121.37.25.71";
+//    public static final String DEFAULT_IP = "43.128.5.63";
 
     //IM sdk api地址
     public static final String IM_API_URL = "http://" + DEFAULT_IP + ":10002";

@@ -37,16 +37,19 @@ import io.openim.android.ouicore.utils.L;
 public class WebViewActivity extends BaseActivity<BaseViewModel, ActivityWebViewBinding> {
 
     public final static String ACTION = "action";
+    public final static String TITLE = "title";
+    public final static String RIGHT = "right";
+    public final static String LOAD_URL = "loadUrl";
+
     //位置
     public final static String LOCATION = "location";
 
     private String action;
-
+    private String loadUrl;
 
     //h5 腾讯地图
-    private String mapUrl;
     private String mapThumbnailUrl;
-    private String mapAppKey = "TMNBZ-3CGC6-C6SSL-EJA3B-E2P5Q-V7F6Q",
+    public static String mapAppKey = "TMNBZ-3CGC6-C6SSL-EJA3B-E2P5Q-V7F6Q",
         mapThumbnailSize = "1200*600",
         mapBackUrl = "http://callback";
 
@@ -70,6 +73,15 @@ public class WebViewActivity extends BaseActivity<BaseViewModel, ActivityWebView
     }
 
     private void initView() {
+        String title = getIntent().getStringExtra(TITLE);
+        if (!TextUtils.isEmpty(title))
+            view.title.setText(title);
+        String right = getIntent().getStringExtra(RIGHT);
+        if (null == right)
+            right = "";
+        view.right.setText(right);
+
+
         view.right.setOnClickListener(v -> finish());
 
         WebSettings webSettings = view.webView.getSettings();
@@ -159,10 +171,11 @@ public class WebViewActivity extends BaseActivity<BaseViewModel, ActivityWebView
                 return true;
             }
         });
-
-        if (TextUtils.isEmpty(action))
-            return;
         switch (action) {
+            default:
+                loadUrl = getIntent().getStringExtra(LOAD_URL);
+                view.webView.loadUrl(loadUrl);
+                break;
             case LOCATION:
                 buildLocation();
                 break;
@@ -171,12 +184,13 @@ public class WebViewActivity extends BaseActivity<BaseViewModel, ActivityWebView
     }
 
     private void buildLocation() {
-        mapUrl =
+        loadUrl =
             "https://apis.map.qq.com/tools/locpicker?search=1&type=0&backurl=" + mapBackUrl + "&key=" + mapAppKey + "&referer=myapp&policy=1";
         mapThumbnailUrl =
             "https://apis.map.qq.com/ws/staticmap/v2/?center=%s&zoom=18&size=" + mapThumbnailSize + "&maptype=roadmap&markers=size:large|color:0xFFCCFF|label:k|%s&key=" + mapAppKey;
 
-
-        view.webView.loadUrl(mapUrl);
+        view.right.setText(R.string.sure);
+        view.title.setText(R.string.my_location);
+        view.webView.loadUrl(loadUrl);
     }
 }

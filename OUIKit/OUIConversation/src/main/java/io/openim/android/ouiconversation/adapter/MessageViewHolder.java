@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -44,6 +45,7 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgImgLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgImgRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgLocation1Binding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgLocation2Binding;
+import io.openim.android.ouiconversation.databinding.LayoutMsgNoticeBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
 import io.openim.android.ouiconversation.ui.PreviewActivity;
@@ -54,6 +56,7 @@ import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.voice.listener.PlayerListener;
 import io.openim.android.ouicore.voice.player.SMediaPlayer;
+import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.models.Message;
 
 public class MessageViewHolder {
@@ -78,6 +81,9 @@ public class MessageViewHolder {
 
         if (viewType == Constant.MsgType.LOCATION)
             return new LocationView(parent);
+
+        if (viewType >= Constant.MsgType.NOTICE)
+            return new NoticeView(parent);
 
         return new TXTView(parent);
     }
@@ -156,6 +162,42 @@ public class MessageViewHolder {
         public LoadingView(ViewGroup parent) {
             super(LayoutLoadingSmallBinding.inflate(LayoutInflater.from(parent.getContext()),
                 parent, false).getRoot());
+        }
+    }
+
+    //通知消息
+    public static class NoticeView extends MessageViewHolder.MsgViewHolder {
+
+        public NoticeView(ViewGroup itemView) {
+            super(itemView);
+        }
+
+        @Override
+        public void bindData(Message message, int position) {
+            TextView textView = itemView.findViewById(R.id.notice);
+            textView.setVisibility(View.VISIBLE);
+            String tips = message.getNotificationElem().getDefaultTips();
+            textView.setText(tips);
+        }
+
+        @Override
+        int getLeftInflatedId() {
+            return 0;
+        }
+
+        @Override
+        int getRightInflatedId() {
+            return 0;
+        }
+
+        @Override
+        void bindLeft(View itemView, Message message) {
+
+        }
+
+        @Override
+        void bindRight(View itemView, Message message) {
+
         }
     }
 
@@ -477,6 +519,12 @@ public class MessageViewHolder {
             } catch (Exception e) {
             }
             view.sendState.setSendState(message.getStatus());
+            view.content.setOnClickListener(v -> {
+
+                v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class)
+                    .putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord=" +
+                        message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey));
+            });
         }
 
         @Override
@@ -492,6 +540,11 @@ public class MessageViewHolder {
             } catch (Exception e) {
             }
             view.sendState2.setSendState(message.getStatus());
+            view.content2.setOnClickListener(v -> {
+                v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class)
+                    .putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord=" +
+                        message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey));
+            });
         }
     }
 
