@@ -3,7 +3,6 @@ package io.openim.android.demo.ui.search;
 import static io.openim.android.ouicore.utils.Constant.ID;
 
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -28,8 +27,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         bindViewDataBinding(ActivityPersonDetailBinding.inflate(getLayoutInflater()));
         super.onCreate(savedInstanceState);
 
-        setLightStatus();
-        SinkHelper.get(this).setTranslucentStatus(view.getRoot());
+        sink();
 
         listener();
         vm.searchContent = getIntent().getStringExtra(ID);
@@ -40,9 +38,9 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
 
     private void click() {
         view.sendMsg.setOnClickListener(v -> ARouter.getInstance().build(Routes.Conversation.CHAT)
-                .withString(ID, vm.searchContent)
-                .withString(io.openim.android.ouicore.utils.Constant.K_NAME, vm.userInfo.getValue().get(0).getNickname())
-                .navigation());
+            .withString(ID, vm.searchContent)
+            .withString(io.openim.android.ouicore.utils.Constant.K_NAME, vm.userInfo.getValue().get(0).getNickname())
+            .navigation());
 
 
         view.addFriend.setOnClickListener(v -> {

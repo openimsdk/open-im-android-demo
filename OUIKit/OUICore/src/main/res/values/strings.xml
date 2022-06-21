@@ -36,4 +36,6 @@
     <string name="picture">图片</string>
     <string name="voice">语音</string>
     <string name="video">视频</string>
+    <string name="san_it">扫一扫</string>
+    <string name="quit_group">退出群聊</string>
 </resources>

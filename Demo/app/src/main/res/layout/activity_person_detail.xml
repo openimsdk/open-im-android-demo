@@ -1,162 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F6F6F6"
-        android:orientation="vertical"
-        tools:context=".ui.search.PersonDetailActivity">
+        android:background="@color/white">
 
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/comm_title_high"
-            app:cardElevation="8dp">
+            android:layout_height="match_parent"
+            android:background="#F6F6F6"
+            android:orientation="vertical"
+            tools:context=".ui.search.PersonDetailActivity">
 
-            <RelativeLayout
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="@dimen/comm_title_high"
+                app:cardElevation="8dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <include
+                        android:id="@+id/back"
+                        layout="@layout/view_back" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="@string/detail"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical">
+
+                <LinearLayout
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/nickName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="李立白"
+                        android:textColor="#ff333333"
+                        android:textSize="20sp" />
+
+                    <io.openim.android.ouicore.widget.AvatarImage
+                        android:id="@+id/avatar"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@mipmap/ic_my_friend" />
+
+                </LinearLayout>
+
+                <include layout="@layout/view_dividing_line" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingLeft="22dp"
+                    android:paddingRight="22dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/id"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/userId"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginBottom="60dp"
                 android:orientation="horizontal">
 
-                <include
-                    android:id="@+id/back"
-                    layout="@layout/view_back" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="@string/detail"
-                    android:textColor="#ff333333"
-                    android:textSize="18sp" />
-            </RelativeLayout>
-        </androidx.cardview.widget.CardView>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:orientation="vertical">
-
-            <LinearLayout
-
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="20dp">
-
-                <TextView
-                    android:id="@+id/nickName"
+                <RadioButton
+                    android:id="@+id/sendMsg"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="李立白"
-                    android:textColor="#ff333333"
-                    android:textSize="20sp" />
+                    android:button="@null"
+                    android:drawableTop="@mipmap/ic_chat"
+                    android:drawablePadding="5dp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/send_msg"
+                    android:textColor="#ff1d6bed"
+                    android:textSize="14sp" />
 
-                <io.openim.android.ouicore.widget.AvatarImage
-                    android:id="@+id/avatar"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:src="@mipmap/ic_my_friend" />
-
-            </LinearLayout>
-
-            <include layout="@layout/view_dividing_line" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingLeft="22dp"
-                android:paddingRight="22dp">
-
-                <TextView
+                <RadioButton
+                    android:id="@+id/call"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/id"
-                    android:textColor="#ff333333"
-                    android:textSize="18sp" />
+                    android:button="@null"
+                    android:drawableTop="@mipmap/ic_call"
+                    android:drawablePadding="5dp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/openim_call"
+                    android:textColor="#ff1d6bed"
+                    android:textSize="14sp" />
 
-                <TextView
-                    android:id="@+id/userId"
-                    android:layout_width="wrap_content"
+                <RadioButton
+                    android:id="@+id/addFriend"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:textColor="#ff333333"
-                    android:textSize="18sp" />
-
+                    android:layout_weight="1"
+                    android:button="@null"
+                    android:drawableTop="@mipmap/ic_add_friend3"
+                    android:drawablePadding="5dp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/add_friend"
+                    android:textColor="#ff1d6bed"
+                    android:textSize="14sp" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/part"
+                android:layout_width="match_parent"
+                android:layout_height="53dp"
+                android:layout_marginBottom="60dp"
+                android:background="@color/white"
+                android:gravity="center"
+                android:text="@string/disassociate"
+                android:textColor="@android:color/holo_red_light"
+                android:textSize="16sp"
+                android:visibility="gone" />
         </LinearLayout>
+    </FrameLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:layout_marginBottom="60dp"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/sendMsg"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:button="@null"
-                android:drawableTop="@mipmap/ic_chat"
-                android:drawablePadding="5dp"
-                android:gravity="center_horizontal"
-                android:text="@string/send_msg"
-                android:textColor="#ff1d6bed"
-                android:textSize="14sp" />
-
-            <RadioButton
-                android:id="@+id/call"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:button="@null"
-                android:drawableTop="@mipmap/ic_call"
-                android:drawablePadding="5dp"
-                android:gravity="center_horizontal"
-                android:text="@string/openim_call"
-                android:textColor="#ff1d6bed"
-                android:textSize="14sp" />
-
-            <RadioButton
-                android:id="@+id/addFriend"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:button="@null"
-                android:drawableTop="@mipmap/ic_add_friend3"
-                android:drawablePadding="5dp"
-                android:gravity="center_horizontal"
-                android:text="@string/add_friend"
-                android:textColor="#ff1d6bed"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/part"
-            android:layout_width="match_parent"
-            android:layout_height="53dp"
-            android:layout_marginBottom="60dp"
-            android:background="@color/white"
-            android:gravity="center"
-            android:text="@string/disassociate"
-            android:textColor="@android:color/holo_red_light"
-            android:textSize="16sp"
-            android:visibility="gone" />
-    </LinearLayout>
 </layout>

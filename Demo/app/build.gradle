@@ -63,6 +63,7 @@ dependencies {
 
     implementation 'com.github.Wynsbin:VerificationCodeInputView:1.0.2'
     implementation 'com.github.lihangleo2:ShadowLayout:2.0.1'
+    implementation 'com.github.yuzhiqiang1993:zxing:2.2.9'
 
     api project(':OUICore')
     if (!isModule) {

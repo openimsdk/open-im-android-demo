@@ -1,33 +1,52 @@
 package io.openim.android.demo.ui.main;
 
+import static io.openim.android.ouicore.utils.Constant.ID;
+
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 import android.widget.RadioGroup;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.FragmentTransaction;
 
 
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.yanzhenjie.permission.Action;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.runtime.Permission;
+import com.yzq.zxinglibrary.android.CaptureActivity;
+import com.yzq.zxinglibrary.bean.ZxingConfig;
+import com.yzq.zxinglibrary.common.Constant;
+
+import java.util.List;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
 import io.openim.android.demo.databinding.LayoutAddActionBinding;
 import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.demo.ui.search.AddConversActivity;
+import io.openim.android.demo.ui.search.PersonDetailActivity;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.demo.vm.MainVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseFragment;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
+import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.models.Message;
 
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
 
     private int mCurrentTabIndex;
     private BaseFragment lastFragment, conversationListFragment, contactFragment;
+    private boolean hasScanPermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +61,8 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
         vm.visibility.observe(this, v -> view.isOnline.setVisibility(v));
         click();
+
+        hasScanPermission = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
     }
 
     private void click() {
@@ -63,6 +84,21 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
             PopupWindow popupWindow = new PopupWindow(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             LayoutAddActionBinding view = LayoutAddActionBinding.inflate(getLayoutInflater());
+            view.scan.setOnClickListener(c -> {
+                popupWindow.dismiss();
+                if (hasScanPermission)
+                    jumpScan();
+                else {
+                    AndPermission.with(this).runtime()
+                        .permission(Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE)
+                        .onGranted(data -> {
+                            jumpScan();
+                        })
+                        .onDenied(data -> {
+                        }).start();
+                }
+
+            });
             view.addFriend.setOnClickListener(c -> {
                 popupWindow.dismiss();
                 startActivity(new Intent(this, AddConversActivity.class));
@@ -93,6 +129,39 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
             popupWindow.showAsDropDown(v);
 
         });
+    }
+
+
+    private final ActivityResultLauncher<Intent> captureActivityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() != Activity.RESULT_OK || null == result.getData()) return;
+        String content = result.getData().getStringExtra(Constant.CODED_CONTENT);
+
+        if (content.contains("addFriend")) {
+            String userId = content.substring(content.lastIndexOf("/") + 1);
+            if (!TextUtils.isEmpty(userId))
+                startActivity(new Intent(this, PersonDetailActivity.class).putExtra(ID, userId));
+        } else if (content.contains("joinGroup")) {
+            String groupId = content.substring(content.lastIndexOf("/") + 1);
+            if (!TextUtils.isEmpty(groupId))
+                ARouter.getInstance().build(Routes.Group.DETAIL)
+                    .withString(io.openim.android.ouicore.utils.Constant.GROUP_ID, groupId).navigation();
+        }
+
+
+    });
+
+    /**
+     * 跳转到扫一扫
+     */
+    private void jumpScan() {
+        Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+        ZxingConfig config = new ZxingConfig();
+        config.setPlayBeep(true);//是否播放扫描声音 默认为true
+        config.setShake(true);//是否震动  默认为true
+        config.setDecodeBarCode(true);//是否扫描条形码 默认为true
+        config.setFullScreenScan(false);//是否全屏扫描  默认为true  设为false则只会在扫描框中扫描
+        intent.putExtra(Constant.INTENT_ZXING_CONFIG, config);
+        captureActivityLauncher.launch(intent);
     }
 
 

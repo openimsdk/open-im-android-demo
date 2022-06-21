@@ -26,8 +26,8 @@ public class Constant {
         public static final int LOCATION = 109;
         //            * 110:自定义消息<br/>
         public static final int CUSTOMIZE = 110;
-        //通知消息一般大于1500
-        public static final int NOTICE = 1500;
+        //通知消息一般大于1200
+        public static final int NOTICE = 1200;
         //            * 111:撤回消息回执<br/>
         public static final int REVOKE = 111;
         //            * 112:C2C已读回执<br/>

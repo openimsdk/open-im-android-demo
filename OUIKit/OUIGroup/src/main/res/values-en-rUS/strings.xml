@@ -5,4 +5,5 @@
     <string name="member">群成员</string>
     <string name="complete_creation">完成创建</string>
     <string name="create_succ">创建成功</string>
+    <string name="group_set">群聊设置</string>
 </resources>

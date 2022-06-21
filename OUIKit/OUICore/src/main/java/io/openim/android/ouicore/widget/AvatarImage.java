@@ -12,7 +12,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import io.openim.android.ouicore.R;
 
-public class AvatarImage extends androidx.appcompat.widget.AppCompatImageView {
+public class AvatarImage extends RoundImageView {
     public AvatarImage(@NonNull Context context) {
         super(context);
     }
@@ -33,6 +33,7 @@ public class AvatarImage extends androidx.appcompat.widget.AppCompatImageView {
         if (null == url || url.isEmpty() || url.contains("ic_avatar")) {
             setImageDrawable(getContext().getDrawable(isGroup ? R.mipmap.ic_my_group : io.openim.android.ouicore.R.mipmap.ic_my_friend));
         } else {
+            setScaleType(ScaleType.CENTER);
             Glide.with(getContext())
                 .load(url)
                 .centerCrop()

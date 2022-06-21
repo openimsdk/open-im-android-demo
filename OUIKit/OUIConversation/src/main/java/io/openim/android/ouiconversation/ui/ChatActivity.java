@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
@@ -36,7 +37,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private MessageAdapter messageAdapter;
     private BottomInputCote bottomInputCote;
-    private int repeat = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +148,15 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 }
                 if (vm.isSingleChat)
                     vm.sendMsgReadReceipt(firstVisiblePosition, lastVisiblePosition);
+            }
+        });
+
+        view.more.setOnClickListener(v -> {
+            if (vm.isSingleChat) {
+
+            } else {
+                ARouter.getInstance().build(Routes.Group.MATERIAL)
+                    .withString(io.openim.android.ouicore.utils.Constant.GROUP_ID, vm.groupID).navigation();
             }
         });
     }

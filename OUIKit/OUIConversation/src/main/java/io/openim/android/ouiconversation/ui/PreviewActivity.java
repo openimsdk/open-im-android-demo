@@ -7,6 +7,7 @@ import android.view.View;
 
 import com.bumptech.glide.Glide;
 
+import cn.jzvd.Jzvd;
 import io.openim.android.ouiconversation.databinding.ActivityPreviewBinding;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseViewModel;
@@ -47,5 +48,19 @@ public class PreviewActivity extends BaseActivity<BaseViewModel, ActivityPreview
                 .into(view.jzVideo.posterImageView);
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (Jzvd.backPress()) {
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Jzvd.releaseAllVideos();
     }
 }

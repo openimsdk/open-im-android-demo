@@ -35,6 +35,9 @@ import io.openim.android.ouigroup.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.FriendInfo;
 
+/**
+ * 发起群聊
+ */
 @Route(path = Routes.Group.CREATE_GROUP)
 public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiateGroupBinding> {
     private RecyclerViewAdapter<ExUserInfo, RecyclerView.ViewHolder> adapter;

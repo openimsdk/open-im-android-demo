@@ -34,11 +34,13 @@ public class GroupVM extends BaseViewModel {
     public String groupId;
     public MutableLiveData<List<String>> letters = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<FriendInfo>> selectedFriendInfo = new MutableLiveData<>(new ArrayList<>());
+    private LoginCertificate loginCertificate;
 
 
     @Override
     protected void viewCreate() {
         super.viewCreate();
+        loginCertificate = LoginCertificate.getCache(getContext());
     }
 
     public void getAllFriend() {
@@ -130,4 +132,13 @@ public class GroupVM extends BaseViewModel {
         }, groupName.getValue(), null, null, null, 0, null, groupMemberRoles);
     }
 
+    /**
+     * 当前用户是否是群主
+     * @return
+     */
+    public boolean isGroupOwner() {
+        GroupInfo groupInfo = groupsInfo.getValue();
+        if (null == groupInfo) return false;
+        return groupInfo.getOwnerUserID().equals(loginCertificate.userID);
+    }
 }
