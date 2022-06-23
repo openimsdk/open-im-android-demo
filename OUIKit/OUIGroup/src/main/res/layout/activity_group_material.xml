@@ -8,7 +8,8 @@
         <variable
             name="GroupVM"
             type="io.openim.android.ouigroup.vm.GroupVM" />
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
     </data>
 
     <FrameLayout
@@ -87,6 +88,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/groupMember"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
@@ -113,7 +115,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@{String.valueOf(GroupVM.groupsInfo.memberCount)+'人'}"
+                                android:text="@{String.valueOf(GroupVM.groupMembers.size())+'人'}"
                                 android:textColor="#ff999999"
                                 android:textSize="14sp" />
 
@@ -124,12 +126,19 @@
                                 android:src="@mipmap/ic_right" />
                         </LinearLayout>
 
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/recyclerview"
+                        <RelativeLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="15dp"
-                            android:paddingBottom="15dp" />
+                            android:layout_height="wrap_content">
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/recyclerview"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:overScrollMode="never"
+                                android:paddingTop="15dp" />
+
+                        </RelativeLayout>
+
                     </LinearLayout>
 
                     <LinearLayout
@@ -140,6 +149,7 @@
                         android:orientation="vertical">
 
                         <LinearLayout
+                            android:id="@+id/groupName"
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:gravity="center_vertical"
@@ -162,11 +172,11 @@
                                 android:textSize="14sp" />
 
                             <ImageView
-                                android:visibility="@{GroupVM.isGroupOwner()?View.VISIBLE:View.GONE}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="6dp"
-                                android:src="@mipmap/ic_right" />
+                                android:src="@mipmap/ic_right"
+                                android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}" />
 
                         </LinearLayout>
 
@@ -207,10 +217,10 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
-                            android:visibility="@{GroupVM.isGroupOwner()?View.VISIBLE:View.GONE}"
                             android:gravity="center_vertical"
                             android:paddingLeft="22dp"
-                            android:paddingRight="22dp">
+                            android:paddingRight="22dp"
+                            android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}">
 
                             <TextView
                                 android:layout_width="0dp"

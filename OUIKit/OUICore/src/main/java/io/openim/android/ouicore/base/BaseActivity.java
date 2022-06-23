@@ -80,9 +80,11 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
             vm.viewDestroy();
         }
     }
+
     public void toBack(View view) {
         finish();
     }
+
     boolean touchClearFocus = true;
 
     public void setTouchClearFocus(boolean touchClearFocus) {
@@ -100,8 +102,12 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     public void removeCacheVM() {
         String key = vm.getClass().getCanonicalName();
-        BaseApp.viewModels.remove(key);
-        vm.context.clear();
+        BaseViewModel viewModel = BaseApp.viewModels.get(key);
+        if (null != viewModel && viewModel == vm) {
+            BaseApp.viewModels.remove(key);
+            vm.context.clear();
+        }
+
     }
 
     @Override

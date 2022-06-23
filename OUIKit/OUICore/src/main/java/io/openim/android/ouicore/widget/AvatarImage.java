@@ -1,5 +1,6 @@
 package io.openim.android.ouicore.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 
@@ -25,12 +26,13 @@ public class AvatarImage extends RoundImageView {
         super(context, attrs, defStyleAttr);
     }
 
-    public void load(String url) {
+    public void load(Object url) {
         load(url, false);
     }
 
-    public void load(String url, boolean isGroup) {
-        if (null == url || url.isEmpty() || url.contains("ic_avatar")) {
+    @SuppressLint("UseCompatLoadingForDrawables")
+    public void load(Object url, boolean isGroup) {
+        if (null == url || (url instanceof String && (String.valueOf(url).isEmpty() || String.valueOf(url).contains("ic_avatar")))) {
             setImageDrawable(getContext().getDrawable(isGroup ? R.mipmap.ic_my_group : io.openim.android.ouicore.R.mipmap.ic_my_friend));
         } else {
             setScaleType(ScaleType.CENTER);

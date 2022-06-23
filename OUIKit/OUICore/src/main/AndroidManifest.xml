@@ -9,15 +9,14 @@
 
     <permission-group android:name="${applicationId}.andpermission" /> <!-- 录音 -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- 播音 -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <!-- Always include this permission -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <!-- Include only if your app benefits from precise location access. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- Always include this permission -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- Include only if your app benefits from precise location access. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-
     <application>
+        <activity
+            android:name=".widget.SingleModifyActivity"
+            android:exported="false" />
         <activity
             android:name=".widget.WebViewActivity"
             android:exported="false" />

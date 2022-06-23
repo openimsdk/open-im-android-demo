@@ -14,15 +14,18 @@ import java.util.List;
 import java.util.Locale;
 
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouigroup.R;
+import io.openim.android.ouigroup.entity.ExGroupMemberInfo;
 import io.openim.android.ouigroup.entity.ExUserInfo;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
+import io.openim.android.sdk.models.GroupInviteResult;
 import io.openim.android.sdk.models.GroupMemberRole;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.UserInfo;
@@ -30,12 +33,25 @@ import io.openim.android.sdk.models.UserInfo;
 public class GroupVM extends BaseViewModel {
     public MutableLiveData<String> groupName = new MutableLiveData<>("");
     public MutableLiveData<GroupInfo> groupsInfo = new MutableLiveData<>();
+    //当前用户是否是群主
+    public MutableLiveData<Boolean> isGroupOwner = new MutableLiveData<>(true);
+    //群所有成员
+    public MutableLiveData<List<GroupMembersInfo>> groupMembers = new MutableLiveData<>(new ArrayList<>());
+    //封装过的群成员 用于字母导航
+    public MutableLiveData<List<ExGroupMemberInfo>> exGroupMembers = new MutableLiveData<>(new ArrayList<>());
+    //群管理
+    public MutableLiveData<List<ExGroupMemberInfo>> exGroupManagement = new MutableLiveData<>(new ArrayList<>());
+    //群字母导航
+    public MutableLiveData<List<String>> groupLetters = new MutableLiveData<>(new ArrayList<>());
+
+    //封装过的好友信息 用于字母导航
     public MutableLiveData<List<ExUserInfo>> exUserInfo = new MutableLiveData<>(new ArrayList<>());
     public String groupId;
     public MutableLiveData<List<String>> letters = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<FriendInfo>> selectedFriendInfo = new MutableLiveData<>(new ArrayList<>());
     private LoginCertificate loginCertificate;
-
+    //是否是邀请入群
+    public boolean isInviteToGroup = false;
 
     @Override
     protected void viewCreate() {
@@ -44,6 +60,7 @@ public class GroupVM extends BaseViewModel {
     }
 
     public void getAllFriend() {
+        exUserInfo.getValue().clear();
         OpenIMClient.getInstance().friendshipManager.getFriendList(new OnBase<List<UserInfo>>() {
             @Override
             public void onError(int code, String error) {
@@ -53,6 +70,7 @@ public class GroupVM extends BaseViewModel {
             @Override
             public void onSuccess(List<UserInfo> data) {
                 if (data.isEmpty()) return;
+
                 List<ExUserInfo> exInfos = new ArrayList<>();
                 List<ExUserInfo> otInfos = new ArrayList<>();
                 for (UserInfo datum : data) {
@@ -65,6 +83,15 @@ public class GroupVM extends BaseViewModel {
                     } else {
                         exUserInfo.sortLetter = letter;
                         exInfos.add(exUserInfo);
+                    }
+                    if (isInviteToGroup) {
+                        ExGroupMemberInfo exGroupMemberInfo = new ExGroupMemberInfo();
+                        exGroupMemberInfo.groupMembersInfo = new GroupMembersInfo();
+                        exGroupMemberInfo.groupMembersInfo.setUserID(datum.getUserID());
+                        exUserInfo.isSelect = exGroupMembers.getValue().contains(exGroupMemberInfo);
+                        //如果已经存在群里则不能点击(不能重复邀请入群)
+                        if (exUserInfo.isSelect)
+                            exUserInfo.isEnabled = false;
                     }
                 }
                 for (ExUserInfo userInfo : exInfos) {
@@ -98,8 +125,9 @@ public class GroupVM extends BaseViewModel {
 
             @Override
             public void onSuccess(List<GroupInfo> data) {
-                if (!data.isEmpty())
-                    groupsInfo.setValue(data.get(0));
+                if (data.isEmpty()) return;
+                groupsInfo.setValue(data.get(0));
+                isGroupOwner.setValue(isOwner());
             }
         }, groupIds);
     }
@@ -132,11 +160,145 @@ public class GroupVM extends BaseViewModel {
         }, groupName.getValue(), null, null, null, 0, null, groupMemberRoles);
     }
 
+
     /**
-     * 当前用户是否是群主
-     * @return
+     * 获取群成员信息
      */
-    public boolean isGroupOwner() {
+    public void getGroupMemberList() {
+        exGroupMembers.getValue().clear();
+        exGroupManagement.getValue().clear();
+        groupLetters.getValue().clear();
+        OpenIMClient.getInstance().groupManager.getGroupMemberList(new OnBase<List<GroupMembersInfo>>() {
+            @Override
+            public void onError(int code, String error) {
+
+            }
+
+            @Override
+            public void onSuccess(List<GroupMembersInfo> data) {
+                if (data.isEmpty()) return;
+                groupMembers.setValue(data);
+
+                List<ExGroupMemberInfo> exGroupMemberInfos = new ArrayList<>();
+                List<ExGroupMemberInfo> otGroupMemberInfos = new ArrayList<>();
+                for (GroupMembersInfo datum : data) {
+                    ExGroupMemberInfo exGroupMemberInfo = new ExGroupMemberInfo();
+                    exGroupMemberInfo.groupMembersInfo = datum;
+                    if (datum.getRoleLevel() > 1) {
+                        //群管理单独存放
+                        exGroupManagement.getValue().add(exGroupMemberInfo);
+                        continue;
+                    }
+                    String nickName = "0";
+                    if (!TextUtils.isEmpty(datum.getNickname()))
+                        nickName = datum.getNickname();
+                    String letter = Pinyin.toPinyin(nickName.charAt(0));
+                    letter = (letter.charAt(0) + "").trim().toUpperCase();
+                    if (!Common.isAlpha(letter)) {
+                        exGroupMemberInfo.sortLetter = "#";
+                        otGroupMemberInfos.add(exGroupMemberInfo);
+                    } else {
+                        exGroupMemberInfo.sortLetter = letter;
+                        exGroupMemberInfos.add(exGroupMemberInfo);
+                    }
+                    if (!groupLetters.getValue().contains(exGroupMemberInfo.sortLetter))
+                        groupLetters.getValue().add(exGroupMemberInfo.sortLetter);
+                }
+
+                Collections.sort(groupLetters.getValue(), new LettersPinyinComparator());
+                groupLetters.getValue().add(0, "↑");
+                groupLetters.setValue(groupLetters.getValue());
+
+                exGroupMembers.getValue().addAll(exGroupMemberInfos);
+                exGroupMembers.getValue().addAll(otGroupMemberInfos);
+
+                Collections.sort(exGroupMembers.getValue(), new PinyinComparator());
+                Collections.sort(exGroupManagement.getValue(), (o1, o2) -> {
+                    if (o2.groupMembersInfo.getRoleLevel()
+                        < o1.groupMembersInfo.getRoleLevel())
+                        return -1;
+                    return 0;
+                });
+                exGroupMembers.setValue(exGroupMembers.getValue());
+            }
+        }, groupId, 0, 0, 0);
+    }
+
+    /**
+     * 邀请入群
+     */
+    public void inviteUserToGroup(List<FriendInfo> friendInfos) {
+        List<String> userIds = new ArrayList<>();
+        for (FriendInfo friendInfo : friendInfos) {
+            userIds.add(friendInfo.getUserID());
+        }
+        OpenIMClient.getInstance().groupManager.inviteUserToGroup(new OnBase<List<GroupInviteResult>>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error);
+            }
+
+            @Override
+            public void onSuccess(List<GroupInviteResult> data) {
+                IView.toast(getContext().getString(io.openim.android.ouicore.R.string.Invitation_succeeded));
+                getGroupMemberList();
+                IView.onSuccess(null);
+            }
+        }, groupId, userIds, "");
+    }
+
+    /**
+     * 邀请入群
+     */
+    public void kickGroupMember(List<FriendInfo> friendInfos) {
+        List<String> userIds = new ArrayList<>();
+        for (FriendInfo friendInfo : friendInfos) {
+            userIds.add(friendInfo.getUserID());
+        }
+        OpenIMClient.getInstance().groupManager.kickGroupMember(new OnBase<List<GroupInviteResult>>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error);
+            }
+
+            @Override
+            public void onSuccess(List<GroupInviteResult> data) {
+                IView.toast(getContext().getString(io.openim.android.ouicore.R.string.kicked_out));
+                getGroupMemberList();
+                IView.onSuccess(null);
+            }
+        }, groupId, userIds, "");
+    }
+
+    public class PinyinComparator implements Comparator<ExGroupMemberInfo> {
+
+        public int compare(ExGroupMemberInfo o1, ExGroupMemberInfo o2) {
+            //根据ABCDEFG...来排序
+            if (o1.sortLetter.equals("#")) {
+                return 1;
+            } else if (o2.sortLetter.equals("#")) {
+                return -1;
+            } else {
+                return o1.sortLetter.compareTo(o2.sortLetter);
+            }
+        }
+    }
+
+    public class LettersPinyinComparator implements Comparator<String> {
+
+        public int compare(String o1, String o2) {
+            //根据ABCDEFG...来排序
+            if (o1.equals("#")) {
+                return 1;
+            } else if (o2.equals("#")) {
+                return -1;
+            } else {
+                return o1.compareTo(o2);
+            }
+        }
+    }
+
+    public boolean isOwner() {
         GroupInfo groupInfo = groupsInfo.getValue();
         if (null == groupInfo) return false;
         return groupInfo.getOwnerUserID().equals(loginCertificate.userID);

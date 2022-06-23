@@ -38,4 +38,11 @@
     <string name="video">视频</string>
     <string name="san_it">扫一扫</string>
     <string name="quit_group">退出群聊</string>
+    <string name="lord">群主</string>
+    <string name="add_member">添加成员</string>
+    <string name="remove_member">删除成员</string>
+    <string name="Invite_to_the_group">邀请入群</string>
+    <string name="Invitation_succeeded">邀请成功</string>
+    <string name="remove_group">移除群聊</string>
+    <string name="kicked_out">踢出成功</string>
 </resources>

@@ -7,4 +7,6 @@ public class ExUserInfo {
     public UserInfo userInfo;
     public boolean isSticky = false; //是否是Sticky
     public boolean isSelect = false;//是否被选中
+    public boolean isEnabled = true;//是否可点击
+
 }
