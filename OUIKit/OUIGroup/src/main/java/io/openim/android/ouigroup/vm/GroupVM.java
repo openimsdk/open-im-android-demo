@@ -160,6 +160,31 @@ public class GroupVM extends BaseViewModel {
         }, groupName.getValue(), null, null, null, 0, null, groupMemberRoles);
     }
 
+    /**
+     * 更新群信息
+     *
+     * @param groupID      群ID
+     * @param groupName    群名称
+     * @param faceURL      群icon
+     * @param notification 群公告
+     * @param introduction 群简介
+     * @param ex           其他信息
+     */
+    public void updataGroup(String groupID, String groupName, String faceURL, String notification, String introduction, String ex) {
+        OpenIMClient.getInstance().groupManager.setGroupInfo(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.onError(error);
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                IView.onSuccess(data);
+                getGroupsInfo();
+            }
+        }, groupID, groupName, faceURL, notification, introduction, ex);
+    }
+
 
     /**
      * 获取群成员信息

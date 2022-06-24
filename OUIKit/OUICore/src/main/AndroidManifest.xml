@@ -15,7 +15,7 @@
 
     <application>
         <activity
-            android:name=".widget.SingleModifyActivity"
+            android:name=".widget.SingleInfoModifyActivity"
             android:exported="false" />
         <activity
             android:name=".widget.WebViewActivity"

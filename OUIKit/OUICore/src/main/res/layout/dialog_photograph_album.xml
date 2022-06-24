@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/sty_top_radius_30_white"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/album"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="18dp"
+        android:paddingBottom="18dp"
+        android:text="@string/album"
+        android:textColor="#ff000000"
+        android:textSize="16sp" />
+
+    <include layout="@layout/view_dividing_line" />
+
+    <TextView
+        android:id="@+id/shoot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="18dp"
+        android:paddingBottom="18dp"
+        android:text="@string/shoot"
+        android:textColor="#ff000000"
+        android:textSize="16sp" />
+
+    <include
+        layout="@layout/view_dividing_line"
+        android:layout_width="match_parent"
+        android:layout_height="7dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="18dp"
+        android:paddingBottom="18dp"
+        android:text="@string/cancel"
+        android:textColor="#ff000000"
+        android:textSize="16sp" />
+
+</LinearLayout>

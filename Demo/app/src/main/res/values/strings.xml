@@ -40,7 +40,7 @@
     <string name="add_group">添加群聊</string>
     <string name="search_group_by_id">通过群ID号搜索添加</string>
     <string name="not_find_group">未找到该群聊</string>
-    <string name="cancel">取消</string>
+
     <string name="send_friend_apply">发送添加好友申请</string>
     <string name="send_join_group_apply">发送入群申请</string>
     <string name="address_book">通讯录</string>

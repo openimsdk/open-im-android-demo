@@ -9,6 +9,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -24,13 +26,18 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
+import io.openim.android.ouicore.widget.PhotographAlbumDialog;
+import io.openim.android.ouicore.widget.SingleInfoModifyActivity;
 import io.openim.android.ouicore.widget.SpacesItemDecoration;
 import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityGroupDetailBinding;
 import io.openim.android.ouigroup.databinding.ActivityGroupMaterialBinding;
 import io.openim.android.ouigroup.vm.GroupVM;
+import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
@@ -38,6 +45,8 @@ import io.openim.android.sdk.models.GroupMembersInfo;
 @Route(path = Routes.Group.MATERIAL)
 public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMaterialBinding> {
     int spanCount = 7;
+    private PhotographAlbumDialog albumDialog;
+    private ActivityResultLauncher infoModifyLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,16 +61,31 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
         initView();
         click();
+
+        infoModifyLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() != RESULT_OK) return;
+            String var = result.getData().getStringExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA);
+            vm.updataGroup(vm.groupId, var, null, null, null, null);
+        });
     }
 
     private void click() {
         view.groupMember.setOnClickListener(v -> {
+
             startActivity(new Intent(this, GroupMemberActivity.class));
         });
         view.groupName.setOnClickListener(v -> {
-            if (vm.isOwner()){
-                startActivity(new Intent(this,));
+            if (vm.isOwner()) {
+                SingleInfoModifyActivity.SingleInfoModifyData modifyData = new SingleInfoModifyActivity.SingleInfoModifyData();
+                modifyData.title = "我在群里的昵称";
+                modifyData.description = "昵称修改后，只会在此群内显示，群内成员都可以看见。";
+                modifyData.avatarUrl = vm.groupsInfo.getValue().getFaceURL();
+                modifyData.editT = vm.groupsInfo.getValue().getGroupName();
+                infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
             }
+        });
+        view.avatar.setOnClickListener(v -> {
+            albumDialog.show();
         });
     }
 
@@ -71,7 +95,34 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         removeCacheVM();
     }
 
+    @Override
+    public void onSuccess(Object body) {
+        super.onSuccess(body);
+
+    }
+
     private void initView() {
+        albumDialog = new PhotographAlbumDialog(this);
+        albumDialog.setOnSelectResultListener(path -> {
+            OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
+                @Override
+                public void onError(int code, String error) {
+
+                }
+
+                @Override
+                public void onProgress(long progress) {
+
+                }
+
+                @Override
+                public void onSuccess(String s) {
+                    vm.updataGroup(vm.groupId, null, s, null, null, null);
+                }
+            }, path);
+
+        });
+
         view.recyclerview.setLayoutManager(new GridLayoutManager(this, spanCount));
         RecyclerViewAdapter adapter = new RecyclerViewAdapter<GroupMembersInfo, ImageTxtViewHolder>(ImageTxtViewHolder.class) {
 
@@ -96,6 +147,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         };
         view.recyclerview.setAdapter(adapter);
         vm.groupsInfo.observe(this, groupInfo -> {
+            view.avatar.load(groupInfo.getFaceURL());
             vm.getGroupMemberList();
         });
 
