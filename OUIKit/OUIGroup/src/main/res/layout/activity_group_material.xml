@@ -160,7 +160,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="群聊名称"
+                                android:text="@string/group_name"
                                 android:textColor="#ff333333"
                                 android:textSize="16sp" />
 
@@ -183,6 +183,7 @@
                         <include layout="@layout/view_dividing_line" />
 
                         <LinearLayout
+                            android:id="@+id/bulletin"
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:gravity="center_vertical"
@@ -193,7 +194,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="群公告"
+                                android:text="@string/group_bulletin"
                                 android:textColor="#ff333333"
                                 android:textSize="16sp" />
 
@@ -226,7 +227,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="32dp"
                                 android:layout_weight="1"
-                                android:text="群主管理权转让"
+                                android:text="@string/group_transfer_permissions"
                                 android:textColor="#ff333333"
                                 android:textSize="16sp" />
 
@@ -248,6 +249,7 @@
                         <include layout="@layout/view_dividing_line" />
 
                         <LinearLayout
+                            android:id="@+id/myName"
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:gravity="center_vertical"
@@ -258,7 +260,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="我在群里的昵称"
+                                android:text="@string/in_group_name"
                                 android:textColor="#ff333333"
                                 android:textSize="16sp" />
 

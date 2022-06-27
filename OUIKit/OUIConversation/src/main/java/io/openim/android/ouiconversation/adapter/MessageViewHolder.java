@@ -49,7 +49,7 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgNoticeBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
 import io.openim.android.ouiconversation.ui.PreviewActivity;
-import io.openim.android.ouiconversation.utils.Constant;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.entity.LocationInfo;
 import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.L;

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="GroupVM"
+            type="io.openim.android.ouigroup.vm.GroupVM" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.GroupBulletinActivity">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/comm_title_high"
+            app:cardElevation="8dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <include layout="@layout/view_back" />
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/group_bulletin"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+
+                    android:layout_marginRight="5dp">
+
+                    <TextView
+                        android:id="@+id/edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="@string/eidt"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                    <Button
+                        android:id="@+id/finish"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="@string/finish"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <EditText
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:enabled="false"
+            android:gravity="top"
+            android:padding="22dp"
+            android:text="@={GroupVM.groupsInfo.notification}"
+            android:textColor="#ff333333"
+            android:textSize="16sp" />
+    </LinearLayout>
+</layout>
+

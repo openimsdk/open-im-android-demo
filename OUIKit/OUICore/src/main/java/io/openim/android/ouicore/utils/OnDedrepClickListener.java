@@ -10,7 +10,7 @@ import android.view.View;
  */
 public abstract class OnDedrepClickListener implements View.OnClickListener {
     private long mLastClickTime;
-    private long timeInterval = 700;
+    private final long timeInterval = 700;
 
     @Override
     public void onClick(View v) {
@@ -21,5 +21,5 @@ public abstract class OnDedrepClickListener implements View.OnClickListener {
         click(v);
     }
 
-    abstract void click(View v);
+    public abstract void click(View v);
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="group_bulletin">群公告</string>
     <string name="search_by_id">通过用户ID号搜索添加</string>
     <string name="send_succ">发送成功</string>
 
@@ -46,4 +47,9 @@
     <string name="remove_group">移除群聊</string>
     <string name="kicked_out">踢出成功</string>
     <string name="cancel">取消</string>
+    <string name="eidt">编辑</string>
+    <string name="finish">完成</string>
+    <string name="group_name">群聊名称</string>
+    <string name="group_transfer_permissions">群主管理权转让</string>
+    <string name="in_group_name">我在群里的昵称</string>
 </resources>

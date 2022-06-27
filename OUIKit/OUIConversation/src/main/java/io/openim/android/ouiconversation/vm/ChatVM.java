@@ -16,7 +16,8 @@ import java.util.List;
 
 
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
-import io.openim.android.ouiconversation.utils.Constant;
+import io.openim.android.ouicore.entity.NotificationMsg;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.entity.LocationInfo;
@@ -35,6 +36,8 @@ import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.ReadReceiptInfo;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener {
+    //通知消息
+    public MutableLiveData<NotificationMsg> notificationMsg = new MutableLiveData<>();
     public MutableLiveData<List<Message>> messages = new MutableLiveData<>(new ArrayList<>());
     public ObservableBoolean typing = new ObservableBoolean(false);
     public MutableLiveData<String> inputMsg = new MutableLiveData<>("");
@@ -159,7 +162,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     //发送消息已读回执
     public void sendMsgReadReceipt(int firstVisiblePosition, int lastVisiblePosition) {
         int size = messages.getValue().size();
-        if (size > firstVisiblePosition || size < lastVisiblePosition) return;
+        if (lastVisiblePosition > size) return;
 
         List<Message> megs = messages.getValue().subList(firstVisiblePosition, lastVisiblePosition);
         List<String> msgIds = new ArrayList<>();
@@ -167,7 +170,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             if (!meg.isRead() && meg.getSendID().equals(otherSideID))
                 msgIds.add(meg.getClientMsgID());
         }
-        OpenIMClient.getInstance().messageManager.markC2CMessageAsRead(null, otherSideID, msgIds);
+        markReaded(msgIds);
     }
 
     private Runnable typRunnable = () -> {
@@ -232,8 +235,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         try {
             if (msg.getContentType() == Constant.MsgType.LOCATION)
                 msg.setExt(GsonHel.fromJson(msg.getLocationElem().getDescription(), LocationInfo.class));
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -6,7 +6,7 @@
     <data>
 
         <variable
-            name="chatVM"
+            name="ChatVM"
             type="io.openim.android.ouiconversation.vm.ChatVM" />
 
         <import type="android.view.View" />
@@ -63,7 +63,7 @@
                         android:text="@string/typing"
                         android:textColor="#ff999999"
                         android:textSize="10sp"
-                        android:visibility="@{chatVM.typing? View.VISIBLE:View.GONE}" />
+                        android:visibility="@{ChatVM.typing? View.VISIBLE:View.GONE}" />
                 </LinearLayout>
 
 
@@ -97,6 +97,44 @@
             android:overScrollMode="never"
             android:paddingLeft="22dp"
             android:paddingRight="22dp" />
+
+        <LinearLayout
+            android:id="@+id/notice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/card"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="12dp"
+            android:background="@drawable/sty_radius_4_f0f6ff"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingTop="7dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="7dp"
+            android:visibility="@{null!=ChatVM.notificationMsg? View.VISIBLE:View.GONE}">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_notice" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="@{ChatVM.notificationMsg.group.notification}"
+                android:textColor="#ff617183"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_right" />
+        </LinearLayout>
 
 
         <include

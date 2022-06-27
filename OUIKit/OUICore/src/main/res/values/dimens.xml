@@ -2,4 +2,5 @@
 <resources>
     <dimen name="comm_title_high">52dp</dimen>
     <dimen name="button_height">60dp</dimen>
+    <dimen name="avatar_size">48dp</dimen>
 </resources>

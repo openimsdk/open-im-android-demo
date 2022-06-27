@@ -2,15 +2,15 @@ package io.openim.android.ouiconversation.ui;
 
 import static io.openim.android.ouicore.utils.Constant.GROUP_ID;
 import static io.openim.android.ouicore.utils.Constant.ID;
+import static io.openim.android.ouicore.utils.Constant.NOTICE;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
@@ -23,14 +23,13 @@ import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouiconversation.databinding.ActivityChatBinding;
-import io.openim.android.ouiconversation.utils.Constant;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouiconversation.widget.BottomInputCote;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.utils.SinkHelper;
 
 @Route(path = Routes.Conversation.CHAT)
 public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> implements ChatVM.ViewAction {
@@ -44,6 +43,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         String userId = getIntent().getStringExtra(ID);
         String groupId = getIntent().getStringExtra(GROUP_ID);
         String name = getIntent().getStringExtra(io.openim.android.ouicore.utils.Constant.K_NAME);
+        NotificationMsg notificationMsg = (NotificationMsg) getIntent().getSerializableExtra(NOTICE);
         bindVM(ChatVM.class);
         if (null != userId)
             vm.otherSideID = userId;
@@ -51,11 +51,12 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             vm.isSingleChat = false;
             vm.groupID = groupId;
         }
+        if (null != notificationMsg)
+            vm.notificationMsg.setValue(notificationMsg);
         super.onCreate(savedInstanceState);
 
         bindViewDataBinding(ActivityChatBinding.inflate(getLayoutInflater()));
-        setLightStatus();
-        SinkHelper.get(this).setTranslucentStatus(view.getRoot());
+        sink();
         view.setChatVM(vm);
 
         initView(name);
@@ -63,7 +64,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
         setTouchClearFocus(false);
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
-
     }
 
     @Override
@@ -135,6 +135,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     };
 
     private void listener() {
+        view.notice.setOnClickListener(v -> ARouter.getInstance().build(Routes.Group.NOTICE_DETAIL)
+            .withSerializable(NOTICE, vm.notificationMsg.getValue()).navigation());
+
         view.back.setOnClickListener(v -> finish());
 
         view.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -151,12 +154,15 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             }
         });
 
-        view.more.setOnClickListener(v -> {
-            if (vm.isSingleChat) {
+        view.more.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                if (vm.isSingleChat) {
 
-            } else {
-                ARouter.getInstance().build(Routes.Group.MATERIAL)
-                    .withString(io.openim.android.ouicore.utils.Constant.GROUP_ID, vm.groupID).navigation();
+                } else {
+                    ARouter.getInstance().build(Routes.Group.MATERIAL)
+                        .withString(io.openim.android.ouicore.utils.Constant.GROUP_ID, vm.groupID).navigation();
+                }
             }
         });
     }

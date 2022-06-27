@@ -11,6 +11,12 @@ public class ExGroupMemberInfo {
     public boolean isSticky = false; //是否是Sticky
 
 
+    /**
+     * contains 方法
+     *
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

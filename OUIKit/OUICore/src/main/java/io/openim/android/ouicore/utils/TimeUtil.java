@@ -10,19 +10,20 @@ import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 
 public class TimeUtil {
+    public final static String hourTimeFormat = "HH:mm";
+    public final static String monthTimeFormat = "M/d HH:mm";
+    public final static String yearTimeFormat = "yyyy/M/d HH:mm";
 
     public static String getTimeString(Long timestamp) {
         String result = "";
         String weekNames[] = {BaseApp.instance().getString(R.string.sunday),
-                BaseApp.instance().getString(R.string.monday),
-                BaseApp.instance().getString(R.string.tuesday),
-                BaseApp.instance().getString(R.string.wednesday),
-                BaseApp.instance().getString(R.string.thursday),
-                BaseApp.instance().getString(R.string.friday),
-                BaseApp.instance().getString(R.string.saturday)};
-        String hourTimeFormat = "HH:mm";
-        String monthTimeFormat = "M/d HH:mm";
-        String yearTimeFormat = "yyyy/M/d HH:mm";
+            BaseApp.instance().getString(R.string.monday),
+            BaseApp.instance().getString(R.string.tuesday),
+            BaseApp.instance().getString(R.string.wednesday),
+            BaseApp.instance().getString(R.string.thursday),
+            BaseApp.instance().getString(R.string.friday),
+            BaseApp.instance().getString(R.string.saturday)};
+
         try {
             Calendar todayCalendar = Calendar.getInstance();
             Calendar calendar = Calendar.getInstance();

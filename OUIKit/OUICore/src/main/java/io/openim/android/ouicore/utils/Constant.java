@@ -14,9 +14,9 @@ public class Constant {
     public static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":10001";
 
 
-    public static  final String K_NAME = "name";
+    public static final String K_NAME = "name";
 
-    public static  final String CONVERSATION_ID = "conversationID";
+    public static final String CONVERSATION_ID = "conversationID";
 
     //存储音频的文件夹
     public static final String AUDIODIR = IM.getStorageDir() + "/audio/";
@@ -40,6 +40,7 @@ public class Constant {
     public static final String ID = "Id";
     public static final String GROUP_ID = "group_id";
     public static final String IS_PERSON = "is_person";
+    public static final String NOTICE = "notice";
 
     /**
      * 发送状态
@@ -49,5 +50,61 @@ public class Constant {
         public static final int SENDING = 1;
         //发送失败
         public static final int SEND_FAILED = 3;
+    }
+
+
+    //加载中
+    public static final int LOADING = 201;
+
+    public static class MsgType {
+        //            * 101:文本消息<br/>
+        public static final int TXT = 101;
+        //            * 102:图片消息<br/>
+        public static final int PICTURE = 102;
+        //            * 103:语音消息<br/>
+        public static final int VOICE = 103;
+        //            * 104:视频消息<br/>
+        public static final int VIDEO = 104;
+        //            * 105:文件消息<br/>'
+        public static final int FILE = 105;
+        //            * 106:@消息<br/>
+        public static final int MENTION = 106;
+        //            * 107:合并消息<br/>
+        public static final int MERGE = 107;
+        //            * 108:转发消息<br/>
+        public static final int TRANSIT = 108;
+        //            * 109:位置消息<br/>
+        public static final int LOCATION = 109;
+        //            * 110:自定义消息<br/>
+        public static final int CUSTOMIZE = 110;
+        //            * 111:撤回消息回执<br/>
+        public static final int REVOKE = 111;
+        //            * 112:C2C已读回执<br/>
+        public static final int ALREADY_READ = 112;
+        //            * 113:正在输入状态
+        public static final int TYPING = 113;
+        //通知消息一般大于1200
+        public static final int NOTICE = 1200;
+        //群公告
+        public static final int BULLETIN = 1502;
+    }
+
+
+    /// 会话强提示内容
+    public static class GroupAtType {
+        /// 无提示
+        public static final int atNormal = 0;
+
+        /// @了我提示
+        public static final int atMe = 1;
+
+        /// @了所有人提示
+        public static final int atAll = 2;
+
+        /// @了所有人@了我
+        public static final int atAllAtMe = 3;
+
+        /// 群公告提示
+        public static final int groupNotification = 4;
     }
 }

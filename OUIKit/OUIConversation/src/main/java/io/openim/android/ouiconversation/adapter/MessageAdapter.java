@@ -11,7 +11,7 @@ import com.yanzhenjie.permission.runtime.Permission;
 import java.util.List;
 
 
-import io.openim.android.ouiconversation.utils.Constant;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.utils.L;

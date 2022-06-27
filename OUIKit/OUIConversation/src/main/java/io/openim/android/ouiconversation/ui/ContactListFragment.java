@@ -43,6 +43,7 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.sdk.OpenIMClient;
 
 @Route(path = Routes.Conversation.CONTACT_LIST)
 public class ContactListFragment extends BaseFragment<ContactListVM> implements ContactListVM.ViewAction {
@@ -117,7 +118,11 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             if (msgConversation.conversationInfo.getConversationType() == 2)
                 intent.putExtra(GROUP_ID, msgConversation.conversationInfo.getGroupID());
 
+            if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification)
+                intent.putExtra(Constant.NOTICE, msgConversation.notificationMsg);
             startActivity(intent);
+            //重置强提醒
+//            OpenIMClient.getInstance().conversationManager.resetConversationGroupAtType(null, msgConversation.conversationInfo.getConversationID());
         });
 
         CustomAdapter adapter = new CustomAdapter(getContext());
@@ -178,23 +183,27 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                 default:
                     lastMsg = msgConversation.lastMsg.getNotificationElem().getDefaultTips();
                     break;
-                case io.openim.android.ouiconversation.utils.Constant.MsgType.TXT:
+                case Constant.MsgType.TXT:
                     lastMsg = msgConversation.lastMsg.getContent();
                     break;
-                case io.openim.android.ouiconversation.utils.Constant.MsgType.PICTURE:
+                case Constant.MsgType.PICTURE:
                     lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.picture) + "]";
                     break;
-                case io.openim.android.ouiconversation.utils.Constant.MsgType.VOICE:
+                case Constant.MsgType.VOICE:
                     lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.voice) + "]";
                     break;
-                case io.openim.android.ouiconversation.utils.Constant.MsgType.VIDEO:
+                case Constant.MsgType.VIDEO:
                     lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.video) + "]";
                     break;
-                case io.openim.android.ouiconversation.utils.Constant.MsgType.FILE:
+                case Constant.MsgType.FILE:
                     lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.file) + "]";
                     break;
-                case io.openim.android.ouiconversation.utils.Constant.MsgType.LOCATION:
+                case Constant.MsgType.LOCATION:
                     lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.location) + "]";
+                    break;
+                case Constant.MsgType.BULLETIN:
+                    lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.group_bulletin) + "]"
+                        + msgConversation.notificationMsg.group.notification;
                     break;
             }
             viewHolder.viewBinding.lastMsg.setText(lastMsg);

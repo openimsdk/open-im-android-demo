@@ -22,6 +22,8 @@ public class Routes {
         public final static String CREATE_GROUP = "/group/CreateGroupActivity";
         //群资料
         public final static String MATERIAL = "/group/GroupMaterialActivity";
+        //通知详情
+        public final static String NOTICE_DETAIL = "/group/NoticeDetailActivity";
     }
 
     //关系链

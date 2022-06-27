@@ -191,11 +191,17 @@ public class IMEvent {
             @Override
             public void onGroupInfoChanged(GroupInfo info) {
                 // 组资料变更
+                for (OnGroupListener onGroupListener : groupListeners) {
+                    onGroupListener.onGroupInfoChanged(info);
+                }
             }
 
             @Override
             public void onGroupMemberAdded(GroupMembersInfo info) {
                 // 组成员进入
+                for (OnGroupListener onGroupListener : groupListeners) {
+                    onGroupListener.onGroupMemberAdded(info);
+                }
             }
 
             @Override

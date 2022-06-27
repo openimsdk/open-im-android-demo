@@ -62,6 +62,12 @@ public class Common {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
     }
+    //弹出键盘
+    public static void pushKeyboard(Context context) {
+        InputMethodManager inputMethodManager =
+            (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+    }
 
     /**
      * 判断是否是字母

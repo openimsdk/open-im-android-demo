@@ -35,6 +35,7 @@ import io.openim.android.ouicore.widget.SpacesItemDecoration;
 import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityGroupDetailBinding;
 import io.openim.android.ouigroup.databinding.ActivityGroupMaterialBinding;
+import io.openim.android.ouigroup.entity.ExGroupMemberInfo;
 import io.openim.android.ouigroup.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
@@ -47,6 +48,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     int spanCount = 7;
     private PhotographAlbumDialog albumDialog;
     private ActivityResultLauncher infoModifyLauncher;
+    private int infoModifyType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,35 +67,52 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         infoModifyLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() != RESULT_OK) return;
             String var = result.getData().getStringExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA);
-            vm.updataGroup(vm.groupId, var, null, null, null, null);
+            if (infoModifyType == 1)
+                vm.updataGroup(vm.groupId, var, null, null, null, null);
+            if (infoModifyType == 2)
+                vm.setGroupMemberNickname(vm.groupId, vm.loginCertificate.userID, var);
         });
     }
 
     private void click() {
+        view.bulletin.setOnClickListener(v -> startActivity(new Intent(this, GroupBulletinActivity.class)));
         view.groupMember.setOnClickListener(v -> {
-
             startActivity(new Intent(this, GroupMemberActivity.class));
         });
         view.groupName.setOnClickListener(v -> {
             if (vm.isOwner()) {
+                infoModifyType = 1;
                 SingleInfoModifyActivity.SingleInfoModifyData modifyData = new SingleInfoModifyActivity.SingleInfoModifyData();
-                modifyData.title = "我在群里的昵称";
-                modifyData.description = "昵称修改后，只会在此群内显示，群内成员都可以看见。";
+                modifyData.title = "修改群聊名称";
+                modifyData.description = "修改群聊名称后，将在群内通知其他成员。";
                 modifyData.avatarUrl = vm.groupsInfo.getValue().getFaceURL();
                 modifyData.editT = vm.groupsInfo.getValue().getGroupName();
                 infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
             }
         });
+        view.myName.setOnClickListener(v -> {
+            infoModifyType = 2;
+            SingleInfoModifyActivity.SingleInfoModifyData modifyData = new SingleInfoModifyActivity.SingleInfoModifyData();
+            modifyData.title = "我在群里的昵称";
+            modifyData.description = "昵称修改后，只会在此群内显示，群内成员都可以看见。";
+            ExGroupMemberInfo exGroupMemberInfo = vm.getOwnInGroup(vm.loginCertificate.userID);
+            modifyData.avatarUrl = exGroupMemberInfo.groupMembersInfo.getFaceURL();
+            modifyData.editT = exGroupMemberInfo.groupMembersInfo.getNickname();
+            infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
+        });
         view.avatar.setOnClickListener(v -> {
             albumDialog.show();
         });
+
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        removeCacheVM();
+    protected void onPause() {
+        super.onPause();
+        if (isFinishing())
+            removeCacheVM();
     }
+
 
     @Override
     public void onSuccess(Object body) {

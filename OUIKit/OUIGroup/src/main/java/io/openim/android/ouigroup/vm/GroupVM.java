@@ -6,19 +6,15 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.github.promeg.pinyinhelper.Pinyin;
 
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
 import io.openim.android.ouicore.base.BaseViewModel;
-import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.entity.LoginCertificate;
+import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.entity.ExGroupMemberInfo;
 import io.openim.android.ouigroup.entity.ExUserInfo;
 import io.openim.android.sdk.OpenIMClient;
@@ -32,6 +28,7 @@ import io.openim.android.sdk.models.UserInfo;
 
 public class GroupVM extends BaseViewModel {
     public MutableLiveData<String> groupName = new MutableLiveData<>("");
+
     public MutableLiveData<GroupInfo> groupsInfo = new MutableLiveData<>();
     //当前用户是否是群主
     public MutableLiveData<Boolean> isGroupOwner = new MutableLiveData<>(true);
@@ -49,9 +46,10 @@ public class GroupVM extends BaseViewModel {
     public String groupId;
     public MutableLiveData<List<String>> letters = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<FriendInfo>> selectedFriendInfo = new MutableLiveData<>(new ArrayList<>());
-    private LoginCertificate loginCertificate;
+    public LoginCertificate loginCertificate;
     //是否是邀请入群
     public boolean isInviteToGroup = false;
+
 
     @Override
     protected void viewCreate() {
@@ -185,6 +183,27 @@ public class GroupVM extends BaseViewModel {
         }, groupID, groupName, faceURL, notification, introduction, ex);
     }
 
+    /**
+     * 修改所在群的昵称
+     *
+     * @param gid           群ID
+     * @param uid           群成员userID
+     * @param groupNickname 群内显示名称
+     */
+    public void setGroupMemberNickname(String gid, String uid, String groupNickname) {
+        OpenIMClient.getInstance().groupManager.setGroupMemberNickname(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                IView.onSuccess(data);
+                getGroupsInfo();
+            }
+        }, gid, uid, groupNickname);
+    }
 
     /**
      * 获取群成员信息
@@ -293,6 +312,26 @@ public class GroupVM extends BaseViewModel {
                 IView.onSuccess(null);
             }
         }, groupId, userIds, "");
+    }
+
+    /**
+     * 获取userID在群里的ExGroupMemberInfo 对象
+     *
+     * @return
+     */
+    public ExGroupMemberInfo getOwnInGroup(String userID) {
+        ExGroupMemberInfo memberInfo = new ExGroupMemberInfo();
+        GroupMembersInfo groupMembersInfo = new GroupMembersInfo();
+        groupMembersInfo.setUserID(userID);
+        memberInfo.groupMembersInfo = groupMembersInfo;
+        int index = exGroupManagement.getValue().indexOf(memberInfo);
+        if (index != -1)
+            return exGroupManagement.getValue().get(index);
+
+        index = exGroupMembers.getValue().indexOf(memberInfo);
+        if (index != -1)
+            return exGroupMembers.getValue().get(index);
+        return null;
     }
 
     public class PinyinComparator implements Comparator<ExGroupMemberInfo> {

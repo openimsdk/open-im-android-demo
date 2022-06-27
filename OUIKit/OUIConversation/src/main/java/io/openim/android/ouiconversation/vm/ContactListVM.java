@@ -121,8 +121,6 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     }
 
-
-
     public interface ViewAction extends IView {
         void onErr(String msg);
     }

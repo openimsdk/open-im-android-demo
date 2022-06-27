@@ -4,6 +4,9 @@
 
     <application>
         <activity
+            android:name=".ui.GroupBulletinActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.GroupMemberActivity"
             android:exported="false" />
         <activity
