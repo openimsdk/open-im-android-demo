@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -122,7 +123,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                 intent.putExtra(Constant.NOTICE, msgConversation.notificationMsg);
             startActivity(intent);
             //重置强提醒
-//            OpenIMClient.getInstance().conversationManager.resetConversationGroupAtType(null, msgConversation.conversationInfo.getConversationID());
+            if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification)
+                OpenIMClient.getInstance().conversationManager.resetConversationGroupAtType(null, msgConversation.conversationInfo.getConversationID());
         });
 
         CustomAdapter adapter = new CustomAdapter(getContext());
@@ -201,11 +203,14 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                 case Constant.MsgType.LOCATION:
                     lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.location) + "]";
                     break;
-                case Constant.MsgType.BULLETIN:
-                    lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.group_bulletin) + "]"
-                        + msgConversation.notificationMsg.group.notification;
-                    break;
             }
+            if (msgConversation.lastMsg.getContentType() == Constant.MsgType.BULLETIN
+                && null != msgConversation.notificationMsg&& null != msgConversation.notificationMsg.group
+                && !TextUtils.isEmpty(msgConversation.notificationMsg.group.notification))
+                lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.group_bulletin) + "]"
+                    + msgConversation.notificationMsg.group.notification;
+
+
             viewHolder.viewBinding.lastMsg.setText(lastMsg);
             viewHolder.viewBinding.badge.badge.setVisibility(msgConversation.conversationInfo.getUnreadCount() != 0 ? View.VISIBLE : View.GONE);
             viewHolder.viewBinding.badge.badge.setText(msgConversation.conversationInfo.getUnreadCount() + "");

@@ -18,7 +18,8 @@ import io.openim.android.ouicore.utils.Routes;
 
 @Route(path = Routes.Contact.HOME)
 public class ContactFragment extends BaseFragment<ContactVM> {
-    private  FragmentContactBinding view;
+    private FragmentContactBinding view;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         bindVM(ContactVM.class);
@@ -28,33 +29,37 @@ public class ContactFragment extends BaseFragment<ContactVM> {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view=FragmentContactBinding.inflate(getLayoutInflater());
+        view = FragmentContactBinding.inflate(getLayoutInflater());
         initView();
         click();
         return view.getRoot();
     }
 
     private void click() {
-        view.groupNotice.setOnClickListener(v->{
+        view.groupNotice.setOnClickListener(v -> {
             vm.dotNum.setValue(0);
-            startActivity(new Intent(getActivity(),GroupNoticeListActivity.class));
+            startActivity(new Intent(getActivity(), GroupNoticeListActivity.class));
         });
 
-        view.newFriendNotice.setOnClickListener(v->{
+        view.newFriendNotice.setOnClickListener(v -> {
             vm.friendDotNum.setValue(0);
-            startActivity(new Intent(getActivity(),NewFriendActivity.class));
+            startActivity(new Intent(getActivity(), NewFriendActivity.class));
+        });
+
+        view.myGoodFriend.setOnClickListener(v -> {
+            startActivity(new Intent(getActivity(), AllFriendActivity.class));
         });
 
     }
 
     private void initView() {
-        vm.dotNum.observe(getActivity(),v->{
-            view.badge.badge.setVisibility(v==0?View.GONE:View.VISIBLE);
-            view.badge.badge.setText(v+"");
+        vm.dotNum.observe(getActivity(), v -> {
+            view.badge.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE);
+            view.badge.badge.setText(v + "");
         });
-        vm.friendDotNum.observe(getActivity(),v->{
-            view.newFriendNoticeBadge.badge.setVisibility(v==0?View.GONE:View.VISIBLE);
-            view.newFriendNoticeBadge.badge.setText(v+"");
+        vm.friendDotNum.observe(getActivity(), v -> {
+            view.newFriendNoticeBadge.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE);
+            view.newFriendNoticeBadge.badge.setText(v + "");
         });
     }
 }

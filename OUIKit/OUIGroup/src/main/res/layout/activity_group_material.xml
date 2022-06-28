@@ -282,6 +282,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/qrCode"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
@@ -299,7 +300,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="群二维码"
+                                android:text="@string/group_qrcode"
                                 android:textColor="#ff333333"
                                 android:textSize="16sp" />
 
@@ -320,6 +321,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/groupId"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"

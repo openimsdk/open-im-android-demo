@@ -18,12 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
+import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
+import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityGroupMemberBinding;
-import io.openim.android.ouigroup.entity.ExGroupMemberInfo;
+
 import io.openim.android.ouigroup.vm.GroupVM;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
@@ -142,15 +144,15 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
             @Override
             public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 if (viewType == ITEM)
-                    return new InitiateGroupActivity.ItemViewHo(parent);
+                    return new ViewHol.ItemViewHo(parent);
 
-                return new InitiateGroupActivity.StickyViewHo(parent);
+                return new ViewHol.StickyViewHo(parent);
             }
 
             @Override
             public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExGroupMemberInfo data, int position) {
                 if (getItemViewType(position) == ITEM) {
-                    InitiateGroupActivity.ItemViewHo itemViewHo = (InitiateGroupActivity.ItemViewHo) holder;
+                    ViewHol.ItemViewHo itemViewHo = (ViewHol.ItemViewHo) holder;
                     GroupMembersInfo friendInfo = data.groupMembersInfo;
                     itemViewHo.view.avatar.load(friendInfo.getFaceURL());
                     itemViewHo.view.nickName.setText(friendInfo.getNickname());
@@ -168,7 +170,7 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
                     } else
                         itemViewHo.view.identity.setVisibility(View.GONE);
                 } else {
-                    InitiateGroupActivity.StickyViewHo stickyViewHo = (InitiateGroupActivity.StickyViewHo) holder;
+                    ViewHol.StickyViewHo stickyViewHo = (ViewHol.StickyViewHo) holder;
                     stickyViewHo.view.title.setText(data.sortLetter);
                 }
             }

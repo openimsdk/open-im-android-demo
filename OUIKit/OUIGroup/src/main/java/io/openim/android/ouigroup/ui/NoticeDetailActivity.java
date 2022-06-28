@@ -12,13 +12,14 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import java.util.List;
 
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityNoticeDetailBinding;
-import io.openim.android.ouigroup.entity.ExGroupMemberInfo;
+
 import io.openim.android.ouigroup.vm.GroupVM;
 
 

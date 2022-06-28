@@ -25,6 +25,12 @@ public class Constant {
     //图片存储文件夹
     public static final String PICTUREDIR = IM.getStorageDir() + "/picture/";
 
+    //二维码
+    public static class QR {
+        public static final String QR_ADD_FRIEND = "addFriend";
+        public static final String QR_JOIN_GROUP = "joinGroup";
+    }
+
 
     public static class Event {
         //已读数量变化

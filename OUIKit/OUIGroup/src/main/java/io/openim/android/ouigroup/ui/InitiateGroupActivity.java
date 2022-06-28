@@ -22,18 +22,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
+import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.entity.ExGroupMemberInfo;
+import io.openim.android.ouicore.entity.ExUserInfo;
+
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.utils.SinkHelper;
-import io.openim.android.ouigroup.R;
+
+
 import io.openim.android.ouigroup.databinding.ActivityInitiateGroupBinding;
-import io.openim.android.ouigroup.databinding.ItemPsrsonSelectBinding;
-import io.openim.android.ouigroup.databinding.ItemPsrsonStickyBinding;
-import io.openim.android.ouigroup.entity.ExUserInfo;
+
 import io.openim.android.ouigroup.vm.GroupVM;
-import io.openim.android.sdk.OpenIMClient;
+
 import io.openim.android.sdk.models.FriendInfo;
 
 /**
@@ -124,18 +124,24 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
             @Override
             public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 if (viewType == ITEM)
-                    return new ItemViewHo(parent);
+                    return new ViewHol.ItemViewHo(parent);
 
-                return new StickyViewHo(parent);
+                return new ViewHol.StickyViewHo(parent);
             }
 
             @Override
             public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExUserInfo data, int position) {
                 if (getItemViewType(position) == ITEM) {
-                    ItemViewHo itemViewHo = (ItemViewHo) holder;
-                    FriendInfo friendInfo = data.userInfo.getFriendInfo();
-                    itemViewHo.view.avatar.load(friendInfo.getFaceURL());
-                    itemViewHo.view.nickName.setText(friendInfo.getNickname());
+                    ViewHol.ItemViewHo itemViewHo = (ViewHol.ItemViewHo) holder;
+                    if (isRemoveGroup) {
+                        ExGroupMemberInfo memberInfo = data.exGroupMemberInfo;
+                        itemViewHo.view.avatar.load(memberInfo.groupMembersInfo.getFaceURL());
+                        itemViewHo.view.nickName.setText(memberInfo.groupMembersInfo.getNickname());
+                    } else {
+                        FriendInfo friendInfo = data.userInfo.getFriendInfo();
+                        itemViewHo.view.avatar.load(friendInfo.getFaceURL());
+                        itemViewHo.view.nickName.setText(friendInfo.getNickname());
+                    }
                     itemViewHo.view.select.setChecked(data.isSelect);
                     if (!data.isEnabled)
                         itemViewHo.view.item.setOnClickListener(null);
@@ -149,7 +155,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                             view.submit.setEnabled(num > 0);
                         });
                 } else {
-                    StickyViewHo stickyViewHo = (StickyViewHo) holder;
+                    ViewHol.StickyViewHo stickyViewHo = (ViewHol.StickyViewHo) holder;
                     stickyViewHo.view.title.setText(data.sortLetter);
                 }
 
@@ -165,6 +171,12 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         for (ExUserInfo item : adapter.getItems()) {
             if (item.isSelect && item.isEnabled) {
                 num++;
+                if (isRemoveGroup) {
+                    FriendInfo friendInfo = new FriendInfo();
+                    friendInfo.setUserID(item.exGroupMemberInfo.groupMembersInfo.getUserID());
+                    friendInfos.add(friendInfo);
+                    continue;
+                }
                 friendInfos.add(item.userInfo.getFriendInfo());
             }
         }
@@ -173,21 +185,41 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
     }
 
     private void listener() {
-        vm.letters.observe(this, v -> {
-            if (null == v || v.isEmpty()) return;
-            StringBuilder letters = new StringBuilder();
-            for (String s : v) {
-                letters.append(s);
-            }
-            view.sortView.setLetters(letters.toString());
-        });
-
-
-        vm.exUserInfo.observe(this, v -> {
-            if (null == v || v.isEmpty()) return;
-            List<ExUserInfo> exUserInfos = new ArrayList<>(v);
-            adapter.setItems(exUserInfos);
-        });
+        if (isRemoveGroup) {
+            vm.groupLetters.observe(this, v -> {
+                if (null == v || v.isEmpty()) return;
+                StringBuilder letters = new StringBuilder();
+                for (String s : v) {
+                    letters.append(s);
+                }
+                view.sortView.setLetters(letters.toString());
+            });
+            vm.exGroupMembers.observe(this, v -> {
+                if (null == v || v.isEmpty()) return;
+                List<ExUserInfo> exUserInfos = new ArrayList<>();
+                for (ExGroupMemberInfo exGroupMemberInfo : v) {
+                    ExUserInfo exUserInfo = new ExUserInfo();
+                    exUserInfo.sortLetter = exGroupMemberInfo.sortLetter;
+                    exUserInfo.exGroupMemberInfo = exGroupMemberInfo;
+                    exUserInfos.add(exUserInfo);
+                }
+                adapter.setItems(exUserInfos);
+            });
+        } else {
+            vm.letters.observe(this, v -> {
+                if (null == v || v.isEmpty()) return;
+                StringBuilder letters = new StringBuilder();
+                for (String s : v) {
+                    letters.append(s);
+                }
+                view.sortView.setLetters(letters.toString());
+            });
+            vm.exUserInfo.observe(this, v -> {
+                if (null == v || v.isEmpty()) return;
+                List<ExUserInfo> exUserInfos = new ArrayList<>(v);
+                adapter.setItems(exUserInfos);
+            });
+        }
 
         view.sortView.setOnLetterChangedListener((letter, position) -> {
             for (int i = 0; i < adapter.getItems().size(); i++) {
@@ -230,21 +262,4 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
             }
         });
 
-    public static class ItemViewHo extends RecyclerView.ViewHolder {
-        ItemPsrsonSelectBinding view;
-
-        public ItemViewHo(@NonNull View itemView) {
-            super(ItemPsrsonSelectBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
-            view = ItemPsrsonSelectBinding.bind(this.itemView);
-        }
-    }
-
-    public static class StickyViewHo extends RecyclerView.ViewHolder {
-        ItemPsrsonStickyBinding view;
-
-        public StickyViewHo(@NonNull View itemView) {
-            super(ItemPsrsonStickyBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
-            view = ItemPsrsonStickyBinding.bind(this.itemView);
-        }
-    }
 }

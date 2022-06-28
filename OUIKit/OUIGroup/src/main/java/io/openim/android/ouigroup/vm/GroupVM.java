@@ -12,11 +12,13 @@ import java.util.Comparator;
 import java.util.List;
 
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.entity.ExGroupMemberInfo;
+import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
-import io.openim.android.ouicore.entity.NotificationMsg;
+
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouigroup.entity.ExGroupMemberInfo;
-import io.openim.android.ouigroup.entity.ExUserInfo;
+
+
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;

@@ -33,6 +33,7 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
     //好友申请详情
     public MutableLiveData<FriendApplicationInfo> friendDetail = new MutableLiveData<>();
 
+
     @Override
     protected void viewCreate() {
         super.viewCreate();

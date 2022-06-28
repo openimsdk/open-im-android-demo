@@ -52,4 +52,13 @@
     <string name="group_name">群聊名称</string>
     <string name="group_transfer_permissions">群主管理权转让</string>
     <string name="in_group_name">我在群里的昵称</string>
+    <string name="group_qrcode">群二维码</string>
+    <string name="copy_group_id">复制团队ID</string>
+    <string name="copy_succ">复制成功</string>
+    <string name="share_group_tips1">搜索群聊ID号，立刻加入该群。</string>
+    <string name="share_group_tips2">扫一扫群二维码，立刻加入该群。</string>
+    <string name="my_good_friend">我的好友</string>
+    <string name="delete_friend">已删除此好友</string>
+    <string name="delete_friend_tips">确定删除此好友吗</string>
+    <string name="apply_join">申请加入该群</string>
 </resources>

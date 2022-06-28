@@ -13,9 +13,6 @@
 
     <application android:theme="@style/Theme.Demo">
         <activity
-            android:name="io.openim.android.ouigroup.ui.NoticeDetailActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.PreviewActivity"
             android:exported="false" />
         <activity

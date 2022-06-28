@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.openim.android.demo.R;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
@@ -102,5 +103,25 @@ public class SearchVM extends BaseViewModel {
                 groupsInfo.setValue(data);
             }
         }, groupIds);
+
+    }
+
+    /**
+     * 移除好友
+     * @param uid
+     */
+    public void deleteFriend(String uid) {
+        OpenIMClient.getInstance().friendshipManager.deleteFriend(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error);
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                IView.toast(getContext().getString(io.openim.android.ouicore.R.string.delete_friend));
+                IView.onSuccess(data);
+            }
+        }, uid);
     }
 }

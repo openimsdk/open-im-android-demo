@@ -1,6 +1,5 @@
 package io.openim.android.demo.ui.main;
 
-import static io.openim.android.ouicore.utils.Constant.ID;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -22,7 +21,6 @@ import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.bean.ZxingConfig;
-import com.yzq.zxinglibrary.common.Constant;
 
 import java.util.List;
 
@@ -41,6 +39,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.Message;
+import io.openim.android.ouicore.utils.Constant;
 
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
 
@@ -134,13 +133,13 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
     private final ActivityResultLauncher<Intent> captureActivityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() != Activity.RESULT_OK || null == result.getData()) return;
-        String content = result.getData().getStringExtra(Constant.CODED_CONTENT);
+        String content = result.getData().getStringExtra(com.yzq.zxinglibrary.common.Constant.CODED_CONTENT);
 
-        if (content.contains("addFriend")) {
+        if (content.contains(Constant.QR.QR_ADD_FRIEND)) {
             String userId = content.substring(content.lastIndexOf("/") + 1);
             if (!TextUtils.isEmpty(userId))
-                startActivity(new Intent(this, PersonDetailActivity.class).putExtra(ID, userId));
-        } else if (content.contains("joinGroup")) {
+                startActivity(new Intent(this, PersonDetailActivity.class).putExtra(Constant.ID, userId));
+        } else if (content.contains(Constant.QR.QR_JOIN_GROUP)) {
             String groupId = content.substring(content.lastIndexOf("/") + 1);
             if (!TextUtils.isEmpty(groupId))
                 ARouter.getInstance().build(Routes.Group.DETAIL)
@@ -160,7 +159,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         config.setShake(true);//是否震动  默认为true
         config.setDecodeBarCode(true);//是否扫描条形码 默认为true
         config.setFullScreenScan(false);//是否全屏扫描  默认为true  设为false则只会在扫描框中扫描
-        intent.putExtra(Constant.INTENT_ZXING_CONFIG, config);
+        intent.putExtra(com.yzq.zxinglibrary.common.Constant.INTENT_ZXING_CONFIG, config);
         captureActivityLauncher.launch(intent);
     }
 

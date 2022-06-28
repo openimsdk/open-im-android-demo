@@ -4,6 +4,8 @@ public class Routes {
     public static class Main {
         //发送验证信息
         public final static String SEND_VERIFY = "/main/SendVerifyActivity";
+        //好友详情
+        public final static String PERSON_DETAIL = "/main/PersonDetailActivity";
     }
 
     //会话相关

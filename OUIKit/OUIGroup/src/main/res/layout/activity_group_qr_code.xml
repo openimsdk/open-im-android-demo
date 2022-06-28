@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="GroupVM"
+            type="io.openim.android.ouigroup.vm.GroupVM" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#F8F8F8"
+            android:orientation="vertical"
+            tools:context=".ui.GroupShareActivity">
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/comm_title_high"
+                app:cardElevation="8dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <include
+                        android:id="@+id/back"
+                        layout="@layout/view_back" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="@string/group_qrcode"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <com.lihang.ShadowLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="58dp"
+                android:layout_marginRight="30dp"
+                app:hl_cornerRadius="10dp"
+                app:hl_shadowColor="#2a000000"
+                app:hl_shadowLimit="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:background="@drawable/sty_radius_10_white"
+                    android:orientation="vertical"
+                    android:padding="30dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <io.openim.android.ouicore.widget.AvatarImage
+                            android:id="@+id/avatar"
+                            android:layout_width="@dimen/avatar_size"
+                            android:layout_height="@dimen/avatar_size"
+                            android:src="@mipmap/ic_my_friend" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="13dp"
+                            android:text="@{GroupVM.groupsInfo.groupName}"
+                            android:textColor="#ff000000"
+                            android:textSize="20sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tips"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="56dp"
+                        android:layout_marginBottom="30dp"
+                        android:text="@string/share_group_tips2"
+                        android:textColor="#ff999999"
+                        android:textSize="14sp" />
+
+                    <RelativeLayout
+                        android:id="@+id/qrCodeRl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="80dp"
+
+                        android:background="@mipmap/bg_qr"
+                        android:padding="20dp">
+
+                        <ImageView
+                            android:id="@+id/qrCode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:scaleType="center" />
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:id="@+id/groupId"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="80dp"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="40dp"
+                            android:text="@{GroupVM.groupsInfo.groupID}"
+                            android:textColor="#ff333333"
+                            android:textSize="28sp" />
+
+                        <Button
+                            android:id="@+id/copy"
+                            android:layout_width="230dp"
+                            android:layout_height="@dimen/button_height"
+                            android:text="@string/copy_group_id"
+                            android:textColor="@color/white"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.lihang.ShadowLayout>
+
+
+        </LinearLayout>
+    </RelativeLayout>
+
+</layout>
+

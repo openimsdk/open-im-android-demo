@@ -17,8 +17,8 @@
         android:paddingBottom="10dp">
 
         <io.openim.android.ouicore.widget.AvatarImage
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
             android:src="@mipmap/ic_friend_add" />
 
         <LinearLayout
@@ -56,12 +56,15 @@
                     android:src="@mipmap/ic_right" />
 
             </LinearLayout>
-
-            <include layout="@layout/view_dividing_line" />
         </LinearLayout>
-
-
     </LinearLayout>
+
+    <include
+        layout="@layout/view_dividing_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="90dp" />
+
 
     <LinearLayout
         android:id="@+id/groupNotice"
@@ -75,8 +78,8 @@
         android:paddingBottom="10dp">
 
         <io.openim.android.ouicore.widget.AvatarImage
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
             android:src="@mipmap/ic_my_group" />
 
         <LinearLayout
@@ -115,11 +118,75 @@
 
             </LinearLayout>
 
-            <include layout="@layout/view_dividing_line" />
+
         </LinearLayout>
 
 
     </LinearLayout>
 
+    <include
+        layout="@layout/view_dividing_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="90dp" />
 
+    <LinearLayout
+        android:id="@+id/myGoodFriend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="22dp"
+        android:paddingTop="10dp"
+        android:paddingRight="22dp"
+        android:paddingBottom="10dp">
+
+        <io.openim.android.ouicore.widget.AvatarImage
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:src="@mipmap/ic_my_friend" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="18dp"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="@string/my_good_friend"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="6dp"
+                    android:src="@mipmap/ic_right" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <include
+        layout="@layout/view_dividing_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="90dp" />
 </LinearLayout>

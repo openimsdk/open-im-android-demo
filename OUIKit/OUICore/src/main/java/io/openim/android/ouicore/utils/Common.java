@@ -1,6 +1,8 @@
 package io.openim.android.ouicore.utils;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Build;
@@ -62,6 +64,7 @@ public class Common {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
     }
+
     //弹出键盘
     public static void pushKeyboard(Context context) {
         InputMethodManager inputMethodManager =
@@ -95,6 +98,16 @@ public class Common {
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
+    }
+
+    /**
+     *  复制
+     * @param clip 内容
+     */
+    public static void copy(String clip) {
+        ClipboardManager cm = (ClipboardManager) BaseApp.instance().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData mClipData = ClipData.newPlainText("text", clip);
+        cm.setPrimaryClip(mClipData);
     }
 }
 

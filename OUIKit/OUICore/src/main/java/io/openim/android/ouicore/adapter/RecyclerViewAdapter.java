@@ -56,3 +56,5 @@ public abstract class RecyclerViewAdapter<T, V extends RecyclerView.ViewHolder> 
     }
 
 }
+
+

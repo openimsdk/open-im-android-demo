@@ -2,45 +2,36 @@ package io.openim.android.ouigroup.ui;
 
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
 import io.openim.android.ouicore.widget.SingleInfoModifyActivity;
-import io.openim.android.ouicore.widget.SpacesItemDecoration;
 import io.openim.android.ouigroup.R;
-import io.openim.android.ouigroup.databinding.ActivityGroupDetailBinding;
 import io.openim.android.ouigroup.databinding.ActivityGroupMaterialBinding;
-import io.openim.android.ouigroup.entity.ExGroupMemberInfo;
+
 import io.openim.android.ouigroup.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
-import io.openim.android.sdk.models.FriendInfo;
-import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 @Route(path = Routes.Group.MATERIAL)
@@ -75,6 +66,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     private void click() {
+        view.qrCode.setOnClickListener(v -> startActivity(new Intent(this, GroupShareActivity.class)));
+        view.groupId.setOnClickListener(v -> startActivity(new Intent(this, GroupShareActivity.class).putExtra(GroupShareActivity.IS_QRCODE, false)));
         view.bulletin.setOnClickListener(v -> startActivity(new Intent(this, GroupBulletinActivity.class)));
         view.groupMember.setOnClickListener(v -> {
             startActivity(new Intent(this, GroupMemberActivity.class));

@@ -261,6 +261,7 @@ public class MessageViewHolder {
             LayoutMsgImgLeftBinding v = LayoutMsgImgLeftBinding.bind(itemView);
             String url = message.getPictureElem().getSourcePicture().getUrl();
 
+            v.avatar2.load(message.getSenderFaceUrl());
             Glide.with(itemView.getContext())
                 .load(url)
                 .into(v.content2);
@@ -272,6 +273,7 @@ public class MessageViewHolder {
         @Override
         void bindRight(View itemView, Message message) {
             LayoutMsgImgRightBinding v = LayoutMsgImgRightBinding.bind(itemView);
+            v.avatar.load(message.getSenderFaceUrl());
             String url = message.getPictureElem().getSourcePicture().getUrl();
             if (messageAdapter.hasStorage) {
                 String filePath = message.getPictureElem().getSourcePath();
@@ -338,6 +340,7 @@ public class MessageViewHolder {
         @Override
         void bindLeft(View itemView, Message message) {
             final LayoutMsgAudioLeftBinding view = LayoutMsgAudioLeftBinding.bind(itemView);
+            view.avatar.load(message.getSenderFaceUrl());
             view.sendState.setSendState(message.getStatus());
             view.duration.setText(message.getSoundElem().getDuration() + "``");
             view.content.setOnClickListener(v -> extracted(message, view.lottieView));
@@ -346,6 +349,7 @@ public class MessageViewHolder {
         @Override
         void bindRight(View itemView, Message message) {
             final LayoutMsgAudioRightBinding view = LayoutMsgAudioRightBinding.bind(itemView);
+            view.avatar2.load(message.getSenderFaceUrl());
             view.sendState2.setSendState(message.getStatus());
             view.duration2.setText(message.getSoundElem().getDuration() + "``");
 
@@ -413,6 +417,7 @@ public class MessageViewHolder {
         @Override
         void bindRight(View itemView, Message message) {
             LayoutMsgImgRightBinding view = LayoutMsgImgRightBinding.bind(itemView);
+            view.avatar.load(message.getSenderFaceUrl());
             view.sendState.setSendState(message.getStatus());
             view.videoPlay.setVisibility(View.VISIBLE);
 
@@ -432,6 +437,7 @@ public class MessageViewHolder {
         @Override
         void bindLeft(View itemView, Message message) {
             LayoutMsgImgLeftBinding view = LayoutMsgImgLeftBinding.bind(itemView);
+            view.avatar2.load(message.getSenderFaceUrl());
             view.sendState2.setSendState(message.getStatus());
             view.videoPlay2.setVisibility(View.VISIBLE);
             Glide.with(itemView.getContext())
@@ -468,8 +474,8 @@ public class MessageViewHolder {
         @Override
         void bindLeft(View itemView, Message message) {
             LayoutMsgFileLeftBinding view = LayoutMsgFileLeftBinding.bind(itemView);
-
             view.avatar.load(message.getSenderFaceUrl());
+
             view.title.setText(message.getFileElem().getFileName());
             Long size = message.getFileElem().getFileSize();
             view.size.setText(ByteUtil.bytes2kb(size) + "");
@@ -480,8 +486,8 @@ public class MessageViewHolder {
         @Override
         void bindRight(View itemView, Message message) {
             LayoutMsgFileRightBinding view = LayoutMsgFileRightBinding.bind(itemView);
-
             view.avatar2.load(message.getSenderFaceUrl());
+
             view.title2.setText(message.getFileElem().getFileName());
             Long size = message.getFileElem().getFileSize();
             view.size2.setText(ByteUtil.bytes2kb(size) + "");
@@ -509,6 +515,7 @@ public class MessageViewHolder {
         @Override
         void bindLeft(View itemView, Message message) {
             LayoutMsgLocation1Binding view = LayoutMsgLocation1Binding.bind(itemView);
+            view.avatar.load(message.getSenderFaceUrl());
             try {
                 LocationInfo locationInfo = (LocationInfo) message.getExt();
                 view.title.setText(locationInfo.name);
@@ -530,6 +537,7 @@ public class MessageViewHolder {
         @Override
         void bindRight(View itemView, Message message) {
             LayoutMsgLocation2Binding view = LayoutMsgLocation2Binding.bind(itemView);
+            view.avatar2.load(message.getSenderFaceUrl());
             try {
                 LocationInfo locationInfo = (LocationInfo) message.getExt();
                 view.title2.setText(locationInfo.name);
