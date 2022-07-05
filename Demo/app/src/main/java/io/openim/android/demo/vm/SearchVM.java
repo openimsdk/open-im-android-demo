@@ -11,6 +11,7 @@ import io.openim.android.demo.R;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.FriendshipInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.UserInfo;
@@ -33,6 +34,7 @@ public class SearchVM extends BaseViewModel {
     public void searchPerson() {
         List<String> uidList = new ArrayList<>(); // 用户ID集合
         uidList.add(searchContent);
+        //兼容旧版
         OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
             @Override
             public void onError(int code, String error) {
@@ -41,10 +43,10 @@ public class SearchVM extends BaseViewModel {
 
             @Override
             public void onSuccess(List<UserInfo> data) {
+                if (data.isEmpty())return;
                 userInfo.setValue(data);
             }
         }, uidList);
-
     }
 
     public void checkFriend(List<UserInfo> data) {

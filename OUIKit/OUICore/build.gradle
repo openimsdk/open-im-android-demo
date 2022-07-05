@@ -74,6 +74,9 @@ dependencies {
 
     api 'com.github.maogedadada:SortLetter-Master:1.0.9'
 
-    api project(':OpenIM-SDK')
 
+    //openIM sdk
+    api 'io.openim:android-sdk:2.2.0@aar'
+    implementation 'io.openim:core-sdk:2.2.0@aar'
+    implementation 'com.google.code.gson:gson:2.9.0'
 }

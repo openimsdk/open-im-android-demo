@@ -35,6 +35,19 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
         UIHandler.postDelayed(this::undataConversation,5*1000);
     }
+    public void deleteConversationFromLocalAndSvr(String conversationId){
+        OpenIMClient.getInstance().conversationManager.deleteConversationFromLocalAndSvr(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                IView.onSuccess(data);
+            }
+        },conversationId);
+    }
 
     private void undataConversation() {
         OpenIMClient.getInstance().conversationManager.getAllConversationList(new OnBase<List<ConversationInfo>>() {

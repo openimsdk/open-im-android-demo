@@ -38,9 +38,6 @@ dependencyResolutionManagement {
 rootProject.name = "Demo"
 include ':app'
 
-include ':OpenIM-SDK'
-project(':OpenIM-SDK').projectDir = new File(settingsDir, '../Open-IM-SDK-Android/OpenIM-SDK')
-
 include ':OUICore'
 project(':OUICore').projectDir = new File(settingsDir, '../OUIKit/OUICore')
 

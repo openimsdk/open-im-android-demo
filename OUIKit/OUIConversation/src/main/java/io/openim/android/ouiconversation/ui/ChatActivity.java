@@ -91,7 +91,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         vm.setMessageAdapter(messageAdapter);
         view.recyclerView.setAdapter(messageAdapter);
         vm.messages.observe(this, v -> {
-            if (null == v || v.isEmpty()) return;
+            if (null == v) return;
             messageAdapter.setMessages(v);
             messageAdapter.notifyDataSetChanged();
         });
@@ -146,7 +146,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) view.recyclerView.getLayoutManager();
                 int firstVisiblePosition = linearLayoutManager.findFirstCompletelyVisibleItemPosition();
                 int lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
-                if (lastVisiblePosition == vm.messages.getValue().size() - 1) {
+                if (lastVisiblePosition == vm.messages.getValue().size() - 1
+                    && vm.messages.getValue().size() >= vm.count) {
                     vm.loadHistoryMessage();
                 }
                 if (vm.isSingleChat)

@@ -3,8 +3,10 @@ package io.openim.android.ouiconversation.vm;
 
 import static io.openim.android.ouicore.utils.Common.UIHandler;
 
+import android.os.Build;
 import android.text.TextUtils;
 
+import androidx.annotation.RequiresApi;
 import androidx.databinding.ObservableBoolean;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -49,7 +51,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public String otherSideID = ""; // 消息发送方
     public String groupID = ""; // 接受消息的群ID
     public boolean isSingleChat = true; //是否单聊 false 群聊
-    int count = 20; //条数
+    public int count = 20; //条数
     Message loading;
 
 
@@ -120,6 +122,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onSuccess(List<Message> data) {
                 for (Message datum : data) {
@@ -247,7 +250,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
         IView.scrollToPosition(0);
 
-        List<Message> megs = messages.getValue();
         OfflinePushInfo offlinePushInfo = new OfflinePushInfo();  // 离线推送的消息备注；不为null
         OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
             @Override
@@ -263,9 +265,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             @Override
             public void onSuccess(Message message) {
                 // 返回新的消息体；替换发送传入的，不然扯回消息会有bug
-                int index = megs.indexOf(msg);
-                megs.add(index, buildExInfo(message));
-                megs.remove(index + 1);
+                int index = messages.getValue().indexOf(msg);
+                messages.getValue().remove(index);
+                messages.getValue().add(index, buildExInfo(message));
                 messageAdapter.notifyItemChanged(index);
             }
         }, msg, otherSideID, groupID, offlinePushInfo);

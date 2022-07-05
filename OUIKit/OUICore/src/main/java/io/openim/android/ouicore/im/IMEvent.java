@@ -12,6 +12,7 @@ import io.openim.android.sdk.listener.OnConnListener;
 import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.listener.OnFriendshipListener;
 import io.openim.android.sdk.listener.OnGroupListener;
+import io.openim.android.sdk.listener.OnSignalingListener;
 import io.openim.android.sdk.listener.OnUserListener;
 import io.openim.android.sdk.models.BlacklistInfo;
 import io.openim.android.sdk.models.ConversationInfo;
@@ -22,6 +23,7 @@ import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.ReadReceiptInfo;
+import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 ///im事件 统一处理
@@ -45,6 +47,51 @@ public class IMEvent {
         friendshipListener();
         conversationListener();
         groupListeners();
+        signalingListener();
+    }
+
+    private void signalingListener() {
+        OpenIMClient.getInstance().signalingManager.setSignalingListener(new OnSignalingListener() {
+            @Override
+            public void onInvitationCancelled(SignalingInfo s) {
+                // 被邀请者收到：邀请者取消音视频通话
+            }
+
+            @Override
+            public void onInvitationTimeout(SignalingInfo s) {
+                // 邀请者收到：被邀请者超时未接通
+            }
+
+            @Override
+            public void onInviteeAccepted(SignalingInfo s) {
+                // 邀请者收到：被邀请者同意音视频通话
+            }
+
+            @Override
+            public void onInviteeAcceptedByOtherDevice(SignalingInfo s) {
+
+            }
+
+            @Override
+            public void onInviteeRejected(SignalingInfo s) {
+                // 邀请者收到：被邀请者拒绝音视频通话
+            }
+
+            @Override
+            public void onInviteeRejectedByOtherDevice(SignalingInfo s) {
+
+            }
+
+            @Override
+            public void onReceiveNewInvitation(SignalingInfo s) {
+                // 被邀请者收到：音视频通话邀请
+            }
+
+            @Override
+            public void onHangup(SignalingInfo s) {
+
+            }
+        });
     }
 
     public static synchronized IMEvent getInstance() {

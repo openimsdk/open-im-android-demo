@@ -45,6 +45,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.models.ConversationInfo;
 
 @Route(path = Routes.Conversation.CONTACT_LIST)
 public class ContactListFragment extends BaseFragment<ContactListVM> implements ContactListVM.ViewAction {
@@ -53,6 +54,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
     private long timeInterval = 700;
 
     private FragmentContactListBinding view;
+    private CustomAdapter adapter;
 
     public static ContactListFragment newInstance() {
         return new ContactListFragment();
@@ -102,7 +104,14 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         view.recyclerView.setSwipeMenuCreator(mSwipeMenuCreator);
         view.recyclerView.setOnItemMenuClickListener((menuBridge, adapterPosition) -> {
             int menuPosition = menuBridge.getPosition();
+            if (menuPosition == 0) {
 
+            } else {
+                MsgConversation conversationInfo =vm.conversations.getValue().get(adapterPosition);
+                vm.conversations.getValue().remove(conversationInfo);
+                adapter.notifyItemRemoved(adapterPosition);
+                vm.deleteConversationFromLocalAndSvr(conversationInfo.conversationInfo.getConversationID());
+            }
         });
         view.recyclerView.setOnItemClickListener((view, position) -> {
             long nowTime = System.currentTimeMillis();
@@ -127,7 +136,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                 OpenIMClient.getInstance().conversationManager.resetConversationGroupAtType(null, msgConversation.conversationInfo.getConversationID());
         });
 
-        CustomAdapter adapter = new CustomAdapter(getContext());
+         adapter = new CustomAdapter(getContext());
         view.recyclerView.setAdapter(adapter);
 
 //        view.recyclerView.addItemDecoration(new DefaultItemDecoration(getActivity().getColor(android.R.color.transparent), 1, 36));
@@ -144,6 +153,11 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onSuccess(Object body) {
+        super.onSuccess(body);
+
+    }
 
     static class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
@@ -156,6 +170,10 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
         public void setConversationInfos(List<MsgConversation> conversationInfos) {
             this.conversationInfos = conversationInfos;
+        }
+
+        public List<MsgConversation> getConversationInfos() {
+            return conversationInfos;
         }
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -205,7 +223,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                     break;
             }
             if (msgConversation.lastMsg.getContentType() == Constant.MsgType.BULLETIN
-                && null != msgConversation.notificationMsg&& null != msgConversation.notificationMsg.group
+                && null != msgConversation.notificationMsg && null != msgConversation.notificationMsg.group
                 && !TextUtils.isEmpty(msgConversation.notificationMsg.group.notification))
                 lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.group_bulletin) + "]"
                     + msgConversation.notificationMsg.group.notification;
