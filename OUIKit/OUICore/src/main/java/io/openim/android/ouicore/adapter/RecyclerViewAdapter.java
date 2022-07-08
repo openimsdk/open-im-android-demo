@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import io.openim.android.ouicore.utils.L;
+
 public abstract class RecyclerViewAdapter<T, V extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<V> {
 
     private List<T> items;
@@ -26,6 +28,9 @@ public abstract class RecyclerViewAdapter<T, V extends RecyclerView.ViewHolder> 
     public void setItems(List<T> items) {
         this.items = items;
         notifyDataSetChanged();
+    }
+    public void setItems2(List<T> items) {
+        this.items = items;
     }
 
     public List<T> getItems() {

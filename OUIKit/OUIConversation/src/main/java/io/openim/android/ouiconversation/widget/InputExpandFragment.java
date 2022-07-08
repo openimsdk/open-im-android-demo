@@ -277,7 +277,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
     }
 
     public static class ExpandHolder extends RecyclerView.ViewHolder {
-        ItemExpandMenuBinding v;
+        public ItemExpandMenuBinding v;
 
         public ExpandHolder(@NonNull View itemView) {
             super(ItemExpandMenuBinding.inflate(LayoutInflater.from(itemView.getContext())).getRoot());

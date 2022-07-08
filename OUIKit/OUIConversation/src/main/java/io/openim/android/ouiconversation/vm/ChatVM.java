@@ -18,6 +18,7 @@ import java.util.List;
 
 
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
+import io.openim.android.ouicore.entity.AtMsgInfo;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.base.BaseViewModel;
@@ -26,6 +27,7 @@ import io.openim.android.ouicore.entity.LocationInfo;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
+import io.openim.android.ouicore.utils.FixSizeLinkedList;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.sdk.OpenIMClient;
@@ -41,6 +43,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     //通知消息
     public MutableLiveData<NotificationMsg> notificationMsg = new MutableLiveData<>();
     public MutableLiveData<List<Message>> messages = new MutableLiveData<>(new ArrayList<>());
+    //@消息
+    public MutableLiveData<List<Message>> atMessages = new MutableLiveData<>(new ArrayList<>());
     public ObservableBoolean typing = new ObservableBoolean(false);
     public MutableLiveData<String> inputMsg = new MutableLiveData<>("");
     MutableLiveData<Boolean> isNoData = new MutableLiveData<>(false);
@@ -140,6 +144,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     Collections.reverse(data);
                 }
                 if (list.isEmpty()) {
+                    IMUtil.calChatTimeInterval(data);
                     messages.setValue(data);
                     return;
                 }
@@ -212,6 +217,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 markReaded(ids);
             }
         }
+        IMUtil.calChatTimeInterval(messages.getValue());
     }
 
     @Override
@@ -226,7 +232,14 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onRecvMessageRevoked(String msgId) {
-
+        for (int i = 0; i < messageAdapter.getMessages().size(); i++) {
+            Message message = messageAdapter.getMessages().get(i);
+            if (message.getClientMsgID().equals(msgId)) {
+                message.setContentType(Constant.MsgType.REVOKE);
+                messageAdapter.notifyItemChanged(i);
+                return;
+            }
+        }
     }
 
     /**
@@ -238,6 +251,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         try {
             if (msg.getContentType() == Constant.MsgType.LOCATION)
                 msg.setExt(GsonHel.fromJson(msg.getLocationElem().getDescription(), LocationInfo.class));
+            if (msg.getContentType() == Constant.MsgType.MENTION)
+                msg.setExt(GsonHel.fromJson(msg.getContent(), AtMsgInfo.class));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -272,6 +287,26 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
         }, msg, otherSideID, groupID, offlinePushInfo);
 
+    }
+
+    /**
+     * 撤回消息
+     *
+     * @param message
+     */
+    public void revokeMessage(Message message) {
+        OpenIMClient.getInstance().messageManager.revokeMessage(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                message.setContentType(Constant.MsgType.REVOKE);
+                messageAdapter.notifyItemChanged(messageAdapter.getMessages().indexOf(message));
+            }
+        }, message);
     }
 
     public interface ViewAction extends IView {

@@ -24,12 +24,14 @@
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingLeft="10dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
             android:paddingRight="10dp">
 
             <CheckBox
                 android:id="@+id/voice"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="35dp"
                 android:layout_marginRight="10dp"
                 android:button="@null"
                 android:drawableLeft="@drawable/selector_chat_checkbox"
@@ -38,11 +40,11 @@
             <EditText
                 android:id="@+id/chatInput"
                 android:layout_width="0dp"
-                android:layout_height="35dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/sty_radius_4_white"
                 android:maxHeight="80dp"
-                android:minHeight="32dp"
+                android:minHeight="35dp"
                 android:paddingLeft="3dp"
                 android:text="@={ChatVM.inputMsg}"
                 android:visibility="visible" />
@@ -68,7 +70,7 @@
             <Button
                 android:id="@+id/chatSend"
                 android:layout_width="63dp"
-                android:layout_height="wrap_content"
+                android:layout_height="43dp"
                 android:enabled="true"
                 android:text="@string/send"
                 android:visibility="visible"

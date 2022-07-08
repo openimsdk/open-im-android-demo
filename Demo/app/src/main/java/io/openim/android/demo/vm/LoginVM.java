@@ -1,6 +1,4 @@
 package io.openim.android.demo.vm;
-
-import static io.openim.android.ouicore.utils.Common.UIHandler;
 import static io.openim.android.ouicore.utils.Common.md5;
 
 import androidx.annotation.NonNull;
@@ -8,9 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -237,7 +233,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
 
                 @Override
                 protected void onFailure(Throwable e) {
-                   IView.err(e.getMessage());
+                   IView.toast(e.getMessage());
                 }
             });
     }

@@ -1,5 +1,7 @@
 package io.openim.android.ouicontact.vm;
 
+import android.text.TextUtils;
+
 import androidx.lifecycle.MutableLiveData;
 
 import com.github.promeg.pinyinhelper.Pinyin;
@@ -39,8 +41,13 @@ public class FriendVM extends BaseViewModel {
                 for (UserInfo datum : data) {
                     ExUserInfo exUserInfo = new ExUserInfo();
                     exUserInfo.userInfo = datum;
-                    String letter = Pinyin.toPinyin(exUserInfo.userInfo.getFriendInfo().getNickname().charAt(0));
-                    if (!Common.isAlpha(letter)) {
+                    String letter = "";
+                    try {
+                        letter = Pinyin.toPinyin(exUserInfo.userInfo.getFriendInfo().getNickname().charAt(0));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (TextUtils.isEmpty(letter) || !Common.isAlpha(letter)) {
                         exUserInfo.sortLetter = "#";
                         otInfos.add(exUserInfo);
                     } else {

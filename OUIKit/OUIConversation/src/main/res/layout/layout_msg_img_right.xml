@@ -9,20 +9,20 @@
         android:orientation="horizontal">
 
         <io.openim.android.ouiconversation.widget.SendStateView
-            android:id="@+id/sendState"
+            android:id="@+id/sendState2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/contentGroup" />
+            android:layout_toLeftOf="@id/contentGroup2" />
 
         <RelativeLayout
-            android:id="@+id/contentGroup"
+            android:id="@+id/contentGroup2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/avatar">
+            android:layout_toLeftOf="@id/avatar2">
 
             <io.openim.android.ouicore.widget.RoundImageView
-                android:id="@+id/content"
+                android:id="@+id/content2"
                 android:layout_width="140dp"
                 android:layout_height="240dp"
                 android:layout_marginLeft="8dp"
@@ -32,7 +32,7 @@
                 android:src="@mipmap/ic_chat_photo" />
 
             <ImageView
-                android:id="@+id/videoPlay"
+                android:id="@+id/videoPlay2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -42,7 +42,7 @@
         </RelativeLayout>
 
         <io.openim.android.ouicore.widget.AvatarImage
-            android:id="@+id/avatar"
+            android:id="@+id/avatar2"
             android:layout_width="42dp"
             android:layout_height="42dp"
             android:layout_alignParentRight="true"

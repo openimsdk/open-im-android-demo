@@ -61,4 +61,7 @@
     <string name="delete_friend">已删除此好友</string>
     <string name="delete_friend_tips">确定删除此好友吗</string>
     <string name="apply_join">申请加入该群</string>
+    <string name="withdraw">撤回</string>
+    <string name="delete">删除</string>
+    <string name="revoke_tips">撤回了一条消息</string>
 </resources>

@@ -44,7 +44,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         String groupId = getIntent().getStringExtra(GROUP_ID);
         String name = getIntent().getStringExtra(io.openim.android.ouicore.utils.Constant.K_NAME);
         NotificationMsg notificationMsg = (NotificationMsg) getIntent().getSerializableExtra(NOTICE);
-        bindVM(ChatVM.class);
+        bindVM(ChatVM.class, true);
         if (null != userId)
             vm.otherSideID = userId;
         if (null != groupId) {
@@ -70,6 +70,13 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     protected void onDestroy() {
         super.onDestroy();
         getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isFinishing())
+            removeCacheVM();
     }
 
     @SuppressLint("ClickableViewAccessibility")

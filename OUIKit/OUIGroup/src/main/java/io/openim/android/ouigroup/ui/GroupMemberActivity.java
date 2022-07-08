@@ -176,11 +176,12 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
             }
 
         };
-        view.recyclerView.setAdapter(adapter);
+
         vm.exGroupMembers.observe(this, v -> {
             if (v.isEmpty()) return;
             List<ExGroupMemberInfo> exGroupMemberInfos = new ArrayList<>();
             exGroupMemberInfos.addAll(vm.exGroupMembers.getValue());
+            view.recyclerView.setAdapter(adapter);
             Common.UIHandler.post(() -> {
                 adapter.setItems(exGroupMemberInfos);
                 exGroupMemberInfos.addAll(0, vm.exGroupManagement.getValue());
