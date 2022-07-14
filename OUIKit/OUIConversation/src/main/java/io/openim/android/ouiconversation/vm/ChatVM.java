@@ -19,6 +19,7 @@ import java.util.List;
 
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouicore.entity.AtMsgInfo;
+import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.base.BaseViewModel;
@@ -49,6 +50,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public MutableLiveData<String> inputMsg = new MutableLiveData<>("");
     MutableLiveData<Boolean> isNoData = new MutableLiveData<>(false);
 
+    //开启多选
+    public MutableLiveData<Boolean> enableMultipleSelect = new MutableLiveData(false);
+
     private MessageAdapter messageAdapter;
     private Observer<String> inputObserver;
     Message startMsg = null; // 消息体，取界面上显示的消息体对象
@@ -56,7 +60,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public String groupID = ""; // 接受消息的群ID
     public boolean isSingleChat = true; //是否单聊 false 群聊
     public int count = 20; //条数
-    Message loading;
+    public Message loading, forwardMsg;
 
 
     @Override
@@ -170,7 +174,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     //发送消息已读回执
     public void sendMsgReadReceipt(int firstVisiblePosition, int lastVisiblePosition) {
         int size = messages.getValue().size();
-        if (lastVisiblePosition > size) return;
+        if (lastVisiblePosition > size || firstVisiblePosition < 0) return;
 
         List<Message> megs = messages.getValue().subList(firstVisiblePosition, lastVisiblePosition);
         List<String> msgIds = new ArrayList<>();
@@ -201,23 +205,23 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 }
             }
         }
-        if (!isTyp) {
-            messages.getValue().add(0, buildExInfo(msg));
-            UIHandler.post(() -> {
-                IView.scrollToPosition(0);
-                messageAdapter.notifyItemInserted(0);
-            });
+        if (isTyp) return;
 
-            //清除列表小红点
-            markReaded(null);
-            //标记本条消息已读
-            if (isSingleChat) {
-                List<String> ids = new ArrayList<>();
-                ids.add(msg.getClientMsgID());
-                markReaded(ids);
-            }
-        }
+        messages.getValue().add(0, buildExInfo(msg));
         IMUtil.calChatTimeInterval(messages.getValue());
+        UIHandler.post(() -> {
+            IView.scrollToPosition(0);
+            messageAdapter.notifyItemInserted(0);
+        });
+
+        //清除列表小红点
+        markReaded(null);
+        //标记本条消息已读
+        if (isSingleChat) {
+            List<String> ids = new ArrayList<>();
+            ids.add(msg.getClientMsgID());
+            markReaded(ids);
+        }
     }
 
     @Override
@@ -232,8 +236,11 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onRecvMessageRevoked(String msgId) {
+
         for (int i = 0; i < messageAdapter.getMessages().size(); i++) {
             Message message = messageAdapter.getMessages().get(i);
+            if (TextUtils.isEmpty(message.getClientMsgID()))
+                continue;
             if (message.getClientMsgID().equals(msgId)) {
                 message.setContentType(Constant.MsgType.REVOKE);
                 messageAdapter.notifyItemChanged(i);
@@ -248,14 +255,18 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
      * @param msg
      */
     private Message buildExInfo(Message msg) {
+        MsgExpand msgExpand = (MsgExpand) msg.getExt();
+        if (null == msgExpand)
+            msgExpand = new MsgExpand();
         try {
             if (msg.getContentType() == Constant.MsgType.LOCATION)
-                msg.setExt(GsonHel.fromJson(msg.getLocationElem().getDescription(), LocationInfo.class));
+                msgExpand.locationInfo = GsonHel.fromJson(msg.getLocationElem().getDescription(), LocationInfo.class);
             if (msg.getContentType() == Constant.MsgType.MENTION)
-                msg.setExt(GsonHel.fromJson(msg.getContent(), AtMsgInfo.class));
+                msgExpand.atMsgInfo = GsonHel.fromJson(msg.getContent(), AtMsgInfo.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        msg.setExt(msgExpand);
         return msg;
     }
 
@@ -283,10 +294,32 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 int index = messages.getValue().indexOf(msg);
                 messages.getValue().remove(index);
                 messages.getValue().add(index, buildExInfo(message));
+                IMUtil.calChatTimeInterval(messages.getValue());
                 messageAdapter.notifyItemChanged(index);
             }
         }, msg, otherSideID, groupID, offlinePushInfo);
+    }
 
+    /**
+     * 独立发送
+     */
+    public void aloneSendMsg(Message msg, String otherSideID, String otherSideGroupID) {
+        OfflinePushInfo offlinePushInfo = new OfflinePushInfo();  // 离线推送的消息备注；不为null
+        OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error + code);
+            }
+
+            @Override
+            public void onProgress(long progress) {
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+                IView.toast(getContext().getString(io.openim.android.ouicore.R.string.send_succ));
+            }
+        }, msg, otherSideID, otherSideGroupID, offlinePushInfo);
     }
 
     /**
@@ -307,7 +340,27 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 messageAdapter.notifyItemChanged(messageAdapter.getMessages().indexOf(message));
             }
         }, message);
+
+
     }
+
+    public void deleteMessageFromLocalStorage(Message message) {
+        message.setExt(null);
+        OpenIMClient.getInstance().messageManager.deleteMessageFromLocalStorage(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error + "(" + code + ")");
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                int index = messageAdapter.getMessages().indexOf(message);
+                messageAdapter.getMessages().remove(index);
+                messageAdapter.notifyItemRemoved(index);
+            }
+        }, message);
+    }
+
 
     public interface ViewAction extends IView {
         void scrollToPosition(int position);

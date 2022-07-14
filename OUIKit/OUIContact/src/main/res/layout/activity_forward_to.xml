@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.ForwardToActivity">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardElevation="8dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/comm_title_high">
+
+                <include layout="@layout/view_back" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/forward"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:paddingLeft="22dp"
+            android:paddingTop="10dp"
+            android:paddingRight="22dp"
+            android:paddingBottom="10dp">
+
+            <io.openim.android.ouicore.widget.SearchView
+                android:id="@+id/searchView"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:clickable="false"
+                android:hint="@string/search_by_id" />
+
+        </RelativeLayout>
+
+        <RadioGroup
+            android:id="@+id/menuGroup"
+            android:layout_width="match_parent"
+            android:layout_height="57dp"
+            android:background="@color/white"
+            android:orientation="horizontal"
+            android:paddingTop="5dp">
+
+            <RadioButton
+                android:id="@+id/men1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:button="@null"
+                android:gravity="center"
+                android:text="按好友选"
+                android:textColor="#ff333333"
+                android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/men2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:button="@null"
+                android:gravity="center"
+                android:text="按群聊选"
+                android:textColor="#ff333333"
+                android:textSize="16sp" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@color/white"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <View
+                    android:id="@+id/men_bg1"
+                    android:layout_width="34dp"
+                    android:layout_height="3dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:background="#1D6BED" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <View
+                    android:id="@+id/men_bg2"
+                    android:layout_width="34dp"
+                    android:layout_height="3dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:background="#1D6BED"
+                    android:visibility="gone" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+</layout>

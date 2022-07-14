@@ -65,4 +65,11 @@
     <string name="withdraw">撤回</string>
     <string name="delete">删除</string>
     <string name="revoke_tips">撤回了一条消息</string>
+    <string name="forward">转发</string>
+    <string name="multiple_choice">多选</string>
+    <string name="merge_forward">合并转发</string>
+    <string name="group_chat_history">群聊天记录</string>
+    <string name="and">和</string>
+    <string name="chat_history">的聊天记录</string>
+    <string name="chat_history2">聊天记录</string>
 </resources>

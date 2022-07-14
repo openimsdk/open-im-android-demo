@@ -142,6 +142,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                         itemViewHo.view.avatar.load(friendInfo.getFaceURL());
                         itemViewHo.view.nickName.setText(friendInfo.getNickname());
                     }
+                    itemViewHo.view.select.setVisibility(View.VISIBLE);
                     itemViewHo.view.select.setChecked(data.isSelect);
                     if (!data.isEnabled)
                         itemViewHo.view.item.setOnClickListener(null);

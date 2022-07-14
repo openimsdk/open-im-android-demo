@@ -5,6 +5,7 @@ import static io.openim.android.ouicore.utils.Constant.ID;
 import static io.openim.android.ouicore.utils.Constant.NOTICE;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -14,6 +15,8 @@ import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,15 +24,23 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouiconversation.databinding.ActivityChatBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouiconversation.widget.BottomInputCote;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.models.Message;
 
 @Route(path = Routes.Conversation.CHAT)
 public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> implements ChatVM.ViewAction {
@@ -142,6 +153,43 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     };
 
     private void listener() {
+        view.delete.setOnClickListener(v -> {
+            List<Message> selectMsg = getSelectMsg();
+            for (Message message : selectMsg) {
+                vm.deleteMessageFromLocalStorage(message);
+            }
+        });
+        view.mergeForward.setOnClickListener(v->{
+            Message mergerMessage = IMUtil.createMergerMessage(vm.isSingleChat,
+                getSelectMsg());
+            vm.forwardMsg = mergerMessage;
+            ARouter.getInstance().build(Routes.Contact.FORWARD)
+                .navigation(this, Constant.Event.FORWARD);
+        });
+        vm.enableMultipleSelect.observe(this, o -> {
+            int px = Common.dp2px(22);
+            if (o) {
+                view.choiceMenu.setVisibility(View.VISIBLE);
+                view.layoutInputCote.getRoot().setVisibility(View.INVISIBLE);
+                view.cancel.setVisibility(View.VISIBLE);
+                view.back.setVisibility(View.GONE);
+                view.recyclerView.setPadding(0, 0, px, 0);
+            } else {
+                view.choiceMenu.setVisibility(View.GONE);
+                view.layoutInputCote.getRoot().setVisibility(View.VISIBLE);
+                view.cancel.setVisibility(View.GONE);
+                view.back.setVisibility(View.VISIBLE);
+                view.recyclerView.setPadding(px, 0, px, 0);
+                messageAdapter.notifyDataSetChanged();
+            }
+        });
+        view.cancel.setOnClickListener(v -> {
+            vm.enableMultipleSelect.setValue(false);
+            for (Message message : vm.messages.getValue()) {
+                ((MsgExpand) message.getExt()).isChoice = false;
+            }
+        });
+
         view.notice.setOnClickListener(v -> ARouter.getInstance().build(Routes.Group.NOTICE_DETAIL)
             .withSerializable(NOTICE, vm.notificationMsg.getValue()).navigation());
 
@@ -175,6 +223,17 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
     }
 
+    @NonNull
+    private List<Message> getSelectMsg() {
+        List<Message> selectMsg = new ArrayList<>();
+        for (Message message : messageAdapter.getMessages()) {
+            MsgExpand msgExpand = (MsgExpand) message.getExt();
+            if (msgExpand.isChoice)
+                selectMsg.add(message);
+        }
+        return selectMsg;
+    }
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         bottomInputCote.dispatchTouchEvent(event);
@@ -184,5 +243,17 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     @Override
     public void scrollToPosition(int position) {
         view.recyclerView.scrollToPosition(position);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK) return;
+        if (requestCode == Constant.Event.FORWARD && null != data) {
+            //在这里转发
+            String id = data.getStringExtra(Constant.ID);
+            String groupId = data.getStringExtra(Constant.GROUP_ID);
+            vm.aloneSendMsg(vm.forwardMsg, id, groupId);
+        }
     }
 }

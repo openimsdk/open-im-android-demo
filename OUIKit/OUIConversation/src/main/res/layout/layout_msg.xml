@@ -4,31 +4,47 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/notice"
-            android:layout_width="wrap_content"
+        <CheckBox
+            android:id="@+id/choose"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:textColor="#ff999999"
-            android:textSize="12sp"
-            android:paddingTop="5dp"
-            android:visibility="gone" />
+            android:button="@null"
+            android:visibility="gone"
+            android:drawableLeft="@drawable/selector_checkbox"
+            android:paddingLeft="13dp" />
 
-        <ViewStub
-            android:id="@+id/left"
+        <LinearLayout
+            android:id="@+id/root"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-        <ViewStub
-            android:id="@+id/right"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/notice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="5dp"
+                android:textColor="#ff999999"
+                android:textSize="12sp"
+                android:visibility="gone" />
 
+            <ViewStub
+                android:id="@+id/left"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <ViewStub
+                android:id="@+id/right"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
     </LinearLayout>
+
 
 </FrameLayout>

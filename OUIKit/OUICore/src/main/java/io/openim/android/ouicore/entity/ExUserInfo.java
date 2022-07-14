@@ -2,8 +2,7 @@ package io.openim.android.ouicore.entity;
 
 import io.openim.android.sdk.models.UserInfo;
 
-public class ExUserInfo {
-    public String sortLetter; //显示数据拼音的首字母
+public class ExUserInfo  extends  SortLetter{
     public UserInfo userInfo;
     public ExGroupMemberInfo exGroupMemberInfo;
     public boolean isSticky = false; //是否是Sticky

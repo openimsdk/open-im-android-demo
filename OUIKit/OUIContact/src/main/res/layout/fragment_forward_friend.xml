@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.ForwardToActivity">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+
+            <com.yanzhenjie.recyclerview.widget.StickyNestedScrollView
+                android:id="@+id/scroll_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <com.yanzhenjie.recyclerview.SwipeRecyclerView
+                    android:id="@+id/recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:overScrollMode="never" />
+
+            </com.yanzhenjie.recyclerview.widget.StickyNestedScrollView>
+
+            <com.mao.sortletterlib.SortLetterView
+                android:id="@+id/sort_view"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                app:iconHeight="49dp"
+                app:iconWidth="58dp"
+                app:leftBigText="26sp"
+                app:letterColor="#5496EB"
+                app:letterSize="15sp"
+                app:paddingRight="20dp"
+                app:selectBackgroundColor="#000093"
+                app:selectLetterColor="@color/white"
+                app:selectbigtTextColor="#000093" />
+        </RelativeLayout>
+    </LinearLayout>
+</layout>

@@ -1,8 +1,10 @@
 package io.openim.android.ouiconversation.adapter;
 
 import static io.openim.android.ouiconversation.adapter.MessageAdapter.OWN_ID;
+import static io.openim.android.ouicore.utils.Constant.ID;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -21,7 +23,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -62,6 +67,7 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgImgLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgImgRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgLocation1Binding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgLocation2Binding;
+import io.openim.android.ouiconversation.databinding.LayoutMsgMergeRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgNoticeBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
@@ -72,6 +78,7 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.AtMsgInfo;
 import io.openim.android.ouicore.entity.AtUsersInfo;
+import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.entity.LocationInfo;
@@ -85,6 +92,8 @@ import io.openim.android.ouicore.voice.listener.PlayerListener;
 import io.openim.android.ouicore.voice.player.SMediaPlayer;
 import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.ouicore.widget.WebViewActivity;
+import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.models.MergeElem;
 import io.openim.android.sdk.models.Message;
 
 public class MessageViewHolder {
@@ -113,11 +122,14 @@ public class MessageViewHolder {
         if (viewType >= Constant.MsgType.NOTICE || viewType == Constant.MsgType.REVOKE)
             return new NoticeView(parent);
 
+        if (viewType == Constant.MsgType.MERGE)
+            return new MergeView(parent);
+
+
         return new TXTView(parent);
     }
 
     public abstract static class MsgViewHolder extends RecyclerView.ViewHolder {
-
         protected RecyclerView recyclerView;
         protected MessageAdapter messageAdapter;
 
@@ -187,9 +199,9 @@ public class MessageViewHolder {
          * 统一处理
          */
         private void unite() {
-            Object ob = message.getEx();
+            MsgExpand msgExpand = (MsgExpand) message.getExt();
             TextView notice = itemView.findViewById(R.id.notice);
-            if ((ob instanceof Boolean) && (boolean) ob) {
+            if (msgExpand.isShowTime) {
                 //显示时间
                 String time = TimeUtil.getTimeString(message.getSendTime());
                 notice.setVisibility(View.VISIBLE);
@@ -211,8 +223,24 @@ public class MessageViewHolder {
                     return false;
                 });
 
+            CheckBox checkBox = itemView.findViewById(R.id.choose);
+            if (chatVM.enableMultipleSelect.getValue()
+                && message.getContentType() != Constant.MsgType.NOTICE) {
+                checkBox.setVisibility(View.VISIBLE);
+                checkBox.setChecked(msgExpand.isChoice);
+                checkBox.setOnClickListener((buttonView) -> {
+                    msgExpand.isChoice = checkBox.isChecked();
+                });
+            } else {
+                checkBox.setVisibility(View.GONE);
+            }
+            ((LinearLayout.LayoutParams) checkBox.getLayoutParams()).topMargin = msgExpand.isShowTime ? Common.dp2px(15) : 0;
         }
 
+        /***
+         * 长按显示扩展菜单
+         * @param view
+         */
         protected void showMsgExMenu(View view) {
             view.setOnLongClickListener(v -> {
                 List<Integer> menuIcons = new ArrayList<>();
@@ -238,6 +266,20 @@ public class MessageViewHolder {
                                 if (iconRes == R.mipmap.ic_withdraw) {
                                     chatVM.revokeMessage(message);
                                 }
+                                if (iconRes == R.mipmap.ic_delete) {
+                                    chatVM.deleteMessageFromLocalStorage(message);
+                                }
+                                if (iconRes == R.mipmap.ic_forward) {
+                                    Message forwardMessage = OpenIMClient.getInstance().messageManager.createForwardMessage(message);
+                                    chatVM.forwardMsg = forwardMessage;
+                                    ARouter.getInstance().build(Routes.Contact.FORWARD)
+                                        .navigation((Activity) view.getContext(), Constant.Event.FORWARD);
+                                }
+                                if (iconRes == R.mipmap.ic_multiple_choice) {
+                                    chatVM.enableMultipleSelect.setValue(true);
+                                    ((MsgExpand) message.getExt()).isChoice = true;
+                                    messageAdapter.notifyDataSetChanged();
+                                }
                             });
                         }
                     };
@@ -252,6 +294,11 @@ public class MessageViewHolder {
                         menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.withdraw));
                     }
                 }
+                menuIcons.add(R.mipmap.ic_forward);
+                menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.forward));
+                menuIcons.add(R.mipmap.ic_multiple_choice);
+                menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.multiple_choice));
+
                 LayoutMsgExMenuBinding.bind(popupWindow.getContentView())
                     .recyclerview.setLayoutManager(new GridLayoutManager(view.getContext(),
                     menuIcons.size() < 4 ? menuIcons.size() : 4));
@@ -273,13 +320,13 @@ public class MessageViewHolder {
         protected boolean AtMsgHandle(TextView showView) {
             if (message.getContentType() == Constant.MsgType.MENTION) {
                 try {
-                    AtMsgInfo atMsgInfo = (AtMsgInfo) message.getExt();
-                    String atTxt = atMsgInfo.text;
-                    for (AtUsersInfo atUsersInfo : atMsgInfo.atUsersInfo) {
+                    MsgExpand msgExpand = (MsgExpand) message.getExt();
+                    String atTxt = msgExpand.atMsgInfo.text;
+                    for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
                         atTxt = atTxt.replace("@" + atUsersInfo.atUserID, "@" + atUsersInfo.groupNickname);
                     }
                     SpannableStringBuilder spannableString = new SpannableStringBuilder(atTxt);
-                    for (AtUsersInfo atUsersInfo : atMsgInfo.atUsersInfo) {
+                    for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
                         String tag = "@" + atUsersInfo.groupNickname;
                         ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
                         ClickableSpan clickableSpan = new ClickableSpan() {
@@ -622,7 +669,7 @@ public class MessageViewHolder {
             Glide.with(itemView.getContext())
                 .load(message.getVideoElem().getSnapshotUrl())
                 .into(view.content);
-            toPreview(view.contentGroup, message.getVideoElem().getVideoUrl(), message.getVideoElem().getSnapshotUrl());
+            toPreview(view.videoPlay, message.getVideoElem().getVideoUrl(), message.getVideoElem().getSnapshotUrl());
             showMsgExMenu(view.content);
         }
 
@@ -699,11 +746,11 @@ public class MessageViewHolder {
             LayoutMsgLocation1Binding view = LayoutMsgLocation1Binding.bind(itemView);
             view.avatar.load(message.getSenderFaceUrl());
             try {
-                LocationInfo locationInfo = (LocationInfo) message.getExt();
-                view.title.setText(locationInfo.name);
-                view.address.setText(locationInfo.addr);
+                MsgExpand msgExpand = (MsgExpand) message.getExt();
+                view.title.setText(msgExpand.locationInfo.name);
+                view.address.setText(msgExpand.locationInfo.addr);
                 Glide.with(itemView.getContext())
-                    .load(locationInfo.url)
+                    .load(msgExpand.locationInfo.url)
                     .into(view.map);
             } catch (Exception e) {
             }
@@ -722,11 +769,11 @@ public class MessageViewHolder {
             LayoutMsgLocation2Binding view = LayoutMsgLocation2Binding.bind(itemView);
             view.avatar2.load(message.getSenderFaceUrl());
             try {
-                LocationInfo locationInfo = (LocationInfo) message.getExt();
-                view.title2.setText(locationInfo.name);
-                view.address2.setText(locationInfo.addr);
+                MsgExpand msgExpand = (MsgExpand) message.getExt();
+                view.title2.setText(msgExpand.locationInfo.name);
+                view.address2.setText(msgExpand.locationInfo.addr);
                 Glide.with(itemView.getContext())
-                    .load(locationInfo.url)
+                    .load(msgExpand.locationInfo.url)
                     .into(view.map2);
             } catch (Exception e) {
             }
@@ -739,5 +786,38 @@ public class MessageViewHolder {
             showMsgExMenu(view.content2);
         }
     }
+    public static  class MergeView extends MessageViewHolder.MsgViewHolder{
+
+        public MergeView(ViewGroup itemView) {
+            super(itemView);
+        }
+
+        @Override
+        int getLeftInflatedId() {
+            return R.layout.layout_msg_merge_right;
+        }
+
+        @Override
+        int getRightInflatedId() {
+            return R.layout.layout_msg_merge_right;
+        }
+
+        @Override
+        void bindLeft(View itemView, Message message) {
+
+        }
+
+        @Override
+        void bindRight(View itemView, Message message) {
+            LayoutMsgMergeRightBinding view= LayoutMsgMergeRightBinding.bind(itemView);
+            view.sendState2.setSendState(message.getStatus());
+            MergeElem mergeElem =message.getMergeElem();
+            view.content2.setText(mergeElem.getTitle());
+            view.history21.setText(mergeElem.getAbstractList().get(0));
+            view.history22.setText(mergeElem.getAbstractList().get(1));
+
+        }
+    }
+
 
 }

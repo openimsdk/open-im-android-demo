@@ -29,9 +29,6 @@ public abstract class RecyclerViewAdapter<T, V extends RecyclerView.ViewHolder> 
         this.items = items;
         notifyDataSetChanged();
     }
-    public void setItems2(List<T> items) {
-        this.items = items;
-    }
 
     public List<T> getItems() {
         return items;

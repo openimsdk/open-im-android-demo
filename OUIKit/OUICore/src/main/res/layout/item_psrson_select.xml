@@ -20,6 +20,7 @@
             android:layout_marginLeft="15dp"
             android:button="@null"
             android:clickable="false"
+            android:visibility="gone"
             android:drawableLeft="@drawable/selector_checkbox"
             android:gravity="center" />
 

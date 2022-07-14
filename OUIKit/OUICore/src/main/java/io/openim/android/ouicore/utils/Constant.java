@@ -35,6 +35,8 @@ public class Constant {
     public static class Event {
         //已读数量变化
         public static final int READ_CHANGE = 10001;
+        //转发选人
+        public static final int FORWARD = 10002;
     }
 
     //会话类型

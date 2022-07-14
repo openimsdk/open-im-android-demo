@@ -41,6 +41,7 @@ import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
+import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.FixSizeLinkedList;
 import io.openim.android.ouicore.utils.L;
@@ -90,7 +91,8 @@ public class BottomInputCote {
                         for (ForegroundColorSpan span : spans) {
                             if (span == null)
                                 continue;
-                            if ((int) atMessage.getExt() == span.hashCode()) {
+                           MsgExpand msgExpand= (MsgExpand) atMessage.getExt();
+                            if (msgExpand.spanHashCode == span.hashCode()) {
                                 final int spanStart = view.chatInput.getText().getSpanStart(span);
                                 final int spanEnd = view.chatInput.getText().getSpanEnd(span);
                                 msgEdit.replace(spanStart, spanEnd, " @" + atMessage.getSendID() + " ");
@@ -183,7 +185,8 @@ public class BottomInputCote {
                     while (iterator.hasNext()) {
                         Message message = (Message) iterator.next();
                         try {
-                            if (((int) message.getExt()) == span.hashCode()) {
+                            MsgExpand msgExpand= (MsgExpand) message.getExt();
+                            if (msgExpand.spanHashCode == span.hashCode()) {
                                 iterator.remove();
                             }
                         } catch (Exception e) {
@@ -218,7 +221,13 @@ public class BottomInputCote {
             SpannableString spannableString = new SpannableString("@" + messages.get(messages.size() - 1).getSenderNickname() + "\t");
             ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
             spannableString.setSpan(colorSpan, 0, spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            messages.get(messages.size() - 1).setExt(colorSpan.hashCode());
+            Message lastMsg=messages.get(messages.size() - 1);
+            try {
+                MsgExpand msgExpand = (MsgExpand) lastMsg.getExt();
+                msgExpand.spanHashCode=colorSpan.hashCode();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             view.chatInput.append(spannableString);
         });
 

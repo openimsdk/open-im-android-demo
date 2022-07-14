@@ -19,6 +19,7 @@ import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.utils.Common;
 
 
+import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
@@ -28,7 +29,7 @@ import io.openim.android.sdk.models.GroupMemberRole;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.UserInfo;
 
-public class GroupVM extends BaseViewModel {
+public class GroupVM extends SocialityVM {
     public MutableLiveData<String> groupName = new MutableLiveData<>("");
 
     public MutableLiveData<GroupInfo> groupsInfo = new MutableLiveData<>();
@@ -44,9 +45,7 @@ public class GroupVM extends BaseViewModel {
     public MutableLiveData<List<String>> groupLetters = new MutableLiveData<>(new ArrayList<>());
 
     //封装过的好友信息 用于字母导航
-    public MutableLiveData<List<ExUserInfo>> exUserInfo = new MutableLiveData<>(new ArrayList<>());
     public String groupId;
-    public MutableLiveData<List<String>> letters = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<FriendInfo>> selectedFriendInfo = new MutableLiveData<>(new ArrayList<>());
     public LoginCertificate loginCertificate;
     //是否是邀请入群
@@ -57,57 +56,6 @@ public class GroupVM extends BaseViewModel {
     protected void viewCreate() {
         super.viewCreate();
         loginCertificate = LoginCertificate.getCache(getContext());
-    }
-
-    public void getAllFriend() {
-        exUserInfo.getValue().clear();
-        OpenIMClient.getInstance().friendshipManager.getFriendList(new OnBase<List<UserInfo>>() {
-            @Override
-            public void onError(int code, String error) {
-
-            }
-
-            @Override
-            public void onSuccess(List<UserInfo> data) {
-                if (data.isEmpty()) return;
-
-                List<ExUserInfo> exInfos = new ArrayList<>();
-                List<ExUserInfo> otInfos = new ArrayList<>();
-                for (UserInfo datum : data) {
-                    ExUserInfo exUserInfo = new ExUserInfo();
-                    exUserInfo.userInfo = datum;
-                    String letter = Pinyin.toPinyin(exUserInfo.userInfo.getFriendInfo().getNickname().charAt(0));
-                    if (!Common.isAlpha(letter)) {
-                        exUserInfo.sortLetter = "#";
-                        otInfos.add(exUserInfo);
-                    } else {
-                        exUserInfo.sortLetter = letter;
-                        exInfos.add(exUserInfo);
-                    }
-                    if (isInviteToGroup) {
-                        ExGroupMemberInfo exGroupMemberInfo = new ExGroupMemberInfo();
-                        exGroupMemberInfo.groupMembersInfo = new GroupMembersInfo();
-                        exGroupMemberInfo.groupMembersInfo.setUserID(datum.getUserID());
-                        exUserInfo.isSelect = exGroupMembers.getValue().contains(exGroupMemberInfo);
-                        //如果已经存在群里则不能点击(不能重复邀请入群)
-                        if (exUserInfo.isSelect)
-                            exUserInfo.isEnabled = false;
-                    }
-                }
-                for (ExUserInfo userInfo : exInfos) {
-                    if (!letters.getValue().contains(userInfo.sortLetter))
-                        letters.getValue().add(userInfo.sortLetter);
-                }
-                if (!otInfos.isEmpty())
-                    letters.getValue().add("#");
-                letters.setValue(letters.getValue());
-
-                exUserInfo.getValue().addAll(exInfos);
-                exUserInfo.getValue().addAll(otInfos);
-
-                exUserInfo.setValue(exUserInfo.getValue());
-            }
-        });
     }
 
 
@@ -336,33 +284,6 @@ public class GroupVM extends BaseViewModel {
         return null;
     }
 
-    public class PinyinComparator implements Comparator<ExGroupMemberInfo> {
-
-        public int compare(ExGroupMemberInfo o1, ExGroupMemberInfo o2) {
-            //根据ABCDEFG...来排序
-            if (o1.sortLetter.equals("#")) {
-                return 1;
-            } else if (o2.sortLetter.equals("#")) {
-                return -1;
-            } else {
-                return o1.sortLetter.compareTo(o2.sortLetter);
-            }
-        }
-    }
-
-    public class LettersPinyinComparator implements Comparator<String> {
-
-        public int compare(String o1, String o2) {
-            //根据ABCDEFG...来排序
-            if (o1.equals("#")) {
-                return 1;
-            } else if (o2.equals("#")) {
-                return -1;
-            } else {
-                return o1.compareTo(o2);
-            }
-        }
-    }
 
     public boolean isOwner() {
         GroupInfo groupInfo = groupsInfo.getValue();

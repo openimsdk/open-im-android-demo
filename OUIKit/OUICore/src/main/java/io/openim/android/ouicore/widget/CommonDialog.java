@@ -3,6 +3,7 @@ package io.openim.android.ouicore.widget;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
@@ -38,13 +39,12 @@ public class CommonDialog extends BaseDialog {
         return mainView;
     }
 
-    public CommonDialog(@NonNull Context context, int themeResId) {
-        super(context, themeResId);
-        initView();
+
+    public void setCustomCentral(View customCentral) {
+        mainView.tips.setVisibility(View.GONE);
+        mainView.content.setVisibility(View.VISIBLE);
+        mainView.content.addView(customCentral);
     }
 
-    protected CommonDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
-        super(context, cancelable, cancelListener);
-        initView();
-    }
 }
+

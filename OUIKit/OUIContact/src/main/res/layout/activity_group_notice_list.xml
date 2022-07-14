@@ -1,44 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#F8F8F8"
-        android:orientation="vertical"
-        tools:context=".ui.GroupNoticeListActivity">
+        android:layout_height="match_parent">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white">
+            android:layout_height="match_parent"
+            android:background="#F8F8F8"
+            android:orientation="vertical"
+            tools:context=".ui.GroupNoticeListActivity">
 
-            <RelativeLayout
-                android:id="@+id/title"
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/comm_title_high"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                app:cardElevation="8dp">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white">
 
-                <include
-                    layout="@layout/view_back" />
+                <RelativeLayout
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/comm_title_high"
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="@string/group_notice"
-                    android:textColor="#ff333333"
-                    android:textSize="18sp" />
+                    <include
+                        layout="@layout/view_back" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="@string/group_notice"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                </RelativeLayout>
             </RelativeLayout>
-        </RelativeLayout>
+            </androidx.cardview.widget.CardView>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-    </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
 </layout>

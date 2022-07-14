@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:ignore="MissingDefaultResource">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <io.openim.android.ouiconversation.widget.SendStateView
+            android:id="@+id/sendState2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@id/contentLy" />
+
+        <LinearLayout
+            android:id="@+id/contentLy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="7dp"
+            android:layout_toLeftOf="@id/avatar2"
+            android:background="@drawable/sty_radius_unright_30"
+            android:gravity="center_vertical"
+            android:minHeight="40dp"
+            android:orientation="vertical"
+            android:padding="7dp">
+
+
+            <TextView
+                android:id="@+id/content2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="3dp"
+                android:textColor="#ff333333"
+                android:textSize="14sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="#F6F6F6"/>
+
+            <TextView
+                android:id="@+id/history21"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="3dp"
+                android:textColor="#ff999999"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/history22"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="3dp"
+                android:textColor="#ff999999"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+        <io.openim.android.ouicore.widget.AvatarImage
+            android:id="@+id/avatar2"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_alignParentRight="true"
+            android:src="@mipmap/ic_my_friend" />
+
+    </RelativeLayout>
+</FrameLayout>

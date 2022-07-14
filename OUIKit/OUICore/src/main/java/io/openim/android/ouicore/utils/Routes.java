@@ -31,5 +31,6 @@ public class Routes {
     //关系链
     public static class Contact {
         public final static String HOME = "/contact/ContactFragment";
+        public final static String FORWARD = "/contact/ForwardToActivity";
     }
 }

@@ -31,9 +31,9 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
     protected void viewCreate() {
         IMEvent.getInstance().addConversationListener(this);
         IMEvent.getInstance().addAdvanceMsgListener(this);
-        undataConversation();
+        updataConversation();
 
-        UIHandler.postDelayed(this::undataConversation,5*1000);
+        UIHandler.postDelayed(this::updataConversation,5*1000);
     }
     public void deleteConversationFromLocalAndSvr(String conversationId){
         OpenIMClient.getInstance().conversationManager.deleteConversationFromLocalAndSvr(new OnBase<String>() {
@@ -49,7 +49,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         },conversationId);
     }
 
-    private void undataConversation() {
+    private void updataConversation() {
         OpenIMClient.getInstance().conversationManager.getAllConversationList(new OnBase<List<ConversationInfo>>() {
             @Override
             public void onError(int code, String error) {
@@ -70,7 +70,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     @Override
     public void onConversationChanged(List<ConversationInfo> list) {
-        undataConversation();
+        updataConversation();
     }
 
 
