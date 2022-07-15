@@ -138,12 +138,12 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         if (content.contains(Constant.QR.QR_ADD_FRIEND)) {
             String userId = content.substring(content.lastIndexOf("/") + 1);
             if (!TextUtils.isEmpty(userId))
-                startActivity(new Intent(this, PersonDetailActivity.class).putExtra(Constant.ID, userId));
+                startActivity(new Intent(this, PersonDetailActivity.class).putExtra(Constant.K_ID, userId));
         } else if (content.contains(Constant.QR.QR_JOIN_GROUP)) {
             String groupId = content.substring(content.lastIndexOf("/") + 1);
             if (!TextUtils.isEmpty(groupId))
                 ARouter.getInstance().build(Routes.Group.DETAIL)
-                    .withString(io.openim.android.ouicore.utils.Constant.GROUP_ID, groupId).navigation();
+                    .withString(io.openim.android.ouicore.utils.Constant.K_GROUP_ID, groupId).navigation();
         }
 
 

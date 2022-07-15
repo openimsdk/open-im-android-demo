@@ -13,11 +13,6 @@ public class Constant {
     //web socket
     public static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":10001";
 
-
-    public static final String K_NAME = "name";
-
-    public static final String CONVERSATION_ID = "conversationID";
-
     //存储音频的文件夹
     public static final String AUDIODIR = IM.getStorageDir() + "/audio/";
     //视频存储文件夹
@@ -45,10 +40,12 @@ public class Constant {
         public static final int GROUP_CHAT = 2;
     }
 
-    public static final String ID = "Id";
-    public static final String GROUP_ID = "group_id";
-    public static final String IS_PERSON = "is_person";
-    public static final String NOTICE = "notice";
+    public static final String K_ID = "Id";
+    public static final String K_GROUP_ID = "group_id";
+    public static final String K_IS_PERSON = "is_person";
+    public static final String K_NOTICE = "notice";
+    public static final String K_NAME = "name";
+    public static final String K_CONVERSATION_ID = "conversationID";
 
     /**
      * 发送状态

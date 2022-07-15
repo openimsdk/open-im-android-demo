@@ -1,8 +1,6 @@
 package io.openim.android.demo.ui.search;
 
 
-import static io.openim.android.ouicore.utils.Constant.ID;
-
 import android.os.Bundle;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -10,6 +8,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import io.openim.android.demo.databinding.ActivitySendVerifyBinding;
 import io.openim.android.demo.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 
@@ -26,8 +25,8 @@ public class SendVerifyActivity extends BaseActivity<SearchVM, ActivitySendVerif
         setLightStatus();
         SinkHelper.get(this).setTranslucentStatus(view.getRoot());
 
-        vm.searchContent = getIntent().getStringExtra(ID);
-        vm.isPerson = getIntent().getBooleanExtra(io.openim.android.ouicore.utils.Constant.IS_PERSON, true);
+        vm.searchContent = getIntent().getStringExtra(Constant.K_ID);
+        vm.isPerson = getIntent().getBooleanExtra(Constant.K_IS_PERSON, true);
         listener();
         click();
     }

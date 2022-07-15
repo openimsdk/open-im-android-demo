@@ -73,7 +73,7 @@ public class GroupFragment extends BaseFragment<SocialityVM> {
                     commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
                     commonDialog.getMainView().confirm.setOnClickListener(v1 -> {
                         if (null != confirmListener)
-                            confirmListener.onListener(data.getGroupID());
+                            confirmListener.onListener(null, data.getGroupID());
                     });
                     commonDialog.show();
                 });

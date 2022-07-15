@@ -1,7 +1,6 @@
 package io.openim.android.demo.ui.search;
 
 
-import static io.openim.android.ouicore.utils.Constant.ID;
 
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +23,7 @@ import io.openim.android.demo.databinding.ActivitySearchPersonBinding;
 import io.openim.android.demo.databinding.LayoutSearchItemBinding;
 import io.openim.android.demo.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.sdk.models.GroupInfo;
@@ -123,10 +123,10 @@ public class SearchConversActivity extends BaseActivity<SearchVM, ActivitySearch
 
             holder.view.getRoot().setOnClickListener(v -> {
                 if (isPerson)
-                    context.startActivity(new Intent(context, PersonDetailActivity.class).putExtra(ID, title));
+                    context.startActivity(new Intent(context, PersonDetailActivity.class).putExtra(Constant.K_ID, title));
                 else
                     ARouter.getInstance().build(Routes.Group.DETAIL)
-                        .withString(io.openim.android.ouicore.utils.Constant.GROUP_ID, title).navigation();
+                        .withString(io.openim.android.ouicore.utils.Constant.K_GROUP_ID, title).navigation();
             });
         }
 

@@ -50,6 +50,10 @@ public class ContactFragment extends BaseFragment<ContactVM> {
             startActivity(new Intent(getActivity(), AllFriendActivity.class));
         });
 
+        view.myGroup.setOnClickListener(v->{
+            startActivity(new Intent(getActivity(), MyGroupActivity.class));
+        });
+
     }
 
     private void initView() {

@@ -71,4 +71,6 @@
     <string name="and">和</string>
     <string name="chat_history">的聊天记录</string>
     <string name="chat_history2">聊天记录</string>
+    <string name="my_group">我的群组</string>
+    <string name="search_group">搜索：群组</string>
 </resources>

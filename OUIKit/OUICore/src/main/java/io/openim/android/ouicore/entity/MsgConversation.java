@@ -1,5 +1,6 @@
 package io.openim.android.ouicore.entity;
 
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.sdk.models.ConversationInfo;
@@ -12,7 +13,7 @@ public class MsgConversation {
     public NotificationMsg notificationMsg;
 
     public MsgConversation(Message lastMsg, ConversationInfo conversationInfo) {
-        this.lastMsg = lastMsg;
+        this.lastMsg = IMUtil.buildExpandInfo(lastMsg);
         this.conversationInfo = conversationInfo;
 
         try {
@@ -20,7 +21,7 @@ public class MsgConversation {
                 notificationMsg = GsonHel.fromJson(lastMsg.getNotificationElem().getDetail(),
                     NotificationMsg.class);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

@@ -1,7 +1,6 @@
 package io.openim.android.ouiconversation.adapter;
 
 import static io.openim.android.ouiconversation.adapter.MessageAdapter.OWN_ID;
-import static io.openim.android.ouicore.utils.Constant.ID;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -67,10 +66,12 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgImgLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgImgRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgLocation1Binding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgLocation2Binding;
+import io.openim.android.ouiconversation.databinding.LayoutMsgMergeLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgMergeRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgNoticeBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
+import io.openim.android.ouiconversation.ui.ChatHistoryDetailsActivity;
 import io.openim.android.ouiconversation.ui.PreviewActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouiconversation.widget.InputExpandFragment;
@@ -333,7 +334,7 @@ public class MessageViewHolder {
                             @Override
                             public void onClick(View view) {
                                 ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                                    .withString(Constant.ID, atUsersInfo.atUserID).navigation(view.getContext());
+                                    .withString(Constant.K_ID, atUsersInfo.atUserID).navigation(view.getContext());
                             }
                         };
                         int start = spannableString.toString().indexOf(tag);
@@ -786,7 +787,8 @@ public class MessageViewHolder {
             showMsgExMenu(view.content2);
         }
     }
-    public static  class MergeView extends MessageViewHolder.MsgViewHolder{
+
+    public static class MergeView extends MessageViewHolder.MsgViewHolder {
 
         public MergeView(ViewGroup itemView) {
             super(itemView);
@@ -794,7 +796,7 @@ public class MessageViewHolder {
 
         @Override
         int getLeftInflatedId() {
-            return R.layout.layout_msg_merge_right;
+            return R.layout.layout_msg_merge_left;
         }
 
         @Override
@@ -802,21 +804,34 @@ public class MessageViewHolder {
             return R.layout.layout_msg_merge_right;
         }
 
+
         @Override
         void bindLeft(View itemView, Message message) {
-
+            LayoutMsgMergeLeftBinding view = LayoutMsgMergeLeftBinding.bind(itemView);
+            view.sendState.setSendState(message.getStatus());
+            MergeElem mergeElem = message.getMergeElem();
+            view.content.setText(mergeElem.getTitle());
+            view.history11.setText(mergeElem.getAbstractList().get(0));
+            view.history12.setText(mergeElem.getAbstractList().get(1));
+            showMsgExMenu(view.contentLy);
+            view.contentLy.setOnClickListener(clickJumpDetail);
         }
 
         @Override
         void bindRight(View itemView, Message message) {
-            LayoutMsgMergeRightBinding view= LayoutMsgMergeRightBinding.bind(itemView);
+            LayoutMsgMergeRightBinding view = LayoutMsgMergeRightBinding.bind(itemView);
             view.sendState2.setSendState(message.getStatus());
-            MergeElem mergeElem =message.getMergeElem();
+            MergeElem mergeElem = message.getMergeElem();
             view.content2.setText(mergeElem.getTitle());
             view.history21.setText(mergeElem.getAbstractList().get(0));
             view.history22.setText(mergeElem.getAbstractList().get(1));
-
+            showMsgExMenu(view.contentLy2);
+            view.contentLy2.setOnClickListener(clickJumpDetail);
         }
+
+        private View.OnClickListener clickJumpDetail = v -> {
+            v.getContext().startActivity(new Intent(v.getContext(), ChatHistoryDetailsActivity.class));
+        };
     }
 
 

@@ -85,7 +85,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
                 }
 
                 @Override
-                public void onError(Throwable e) {
+                protected void onFailure(Throwable e) {
                     IView.err(e.getMessage());
                 }
             });

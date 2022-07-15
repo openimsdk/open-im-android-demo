@@ -56,7 +56,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     private MessageAdapter messageAdapter;
     private Observer<String> inputObserver;
     Message startMsg = null; // 消息体，取界面上显示的消息体对象
-    public String otherSideID = ""; // 消息发送方
+    public String otherSideID = ""; // 接受消息放Id
     public String groupID = ""; // 接受消息的群ID
     public boolean isSingleChat = true; //是否单聊 false 群聊
     public int count = 20; //条数
@@ -134,7 +134,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             @Override
             public void onSuccess(List<Message> data) {
                 for (Message datum : data) {
-                    buildExInfo(datum);
+                    IMUtil.buildExpandInfo(datum);
                 }
                 List<Message> list = messages.getValue();
                 if (data.isEmpty()) {
@@ -207,7 +207,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }
         if (isTyp) return;
 
-        messages.getValue().add(0, buildExInfo(msg));
+        messages.getValue().add(0, IMUtil.buildExpandInfo(msg));
         IMUtil.calChatTimeInterval(messages.getValue());
         UIHandler.post(() -> {
             IView.scrollToPosition(0);
@@ -249,29 +249,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }
     }
 
-    /**
-     * 解析扩展信息 避免在bindView时解析造成卡顿
-     *
-     * @param msg
-     */
-    private Message buildExInfo(Message msg) {
-        MsgExpand msgExpand = (MsgExpand) msg.getExt();
-        if (null == msgExpand)
-            msgExpand = new MsgExpand();
-        try {
-            if (msg.getContentType() == Constant.MsgType.LOCATION)
-                msgExpand.locationInfo = GsonHel.fromJson(msg.getLocationElem().getDescription(), LocationInfo.class);
-            if (msg.getContentType() == Constant.MsgType.MENTION)
-                msgExpand.atMsgInfo = GsonHel.fromJson(msg.getContent(), AtMsgInfo.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        msg.setExt(msgExpand);
-        return msg;
-    }
+
 
     public void sendMsg(Message msg) {
-        messages.getValue().add(0, buildExInfo(msg));
+        messages.getValue().add(0, IMUtil.buildExpandInfo(msg));
         messageAdapter.notifyItemInserted(0);
 
         IView.scrollToPosition(0);
@@ -280,7 +261,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
             @Override
             public void onError(int code, String error) {
-                L.e("");
+                IView.toast(error + code);
             }
 
             @Override
@@ -293,7 +274,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 // 返回新的消息体；替换发送传入的，不然扯回消息会有bug
                 int index = messages.getValue().indexOf(msg);
                 messages.getValue().remove(index);
-                messages.getValue().add(index, buildExInfo(message));
+                messages.getValue().add(index, IMUtil.buildExpandInfo(message));
                 IMUtil.calChatTimeInterval(messages.getValue());
                 messageAdapter.notifyItemChanged(index);
             }
@@ -304,6 +285,11 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
      * 独立发送
      */
     public void aloneSendMsg(Message msg, String otherSideID, String otherSideGroupID) {
+        if (this.otherSideID.equals(otherSideID) || groupID.equals(otherSideGroupID)) {
+            //如果转发给本人/本群
+            sendMsg(msg);
+            return;
+        }
         OfflinePushInfo offlinePushInfo = new OfflinePushInfo();  // 离线推送的消息备注；不为null
         OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
             @Override

@@ -119,7 +119,7 @@ public class FriendFragment extends BaseFragment<SocialityVM> {
                         commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
                         commonDialog.getMainView().confirm.setOnClickListener(v1 -> {
                             if (null!=confirmListener)
-                                confirmListener.onListener(data.userInfo.getUserID());
+                                confirmListener.onListener(data.userInfo,data.userInfo.getUserID());
                         });
                         commonDialog.show();
                     });

@@ -1,6 +1,5 @@
 package io.openim.android.ouicontact.ui;
 
-import static io.openim.android.ouicore.utils.Constant.ID;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -81,7 +80,7 @@ public class NewFriendActivity extends BaseActivity<ContactVM, ActivityNewFriend
                 } else {
                     holder.view.handle.setText(getString(io.openim.android.ouicore.R.string.hil));
                     holder.view.getRoot().setOnClickListener(v -> ARouter.getInstance().build(Routes.Conversation.CHAT)
-                        .withString(ID, data.getFromUserID())
+                        .withString(Constant.K_ID, data.getFromUserID())
                         .withString(Constant.K_NAME, data.getFromNickname())
                         .navigation());
                 }

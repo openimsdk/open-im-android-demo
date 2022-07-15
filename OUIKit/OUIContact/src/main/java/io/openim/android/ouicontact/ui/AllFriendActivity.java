@@ -16,24 +16,23 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.openim.android.ouicontact.R;
 import io.openim.android.ouicontact.databinding.ActivityAllFriendBinding;
-import io.openim.android.ouicontact.vm.FriendVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.sdk.models.FriendInfo;
 
-public class AllFriendActivity extends BaseActivity<FriendVM, ActivityAllFriendBinding> {
+public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFriendBinding> {
 
     private RecyclerViewAdapter<ExUserInfo, RecyclerView.ViewHolder> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        bindVM(FriendVM.class);
+        bindVM(SocialityVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityAllFriendBinding.inflate(getLayoutInflater()));
         sink();
@@ -98,7 +97,7 @@ public class AllFriendActivity extends BaseActivity<FriendVM, ActivityAllFriendB
                     itemViewHo.view.select.setVisibility(View.GONE);
                     itemViewHo.view.getRoot().setOnClickListener(v -> {
                         ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                            .withString(Constant.ID, friendInfo.getUserID()).navigation(AllFriendActivity.this, 1001);
+                            .withString(Constant.K_ID, friendInfo.getUserID()).navigation(AllFriendActivity.this, 1001);
                     });
                 } else {
                     ViewHol.StickyViewHo stickyViewHo = (ViewHol.StickyViewHo) holder;

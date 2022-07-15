@@ -9,10 +9,13 @@ import java.util.List;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.entity.AtMsgInfo;
+import io.openim.android.ouicore.entity.LocationInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.net.bage.Base;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.Message;
@@ -61,7 +64,7 @@ public class IMUtil {
         return list;
     }
 
-    public static Message createMergerMessage(boolean isSingleChat, List<Message> list) {
+    public static Message createMergerMessage(boolean isSingleChat, String otherSideName, List<Message> list) {
         String title = "";
         List<String> summaryList = new ArrayList<>();
         for (Message message : list) {
@@ -69,13 +72,6 @@ public class IMUtil {
             if (summaryList.size() >= 2) break;
         }
         if (isSingleChat) {
-            LoginCertificate loginCertificate = LoginCertificate.getCache(BaseApp.instance());
-            String otherSideName = "";
-            for (Message message : list) {
-                if (!message.getSendID().equals(loginCertificate.userID)) {
-                    otherSideName = message.getSenderNickname();
-                }
-            }
             title = LoginCertificate.getCache(BaseApp.instance()).nickname
                 + BaseApp.instance().getString(R.string.and) + otherSideName
                 + BaseApp.instance().getString(R.string.chat_history);
@@ -84,6 +80,27 @@ public class IMUtil {
         }
 
         return OpenIMClient.getInstance().messageManager.createMergerMessage(list, title, summaryList);
+    }
+
+    /**
+     * 解析扩展信息 避免在bindView时解析造成卡顿
+     *
+     * @param msg
+     */
+    public static Message buildExpandInfo(Message msg) {
+        MsgExpand msgExpand = (MsgExpand) msg.getExt();
+        if (null == msgExpand)
+            msgExpand = new MsgExpand();
+        try {
+            if (msg.getContentType() == Constant.MsgType.LOCATION)
+                msgExpand.locationInfo = GsonHel.fromJson(msg.getLocationElem().getDescription(), LocationInfo.class);
+            if (msg.getContentType() == Constant.MsgType.MENTION)
+                msgExpand.atMsgInfo = GsonHel.fromJson(msg.getContent(), AtMsgInfo.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        msg.setExt(msgExpand);
+        return msg;
     }
 
     /**
@@ -117,6 +134,9 @@ public class IMUtil {
                 lastMsg = "[" + BaseApp.instance().getString(io.openim.android.ouicore.R.string.location) + "]";
                 break;
             case Constant.MsgType.MENTION:
+                lastMsg = ((MsgExpand) msg.getExt()).atMsgInfo.text;
+                break;
+            case Constant.MsgType.MERGE:
                 lastMsg = "[" + BaseApp.instance().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";
                 break;
         }

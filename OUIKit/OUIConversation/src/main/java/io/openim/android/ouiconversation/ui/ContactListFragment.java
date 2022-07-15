@@ -3,9 +3,7 @@ package io.openim.android.ouiconversation.ui;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
-import static io.openim.android.ouicore.utils.Constant.GROUP_ID;
-import static io.openim.android.ouicore.utils.Constant.ID;
-import static io.openim.android.ouicore.utils.Constant.K_NAME;
+
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -122,15 +120,15 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
             MsgConversation msgConversation = vm.conversations.getValue().get(position);
             Intent intent = new Intent(getContext(), ChatActivity.class)
-                .putExtra(K_NAME, msgConversation.conversationInfo.getShowName());
+                .putExtra(Constant.K_NAME, msgConversation.conversationInfo.getShowName());
 
             if (msgConversation.conversationInfo.getConversationType() == 1)
-                intent.putExtra(ID, msgConversation.conversationInfo.getUserID());
+                intent.putExtra(Constant.K_ID, msgConversation.conversationInfo.getUserID());
             if (msgConversation.conversationInfo.getConversationType() == 2)
-                intent.putExtra(GROUP_ID, msgConversation.conversationInfo.getGroupID());
+                intent.putExtra(Constant.K_GROUP_ID, msgConversation.conversationInfo.getGroupID());
 
             if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification)
-                intent.putExtra(Constant.NOTICE, msgConversation.notificationMsg);
+                intent.putExtra(Constant.K_NOTICE, msgConversation.notificationMsg);
             startActivity(intent);
             //重置强提醒
             if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification)

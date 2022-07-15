@@ -44,7 +44,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         bindVM(GroupVM.class, true);
-        vm.groupId = getIntent().getStringExtra(Constant.GROUP_ID);
+        vm.groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityGroupMaterialBinding.inflate(getLayoutInflater()));
         view.setGroupVM(vm);

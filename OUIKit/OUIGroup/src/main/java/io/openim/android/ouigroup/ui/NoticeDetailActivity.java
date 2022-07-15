@@ -32,7 +32,7 @@ public class NoticeDetailActivity extends BaseActivity<GroupVM, ActivityNoticeDe
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityNoticeDetailBinding.inflate(getLayoutInflater()));
         sink();
-        NotificationMsg notificationMsg = (NotificationMsg) getIntent().getSerializableExtra(Constant.NOTICE);
+        NotificationMsg notificationMsg = (NotificationMsg) getIntent().getSerializableExtra(Constant.K_NOTICE);
         vm.groupId=notificationMsg.group.groupID;
         vm.getGroupMemberList();
         vm.exGroupMembers.observe(this, exGroupMemberInfos -> {

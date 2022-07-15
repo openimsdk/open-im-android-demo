@@ -1,7 +1,5 @@
 package io.openim.android.ouigroup.ui;
 
-import static io.openim.android.ouicore.utils.Constant.GROUP_ID;
-import static io.openim.android.ouicore.utils.Constant.ID;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -16,6 +14,7 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
 import io.openim.android.ouigroup.R;
@@ -77,7 +76,7 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
         Toast.makeText(this, getString(R.string.create_succ), Toast.LENGTH_SHORT).show();
         GroupInfo groupInfo = (GroupInfo) body;
         ARouter.getInstance().build(Routes.Conversation.CHAT)
-            .withString(GROUP_ID, groupInfo.getGroupID())
+            .withString(Constant.K_GROUP_ID, groupInfo.getGroupID())
             .withString(io.openim.android.ouicore.utils.Constant.K_NAME, groupInfo.getGroupName())
             .navigation();
 

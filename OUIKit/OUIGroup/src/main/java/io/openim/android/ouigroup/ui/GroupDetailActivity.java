@@ -1,6 +1,5 @@
 package io.openim.android.ouigroup.ui;
 
-import static io.openim.android.ouicore.utils.Constant.ID;
 
 import android.os.Bundle;
 import android.view.View;
@@ -27,7 +26,7 @@ public class GroupDetailActivity extends BaseActivity<GroupVM, ActivityGroupDeta
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         bindVM(GroupVM.class);
-        vm.groupId = getIntent().getStringExtra(Constant.GROUP_ID);
+        vm.groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
         vm.getGroupsInfo();
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityGroupDetailBinding.inflate(getLayoutInflater()));
@@ -41,7 +40,7 @@ public class GroupDetailActivity extends BaseActivity<GroupVM, ActivityGroupDeta
 
     private void initView() {
         view.joinGroup.setOnClickListener(v -> ARouter.getInstance().build(Routes.Main.SEND_VERIFY)
-            .withString(ID, vm.groupId).withBoolean(Constant.IS_PERSON, false).navigation());
+            .withString(Constant.K_ID, vm.groupId).withBoolean(Constant.K_IS_PERSON, false).navigation());
     }
 
     public void toBack(View v) {

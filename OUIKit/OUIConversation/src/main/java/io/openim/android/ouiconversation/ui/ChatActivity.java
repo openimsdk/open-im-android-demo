@@ -1,8 +1,5 @@
 package io.openim.android.ouiconversation.ui;
 
-import static io.openim.android.ouicore.utils.Constant.GROUP_ID;
-import static io.openim.android.ouicore.utils.Constant.ID;
-import static io.openim.android.ouicore.utils.Constant.NOTICE;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -37,6 +34,7 @@ import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
@@ -51,10 +49,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //userId 与 GROUP_ID 互斥
-        String userId = getIntent().getStringExtra(ID);
-        String groupId = getIntent().getStringExtra(GROUP_ID);
+        String userId = getIntent().getStringExtra(Constant.K_ID);
+        String groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
         String name = getIntent().getStringExtra(io.openim.android.ouicore.utils.Constant.K_NAME);
-        NotificationMsg notificationMsg = (NotificationMsg) getIntent().getSerializableExtra(NOTICE);
+        NotificationMsg notificationMsg = (NotificationMsg) getIntent().getSerializableExtra(Constant.K_NOTICE);
         bindVM(ChatVM.class, true);
         if (null != userId)
             vm.otherSideID = userId;
@@ -159,10 +157,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 vm.deleteMessageFromLocalStorage(message);
             }
         });
-        view.mergeForward.setOnClickListener(v->{
-            Message mergerMessage = IMUtil.createMergerMessage(vm.isSingleChat,
-                getSelectMsg());
-            vm.forwardMsg = mergerMessage;
+        view.mergeForward.setOnClickListener(v -> {
             ARouter.getInstance().build(Routes.Contact.FORWARD)
                 .navigation(this, Constant.Event.FORWARD);
         });
@@ -186,12 +181,14 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.cancel.setOnClickListener(v -> {
             vm.enableMultipleSelect.setValue(false);
             for (Message message : vm.messages.getValue()) {
-                ((MsgExpand) message.getExt()).isChoice = false;
+                MsgExpand msgExpand = (MsgExpand) message.getExt();
+                if (null != msgExpand)
+                    msgExpand.isChoice = false;
             }
         });
 
         view.notice.setOnClickListener(v -> ARouter.getInstance().build(Routes.Group.NOTICE_DETAIL)
-            .withSerializable(NOTICE, vm.notificationMsg.getValue()).navigation());
+            .withSerializable(Constant.K_NOTICE, vm.notificationMsg.getValue()).navigation());
 
         view.back.setOnClickListener(v -> finish());
 
@@ -217,7 +214,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
                 } else {
                     ARouter.getInstance().build(Routes.Group.MATERIAL)
-                        .withString(io.openim.android.ouicore.utils.Constant.GROUP_ID, vm.groupID).navigation();
+                        .withString(Constant.K_GROUP_ID, vm.groupID).navigation();
                 }
             }
         });
@@ -228,7 +225,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         List<Message> selectMsg = new ArrayList<>();
         for (Message message : messageAdapter.getMessages()) {
             MsgExpand msgExpand = (MsgExpand) message.getExt();
-            if (msgExpand.isChoice)
+            if (null != msgExpand && msgExpand.isChoice)
                 selectMsg.add(message);
         }
         return selectMsg;
@@ -251,9 +248,18 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         if (resultCode != RESULT_OK) return;
         if (requestCode == Constant.Event.FORWARD && null != data) {
             //在这里转发
-            String id = data.getStringExtra(Constant.ID);
-            String groupId = data.getStringExtra(Constant.GROUP_ID);
-            vm.aloneSendMsg(vm.forwardMsg, id, groupId);
+            String id = data.getStringExtra(Constant.K_ID);
+            String otherSideNickName = data.getStringExtra(Constant.K_NAME);
+
+            String groupId = data.getStringExtra(Constant.K_GROUP_ID);
+
+            Message forwardMsg;
+            if (null == vm.forwardMsg)//表示合并转发
+                forwardMsg = IMUtil.createMergerMessage(vm.isSingleChat, otherSideNickName,
+                    getSelectMsg());
+            else
+                forwardMsg = vm.forwardMsg;
+            vm.aloneSendMsg(forwardMsg, id, groupId);
         }
     }
 }

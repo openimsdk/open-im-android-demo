@@ -33,6 +33,7 @@ import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.sdk.models.FriendInfo;
+import io.openim.android.sdk.models.UserInfo;
 
 
 @Route(path = Routes.Contact.FORWARD)
@@ -76,12 +77,13 @@ public class ForwardToActivity extends BaseActivity<SocialityVM, ActivityForward
         switchFragment(friendFragment);
 
 
-        ((FriendFragment) friendFragment).setConfirmListener(id -> {
-            setResult(RESULT_OK, new Intent().putExtra(Constant.ID, id));
+        ((FriendFragment) friendFragment).setConfirmListener((userInfo, id) -> {
+            setResult(RESULT_OK, new Intent().putExtra(Constant.K_ID, id)
+                .putExtra(Constant.K_NAME, userInfo.getNickname()));
             finish();
         });
-        ((GroupFragment) groupFragment).setConfirmListener(id -> {
-            setResult(RESULT_OK, new Intent().putExtra(Constant.GROUP_ID, id));
+        ((GroupFragment) groupFragment).setConfirmListener((userInfo, id) -> {
+            setResult(RESULT_OK, new Intent().putExtra(Constant.K_GROUP_ID, id));
             finish();
         });
     }
@@ -107,6 +109,6 @@ public class ForwardToActivity extends BaseActivity<SocialityVM, ActivityForward
     }
 
     public interface ConfirmListener {
-        void onListener(String id);
+        void onListener(UserInfo userInfo, String id);
     }
 }

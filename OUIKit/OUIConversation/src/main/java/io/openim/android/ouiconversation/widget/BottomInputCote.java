@@ -91,7 +91,7 @@ public class BottomInputCote {
                         for (ForegroundColorSpan span : spans) {
                             if (span == null)
                                 continue;
-                           MsgExpand msgExpand= (MsgExpand) atMessage.getExt();
+                            MsgExpand msgExpand = (MsgExpand) atMessage.getExt();
                             if (msgExpand.spanHashCode == span.hashCode()) {
                                 final int spanStart = view.chatInput.getText().getSpanStart(span);
                                 final int spanEnd = view.chatInput.getText().getSpanEnd(span);
@@ -104,7 +104,7 @@ public class BottomInputCote {
                 }
                 msg = OpenIMClient.getInstance().messageManager.createTextAtMessage(msgEdit.toString(), atUserIDList, atUserInfoList, null);
             }
-            if (null!=msg){
+            if (null != msg) {
                 vm.sendMsg(msg);
                 vm.inputMsg.setValue("");
                 view.chatInput.setText("");
@@ -178,14 +178,14 @@ public class BottomInputCote {
                         final int spanStart = view.chatInput.getText().getSpanStart(span);
                         final int spanEnd = view.chatInput.getText().getSpanEnd(span);
                         Selection.setSelection(view.chatInput.getText(), spanStart, spanEnd);
-                        view.chatInput.getText().delete(spanStart, spanEnd);
+                        view.chatInput.getText().delete(spanStart+1, spanEnd);
                     }
                     List<Message> atMessages = vm.atMessages.getValue();
                     Iterator iterator = atMessages.iterator();
                     while (iterator.hasNext()) {
                         Message message = (Message) iterator.next();
                         try {
-                            MsgExpand msgExpand= (MsgExpand) message.getExt();
+                            MsgExpand msgExpand = (MsgExpand) message.getExt();
                             if (msgExpand.spanHashCode == span.hashCode()) {
                                 iterator.remove();
                             }
@@ -221,13 +221,10 @@ public class BottomInputCote {
             SpannableString spannableString = new SpannableString("@" + messages.get(messages.size() - 1).getSenderNickname() + "\t");
             ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
             spannableString.setSpan(colorSpan, 0, spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            Message lastMsg=messages.get(messages.size() - 1);
-            try {
-                MsgExpand msgExpand = (MsgExpand) lastMsg.getExt();
-                msgExpand.spanHashCode=colorSpan.hashCode();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            Message lastMsg = messages.get(messages.size() - 1);
+            MsgExpand msgExpand = (MsgExpand) lastMsg.getExt();
+            if (null != msgExpand)
+                msgExpand.spanHashCode = colorSpan.hashCode();
             view.chatInput.append(spannableString);
         });
 

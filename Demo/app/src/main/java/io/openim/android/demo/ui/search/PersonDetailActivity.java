@@ -1,6 +1,6 @@
 package io.openim.android.demo.ui.search;
 
-import static io.openim.android.ouicore.utils.Constant.ID;
+
 
 
 import android.content.Intent;
@@ -16,10 +16,10 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityPersonDetailBinding;
 import io.openim.android.demo.vm.SearchVM;
-import io.openim.android.ouiconversation.utils.Constant;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
@@ -39,7 +39,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         sink();
 
         listener();
-        vm.searchContent = getIntent().getStringExtra(ID);
+        vm.searchContent = getIntent().getStringExtra(Constant.K_ID);
         vm.searchPerson();
 
         click();
@@ -48,13 +48,13 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
 
     private void click() {
         view.sendMsg.setOnClickListener(v -> ARouter.getInstance().build(Routes.Conversation.CHAT)
-            .withString(ID, vm.searchContent)
+            .withString(Constant.K_ID, vm.searchContent)
             .withString(io.openim.android.ouicore.utils.Constant.K_NAME, vm.userInfo.getValue().get(0).getNickname())
             .navigation());
 
 
         view.addFriend.setOnClickListener(v -> {
-            startActivity(new Intent(this, SendVerifyActivity.class).putExtra(ID, vm.searchContent));
+            startActivity(new Intent(this, SendVerifyActivity.class).putExtra(Constant.K_ID, vm.searchContent));
         });
         view.part.setOnClickListener(v -> {
             CommonDialog commonDialog = new CommonDialog(this);
