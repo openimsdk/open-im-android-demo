@@ -11,8 +11,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
-import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.entity.SortLetter;
 import io.openim.android.ouicore.utils.Common;
@@ -28,22 +28,33 @@ public class SocialityVM extends BaseViewModel {
     public MutableLiveData<List<String>> letters = new MutableLiveData<>(new ArrayList<>());
     //我加入的群
     public MutableLiveData<List<GroupInfo>> groups = new MutableLiveData<>(new ArrayList<>());
+    //我创建的群
+    public MutableLiveData<List<GroupInfo>> ownGroups = new MutableLiveData<>(new ArrayList<>());
 
 
     public void getAllGroup() {
         OpenIMClient.getInstance().groupManager.getJoinedGroupList(new OnBase<List<GroupInfo>>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error+"("+code+")");
+                IView.toast(error + "(" + code + ")");
             }
 
             @Override
             public void onSuccess(List<GroupInfo> data) {
                 if (data.isEmpty()) return;
                 groups.setValue(data);
+                for (GroupInfo datum : data) {
+                    if (datum.getCreatorUserID().equals(BaseApp.inst()
+                        .loginCertificate.userID)) {
+                        ownGroups.getValue().add(datum);
+                    }
+                }
+                if (!ownGroups.getValue().isEmpty())
+                    ownGroups.setValue(ownGroups.getValue());
             }
         });
     }
+
 
     public void getAllFriend() {
         exUserInfo.getValue().clear();
@@ -51,7 +62,7 @@ public class SocialityVM extends BaseViewModel {
         OpenIMClient.getInstance().friendshipManager.getFriendList(new OnBase<List<UserInfo>>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error+"("+code+")");
+                IView.toast(error + "(" + code + ")");
             }
 
             @Override

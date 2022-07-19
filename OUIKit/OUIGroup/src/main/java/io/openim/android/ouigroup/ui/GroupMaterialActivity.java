@@ -66,8 +66,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     private void click() {
-        view.qrCode.setOnClickListener(v -> startActivity(new Intent(this, GroupShareActivity.class)));
-        view.groupId.setOnClickListener(v -> startActivity(new Intent(this, GroupShareActivity.class).putExtra(GroupShareActivity.IS_QRCODE, false)));
+        view.qrCode.setOnClickListener(v -> startActivity(new Intent(this, ShareQrcodeActivity.class)));
+        view.groupId.setOnClickListener(v -> startActivity(new Intent(this, ShareQrcodeActivity.class).putExtra(ShareQrcodeActivity.IS_QRCODE, false)));
         view.bulletin.setOnClickListener(v -> startActivity(new Intent(this, GroupBulletinActivity.class)));
         view.groupMember.setOnClickListener(v -> {
             startActivity(new Intent(this, GroupMemberActivity.class));

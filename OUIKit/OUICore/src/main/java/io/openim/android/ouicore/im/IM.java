@@ -1,12 +1,9 @@
 package io.openim.android.ouicore.im;
 
 
-import android.content.Context;
-
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.net.RXRetrofit.HttpConfig;
 import io.openim.android.ouicore.net.RXRetrofit.N;
-import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.sdk.OpenIMClient;
 
@@ -20,6 +17,6 @@ public class IM {
     }
     //存储路径
     public static String getStorageDir() {
-        return BaseApp.instance().getFilesDir().getAbsolutePath();
+        return BaseApp.inst().getFilesDir().getAbsolutePath();
     }
 }

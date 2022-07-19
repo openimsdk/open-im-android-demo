@@ -10,23 +10,12 @@ import android.text.Editable;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
-import android.util.AttributeSet;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
@@ -35,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.LayoutInputCoteBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
@@ -43,8 +31,6 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.FixSizeLinkedList;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.AtUserInfo;
 import io.openim.android.sdk.models.Message;
@@ -153,7 +139,7 @@ public class BottomInputCote {
 
         view.chatMore.setOnClickListener(v -> {
             clearFocus();
-            Common.hideKeyboard(BaseApp.instance(), v);
+            Common.hideKeyboard(BaseApp.inst(), v);
             view.fragmentContainer.setVisibility(VISIBLE);
             if (null == inputExpandFragment) {
                 inputExpandFragment = new InputExpandFragment();

@@ -64,7 +64,6 @@ dependencies {
     implementation 'com.github.Wynsbin:VerificationCodeInputView:1.0.2'
 
 
-
     api project(':OUICore')
     if (!isModule) {
         implementation project(':OUIConversation')

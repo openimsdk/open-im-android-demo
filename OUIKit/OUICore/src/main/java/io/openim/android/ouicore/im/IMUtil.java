@@ -1,10 +1,7 @@
 package io.openim.android.ouicore.im;
 
-import android.text.TextUtils;
-
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import io.openim.android.ouicore.R;
@@ -14,7 +11,6 @@ import io.openim.android.ouicore.entity.LocationInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.entity.MsgExpand;
-import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.sdk.OpenIMClient;
@@ -72,11 +68,11 @@ public class IMUtil {
             if (summaryList.size() >= 2) break;
         }
         if (isSingleChat) {
-            title = LoginCertificate.getCache(BaseApp.instance()).nickname
-                + BaseApp.instance().getString(R.string.and) + otherSideName
-                + BaseApp.instance().getString(R.string.chat_history);
+            title = LoginCertificate.getCache(BaseApp.inst()).nickname
+                + BaseApp.inst().getString(R.string.and) + otherSideName
+                + BaseApp.inst().getString(R.string.chat_history);
         } else {
-            title = BaseApp.instance().getString(R.string.group_chat_history);
+            title = BaseApp.inst().getString(R.string.group_chat_history);
         }
 
         return OpenIMClient.getInstance().messageManager.createMergerMessage(list, title, summaryList);
@@ -119,25 +115,25 @@ public class IMUtil {
                 lastMsg = msg.getContent();
                 break;
             case Constant.MsgType.PICTURE:
-                lastMsg = "[" + BaseApp.instance().getString(io.openim.android.ouicore.R.string.picture) + "]";
+                lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.picture) + "]";
                 break;
             case Constant.MsgType.VOICE:
-                lastMsg = "[" + BaseApp.instance().getString(io.openim.android.ouicore.R.string.voice) + "]";
+                lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.voice) + "]";
                 break;
             case Constant.MsgType.VIDEO:
-                lastMsg = "[" + BaseApp.instance().getString(io.openim.android.ouicore.R.string.video) + "]";
+                lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.video) + "]";
                 break;
             case Constant.MsgType.FILE:
-                lastMsg = "[" + BaseApp.instance().getString(io.openim.android.ouicore.R.string.file) + "]";
+                lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.file) + "]";
                 break;
             case Constant.MsgType.LOCATION:
-                lastMsg = "[" + BaseApp.instance().getString(io.openim.android.ouicore.R.string.location) + "]";
+                lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.location) + "]";
                 break;
             case Constant.MsgType.MENTION:
                 lastMsg = ((MsgExpand) msg.getExt()).atMsgInfo.text;
                 break;
             case Constant.MsgType.MERGE:
-                lastMsg = "[" + BaseApp.instance().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";
+                lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";
                 break;
         }
         return lastMsg;

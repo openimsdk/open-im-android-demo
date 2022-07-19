@@ -4,26 +4,17 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.graphics.Rect;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
-
-import androidx.fragment.app.FragmentTransaction;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Comparator;
 
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.base.BaseFragment;
-import io.openim.android.ouicore.entity.MsgConversation;
-import io.openim.android.sdk.models.ConversationInfo;
 
 public class Common {
     /**
@@ -53,7 +44,7 @@ public class Common {
     }
 
     public static int dp2px(float dp) {
-        float scale = BaseApp.instance().getResources().getDisplayMetrics().density;
+        float scale = BaseApp.inst().getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
     }
 
@@ -105,7 +96,7 @@ public class Common {
      * @param clip 内容
      */
     public static void copy(String clip) {
-        ClipboardManager cm = (ClipboardManager) BaseApp.instance().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipboardManager cm = (ClipboardManager) BaseApp.inst().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData mClipData = ClipData.newPlainText("text", clip);
         cm.setPrimaryClip(mClipData);
     }

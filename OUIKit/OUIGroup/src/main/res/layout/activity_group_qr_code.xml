@@ -20,7 +20,7 @@
             android:layout_height="match_parent"
             android:background="#F8F8F8"
             android:orientation="vertical"
-            tools:context=".ui.GroupShareActivity">
+            tools:context=".ui.ShareQrcodeActivity">
 
 
             <androidx.cardview.widget.CardView
@@ -37,6 +37,7 @@
                         layout="@layout/view_back" />
 
                     <TextView
+                        android:id="@+id/title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"

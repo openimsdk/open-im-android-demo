@@ -36,10 +36,10 @@ public class SinkHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // 透明状态栏
             soft.get().getWindow().addFlags(
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             // 透明导航栏 在某些使用屏幕按钮的手机上，可能会影响操作
-            // getWindow().addFlags(
-            //WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+//            soft.get(). getWindow().addFlags(
+//            WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
             if (view != null) {
                 int statusBarHeight = getStatusBarHeight(soft.get().getBaseContext());
                 view.setPadding(0, statusBarHeight, 0, 0);
@@ -55,7 +55,7 @@ public class SinkHelper {
     private int getStatusBarHeight(Context context) {
         int result = 0;
         int resourceId = context.getResources().getIdentifier(
-                "status_bar_height", "dimen", "android");
+            "status_bar_height", "dimen", "android");
         if (resourceId > 0) {
             result = context.getResources().getDimensionPixelSize(resourceId);
         }

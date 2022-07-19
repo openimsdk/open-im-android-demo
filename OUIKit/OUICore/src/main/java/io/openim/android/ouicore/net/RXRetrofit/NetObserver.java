@@ -97,7 +97,7 @@ public abstract class NetObserver<T> implements Observer<T> {
      * @return
      */
     public static boolean isConnected() {
-        ConnectivityManager connectivity = (ConnectivityManager) BaseApp.instance()
+        ConnectivityManager connectivity = (ConnectivityManager) BaseApp.inst()
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         if (null != connectivity) {
             NetworkInfo info = connectivity.getActiveNetworkInfo();

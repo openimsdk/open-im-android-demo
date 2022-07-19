@@ -36,6 +36,7 @@
 
 
         </androidx.cardview.widget.CardView>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -53,6 +54,90 @@
                 android:hint="@string/search_group" />
 
         </RelativeLayout>
+
+        <RadioGroup
+            android:id="@+id/menuGroup"
+            android:layout_width="match_parent"
+            android:layout_height="57dp"
+            android:background="@color/white"
+            android:orientation="horizontal"
+            android:paddingTop="5dp">
+
+            <RadioButton
+                android:id="@+id/men1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:button="@null"
+                android:gravity="center"
+                android:text="@string/i_created"
+                android:textColor="#ff333333"
+                android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/men2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:button="@null"
+                android:gravity="center"
+                android:text="@string/i_joined"
+                android:textColor="#ff333333"
+                android:textSize="16sp" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@color/white"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <View
+                    android:id="@+id/men_bg1"
+                    android:layout_width="34dp"
+                    android:layout_height="3dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:background="#1D6BED" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <View
+                    android:id="@+id/men_bg2"
+                    android:layout_width="34dp"
+                    android:layout_height="3dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:background="#1D6BED"
+                    android:visibility="gone" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/create"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/joined"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+        </FrameLayout>
 
 
     </LinearLayout>

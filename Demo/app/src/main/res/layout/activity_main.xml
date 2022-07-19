@@ -2,7 +2,6 @@
 <layout>
 
     <data>
-
         <variable
             name="MainVM"
             type="io.openim.android.demo.vm.MainVM" />
@@ -18,6 +17,7 @@
         tools:context=".ui.main.MainActivity">
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardElevation="8dp">
@@ -138,6 +138,17 @@
                         android:textColor="#ff1b72ec"
                         android:textSize="10sp"
                         android:text="@string/address_book" />
+                    <RadioButton
+                        android:id="@+id/men3"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:button="@null"
+                        android:drawableTop="@mipmap/ic_my"
+                        android:gravity="center"
+                        android:textColor="#ff1b72ec"
+                        android:textSize="10sp"
+                        android:text="@string/my" />
                 </RadioGroup>
             </com.lihang.ShadowLayout>
         </RelativeLayout>

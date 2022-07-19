@@ -7,14 +7,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import io.openim.android.ouicore.entity.LoginCertificate;
+
 public class BaseApp extends Application {
-    public static final HashMap<String, BaseViewModel> viewModels = new HashMap<>();
 
     private static BaseApp instance;
 
-    public static BaseApp instance() {
+    public static BaseApp inst() {
         return instance;
     }
+
+    public LoginCertificate loginCertificate;
+
+    public static final HashMap<String, BaseViewModel> viewModels = new HashMap<>();
 
     public <T> T getVMByCache(Class<T> vm) {
         String key = vm.getCanonicalName();

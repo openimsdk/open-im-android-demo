@@ -37,7 +37,7 @@
             android:id="@+id/tips"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{LoginVM.isPhone?BaseApp.instance().getString(R.string.verification_code_send_phone):BaseApp.instance().getString(R.string.verification_code_send_mail)}"
+            android:text="@{LoginVM.isPhone?BaseApp.inst().getString(R.string.verification_code_send_phone):BaseApp.inst().getString(R.string.verification_code_send_mail)}"
             android:textColor="#ff333333"
             android:textSize="26sp"
             android:textStyle="bold" />

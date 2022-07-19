@@ -1,4 +1,3 @@
-
 pluginManagement {
     repositories {
         maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
@@ -9,12 +8,9 @@ pluginManagement {
             allowInsecureProtocol = true
             url 'http://121.37.25.71:8081/repository/maven2/'
         }
-        maven {
-            url "https://jitpack.io"
-        }
-//        gradlePluginPortal()
-//        google()
-//        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        google()
+        mavenCentral()
     }
 }
 dependencyResolutionManagement {
@@ -28,11 +24,9 @@ dependencyResolutionManagement {
             allowInsecureProtocol = true
             url 'http://121.37.25.71:8081/repository/maven2/'
         }
-        maven {
-            url "https://jitpack.io"
-        }
-//        google()
-//        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        google()
+        mavenCentral()
     }
 }
 rootProject.name = "Demo"
@@ -40,11 +34,11 @@ include ':app'
 
 include ':OUICore'
 project(':OUICore').projectDir = new File(settingsDir, '../OUIKit/OUICore')
-
 include ':OUIConversation'
 project(':OUIConversation').projectDir = new File(settingsDir, '../OUIKit/OUIConversation')
-
 include ':OUIGroup'
 project(':OUIGroup').projectDir = new File(settingsDir, '../OUIKit/OUIGroup')
 include ':OUIContact'
 project(':OUIContact').projectDir = new File(settingsDir, '../OUIKit/OUIContact')
+include ':OUICalling'
+project(':OUICalling').projectDir = new File(settingsDir, '../OUIKit/OUICalling')

@@ -1,7 +1,5 @@
 package io.openim.android.ouicore.utils;
 
-import android.content.Context;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -16,13 +14,13 @@ public class TimeUtil {
 
     public static String getTimeString(Long timestamp) {
         String result = "";
-        String weekNames[] = {BaseApp.instance().getString(R.string.sunday),
-            BaseApp.instance().getString(R.string.monday),
-            BaseApp.instance().getString(R.string.tuesday),
-            BaseApp.instance().getString(R.string.wednesday),
-            BaseApp.instance().getString(R.string.thursday),
-            BaseApp.instance().getString(R.string.friday),
-            BaseApp.instance().getString(R.string.saturday)};
+        String weekNames[] = {BaseApp.inst().getString(R.string.sunday),
+            BaseApp.inst().getString(R.string.monday),
+            BaseApp.inst().getString(R.string.tuesday),
+            BaseApp.inst().getString(R.string.wednesday),
+            BaseApp.inst().getString(R.string.thursday),
+            BaseApp.inst().getString(R.string.friday),
+            BaseApp.inst().getString(R.string.saturday)};
 
         try {
             Calendar todayCalendar = Calendar.getInstance();

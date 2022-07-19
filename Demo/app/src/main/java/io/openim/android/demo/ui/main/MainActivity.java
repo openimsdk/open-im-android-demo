@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 import android.widget.RadioGroup;
@@ -44,7 +45,7 @@ import io.openim.android.ouicore.utils.Constant;
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
 
     private int mCurrentTabIndex;
-    private BaseFragment lastFragment, conversationListFragment, contactFragment;
+    private BaseFragment lastFragment, conversationListFragment, contactFragment, personalFragment;
     private boolean hasScanPermission;
 
     @Override
@@ -53,8 +54,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMainBinding.inflate(getLayoutInflater()));
 
-        setLightStatus();
-        SinkHelper.get(this).setTranslucentStatus(view.getRoot());
+        sink();
 
         view.setMainVM(vm);
 
@@ -66,13 +66,18 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
     private void click() {
         showPopupWindow();
-        view.menuGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.men1)
-                    switchFragment(conversationListFragment);
-                if (checkedId == R.id.men2)
-                    switchFragment(contactFragment);
+        view.menuGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.men1)
+                switchFragment(conversationListFragment);
+            if (checkedId == R.id.men2)
+                switchFragment(contactFragment);
+
+            view.header.setVisibility(View.VISIBLE);
+            SinkHelper.get(this).setTranslucentStatus(view.getRoot());
+            if (checkedId == R.id.men3) {
+                switchFragment(personalFragment);
+                view.header.setVisibility(View.GONE);
+                view.getRoot().setPadding(0,0,0,0);
             }
         });
     }
@@ -184,17 +189,19 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     public void initDate() {
         conversationListFragment = (BaseFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
         contactFragment = (BaseFragment) ARouter.getInstance().build(Routes.Contact.HOME).navigation();
+        personalFragment = PersonalFragment.newInstance();
+
+        personalFragment.setPage(3);
+        switchFragment(personalFragment);
 
         if (null != contactFragment) {
             contactFragment.setPage(2);
             switchFragment(contactFragment);
         }
-
         if (null != conversationListFragment) {
             conversationListFragment.setPage(1);
             switchFragment(conversationListFragment);
         }
-
 //        getSupportFragmentManager().beginTransaction()
 //            .add(R.id.fragment_container, contactListFragment).commit();
     }

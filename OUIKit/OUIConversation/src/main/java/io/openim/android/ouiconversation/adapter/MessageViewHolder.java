@@ -1,20 +1,14 @@
 package io.openim.android.ouiconversation.adapter;
 
-import static io.openim.android.ouiconversation.adapter.MessageAdapter.OWN_ID;
+
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
@@ -23,8 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -38,17 +30,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
-import com.lqr.audio.AudioPlayManager;
-import com.lqr.audio.IAudioPlayListener;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import io.openim.android.ouiconversation.R;
@@ -56,7 +40,6 @@ import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.LayoutLoadingSmallBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgAudioLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgAudioRightBinding;
-import io.openim.android.ouiconversation.databinding.LayoutMsgBinding;
 
 
 import io.openim.android.ouiconversation.databinding.LayoutMsgExMenuBinding;
@@ -68,7 +51,6 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgLocation1Binding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgLocation2Binding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgMergeLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgMergeRightBinding;
-import io.openim.android.ouiconversation.databinding.LayoutMsgNoticeBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
 import io.openim.android.ouiconversation.ui.ChatHistoryDetailsActivity;
@@ -77,15 +59,11 @@ import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouiconversation.widget.InputExpandFragment;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.entity.AtMsgInfo;
 import io.openim.android.ouicore.entity.AtUsersInfo;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.entity.LocationInfo;
 import io.openim.android.ouicore.utils.ByteUtil;
-import io.openim.android.ouicore.utils.FixSizeLinkedList;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.voice.SPlayer;
@@ -137,7 +115,7 @@ public class MessageViewHolder {
         private PopupWindow popupWindow;
         private Message message;
         private RecyclerViewAdapter adapter;
-        private ChatVM chatVM = BaseApp.instance().getVMByCache(ChatVM.class);
+        private ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
 
         private boolean leftIsInflated = false, rightIsInflated = false;
         private final ViewStub right;
@@ -172,7 +150,7 @@ public class MessageViewHolder {
         //绑定数据
         public void bindData(Message message, int position) {
             this.message = message;
-            if (isOwn = message.getSendID().equals(OWN_ID)) {
+            if (isOwn = message.getSendID().equals(BaseApp.inst().loginCertificate.userID)) {
                 if (leftIsInflated)
                     left.setVisibility(View.GONE);
                 if (rightIsInflated)
@@ -288,7 +266,7 @@ public class MessageViewHolder {
                 }
                 menuIcons.add(R.mipmap.ic_delete);
                 menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.delete));
-                if (message.getSendID().equals(OWN_ID)) {
+                if (message.getSendID().equals(BaseApp.inst().loginCertificate.userID)) {
                     //5分钟内可以撤回
                     if (System.currentTimeMillis() - message.getSendTime() < (1000 * 60 * 5)) {
                         menuIcons.add(R.mipmap.ic_withdraw);

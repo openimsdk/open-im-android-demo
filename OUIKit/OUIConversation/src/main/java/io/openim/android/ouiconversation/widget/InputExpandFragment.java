@@ -12,10 +12,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -25,8 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.yanzhenjie.permission.AndPermission;
@@ -39,7 +34,6 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.FragmentInputExpandBinding;
@@ -51,8 +45,6 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
-import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
@@ -62,9 +54,9 @@ import io.openim.android.sdk.models.Message;
 public class InputExpandFragment extends BaseFragment<ChatVM> {
     public List<Integer> menuIcons = Arrays.asList(R.mipmap.ic_chat_photo, R.mipmap.ic_chat_shoot, R.mipmap.ic_chat_menu_file,
         R.mipmap.ic_chat_location);
-    public List<String> menuTitles = Arrays.asList(BaseApp.instance().getString(io.openim.android.ouicore.R.string.album),
-        BaseApp.instance().getString(io.openim.android.ouicore.R.string.shoot), BaseApp.instance().getString(io.openim.android.ouicore.R.string.file),
-        BaseApp.instance().getString(io.openim.android.ouicore.R.string.location));
+    public List<String> menuTitles = Arrays.asList(BaseApp.inst().getString(io.openim.android.ouicore.R.string.album),
+        BaseApp.inst().getString(io.openim.android.ouicore.R.string.shoot), BaseApp.inst().getString(io.openim.android.ouicore.R.string.file),
+        BaseApp.inst().getString(io.openim.android.ouicore.R.string.location));
 
     FragmentInputExpandBinding v;
     //权限

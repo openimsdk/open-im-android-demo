@@ -4,6 +4,7 @@ import android.view.View;
 
 import androidx.lifecycle.MutableLiveData;
 
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.im.IMEvent;
@@ -17,13 +18,13 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
 
     public MutableLiveData<String> nickname = new MutableLiveData<>("");
     public MutableLiveData<Integer> visibility = new MutableLiveData<>(View.INVISIBLE);
-    private LoginCertificate loginCertificate;
+
 
     @Override
     protected void viewCreate() {
         IMEvent.getInstance().addConnListener(this);
 
-        loginCertificate = LoginCertificate.getCache(getContext());
+        BaseApp.inst().loginCertificate = LoginCertificate.getCache(getContext());
         OpenIMClient.getInstance().login(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -32,7 +33,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
 
             @Override
             public void onSuccess(String data) {
-                L.e("user_token:"+loginCertificate.token);
+                L.e("user_token:"+BaseApp.inst().loginCertificate.token);
                 IView.initDate();
                 OpenIMClient.getInstance().userInfoManager.getSelfUserInfo(new OnBase<UserInfo>() {
                     @Override
@@ -43,16 +44,17 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
                     @Override
                     public void onSuccess(UserInfo data) {
                         // 返回当前登录用户的资料
-                        loginCertificate.nickname = data.getNickname();
-                        loginCertificate.cache(getContext());
-                        nickname.setValue(loginCertificate.nickname);
+                        BaseApp.inst().loginCertificate.nickname = data.getNickname();
+                        BaseApp.inst().loginCertificate.faceURL = data.getFaceURL();
+                        BaseApp.inst().loginCertificate.cache(getContext());
+                        nickname.setValue(BaseApp.inst().loginCertificate.nickname);
                     }
                 });
             }
-        }, loginCertificate.userID, loginCertificate.token);
+        }, BaseApp.inst().loginCertificate.userID, BaseApp.inst().loginCertificate.token);
 
-        if (null != loginCertificate.nickname)
-            nickname.setValue(loginCertificate.nickname);
+        if (null != BaseApp.inst().loginCertificate.nickname)
+            nickname.setValue(BaseApp.inst().loginCertificate.nickname);
     }
 
     @Override

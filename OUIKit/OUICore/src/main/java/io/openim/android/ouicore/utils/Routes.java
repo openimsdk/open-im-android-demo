@@ -26,11 +26,18 @@ public class Routes {
         public final static String MATERIAL = "/group/GroupMaterialActivity";
         //通知详情
         public final static String NOTICE_DETAIL = "/group/NoticeDetailActivity";
+        //分享二维码
+        public static final String SHARE_QRCODE = "/group/ShareQrcodeActivity";
     }
 
     //关系链
     public static class Contact {
         public final static String HOME = "/contact/ContactFragment";
         public final static String FORWARD = "/contact/ForwardToActivity";
+    }
+
+    //音视频
+    public static class Calling {
+        public final static String CALL = "/Calling/CallActivity";
     }
 }

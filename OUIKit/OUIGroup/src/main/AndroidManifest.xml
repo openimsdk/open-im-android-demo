@@ -7,7 +7,7 @@
             android:name=".ui.NoticeDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.GroupShareActivity"
+            android:name=".ui.ShareQrcodeActivity"
             android:exported="false" />
         <activity
             android:name=".ui.GroupBulletinActivity"

@@ -2,7 +2,6 @@ package io.openim.android.ouiconversation.widget;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Environment;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,11 +20,8 @@ import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.LayoutTouchVoiceBinding;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseDialog;
-import io.openim.android.ouicore.im.IM;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouicore.widget.RecordWaveView;
 
 public class TouchVoiceDialog extends BaseDialog {
     //和布局里保持一致
@@ -54,7 +50,7 @@ public class TouchVoiceDialog extends BaseDialog {
         view = LayoutTouchVoiceBinding.inflate(getLayoutInflater());
         setContentView(view.getRoot());
 
-        WindowManager wm = (WindowManager) BaseApp.instance()
+        WindowManager wm = (WindowManager) BaseApp.inst()
             .getSystemService(Context.WINDOW_SERVICE);
         screenWidth = wm.getDefaultDisplay().getWidth();
         screenHeight = wm.getDefaultDisplay().getHeight();

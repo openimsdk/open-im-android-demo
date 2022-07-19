@@ -10,7 +10,7 @@ public class NetworkException extends Exception {
 
 
     public NetworkException() {
-        super(BaseApp.instance().getString(R.string.network_unavailable_tips));
+        super(BaseApp.inst().getString(R.string.network_unavailable_tips));
     }
 
     public NetworkException(String message) {

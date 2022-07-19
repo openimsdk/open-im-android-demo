@@ -13,8 +13,6 @@ import java.util.List;
 
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.entity.LoginCertificate;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.sdk.models.Message;
 
 public class MessageAdapter extends RecyclerView.Adapter {
@@ -22,13 +20,10 @@ public class MessageAdapter extends RecyclerView.Adapter {
     private RecyclerView recyclerView;
 
     List<Message> messages;
-    //自己的userId
-    public static String OWN_ID;
     boolean hasStorage;
 
     public MessageAdapter() {
-        OWN_ID = LoginCertificate.getCache(BaseApp.instance()).userID;
-        hasStorage = AndPermission.hasPermissions(BaseApp.instance(), Permission.Group.STORAGE);
+        hasStorage = AndPermission.hasPermissions(BaseApp.inst(), Permission.Group.STORAGE);
     }
 
     public void setMessages(List<Message> messages) {

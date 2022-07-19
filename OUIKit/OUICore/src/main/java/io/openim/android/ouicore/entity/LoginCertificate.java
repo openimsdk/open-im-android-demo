@@ -2,11 +2,13 @@ package io.openim.android.ouicore.entity;
 
 import android.content.Context;
 
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 
 public class LoginCertificate {
     public String nickname;
+    public String faceURL;
     public String userID;
     public String token;
 
@@ -19,4 +21,9 @@ public class LoginCertificate {
         if (u.isEmpty()) return null;
         return GsonHel.fromJson(u, LoginCertificate.class);
     }
+
+    public static void clear() {
+        SharedPreferencesUtil.remove(BaseApp.inst(), "user.LoginCertificate");
+    }
+
 }

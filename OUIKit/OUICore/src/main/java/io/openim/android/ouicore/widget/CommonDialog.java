@@ -46,5 +46,9 @@ public class CommonDialog extends BaseDialog {
         mainView.content.addView(customCentral);
     }
 
+    public CommonDialog atShow() {
+        show();
+        return this;
+    }
 }
 
