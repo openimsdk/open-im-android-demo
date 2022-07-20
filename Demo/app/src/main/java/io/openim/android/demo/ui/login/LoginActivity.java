@@ -16,6 +16,8 @@ import android.view.View;
 import android.widget.Toast;
 
 
+import com.yanzhenjie.permission.AndPermission;
+
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityLoginBinding;
 import io.openim.android.demo.vm.LoginVM;
@@ -26,6 +28,7 @@ public class LoginActivity extends BaseActivity<LoginVM,ActivityLoginBinding> im
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndPermission.with(this).overlay().start();
         super.onCreate(savedInstanceState);
         bindVM(LoginVM.class, true);
         bindViewDataBinding(ActivityLoginBinding.inflate(getLayoutInflater()));

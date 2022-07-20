@@ -808,7 +808,7 @@ public class MessageViewHolder {
         }
 
         private View.OnClickListener clickJumpDetail = v -> {
-            v.getContext().startActivity(new Intent(v.getContext(), ChatHistoryDetailsActivity.class));
+//            v.getContext().startActivity(new Intent(v.getContext(), ChatHistoryDetailsActivity.class));
         };
     }
 

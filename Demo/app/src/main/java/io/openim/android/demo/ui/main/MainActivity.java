@@ -35,6 +35,7 @@ import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.demo.vm.MainVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseFragment;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
@@ -50,6 +51,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndPermission.with(this).overlay().start();
         bindVM(MainVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMainBinding.inflate(getLayoutInflater()));
@@ -77,7 +79,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
             if (checkedId == R.id.men3) {
                 switchFragment(personalFragment);
                 view.header.setVisibility(View.GONE);
-                view.getRoot().setPadding(0,0,0,0);
+                view.getRoot().setPadding(0, 0, 0, 0);
             }
         });
     }

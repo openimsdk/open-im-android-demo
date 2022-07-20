@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:alpha="0.8"
+    android:background="#000000"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
+    tools:context="io.openim.android.ouicalling.CallDialog">
+
+
+    <io.livekit.android.renderer.TextureViewRenderer
+        android:id="@+id/speakerVideoView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/zoomOut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="22dp"
+        android:layout_marginTop="40dp"
+        android:src="@mipmap/ic_zoom_out" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/zoomOut"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="35dp"
+        android:orientation="horizontal">
+
+        <io.openim.android.ouicore.widget.AvatarImage
+            android:id="@+id/avatar"
+            android:layout_width="78dp"
+            android:layout_height="78dp"
+            android:src="@mipmap/ic_my_friend" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="96dp"
+                android:layout_height="45dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="#ffffffff"
+                android:textSize="32sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/Invite_a_video_call"
+                android:textColor="#ffffffff"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="68dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/hangUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="15dp"
+                android:background="@drawable/sty_radius_30_red"
+                android:padding="20dp"
+                android:src="@mipmap/ic_hang_up" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:shadowColor="#80000000"
+                android:text="@string/hang_up"
+                android:textColor="#ffffffff"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/answer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="15dp"
+                android:background="@drawable/sty_radius_30_29e3a0"
+                android:padding="20dp"
+                android:src="@mipmap/ic_answer" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:shadowColor="#80000000"
+                android:text="@string/answer"
+                android:textColor="#ffffffff"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</RelativeLayout>

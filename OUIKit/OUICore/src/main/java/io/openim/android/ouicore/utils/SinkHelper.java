@@ -52,7 +52,7 @@ public class SinkHelper {
      *
      * @return 返回状态栏高度的像素值。
      */
-    private int getStatusBarHeight(Context context) {
+    public static  int getStatusBarHeight(Context context) {
         int result = 0;
         int resourceId = context.getResources().getIdentifier(
             "status_bar_height", "dimen", "android");

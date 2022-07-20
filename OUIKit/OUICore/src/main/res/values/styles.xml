@@ -37,4 +37,13 @@
         <item name="android:windowExitAnimation">@anim/dialog_exit</item>
         <!-- 退出时的动画 -->
     </style>
+
+
+    <!--全屏主题-->
+    <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 </resources>

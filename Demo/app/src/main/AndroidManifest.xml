@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.openim.android.demo">
 
+
     <application
         android:name=".DemoApplication"
         android:allowBackup="true"

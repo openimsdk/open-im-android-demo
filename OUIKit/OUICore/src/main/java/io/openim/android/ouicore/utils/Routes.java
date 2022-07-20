@@ -1,6 +1,10 @@
 package io.openim.android.ouicore.utils;
 
 public class Routes {
+    public static class Service {
+        public final static String CALLING = "/Service/CallingServiceImp";
+    }
+
     public static class Main {
         //发送验证信息
         public final static String SEND_VERIFY = "/main/SendVerifyActivity";
@@ -36,8 +40,4 @@ public class Routes {
         public final static String FORWARD = "/contact/ForwardToActivity";
     }
 
-    //音视频
-    public static class Calling {
-        public final static String CALL = "/Calling/CallActivity";
-    }
 }

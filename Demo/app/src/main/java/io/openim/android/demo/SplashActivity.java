@@ -7,9 +7,12 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.yanzhenjie.permission.AndPermission;
+
 import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.demo.ui.main.MainActivity;
 import io.openim.android.ouicore.entity.LoginCertificate;
+import io.openim.android.ouicore.utils.L;
 
 
 public class SplashActivity extends AppCompatActivity {

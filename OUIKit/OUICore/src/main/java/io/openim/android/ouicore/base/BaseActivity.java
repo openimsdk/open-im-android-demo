@@ -1,23 +1,53 @@
 package io.openim.android.ouicore.base;
 
 
+import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.alibaba.android.arouter.facade.Postcard;
+import com.alibaba.android.arouter.facade.annotation.Autowired;
+import com.alibaba.android.arouter.facade.service.DegradeService;
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.yanzhenjie.permission.Action;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.runtime.Permission;
+
 import io.openim.android.ouicore.R;
+import io.openim.android.ouicore.net.bage.GsonHel;
+import io.openim.android.ouicore.utils.CallingService;
+import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
+
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
+import io.openim.android.ouicore.widget.CommonDialog;
+import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.listener.OnSignalingListener;
+import io.openim.android.sdk.models.SignalingInfo;
 
 
 public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> extends AppCompatActivity implements IView {
@@ -25,11 +55,17 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     protected T vm;
     protected A view;
     private String vmCanonicalName;
+    private CallingService callingService = (CallingService) ARouter.getInstance()
+        .build(Routes.Service.CALLING).navigation();
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
+        OpenIMClient.getInstance().signalingManager.setSignalingListener(callingService);
+        ActionBar actionBar = getSupportActionBar();
+        if (null != actionBar)
+            actionBar.hide();
         if (null != vm) {
             vm.viewCreate();
         }
@@ -160,4 +196,33 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     public void toast(String tips) {
         Toast.makeText(this, tips, Toast.LENGTH_SHORT).show();
     }
+
+//    @RequiresApi(api = Build.VERSION_CODES.O)
+//    private void createNotificationChannel(String channelId, String channelName) {
+//        NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
+//        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+//        notificationManager.createNotificationChannel(notificationChannel);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            createNotificationChannel("default","default");
+//        }
+//        ProvideService locationService = (ProvideService) ARouter.getInstance()
+//            .build(Routes.Service.PROVISION).navigation();
+//        Intent intent = new Intent(this, locationService.getSpecifyClass());
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+//
+//        NotificationCompat.Builder mBuilder =
+//            new NotificationCompat.Builder(this, "default")
+//                .setSmallIcon(R.mipmap.ic_logo)
+//                .setContentTitle("My notification")
+//                .setContentText("Hello World!")
+//                .setPriority(Notification.PRIORITY_MAX)
+////                .setContentIntent(pendingIntent)
+//                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                .setFullScreenIntent(pendingIntent, true);
+//
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+//        notificationManager.notify(255, mBuilder.build());
+//    }
+
 }

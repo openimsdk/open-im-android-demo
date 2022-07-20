@@ -80,4 +80,7 @@
     <string name="qr_tips2">扫一扫下面的二维码，添加我为好友</string>
     <string name="qr_code">二维码</string>
     <string name="quit_tips">您确定要退出登陆吗？</string>
+    <string name="Invite_a_video_call">邀请你进行视频通话…</string>
+    <string name="hang_up">挂断</string>
+    <string name="answer">接听</string>
 </resources>
