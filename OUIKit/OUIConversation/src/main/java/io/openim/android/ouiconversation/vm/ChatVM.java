@@ -39,6 +39,7 @@ import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.ReadReceiptInfo;
+import io.openim.android.sdk.models.RevokedInfo;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener {
     //通知消息
@@ -249,6 +250,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }
     }
 
+    @Override
+    public void onRecvMessageRevokedV2(RevokedInfo info) {
+
+    }
 
 
     public void sendMsg(Message msg) {

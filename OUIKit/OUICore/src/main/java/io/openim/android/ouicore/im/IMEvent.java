@@ -23,6 +23,7 @@ import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.ReadReceiptInfo;
+import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
 
@@ -400,6 +401,11 @@ public class IMEvent {
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
                     onAdvanceMsgListener.onRecvMessageRevoked(msgId);
                 }
+            }
+
+            @Override
+            public void onRecvMessageRevokedV2(RevokedInfo info) {
+
             }
 
             @Override

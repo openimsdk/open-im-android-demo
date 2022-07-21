@@ -1,6 +1,10 @@
 package io.openim.android.ouicalling;
 
+import android.app.Application;
 import android.content.Context;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -19,17 +23,18 @@ public class CallingServiceImp implements CallingService {
     private static final String TAG = "CallingServiceImp";
     private CallDialog callDialog;
     private Context context;
+    private CallViewModel callViewModel;
 
     @Override
     public void init(Context context) {
         this.context = context;
-        callDialog = new CallDialog(context);
+        callDialog =new CallDialog(context);
     }
-
     @Override
     public void onInvitationCancelled(SignalingInfo s) {
         L.e(TAG, "----onInvitationCancelled-----");
-
+        if (null == callDialog) return;
+        callDialog.dismiss();
     }
 
     @Override
@@ -60,6 +65,7 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onReceiveNewInvitation(SignalingInfo s) {
         L.e(TAG, "----onReceiveNewInvitation-----");
+        if (null == callDialog) return;
         Common.UIHandler.post(() -> {
             AndPermission.with(context).overlay().onGranted(data -> {
                 callDialog.bindData(s);
@@ -71,6 +77,7 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onHangup(SignalingInfo signalingInfo) {
         L.e(TAG, "----onHangup-----");
+        if (null == callDialog) return;
         Common.UIHandler.post(() -> {
             callDialog.dismiss();
         });

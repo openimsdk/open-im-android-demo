@@ -1,7 +1,6 @@
 package io.openim.android.ouicalling
 
 import android.content.Context
-import android.view.View
 import io.livekit.android.ConnectOptions
 import io.livekit.android.LiveKit
 import io.livekit.android.RoomOptions
@@ -12,22 +11,15 @@ import io.livekit.android.room.track.VideoTrack
 
 import io.openim.android.sdk.models.SignalingCertificate
 
-abstract class Continuation<in T> : kotlin.coroutines.Continuation<T> {
-    abstract fun resume(value: T)
-    abstract fun resumeWithException(exception: Throwable)
-    override fun resumeWith(result: Result<T>) = result.fold(::resume, ::resumeWithException)
-}
 
 object LiveKitLaunch {
-
-      suspend fun launch(context: Context, signalingCertificate: SignalingCertificate, view: TextureViewRenderer) {
-        val room = LiveKit.create(
+      suspend fun launch(context: Context, signalingCertificate: SignalingCertificate, view: TextureViewRenderer){
+          val room = LiveKit.create(
             context,
             RoomOptions(),
         )
         // Setup event handling.
         room.events.collect { event ->
-            view
             when (event) {
                 is RoomEvent.TrackSubscribed -> onTrackSubscribed(event, view)
                 else -> {}

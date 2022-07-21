@@ -81,7 +81,7 @@ public class SearchVM extends BaseViewModel {
         if (isPerson)
             OpenIMClient.getInstance().friendshipManager.addFriend(callBack, searchContent, hail.getValue());
         else
-            OpenIMClient.getInstance().groupManager.joinGroup(callBack, searchContent, hail.getValue());
+            OpenIMClient.getInstance().groupManager.joinGroup(callBack, searchContent, hail.getValue(),2);
     }
 
     public void search() {

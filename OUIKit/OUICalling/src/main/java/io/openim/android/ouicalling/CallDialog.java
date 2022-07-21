@@ -1,13 +1,12 @@
 package io.openim.android.ouicalling;
 
-import android.app.Activity;
+
+import android.app.Application;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+
 import android.os.Build;
+
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -15,7 +14,9 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
+
 
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
@@ -25,14 +26,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.livekit.android.LiveKit;
-import io.livekit.android.LiveKitOverrides;
-import io.livekit.android.RoomOptions;
-import io.livekit.android.room.Room;
-import io.livekit.android.room.RoomListener;
+;
 import io.openim.android.ouicalling.databinding.DialogCallBinding;
 import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.sdk.OpenIMClient;
@@ -44,20 +42,27 @@ import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
+import kotlin.jvm.functions.Function2;
+import kotlinx.coroutines.BuildersKt;
+import kotlinx.coroutines.CoroutineScope;
+import kotlinx.coroutines.CoroutineStart;
+import kotlinx.coroutines.Dispatchers;
+import kotlinx.coroutines.GlobalScope;
 import okio.Sink;
 
 
 public class CallDialog extends BaseDialog {
 
-    private boolean hasShoot;
+
+    private final CallViewModel callViewModel;
     private Context context;
     private DialogCallBinding view;
 
     public CallDialog(@NonNull Context context) {
         super(context);
         this.context = context;
-        hasShoot = AndPermission.hasPermissions(context, Permission.CAMERA, Permission.RECORD_AUDIO);
         initView();
+        callViewModel=new CallViewModel((Application) context);
     }
 
     private void initView() {
@@ -107,10 +112,10 @@ public class CallDialog extends BaseDialog {
         view.hangUp.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                OpenIMClient.getInstance().signalingManager.signalingHungUp(new OnBase<SignalingCertificate>() {
+                OpenIMClient.getInstance().signalingManager.signalingReject(new OnBase<SignalingCertificate>() {
                     @Override
                     public void onError(int code, String error) {
-                        Toast.makeText(context, error + code, Toast.LENGTH_SHORT).show();
+                        dismiss();
                     }
 
                     @Override
@@ -123,24 +128,7 @@ public class CallDialog extends BaseDialog {
         view.answer.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                if (hasShoot)
-                    accept(signalingInfo);
-                else {
-                    AndPermission.with(context)
-                        .runtime()
-                        .permission(Permission.CAMERA, Permission.RECORD_AUDIO)
-                        .onGranted(permissions -> {
-                            // Storage permission are allowed.
-                            hasShoot = true;
-                            accept(signalingInfo);
-                        })
-                        .onDenied(permissions -> {
-                            // Storage permission are not allowed.
-
-                        })
-                        .start();
-                }
-
+                accept(signalingInfo);
             }
         });
     }
@@ -149,23 +137,24 @@ public class CallDialog extends BaseDialog {
         OpenIMClient.getInstance().signalingManager.signalingAccept(new OnBase<SignalingCertificate>() {
             @Override
             public void onError(int code, String error) {
-                Toast.makeText(context, error + code, Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
             public void onSuccess(SignalingCertificate data) {
                 // Create Room object.
-                LiveKitLaunch.INSTANCE.launch(context, data, view.speakerVideoView, new Continuation<Unit>() {
-                    @Override
-                    public void resumeWith(@NonNull Object o) {
-
-                    }
-
+                callViewModel.getRoom().initVideoRenderer(view.speakerVideoView);
+                callViewModel.connectToRoom(data.getLiveURL(), data.getToken(), new Continuation<Unit>() {
+                    @NonNull
                     @Override
                     public CoroutineContext getContext() {
                         return EmptyCoroutineContext.INSTANCE;
                     }
 
+                    @Override
+                    public void resumeWith(@NonNull Object o) {
+
+                    }
                 });
             }
         }, signalingInfo);
@@ -175,4 +164,6 @@ public class CallDialog extends BaseDialog {
     public void show() {
         super.show();
     }
+
+
 }

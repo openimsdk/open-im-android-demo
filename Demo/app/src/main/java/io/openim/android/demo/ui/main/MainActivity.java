@@ -47,10 +47,12 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
     private int mCurrentTabIndex;
     private BaseFragment lastFragment, conversationListFragment, contactFragment, personalFragment;
-    private boolean hasScanPermission;
+    private boolean hasScanPermission, hasShoot;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        hasShoot = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.RECORD_AUDIO);
         AndPermission.with(this).overlay().start();
         bindVM(MainVM.class);
         super.onCreate(savedInstanceState);
@@ -64,6 +66,24 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         click();
 
         hasScanPermission = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!hasShoot) {
+            AndPermission.with(this)
+                .runtime()
+                .permission(Permission.CAMERA, Permission.RECORD_AUDIO)
+                .onGranted(permissions -> {
+                    // Storage permission are allowed.
+                    hasShoot = true;
+                })
+                .onDenied(permissions -> {
+                    // Storage permission are not allowed.
+                })
+                .start();
+        }
     }
 
     private void click() {

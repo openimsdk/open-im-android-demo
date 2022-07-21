@@ -23,6 +23,7 @@ import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.ReadReceiptInfo;
+import io.openim.android.sdk.models.RevokedInfo;
 
 public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> implements OnConversationListener, OnAdvanceMsgListener {
     public MutableLiveData<List<MsgConversation>> conversations = new MutableLiveData<>(new ArrayList<>());
@@ -131,6 +132,11 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     @Override
     public void onRecvMessageRevoked(String msgId) {
+
+    }
+
+    @Override
+    public void onRecvMessageRevokedV2(RevokedInfo info) {
 
     }
 
