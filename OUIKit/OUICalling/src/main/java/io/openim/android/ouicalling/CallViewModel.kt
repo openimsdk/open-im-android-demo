@@ -8,6 +8,7 @@ import io.livekit.android.RoomOptions
 import io.livekit.android.audio.AudioSwitchHandler
 import io.livekit.android.events.RoomEvent
 import io.livekit.android.events.collect
+import io.livekit.android.renderer.TextureViewRenderer
 import io.livekit.android.room.Room
 import io.livekit.android.room.participant.LocalParticipant
 import io.livekit.android.room.participant.Participant
@@ -18,6 +19,7 @@ import io.openim.android.ouicore.base.BaseViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import livekit.LivekitRtc
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -160,6 +162,10 @@ class CallViewModel(
         mutablePrimarySpeaker.value = speaker
     }
 
+    fun getVideoTrack(participant: Participant): VideoTrack? {
+        return participant.getTrackPublication(Track.Source.CAMERA)?.track as? VideoTrack
+    }
+
     fun startScreenCapture(mediaProjectionPermissionResultData: Intent) {
         val localParticipant = room.localParticipant
         viewModelScope.launch {
@@ -177,6 +183,7 @@ class CallViewModel(
             mutableScreencastEnabled.postValue(screencastTrack.enabled)
         }
     }
+
 
     fun stopScreenCapture() {
         viewModelScope.launch {

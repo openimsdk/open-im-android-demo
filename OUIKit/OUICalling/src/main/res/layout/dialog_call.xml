@@ -11,9 +11,17 @@
 
 
     <io.livekit.android.renderer.TextureViewRenderer
-        android:id="@+id/speakerVideoView"
+        android:id="@+id/remoteSpeakerVideoView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <io.livekit.android.renderer.TextureViewRenderer
+        android:id="@+id/localSpeakerVideoView"
+        android:layout_width="107dp"
+        android:layout_height="197dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="48dp"
+        android:layout_marginRight="13dp" />
 
     <ImageView
         android:id="@+id/zoomOut"

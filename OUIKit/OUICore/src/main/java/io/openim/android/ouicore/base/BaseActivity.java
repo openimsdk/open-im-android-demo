@@ -62,7 +62,8 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OpenIMClient.getInstance().signalingManager.setSignalingListener(callingService);
+        if (null != callingService)
+            OpenIMClient.getInstance().signalingManager.setSignalingListener(callingService);
         ActionBar actionBar = getSupportActionBar();
         if (null != actionBar)
             actionBar.hide();

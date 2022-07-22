@@ -20,15 +20,13 @@ import io.openim.android.sdk.models.SignalingInfo;
 
 @Route(path = Routes.Service.CALLING)
 public class CallingServiceImp implements CallingService {
-    private static final String TAG = "CallingServiceImp";
-    private CallDialog callDialog;
+    public static final String TAG = "CallingServiceImp";
     private Context context;
-    private CallViewModel callViewModel;
+    private CallDialog callDialog;
 
     @Override
     public void init(Context context) {
         this.context = context;
-        callDialog =new CallDialog(context);
     }
     @Override
     public void onInvitationCancelled(SignalingInfo s) {
@@ -65,9 +63,9 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onReceiveNewInvitation(SignalingInfo s) {
         L.e(TAG, "----onReceiveNewInvitation-----");
-        if (null == callDialog) return;
         Common.UIHandler.post(() -> {
             AndPermission.with(context).overlay().onGranted(data -> {
+                callDialog =new CallDialog(context);
                 callDialog.bindData(s);
                 callDialog.show();
             }).start();

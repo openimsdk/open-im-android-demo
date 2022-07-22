@@ -6,7 +6,6 @@ import android.content.Context;
 
 import android.os.Build;
 
-import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -14,25 +13,23 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
+import androidx.annotation.Nullable;
 
-
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 ;
+import io.livekit.android.room.participant.Participant;
+import io.livekit.android.room.participant.RemoteParticipant;
+import io.livekit.android.room.track.VideoTrack;
+import io.livekit.android.room.track.video.ViewVisibility;
 import io.openim.android.ouicalling.databinding.DialogCallBinding;
 import io.openim.android.ouicore.base.BaseDialog;
-import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
-import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.SignalingCertificate;
@@ -42,27 +39,24 @@ import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
-import kotlin.jvm.functions.Function2;
-import kotlinx.coroutines.BuildersKt;
-import kotlinx.coroutines.CoroutineScope;
-import kotlinx.coroutines.CoroutineStart;
-import kotlinx.coroutines.Dispatchers;
-import kotlinx.coroutines.GlobalScope;
-import okio.Sink;
+import kotlinx.coroutines.flow.FlowCollector;
 
 
 public class CallDialog extends BaseDialog {
 
 
-    private final CallViewModel callViewModel;
+    private final CallViewModel callingVM;
     private Context context;
     private DialogCallBinding view;
+    private VideoTrack localVideoTrack, remoteVideoTrack;
 
     public CallDialog(@NonNull Context context) {
         super(context);
         this.context = context;
         initView();
-        callViewModel=new CallViewModel((Application) context);
+        callingVM = new CallViewModel((Application) context);
+        callingVM.getRoom().initVideoRenderer(view.localSpeakerVideoView);
+        callingVM.getRoom().initVideoRenderer(view.remoteSpeakerVideoView);
     }
 
     private void initView() {
@@ -137,14 +131,13 @@ public class CallDialog extends BaseDialog {
         OpenIMClient.getInstance().signalingManager.signalingAccept(new OnBase<SignalingCertificate>() {
             @Override
             public void onError(int code, String error) {
-
+                L.e(CallingServiceImp.TAG, error + code);
             }
 
             @Override
             public void onSuccess(SignalingCertificate data) {
-                // Create Room object.
-                callViewModel.getRoom().initVideoRenderer(view.speakerVideoView);
-                callViewModel.connectToRoom(data.getLiveURL(), data.getToken(), new Continuation<Unit>() {
+                L.e(CallingServiceImp.TAG, data.getToken());
+                callingVM.connectToRoom(data.getLiveURL(), data.getToken(), new Continuation<Unit>() {
                     @NonNull
                     @Override
                     public CoroutineContext getContext() {
@@ -153,7 +146,38 @@ public class CallDialog extends BaseDialog {
 
                     @Override
                     public void resumeWith(@NonNull Object o) {
+                        callingVM.getParticipants().collect((participants, continuation) -> {
 
+                            for (int i = 0; i < participants.size(); i++) {
+                                Participant participant = participants.get(i);
+                                VideoTrack videoTrack = callingVM.getVideoTrack(participant);
+                                if (null != videoTrack) {
+                                    videoTrack.addRenderer(i == 0 ? view.localSpeakerVideoView : view.remoteSpeakerVideoView);
+                                }
+                            }
+                            return null;
+                        }, new Continuation<Unit>() {
+                            @NonNull
+                            @Override
+                            public CoroutineContext getContext() {
+                                return EmptyCoroutineContext.INSTANCE;
+                            }
+
+                            @Override
+                            public void resumeWith(@NonNull Object o) {
+
+                            }
+                        });
+//                        localVideoTrack = callingVM.getVideoTrack(callingVM.getRoom().getLocalParticipant());
+//                        Map<String, RemoteParticipant> remoteParticipants = callingVM.getRoom().getRemoteParticipants();
+//                        if (!remoteParticipants.isEmpty()){
+//                            Collection<RemoteParticipant> values=remoteParticipants.values();
+//                            remoteVideoTrack = callingVM.getVideoTrack(((RemoteParticipant)values.toArray()[0]));
+//                        }
+//                        if (null != localVideoTrack)
+//                            localVideoTrack.addRenderer(view.localSpeakerVideoView);
+//                        if (null != remoteVideoTrack)
+//                            remoteVideoTrack.addRenderer(view.remoteSpeakerVideoView);
                     }
                 });
             }
@@ -165,5 +189,11 @@ public class CallDialog extends BaseDialog {
         super.show();
     }
 
+    @Override
+    public void dismiss() {
+        if (null != localVideoTrack)
+            localVideoTrack.removeRenderer(view.localSpeakerVideoView);
 
+        super.dismiss();
+    }
 }
