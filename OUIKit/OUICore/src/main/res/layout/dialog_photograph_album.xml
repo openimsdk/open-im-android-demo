@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/album"
+        android:id="@+id/menu1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -19,7 +19,7 @@
     <include layout="@layout/view_dividing_line" />
 
     <TextView
-        android:id="@+id/shoot"
+        android:id="@+id/menu2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -35,6 +35,7 @@
         android:layout_height="7dp" />
 
     <TextView
+        android:id="@+id/menu3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"

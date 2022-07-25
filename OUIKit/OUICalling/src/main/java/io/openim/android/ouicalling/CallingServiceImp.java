@@ -2,7 +2,9 @@ package io.openim.android.ouicalling;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Build;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -16,6 +18,8 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
+import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.models.SignalingCertificate;
 import io.openim.android.sdk.models.SignalingInfo;
 
 @Route(path = Routes.Service.CALLING)
@@ -28,6 +32,7 @@ public class CallingServiceImp implements CallingService {
     public void init(Context context) {
         this.context = context;
     }
+
     @Override
     public void onInvitationCancelled(SignalingInfo s) {
         L.e(TAG, "----onInvitationCancelled-----");
@@ -43,6 +48,8 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onInviteeAccepted(SignalingInfo s) {
         L.e(TAG, "----onInviteeAccepted-----");
+        if (null != callDialog)
+            callDialog.otherSideAccepted();
     }
 
     @Override
@@ -53,6 +60,7 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onInviteeRejected(SignalingInfo s) {
         L.e(TAG, "----onInviteeRejected-----");
+        callDialog.dismiss();
     }
 
     @Override
@@ -60,13 +68,14 @@ public class CallingServiceImp implements CallingService {
         L.e(TAG, "----onInviteeRejectedByOtherDevice-----");
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
-    public void onReceiveNewInvitation(SignalingInfo s) {
+    public void onReceiveNewInvitation(SignalingInfo signalingInfo) {
         L.e(TAG, "----onReceiveNewInvitation-----");
         Common.UIHandler.post(() -> {
             AndPermission.with(context).overlay().onGranted(data -> {
-                callDialog =new CallDialog(context);
-                callDialog.bindData(s);
+                callDialog = new CallDialog(context, this);
+                callDialog.bindData(signalingInfo);
                 callDialog.show();
             }).start();
         });
@@ -79,6 +88,14 @@ public class CallingServiceImp implements CallingService {
         Common.UIHandler.post(() -> {
             callDialog.dismiss();
         });
+    }
+
+
+    @Override
+    public void call(boolean isVideoCalls, SignalingInfo signalingInfo) {
+        callDialog = new CallDialog(context, this, true, signalingInfo);
+        callDialog.bindData(signalingInfo);
+        callDialog.show();
     }
 }
 

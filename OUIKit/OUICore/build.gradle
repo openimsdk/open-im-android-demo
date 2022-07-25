@@ -75,7 +75,7 @@ dependencies {
     implementation 'com.alibaba:arouter-api:1.5.2'
 
     //openIM sdk
-    api 'io.openim:android-sdk:2.3.0@aar'
-    implementation 'io.openim:core-sdk:2.3.0@aar'
+    api 'io.openim:android-sdk:2.3.0.1@aar'
+    api 'io.openim:core-sdk:2.3.0-rc0@aar'
     implementation 'com.google.code.gson:gson:2.9.0'
 }

@@ -9,8 +9,8 @@ pluginManagement {
             url 'http://121.37.25.71:8081/repository/maven2/'
         }
         maven { url 'https://jitpack.io' }
-        google()
-        mavenCentral()
+//        google()
+//        mavenCentral()
     }
 }
 dependencyResolutionManagement {
@@ -25,8 +25,8 @@ dependencyResolutionManagement {
             url 'http://121.37.25.71:8081/repository/maven2/'
         }
         maven { url 'https://jitpack.io' }
-        google()
-        mavenCentral()
+//        google()
+//        mavenCentral()
     }
 }
 rootProject.name = "Demo"
@@ -42,6 +42,9 @@ include ':OUIContact'
 project(':OUIContact').projectDir = new File(settingsDir, '../OUIKit/OUIContact')
 include ':OUICalling'
 project(':OUICalling').projectDir = new File(settingsDir, '../OUIKit/OUICalling')
+include ':aar-spotify'
+project(':aar-spotify').projectDir = new File(settingsDir, '../OUIKit/aar-spotify')
+//include ':livekit-android-sdk'
+//project(':livekit-android-sdk').projectDir = new File(settingsDir, '../OUIKit/livekit-android-sdk')
 
-include ':livekit-android-sdk'
-project(':livekit-android-sdk').projectDir = new File(settingsDir, '../OUIKit/livekit-android-sdk')
+

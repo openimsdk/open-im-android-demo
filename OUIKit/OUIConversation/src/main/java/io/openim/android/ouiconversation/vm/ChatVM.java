@@ -40,6 +40,7 @@ import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.ReadReceiptInfo;
 import io.openim.android.sdk.models.RevokedInfo;
+import io.openim.android.sdk.models.UserInfo;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener {
     //通知消息
@@ -63,7 +64,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public int count = 20; //条数
     public Message loading, forwardMsg;
 
-
     @Override
     protected void viewCreate() {
         super.viewCreate();
@@ -79,6 +79,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             listener();
 
         IMEvent.getInstance().addAdvanceMsgListener(this);
+
     }
 
     @Override

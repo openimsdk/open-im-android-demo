@@ -7,7 +7,7 @@ import android.content.DialogInterface;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class BaseDialog  extends Dialog implements DialogInterface {
+public class BaseDialog extends Dialog implements DialogInterface {
     public BaseDialog(@NonNull Context context) {
         super(context);
     }

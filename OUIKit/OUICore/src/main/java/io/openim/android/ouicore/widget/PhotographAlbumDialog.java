@@ -154,10 +154,10 @@ public class PhotographAlbumDialog extends BaseDialog {
 
 
     private void click() {
-        view.album.setOnClickListener(v -> {
+        view.menu1.setOnClickListener(v -> {
             showMediaPicker();
         });
-        view.shoot.setOnClickListener(v -> {
+        view.menu2.setOnClickListener(v -> {
             takePhoto();
         });
     }

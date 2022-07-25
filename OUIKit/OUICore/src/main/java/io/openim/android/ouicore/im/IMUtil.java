@@ -17,6 +17,9 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.Message;
 
 public class IMUtil {
+    //android PlatformID 2
+    public static final int PLATFORM_ID = 2;
+
     /**
      * 会话排序比较器
      */

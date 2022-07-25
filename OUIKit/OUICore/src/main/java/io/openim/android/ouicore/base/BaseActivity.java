@@ -55,7 +55,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     protected T vm;
     protected A view;
     private String vmCanonicalName;
-    private CallingService callingService = (CallingService) ARouter.getInstance()
+    protected CallingService callingService = (CallingService) ARouter.getInstance()
         .build(Routes.Service.CALLING).navigation();
 
 

@@ -54,6 +54,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     protected void onCreate(Bundle savedInstanceState) {
         hasShoot = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.RECORD_AUDIO);
         AndPermission.with(this).overlay().start();
+
         bindVM(MainVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMainBinding.inflate(getLayoutInflater()));

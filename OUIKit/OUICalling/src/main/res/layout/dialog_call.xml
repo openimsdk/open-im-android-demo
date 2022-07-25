@@ -13,7 +13,7 @@
     <io.livekit.android.renderer.TextureViewRenderer
         android:id="@+id/remoteSpeakerVideoView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent" />
 
     <io.livekit.android.renderer.TextureViewRenderer
         android:id="@+id/localSpeakerVideoView"
@@ -37,6 +37,7 @@
         android:layout_below="@id/zoomOut"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="35dp"
+        android:id="@+id/headTips"
         android:orientation="horizontal">
 
         <io.openim.android.ouicore.widget.AvatarImage
@@ -60,6 +61,7 @@
                 android:textSize="32sp" />
 
             <TextView
+                android:id="@+id/callingTips"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/Invite_a_video_call"
@@ -70,6 +72,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ask"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -78,7 +81,7 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:id="@+id/hangUp"
+            android:id="@+id/reject"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -125,6 +128,67 @@
                 android:textColor="#ffffffff"
                 android:textSize="16sp" />
         </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/callingMenu"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="68dp"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/micIsOn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:button="@null"
+            android:drawableTop="@drawable/selector_mic"
+            android:drawablePadding="15dp"
+            android:text="@string/microphone_on"
+            android:textColor="#ffffffff"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:id="@+id/hangUp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="15dp"
+                android:background="@drawable/sty_radius_30_red"
+                android:padding="20dp"
+                android:src="@mipmap/ic_hang_up" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:shadowColor="#80000000"
+                android:text="@string/hang_up"
+                android:textColor="#ffffffff"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/speakerIsOn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/speaker_on"
+            android:textColor="#ffffffff"
+            android:drawablePadding="15dp"
+            android:button="@null"
+            android:drawableTop="@drawable/selector_speaker"
+            android:textSize="16sp" />
+
     </LinearLayout>
 
 

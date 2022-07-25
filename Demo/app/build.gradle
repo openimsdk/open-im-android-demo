@@ -29,7 +29,7 @@ android {
             }
         }
         ndk {
-             rootProject.ext.androidConfig.abiFilters
+            rootProject.ext.androidConfig.abiFilters
         }
     }
 
