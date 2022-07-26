@@ -6,11 +6,14 @@ import android.media.AudioManager;
 import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 
 import org.webrtc.VideoSink;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.livekit.android.renderer.TextureViewRenderer;
 import io.livekit.android.room.participant.Participant;
@@ -22,6 +25,7 @@ import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.utils.CallingService;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
+import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.SignalingCertificate;
@@ -32,16 +36,21 @@ import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
 
 public class CallingVM {
+    //通话时间
+    private Timer timer;
+    private int second = 0;
+    public MutableLiveData<String> timeStr = new MutableLiveData<>("");
+
     //获取音频服务
     public AudioManager audioManager;
     private DialogInterface.OnDismissListener dismissListener;
-    private final CallViewModel callViewModel;
+    public final CallViewModel callViewModel;
+    public final CallingService callingService;
     private VideoTrack localVideoTrack;
-    private CallingService callingService;
     //是否是视频通话
-    public boolean isVideoCalls;
-    //已连接
-    public boolean isConnected;
+    public boolean isVideoCalls = true;
+    //已经开始通话
+    public boolean isStartCall;
     //呼出
     public boolean isCallOut;
 
@@ -49,14 +58,9 @@ public class CallingVM {
     private List<TextureViewRenderer> remoteSpeakerVideoViews;
 
 
-    public CallingVM(CallingService callingService, boolean isVideoCalls) {
-        this(callingService, isVideoCalls, false);
-    }
-
-    public CallingVM(CallingService callingService, boolean isVideoCalls,
+    public CallingVM(CallingService callingService,
                      boolean isCallOut) {
         this.callingService = callingService;
-        this.isVideoCalls = isVideoCalls;
         this.isCallOut = isCallOut;
 
         callViewModel = new CallViewModel(BaseApp.inst());
@@ -80,15 +84,34 @@ public class CallingVM {
         callViewModel.getRoom().initVideoRenderer(localSpeakerVideoView);
     }
 
+    public void setVideoCalls(boolean videoCalls) {
+        isVideoCalls = videoCalls;
+    }
+
+    private OnBase<SignalingCertificate> callBackDismissUI = new OnBase<SignalingCertificate>() {
+        @Override
+        public void onError(int code, String error) {
+            L.e(CallingServiceImp.TAG, error+"-"+code);
+            dismissUI();
+        }
+
+        @Override
+        public void onSuccess(SignalingCertificate data) {
+            dismissUI();
+        }
+    };
+
     public void signalingInvite(SignalingInfo signalingInfo) {
         OpenIMClient.getInstance().signalingManager.signalingInvite(new OnBase<SignalingCertificate>() {
             @Override
             public void onError(int code, String error) {
+                L.e(CallingServiceImp.TAG, error+"-"+code);
                 dismissUI();
             }
 
             @Override
             public void onSuccess(SignalingCertificate data) {
+                L.e(CallingServiceImp.TAG, data.getToken());
                 connectToRoom(data);
             }
         }, signalingInfo);
@@ -110,6 +133,9 @@ public class CallingVM {
             @Override
             public void resumeWith(@NonNull Object o) {
                 audioManager.setSpeakerphoneOn(true);
+                if (!isVideoCalls)
+                    callViewModel.setCameraEnabled(false);
+
                 localVideoTrack = callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
                 if (null != localVideoTrack && null != localSpeakerVideoView)
                     localVideoTrack.addRenderer(localSpeakerVideoView);
@@ -154,22 +180,40 @@ public class CallingVM {
         });
     }
 
+    public void buildTimer() {
+        cancelTimer();
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                second++;
+                int minute = (second / 60);
+                int hour = (minute / 60);
+                if (hour != 0)
+                    timeStr.postValue(repair0(hour) + ":" + repair0(minute) + ":" + repair0(second));
+                else
+                    timeStr.postValue(repair0(minute) + ":" + repair0(second));
+            }
+        }, 0, 1000);
+    }
+
+    private String repair0(int v) {
+        return v < 10 ? ("0" + v) : (v + "");
+    }
+
+    private void cancelTimer() {
+        if (null != timer) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
     public void signalingHungUp(SignalingInfo signalingInfo) {
-        if (!isConnected) {
+        if (!isStartCall) {
             signalingCancel(signalingInfo);
             return;
         }
-        OpenIMClient.getInstance().signalingManager.signalingHungUp(new OnBase<SignalingCertificate>() {
-            @Override
-            public void onError(int code, String error) {
-                dismissUI();
-            }
-
-            @Override
-            public void onSuccess(SignalingCertificate data) {
-                dismissUI();
-            }
-        }, signalingInfo);
+        OpenIMClient.getInstance().signalingManager.signalingHungUp(callBackDismissUI, signalingInfo);
     }
 
     private void dismissUI() {
@@ -179,29 +223,9 @@ public class CallingVM {
 
     private void signalingCancel(SignalingInfo signalingInfo) {
         if (isCallOut)
-            OpenIMClient.getInstance().signalingManager.signalingCancel(new OnBase<SignalingCertificate>() {
-                @Override
-                public void onError(int code, String error) {
-                    dismissUI();
-                }
-
-                @Override
-                public void onSuccess(SignalingCertificate data) {
-                    dismissUI();
-                }
-            }, signalingInfo);
+            OpenIMClient.getInstance().signalingManager.signalingCancel(callBackDismissUI, signalingInfo);
         else
-            OpenIMClient.getInstance().signalingManager.signalingReject(new OnBase<SignalingCertificate>() {
-                @Override
-                public void onError(int code, String error) {
-                    dismissUI();
-                }
-
-                @Override
-                public void onSuccess(SignalingCertificate data) {
-                    dismissUI();
-                }
-            }, signalingInfo);
+            OpenIMClient.getInstance().signalingManager.signalingReject(callBackDismissUI, signalingInfo);
     }
 
     public void signalingAccept(SignalingInfo signalingInfo, OnBase onBase) {
@@ -217,15 +241,18 @@ public class CallingVM {
                 MediaPlayerUtil.INSTANCE.pause();
                 MediaPlayerUtil.INSTANCE.release();
 
-
+                isStartCall = true;
                 onBase.onSuccess(null);
                 connectToRoom(data);
+                buildTimer();
             }
         }, signalingInfo);
     }
 
     public void unBindView() {
         try {
+            callViewModel.onCleared();
+            cancelTimer();
             if (null != localVideoTrack)
                 localVideoTrack.removeRenderer(localSpeakerVideoView);
 
@@ -235,7 +262,7 @@ public class CallingVM {
                     ((VideoTrack) videoTask).removeRenderer(textureViewRenderer);
                 }
             }
-
+            L.e("unBindView");
         } catch (Exception e) {
             e.printStackTrace();
         }

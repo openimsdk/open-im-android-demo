@@ -59,6 +59,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <service
+            android:name="io.openim.android.ouicore.utils.WeakLockService"
+            android:process=":weakLock" />
     </application>
 
 </manifest>

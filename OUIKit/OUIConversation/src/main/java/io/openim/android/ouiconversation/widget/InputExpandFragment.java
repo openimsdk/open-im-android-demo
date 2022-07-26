@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -32,6 +34,7 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,19 +46,27 @@ import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
+import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.utils.CallingService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.MediaFileUtil;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.SignalingInfo;
 
 
 public class InputExpandFragment extends BaseFragment<ChatVM> {
-    public List<Integer> menuIcons = Arrays.asList(R.mipmap.ic_chat_photo, R.mipmap.ic_chat_shoot, R.mipmap.ic_chat_menu_file,
+    public List<Integer> menuIcons = Arrays.asList(R.mipmap.ic_chat_photo,
+        R.mipmap.ic_chat_shoot,
+        R.mipmap.ic_tools_video_call,
+        R.mipmap.ic_chat_menu_file,
         R.mipmap.ic_chat_location);
     public List<String> menuTitles = Arrays.asList(BaseApp.inst().getString(io.openim.android.ouicore.R.string.album),
-        BaseApp.inst().getString(io.openim.android.ouicore.R.string.shoot), BaseApp.inst().getString(io.openim.android.ouicore.R.string.file),
+        BaseApp.inst().getString(io.openim.android.ouicore.R.string.shoot), BaseApp.inst().getString(io.openim.android.ouicore.R.string.video_calls),
+        BaseApp.inst().getString(io.openim.android.ouicore.R.string.file),
         BaseApp.inst().getString(io.openim.android.ouicore.R.string.location));
 
     FragmentInputExpandBinding v;
@@ -95,9 +106,23 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                             goToShoot();
                             break;
                         case 2:
-                            gotoSelectFile();
+                            if (vm.isSingleChat){
+                                IMUtil.showBottomPopMenu(getContext(), (v1, keyCode, event) -> {
+                                    List<String> ids = new ArrayList<>();
+                                    ids.add(vm.otherSideID);
+                                    SignalingInfo signalingInfo =IMUtil.buildSignalingInfo(keyCode!=1, vm.isSingleChat,
+                                        ids, null);
+                                    CallingService callingService = (CallingService) ARouter.getInstance()
+                                        .build(Routes.Service.CALLING).navigation();
+                                    callingService.call(signalingInfo);
+                                    return false;
+                                });
+                            }
                             break;
                         case 3:
+                            gotoSelectFile();
+                            break;
+                        case 4:
                             gotoShareLocation();
                             break;
                     }
@@ -113,10 +138,10 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         Bundle resultBundle = result.getData().getBundleExtra("result");
         if (null == resultBundle) return;
 
-        Double latitude=resultBundle.getDouble("latitude");
-        Double longitude=resultBundle.getDouble("longitude");
-        String description=resultBundle.getString("description");
-        Message message=OpenIMClient.getInstance().messageManager.createLocationMessage(latitude,longitude,description);
+        Double latitude = resultBundle.getDouble("latitude");
+        Double longitude = resultBundle.getDouble("longitude");
+        String description = resultBundle.getString("description");
+        Message message = OpenIMClient.getInstance().messageManager.createLocationMessage(latitude, longitude, description);
         vm.sendMsg(message);
     });
 

@@ -1,11 +1,14 @@
 package io.openim.android.ouicore.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.KeyguardManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -99,6 +102,17 @@ public class Common {
         ClipboardManager cm = (ClipboardManager) BaseApp.inst().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData mClipData = ClipData.newPlainText("text", clip);
         cm.setPrimaryClip(mClipData);
+    }
+
+    public static void wakeUp(Context context){
+        //获取电源管理器对象
+        PowerManager pm=(PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        //获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
+        PowerManager.WakeLock wakeLock = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK,"openIM:bright");
+        //点亮屏幕
+        wakeLock.acquire();
+        //释放
+        new Handler().postDelayed(() -> wakeLock.release(), 5000);
     }
 }
 

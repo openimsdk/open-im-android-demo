@@ -11,8 +11,7 @@ import io.openim.android.sdk.models.SignalingInfo;
 
 public interface CallingService extends IProvider, OnSignalingListener {
     /**
-     * 电话
-     * @param isVideoCalls 是否是视频通话
+     * 呼叫
      */
-    void call(boolean isVideoCalls, SignalingInfo signalingInfo);
+    void call(SignalingInfo signalingInfo);
 }

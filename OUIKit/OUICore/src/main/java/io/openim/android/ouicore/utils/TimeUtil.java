@@ -8,6 +8,7 @@ import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 
 public class TimeUtil {
+    public final static String minuteTimeFormat = "mm:ss";
     public final static String hourTimeFormat = "HH:mm";
     public final static String monthTimeFormat = "M/d HH:mm";
     public final static String yearTimeFormat = "yyyy/M/d HH:mm";

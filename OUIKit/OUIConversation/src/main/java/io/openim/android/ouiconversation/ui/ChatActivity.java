@@ -35,6 +35,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.utils.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
@@ -160,21 +161,15 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     private void listener() {
         view.call.setOnClickListener(v -> {
             if (!vm.isSingleChat) return;
-            BottomPopDialog dialog = new BottomPopDialog(this);
-            dialog.show();
-            dialog.getMainView().menu3.setOnClickListener(v1 -> dialog.dismiss());
-            dialog.getMainView().menu1.setText(io.openim.android.ouicore.R.string.voice_calls);
-            dialog.getMainView().menu2.setText(io.openim.android.ouicore.R.string.video_calls);
-            List<String> ids = new ArrayList<>();
-            ids.add(vm.otherSideID);
-            dialog.getMainView().menu1.setOnClickListener(v1 -> {
-                toCall(false, ids, null);
-                dialog.dismiss();
-
-            });
-            dialog.getMainView().menu2.setOnClickListener(v1 -> {
-                toCall(true, ids, null);
-                dialog.dismiss();
+            IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
+                List<String> ids = new ArrayList<>();
+                ids.add(vm.otherSideID);
+                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1, vm.isSingleChat,
+                    ids, null);
+                CallingService callingService = (CallingService) ARouter.getInstance()
+                    .build(Routes.Service.CALLING).navigation();
+                callingService.call(signalingInfo);
+                return false;
             });
 
         });
@@ -247,26 +242,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
     }
 
-    private void toCall(boolean isVideoCalls, List<String> inviteeUserIDs, String groupID) {
-        if (null == callingService) return;
-        SignalingInfo signalingInfo = new SignalingInfo();
-        String inId = BaseApp.inst().loginCertificate.userID;
-        signalingInfo.setOpUserID(inId);
-        SignalingInvitationInfo signalingInvitationInfo = new SignalingInvitationInfo();
-        signalingInvitationInfo.setInviterUserID(inId);
-        signalingInvitationInfo.setInviteeUserIDList(inviteeUserIDs);
-        signalingInvitationInfo.setRoomID(String.valueOf(UUID.randomUUID()));
-        signalingInvitationInfo.setTimeout(30);
-        signalingInvitationInfo.setMediaType(isVideoCalls ? "video" : "audio");
-        signalingInvitationInfo.setPlatformID(IMUtil.PLATFORM_ID);
-        signalingInvitationInfo.setSessionType(vm.isSingleChat?1:2);
-        signalingInvitationInfo.setGroupID(groupID);
-
-        signalingInfo.setInvitation(signalingInvitationInfo);
-        signalingInfo.setOfflinePushInfo(new OfflinePushInfo());
-        callingService.call(isVideoCalls, signalingInfo);
-
-    }
 
     @NonNull
     private List<Message> getSelectMsg() {

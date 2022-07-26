@@ -1,8 +1,12 @@
 package io.openim.android.ouicore.im;
 
+import android.content.Context;
+import android.view.View;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
@@ -13,8 +17,12 @@ import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.OfflinePushInfo;
+import io.openim.android.sdk.models.SignalingInfo;
+import io.openim.android.sdk.models.SignalingInvitationInfo;
 
 public class IMUtil {
     //android PlatformID 2
@@ -140,5 +148,54 @@ public class IMUtil {
                 break;
         }
         return lastMsg;
+    }
+
+    /**
+     * build SignalingInfo
+     *
+     * @param isVideoCalls   是否视频通话
+     * @param isSingleChat   是否单聊
+     * @param inviteeUserIDs 邀请ids
+     * @param groupID        群id
+     * @return
+     */
+    public static SignalingInfo buildSignalingInfo(boolean isVideoCalls, boolean isSingleChat,
+                                                   List<String> inviteeUserIDs, String groupID) {
+        SignalingInfo signalingInfo = new SignalingInfo();
+        String inId = BaseApp.inst().loginCertificate.userID;
+        signalingInfo.setOpUserID(inId);
+        SignalingInvitationInfo signalingInvitationInfo = new SignalingInvitationInfo();
+        signalingInvitationInfo.setInviterUserID(inId);
+        signalingInvitationInfo.setInviteeUserIDList(inviteeUserIDs);
+        signalingInvitationInfo.setRoomID(String.valueOf(UUID.randomUUID()));
+        signalingInvitationInfo.setTimeout(30);
+        signalingInvitationInfo.setMediaType(isVideoCalls ? "video" : "audio");
+        signalingInvitationInfo.setPlatformID(IMUtil.PLATFORM_ID);
+        signalingInvitationInfo.setSessionType(isSingleChat ? 1 : 2);
+        signalingInvitationInfo.setGroupID(groupID);
+
+        signalingInfo.setInvitation(signalingInvitationInfo);
+        signalingInfo.setOfflinePushInfo(new OfflinePushInfo());
+        return signalingInfo;
+    }
+
+    /**
+     * 弹出底部菜单选择 音视通话
+     */
+    public static void showBottomPopMenu(Context context, View.OnKeyListener v) {
+        BottomPopDialog dialog = new BottomPopDialog(context);
+        dialog.show();
+        dialog.getMainView().menu3.setOnClickListener(v1 -> dialog.dismiss());
+        dialog.getMainView().menu1.setText(io.openim.android.ouicore.R.string.voice_calls);
+        dialog.getMainView().menu2.setText(io.openim.android.ouicore.R.string.video_calls);
+
+        dialog.getMainView().menu1.setOnClickListener(v1 -> {
+            v.onKey(v1, 1, null);
+            dialog.dismiss();
+        });
+        dialog.getMainView().menu2.setOnClickListener(v1 -> {
+            v.onKey(v1, 2, null);
+            dialog.dismiss();
+        });
     }
 }

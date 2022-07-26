@@ -2,9 +2,12 @@ package io.openim.android.demo.ui.main;
 
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +42,7 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
+import io.openim.android.ouicore.utils.WeakLockService;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.ouicore.utils.Constant;
@@ -67,6 +71,8 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         click();
 
         hasScanPermission = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
+
+//        startService(new Intent(this, WeakLockService.class));
     }
 
     @Override

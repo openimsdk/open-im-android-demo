@@ -26,7 +26,7 @@ import io.openim.android.sdk.models.SignalingInfo;
 public class CallingServiceImp implements CallingService {
     public static final String TAG = "CallingServiceImp";
     private Context context;
-    private CallDialog callDialog;
+    public CallDialog callDialog;
 
     @Override
     public void init(Context context) {
@@ -36,8 +36,10 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onInvitationCancelled(SignalingInfo s) {
         L.e(TAG, "----onInvitationCancelled-----");
-        if (null == callDialog) return;
-        callDialog.dismiss();
+        Common.UIHandler.post(() -> {
+            if (null == callDialog) return;
+            callDialog.dismiss();
+        });
     }
 
     @Override
@@ -48,8 +50,10 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onInviteeAccepted(SignalingInfo s) {
         L.e(TAG, "----onInviteeAccepted-----");
-        if (null != callDialog)
-            callDialog.otherSideAccepted();
+            Common.UIHandler.post(() -> {
+                if (null == callDialog) return;
+                callDialog.otherSideAccepted();
+            });
     }
 
     @Override
@@ -60,7 +64,10 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onInviteeRejected(SignalingInfo s) {
         L.e(TAG, "----onInviteeRejected-----");
-        callDialog.dismiss();
+            Common.UIHandler.post(() -> {
+                if (null == callDialog) return;
+                callDialog.dismiss();
+            });
     }
 
     @Override
@@ -74,6 +81,7 @@ public class CallingServiceImp implements CallingService {
         L.e(TAG, "----onReceiveNewInvitation-----");
         Common.UIHandler.post(() -> {
             AndPermission.with(context).overlay().onGranted(data -> {
+                if (callDialog != null) return;
                 callDialog = new CallDialog(context, this);
                 callDialog.bindData(signalingInfo);
                 callDialog.show();
@@ -84,16 +92,16 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onHangup(SignalingInfo signalingInfo) {
         L.e(TAG, "----onHangup-----");
-        if (null == callDialog) return;
         Common.UIHandler.post(() -> {
+            if (null == callDialog) return;
             callDialog.dismiss();
         });
     }
 
 
     @Override
-    public void call(boolean isVideoCalls, SignalingInfo signalingInfo) {
-        callDialog = new CallDialog(context, this, true, signalingInfo);
+    public void call(SignalingInfo signalingInfo) {
+        callDialog = new CallDialog(context, this, true);
         callDialog.bindData(signalingInfo);
         callDialog.show();
     }
