@@ -90,4 +90,5 @@
     <string name="voice_calls">语音通话</string>
     <string name="video_calls">视频通话</string>
     <string name="waiting_tips">正在等待对方接受邀请</string>
+    <string name="Invite_a_audio_call">邀请你进行语音通话</string>
 </resources>
