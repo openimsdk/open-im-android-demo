@@ -32,6 +32,8 @@ public class Constant {
         public static final int READ_CHANGE = 10001;
         //转发选人
         public static final int FORWARD = 10002;
+        //音视频通话
+        public static final int CALLING_REQUEST_CODE = 10003;
     }
 
     //会话类型
@@ -45,7 +47,7 @@ public class Constant {
     public static final String K_IS_PERSON = "is_person";
     public static final String K_NOTICE = "notice";
     public static final String K_NAME = "name";
-    public static final String K_CONVERSATION_ID = "conversationID";
+    public static final String K_RESULT = "result";
 
     /**
      * 发送状态

@@ -36,6 +36,7 @@ import io.openim.android.demo.ui.search.AddConversActivity;
 import io.openim.android.demo.ui.search.PersonDetailActivity;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.demo.vm.MainVM;
+import io.openim.android.ouicalling.AudioVideoService;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.utils.Common;
@@ -60,8 +61,12 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         AndPermission.with(this).overlay().start();
 
         bindVM(MainVM.class);
+        vm.fromLogin = getIntent().getBooleanExtra(LoginActivity.FORM_LOGIN, false);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMainBinding.inflate(getLayoutInflater()));
+
+        if (null != callingService)
+            callingService.setClickNotificationToPage(this);
 
         sink();
 

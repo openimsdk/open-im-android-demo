@@ -22,9 +22,12 @@ import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityLoginBinding;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.SinkHelper;
 
-public class LoginActivity extends BaseActivity<LoginVM,ActivityLoginBinding> implements LoginVM.ViewAction {
+public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> implements LoginVM.ViewAction {
+
+    public static final String FORM_LOGIN = "form_login";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +90,8 @@ public class LoginActivity extends BaseActivity<LoginVM,ActivityLoginBinding> im
 
     @Override
     public void jump() {
-        startActivity(new Intent(this, MainActivity.class));
+        startActivity(new Intent(this, MainActivity.class).putExtra(FORM_LOGIN,
+            true));
         finish();
     }
 

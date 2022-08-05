@@ -70,6 +70,7 @@ dependencies {
     implementation project(':OUICore')
     implementation 'com.alibaba:arouter-api:1.5.2'
     annotationProcessor 'com.alibaba:arouter-compiler:1.5.2'
+    implementation 'me.weishu:free_reflection:2.2.0'
 
     //liveKit
     implementation project(':aar-spotify')

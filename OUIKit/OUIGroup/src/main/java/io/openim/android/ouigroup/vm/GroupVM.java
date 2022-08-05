@@ -48,8 +48,6 @@ public class GroupVM extends SocialityVM {
     public String groupId;
     public MutableLiveData<List<FriendInfo>> selectedFriendInfo = new MutableLiveData<>(new ArrayList<>());
     public LoginCertificate loginCertificate;
-    //是否是邀请入群
-    public boolean isInviteToGroup = false;
 
 
     @Override
@@ -165,7 +163,7 @@ public class GroupVM extends SocialityVM {
         OpenIMClient.getInstance().groupManager.getGroupMemberList(new OnBase<List<GroupMembersInfo>>() {
             @Override
             public void onError(int code, String error) {
-
+                IView.toast(error + "-" + code);
             }
 
             @Override
@@ -242,7 +240,7 @@ public class GroupVM extends SocialityVM {
     }
 
     /**
-     * 邀请入群
+     * 踢出群
      */
     public void kickGroupMember(List<FriendInfo> friendInfos) {
         List<String> userIds = new ArrayList<>();

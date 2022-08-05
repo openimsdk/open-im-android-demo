@@ -51,8 +51,10 @@ import io.openim.android.sdk.models.SignalingInvitationInfo;
 @Route(path = Routes.Conversation.CHAT)
 public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> implements ChatVM.ViewAction {
 
+
     private MessageAdapter messageAdapter;
     private BottomInputCote bottomInputCote;
+    private  boolean isVideoCalls;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,18 +162,23 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private void listener() {
         view.call.setOnClickListener(v -> {
-            if (!vm.isSingleChat) return;
             IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
-                List<String> ids = new ArrayList<>();
-                ids.add(vm.otherSideID);
-                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1, vm.isSingleChat,
-                    ids, null);
-                CallingService callingService = (CallingService) ARouter.getInstance()
-                    .build(Routes.Service.CALLING).navigation();
-                callingService.call(signalingInfo);
+                isVideoCalls=keyCode != 1;
+                if (vm.isSingleChat) {
+                    List<String> ids = new ArrayList<>();
+                    ids.add(vm.otherSideID);
+                    SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(isVideoCalls, vm.isSingleChat,
+                        ids, null);
+                    callingService.call(signalingInfo);
+                } else {
+                    ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
+                        .withBoolean("isSelectMember", true)
+                        .withInt("max_num", 9)
+                        .withString(Constant.K_GROUP_ID,vm.groupID)
+                        .navigation(this, Constant.Event.CALLING_REQUEST_CODE);
+                }
                 return false;
             });
-
         });
         view.delete.setOnClickListener(v -> {
             List<Message> selectMsg = getSelectMsg();
@@ -283,6 +290,13 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             else
                 forwardMsg = vm.forwardMsg;
             vm.aloneSendMsg(forwardMsg, id, groupId);
+        }
+        if (requestCode==Constant.Event.CALLING_REQUEST_CODE&& null != data){
+            //发起群通话
+            List<String> ids=data.getStringArrayListExtra(Constant.K_RESULT);
+            SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(isVideoCalls, false,
+                ids, vm.groupID);
+            callingService.call(signalingInfo);
         }
     }
 }

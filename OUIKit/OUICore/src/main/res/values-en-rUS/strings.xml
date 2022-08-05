@@ -87,4 +87,9 @@
     <string name="video_calls">视频通话</string>
     <string name="waiting_tips">正在等待对方接受邀请</string>
     <string name="Invite_a_audio_call">邀请你进行语音通话</string>
+    <string name="selete_member">选择成员</string>
+    <string name="invite_video_call">邀请你视频通话</string>
+    <string name="calling">正在通话中</string>
+    <string name="audio_video_service">音视频服务</string>
+    <string name="audio_video_service_tips1">已开启后台音视频服务</string>
 </resources>

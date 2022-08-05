@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import io.openim.android.ouicore.databinding.ItemGroupShowBinding;
+import io.openim.android.ouicore.databinding.ItemImgTxtBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonSelectBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonStickyBinding;
 
@@ -39,4 +40,13 @@ public class ViewHol {
             view = ItemGroupShowBinding.bind(this.itemView);
         }
     }
+    public static class ImageTxtViewHolder extends RecyclerView.ViewHolder {
+        public ItemImgTxtBinding view;
+
+        public ImageTxtViewHolder(@NonNull View itemView) {
+            super(ItemImgTxtBinding.inflate(LayoutInflater.from(itemView.getContext())).getRoot());
+            view = ItemImgTxtBinding.bind(this.itemView);
+        }
+    }
+
 }

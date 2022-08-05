@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import org.webrtc.VideoSink;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
@@ -44,6 +45,8 @@ public class CallingVM {
     //获取音频服务
     public AudioManager audioManager;
     private DialogInterface.OnDismissListener dismissListener;
+    private OnParticipantsChangeListener onParticipantsChangeListener;
+
     public final CallViewModel callViewModel;
     public final CallingService callingService;
     private VideoTrack localVideoTrack;
@@ -53,6 +56,8 @@ public class CallingVM {
     public boolean isStartCall;
     //呼出
     public boolean isCallOut;
+    //是否是群
+    public boolean isGroup;
 
     private TextureViewRenderer localSpeakerVideoView;
     private List<TextureViewRenderer> remoteSpeakerVideoViews;
@@ -74,6 +79,9 @@ public class CallingVM {
         }
     }
 
+    public void setOnParticipantsChangeListener(OnParticipantsChangeListener onParticipantsChangeListener) {
+        this.onParticipantsChangeListener = onParticipantsChangeListener;
+    }
 
     public void setDismissListener(DialogInterface.OnDismissListener dismissListener) {
         this.dismissListener = dismissListener;
@@ -91,7 +99,7 @@ public class CallingVM {
     private OnBase<SignalingCertificate> callBackDismissUI = new OnBase<SignalingCertificate>() {
         @Override
         public void onError(int code, String error) {
-            L.e(CallingServiceImp.TAG, error+"-"+code);
+            L.e(CallingServiceImp.TAG, error + "-" + code);
             dismissUI();
         }
 
@@ -105,7 +113,7 @@ public class CallingVM {
         OpenIMClient.getInstance().signalingManager.signalingInvite(new OnBase<SignalingCertificate>() {
             @Override
             public void onError(int code, String error) {
-                L.e(CallingServiceImp.TAG, error+"-"+code);
+                L.e(CallingServiceImp.TAG, error + "-" + code);
                 dismissUI();
             }
 
@@ -142,27 +150,40 @@ public class CallingVM {
 
                 callViewModel.getParticipants().collect((participants, continuation) -> {
                     if (participants.isEmpty()) return null;
-                    if (participants.size() == 1 && !isCallOut) {
+                    if (!isGroup && !isCallOut &&participants.size() == 1) {
                         callingService.onHangup(null);
                         return null;
                     }
-                    for (int i = 0; i < participants.size(); i++) {
-                        Participant participant = participants.get(i);
-                        if (participant instanceof RemoteParticipant) {
-                            callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoViews.get(0), participant, new Continuation<Unit>() {
-                                @NonNull
-                                @Override
-                                public CoroutineContext getContext() {
-                                    return EmptyCoroutineContext.INSTANCE;
-                                }
+                    if (null != onParticipantsChangeListener) {
+                        List<Participant> participantList = new ArrayList<>();
+                        for (Participant participant : participants) {
+                            if (participant instanceof RemoteParticipant)
+                                participantList.add(participant);
+                        }
+                        onParticipantsChangeListener.onChange(participantList);
+                    } else {
+                        for (int i = 0; i < participants.size(); i++) {
+                            Participant participant = participants.get(i);
+                            if (participant instanceof RemoteParticipant) {
+                                for (TextureViewRenderer remoteSpeakerVideoView
+                                    : remoteSpeakerVideoViews) {
+                                    callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoView, participant, new Continuation<Unit>() {
+                                        @NonNull
+                                        @Override
+                                        public CoroutineContext getContext() {
+                                            return EmptyCoroutineContext.INSTANCE;
+                                        }
 
-                                @Override
-                                public void resumeWith(@NonNull Object o) {
+                                        @Override
+                                        public void resumeWith(@NonNull Object o) {
 
+                                        }
+                                    });
                                 }
-                            });
+                            }
                         }
                     }
+
                     return null;
                 }, new Continuation<Unit>() {
                     @NonNull
@@ -266,5 +287,10 @@ public class CallingVM {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    interface OnParticipantsChangeListener {
+        void onChange(List<Participant> participants);
     }
 }

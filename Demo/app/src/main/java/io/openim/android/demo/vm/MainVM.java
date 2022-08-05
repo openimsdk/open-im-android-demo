@@ -18,43 +18,52 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
 
     public MutableLiveData<String> nickname = new MutableLiveData<>("");
     public MutableLiveData<Integer> visibility = new MutableLiveData<>(View.INVISIBLE);
-
+    public boolean fromLogin;
 
     @Override
     protected void viewCreate() {
         IMEvent.getInstance().addConnListener(this);
-
         BaseApp.inst().loginCertificate = LoginCertificate.getCache(getContext());
-        OpenIMClient.getInstance().login(new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-                    IView.err(error);
-            }
+        if (fromLogin) {
+            IView.initDate();
+            getSelfUserInfo();
+            onConnectSuccess();
+        } else {
+            OpenIMClient.getInstance().login(new OnBase<String>() {
+                @Override
+                public void onError(int code, String error) {
+                    IView.toast(error + code);
+                }
 
-            @Override
-            public void onSuccess(String data) {
-                L.e("user_token:"+BaseApp.inst().loginCertificate.token);
-                IView.initDate();
-                OpenIMClient.getInstance().userInfoManager.getSelfUserInfo(new OnBase<UserInfo>() {
-                    @Override
-                    public void onError(int code, String error) {
+                @Override
+                public void onSuccess(String data) {
+                    L.e("user_token:" + BaseApp.inst().loginCertificate.token);
+                    IView.initDate();
+                    getSelfUserInfo();
+                }
+            }, BaseApp.inst().loginCertificate.userID, BaseApp.inst().loginCertificate.token);
 
-                    }
-
-                    @Override
-                    public void onSuccess(UserInfo data) {
-                        // 返回当前登录用户的资料
-                        BaseApp.inst().loginCertificate.nickname = data.getNickname();
-                        BaseApp.inst().loginCertificate.faceURL = data.getFaceURL();
-                        BaseApp.inst().loginCertificate.cache(getContext());
-                        nickname.setValue(BaseApp.inst().loginCertificate.nickname);
-                    }
-                });
-            }
-        }, BaseApp.inst().loginCertificate.userID, BaseApp.inst().loginCertificate.token);
-
+        }
         if (null != BaseApp.inst().loginCertificate.nickname)
             nickname.setValue(BaseApp.inst().loginCertificate.nickname);
+    }
+
+    void getSelfUserInfo() {
+        OpenIMClient.getInstance().userInfoManager.getSelfUserInfo(new OnBase<UserInfo>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error + code);
+            }
+
+            @Override
+            public void onSuccess(UserInfo data) {
+                // 返回当前登录用户的资料
+                BaseApp.inst().loginCertificate.nickname = data.getNickname();
+                BaseApp.inst().loginCertificate.faceURL = data.getFaceURL();
+                BaseApp.inst().loginCertificate.cache(getContext());
+                nickname.setValue(BaseApp.inst().loginCertificate.nickname);
+            }
+        });
     }
 
     @Override

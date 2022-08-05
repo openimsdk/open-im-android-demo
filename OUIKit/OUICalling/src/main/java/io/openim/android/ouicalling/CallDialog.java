@@ -39,9 +39,9 @@ import io.reactivex.Observable;
 
 public class CallDialog extends BaseDialog {
 
-    private Context context;
+    protected Context context;
     private DialogCallBinding view;
-    private CallingVM callingVM;
+    public CallingVM callingVM;
 
 
     public CallDialog(@NonNull Context context, CallingService callingService) {
@@ -64,6 +64,10 @@ public class CallDialog extends BaseDialog {
             dismiss();
         });
         initView();
+        initRendererView();
+    }
+
+    public void initRendererView() {
         callingVM.setLocalSpeakerVideoView(view.localSpeakerVideoView);
         callingVM.initRemoteVideoRenderer(view.remoteSpeakerVideoView);
     }
@@ -93,6 +97,7 @@ public class CallDialog extends BaseDialog {
     }
 
     public void bindData(SignalingInfo signalingInfo) {
+        callingVM.isGroup = signalingInfo.getInvitation().getInviteeUserIDList().size() > 1;
         callingVM.setVideoCalls("video".equals(signalingInfo.getInvitation()
             .getMediaType()));
         if (!callingVM.isVideoCalls) {
@@ -112,11 +117,20 @@ public class CallDialog extends BaseDialog {
             view.callingMenu.setVisibility(View.GONE);
             view.ask.setVisibility(View.VISIBLE);
         }
+        bindUserInfo(signalingInfo);
+        listener(signalingInfo);
+    }
 
+    /**
+     * 绑定用户信息
+     */
+    public void bindUserInfo(SignalingInfo signalingInfo) {
         try {
             ArrayList<String> ids = new ArrayList<>();
-            ids.add(callingVM.isCallOut ? signalingInfo.getInvitation().getInviteeUserIDList().get(0)
+            ids.add(callingVM.isCallOut ?
+                signalingInfo.getInvitation().getInviteeUserIDList().get(0)
                 : signalingInfo.getInvitation().getInviterUserID());
+
             OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
                 @Override
                 public void onError(int code, String error) {
@@ -137,10 +151,9 @@ public class CallDialog extends BaseDialog {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        listener(signalingInfo);
     }
 
-    private final Observer<String> bindTime = new Observer<String>() {
+    public final Observer<String> bindTime = new Observer<String>() {
         @Override
         public void onChanged(String s) {
             if (TextUtils.isEmpty(s)) return;
@@ -149,7 +162,7 @@ public class CallDialog extends BaseDialog {
         }
     };
 
-    private void listener(SignalingInfo signalingInfo) {
+    public void listener(SignalingInfo signalingInfo) {
         callingVM.timeStr.observeForever(bindTime);
         view.micIsOn.setOnCheckedChangeListener((buttonView, isChecked) -> {
             view.micIsOn.setText(isChecked ? context.getString(io.openim.android.ouicore.R.string.microphone_on)
@@ -196,7 +209,7 @@ public class CallDialog extends BaseDialog {
     }
 
 
-    private void changeView() {
+    public void changeView() {
         view.headTips.setVisibility(View.GONE);
         view.ask.setVisibility(View.GONE);
         view.callingMenu.setVisibility(View.VISIBLE);
