@@ -2,7 +2,10 @@ package io.openim.android.ouicore.utils;
 
 public class Routes {
     public static class Service {
-        public final static String CALLING = "/Service/CallingServiceImp";
+        public final static String CALLING = "/CallingService/CallingServiceImp";
+
+        public static final String MAIN = "/MainService/ProviderService";
+        public static final String CONVERSATION = "/ConversationService/IBridgeImpl";
     }
 
     public static class Main {
@@ -10,6 +13,10 @@ public class Routes {
         public final static String SEND_VERIFY = "/main/SendVerifyActivity";
         //好友详情
         public final static String PERSON_DETAIL = "/main/PersonDetailActivity";
+        //首页
+        public final static String HOME = "/main/MainActivity";
+
+        public final static String SPLASH = "/main/SplashActivity";
     }
 
     //会话相关

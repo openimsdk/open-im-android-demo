@@ -63,4 +63,9 @@ public class BaseFragment<T extends BaseViewModel> extends Fragment implements I
     public void toast(String tips) {
         Toast.makeText(getContext(), tips, Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void close() {
+
+    }
 }

@@ -2,7 +2,7 @@ package io.openim.android.ouiconversation.ui;
 
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -13,8 +13,6 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -23,30 +21,21 @@ import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouiconversation.databinding.ActivityChatBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouiconversation.widget.BottomInputCote;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.im.IMUtil;
-import io.openim.android.ouicore.utils.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.widget.BottomPopDialog;
-import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.SignalingInfo;
-import io.openim.android.sdk.models.SignalingInvitationInfo;
 
 @Route(path = Routes.Conversation.CHAT)
 public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> implements ChatVM.ViewAction {
@@ -54,7 +43,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private MessageAdapter messageAdapter;
     private BottomInputCote bottomInputCote;
-    private  boolean isVideoCalls;
+    private boolean isVideoCalls;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +93,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         bottomInputCote.setChatVM(vm);
 
         view.nickName.setText(name);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutMg linearLayoutManager = new LinearLayoutMg(this);
         //倒叙
         linearLayoutManager.setStackFromEnd(true);
         linearLayoutManager.setReverseLayout(true);
@@ -163,7 +152,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     private void listener() {
         view.call.setOnClickListener(v -> {
             IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
-                isVideoCalls=keyCode != 1;
+                isVideoCalls = keyCode != 1;
                 if (vm.isSingleChat) {
                     List<String> ids = new ArrayList<>();
                     ids.add(vm.otherSideID);
@@ -174,7 +163,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                     ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
                         .withBoolean("isSelectMember", true)
                         .withInt("max_num", 9)
-                        .withString(Constant.K_GROUP_ID,vm.groupID)
+                        .withString(Constant.K_GROUP_ID, vm.groupID)
                         .navigation(this, Constant.Event.CALLING_REQUEST_CODE);
                 }
                 return false;
@@ -224,7 +213,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) view.recyclerView.getLayoutManager();
+                LinearLayoutMg linearLayoutManager = (LinearLayoutMg) view.recyclerView.getLayoutManager();
                 int firstVisiblePosition = linearLayoutManager.findFirstCompletelyVisibleItemPosition();
                 int lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
                 if (lastVisiblePosition == vm.messages.getValue().size() - 1
@@ -240,7 +229,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             @Override
             public void click(View v) {
                 if (vm.isSingleChat) {
-
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                        .withString(Constant.K_ID, vm.otherSideID).withBoolean(Constant.K_RESULT,
+                        true).navigation();
                 } else {
                     ARouter.getInstance().build(Routes.Group.MATERIAL)
                         .withString(Constant.K_GROUP_ID, vm.groupID).navigation();
@@ -273,6 +264,11 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     @Override
+    public void closePage() {
+        finish();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != RESULT_OK) return;
@@ -291,12 +287,27 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 forwardMsg = vm.forwardMsg;
             vm.aloneSendMsg(forwardMsg, id, groupId);
         }
-        if (requestCode==Constant.Event.CALLING_REQUEST_CODE&& null != data){
+        if (requestCode == Constant.Event.CALLING_REQUEST_CODE && null != data) {
             //发起群通话
-            List<String> ids=data.getStringArrayListExtra(Constant.K_RESULT);
+            List<String> ids = data.getStringArrayListExtra(Constant.K_RESULT);
             SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(isVideoCalls, false,
                 ids, vm.groupID);
             callingService.call(signalingInfo);
+        }
+    }
+
+    public static class LinearLayoutMg extends androidx.recyclerview.widget.LinearLayoutManager {
+        public LinearLayoutMg(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+            try {
+                super.onLayoutChildren(recycler, state);
+            } catch (IndexOutOfBoundsException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

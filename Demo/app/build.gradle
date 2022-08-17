@@ -12,7 +12,6 @@ android {
     dataBinding {
         enabled = true
     }
-
     defaultConfig {
         applicationId rootProject.ext.applicationId.app
         minSdk rootProject.ext.androidConfig.minSdk

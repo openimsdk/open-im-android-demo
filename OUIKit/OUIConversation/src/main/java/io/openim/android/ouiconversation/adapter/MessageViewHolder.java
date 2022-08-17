@@ -1,7 +1,6 @@
 package io.openim.android.ouiconversation.adapter;
 
 
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -171,7 +170,9 @@ public class MessageViewHolder {
                 }
                 bindLeft(itemView, message);
             }
-            unite();
+            try {
+                unite();
+            }catch (Exception ignored){}
         }
 
         /**
@@ -789,8 +790,12 @@ public class MessageViewHolder {
             view.sendState.setSendState(message.getStatus());
             MergeElem mergeElem = message.getMergeElem();
             view.content.setText(mergeElem.getTitle());
-            view.history11.setText(mergeElem.getAbstractList().get(0));
-            view.history12.setText(mergeElem.getAbstractList().get(1));
+            try {
+                view.history11.setText(mergeElem.getAbstractList().get(0));
+                view.history12.setText(mergeElem.getAbstractList().get(1));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             showMsgExMenu(view.contentLy);
             view.contentLy.setOnClickListener(clickJumpDetail);
         }
@@ -801,8 +806,12 @@ public class MessageViewHolder {
             view.sendState2.setSendState(message.getStatus());
             MergeElem mergeElem = message.getMergeElem();
             view.content2.setText(mergeElem.getTitle());
-            view.history21.setText(mergeElem.getAbstractList().get(0));
-            view.history22.setText(mergeElem.getAbstractList().get(1));
+            try {
+                view.history21.setText(mergeElem.getAbstractList().get(0));
+                view.history22.setText(mergeElem.getAbstractList().get(1));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             showMsgExMenu(view.contentLy2);
             view.contentLy2.setOnClickListener(clickJumpDetail);
         }

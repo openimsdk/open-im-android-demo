@@ -1,8 +1,6 @@
 package io.openim.android.demo.ui.search;
 
 
-
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -13,22 +11,28 @@ import com.alibaba.android.arouter.facade.callback.NavCallback;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityPersonDetailBinding;
 import io.openim.android.demo.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.sdk.models.FriendshipInfo;
+import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 @Route(path = Routes.Main.PERSON_DETAIL)
 public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonDetailBinding> {
+    private boolean formChat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,15 +46,24 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         vm.searchContent = getIntent().getStringExtra(Constant.K_ID);
         vm.searchPerson();
 
+        formChat = getIntent().getBooleanExtra(Constant.K_RESULT, false);
+
         click();
     }
 
 
     private void click() {
-        view.sendMsg.setOnClickListener(v -> ARouter.getInstance().build(Routes.Conversation.CHAT)
-            .withString(Constant.K_ID, vm.searchContent)
-            .withString(io.openim.android.ouicore.utils.Constant.K_NAME, vm.userInfo.getValue().get(0).getNickname())
-            .navigation());
+        view.sendMsg.setOnClickListener(v -> {
+                if (formChat) {
+                    finish();
+                } else {
+                    ARouter.getInstance().build(Routes.Conversation.CHAT)
+                        .withString(Constant.K_ID, vm.searchContent)
+                        .withString(Constant.K_NAME, vm.userInfo.getValue().get(0).getNickname())
+                        .navigation();
+                }
+            }
+        );
 
 
         view.addFriend.setOnClickListener(v -> {
@@ -65,6 +78,17 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             mainView.confirm.setOnClickListener(v1 -> {
                 commonDialog.dismiss();
                 vm.deleteFriend(vm.searchContent);
+            });
+        });
+
+        view.call.setOnClickListener(v -> {
+            IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
+                List<String> ids = new ArrayList<>();
+                ids.add(vm.searchContent);
+                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1, true,
+                    ids, null);
+                callingService.call(signalingInfo);
+                return false;
             });
         });
     }

@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.github.promeg.pinyinhelper.Pinyin;
 
 import java.util.ArrayList;
@@ -11,15 +12,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
 
+import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.Common;
 
 
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SocialityVM;
+import io.openim.android.ouicore.widget.CommonDialog;
+import io.openim.android.ouigroup.R;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
@@ -287,5 +293,57 @@ public class GroupVM extends SocialityVM {
         GroupInfo groupInfo = groupsInfo.getValue();
         if (null == groupInfo) return false;
         return groupInfo.getOwnerUserID().equals(loginCertificate.userID);
+    }
+
+    public void getGroupMembersInfo(OnBase<List<GroupMembersInfo>> onBase, List<String> uIds) {
+        OpenIMClient.getInstance().groupManager.getGroupMembersInfo(onBase, groupId, uIds);
+    }
+
+    public void dissolveGroup() {
+        CommonDialog commonDialog = new CommonDialog(getContext());
+        commonDialog.show();
+        commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.dissolve_tips);
+        commonDialog.getMainView().cancel.setOnClickListener(v -> commonDialog.dismiss());
+        commonDialog.getMainView().confirm.setOnClickListener(v -> OpenIMClient.getInstance().groupManager.dismissGroup(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error + code);
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                IView.toast(getContext().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
+                close(commonDialog);
+            }
+        }, groupId));
+
+    }
+
+    public void quitGroup() {
+        CommonDialog commonDialog = new CommonDialog(getContext());
+        commonDialog.show();
+        commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.quit_group_tips);
+        commonDialog.getMainView().cancel.setOnClickListener(v -> commonDialog.dismiss());
+        commonDialog.getMainView().confirm.setOnClickListener(v -> OpenIMClient.getInstance().groupManager.quitGroup(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error + code);
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                IView.toast(getContext().getString(io.openim.android.ouicore.R.string.quit_group_tips2));
+                close(commonDialog);
+
+            }
+        }, groupId));
+    }
+
+    private void close(CommonDialog commonDialog) {
+        IConversationBridge iConversationBridge = (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();
+        iConversationBridge.deleteConversationFromLocalAndSvr(groupId);
+        iConversationBridge.closeChatPage();
+        commonDialog.dismiss();
+        IView.close();
     }
 }

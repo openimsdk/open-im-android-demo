@@ -1,4 +1,5 @@
 <resources>
+
     <style name="dialog_tran" parent="android:style/Theme.Dialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>
@@ -22,6 +23,7 @@
         <item name="maxHeight">16dp</item>
         <item name="indicatorName">BallSpinFadeLoaderIndicator</item>
     </style>
+
     <style name="AVLoadingIndicatorView.Small3">
         <item name="minWidth">14dp</item>
         <item name="maxWidth">14dp</item>
@@ -45,5 +47,20 @@
         <item name="windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+
+    <style name="Animation">
+        <item name="android:windowEnterAnimation">@null</item>
+        <item name="android:windowExitAnimation">@null</item>
+    </style>
+
+    <style name="ThemeWithoutAnim" parent="Theme.AppCompat.Light.NoActionBar.FullScreen">
+        <item name="android:windowAnimationStyle">@style/Animation</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="backgroundTransparent" parent="@style/Theme.AppCompat.Light">
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 </resources>

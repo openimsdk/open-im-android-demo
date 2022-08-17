@@ -1,53 +1,29 @@
 package io.openim.android.ouicore.base;
 
 
-import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.alibaba.android.arouter.facade.Postcard;
-import com.alibaba.android.arouter.facade.annotation.Autowired;
-import com.alibaba.android.arouter.facade.service.DegradeService;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.yanzhenjie.permission.Action;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
 
-import io.openim.android.ouicore.R;
-import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.CallingService;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.services.CallingService;
 
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
-import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.listener.OnSignalingListener;
-import io.openim.android.sdk.models.SignalingInfo;
 
 
 public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> extends AppCompatActivity implements IView {
@@ -196,6 +172,11 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     @Override
     public void toast(String tips) {
         Toast.makeText(this, tips, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void close() {
+        finish();
     }
 
 //    @RequiresApi(api = Build.VERSION_CODES.O)

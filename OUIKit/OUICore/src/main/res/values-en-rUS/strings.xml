@@ -92,4 +92,10 @@
     <string name="calling">正在通话中</string>
     <string name="audio_video_service">音视频服务</string>
     <string name="audio_video_service_tips1">已开启后台音视频服务</string>
+    <string name="start_chat">开始聊天</string>
+    <string name="dissolve_group">解散群聊</string>
+    <string name="dissolve_tips">解散群聊后，将失去群成员的联系</string>
+    <string name="quit_group_tips">退出群聊后，将不再接收群聊消息</string>
+    <string name="dissolve_tips2">群已解散</string>
+    <string name="quit_group_tips2">已退出</string>
 </resources>

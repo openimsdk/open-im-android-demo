@@ -238,16 +238,19 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onRecvMessageRevoked(String msgId) {
-
-        for (int i = 0; i < messageAdapter.getMessages().size(); i++) {
-            Message message = messageAdapter.getMessages().get(i);
-            if (TextUtils.isEmpty(message.getClientMsgID()))
-                continue;
-            if (message.getClientMsgID().equals(msgId)) {
-                message.setContentType(Constant.MsgType.REVOKE);
-                messageAdapter.notifyItemChanged(i);
-                return;
+        try {
+            for (int i = 0; i < messageAdapter.getMessages().size(); i++) {
+                Message message = messageAdapter.getMessages().get(i);
+                if (TextUtils.isEmpty(message.getClientMsgID()))
+                    continue;
+                if (message.getClientMsgID().equals(msgId)) {
+                    message.setContentType(Constant.MsgType.REVOKE);
+                    messageAdapter.notifyItemChanged(i);
+                    return;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -353,8 +356,14 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }, message);
     }
 
+    public void closePage() {
+        IView.closePage();
+    }
+
 
     public interface ViewAction extends IView {
         void scrollToPosition(int position);
+
+        void closePage();
     }
 }

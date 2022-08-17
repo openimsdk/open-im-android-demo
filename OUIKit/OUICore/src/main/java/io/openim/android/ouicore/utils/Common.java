@@ -95,7 +95,8 @@ public class Common {
     }
 
     /**
-     *  复制
+     * 复制
+     *
      * @param clip 内容
      */
     public static void copy(String clip) {
@@ -104,15 +105,30 @@ public class Common {
         cm.setPrimaryClip(mClipData);
     }
 
-    public static void wakeUp(Context context){
+    /**
+     * 唤醒设备
+     *
+     * @param context
+     */
+    public static void wakeUp(Context context) {
         //获取电源管理器对象
-        PowerManager pm=(PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         //获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
-        PowerManager.WakeLock wakeLock = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK,"openIM:bright");
+        PowerManager.WakeLock wakeLock = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK, "openIM:bright");
         //点亮屏幕
-        wakeLock.acquire();
+        wakeLock.acquire(10 * 60 * 1000L /*10 minutes*/);
         //释放
-        new Handler().postDelayed(() -> wakeLock.release(), 5000);
+        new Handler().postDelayed(wakeLock::release, 5000);
+    }
+
+    /**
+     * 是否锁屏
+     *
+     * @return
+     */
+    public static boolean isScreenLocked() {
+        android.app.KeyguardManager mKeyguardManager = (KeyguardManager) BaseApp.inst().getSystemService(Context.KEYGUARD_SERVICE);
+        return mKeyguardManager.inKeyguardRestrictedInputMode();
     }
 }
 

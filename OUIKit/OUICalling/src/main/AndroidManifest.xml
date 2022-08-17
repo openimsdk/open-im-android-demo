@@ -3,12 +3,20 @@
     package="io.openim.android.ouicalling">
 
     <application>
+
+        <receiver android:name=".JumpReceiver" />
+
+        <activity
+            android:name=".LockPushActivity"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:theme="@style/ThemeWithoutAnim" />
+
+        <service android:name=".service.AudioVideoService" />
         <service
-            android:name=".AudioVideoService"
-            android:process=":resident" />
-        <service
-            android:name=".AudioVideoDaemonService"
-            android:process="openIM.AudioVideoService" />
+            android:name=".service.AudioVideoDaemonService"
+            android:process="openim.daemon" />
     </application>
 
 </manifest>

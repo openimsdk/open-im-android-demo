@@ -2,31 +2,28 @@ package io.openim.android.demo.ui.main;
 
 
 import android.app.Activity;
-import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.os.PowerManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
-import android.widget.RadioGroup;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
 
 
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.bean.ZxingConfig;
-
-import java.util.List;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
@@ -36,18 +33,19 @@ import io.openim.android.demo.ui.search.AddConversActivity;
 import io.openim.android.demo.ui.search.PersonDetailActivity;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.demo.vm.MainVM;
-import io.openim.android.ouicalling.AudioVideoService;
+import io.openim.android.ouicontact.ui.ContactFragment;
+import io.openim.android.ouicontact.vm.ContactVM;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
-import io.openim.android.ouicore.utils.WeakLockService;
-import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.models.Message;
 import io.openim.android.ouicore.utils.Constant;
 
+@Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
 
     private int mCurrentTabIndex;
@@ -65,9 +63,6 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMainBinding.inflate(getLayoutInflater()));
 
-        if (null != callingService)
-            callingService.setClickNotificationToPage(this);
-
         sink();
 
         view.setMainVM(vm);
@@ -76,8 +71,17 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         click();
 
         hasScanPermission = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
+    }
 
-//        startService(new Intent(this, WeakLockService.class));
+    private void bindDot() {
+        ContactVM contactVM = ((ContactFragment) contactFragment).getVM();
+        if (null == contactVM) return;
+        contactVM.friendDotNum.observe(this, integer -> {
+            view.badge.setVisibility((integer > 0 || contactVM.dotNum.getValue() > 0) ? View.VISIBLE : View.GONE);
+        });
+        contactVM.dotNum.observe(this, integer -> {
+            view.badge.setVisibility((integer > 0 || contactVM.friendDotNum.getValue() > 0) ? View.VISIBLE : View.GONE);
+        });
     }
 
     @Override
@@ -184,8 +188,6 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
                 ARouter.getInstance().build(Routes.Group.DETAIL)
                     .withString(io.openim.android.ouicore.utils.Constant.K_GROUP_ID, groupId).navigation();
         }
-
-
     });
 
     /**
@@ -206,7 +208,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     @Override
     public void jump() {
         //token过期
-        startActivity(new Intent(this, LoginActivity.class));
+        IMUtil.logout(this, LoginActivity.class);
     }
 
     @Override
@@ -238,6 +240,8 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         }
 //        getSupportFragmentManager().beginTransaction()
 //            .add(R.id.fragment_container, contactListFragment).commit();
+
+        Common.UIHandler.postDelayed(this::bindDot, 500);
     }
 
 

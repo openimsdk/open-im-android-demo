@@ -25,7 +25,7 @@ import io.openim.android.ouicalling.databinding.DialogCallBinding;
 import io.openim.android.ouicalling.vm.CallingVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseDialog;
-import io.openim.android.ouicore.utils.CallingService;
+import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.MediaPlayerListener;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
@@ -34,7 +34,6 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
-import io.reactivex.Observable;
 
 
 public class CallDialog extends BaseDialog {
@@ -93,6 +92,7 @@ public class CallDialog extends BaseDialog {
         } else {
             params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
         }
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         window.setAttributes(params);
     }
 

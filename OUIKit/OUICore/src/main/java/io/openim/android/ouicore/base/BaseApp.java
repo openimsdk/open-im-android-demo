@@ -29,6 +29,14 @@ public class BaseApp extends Application {
         return null;
     }
 
+    public <T extends BaseViewModel> void putVM(T vm) {
+        String key = vm.getClass().getCanonicalName();
+        if (!BaseApp.viewModels.containsKey(key)) {
+            BaseApp.viewModels.put(key, vm);
+        }
+    }
+
+
     @Override
     public void onCreate() {
         super.onCreate();

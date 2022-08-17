@@ -48,6 +48,10 @@ public class Constant {
     public static final String K_NOTICE = "notice";
     public static final String K_NAME = "name";
     public static final String K_RESULT = "result";
+    //好友红点
+    public static final String K_FRIEND_NUM = "k_friend_num";
+    //群红点
+    public static final String K_GROUP_NUM = "k_group_num";
 
     /**
      * 发送状态

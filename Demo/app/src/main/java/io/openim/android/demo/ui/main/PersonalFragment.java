@@ -1,6 +1,5 @@
 package io.openim.android.demo.ui.main;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,17 +7,16 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.FragmentPersonalBinding;
 import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.demo.vm.PersonalVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
-import io.openim.android.ouicore.entity.LoginCertificate;
-import io.openim.android.ouicore.net.bage.Base;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
@@ -75,21 +73,19 @@ public class PersonalFragment extends BaseFragment<PersonalVM> {
             commonDialog.getMainView().cancel.setOnClickListener(v2 -> commonDialog.dismiss());
             commonDialog.getMainView().confirm.setOnClickListener(v2 -> {
                 commonDialog.dismiss();
-                WaitDialog waitDialog=new WaitDialog(getActivity());
+                WaitDialog waitDialog = new WaitDialog(getActivity());
                 waitDialog.show();
                 OpenIMClient.getInstance().logout(new OnBase<String>() {
                     @Override
                     public void onError(int code, String error) {
                         waitDialog.dismiss();
-                        toast(error+code);
+                        toast(error + code);
                     }
 
                     @Override
                     public void onSuccess(String data) {
                         waitDialog.dismiss();
-                        startActivity(new Intent(getActivity(), LoginActivity.class));
-                        getActivity().finish();
-                        LoginCertificate.clear();
+                        IMUtil.logout((AppCompatActivity) getActivity(),LoginActivity.class);
                     }
                 });
 

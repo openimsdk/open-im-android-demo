@@ -40,17 +40,9 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
 
     public void login() {
         Parameter parameter = getParameter(null);
-
-        WaitDialog waitDialog = showWait();
         N.API(OpenIMService.class).login(parameter.buildJsonBody())
             .compose(N.IOMain())
             .subscribe(new NetObserver<ResponseBody>(getContext()) {
-
-                @Override
-                public void onComplete() {
-                    super.onComplete();
-                    waitDialog.dismiss();
-                }
 
                 @Override
                 public void onSuccess(ResponseBody o) {
@@ -76,8 +68,6 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
                             }
                         }, loginCertificate.data.userID, loginCertificate.data.token);
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -148,7 +138,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     }
 
     @NonNull
-    private WaitDialog showWait() {
+    public WaitDialog showWait() {
         WaitDialog waitDialog = new WaitDialog(getContext());
         waitDialog.setNotDismiss();
         waitDialog.show();
@@ -259,6 +249,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
         void succ(Object o);
 
         void initDate();
+
     }
 
 }

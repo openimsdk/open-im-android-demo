@@ -1,11 +1,16 @@
 package io.openim.android.ouicore.im;
 
 
+import com.alibaba.android.arouter.launcher.ARouter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
+import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnConnListener;
@@ -191,6 +196,11 @@ public class IMEvent {
         public void onKickedOffline() {
             // 当前用户被踢下线，此时可以 UI 提示用户“您已经在其他端登录了当前账号，是否重新登录？”
             L.d("当前用户被踢下线");
+
+            CallingService callingService = (CallingService) ARouter.getInstance()
+                .build(Routes.Service.CALLING).navigation();
+            if (null != callingService)
+                callingService.stopAudioVideoService(BaseApp.inst());
         }
 
         @Override

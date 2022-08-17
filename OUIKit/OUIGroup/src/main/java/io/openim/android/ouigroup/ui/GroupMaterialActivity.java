@@ -97,6 +97,14 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             albumDialog.show();
         });
 
+        view.quitGroup.setOnClickListener(v -> {
+                if (vm.isOwner()){
+                    vm.dissolveGroup();
+                }else {
+                   vm.quitGroup();
+                }
+        });
+
     }
 
     @Override
@@ -114,6 +122,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     private void initView() {
+        if (vm.isOwner())
+            view.quitGroup.setText(io.openim.android.ouicore.R.string.dissolve_group);
         albumDialog = new PhotographAlbumDialog(this);
         albumDialog.setOnSelectResultListener(path -> {
             OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {

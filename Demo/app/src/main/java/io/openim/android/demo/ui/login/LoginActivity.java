@@ -24,10 +24,12 @@ import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.SinkHelper;
+import io.openim.android.ouicore.widget.WaitDialog;
 
 public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> implements LoginVM.ViewAction {
 
     public static final String FORM_LOGIN = "form_login";
+    private WaitDialog waitDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,7 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
         setLightStatus();
         SinkHelper.get(this).setTranslucentStatus(null);
 
+        waitDialog = new WaitDialog(this);
         view.loginContent.setLoginVM(vm);
         click();
         listener();
@@ -80,6 +83,7 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
         view.loginContent.registerTv.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
 
         view.submit.setOnClickListener(v -> {
+            waitDialog.show();
             vm.login();
         });
     }
@@ -92,11 +96,13 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
     public void jump() {
         startActivity(new Intent(this, MainActivity.class).putExtra(FORM_LOGIN,
             true));
+        waitDialog.dismiss();
         finish();
     }
 
     @Override
     public void err(String msg) {
+        waitDialog.dismiss();
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 

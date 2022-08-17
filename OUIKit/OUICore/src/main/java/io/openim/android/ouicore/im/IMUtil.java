@@ -1,7 +1,12 @@
 package io.openim.android.ouicore.im;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -16,7 +21,10 @@ import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.net.bage.GsonHel;
+import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.Message;
@@ -27,6 +35,7 @@ import io.openim.android.sdk.models.SignalingInvitationInfo;
 public class IMUtil {
     //android PlatformID 2
     public static final int PLATFORM_ID = 2;
+    private static final String TAG = "IMUtil";
 
     /**
      * 会话排序比较器
@@ -197,5 +206,32 @@ public class IMUtil {
             v.onKey(v1, 2, null);
             dialog.dismiss();
         });
+    }
+
+    /**
+     * 已登录或登录中
+     *
+     * @return
+     */
+    public static boolean isLogged() {
+        long status = OpenIMClient.getInstance().getLoginStatus();
+        L.e(TAG, "login status-----[" + status + "]");
+        return status == 101 || status == 102;
+    }
+
+    /**
+     * 退出
+     *
+     * @param from
+     * @param to
+     */
+    public static void logout(AppCompatActivity from, Class<?> to) {
+        from.startActivity(new Intent(from, to));
+        LoginCertificate.clear();
+        CallingService callingService = (CallingService) ARouter.getInstance()
+            .build(Routes.Service.CALLING).navigation();
+        if (null != callingService)
+            callingService.stopAudioVideoService(from);
+        from.finish();
     }
 }

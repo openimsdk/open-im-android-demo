@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+
         <variable
             name="MainVM"
             type="io.openim.android.demo.vm.MainVM" />
 
     </data>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -101,55 +102,79 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                app:hl_shadowColor="#2a000000"
-                app:hl_shadowLimit="8dp"
-                app:hl_bottomShow="false"
                 android:layout_marginLeft="-8dp"
                 android:layout_marginRight="-8dp"
-                >
+                app:hl_bottomShow="false"
+                app:hl_shadowColor="#2a000000"
+                app:hl_shadowLimit="8dp">
 
-                <RadioGroup
-                    android:id="@+id/menuGroup"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:paddingTop="5dp"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content">
 
-                    <RadioButton
-                        android:id="@+id/men1"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:button="@null"
-                        android:drawableTop="@mipmap/ic_logo"
-                        android:gravity="center"
-                        android:textColor="#ff1b72ec"
-                        android:textSize="10sp"
-                        android:text="OpenIM" />
+                    <RadioGroup
+                        android:id="@+id/menuGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:orientation="horizontal"
+                        android:paddingTop="5dp">
 
-                    <RadioButton
-                        android:id="@+id/men2"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:button="@null"
-                        android:drawableTop="@mipmap/ic_newsletter"
-                        android:gravity="center"
-                        android:textColor="#ff1b72ec"
-                        android:textSize="10sp"
-                        android:text="@string/address_book" />
-                    <RadioButton
-                        android:id="@+id/men3"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:button="@null"
-                        android:drawableTop="@mipmap/ic_my"
-                        android:gravity="center"
-                        android:textColor="#ff1b72ec"
-                        android:textSize="10sp"
-                        android:text="@string/my" />
-                </RadioGroup>
+                        <RadioButton
+                            android:id="@+id/men1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:button="@null"
+                            android:drawableTop="@mipmap/ic_logo"
+                            android:gravity="center"
+                            android:text="OpenIM"
+                            android:textColor="#ff1b72ec"
+                            android:textSize="10sp" />
+
+                        <RadioButton
+                            android:id="@+id/men2"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:button="@null"
+                            android:drawableTop="@mipmap/ic_newsletter"
+                            android:gravity="center"
+                            android:text="@string/address_book"
+                            android:textColor="#ff1b72ec"
+                            android:textSize="10sp" />
+
+                        <RadioButton
+                            android:id="@+id/men3"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:button="@null"
+                            android:drawableTop="@mipmap/ic_my"
+                            android:gravity="center"
+                            android:text="@string/my"
+                            android:textColor="#ff1b72ec"
+                            android:textSize="10sp" />
+                    </RadioGroup>
+
+                    <LinearLayout
+                        android:id="@+id/badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:visibility="gone"
+                        android:layout_centerHorizontal="true"
+                        android:paddingLeft="45dp">
+
+                        <include
+                            layout="@layout/view_badge"
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:visibility="visible"
+                           />
+                    </LinearLayout>
+
+                </RelativeLayout>
+
             </com.lihang.ShadowLayout>
         </RelativeLayout>
 

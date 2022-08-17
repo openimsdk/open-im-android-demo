@@ -3,12 +3,9 @@ package io.openim.android.ouicalling.vm;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.media.AudioManager;
-import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
-
-import org.webrtc.VideoSink;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,11 +19,10 @@ import io.livekit.android.room.participant.RemoteParticipant;
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicalling.CallingServiceImp;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.base.BaseViewModel;
-import io.openim.android.ouicore.utils.CallingService;
+import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
-import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.SignalingCertificate;
@@ -110,7 +106,7 @@ public class CallingVM {
     };
 
     public void signalingInvite(SignalingInfo signalingInfo) {
-        OpenIMClient.getInstance().signalingManager.signalingInvite(new OnBase<SignalingCertificate>() {
+        OnBase<SignalingCertificate> certificateOnBase = new OnBase<SignalingCertificate>() {
             @Override
             public void onError(int code, String error) {
                 L.e(CallingServiceImp.TAG, error + "-" + code);
@@ -122,7 +118,13 @@ public class CallingVM {
                 L.e(CallingServiceImp.TAG, data.getToken());
                 connectToRoom(data);
             }
-        }, signalingInfo);
+        };
+        if (isGroup)
+            OpenIMClient.getInstance().signalingManager.signalingInviteInGroup(certificateOnBase,
+                signalingInfo);
+        else
+            OpenIMClient.getInstance().signalingManager.signalingInvite(certificateOnBase,
+                signalingInfo);
     }
 
     /**
@@ -150,17 +152,18 @@ public class CallingVM {
 
                 callViewModel.getParticipants().collect((participants, continuation) -> {
                     if (participants.isEmpty()) return null;
-                    if (!isGroup && !isCallOut &&participants.size() == 1) {
+                    if (!isGroup && !isCallOut && participants.size() == 1) {
                         callingService.onHangup(null);
                         return null;
                     }
                     if (null != onParticipantsChangeListener) {
-                        List<Participant> participantList = new ArrayList<>();
-                        for (Participant participant : participants) {
-                            if (participant instanceof RemoteParticipant)
-                                participantList.add(participant);
-                        }
-                        onParticipantsChangeListener.onChange(participantList);
+//                        List<Participant> participantList = new ArrayList<>();
+//                        for (Participant participant : participants) {
+//                            if (participant instanceof RemoteParticipant)
+//                                participantList.add(participant);
+//                        }
+                        Common.UIHandler.post(() -> onParticipantsChangeListener.onChange(participants));
+
                     } else {
                         for (int i = 0; i < participants.size(); i++) {
                             Participant participant = participants.get(i);
@@ -290,7 +293,7 @@ public class CallingVM {
     }
 
 
-    interface OnParticipantsChangeListener {
+    public interface OnParticipantsChangeListener {
         void onChange(List<Participant> participants);
     }
 }

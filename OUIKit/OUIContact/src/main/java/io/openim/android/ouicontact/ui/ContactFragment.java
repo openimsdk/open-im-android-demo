@@ -13,8 +13,11 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 
 import io.openim.android.ouicontact.databinding.FragmentContactBinding;
 import io.openim.android.ouicontact.vm.ContactVM;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 
 @Route(path = Routes.Contact.HOME)
 public class ContactFragment extends BaseFragment<ContactVM> {
@@ -35,14 +38,20 @@ public class ContactFragment extends BaseFragment<ContactVM> {
         return view.getRoot();
     }
 
+    public ContactVM getVM() {
+        return vm;
+    }
+
     private void click() {
         view.groupNotice.setOnClickListener(v -> {
             vm.dotNum.setValue(0);
+            SharedPreferencesUtil.remove(getContext(), Constant.K_GROUP_NUM);
             startActivity(new Intent(getActivity(), GroupNoticeListActivity.class));
         });
 
         view.newFriendNotice.setOnClickListener(v -> {
             vm.friendDotNum.setValue(0);
+            SharedPreferencesUtil.remove(getContext(), Constant.K_FRIEND_NUM);
             startActivity(new Intent(getActivity(), NewFriendActivity.class));
         });
 
@@ -50,7 +59,7 @@ public class ContactFragment extends BaseFragment<ContactVM> {
             startActivity(new Intent(getActivity(), AllFriendActivity.class));
         });
 
-        view.myGroup.setOnClickListener(v->{
+        view.myGroup.setOnClickListener(v -> {
             startActivity(new Intent(getActivity(), MyGroupActivity.class));
         });
 
@@ -65,5 +74,10 @@ public class ContactFragment extends BaseFragment<ContactVM> {
             view.newFriendNoticeBadge.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE);
             view.newFriendNoticeBadge.badge.setText(v + "");
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 }

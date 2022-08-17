@@ -6,31 +6,31 @@ import android.content.Context;
 import androidx.multidex.MultiDex;
 
 
-
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.im.IM;
-import io.openim.android.ouicore.im.IMEvent;
-import io.openim.android.ouicore.net.RXRetrofit.HttpConfig;
-import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.voice.SPlayer;
-import io.openim.android.sdk.OpenIMClient;
 
 
 public class DemoApplication extends BaseApp {
     private static final String TAG = BaseApp.class.getSimpleName();
 
     @Override
+    protected void attachBaseContext(Context base) {
+        L.e(TAG, "-----attachBaseContext");
+        super.attachBaseContext(base);
+    }
+
+    @Override
     public void onCreate() {
+        L.e(TAG, "-----onCreate");
         super.onCreate();
-        if (!isMainProcess()) return;
+//      if (!isMainProcess()) return;
 
         MultiDex.install(this);
         //im 初始化
@@ -38,11 +38,10 @@ public class DemoApplication extends BaseApp {
         //音频播放
         SPlayer.init(this);
         SPlayer.instance().setCacheDirPath(Constant.AUDIODIR);
-
         //ARouter init
+        ARouter.init(this);
         ARouter.openLog();
         ARouter.openDebug();
-        ARouter.init(this);
     }
 
     private boolean isMainProcess() {

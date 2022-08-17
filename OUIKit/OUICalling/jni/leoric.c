@@ -1,19 +1,3 @@
-/*
- * Original Copyright 2015 Mars Kwok
- * Modified work Copyright (c) 2020, weishu
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 #include <jni.h>
 #include <fcntl.h>
@@ -28,7 +12,7 @@
 
 #include <android/log.h>
 
-#define TAG		"Leoric"
+#define TAG		"LongLive"
 #define LOGI(...)	__android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
 #define LOGD(...)	__android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 #define LOGW(...)	__android_log_print(ANDROID_LOG_WARN, TAG, __VA_ARGS__)
@@ -170,7 +154,7 @@ void set_process_name(JNIEnv *env) {
 }
 
 JNIEXPORT void JNICALL
-Java_me_weishu_leoric_NativeLeoric_doDaemon(JNIEnv *env, jobject jobj,
+Java_io_openim_android_ouicalling_resident_NativeLeoric_doDaemon(JNIEnv *env, jobject jobj,
                                                                jstring indicatorSelfPath,
                                                                jstring indicatorDaemonPath,
                                                                jstring observerSelfPath,

@@ -6,20 +6,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.livekit.android.room.participant.LocalParticipant;
 import io.livekit.android.room.participant.Participant;
+import io.livekit.android.room.participant.RemoteParticipant;
+import io.livekit.android.room.track.LocalVideoTrack;
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicalling.databinding.DialogGroupCallBinding;
 import io.openim.android.ouicalling.databinding.ItemMemberRendererBinding;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
-import io.openim.android.ouicore.databinding.ItemImgTxtBinding;
-import io.openim.android.ouicore.utils.CallingService;
+import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.sdk.OpenIMClient;
@@ -57,7 +61,7 @@ public class GroupCallDialog extends CallDialog {
             }
         });
 
-        view.viewRenderers.setLayoutManager(new LinearLayoutManager(context));
+        view.viewRenderers.setLayoutManager(new GridLayoutManager(context, 2));
         view.viewRenderers.setAdapter(viewRenderersAdapter = new RecyclerViewAdapter<Participant,
             RendererViewHole>(RendererViewHole.class) {
 
@@ -67,19 +71,29 @@ public class GroupCallDialog extends CallDialog {
                 if (speakerVideoViewTag instanceof VideoTrack) {
                     ((VideoTrack) speakerVideoViewTag).removeRenderer(holder.view.remoteSpeakerVideoView);
                 }
-                callingVM.callViewModel.bindRemoteViewRenderer(holder.view.remoteSpeakerVideoView, data,
-                    new Continuation<Unit>() {
-                        @NonNull
-                        @Override
-                        public CoroutineContext getContext() {
-                            return EmptyCoroutineContext.INSTANCE;
-                        }
+                try {
+                    callingVM.initRemoteVideoRenderer(holder.view.remoteSpeakerVideoView);
+                }catch (Exception ignore){}
 
-                        @Override
-                        public void resumeWith(@NonNull Object o) {
+                if (data instanceof LocalParticipant) {
+                    VideoTrack localVideoTrack = callingVM.callViewModel.getVideoTrack(data);
+                    localVideoTrack.addRenderer(holder.view.remoteSpeakerVideoView);
+                    holder.view.remoteSpeakerVideoView.setTag(localVideoTrack);
+                } else {
+                    callingVM.callViewModel.bindRemoteViewRenderer(holder.view.remoteSpeakerVideoView, data,
+                        new Continuation<Unit>() {
+                            @NonNull
+                            @Override
+                            public CoroutineContext getContext() {
+                                return EmptyCoroutineContext.INSTANCE;
+                            }
 
-                        }
-                    });
+                            @Override
+                            public void resumeWith(@NonNull Object o) {
+
+                            }
+                        });
+                }
             }
         });
     }
@@ -155,6 +169,9 @@ public class GroupCallDialog extends CallDialog {
                 });
             }
         });
+        callingVM.setOnParticipantsChangeListener(participants -> {
+            viewRenderersAdapter.setItems(participants);
+        });
     }
 
     @Override
@@ -177,19 +194,20 @@ public class GroupCallDialog extends CallDialog {
             @Override
             public void onSuccess(List<UserInfo> data) {
                 if (data.isEmpty()) return;
-                if (!callingVM.isCallOut) {
+                if (callingVM.isCallOut) {
+                    memberAdapter.setItems(data);
+                } else {
                     UserInfo inviterUser = data.get(0);
                     view.tips1.setText(inviterUser.getNickname() + (callingVM.isVideoCalls ?
                         context.getString(io.openim.android.ouicore.R.string.invite_video_call) :
                         context.getString(io.openim.android.ouicore.R.string.invite_audio_call)));
                     view.tips2.setText(data.size() + "人" + context.getString(io.openim.android.ouicore.R.string.calling));
                 }
-
             }
         }, ids);
     }
 
-    private static class RendererViewHole extends RecyclerView.ViewHolder {
+    public static class RendererViewHole extends RecyclerView.ViewHolder {
 
         public ItemMemberRendererBinding view;
 

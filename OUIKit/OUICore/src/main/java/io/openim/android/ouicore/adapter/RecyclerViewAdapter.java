@@ -41,8 +41,8 @@ public abstract class RecyclerViewAdapter<T, V extends RecyclerView.ViewHolder> 
             return viewHolder.getConstructor(View.class).newInstance(parent);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             e.printStackTrace();
+            throw new NullPointerException();
         }
-        return null;
     }
 
     @Override

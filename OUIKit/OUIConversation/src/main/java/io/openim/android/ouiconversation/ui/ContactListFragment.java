@@ -36,9 +36,11 @@ import io.openim.android.ouiconversation.adapter.MessageViewHolder;
 import io.openim.android.ouiconversation.databinding.FragmentContactListBinding;
 import io.openim.android.ouiconversation.databinding.LayoutContactItemBinding;
 import io.openim.android.ouiconversation.vm.ContactListVM;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
@@ -62,6 +64,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         bindVM(ContactListVM.class);
+        BaseApp.inst().putVM(vm);
         super.onCreate(savedInstanceState);
     }
 
@@ -155,7 +158,6 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
     @Override
     public void onSuccess(Object body) {
         super.onSuccess(body);
-
     }
 
     static class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
@@ -217,4 +219,9 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        BaseApp.viewModels.remove(vm.getClass().getCanonicalName());
+    }
 }
