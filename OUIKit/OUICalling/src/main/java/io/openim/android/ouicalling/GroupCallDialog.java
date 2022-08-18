@@ -2,10 +2,13 @@ package io.openim.android.ouicalling;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.livekit.android.events.ParticipantEvent;
 import io.livekit.android.room.participant.LocalParticipant;
 import io.livekit.android.room.participant.Participant;
 import io.livekit.android.room.participant.RemoteParticipant;
@@ -34,6 +38,7 @@ import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
+import kotlinx.coroutines.flow.FlowCollector;
 
 public class GroupCallDialog extends CallDialog {
     private DialogGroupCallBinding view;
@@ -65,6 +70,7 @@ public class GroupCallDialog extends CallDialog {
         view.viewRenderers.setAdapter(viewRenderersAdapter = new RecyclerViewAdapter<Participant,
             RendererViewHole>(RendererViewHole.class) {
 
+            @SuppressLint("UnsafeOptInUsageError")
             @Override
             public void onBindView(@NonNull RendererViewHole holder, Participant data, int position) {
                 Object speakerVideoViewTag = holder.view.remoteSpeakerVideoView.getTag();
@@ -73,7 +79,8 @@ public class GroupCallDialog extends CallDialog {
                 }
                 try {
                     callingVM.initRemoteVideoRenderer(holder.view.remoteSpeakerVideoView);
-                }catch (Exception ignore){}
+                } catch (Exception ignore) {
+                }
 
                 if (data instanceof LocalParticipant) {
                     VideoTrack localVideoTrack = callingVM.callViewModel.getVideoTrack(data);
@@ -123,7 +130,13 @@ public class GroupCallDialog extends CallDialog {
         bindUserInfo(signalingInfo);
         listener(signalingInfo);
     }
-
+    public final Observer<String> bindTime = new Observer<String>() {
+        @Override
+        public void onChanged(String s) {
+            if (TextUtils.isEmpty(s)) return;
+            view.timeTv.setText(s);
+        }
+    };
     @Override
     public void listener(SignalingInfo signalingInfo) {
         callingVM.timeStr.observeForever(bindTime);
@@ -176,7 +189,10 @@ public class GroupCallDialog extends CallDialog {
 
     @Override
     public void changeView() {
-
+        view.headTips.setVisibility(View.GONE);
+        view.ask.setVisibility(View.GONE);
+        view.callingMenu.setVisibility(View.VISIBLE);
+        view.timeTv.setVisibility(View.VISIBLE);
     }
 
     @Override

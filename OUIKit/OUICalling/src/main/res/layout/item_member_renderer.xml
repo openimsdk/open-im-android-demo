@@ -2,6 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+
+    android:paddingRight="2dp"
+    android:paddingLeft="2dp"
     android:layout_height="162dp">
 
     <io.livekit.android.renderer.TextureViewRenderer
@@ -27,7 +30,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
-            android:text="1545"
             android:textColor="@color/white"
             android:textSize="16sp" />
 
@@ -35,6 +37,6 @@
             android:id="@+id/micOn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/ic_mic" />
+            android:src="@mipmap/ic_mic_s_on" />
     </LinearLayout>
 </RelativeLayout>

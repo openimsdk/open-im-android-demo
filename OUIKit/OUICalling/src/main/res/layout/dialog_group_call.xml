@@ -25,14 +25,6 @@
             android:layout_marginTop="40dp"
             android:src="@mipmap/ic_zoom_out" />
 
-        <TextView
-            android:id="@+id/timeTv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="45dp"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
 
         <LinearLayout
             android:id="@+id/headTips"
@@ -41,42 +33,43 @@
             android:layout_below="@id/zoomOut"
             android:orientation="vertical"
             android:visibility="visible">
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="35dp"
-            android:orientation="horizontal"
-            android:visibility="visible">
-
-            <io.openim.android.ouicore.widget.AvatarImage
-                android:id="@+id/avatar"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@mipmap/ic_my_friend" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
-                android:orientation="vertical">
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="35dp"
+                android:orientation="horizontal"
+                android:visibility="visible">
 
-                <TextView
-                    android:id="@+id/tips1"
+                <io.openim.android.ouicore.widget.AvatarImage
+                    android:id="@+id/avatar"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@mipmap/ic_my_friend" />
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#ffffffff"
-                    android:textSize="20sp" />
+                    android:layout_marginLeft="12dp"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tips2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#ffffffff"
-                    android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/tips1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#ffffffff"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/tips2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#ffffffff"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
             </LinearLayout>
-
-        </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/memberRecyclerView"
@@ -84,6 +77,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/headTips" />
         </LinearLayout>
+
+
         <LinearLayout
             android:id="@+id/ask"
             android:layout_width="wrap_content"
@@ -142,6 +137,18 @@
                     android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/timeTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/callingMenu"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="45dp"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
 
         <LinearLayout
             android:id="@+id/callingMenu"
