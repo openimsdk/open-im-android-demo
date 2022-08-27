@@ -110,6 +110,9 @@ public class CallDialog extends BaseDialog {
         if (callingVM.isCallOut) {
             view.callingMenu.setVisibility(View.VISIBLE);
             view.ask.setVisibility(View.GONE);
+
+
+
             view.callingTips.setText(context.getString(io.openim.android.ouicore.R.string.waiting_tips) + "...");
             view.callingTips2.setText(context.getString(io.openim.android.ouicore.R.string.waiting_tips) + "...");
             callingVM.signalingInvite(signalingInfo);
