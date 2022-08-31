@@ -1,5 +1,6 @@
 package io.openim.android.demo.ui.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,13 +19,14 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 
-public class PersonalFragment extends BaseFragment<PersonalVM> {
+public class PersonalFragment extends BaseFragment {
     public FragmentPersonalBinding view;
 
     public static PersonalFragment newInstance() {
@@ -36,11 +38,6 @@ public class PersonalFragment extends BaseFragment<PersonalVM> {
         return fragment;
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        bindVM(PersonalVM.class);
-        super.onCreate(savedInstanceState);
-    }
 
     @Nullable
     @Override
@@ -59,6 +56,12 @@ public class PersonalFragment extends BaseFragment<PersonalVM> {
     }
 
     private void listener() {
+        view.personalInfo.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                startActivity(new Intent(getActivity(),PersonalInfoActivity.class));
+            }
+        });
         view.userId.setOnClickListener(v -> {
             Common.copy(BaseApp.inst().loginCertificate.userID);
             toast(getString(io.openim.android.ouicore.R.string.copy_succ));

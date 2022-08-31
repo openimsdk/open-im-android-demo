@@ -45,7 +45,7 @@
     <string name="send_friend_apply">发送添加好友申请</string>
     <string name="send_join_group_apply">发送入群申请</string>
     <string name="address_book">通讯录</string>
-
+    <string name="nickname">昵称</string>
 
 
 </resources>

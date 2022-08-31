@@ -98,4 +98,9 @@
     <string name="quit_group_tips">退出群聊后，将不再接收群聊消息</string>
     <string name="dissolve_tips2">群已解散</string>
     <string name="quit_group_tips2">已退出</string>
+    <string name="avatar">头像</string>
+    <string name="gender">性别</string>
+    <string name="birthday">生日</string>
+    <string name="my_info">我的信息</string>
+    <string name="save">保存</string>
 </resources>

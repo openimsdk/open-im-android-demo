@@ -12,6 +12,7 @@ public class TimeUtil {
     public final static String hourTimeFormat = "HH:mm";
     public final static String monthTimeFormat = "M/d HH:mm";
     public final static String yearTimeFormat = "yyyy/M/d HH:mm";
+    public final static String yearMonthDayFormat = "yyyy/M/d";
 
     public static String getTimeString(Long timestamp) {
         String result = "";
