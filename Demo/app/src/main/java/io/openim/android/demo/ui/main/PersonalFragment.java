@@ -12,6 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import io.openim.android.demo.databinding.FragmentPersonalBinding;
 import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.demo.vm.PersonalVM;
@@ -19,6 +22,8 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
@@ -26,7 +31,7 @@ import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 
-public class PersonalFragment extends BaseFragment {
+public class PersonalFragment extends BaseFragment implements Observer {
     public FragmentPersonalBinding view;
 
     public static PersonalFragment newInstance() {
@@ -46,6 +51,7 @@ public class PersonalFragment extends BaseFragment {
 
         initView();
         listener();
+        Obs.inst().addObserver(this);
         return view.getRoot();
     }
 
@@ -55,11 +61,12 @@ public class PersonalFragment extends BaseFragment {
         view.userId.setText("ID：" + BaseApp.inst().loginCertificate.userID);
     }
 
+
     private void listener() {
         view.personalInfo.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                startActivity(new Intent(getActivity(),PersonalInfoActivity.class));
+                startActivity(new Intent(getActivity(), PersonalInfoActivity.class));
             }
         });
         view.userId.setOnClickListener(v -> {
@@ -88,11 +95,20 @@ public class PersonalFragment extends BaseFragment {
                     @Override
                     public void onSuccess(String data) {
                         waitDialog.dismiss();
-                        IMUtil.logout((AppCompatActivity) getActivity(),LoginActivity.class);
+                        IMUtil.logout((AppCompatActivity) getActivity(), LoginActivity.class);
                     }
                 });
 
             });
         });
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        Obs.Message message = (Obs.Message) o;
+        if (message.tag == Constant.Event.USER_INFO_UPDATA) {
+            view.avatar.load(BaseApp.inst().loginCertificate.faceURL);
+            view.name.setText(BaseApp.inst().loginCertificate.nickname);
+        }
     }
 }

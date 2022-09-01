@@ -103,4 +103,7 @@
     <string name="birthday">生日</string>
     <string name="my_info">我的信息</string>
     <string name="save">保存</string>
+    <string name="NickName">昵称</string>
+    <string name="male">男</string>
+    <string name="girl">女</string>
 </resources>

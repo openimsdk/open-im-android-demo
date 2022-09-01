@@ -2,7 +2,10 @@ package io.openim.android.demo.vm;
 
 import androidx.lifecycle.MutableLiveData;
 
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
@@ -15,7 +18,7 @@ public class PersonalVM extends BaseViewModel {
     @Override
     protected void viewCreate() {
         super.viewCreate();
-        waitDialog  = new WaitDialog(getContext());
+        waitDialog = new WaitDialog(getContext());
     }
 
     OnBase<String> callBack = new OnBase<String>() {
@@ -29,6 +32,10 @@ public class PersonalVM extends BaseViewModel {
         public void onSuccess(String data) {
             waitDialog.dismiss();
             userInfo.setValue(userInfo.getValue());
+
+            BaseApp.inst().loginCertificate.nickname=userInfo.getValue().getNickname();
+            BaseApp.inst().loginCertificate.faceURL=userInfo.getValue().getFaceURL();
+            Obs.newMessage(Constant.Event.USER_INFO_UPDATA);
         }
     };
 
@@ -63,5 +70,15 @@ public class PersonalVM extends BaseViewModel {
     public void setFaceURL(String faceURL) {
         userInfo.getValue().setFaceURL(faceURL);
         setSelfInfo(null, faceURL, 0, 0, null, 0, null, null);
+    }
+
+    public void setGender(int gender) {
+        userInfo.getValue().setGender(gender);
+        setSelfInfo(null, null, gender, 0, null, 0, null, null);
+    }
+
+    public void setBirthday(long birth) {
+        userInfo.getValue().setBirth(birth);
+        setSelfInfo(null, null, 0, 0, null, birth, null, null);
     }
 }

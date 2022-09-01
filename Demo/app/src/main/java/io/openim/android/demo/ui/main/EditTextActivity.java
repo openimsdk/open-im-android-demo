@@ -15,8 +15,8 @@ import io.openim.android.ouicore.utils.OnDedrepClickListener;
 
 public class EditTextActivity extends BaseActivity<BaseViewModel, ActivityEditTextBinding> {
 
-    private static final String TITLE = "title";
-    private static final String INIT_TXT = "init_txt";
+    public static final String TITLE = "title";
+    public static final String INIT_TXT = "init_txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

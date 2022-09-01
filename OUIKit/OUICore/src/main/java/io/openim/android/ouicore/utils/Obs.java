@@ -9,7 +9,7 @@ import java.util.Observer;
 public class Obs extends Observable {
     private static Obs observer = null;
 
-    public synchronized static Obs getInstance() {
+    public synchronized static Obs inst() {
         if (observer == null) {
             observer = new Obs();
         }
@@ -17,11 +17,11 @@ public class Obs extends Observable {
     }
 
     public static void newMessage(int tag) {
-        getInstance().setMessage(new Message(tag));
+        inst().setMessage(new Message(tag));
     }
 
     public static void newMessage(int tag, Object object) {
-        getInstance().setMessage(new Message(tag, object));
+        inst().setMessage(new Message(tag, object));
     }
 
     private void setMessage(Message message) {

@@ -33,7 +33,7 @@
                 android:paddingRight="22dp"
                 android:paddingBottom="15dp">
 
-                <ImageView
+                <io.openim.android.ouicore.widget.AvatarImage
                     android:id="@+id/avatar"
                     android:layout_width="48dp"
                     android:layout_height="48dp"

@@ -10,9 +10,9 @@ import io.openim.android.ouicore.base.BaseApp;
 public class TimeUtil {
     public final static String minuteTimeFormat = "mm:ss";
     public final static String hourTimeFormat = "HH:mm";
-    public final static String monthTimeFormat = "M/d HH:mm";
-    public final static String yearTimeFormat = "yyyy/M/d HH:mm";
-    public final static String yearMonthDayFormat = "yyyy/M/d";
+    public final static String monthTimeFormat = "MM/dd HH:mm";
+    public final static String yearTimeFormat = "yyyy/MM/dd HH:mm";
+    public final static String yearMonthDayFormat = "yyyy/MM/dd";
 
     public static String getTimeString(Long timestamp) {
         String result = "";

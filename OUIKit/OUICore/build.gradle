@@ -77,4 +77,6 @@ dependencies {
     api 'io.openim:android-sdk:2.3.0.1@aar'
     api 'io.openim:core-sdk:2.3.0@aar'
     implementation 'com.google.code.gson:gson:2.9.0'
+
+    api 'com.contrarywind:Android-PickerView:4.1.9'
 }

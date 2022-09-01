@@ -34,6 +34,8 @@ public class Constant {
         public static final int FORWARD = 10002;
         //音视频通话
         public static final int CALLING_REQUEST_CODE = 10003;
+        //用户信息更新
+        public static final int USER_INFO_UPDATA = 10004;
     }
 
     //会话类型

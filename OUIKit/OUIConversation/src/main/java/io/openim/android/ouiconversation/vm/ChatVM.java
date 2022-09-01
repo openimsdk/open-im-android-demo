@@ -30,7 +30,6 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.FixSizeLinkedList;
 import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.sdk.OpenIMClient;
 
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;

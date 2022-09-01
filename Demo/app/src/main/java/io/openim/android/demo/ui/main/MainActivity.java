@@ -66,11 +66,16 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         sink();
 
         view.setMainVM(vm);
+        initView();
 
         vm.visibility.observe(this, v -> view.isOnline.setVisibility(v));
         click();
 
         hasScanPermission = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
+    }
+
+    private void initView() {
+
     }
 
     private void bindDot() {

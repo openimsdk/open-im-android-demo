@@ -160,7 +160,6 @@
                 android:id="@+id/birthday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1994/12/28"
                 android:textColor="#ff999999"
                 android:textSize="16sp" />
 
