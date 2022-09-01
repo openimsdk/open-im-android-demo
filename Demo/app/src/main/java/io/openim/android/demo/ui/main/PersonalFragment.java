@@ -61,6 +61,11 @@ public class PersonalFragment extends BaseFragment implements Observer {
         view.userId.setText("ID：" + BaseApp.inst().loginCertificate.userID);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Obs.inst().deleteObserver(this);
+    }
 
     private void listener() {
         view.personalInfo.setOnClickListener(new OnDedrepClickListener() {

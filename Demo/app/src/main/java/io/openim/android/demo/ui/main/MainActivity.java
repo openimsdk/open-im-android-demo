@@ -15,7 +15,6 @@ import android.widget.PopupWindow;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -24,6 +23,9 @@ import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.bean.ZxingConfig;
+
+import java.util.Observable;
+import java.util.Observer;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
@@ -40,13 +42,14 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.utils.Constant;
 
 @Route(path = Routes.Main.HOME)
-public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
+public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction, Observer {
 
     private int mCurrentTabIndex;
     private BaseFragment lastFragment, conversationListFragment, contactFragment, personalFragment;
@@ -67,6 +70,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
         view.setMainVM(vm);
         initView();
+        Obs.inst().addObserver(this);
 
         vm.visibility.observe(this, v -> view.isOnline.setVisibility(v));
         click();
@@ -74,8 +78,15 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         hasScanPermission = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
     }
 
-    private void initView() {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Obs.inst().deleteObserver(this);
+    }
 
+    private void initView() {
+        view.avatar.load(BaseApp.inst().loginCertificate.faceURL);
+        view.nickname.setText(BaseApp.inst().loginCertificate.nickname);
     }
 
     private void bindDot() {
@@ -269,6 +280,14 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        Obs.Message message = (Obs.Message) o;
+        if (message.tag == Constant.Event.USER_INFO_UPDATA) {
+            initView();
         }
     }
 }
