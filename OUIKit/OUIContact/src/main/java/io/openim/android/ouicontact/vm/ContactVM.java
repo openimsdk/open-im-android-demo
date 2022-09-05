@@ -74,15 +74,15 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
 
     //群申请列表
     public void getRecvGroupApplicationList() {
-
         OpenIMClient.getInstance().groupManager.getRecvGroupApplicationList(new OnBase<List<GroupApplicationInfo>>() {
             @Override
             public void onError(int code, String error) {
-
+                L.e("");
             }
 
             @Override
             public void onSuccess(List<GroupApplicationInfo> data) {
+                L.e("");
                 if (!data.isEmpty())
                     groupApply.setValue(data);
             }
@@ -170,8 +170,7 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
 
     @Override
     public void onJoinedGroupAdded(GroupInfo info) {
-        dotNum.setValue(dotNum.getValue() + 1);
-        cacheGroupDot();
+
     }
 
     private void cacheGroupDot() {

@@ -76,7 +76,7 @@ public class SocialityVM extends BaseViewModel {
                     exUserInfo.userInfo = datum;
                     String letter = "";
                     try {
-                        letter = Pinyin.toPinyin(exUserInfo.userInfo.getFriendInfo().getNickname().charAt(0));
+                        letter = String.valueOf(Pinyin.toPinyin(exUserInfo.userInfo.getFriendInfo().getNickname().charAt(0)).charAt(0));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

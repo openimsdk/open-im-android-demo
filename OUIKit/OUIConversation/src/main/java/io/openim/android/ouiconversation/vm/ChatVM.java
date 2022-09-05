@@ -18,6 +18,7 @@ import java.util.List;
 
 
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.AtMsgInfo;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
@@ -160,7 +161,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 messageAdapter.notifyItemRangeChanged(list.size() - 1 - data.size(), list.size() - 1);
             }
 
-        }, otherSideID, groupID, startMsg, count);
+        }, otherSideID, groupID, null,startMsg, count);
     }
 
     //移除加载视图

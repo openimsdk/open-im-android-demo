@@ -13,6 +13,19 @@ public class Constant {
     //web socket
     public static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":10001";
 
+
+
+//    public static final String DEFAULT_IP = "139.9.112.88";
+//
+//    //IM sdk api地址
+//    public static final String IM_API_URL = "http://" + DEFAULT_IP + ":11009";
+//    //登录注册手机验 证服务器地址
+//    public static final String APP_AUTH_URL = "http://" + DEFAULT_IP + ":11009";
+//    //    public static final String APP_AUTH_URL = "http://" + DEFAULT_IP + ":3010";
+////web socket
+//    public static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":11008";
+
+
     //存储音频的文件夹
     public static final String AUDIODIR = IM.getStorageDir() + "/audio/";
     //视频存储文件夹

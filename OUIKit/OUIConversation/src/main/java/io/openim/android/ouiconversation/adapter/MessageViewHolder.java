@@ -3,11 +3,14 @@ package io.openim.android.ouiconversation.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
@@ -63,6 +66,8 @@ import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.ByteUtil;
+import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.voice.SPlayer;
@@ -172,7 +177,8 @@ public class MessageViewHolder {
             }
             try {
                 unite();
-            }catch (Exception ignored){}
+            } catch (Exception ignored) {
+            }
         }
 
         /**
@@ -281,7 +287,7 @@ public class MessageViewHolder {
 
                 LayoutMsgExMenuBinding.bind(popupWindow.getContentView())
                     .recyclerview.setLayoutManager(new GridLayoutManager(view.getContext(),
-                    menuIcons.size() < 4 ? menuIcons.size() : 4));
+                        menuIcons.size() < 4 ? menuIcons.size() : 4));
                 adapter.setItems(menuIcons);
 
                 int yDelay = Common.dp2px(5);
@@ -636,7 +642,7 @@ public class MessageViewHolder {
             Glide.with(itemView.getContext())
                 .load(snapshotUrl)
                 .into(view.content2);
-            toPreview(view.contentGroup2, message.getVideoElem().getVideoUrl(), snapshotUrl);
+            toPreview(view.videoPlay2, message.getVideoElem().getVideoUrl(), snapshotUrl);
             showMsgExMenu(view.content2);
         }
 
@@ -689,6 +695,10 @@ public class MessageViewHolder {
 
             view.sendState.setSendState(message.getStatus());
             showMsgExMenu(view.content);
+
+            view.content.setOnClickListener(v -> {
+                openFile(v.getContext(), message);
+            });
         }
 
         @Override
@@ -702,6 +712,30 @@ public class MessageViewHolder {
 
             view.sendState2.setSendState(message.getStatus());
             showMsgExMenu(view.content2);
+
+            view.content2.setOnClickListener(v -> {
+                openFile(v.getContext(), message);
+            });
+        }
+
+        private void openFile(Context context, Message message) {
+            Intent it = new Intent(Intent.ACTION_VIEW);
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            String path = message.getFileElem().getFilePath();
+            if (!TextUtils.isEmpty(path) && GetFilePathFromUri.fileIsExists(path)) {
+                try {
+                    if (MediaFileUtil.isAudioType(path)) {
+                        it.setDataAndType(Uri.parse(path), "audio/MP3");
+                        context.startActivity(it);
+                        return;
+                    }
+                } catch (Exception ignored) {
+                }
+            } else {
+                path = message.getFileElem().getSourceUrl();
+            }
+            it.setDataAndType(Uri.parse(path), "*/*");
+            context.startActivity(it);
         }
     }
 

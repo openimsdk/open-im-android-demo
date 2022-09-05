@@ -59,6 +59,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             vm.isSingleChat = false;
             vm.groupID = groupId;
         }
+
         if (null != notificationMsg)
             vm.notificationMsg.setValue(notificationMsg);
         super.onCreate(savedInstanceState);
@@ -230,8 +231,11 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             public void click(View v) {
                 if (vm.isSingleChat) {
                     ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                        .withString(Constant.K_ID, vm.otherSideID).withBoolean(Constant.K_RESULT,
-                        true).navigation();
+                        .withString(Constant.K_ID, vm.otherSideID)
+                        .withBoolean(Constant.K_RESULT, true)
+                        .navigation();
+//                    startActivity(new Intent(ChatActivity.this,
+//                        ChatSettingActivity.class));
                 } else {
                     ARouter.getInstance().build(Routes.Group.MATERIAL)
                         .withString(Constant.K_GROUP_ID, vm.groupID).navigation();

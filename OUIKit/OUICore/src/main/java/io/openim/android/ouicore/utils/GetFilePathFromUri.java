@@ -28,6 +28,18 @@ import java.io.OutputStream;
 public class GetFilePathFromUri {
 
 
+    //判断文件是否存在
+    public static boolean fileIsExists(String filePath) {
+        try {
+            File f = new File(filePath);
+            if (!f.exists())
+                return false;
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * 根据Uri获取文件绝对路径，解决Android4.4以上版本Uri转换 兼容Android 10
      *

@@ -14,4 +14,12 @@
         <attr name="strokePadding" format="dimension" />
         <attr name="strokeBackground" format="reference" />
     </declare-styleable>
+
+
+    <declare-styleable name="SlideButton">
+        <attr name="sBackgroundColorOff" format="color|reference" />
+        <attr name="sBackgroundColorOn" format="color|reference" />
+        <attr name="sButtonColor" format="color|reference" />
+        <attr name="sMargin" format="dimension|reference" />
+    </declare-styleable>
 </resources>

@@ -105,11 +105,11 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                             goToShoot();
                             break;
                         case 2:
-                            if (vm.isSingleChat){
+                            if (vm.isSingleChat) {
                                 IMUtil.showBottomPopMenu(getContext(), (v1, keyCode, event) -> {
                                     List<String> ids = new ArrayList<>();
                                     ids.add(vm.otherSideID);
-                                    SignalingInfo signalingInfo =IMUtil.buildSignalingInfo(keyCode!=1, vm.isSingleChat,
+                                    SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1, vm.isSingleChat,
                                         ids, null);
                                     CallingService callingService = (CallingService) ARouter.getInstance()
                                         .build(Routes.Service.CALLING).navigation();
@@ -199,6 +199,24 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                     Uri uri = data.getData();
                     if (null != uri) {
                         String filePath = GetFilePathFromUri.getFileAbsolutePath(getContext(), uri);
+                        if (MediaFileUtil.isImageType(filePath)) {
+                            Message msg = OpenIMClient.getInstance().messageManager.createImageMessageFromFullPath(filePath);
+                            vm.sendMsg(msg);
+                            return;
+                        }
+                        if (MediaFileUtil.isVideoType(filePath)) {
+                            Glide.with(this).asBitmap().load(filePath).into(new SimpleTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                    String firstFame = MediaFileUtil.saveBitmap(resource, Constant.PICTUREDIR);
+                                    long duration = MediaFileUtil.getDuration(filePath);
+                                    Message msg = OpenIMClient.getInstance().messageManager
+                                        .createVideoMessageFromFullPath(filePath, MediaFileUtil.getFileType(filePath).mimeType, duration, firstFame);
+                                    vm.sendMsg(msg);
+                                }
+                            });
+                            return;
+                        }
                         if (null != filePath) {
                             Message msg = OpenIMClient.getInstance().messageManager.createFileMessageFromFullPath(filePath, new File(filePath).getName());
                             vm.sendMsg(msg);

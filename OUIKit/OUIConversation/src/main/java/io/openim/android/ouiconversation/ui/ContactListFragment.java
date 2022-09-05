@@ -4,7 +4,6 @@ package io.openim.android.ouiconversation.ui;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -109,7 +108,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             if (menuPosition == 0) {
 
             } else {
-                MsgConversation conversationInfo =vm.conversations.getValue().get(adapterPosition);
+                MsgConversation conversationInfo = vm.conversations.getValue().get(adapterPosition);
                 vm.conversations.getValue().remove(conversationInfo);
                 adapter.notifyItemRemoved(adapterPosition);
                 vm.deleteConversationFromLocalAndSvr(conversationInfo.conversationInfo.getConversationID());
@@ -124,7 +123,6 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             MsgConversation msgConversation = vm.conversations.getValue().get(position);
             Intent intent = new Intent(getContext(), ChatActivity.class)
                 .putExtra(Constant.K_NAME, msgConversation.conversationInfo.getShowName());
-
             if (msgConversation.conversationInfo.getConversationType() == 1)
                 intent.putExtra(Constant.K_ID, msgConversation.conversationInfo.getUserID());
             if (msgConversation.conversationInfo.getConversationType() == 2)
@@ -138,7 +136,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                 OpenIMClient.getInstance().conversationManager.resetConversationGroupAtType(null, msgConversation.conversationInfo.getConversationID());
         });
 
-         adapter = new CustomAdapter(getContext());
+        adapter = new CustomAdapter(getContext());
         view.recyclerView.setAdapter(adapter);
 
 //        view.recyclerView.addItemDecoration(new DefaultItemDecoration(getActivity().getColor(android.R.color.transparent), 1, 36));
