@@ -16,6 +16,7 @@ import java.util.List;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityPersonDetailBinding;
+import io.openim.android.demo.ui.user.PersonInfoActivity;
 import io.openim.android.demo.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseDialog;
@@ -47,12 +48,17 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         vm.searchPerson();
 
         formChat = getIntent().getBooleanExtra(Constant.K_RESULT, false);
+        if (formChat)
+            view.userInfo.setVisibility(View.VISIBLE);
 
         click();
     }
 
 
     private void click() {
+        view.userInfo.setOnClickListener(v->{
+            startActivity(new Intent(this, PersonInfoActivity.class));
+        });
         view.sendMsg.setOnClickListener(v -> {
                 if (formChat) {
                     finish();

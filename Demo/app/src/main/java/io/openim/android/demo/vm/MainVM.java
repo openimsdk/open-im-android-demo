@@ -31,9 +31,10 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     protected void viewCreate() {
         IMEvent.getInstance().addConnListener(this);
 
-        callingService= (CallingService) ARouter.getInstance()
+        callingService = (CallingService) ARouter.getInstance()
             .build(Routes.Service.CALLING).navigation();
-        callingService.setOnServicePriorLoginCallBack(this::initDate);
+        if (null != callingService)
+            callingService.setOnServicePriorLoginCallBack(this::initDate);
 
         BaseApp.inst().loginCertificate = LoginCertificate.getCache(getContext());
         long status = OpenIMClient.getInstance().getLoginStatus();
@@ -64,6 +65,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     private void initDate() {
         if (isInitDate) return;
         isInitDate = true;
+        if (null != callingService)
         callingService.startAudioVideoService(getContext());
 
         IView.initDate();

@@ -58,7 +58,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     private MessageAdapter messageAdapter;
     private Observer<String> inputObserver;
     Message startMsg = null; // 消息体，取界面上显示的消息体对象
-    public String otherSideID = ""; // 接受消息放Id
+    public String otherSideID = ""; // 接受消息Id
     public String groupID = ""; // 接受消息的群ID
     public boolean isSingleChat = true; //是否单聊 false 群聊
     public int count = 20; //条数
@@ -280,7 +280,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
             @Override
             public void onSuccess(Message message) {
-                // 返回新的消息体；替换发送传入的，不然扯回消息会有bug
+                // 返回新的消息体；替换发送传入的，不然撤回消息会有bug
                 int index = messages.getValue().indexOf(msg);
                 messages.getValue().remove(index);
                 messages.getValue().add(index, IMUtil.buildExpandInfo(message));
@@ -359,6 +359,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public void closePage() {
         IView.closePage();
     }
+
+
 
 
     public interface ViewAction extends IView {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -43,27 +44,30 @@
             android:padding="22dp">
 
             <LinearLayout
+                android:id="@+id/user"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
 
                 <io.openim.android.ouicore.widget.AvatarImage
+                    android:id="@+id/avatar"
                     android:layout_width="@dimen/avatar_size"
                     android:layout_height="@dimen/avatar_size"
                     android:src="@mipmap/ic_my_friend" />
 
                 <TextView
+                    android:id="@+id/userName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="托云"
                     android:textColor="#ff333333"
                     android:textSize="16sp" />
 
             </LinearLayout>
 
             <ImageView
+                android:id="@+id/addChat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="22dp"
@@ -107,8 +111,8 @@
                         android:orientation="vertical">
 
                         <ImageView
-                            android:layout_width="@dimen/avatar_size"
-                            android:layout_height="@dimen/avatar_size"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
                             android:src="@mipmap/ic_c_search" />
 
                         <TextView
@@ -134,8 +138,8 @@
                         android:orientation="vertical">
 
                         <ImageView
-                            android:layout_width="@dimen/avatar_size"
-                            android:layout_height="@dimen/avatar_size"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
                             android:src="@mipmap/ic_c_photo" />
 
                         <TextView
@@ -161,8 +165,8 @@
                         android:orientation="vertical">
 
                         <ImageView
-                            android:layout_width="@dimen/avatar_size"
-                            android:layout_height="@dimen/avatar_size"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
                             android:src="@mipmap/ic_c_video" />
 
                         <TextView
@@ -188,8 +192,8 @@
                         android:orientation="vertical">
 
                         <ImageView
-                            android:layout_width="@dimen/avatar_size"
-                            android:layout_height="@dimen/avatar_size"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
                             android:src="@mipmap/ic_c_file" />
 
                         <TextView

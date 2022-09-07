@@ -114,4 +114,5 @@
     <string name="girl">女</string>
     <string name="chat_setting">聊天设置</string>
     <string name="search">搜索</string>
+    <string name="person_info">个人资料</string>
 </resources>
