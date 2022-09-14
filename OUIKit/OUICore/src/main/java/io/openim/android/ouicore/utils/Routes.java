@@ -45,6 +45,7 @@ public class Routes {
     public static class Contact {
         public final static String HOME = "/contact/ContactFragment";
         public final static String FORWARD = "/contact/ForwardToActivity";
+        public static final String ALL_FRIEND = "/contact/AllFriendActivity";
     }
 
 }

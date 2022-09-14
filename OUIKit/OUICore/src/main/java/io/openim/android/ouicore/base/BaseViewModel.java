@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModel;
 
 import java.lang.ref.WeakReference;
 
+import io.openim.android.ouicore.widget.WaitDialog;
+import io.openim.android.sdk.listener.OnBase;
+
 public class BaseViewModel<T extends IView> extends ViewModel {
     public WeakReference<Context> context;
     protected T IView;
@@ -29,7 +32,6 @@ public class BaseViewModel<T extends IView> extends ViewModel {
 
     //视图销毁时
     protected void viewDestroy() {
-
     }
 
     //视图已构建

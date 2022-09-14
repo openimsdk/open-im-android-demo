@@ -1,4 +1,4 @@
-package io.openim.android.demo.ui.main;
+package io.openim.android.demo.ui.user;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +17,6 @@ import java.util.Observer;
 
 import io.openim.android.demo.databinding.FragmentPersonalBinding;
 import io.openim.android.demo.ui.login.LoginActivity;
-import io.openim.android.demo.vm.PersonalVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.im.IMUtil;

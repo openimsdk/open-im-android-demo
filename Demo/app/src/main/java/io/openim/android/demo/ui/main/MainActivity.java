@@ -2,11 +2,9 @@ package io.openim.android.demo.ui.main;
 
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +31,7 @@ import io.openim.android.demo.databinding.LayoutAddActionBinding;
 import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.demo.ui.search.AddConversActivity;
 import io.openim.android.demo.ui.search.PersonDetailActivity;
+import io.openim.android.demo.ui.user.PersonalFragment;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.demo.vm.MainVM;
 import io.openim.android.ouicontact.ui.ContactFragment;
@@ -44,7 +43,6 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.utils.Constant;
 

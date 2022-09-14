@@ -109,4 +109,11 @@
     <string name="chat_setting">聊天设置</string>
     <string name="search">搜索</string>
     <string name="person_info">个人资料</string>
+    <string name="remark">备注</string>
+    <string name="join_the_blacklist">加入黑名单</string>
+    <string name="clear_chat_record">清空聊天记录</string>
+    <string name="clear_chat_tips">确认清空聊天记录？</string>
+    <string name="clear_succ">清理成功</string>
+    <string name="business_card">名片</string>
+    <string name="card">名片</string>
 </resources>

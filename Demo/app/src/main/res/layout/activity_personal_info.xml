@@ -8,7 +8,7 @@
         android:layout_height="match_parent"
         android:background="#F8F8F8FF"
         android:orientation="vertical"
-        tools:context=".ui.main.PersonalInfoActivity">
+        tools:context=".ui.user.PersonalInfoActivity">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"

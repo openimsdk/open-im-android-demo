@@ -2,6 +2,9 @@ package io.openim.android.demo.vm;
 
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.utils.Constant;
@@ -33,8 +36,8 @@ public class PersonalVM extends BaseViewModel {
             waitDialog.dismiss();
             userInfo.setValue(userInfo.getValue());
 
-            BaseApp.inst().loginCertificate.nickname=userInfo.getValue().getNickname();
-            BaseApp.inst().loginCertificate.faceURL=userInfo.getValue().getFaceURL();
+            BaseApp.inst().loginCertificate.nickname = userInfo.getValue().getNickname();
+            BaseApp.inst().loginCertificate.faceURL = userInfo.getValue().getFaceURL();
             Obs.newMessage(Constant.Event.USER_INFO_UPDATA);
         }
     };
@@ -55,6 +58,26 @@ public class PersonalVM extends BaseViewModel {
             }
         });
 
+    }
+
+    public void getUserInfo(String id) {
+        waitDialog.show();
+        List<String> ids = new ArrayList<>();
+        ids.add(id);
+        OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
+            @Override
+            public void onError(int code, String error) {
+                waitDialog.dismiss();
+                IView.toast(error + code);
+            }
+
+            @Override
+            public void onSuccess(List<UserInfo> data) {
+                waitDialog.dismiss();
+                if (data.isEmpty()) return;
+                userInfo.setValue(data.get(0));
+            }
+        }, ids);
     }
 
     public void setSelfInfo(String nickname, String faceURL, int gender, int appMangerLevel, String phoneNumber, long birth, String email, String ex) {

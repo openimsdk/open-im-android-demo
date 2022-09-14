@@ -231,6 +231,29 @@
                 android:layout_height="23dp" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/clearRecord"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="12dp"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:paddingLeft="22dp"
+            android:paddingRight="22dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/clear_chat_record"
+                android:textColor="#ff333333"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_right" />
+        </LinearLayout>
 
     </LinearLayout>
 </layout>

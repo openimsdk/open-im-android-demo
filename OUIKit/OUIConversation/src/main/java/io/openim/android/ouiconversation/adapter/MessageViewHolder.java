@@ -44,6 +44,8 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgAudioLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgAudioRightBinding;
 
 
+import io.openim.android.ouiconversation.databinding.LayoutMsgCardLeftBinding;
+import io.openim.android.ouiconversation.databinding.LayoutMsgCardRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgExMenuBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgFileLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgFileRightBinding;
@@ -63,6 +65,7 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.AtUsersInfo;
 import io.openim.android.ouicore.entity.MsgExpand;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.ByteUtil;
@@ -76,6 +79,7 @@ import io.openim.android.ouicore.voice.player.SMediaPlayer;
 import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.MergeElem;
 import io.openim.android.sdk.models.Message;
 
@@ -108,6 +112,8 @@ public class MessageViewHolder {
         if (viewType == Constant.MsgType.MERGE)
             return new MergeView(parent);
 
+        if (viewType == Constant.MsgType.TRANSIT)
+            return new BusinessCardView(parent);
 
         return new TXTView(parent);
     }
@@ -154,30 +160,31 @@ public class MessageViewHolder {
         //绑定数据
         public void bindData(Message message, int position) {
             this.message = message;
-            if (isOwn = message.getSendID().equals(BaseApp.inst().loginCertificate.userID)) {
-                if (leftIsInflated)
-                    left.setVisibility(View.GONE);
-                if (rightIsInflated)
-                    right.setVisibility(View.VISIBLE);
-                if (!rightIsInflated) {
-                    right.setLayoutResource(getRightInflatedId());
-                    right.inflate();
-                }
-                bindRight(itemView, message);
-            } else {
-                if (leftIsInflated)
-                    left.setVisibility(View.VISIBLE);
-                if (rightIsInflated)
-                    right.setVisibility(View.GONE);
-                if (!leftIsInflated) {
-                    left.setLayoutResource(getLeftInflatedId());
-                    left.inflate();
-                }
-                bindLeft(itemView, message);
-            }
             try {
+                if (isOwn = message.getSendID().equals(BaseApp.inst().loginCertificate.userID)) {
+                    if (leftIsInflated)
+                        left.setVisibility(View.GONE);
+                    if (rightIsInflated)
+                        right.setVisibility(View.VISIBLE);
+                    if (!rightIsInflated) {
+                        right.setLayoutResource(getRightInflatedId());
+                        right.inflate();
+                    }
+                    bindRight(itemView, message);
+                } else {
+                    if (leftIsInflated)
+                        left.setVisibility(View.VISIBLE);
+                    if (rightIsInflated)
+                        right.setVisibility(View.GONE);
+                    if (!leftIsInflated) {
+                        left.setLayoutResource(getLeftInflatedId());
+                        left.inflate();
+                    }
+                    bindLeft(itemView, message);
+                }
                 unite();
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
@@ -855,5 +862,45 @@ public class MessageViewHolder {
         };
     }
 
+
+    public static class BusinessCardView extends MessageViewHolder.MsgViewHolder {
+
+        public BusinessCardView(ViewGroup itemView) {
+            super(itemView);
+        }
+
+        @Override
+        int getLeftInflatedId() {
+            return R.layout.layout_msg_card_left;
+        }
+
+        @Override
+        int getRightInflatedId() {
+            return R.layout.layout_msg_card_right;
+        }
+
+        @Override
+        void bindLeft(View itemView, Message message) {
+            LayoutMsgCardLeftBinding view = LayoutMsgCardLeftBinding.bind(itemView);
+            view.sendState.setSendState(message.getStatus());
+            view.avatar.load(message.getSenderFaceUrl());
+            String friendInfo = message.getContent();
+            FriendInfo friendInfoBean = GsonHel.fromJson(friendInfo, FriendInfo.class);
+            view.nickName.setText(friendInfoBean.getNickname());
+            view.otherAvatar.load(friendInfoBean.getFaceURL());
+
+        }
+
+        @Override
+        void bindRight(View itemView, Message message) {
+            LayoutMsgCardRightBinding view = LayoutMsgCardRightBinding.bind(itemView);
+            view.sendState2.setSendState(message.getStatus());
+            view.avatar2.load(message.getSenderFaceUrl());
+            String friendInfo = message.getContent();
+            FriendInfo friendInfoBean = GsonHel.fromJson(friendInfo, FriendInfo.class);
+            view.nickName2.setText(friendInfoBean.getNickname());
+            view.otherAvatar2.load(friendInfoBean.getFaceURL());
+        }
+    }
 
 }

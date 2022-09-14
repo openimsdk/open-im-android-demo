@@ -34,9 +34,10 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         IMEvent.getInstance().addAdvanceMsgListener(this);
         updataConversation();
 
-        UIHandler.postDelayed(this::updataConversation,5*1000);
+        UIHandler.postDelayed(this::updataConversation, 5 * 1000);
     }
-    public void deleteConversationFromLocalAndSvr(String conversationId){
+
+    public void deleteConversationFromLocalAndSvr(String conversationId) {
         OpenIMClient.getInstance().conversationManager.deleteConversationFromLocalAndSvr(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -47,7 +48,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
             public void onSuccess(String data) {
                 updataConversation();
             }
-        },conversationId);
+        }, conversationId);
     }
 
     private void updataConversation() {
@@ -59,10 +60,13 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
             @Override
             public void onSuccess(List<ConversationInfo> data) {
-                L.e("AllConversationList---size--"+data.size());
+                L.e("AllConversationList---size--" + data.size());
                 conversations.getValue().clear();
                 for (ConversationInfo datum : data) {
-                    conversations.getValue().add(new MsgConversation(GsonHel.fromJson(datum.getLatestMsg(), Message.class), datum));
+                    Message msg = GsonHel.fromJson(datum.getLatestMsg(), Message.class);
+                    if (null == msg)
+                        continue;
+                    conversations.getValue().add(new MsgConversation(msg, datum));
                 }
                 conversations.setValue(conversations.getValue());
             }
@@ -112,7 +116,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     @Override
     public void onTotalUnreadMessageCountChanged(int i) {
-            L.e("");
+        L.e("");
     }
 
     @Override

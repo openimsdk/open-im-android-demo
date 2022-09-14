@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 
+import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.AtMsgInfo;
@@ -31,6 +32,7 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.FixSizeLinkedList;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
@@ -161,7 +163,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 messageAdapter.notifyItemRangeChanged(list.size() - 1 - data.size(), list.size() - 1);
             }
 
-        }, otherSideID, groupID, null,startMsg, count);
+        }, otherSideID, groupID, null, startMsg, count);
     }
 
     //移除加载视图
@@ -360,7 +362,25 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         IView.closePage();
     }
 
+    public void clearC2CHistory(String uid) {
+        WaitDialog waitDialog = new WaitDialog(getContext());
+        waitDialog.show();
+        OpenIMClient.getInstance().messageManager
+            .clearC2CHistoryMessageFromLocalAndSvr(new OnBase<String>() {
+                @Override
+                public void onError(int code, String error) {
+                    waitDialog.dismiss();
+                    IView.toast(error + code);
+                }
 
+                @Override
+                public void onSuccess(String data) {
+                    waitDialog.dismiss();
+                    messages.getValue().clear();
+                    IView.toast(getContext().getString(io.openim.android.ouicore.R.string.clear_succ));
+                }
+            }, uid);
+    }
 
 
     public interface ViewAction extends IView {

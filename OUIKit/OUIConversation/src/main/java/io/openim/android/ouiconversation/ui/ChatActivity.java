@@ -230,7 +230,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             @Override
             public void click(View v) {
                 if (vm.isSingleChat) {
-
                     startActivity(new Intent(ChatActivity.this,
                         ChatSettingActivity.class));
                 } else {

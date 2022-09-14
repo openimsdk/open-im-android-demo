@@ -102,8 +102,8 @@ public class SlideButton extends View {
             mCircleX = mMargin + mCircleRadius;
         }
 
-        if (onClickListener != null)
-            onClickListener.onClicked(this.isChecked);
+//        if (onClickListener != null)
+//            onClickListener.onClicked(this.isChecked);
 
         postInvalidate();
     }

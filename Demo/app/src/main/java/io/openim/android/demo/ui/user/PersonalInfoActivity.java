@@ -1,4 +1,4 @@
-package io.openim.android.demo.ui.main;
+package io.openim.android.demo.ui.user;
 
 
 import android.app.Activity;
@@ -21,6 +21,7 @@ import java.util.Date;
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
 import io.openim.android.demo.databinding.ActivityPersonalInfoBinding;
+import io.openim.android.demo.ui.main.EditTextActivity;
 import io.openim.android.demo.vm.PersonalVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Common;

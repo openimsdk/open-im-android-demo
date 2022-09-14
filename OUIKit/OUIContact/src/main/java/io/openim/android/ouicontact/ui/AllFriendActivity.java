@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.android.arouter.facade.Postcard;
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
@@ -21,14 +23,17 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.entity.ExUserInfo;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.sdk.models.FriendInfo;
 
+@Route(path = Routes.Contact.ALL_FRIEND)
 public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFriendBinding> {
 
     private RecyclerViewAdapter<ExUserInfo, RecyclerView.ViewHolder> adapter;
+    private boolean formChat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +41,7 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityAllFriendBinding.inflate(getLayoutInflater()));
         sink();
+        formChat = getIntent().getBooleanExtra("formChat", false);
         vm.getAllFriend();
 
         listener();
@@ -96,6 +102,12 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
                     itemViewHo.view.nickName.setText(friendInfo.getNickname());
                     itemViewHo.view.select.setVisibility(View.GONE);
                     itemViewHo.view.getRoot().setOnClickListener(v -> {
+                        if (formChat) {
+                            setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
+                                GsonHel.toJson(friendInfo)));
+                            finish();
+                            return;
+                        }
                         ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
                             .withString(Constant.K_ID, friendInfo.getUserID()).navigation(AllFriendActivity.this, 1001);
                     });

@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +22,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -35,7 +38,9 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.FragmentInputExpandBinding;
@@ -46,13 +51,16 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
 
@@ -62,11 +70,14 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         R.mipmap.ic_chat_shoot,
         R.mipmap.ic_tools_video_call,
         R.mipmap.ic_chat_menu_file,
-        R.mipmap.ic_chat_location);
+        R.mipmap.ic_chat_location,
+        R.mipmap.ic_business_card);
     public List<String> menuTitles = Arrays.asList(BaseApp.inst().getString(io.openim.android.ouicore.R.string.album),
         BaseApp.inst().getString(io.openim.android.ouicore.R.string.shoot), BaseApp.inst().getString(io.openim.android.ouicore.R.string.video_calls),
         BaseApp.inst().getString(io.openim.android.ouicore.R.string.file),
-        BaseApp.inst().getString(io.openim.android.ouicore.R.string.location));
+        BaseApp.inst().getString(io.openim.android.ouicore.R.string.location),
+        BaseApp.inst().getString(io.openim.android.ouicore.R.string.business_card)
+    );
 
     FragmentInputExpandBinding v;
     //权限
@@ -124,6 +135,13 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                         case 4:
                             gotoShareLocation();
                             break;
+                        case 5:
+                            Postcard postcard = ARouter.getInstance()
+                                .build(Routes.Contact.ALL_FRIEND);
+                            LogisticsCenter.completion(postcard);
+                            businessCardLauncher.launch(new Intent(getContext(), postcard.getDestination())
+                                .putExtra("formChat", true));
+                            break;
                     }
                 });
             }
@@ -131,6 +149,20 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         v.getRoot().setAdapter(adapter);
         adapter.setItems(menuIcons);
     }
+
+    private final ActivityResultLauncher<Intent> businessCardLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() != Activity.RESULT_OK) return;
+        String friendInfo = result.getData().getStringExtra(Constant.K_RESULT);
+
+        FriendInfo friendInfoBean = GsonHel.fromJson(friendInfo, FriendInfo.class);
+        Map<String, String> bean = new HashMap();
+        bean.put("userID", friendInfoBean.getUserID());
+        bean.put("nickname", friendInfoBean.getNickname());
+        bean.put("faceURL", friendInfoBean.getFaceURL());
+        Message message = OpenIMClient.getInstance().messageManager
+            .createCardMessage(GsonHel.toJson(bean));
+        vm.sendMsg(message);
+    });
 
     private final ActivityResultLauncher<Intent> shareLocationLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() != Activity.RESULT_OK) return;
