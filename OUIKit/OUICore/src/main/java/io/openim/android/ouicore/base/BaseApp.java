@@ -8,10 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.openim.android.ouicore.entity.LoginCertificate;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class BaseApp extends Application {
 
     private static BaseApp instance;
+    public Realm realm;
 
     public static BaseApp inst() {
         return instance;
@@ -36,10 +39,18 @@ public class BaseApp extends Application {
         }
     }
 
+    private void realmInit() {
+        Realm.init(this);
+        String realmName = "open_im_db";
+        RealmConfiguration config = new RealmConfiguration.Builder().name(realmName).build();
+        realm = Realm.getInstance(config);
+    }
+
 
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
+        realmInit();
     }
 }

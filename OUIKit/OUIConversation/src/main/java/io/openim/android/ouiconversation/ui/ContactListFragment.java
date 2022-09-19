@@ -127,9 +127,10 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                 intent.putExtra(Constant.K_ID, msgConversation.conversationInfo.getUserID());
             if (msgConversation.conversationInfo.getConversationType() == 2)
                 intent.putExtra(Constant.K_GROUP_ID, msgConversation.conversationInfo.getGroupID());
-
             if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification)
                 intent.putExtra(Constant.K_NOTICE, msgConversation.notificationMsg);
+
+
             startActivity(intent);
             //重置强提醒
             if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification)

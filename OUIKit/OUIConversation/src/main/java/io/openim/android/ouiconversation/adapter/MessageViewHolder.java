@@ -888,7 +888,13 @@ public class MessageViewHolder {
             FriendInfo friendInfoBean = GsonHel.fromJson(friendInfo, FriendInfo.class);
             view.nickName.setText(friendInfoBean.getNickname());
             view.otherAvatar.load(friendInfoBean.getFaceURL());
+            jump(view.content, friendInfoBean.getUserID());
+        }
 
+        void jump(View view, String uid) {
+            view.setOnClickListener(v -> ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                .withString(Constant.K_ID, uid)
+                .withBoolean(Constant.K_RESULT, true).navigation(view.getContext()));
         }
 
         @Override
@@ -900,6 +906,7 @@ public class MessageViewHolder {
             FriendInfo friendInfoBean = GsonHel.fromJson(friendInfo, FriendInfo.class);
             view.nickName2.setText(friendInfoBean.getNickname());
             view.otherAvatar2.load(friendInfoBean.getFaceURL());
+            jump(view.content2, friendInfoBean.getUserID());
         }
     }
 

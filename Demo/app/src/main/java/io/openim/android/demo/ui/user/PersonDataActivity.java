@@ -39,7 +39,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        bindVM(PersonalVM.class);
+        bindVM(PersonalVM.class, true);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityPersonInfoBinding.inflate(getLayoutInflater()));
         sink();
@@ -47,6 +47,13 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         listener();
         chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
         vm.getUserInfo(chatVM.otherSideID);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isFinishing())
+            removeCacheVM();
     }
 
     private void init() {
@@ -59,6 +66,9 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
 
 
     private void listener() {
+        view.moreData.setOnClickListener(v -> {
+            startActivity(new Intent(this, MoreDataActivity.class));
+        });
         view.remark.setOnClickListener(view -> {
             if (null == vm.userInfo.getValue()) return;
             resultLauncher.launch(new Intent(this, EditTextActivity.class)

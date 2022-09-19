@@ -14,7 +14,6 @@ public class Constant {
     public static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":10001";
 
 
-
 //    public static final String DEFAULT_IP = "139.9.112.88";
 //
 //    //IM sdk api地址
@@ -49,12 +48,19 @@ public class Constant {
         public static final int CALLING_REQUEST_CODE = 10003;
         //用户信息更新
         public static final int USER_INFO_UPDATA = 10004;
+        //设置背景
+        public static final int SET_BACKGROUND = 10005;
     }
 
     //会话类型
     public static class SessionType {
         public static final int SINGLE_CHAT = 1;
         public static final int GROUP_CHAT = 2;
+        /// 大群
+        public static final int SUPER_GROUP = 3;
+
+        /// 通知
+        public static final int NOTIFICATION = 4;
     }
 
     public static final String K_ID = "Id";
@@ -67,6 +73,7 @@ public class Constant {
     public static final String K_FRIEND_NUM = "k_friend_num";
     //群红点
     public static final String K_GROUP_NUM = "k_group_num";
+    public static final String K_SET_BACKGROUND = "set_background";
 
     /**
      * 发送状态

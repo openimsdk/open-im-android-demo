@@ -25,6 +25,7 @@ import io.openim.android.ouicalling.databinding.DialogCallBinding;
 import io.openim.android.ouicalling.vm.CallingVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseDialog;
+import io.openim.android.ouicore.entity.CallHistory;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.MediaPlayerListener;
@@ -112,7 +113,6 @@ public class CallDialog extends BaseDialog {
             view.ask.setVisibility(View.GONE);
 
 
-
             view.callingTips.setText(context.getString(io.openim.android.ouicore.R.string.waiting_tips) + "...");
             view.callingTips2.setText(context.getString(io.openim.android.ouicore.R.string.waiting_tips) + "...");
             callingVM.signalingInvite(signalingInfo);
@@ -184,6 +184,9 @@ public class CallDialog extends BaseDialog {
             @Override
             public void click(View v) {
                 callingVM.signalingHungUp(signalingInfo);
+
+                callingVM.renewalDB(signalingInfo,
+                    callHistory -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
             }
         });
         view.reject.setOnClickListener(new OnDedrepClickListener() {
@@ -205,6 +208,14 @@ public class CallDialog extends BaseDialog {
                     @Override
                     public void onSuccess(Object data) {
                         changeView();
+
+                        BaseApp.inst().realm.executeTransactionAsync(realm -> {
+                            CallHistory callHistory = realm.where(CallHistory.class)
+                                .equalTo("roomID",
+                                    signalingInfo.getInvitation().getRoomID()).findFirst();
+                            if (null == callHistory) return;
+                            callHistory.setSuccess(true);
+                        });
                     }
                 });
             }
@@ -275,4 +286,5 @@ public class CallDialog extends BaseDialog {
         MediaPlayerUtil.INSTANCE.pause();
         MediaPlayerUtil.INSTANCE.release();
     }
+
 }

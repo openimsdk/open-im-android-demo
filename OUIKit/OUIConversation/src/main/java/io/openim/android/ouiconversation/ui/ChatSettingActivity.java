@@ -1,11 +1,15 @@
 package io.openim.android.ouiconversation.ui;
 
 
+import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.lifecycle.Observer;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import io.openim.android.ouiconversation.R;
@@ -18,9 +22,11 @@ import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.UserInfo;
 
-public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding>implements ChatVM.ViewAction {
+public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding> implements ChatVM.ViewAction {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,11 +35,19 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
         bindViewDataBinding(ActivityChatSettingBinding.inflate(getLayoutInflater()));
         sink();
 
+
         initView();
         click();
     }
 
     private void click() {
+        view.chatbg.setOnClickListener(view1 -> {
+            startActivity(new Intent(this,SetChatBgActivity.class));
+        });
+
+        view.noDisturb.setOnSlideButtonClickListener(is -> {
+            vm.setConversationRecvMessageOpt(is ? 2 : 0, vm.conversationInfo.getValue().getConversationID());
+        });
         view.user.setOnClickListener(v -> {
             ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
                 .withString(Constant.K_ID, vm.otherSideID)
@@ -53,6 +67,10 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
     }
 
     private void initView() {
+        vm.notDisturbStatus.observe(this, integer -> {
+            view.noDisturb.setChecked(integer == 2);
+        });
+
         List<String> uid = new ArrayList<>();
         uid.add(vm.otherSideID);
         OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {

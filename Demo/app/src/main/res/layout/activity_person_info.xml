@@ -71,6 +71,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/moreData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
@@ -87,7 +88,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="更多资料"
+                        android:text="@string/more_data"
                         android:textColor="#ff333333"
                         android:textSize="18sp" />
 

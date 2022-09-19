@@ -77,6 +77,14 @@
                 </LinearLayout>
 
                 <ImageView
+                    android:id="@+id/callRecord"
+                    android:layout_width="31dp"
+                    android:layout_height="31dp"
+                    android:padding="5dp"
+                    android:layout_marginRight="15dp"
+                    android:src="@mipmap/ic_call_white" />
+
+                <ImageView
                     android:id="@+id/addFriend"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

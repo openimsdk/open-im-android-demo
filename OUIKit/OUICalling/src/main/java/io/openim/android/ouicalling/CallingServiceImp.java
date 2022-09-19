@@ -15,12 +15,26 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.yanzhenjie.permission.AndPermission;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.openim.android.ouicalling.service.AudioVideoService;
+import io.openim.android.ouicalling.vm.CallingVM;
+import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.entity.CallHistory;
+import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.PersonalVM;
+import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.SignalingInfo;
+import io.openim.android.sdk.models.UserInfo;
+import io.realm.Realm;
+import io.realm.RealmAsyncTask;
+import io.realm.RealmResults;
 
 @Route(path = Routes.Service.CALLING)
 public class CallingServiceImp implements CallingService {
@@ -110,6 +124,9 @@ public class CallingServiceImp implements CallingService {
         Common.UIHandler.post(() -> {
             if (null == callDialog) return;
             callDialog.otherSideAccepted();
+
+            callDialog.callingVM.renewalDB(signalingInfo,
+                callHistory ->  callHistory.setSuccess(true));
         });
     }
 
@@ -119,12 +136,16 @@ public class CallingServiceImp implements CallingService {
     }
 
     @Override
-    public void onInviteeRejected(SignalingInfo s) {
+    public void onInviteeRejected(SignalingInfo signalingInfo) {
         L.e(TAG, "----onInviteeRejected-----");
         Common.UIHandler.post(() -> {
             if (null == callDialog) return;
             callDialog.dismiss();
+
+            callDialog.callingVM.renewalDB(signalingInfo,
+                callHistory ->  callHistory.setSuccess(false));
         });
+
     }
 
     @Override
@@ -135,8 +156,8 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onReceiveNewInvitation(SignalingInfo signalingInfo) {
         L.e(TAG, "----onReceiveNewInvitation-----");
-        this.signalingInfo = signalingInfo;
         Common.UIHandler.post(() -> {
+            this.signalingInfo = signalingInfo;
             AndPermission.with(context).overlay().onGranted(data -> {
                 context.startActivity(new Intent(context, LockPushActivity.class)
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
@@ -161,6 +182,8 @@ public class CallingServiceImp implements CallingService {
             }
         }
         callDialog.show();
+
+        insetDB();
     }
 
     @Override
@@ -169,6 +192,9 @@ public class CallingServiceImp implements CallingService {
         Common.UIHandler.post(() -> {
             if (null == callDialog) return;
             callDialog.dismiss();
+
+            callDialog.callingVM.renewalDB(signalingInfo,
+                callHistory -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
         });
     }
 
@@ -177,6 +203,35 @@ public class CallingServiceImp implements CallingService {
     public void call(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
         showCalling(null, true);
+    }
+
+    private void insetDB() {
+        if (callDialog.callingVM.isGroup) return;
+        List<String> ids = new ArrayList<>();
+        ids.add(callDialog.callingVM.isCallOut ?
+            signalingInfo.getInvitation().getInviteeUserIDList().get(0)
+            : signalingInfo.getInvitation().getInviterUserID());
+        OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
+            @Override
+            public void onError(int code, String error) {
+            }
+
+            @Override
+            public void onSuccess(List<UserInfo> data) {
+                if (data.isEmpty()) return;
+                UserInfo userInfo = data.get(0);
+
+                BaseApp.inst().realm.executeTransactionAsync(realm -> {
+                    CallHistory callHistory = new CallHistory(
+                        signalingInfo.getInvitation().getRoomID(),
+                        userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(),
+                        signalingInfo.getInvitation().getMediaType(), false, !callDialog.callingVM.isCallOut,
+                        System.currentTimeMillis(), 0
+                    );
+                    realm.insert(callHistory);
+                });
+            }
+        }, ids);
     }
 
 }

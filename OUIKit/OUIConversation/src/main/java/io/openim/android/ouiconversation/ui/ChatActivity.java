@@ -17,10 +17,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.bumptech.glide.Glide;
 import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouiconversation.databinding.ActivityChatBinding;
@@ -32,13 +35,15 @@ import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
 
 @Route(path = Routes.Conversation.CHAT)
-public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> implements ChatVM.ViewAction {
+public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> implements ChatVM.ViewAction, Observer {
 
 
     private MessageAdapter messageAdapter;
@@ -50,7 +55,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         //userId 与 GROUP_ID 互斥
         String userId = getIntent().getStringExtra(Constant.K_ID);
         String groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
-        String name = getIntent().getStringExtra(io.openim.android.ouicore.utils.Constant.K_NAME);
+        String name = getIntent().getStringExtra(Constant.K_NAME);
         NotificationMsg notificationMsg = (NotificationMsg) getIntent().getSerializableExtra(Constant.K_NOTICE);
         bindVM(ChatVM.class, true);
         if (null != userId)
@@ -68,9 +73,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         sink();
         view.setChatVM(vm);
 
+        Obs.inst().addObserver(this);
+
         initView(name);
         listener();
-
         setTouchClearFocus(false);
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
     }
@@ -84,8 +90,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     @Override
     protected void onPause() {
         super.onPause();
-        if (isFinishing())
+        if (isFinishing()) {
             removeCacheVM();
+            Obs.inst().deleteObserver(this);
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -123,7 +131,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 scrollToPosition(0);
             }
         });
-
+        String chatBg = SharedPreferencesUtil.get(this).getString(
+            Constant.K_SET_BACKGROUND + (vm.isSingleChat ? vm.otherSideID : vm.groupID));
+        if (!chatBg.isEmpty())
+            Glide.with(this).load(chatBg).into(view.chatBg);
     }
 
     //记录原始窗口高度
@@ -293,6 +304,24 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(isVideoCalls, false,
                 ids, vm.groupID);
             callingService.call(signalingInfo);
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        Obs.Message message = (Obs.Message) o;
+        if (message.tag == Constant.Event.SET_BACKGROUND) {
+            String path = "";
+            if (null != message.object) {
+                path = (String) message.object;
+            } else {
+                path = SharedPreferencesUtil.get(this).getString(
+                    Constant.K_SET_BACKGROUND + (vm.isSingleChat ? vm.otherSideID : vm.groupID));
+            }
+            if (path.isEmpty())
+                view.chatBg.setVisibility(View.GONE);
+            else
+                Glide.with(this).load(path).into(view.chatBg);
         }
     }
 

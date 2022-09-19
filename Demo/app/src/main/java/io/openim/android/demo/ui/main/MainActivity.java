@@ -117,6 +117,9 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     }
 
     private void click() {
+        view.callRecord.setOnClickListener(view -> {
+            startActivity(new Intent(this,CallHistoryActivity.class));
+        });
         showPopupWindow();
         view.menuGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.men1)

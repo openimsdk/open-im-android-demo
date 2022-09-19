@@ -122,4 +122,14 @@
     <string name="clear_succ">清理成功</string>
     <string name="business_card">名片</string>
     <string name="card">名片</string>
+    <string name="more_data">更多资料</string>
+    <string name="call_history">通话记录</string>
+    <string name="all_call">所有通话</string>
+    <string name="ont_answer_call">未接通话</string>
+    <string name="inbound">呼入</string>
+    <string name="outbound">呼出</string>
+    <string name="select_from_album">从相册选择</string>
+    <string name="take_picture">拍照</string>
+    <string name="reduction">还原</string>
+    <string name="set_succ">设置成功</string>
 </resources>

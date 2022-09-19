@@ -19,6 +19,7 @@ import io.livekit.android.room.participant.RemoteParticipant;
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicalling.CallingServiceImp;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.entity.CallHistory;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
@@ -295,5 +296,20 @@ public class CallingVM {
 
     public interface OnParticipantsChangeListener {
         void onChange(List<Participant> participants);
+    }
+
+
+    public void renewalDB(SignalingInfo signalingInfo, OnRenewalDBListener onRenewalDBListener) {
+        BaseApp.inst().realm.executeTransactionAsync(realm -> {
+            CallHistory callHistory = realm.where(CallHistory.class)
+                .equalTo("roomID",
+                    signalingInfo.getInvitation().getRoomID()).findFirst();
+            if (null == callHistory) return;
+            onRenewalDBListener.onRenewal(callHistory);
+        });
+    }
+
+    public interface OnRenewalDBListener {
+        void onRenewal(CallHistory callHistory);
     }
 }

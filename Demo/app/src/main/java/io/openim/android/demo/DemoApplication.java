@@ -15,10 +15,13 @@ import io.openim.android.ouicore.im.IM;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.voice.SPlayer;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 
 public class DemoApplication extends BaseApp {
     private static final String TAG = BaseApp.class.getSimpleName();
+    public Realm realm;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -42,7 +45,10 @@ public class DemoApplication extends BaseApp {
         ARouter.init(this);
         ARouter.openLog();
         ARouter.openDebug();
+
+
     }
+
 
     private boolean isMainProcess() {
         ActivityManager am = ((ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE));

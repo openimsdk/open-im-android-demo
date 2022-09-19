@@ -74,5 +74,19 @@ public class TimeUtil {
         return format.format(date);
     }
 
+    public static String secondFormat(int second, boolean isZh) {
+        int minute = (second / 60);
+        int hour = (minute / 60);
+        if (hour != 0)
+            return repair0(hour) + (isZh ? "时" : ":")
+                + repair0(minute) + (isZh ? "分" : ":") + repair0(second) + (isZh ? "秒" : "");
+        if (minute != 0)
+            return repair0(minute) + (isZh ? "分" : ":") + repair0(second);
+        return repair0(second) + (isZh ? "秒" : "");
+    }
+
+    private static String repair0(int v) {
+        return v < 10 ? ("0" + v) : (v + "");
+    }
 
 }

@@ -104,16 +104,26 @@
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_above="@id/layout_input_cote"
-            android:layout_below="@id/card"
-            android:overScrollMode="never"
-            android:paddingLeft="22dp"
-            android:paddingRight="22dp" />
+            android:layout_below="@id/card">
+
+            <ImageView
+                android:id="@+id/chatBg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                android:paddingLeft="22dp"
+                android:paddingRight="22dp" />
+        </FrameLayout>
+
 
         <LinearLayout
             android:id="@+id/notice"
@@ -168,8 +178,8 @@
             android:layout_alignParentBottom="true"
             android:layout_marginLeft="-8dp"
             android:layout_marginRight="-8dp"
-            app:hl_bottomShow="false"
             android:visibility="gone"
+            app:hl_bottomShow="false"
             app:hl_shadowColor="#2a000000"
             app:hl_shadowLimit="8dp">
 
@@ -190,7 +200,7 @@
                     android:drawableTop="@mipmap/ic_delete_grey"
                     android:drawablePadding="3dp"
                     android:gravity="center"
-                   android:padding="7dp"
+                    android:padding="7dp"
                     android:text="@string/delete"
                     android:textColor="#ff898989"
                     android:textSize="12sp" />

@@ -12,6 +12,12 @@
         android:theme="@style/Theme.Demo"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ui.main.CallHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.user.MoreDataActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.user.PersonDataActivity"
             android:exported="false" />
         <activity
