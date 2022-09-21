@@ -57,6 +57,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public MutableLiveData<List<Message>> messages = new MutableLiveData<>(new ArrayList<>());
     //@消息
     public MutableLiveData<List<Message>> atMessages = new MutableLiveData<>(new ArrayList<>());
+    //表情
+    public MutableLiveData<List<String>> emojiMessages = new MutableLiveData<>(new ArrayList<>());
     public ObservableBoolean typing = new ObservableBoolean(false);
     public MutableLiveData<String> inputMsg = new MutableLiveData<>("");
     MutableLiveData<Boolean> isNoData = new MutableLiveData<>(false);

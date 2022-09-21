@@ -13,8 +13,8 @@
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:focusableInTouchMode="true"
-        android:tag="layout/layout_input_cote_0"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:tag="layout/layout_input_cote_0">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,8 +25,8 @@
             android:orientation="horizontal"
             android:paddingLeft="10dp"
             android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            android:paddingRight="10dp">
+            android:paddingRight="10dp"
+            android:paddingBottom="6dp">
 
             <CheckBox
                 android:id="@+id/voice"
@@ -37,7 +37,7 @@
                 android:drawableLeft="@drawable/selector_chat_checkbox"
                 android:paddingLeft="10dp" />
 
-            <EditText
+            <io.openim.android.ouiconversation.widget.TailInputEditText
                 android:id="@+id/chatInput"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -58,10 +58,18 @@
                 android:visibility="gone" />
 
             <ImageView
+                android:id="@+id/emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:clickable="true"
+                android:padding="7dp"
+                android:src="@mipmap/emoji" />
+
+            <ImageView
                 android:id="@+id/chatMore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:clickable="true"
                 android:padding="7dp"
@@ -73,9 +81,8 @@
                 android:layout_height="43dp"
                 android:enabled="true"
                 android:text="@string/send"
-                android:visibility="visible"
                 android:textSize="14sp"
-                />
+                android:visibility="visible" />
         </LinearLayout>
 
         <FrameLayout

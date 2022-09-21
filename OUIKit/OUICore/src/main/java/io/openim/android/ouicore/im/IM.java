@@ -12,7 +12,8 @@ public class IM {
         N.init(new HttpConfig().setBaseUrl(Constant.APP_AUTH_URL));
         ///IM 初始化
         OpenIMClient.getInstance().initSDK(2, Constant.IM_API_URL, Constant.IM_WS_URL, getStorageDir(), 1, "minio",
-            IMEvent.getInstance().connListener);
+            "",IMEvent.getInstance().connListener);
+
         IMEvent.getInstance().init();
     }
 

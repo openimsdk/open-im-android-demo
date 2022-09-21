@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.runtime.Permission;
 import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
@@ -49,9 +52,13 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     private MessageAdapter messageAdapter;
     private BottomInputCote bottomInputCote;
     private boolean isVideoCalls;
+    private boolean hasMicrophone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        MThreadTool.executorService.execute(() -> {
+            hasMicrophone = AndPermission.hasPermissions(this, Permission.Group.MICROPHONE);
+        });
         //userId 与 GROUP_ID 互斥
         String userId = getIntent().getStringExtra(Constant.K_ID);
         String groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
@@ -98,7 +105,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     @SuppressLint("ClickableViewAccessibility")
     private void initView(String name) {
-        bottomInputCote = new BottomInputCote(this, view.layoutInputCote);
+        bottomInputCote = new BottomInputCote(this, view.layoutInputCote,hasMicrophone);
         bottomInputCote.setChatVM(vm);
 
         view.nickName.setText(name);

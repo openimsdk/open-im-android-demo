@@ -130,5 +130,14 @@ public class Common {
         android.app.KeyguardManager mKeyguardManager = (KeyguardManager) BaseApp.inst().getSystemService(Context.KEYGUARD_SERVICE);
         return mKeyguardManager.inKeyguardRestrictedInputMode();
     }
+
+    public static int getMipmapId(String var) {
+        try {
+            return BaseApp.inst().getResources().getIdentifier(var, "mipmap",
+                BaseApp.inst().getPackageName());
+        } catch (Exception e) {
+            return 0;
+        }
+    }
 }
 

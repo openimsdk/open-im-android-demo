@@ -56,6 +56,7 @@ import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.WebViewActivity;
@@ -66,13 +67,13 @@ import io.openim.android.sdk.models.SignalingInfo;
 
 
 public class InputExpandFragment extends BaseFragment<ChatVM> {
-    public List<Integer> menuIcons = Arrays.asList(R.mipmap.ic_chat_photo,
+    public static List<Integer> menuIcons = Arrays.asList(R.mipmap.ic_chat_photo,
         R.mipmap.ic_chat_shoot,
         R.mipmap.ic_tools_video_call,
         R.mipmap.ic_chat_menu_file,
         R.mipmap.ic_chat_location,
         R.mipmap.ic_business_card);
-    public List<String> menuTitles = Arrays.asList(BaseApp.inst().getString(io.openim.android.ouicore.R.string.album),
+    public static List<String> menuTitles = Arrays.asList(BaseApp.inst().getString(io.openim.android.ouicore.R.string.album),
         BaseApp.inst().getString(io.openim.android.ouicore.R.string.shoot), BaseApp.inst().getString(io.openim.android.ouicore.R.string.video_calls),
         BaseApp.inst().getString(io.openim.android.ouicore.R.string.file),
         BaseApp.inst().getString(io.openim.android.ouicore.R.string.location),
@@ -86,9 +87,12 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        hasStorage = AndPermission.hasPermissions(getActivity(), Permission.Group.STORAGE);
-        hasShoot = AndPermission.hasPermissions(getActivity(), Permission.CAMERA, Permission.RECORD_AUDIO);
-        hasLocation = AndPermission.hasPermissions(getActivity(), Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
+        MThreadTool.executorService.execute(() -> {
+            hasStorage = AndPermission.hasPermissions(getActivity(), Permission.Group.STORAGE);
+            hasShoot = AndPermission.hasPermissions(getActivity(), Permission.CAMERA, Permission.RECORD_AUDIO);
+            hasLocation = AndPermission.hasPermissions(getActivity(), Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
+        });
+
     }
 
     @Nullable

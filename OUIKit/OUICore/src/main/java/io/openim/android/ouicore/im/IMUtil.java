@@ -23,6 +23,7 @@ import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.EmojiUtil;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.BottomPopDialog;
@@ -112,6 +113,11 @@ public class IMUtil {
                 msgExpand.locationInfo = GsonHel.fromJson(msg.getLocationElem().getDescription(), LocationInfo.class);
             if (msg.getContentType() == Constant.MsgType.MENTION)
                 msgExpand.atMsgInfo = GsonHel.fromJson(msg.getContent(), AtMsgInfo.class);
+
+            for (String key : EmojiUtil.emojiFaces.keySet()) {
+                if (msg.getContent().contains(key))
+                    msgExpand.emojiCode.add(key);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

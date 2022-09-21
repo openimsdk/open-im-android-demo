@@ -7,13 +7,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +39,7 @@ import com.bumptech.glide.Glide;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import io.openim.android.ouiconversation.R;
 
@@ -57,8 +61,8 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgMergeLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgMergeRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
-import io.openim.android.ouiconversation.ui.ChatHistoryDetailsActivity;
 import io.openim.android.ouiconversation.ui.PreviewActivity;
+import io.openim.android.ouicore.utils.EmojiUtil;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouiconversation.widget.InputExpandFragment;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
@@ -228,6 +232,7 @@ public class MessageViewHolder {
                 checkBox.setVisibility(View.GONE);
             }
             ((LinearLayout.LayoutParams) checkBox.getLayoutParams()).topMargin = msgExpand.isShowTime ? Common.dp2px(15) : 0;
+
         }
 
         /***
@@ -294,7 +299,7 @@ public class MessageViewHolder {
 
                 LayoutMsgExMenuBinding.bind(popupWindow.getContentView())
                     .recyclerview.setLayoutManager(new GridLayoutManager(view.getContext(),
-                        menuIcons.size() < 4 ? menuIcons.size() : 4));
+                    menuIcons.size() < 4 ? menuIcons.size() : 4));
                 adapter.setItems(menuIcons);
 
                 int yDelay = Common.dp2px(5);
@@ -311,14 +316,15 @@ public class MessageViewHolder {
          * @return
          */
         protected boolean AtMsgHandle(TextView showView) {
-            if (message.getContentType() == Constant.MsgType.MENTION) {
-                try {
-                    MsgExpand msgExpand = (MsgExpand) message.getExt();
+            try {
+                MsgExpand msgExpand = (MsgExpand) message.getExt();
+                SpannableStringBuilder spannableString = null;
+                if (null != msgExpand.atMsgInfo) {
                     String atTxt = msgExpand.atMsgInfo.text;
                     for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
                         atTxt = atTxt.replace("@" + atUsersInfo.atUserID, "@" + atUsersInfo.groupNickname);
                     }
-                    SpannableStringBuilder spannableString = new SpannableStringBuilder(atTxt);
+                    spannableString = new SpannableStringBuilder(atTxt);
                     for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
                         String tag = "@" + atUsersInfo.groupNickname;
                         ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
@@ -336,12 +342,35 @@ public class MessageViewHolder {
                         spannableString.setSpan(clickableSpan, start, end,
                             Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
                     }
-                    showView.setText(spannableString);
                     showView.setMovementMethod(LinkMovementMethod.getInstance());
-                    return true;
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+                List<String> emojiMessages = msgExpand.emojiCode;
+                if (!emojiMessages.isEmpty()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        emojiMessages = emojiMessages.stream().distinct().collect(Collectors.toList());
+                        if (null == spannableString)
+                            spannableString = new SpannableStringBuilder(message.getContent());
+                        for (String emojiMessage : emojiMessages) {
+                            if (!message.getContent().contains(emojiMessage))
+                                continue;
+                            int start = spannableString.toString().indexOf(emojiMessage);
+                            int end = spannableString.toString().indexOf(emojiMessage) + emojiMessage.length();
+                            int emojiId = Common.getMipmapId(EmojiUtil.emojiFaces.get(emojiMessage));
+                            Drawable drawable = BaseApp.inst().getResources().getDrawable(emojiId, null);
+                            drawable.setBounds(0, 0, Common.dp2px(22), Common.dp2px(22));
+                            ImageSpan imageSpan = new ImageSpan(drawable);
+                            spannableString.setSpan(imageSpan, start, end
+                                , Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                    }
+                }
+                if (null != spannableString) {
+                    showView.setText(spannableString);
+                    return true;
+                }
+                return false;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             return false;
         }
