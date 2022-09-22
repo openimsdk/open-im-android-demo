@@ -45,11 +45,9 @@ public class GroupCallDialog extends CallDialog {
     private RecyclerViewAdapter<UserInfo, ViewHol.ImageTxtViewHolder> memberAdapter;
     private RecyclerViewAdapter<Participant, RendererViewHole> viewRenderersAdapter;
 
-    public GroupCallDialog(@NonNull Context context, CallingService callingService) {
-        super(context, callingService);
-    }
 
-    public GroupCallDialog(@NonNull Context context, CallingService callingService, boolean isCallOut) {
+    public GroupCallDialog(@NonNull Context context, CallingService callingService,
+                           boolean isCallOut) {
         super(context, callingService, isCallOut);
     }
 

@@ -72,6 +72,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public String otherSideID = ""; // 接受消息Id
     public String groupID = ""; // 接受消息的群ID
     public boolean isSingleChat = true; //是否单聊 false 群聊
+    public boolean isVideoCall = true;//是否是视频通话
     public int count = 20; //条数
     public Message loading, forwardMsg;
 

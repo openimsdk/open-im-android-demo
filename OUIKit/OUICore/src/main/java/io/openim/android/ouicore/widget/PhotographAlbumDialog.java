@@ -45,6 +45,7 @@ public class PhotographAlbumDialog extends BaseDialog {
     private ActivityResultLauncher<Intent> cropLauncher;
     private ActivityResultLauncher<Intent> takePhotoLauncher;
     private ActivityResultLauncher<Intent> albumLauncher;
+    private WaitDialog waitDialog;
 
     public PhotographAlbumDialog(@NonNull AppCompatActivity context) {
         super(context);
@@ -105,6 +106,7 @@ public class PhotographAlbumDialog extends BaseDialog {
         cropLauncher = compatActivity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() != Activity.RESULT_OK) return;
             String path = GetFilePathFromUri.getFileAbsolutePath(compatActivity, fileUri);
+            waitDialog.dismiss();
             dismiss();
             if (null != onSelectResultListener)
                 onSelectResultListener.onResult(path);
@@ -149,6 +151,8 @@ public class PhotographAlbumDialog extends BaseDialog {
         File temporaryFile = buildTemporaryFile();
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri = Uri.fromFile(temporaryFile));      //设置输出
 
+        waitDialog = new WaitDialog(getContext());
+        waitDialog.show();
         cropLauncher.launch(intent);
     }
 
@@ -160,6 +164,7 @@ public class PhotographAlbumDialog extends BaseDialog {
         view.menu2.setOnClickListener(v -> {
             takePhoto();
         });
+        view.menu3.setOnClickListener(v -> dismiss());
     }
 
     /**

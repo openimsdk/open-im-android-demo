@@ -55,11 +55,13 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
         PhotographAlbumDialog albumDialog = new PhotographAlbumDialog(this);
         view.avatarLy.setOnClickListener(view -> {
             albumDialog.setOnSelectResultListener(path -> {
+                vm.setFaceURL(path);
                 vm.waitDialog.show();
                 OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                     @Override
                     public void onError(int code, String error) {
                         vm.waitDialog.dismiss();
+                        toast(error + code);
                     }
 
                     @Override
@@ -69,11 +71,12 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
 
                     @Override
                     public void onSuccess(String s) {
-                        vm.setFaceURL(s);
+                        vm.setFaceURL(path);
+                        Common.UIHandler.postDelayed(() -> vm.waitDialog.dismiss(), 1000);
                     }
                 }, path);
-
             });
+
             albumDialog.show();
         });
         view.nickNameLy.setOnClickListener(v -> resultLauncher.launch(new Intent(this, EditTextActivity.class)
@@ -107,7 +110,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
         view.qrCode.setOnClickListener(v -> {
             ARouter.getInstance().build(Routes.Group.SHARE_QRCODE).navigation();
         });
-        view.identity.setOnClickListener(v-> {
+        view.identity.setOnClickListener(v -> {
             Common.copy(vm.userInfo.getValue().getUserID());
             toast(getString(io.openim.android.ouicore.R.string.copy_succ));
         });

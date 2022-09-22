@@ -183,17 +183,17 @@ public class CallDialog extends BaseDialog {
         view.hangUp.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                callingVM.signalingHungUp(signalingInfo);
-
                 callingVM.renewalDB(signalingInfo,
-                    callHistory -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
+                    callHistory -> callHistory.setDuration((int)
+                        (System.currentTimeMillis() - callHistory.getDate())));
+
+                callingVM.signalingHungUp(signalingInfo);
             }
         });
         view.reject.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
                 callingVM.signalingHungUp(signalingInfo);
-
             }
         });
         view.answer.setOnClickListener(new OnDedrepClickListener() {
@@ -272,11 +272,12 @@ public class CallDialog extends BaseDialog {
             callingVM.audioManager.setSpeakerphoneOn(true);
             callingVM.timeStr.removeObserver(bindTime);
             callingVM.unBindView();
+            super.dismiss();
             ((CallingServiceImp) callingVM.callingService).callDialog = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        super.dismiss();
+
     }
 
     public void otherSideAccepted() {

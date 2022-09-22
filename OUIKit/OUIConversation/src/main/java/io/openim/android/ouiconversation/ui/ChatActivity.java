@@ -51,7 +51,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private MessageAdapter messageAdapter;
     private BottomInputCote bottomInputCote;
-    private boolean isVideoCalls;
     private boolean hasMicrophone;
 
     @Override
@@ -91,7 +90,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
+        getWindow().getDecorView().getViewTreeObserver()
+            .removeOnGlobalLayoutListener(mGlobalLayoutListener);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     @SuppressLint("ClickableViewAccessibility")
     private void initView(String name) {
-        bottomInputCote = new BottomInputCote(this, view.layoutInputCote,hasMicrophone);
+        bottomInputCote = new BottomInputCote(this, view.layoutInputCote, hasMicrophone);
         bottomInputCote.setChatVM(vm);
 
         view.nickName.setText(name);
@@ -171,11 +171,12 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     private void listener() {
         view.call.setOnClickListener(v -> {
             IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
-                isVideoCalls = keyCode != 1;
+                vm.isVideoCall = keyCode != 1;
                 if (vm.isSingleChat) {
                     List<String> ids = new ArrayList<>();
                     ids.add(vm.otherSideID);
-                    SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(isVideoCalls, vm.isSingleChat,
+                    SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
+                        vm.isSingleChat,
                         ids, null);
                     callingService.call(signalingInfo);
                 } else {
@@ -308,7 +309,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         if (requestCode == Constant.Event.CALLING_REQUEST_CODE && null != data) {
             //发起群通话
             List<String> ids = data.getStringArrayListExtra(Constant.K_RESULT);
-            SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(isVideoCalls, false,
+            SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall, false,
                 ids, vm.groupID);
             callingService.call(signalingInfo);
         }

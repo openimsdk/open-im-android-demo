@@ -238,7 +238,8 @@ public class CallingVM {
             signalingCancel(signalingInfo);
             return;
         }
-        OpenIMClient.getInstance().signalingManager.signalingHungUp(callBackDismissUI, signalingInfo);
+        OpenIMClient.getInstance().signalingManager
+            .signalingHungUp(callBackDismissUI, signalingInfo);
     }
 
     private void dismissUI() {
@@ -278,9 +279,11 @@ public class CallingVM {
         try {
             callViewModel.onCleared();
             cancelTimer();
-            if (null != localVideoTrack)
-                localVideoTrack.removeRenderer(localSpeakerVideoView);
-
+            if (null != localVideoTrack) {
+                localVideoTrack.stop();
+                if (null != localSpeakerVideoView)
+                    localVideoTrack.removeRenderer(localSpeakerVideoView);
+            }
             for (TextureViewRenderer textureViewRenderer : remoteSpeakerVideoViews) {
                 Object videoTask = textureViewRenderer.getTag();
                 if (null != videoTask) {

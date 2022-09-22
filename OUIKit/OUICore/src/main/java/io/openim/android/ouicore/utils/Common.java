@@ -6,12 +6,19 @@ import android.app.KeyguardManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+
+import androidx.annotation.NonNull;
+
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.runtime.Permission;
+import com.yanzhenjie.permission.runtime.PermissionDef;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -138,6 +145,33 @@ public class Common {
         } catch (Exception e) {
             return 0;
         }
+    }
+
+
+    @SuppressLint("WrongConstant")
+    public static void permission(Context context,
+                                  OnGrantedListener onGrantedListener, boolean hasPermission,
+                                  String... permissions) {
+        if (hasPermission)
+            onGrantedListener.onGranted();
+        else {
+            AndPermission.with(context)
+                .runtime()
+                .permission(permissions)
+                .onGranted(permission -> {
+                    // Storage permission are allowed.
+                    onGrantedListener
+                        .onGranted();
+                })
+                .onDenied(permission -> {
+                    // Storage permission are not allowed.
+                })
+                .start();
+        }
+    }
+
+    public interface OnGrantedListener {
+        void onGranted();
     }
 }
 

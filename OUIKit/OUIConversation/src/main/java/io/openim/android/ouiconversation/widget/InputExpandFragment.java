@@ -45,6 +45,7 @@ import java.util.Map;
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.FragmentInputExpandBinding;
 import io.openim.android.ouiconversation.databinding.ItemExpandMenuBinding;
+import io.openim.android.ouiconversation.ui.ChatActivity;
 import io.openim.android.ouiconversation.ui.ShootActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
@@ -53,6 +54,7 @@ import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.L;
@@ -120,18 +122,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                             goToShoot();
                             break;
                         case 2:
-                            if (vm.isSingleChat) {
-                                IMUtil.showBottomPopMenu(getContext(), (v1, keyCode, event) -> {
-                                    List<String> ids = new ArrayList<>();
-                                    ids.add(vm.otherSideID);
-                                    SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1, vm.isSingleChat,
-                                        ids, null);
-                                    CallingService callingService = (CallingService) ARouter.getInstance()
-                                        .build(Routes.Service.CALLING).navigation();
-                                    callingService.call(signalingInfo);
-                                    return false;
-                                });
-                            }
+                            goToCall();
                             break;
                         case 3:
                             gotoSelectFile();
@@ -152,6 +143,34 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         };
         v.getRoot().setAdapter(adapter);
         adapter.setItems(menuIcons);
+    }
+
+    @SuppressLint("WrongConstant")
+    private void goToCall() {
+        Common.permission(getContext(), () -> {
+            hasStorage = true;
+            CallingService callingService = (CallingService) ARouter.getInstance()
+                .build(Routes.Service.CALLING).navigation();
+            if (null == callingService) return;
+            IMUtil.showBottomPopMenu(getContext(), (v1, keyCode, event) -> {
+                vm.isVideoCall = keyCode != 1;
+                if (vm.isSingleChat) {
+                    List<String> ids = new ArrayList<>();
+                    ids.add(vm.otherSideID);
+                    SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
+                        vm.isSingleChat,
+                        ids, null);
+                    callingService.call(signalingInfo);
+                } else {
+                    ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
+                        .withBoolean("isSelectMember", true)
+                        .withInt("max_num", 9)
+                        .withString(Constant.K_GROUP_ID, vm.groupID)
+                        .navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
+                }
+                return false;
+            });
+        }, hasStorage, Permission.Group.STORAGE);
     }
 
     private final ActivityResultLauncher<Intent> businessCardLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -329,6 +348,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                 })
                 .start();
     }
+
 
     private void goMediaPicker() {
         Matisse.from(getActivity())

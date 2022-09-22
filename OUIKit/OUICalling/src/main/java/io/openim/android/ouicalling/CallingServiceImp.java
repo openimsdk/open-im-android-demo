@@ -124,9 +124,8 @@ public class CallingServiceImp implements CallingService {
         Common.UIHandler.post(() -> {
             if (null == callDialog) return;
             callDialog.otherSideAccepted();
-
             callDialog.callingVM.renewalDB(signalingInfo,
-                callHistory ->  callHistory.setSuccess(true));
+                callHistory -> callHistory.setSuccess(true));
         });
     }
 
@@ -140,10 +139,9 @@ public class CallingServiceImp implements CallingService {
         L.e(TAG, "----onInviteeRejected-----");
         Common.UIHandler.post(() -> {
             if (null == callDialog) return;
-            callDialog.dismiss();
-
             callDialog.callingVM.renewalDB(signalingInfo,
-                callHistory ->  callHistory.setSuccess(false));
+                callHistory -> callHistory.setSuccess(false));
+            callDialog.dismiss();
         });
 
     }
@@ -157,6 +155,7 @@ public class CallingServiceImp implements CallingService {
     public void onReceiveNewInvitation(SignalingInfo signalingInfo) {
         L.e(TAG, "----onReceiveNewInvitation-----");
         Common.UIHandler.post(() -> {
+            if (callDialog != null) return;
             this.signalingInfo = signalingInfo;
             AndPermission.with(context).overlay().onGranted(data -> {
                 context.startActivity(new Intent(context, LockPushActivity.class)
@@ -191,10 +190,10 @@ public class CallingServiceImp implements CallingService {
         L.e(TAG, "----onHangup-----");
         Common.UIHandler.post(() -> {
             if (null == callDialog) return;
-            callDialog.dismiss();
-
             callDialog.callingVM.renewalDB(signalingInfo,
-                callHistory -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
+                callHistory -> callHistory.setDuration(
+                    (int) (System.currentTimeMillis() - callHistory.getDate())));
+            callDialog.dismiss();
         });
     }
 
