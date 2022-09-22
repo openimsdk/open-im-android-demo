@@ -36,6 +36,7 @@ import io.openim.android.sdk.models.GroupMembersInfo;
 
 @Route(path = Routes.Group.MATERIAL)
 public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMaterialBinding> {
+    public static final int SUPER_GROUP_LIMIT = 300;
     int spanCount = 7;
     private PhotographAlbumDialog albumDialog;
     private ActivityResultLauncher infoModifyLauncher;
@@ -70,7 +71,10 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         view.groupId.setOnClickListener(v -> startActivity(new Intent(this, ShareQrcodeActivity.class).putExtra(ShareQrcodeActivity.IS_QRCODE, false)));
         view.bulletin.setOnClickListener(v -> startActivity(new Intent(this, GroupBulletinActivity.class)));
         view.groupMember.setOnClickListener(v -> {
-            startActivity(new Intent(this, GroupMemberActivity.class));
+            if (vm.groupMembers.getValue().size() > SUPER_GROUP_LIMIT)
+                startActivity(new Intent(this, SuperGroupMemberActivity.class));
+            else
+                startActivity(new Intent(this, GroupMemberActivity.class));
         });
         view.groupName.setOnClickListener(v -> {
             if (vm.isOwner()) {
@@ -98,11 +102,11 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
 
         view.quitGroup.setOnClickListener(v -> {
-                if (vm.isOwner()){
-                    vm.dissolveGroup();
-                }else {
-                   vm.quitGroup();
-                }
+            if (vm.isOwner()) {
+                vm.dissolveGroup();
+            } else {
+                vm.quitGroup();
+            }
         });
 
     }

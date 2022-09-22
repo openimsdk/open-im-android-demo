@@ -123,13 +123,15 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             MsgConversation msgConversation = vm.conversations.getValue().get(position);
             Intent intent = new Intent(getContext(), ChatActivity.class)
                 .putExtra(Constant.K_NAME, msgConversation.conversationInfo.getShowName());
-            if (msgConversation.conversationInfo.getConversationType() == 1)
+            if (msgConversation.conversationInfo.getConversationType() == Constant.SessionType.SINGLE_CHAT)
                 intent.putExtra(Constant.K_ID, msgConversation.conversationInfo.getUserID());
-            if (msgConversation.conversationInfo.getConversationType() == 2)
-                intent.putExtra(Constant.K_GROUP_ID, msgConversation.conversationInfo.getGroupID());
-            if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification)
-                intent.putExtra(Constant.K_NOTICE, msgConversation.notificationMsg);
 
+            if (msgConversation.conversationInfo.getConversationType() == Constant.SessionType.GROUP_CHAT
+                || msgConversation.conversationInfo.getConversationType() == Constant.SessionType.SUPER_GROUP)
+                intent.putExtra(Constant.K_GROUP_ID, msgConversation.conversationInfo.getGroupID());
+
+            if (msgConversation.conversationInfo.getGroupAtType() == Constant.SessionType.NOTIFICATION)
+                intent.putExtra(Constant.K_NOTICE, msgConversation.notificationMsg);
 
             startActivity(intent);
             //重置强提醒

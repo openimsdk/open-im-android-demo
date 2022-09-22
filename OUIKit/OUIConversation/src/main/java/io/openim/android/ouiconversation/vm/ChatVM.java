@@ -36,6 +36,7 @@ import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 
+import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
@@ -72,6 +73,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public String otherSideID = ""; // 接受消息Id
     public String groupID = ""; // 接受消息的群ID
     public boolean isSingleChat = true; //是否单聊 false 群聊
+    public boolean isSuperGroup = false;//是否超级大群
     public boolean isVideoCall = true;//是否是视频通话
     public int count = 20; //条数
     public Message loading, forwardMsg;
@@ -81,18 +83,16 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         super.viewCreate();
         loading = new Message();
         loading.setContentType(Constant.LOADING);
-
-        //加载消息记录
-        loadHistoryMessage();
-        //标记所有消息已读
-        markReaded(null);
-
-        if (isSingleChat)
-            listener();
-        IMEvent.getInstance().addAdvanceMsgListener(this);
         //获取会话信息
         getConversationInfo();
-
+        //标记所有消息已读
+        markReaded(null);
+        if (isSingleChat) {
+            //加载消息记录
+            loadHistoryMessage();
+            listener();
+        }
+        IMEvent.getInstance().addAdvanceMsgListener(this);
     }
 
     private void getConversationInfo() {
@@ -104,6 +104,12 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
             @Override
             public void onSuccess(ConversationInfo data) {
+                isSuperGroup =
+                    data.getConversationType() == Constant.SessionType.SUPER_GROUP;
+                if (!isSingleChat) {
+                    //加载消息记录
+                    loadHistoryMessage();
+                }
                 conversationInfo.setValue(data);
                 getConversationRecvMessageOpt(data.getConversationID());
             }
@@ -155,42 +161,60 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     public void loadHistoryMessage() {
-        OpenIMClient.getInstance().messageManager.getHistoryMessageList(new OnBase<List<Message>>() {
-            @Override
-            public void onError(int code, String error) {
-
-            }
-
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onSuccess(List<Message> data) {
-                for (Message datum : data) {
-                    IMUtil.buildExpandInfo(datum);
-                }
-                List<Message> list = messages.getValue();
-                if (data.isEmpty()) {
-                    if (!messages.getValue().isEmpty()) {
-                        isNoData.setValue(true);
-                        removeLoading(list);
+        if (isSuperGroup) {
+            OpenIMClient.getInstance().messageManager.getAdvancedHistoryMessageList(
+                new OnBase<List<Message>>() {
+                    @Override
+                    public void onError(int code, String error) {
+                        IView.toast(error + code);
                     }
-                    return;
-                } else {
-                    startMsg = data.get(0);
-                    Collections.reverse(data);
-                }
-                if (list.isEmpty()) {
-                    IMUtil.calChatTimeInterval(data);
-                    messages.setValue(data);
-                    return;
-                }
-                removeLoading(list);
-                list.addAll(data);
-                IMUtil.calChatTimeInterval(list);
-                list.add(loading);
-                messageAdapter.notifyItemRangeChanged(list.size() - 1 - data.size(), list.size() - 1);
-            }
 
-        }, otherSideID, groupID, null, startMsg, count);
+                    @Override
+                    public void onSuccess(List<Message> data) {
+                        handleMessage(data);
+                    }
+                }, otherSideID, groupID, null, startMsg, count);
+        } else {
+            OpenIMClient.getInstance().messageManager.getHistoryMessageList(new OnBase<List<Message>>() {
+                @Override
+                public void onError(int code, String error) {
+
+                }
+
+                @Override
+                public void onSuccess(List<Message> data) {
+                    handleMessage(data);
+                }
+
+            }, otherSideID, groupID, null, startMsg, count);
+        }
+    }
+
+    private void handleMessage(List<Message> data) {
+        for (Message datum : data) {
+            IMUtil.buildExpandInfo(datum);
+        }
+        List<Message> list = messages.getValue();
+        if (data.isEmpty()) {
+            if (!messages.getValue().isEmpty()) {
+                isNoData.setValue(true);
+                removeLoading(list);
+            }
+            return;
+        } else {
+            startMsg = data.get(0);
+            Collections.reverse(data);
+        }
+        if (list.isEmpty()) {
+            IMUtil.calChatTimeInterval(data);
+            messages.setValue(data);
+            return;
+        }
+        removeLoading(list);
+        list.addAll(data);
+        IMUtil.calChatTimeInterval(list);
+        list.add(loading);
+        messageAdapter.notifyItemRangeChanged(list.size() - 1 - data.size(), list.size() - 1);
     }
 
     //移除加载视图

@@ -16,6 +16,9 @@
             android:name=".ui.GroupMemberActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.SuperGroupMemberActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.GroupMaterialActivity"
             android:exported="false" />
         <activity

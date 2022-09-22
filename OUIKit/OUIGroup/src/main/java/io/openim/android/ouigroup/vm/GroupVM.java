@@ -43,6 +43,8 @@ public class GroupVM extends SocialityVM {
     public MutableLiveData<Boolean> isGroupOwner = new MutableLiveData<>(true);
     //群所有成员
     public MutableLiveData<List<GroupMembersInfo>> groupMembers = new MutableLiveData<>(new ArrayList<>());
+    //超级群成员分页加载
+    public MutableLiveData<List<GroupMembersInfo>> superGroupMembers = new MutableLiveData<>(new ArrayList<>());
     //封装过的群成员 用于字母导航
     public MutableLiveData<List<ExGroupMemberInfo>> exGroupMembers = new MutableLiveData<>(new ArrayList<>());
     //群管理
@@ -55,6 +57,8 @@ public class GroupVM extends SocialityVM {
     public MutableLiveData<List<FriendInfo>> selectedFriendInfo = new MutableLiveData<>(new ArrayList<>());
     public LoginCertificate loginCertificate;
 
+    public int page = 0;
+    public int pageSize = 20;
 
     @Override
     protected void viewCreate() {
@@ -159,10 +163,28 @@ public class GroupVM extends SocialityVM {
         }, gid, uid, groupNickname);
     }
 
+    public void getSuperGroupMemberList() {
+        int start = page * pageSize;
+        OpenIMClient.getInstance().groupManager.getGroupMemberList(new OnBase<List<GroupMembersInfo>>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error + "-" + code);
+            }
+
+            @Override
+            public void onSuccess(List<GroupMembersInfo> data) {
+                if (data.isEmpty()) return;
+                superGroupMembers.getValue().addAll(data);
+                superGroupMembers.setValue(superGroupMembers.getValue());
+            }
+        }, groupId, 0, start, pageSize);
+    }
+
     /**
      * 获取群成员信息
      */
     public void getGroupMemberList() {
+        if (!superGroupMembers.getValue().isEmpty())return; //表示走了超级大群逻辑
         exGroupMembers.getValue().clear();
         exGroupManagement.getValue().clear();
         groupLetters.getValue().clear();

@@ -177,6 +177,7 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
 
         };
 
+
         vm.exGroupMembers.observe(this, v -> {
             if (v.isEmpty()) return;
             List<ExGroupMemberInfo> exGroupMemberInfos = new ArrayList<>();
@@ -189,4 +190,5 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
             });
         });
     }
+
 }
