@@ -2,6 +2,14 @@ package io.openim.android.ouicore.im;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.ImageSpan;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,12 +24,14 @@ import java.util.UUID;
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.AtMsgInfo;
+import io.openim.android.ouicore.entity.AtUsersInfo;
 import io.openim.android.ouicore.entity.LocationInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.EmojiUtil;
 import io.openim.android.ouicore.utils.L;
@@ -111,18 +121,64 @@ public class IMUtil {
         try {
             if (msg.getContentType() == Constant.MsgType.LOCATION)
                 msgExpand.locationInfo = GsonHel.fromJson(msg.getLocationElem().getDescription(), LocationInfo.class);
-            if (msg.getContentType() == Constant.MsgType.MENTION)
+            if (msg.getContentType() == Constant.MsgType.MENTION) {
                 msgExpand.atMsgInfo = GsonHel.fromJson(msg.getContent(), AtMsgInfo.class);
-
-            for (String key : EmojiUtil.emojiFaces.keySet()) {
-                if (msg.getContent().contains(key))
-                    msgExpand.emojiCode.add(key);
+                handleAt(msgExpand);
             }
+            handleEmoji(msgExpand, msg);
         } catch (Exception e) {
             e.printStackTrace();
         }
         msg.setExt(msgExpand);
         return msg;
+    }
+
+    private static void handleEmoji(MsgExpand expand, Message msg) {
+        String content = msg.getContent();
+        for (String key : EmojiUtil.emojiFaces.keySet()) {
+            int fromIndex = 0;
+            if (content.contains(key)) {
+                if (null == expand.sequence) {
+                    expand.sequence = new SpannableStringBuilder(content);
+                }
+                while ((fromIndex = content.indexOf(key, fromIndex)) > -1) {
+                    int emojiId = Common.getMipmapId(EmojiUtil.emojiFaces.get(key));
+                    Drawable drawable = BaseApp.inst().getResources().getDrawable(emojiId, null);
+                    drawable.setBounds(0, 0, Common.dp2px(22), Common.dp2px(22));
+                    ImageSpan imageSpan = new ImageSpan(drawable);
+                    expand.sequence.setSpan(imageSpan, fromIndex, fromIndex + key.length()
+                        , Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    fromIndex += 1;//往后继续查
+                }
+            }
+        }
+    }
+
+    private static void handleAt(MsgExpand msgExpand) {
+        if (null == msgExpand.atMsgInfo) return;
+        String atTxt = msgExpand.atMsgInfo.text;
+        for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
+            atTxt = atTxt.replace("@" + atUsersInfo.atUserID, "@" + atUsersInfo.groupNickname);
+        }
+        SpannableStringBuilder spannableString = new SpannableStringBuilder(atTxt);
+        for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
+            String tag = "@" + atUsersInfo.groupNickname;
+            ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
+            ClickableSpan clickableSpan = new ClickableSpan() {
+                @Override
+                public void onClick(View view) {
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                        .withString(Constant.K_ID, atUsersInfo.atUserID).navigation(view.getContext());
+                }
+            };
+            int start = spannableString.toString().indexOf(tag);
+            int end = spannableString.toString().indexOf(tag) + tag.length();
+            spannableString.setSpan(colorSpan, start, end
+                , Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString.setSpan(clickableSpan, start, end,
+                Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        }
+        msgExpand.sequence = spannableString;
     }
 
     /**
@@ -156,7 +212,12 @@ public class IMUtil {
                 lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.location) + "]";
                 break;
             case Constant.MsgType.MENTION:
-                lastMsg = ((MsgExpand) msg.getExt()).atMsgInfo.text;
+                MsgExpand msgExpand = (MsgExpand) msg.getExt();
+                String atTxt = msgExpand.atMsgInfo.text;
+                for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
+                    atTxt = atTxt.replace("@" + atUsersInfo.atUserID, "@" + atUsersInfo.groupNickname);
+                }
+                lastMsg = atTxt;
                 break;
             case Constant.MsgType.MERGE:
                 lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";

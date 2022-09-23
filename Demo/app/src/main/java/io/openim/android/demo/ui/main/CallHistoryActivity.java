@@ -147,6 +147,7 @@ public class CallHistoryActivity extends BaseActivity<BaseViewModel, ActivityCal
                     getString(io.openim.android.ouicore.R.string.outbound) + duration);
 
                 holder.v.getRoot().setOnClickListener(view1 -> {
+                    if (null==callingService)return;
                     IMUtil.showBottomPopMenu(CallHistoryActivity.this, (v1, keyCode, event) -> {
                         List<String> ids = new ArrayList<>();
                         ids.add(data.getUserID());

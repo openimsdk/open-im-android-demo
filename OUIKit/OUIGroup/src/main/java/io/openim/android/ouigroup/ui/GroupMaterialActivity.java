@@ -36,7 +36,7 @@ import io.openim.android.sdk.models.GroupMembersInfo;
 
 @Route(path = Routes.Group.MATERIAL)
 public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMaterialBinding> {
-    public static final int SUPER_GROUP_LIMIT = 300;
+    public static final int SUPER_GROUP_LIMIT = 200;
     int spanCount = 7;
     private PhotographAlbumDialog albumDialog;
     private ActivityResultLauncher infoModifyLauncher;

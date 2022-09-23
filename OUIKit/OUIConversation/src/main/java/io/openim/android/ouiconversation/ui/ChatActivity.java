@@ -170,6 +170,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private void listener() {
         view.call.setOnClickListener(v -> {
+            if (null==callingService)return;
             IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
                 vm.isVideoCall = keyCode != 1;
                 if (vm.isSingleChat) {
@@ -311,6 +312,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             List<String> ids = data.getStringArrayListExtra(Constant.K_RESULT);
             SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall, false,
                 ids, vm.groupID);
+            if (null==callingService)return;
             callingService.call(signalingInfo);
         }
     }

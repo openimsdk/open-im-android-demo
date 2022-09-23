@@ -310,67 +310,18 @@ public class MessageViewHolder {
         }
 
         /**
-         * at 消息显示
+         * 处理at、emoji
          *
          * @param showView
          * @return
          */
-        protected boolean AtMsgHandle(TextView showView) {
-            try {
-                MsgExpand msgExpand = (MsgExpand) message.getExt();
-                SpannableStringBuilder spannableString = null;
-                if (null != msgExpand.atMsgInfo) {
-                    String atTxt = msgExpand.atMsgInfo.text;
-                    for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
-                        atTxt = atTxt.replace("@" + atUsersInfo.atUserID, "@" + atUsersInfo.groupNickname);
-                    }
-                    spannableString = new SpannableStringBuilder(atTxt);
-                    for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
-                        String tag = "@" + atUsersInfo.groupNickname;
-                        ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
-                        ClickableSpan clickableSpan = new ClickableSpan() {
-                            @Override
-                            public void onClick(View view) {
-                                ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                                    .withString(Constant.K_ID, atUsersInfo.atUserID).navigation(view.getContext());
-                            }
-                        };
-                        int start = spannableString.toString().indexOf(tag);
-                        int end = spannableString.toString().indexOf(tag) + tag.length();
-                        spannableString.setSpan(colorSpan, start, end
-                            , Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        spannableString.setSpan(clickableSpan, start, end,
-                            Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-                    }
+        protected boolean handleSequence(TextView showView) {
+            MsgExpand msgExpand = (MsgExpand) message.getExt();
+            if (null != msgExpand.sequence) {
+                showView.setText(msgExpand.sequence);
+                if (null != msgExpand.atMsgInfo)
                     showView.setMovementMethod(LinkMovementMethod.getInstance());
-                }
-                List<String> emojiMessages = msgExpand.emojiCode;
-                if (!emojiMessages.isEmpty()) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        emojiMessages = emojiMessages.stream().distinct().collect(Collectors.toList());
-                        if (null == spannableString)
-                            spannableString = new SpannableStringBuilder(message.getContent());
-                        for (String emojiMessage : emojiMessages) {
-                            if (!message.getContent().contains(emojiMessage))
-                                continue;
-                            int start = spannableString.toString().indexOf(emojiMessage);
-                            int end = spannableString.toString().indexOf(emojiMessage) + emojiMessage.length();
-                            int emojiId = Common.getMipmapId(EmojiUtil.emojiFaces.get(emojiMessage));
-                            Drawable drawable = BaseApp.inst().getResources().getDrawable(emojiId, null);
-                            drawable.setBounds(0, 0, Common.dp2px(22), Common.dp2px(22));
-                            ImageSpan imageSpan = new ImageSpan(drawable);
-                            spannableString.setSpan(imageSpan, start, end
-                                , Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        }
-                    }
-                }
-                if (null != spannableString) {
-                    showView.setText(spannableString);
-                    return true;
-                }
-                return false;
-            } catch (Exception e) {
-                e.printStackTrace();
+                return true;
             }
             return false;
         }
@@ -464,9 +415,10 @@ public class MessageViewHolder {
                 v.nickName.setVisibility(View.GONE);
 
             showMsgExMenu(v.content);
-            if (!AtMsgHandle(v.content)) {
+
+            if (!handleSequence(v.content))
                 v.content.setText(message.getContent());
-            }
+
         }
 
         @Override
@@ -474,9 +426,10 @@ public class MessageViewHolder {
             LayoutMsgTxtRightBinding v = LayoutMsgTxtRightBinding.bind(itemView);
             v.avatar2.load(message.getSenderFaceUrl());
             showMsgExMenu(v.content2);
-            if (!AtMsgHandle(v.content2)) {
+
+            if (!handleSequence(v.content2))
                 v.content2.setText(message.getContent());
-            }
+
         }
 
     }

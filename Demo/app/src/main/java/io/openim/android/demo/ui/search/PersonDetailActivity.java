@@ -82,6 +82,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         });
 
         view.call.setOnClickListener(v -> {
+            if (null==callingService)return;
             IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
                 List<String> ids = new ArrayList<>();
                 ids.add(vm.searchContent);

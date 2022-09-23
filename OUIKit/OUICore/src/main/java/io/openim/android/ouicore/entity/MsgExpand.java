@@ -1,5 +1,7 @@
 package io.openim.android.ouicore.entity;
 
+import android.text.SpannableStringBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +22,8 @@ public class MsgExpand {
     public AtMsgInfo atMsgInfo;
     //用于在消息输入框监听删除键时 判断删除对应@的人
     public int spanHashCode;
-    //表情代码
-    public List<String> emojiCode=new ArrayList<>();
+
+    //富文本（at 消息、表情）
+    public SpannableStringBuilder sequence;
 
 }

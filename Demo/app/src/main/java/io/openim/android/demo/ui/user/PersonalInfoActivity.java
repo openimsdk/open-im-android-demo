@@ -71,8 +71,8 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
 
                     @Override
                     public void onSuccess(String s) {
-                        vm.setFaceURL(path);
-                        Common.UIHandler.postDelayed(() -> vm.waitDialog.dismiss(), 1000);
+                        vm.setFaceURL(s);
+                        Common.UIHandler.postDelayed(() -> vm.waitDialog.dismiss(), 1500);
                     }
                 }, path);
             });
