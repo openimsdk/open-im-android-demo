@@ -25,6 +25,7 @@ public class Routes {
         public final static String CONTACT_LIST = "/conversation/ContactListFragment";
         //聊天页
         public final static String CHAT = "/conversation/ChatActivity";
+        public static final String CHAT_HISTORY = "/conversation/ChatHistorySearchActivity";
     }
 
     //群组

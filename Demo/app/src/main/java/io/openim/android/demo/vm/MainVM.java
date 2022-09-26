@@ -12,7 +12,9 @@ import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
@@ -87,6 +89,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
                 BaseApp.inst().loginCertificate.faceURL = data.getFaceURL();
                 BaseApp.inst().loginCertificate.cache(getContext());
                 nickname.setValue(BaseApp.inst().loginCertificate.nickname);
+                Obs.newMessage(Constant.Event.USER_INFO_UPDATA);
             }
         });
     }

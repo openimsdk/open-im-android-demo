@@ -33,10 +33,11 @@ import io.openim.android.ouiconversation.R;
 
 import io.openim.android.ouiconversation.adapter.MessageViewHolder;
 import io.openim.android.ouiconversation.databinding.FragmentContactListBinding;
-import io.openim.android.ouiconversation.databinding.LayoutContactItemBinding;
 import io.openim.android.ouiconversation.vm.ContactListVM;
+import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
+import io.openim.android.ouicore.databinding.LayoutContactItemBinding;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.Base;
@@ -161,7 +162,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         super.onSuccess(body);
     }
 
-    static class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+    static class CustomAdapter extends RecyclerView.Adapter<ViewHol.ContactItemHolder> {
 
         private List<MsgConversation> conversationInfos;
         private Context context;
@@ -178,23 +179,15 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             return conversationInfos;
         }
 
-        public static class ViewHolder extends RecyclerView.ViewHolder {
-            public final LayoutContactItemBinding viewBinding;
-
-            public ViewHolder(LayoutContactItemBinding viewBinding) {
-                super(viewBinding.getRoot());
-                this.viewBinding = viewBinding;
-            }
-        }
 
 
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-            return new ViewHolder(LayoutContactItemBinding.inflate(LayoutInflater.from(viewGroup.getContext())));
+        public ViewHol.ContactItemHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+            return new ViewHol.ContactItemHolder(viewGroup);
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder viewHolder, final int position) {
+        public void onBindViewHolder(ViewHol.ContactItemHolder viewHolder, final int position) {
             MsgConversation msgConversation = conversationInfos.get(position);
 
             viewHolder.viewBinding.avatar.load(msgConversation.conversationInfo.getFaceURL(), msgConversation.conversationInfo.getConversationType() == Constant.SessionType.GROUP_CHAT);

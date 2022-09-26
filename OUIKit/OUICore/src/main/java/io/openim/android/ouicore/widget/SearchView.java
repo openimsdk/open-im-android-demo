@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
@@ -16,7 +17,7 @@ import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.utils.L;
 
 public class SearchView extends LinearLayout {
-    boolean clickable = true;
+    boolean clickable = true, isClear;
     String hint;
 
     public SearchView(Context context) {
@@ -30,6 +31,7 @@ public class SearchView extends LinearLayout {
         try {
             clickable = array.getBoolean(R.styleable.customize_android_clickable, true);
             hint = array.getString(R.styleable.customize_android_hint);
+            isClear = array.getBoolean(R.styleable.customize_isClear, false);
         } finally {
             array.recycle();
         }
@@ -49,6 +51,9 @@ public class SearchView extends LinearLayout {
         editText = findViewById(R.id.editText);
         if (null != hint)
             editText.setHint(hint);
+        ImageView imageView = findViewById(R.id.clearIv);
+        imageView.setVisibility(isClear ? VISIBLE : GONE);
+        imageView.setOnClickListener(this::onClick);
     }
 
     public EditText getEditText() {
@@ -61,5 +66,9 @@ public class SearchView extends LinearLayout {
             return super.onInterceptTouchEvent(ev);
         else
             return true;
+    }
+
+    private void onClick(View v) {
+        editText.setText("");
     }
 }

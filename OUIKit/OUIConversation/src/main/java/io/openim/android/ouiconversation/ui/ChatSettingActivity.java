@@ -41,6 +41,9 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
     }
 
     private void click() {
+        view.searchChat.setOnClickListener(v -> {
+            startActivity(new Intent(this,ChatHistorySearchActivity.class));
+        });
         view.chatbg.setOnClickListener(view1 -> {
             startActivity(new Intent(this,SetChatBgActivity.class));
         });

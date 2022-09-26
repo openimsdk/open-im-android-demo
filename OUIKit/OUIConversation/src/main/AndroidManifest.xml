@@ -19,7 +19,7 @@
             android:name=".ui.ChatSettingActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.ChatHistoryDetailsActivity"
+            android:name=".ui.ChatHistorySearchActivity"
             android:exported="false" />
         <activity
             android:name=".ui.PreviewActivity"

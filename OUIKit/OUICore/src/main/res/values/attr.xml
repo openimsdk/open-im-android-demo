@@ -4,6 +4,7 @@
         <attr name="android:clickable"/>
         <attr name="android:hint"/>
         <attr name="android:radius"/>
+        <attr name="isClear" format="boolean" />
     </declare-styleable>
 
 

@@ -46,10 +46,13 @@ import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.ReadReceiptInfo;
 import io.openim.android.sdk.models.RevokedInfo;
+import io.openim.android.sdk.models.SearchResult;
+import io.openim.android.sdk.models.SearchResultItem;
 import io.openim.android.sdk.models.UserInfo;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener {
-
+    //搜索的本地消息
+    public MutableLiveData<List<Message>> searchMessageItems = new MutableLiveData<>(new ArrayList<>());
     //会话信息
     public MutableLiveData<ConversationInfo> conversationInfo = new MutableLiveData<>();
     public MutableLiveData<Integer> notDisturbStatus = new MutableLiveData<>(0);
@@ -460,6 +463,36 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 notDisturbStatus.setValue(status);
             }
         }, Arrays.asList(cid), status);
+    }
+
+    public void searchLocalMessages(String key, int page) {
+        List<String> keys = new ArrayList<>();
+        keys.add(key);
+        List<Integer> messageTypeLists = new ArrayList<>();
+        messageTypeLists.add(Constant.MsgType.TXT);
+        messageTypeLists.add(Constant.MsgType.MENTION);
+        String conversationID = conversationInfo.getValue().getConversationID();
+        OpenIMClient.getInstance()
+            .messageManager
+            .searchLocalMessages
+                (new OnBase<SearchResult>() {
+                     @Override
+                     public void onError(int code, String error) {
+                         L.e("");
+                     }
+
+                     @Override
+                     public void onSuccess(SearchResult data) {
+                         searchMessageItems.getValue().clear();
+                         if (data.getTotalCount() != 0) {
+                             searchMessageItems.getValue().addAll(data.getSearchResultItems().get(0).getMessageList());
+                         }
+                         searchMessageItems.setValue(searchMessageItems.getValue());
+                     }
+                 }, conversationID,
+                    keys, 0,
+                    null, messageTypeLists, 0,
+                    0, page, count);
     }
 
     public interface ViewAction extends IView {

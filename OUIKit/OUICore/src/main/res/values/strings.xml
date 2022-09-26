@@ -132,4 +132,8 @@
     <string name="take_picture">拍照</string>
     <string name="reduction">还原</string>
     <string name="set_succ">设置成功</string>
+    <string name="search_tips">搜索指定内容</string>
+    <string name="view_chat_history">查看聊天记录</string>
+    <string name="not_find">没有找到</string>
+    <string name="result">相关结果</string>
 </resources>

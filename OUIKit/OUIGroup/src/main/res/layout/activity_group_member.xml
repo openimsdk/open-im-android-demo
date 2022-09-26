@@ -75,7 +75,6 @@
                 app:iconWidth="58dp"
                 app:leftBigText="26sp"
                 app:letterColor="#5496EB"
-                android:visibility="gone"
                 app:letterSize="15sp"
                 app:paddingRight="20dp"
                 app:selectBackgroundColor="#000093"
