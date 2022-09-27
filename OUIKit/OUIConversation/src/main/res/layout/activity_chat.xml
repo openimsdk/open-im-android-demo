@@ -50,7 +50,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
-                        android:text="取消"
+                        android:text="@string/cancel"
                         android:textColor="#ff333333"
                         android:textSize="15sp"
                         android:visibility="gone" />
@@ -68,7 +68,7 @@
                         android:id="@+id/nickName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="李立白"
+                        android:text="@{ChatVM.conversationInfo.showName}"
                         android:textColor="#ff333333"
                         android:textSize="18sp"
                         android:visibility="visible" />

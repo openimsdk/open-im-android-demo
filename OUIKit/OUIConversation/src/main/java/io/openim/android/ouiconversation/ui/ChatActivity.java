@@ -32,11 +32,13 @@ import io.openim.android.ouiconversation.databinding.ActivityChatBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouiconversation.widget.BottomInputCote;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
@@ -53,27 +55,15 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     private BottomInputCote bottomInputCote;
     private boolean hasMicrophone;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         MThreadTool.executorService.execute(() -> {
             hasMicrophone = AndPermission.hasPermissions(this, Permission.Group.MICROPHONE);
         });
-        //userId 与 GROUP_ID 互斥
-        String userId = getIntent().getStringExtra(Constant.K_ID);
-        String groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
-        String name = getIntent().getStringExtra(Constant.K_NAME);
-        NotificationMsg notificationMsg = (NotificationMsg) getIntent().getSerializableExtra(Constant.K_NOTICE);
-        bindVM(ChatVM.class, true);
-        if (null != userId)
-            vm.otherSideID = userId;
-        if (null != groupId) {
-            vm.isSingleChat = false;
-            vm.groupID = groupId;
-        }
-
-        if (null != notificationMsg)
-            vm.notificationMsg.setValue(notificationMsg);
+        initVM();
         super.onCreate(savedInstanceState);
+        vm.init();
 
         bindViewDataBinding(ActivityChatBinding.inflate(getLayoutInflater()));
         sink();
@@ -81,10 +71,38 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
         Obs.inst().addObserver(this);
 
-        initView(name);
+        initView();
         listener();
         setTouchClearFocus(false);
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
+    }
+
+    private void initVM() {
+        //userId 与 GROUP_ID 互斥
+        String userId = getIntent().getStringExtra(Constant.K_ID);
+        String groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
+        boolean fromChatHistory = getIntent().getBooleanExtra(Constant.K_FROM, false);
+        NotificationMsg notificationMsg = (NotificationMsg) getIntent().getSerializableExtra(Constant.K_NOTICE);
+
+        bindVM(ChatVM.class, !fromChatHistory);
+        if (null != userId)
+            vm.otherSideID = userId;
+        if (null != groupId) {
+            vm.isSingleChat = false;
+            vm.groupID = groupId;
+        }
+        vm.fromChatHistory = fromChatHistory;
+        if (null != notificationMsg)
+            vm.notificationMsg.setValue(notificationMsg);
+
+        if (fromChatHistory) {
+            ChatVM chatVM = (ChatVM) BaseApp.inst().getVMByCache(ChatVM.class);
+            vm.startMsg = chatVM.startMsg;
+            vm.otherSideID = chatVM.otherSideID;
+            vm.isSingleChat = chatVM.isSingleChat;
+            vm.groupID = chatVM.groupID;
+            vm.notificationMsg.setValue(chatVM.notificationMsg.getValue());
+        }
     }
 
     @Override
@@ -98,17 +116,19 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     protected void onPause() {
         super.onPause();
         if (isFinishing()) {
-            removeCacheVM();
+            if (!vm.fromChatHistory)
+                removeCacheVM();
             Obs.inst().deleteObserver(this);
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private void initView(String name) {
+    @SuppressLint({"ClickableViewAccessibility", "NotifyDataSetChanged"})
+    private void initView() {
         bottomInputCote = new BottomInputCote(this, view.layoutInputCote, hasMicrophone);
         bottomInputCote.setChatVM(vm);
+        if (vm.fromChatHistory)
+            view.layoutInputCote.getRoot().setVisibility(View.GONE);
 
-        view.nickName.setText(name);
         LinearLayoutMg linearLayoutManager = new LinearLayoutMg(this);
         //倒叙
         linearLayoutManager.setStackFromEnd(true);
@@ -132,7 +152,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             bottomInputCote.setExpandHide();
             return false;
         });
-        view.recyclerView.post(() -> scrollToPosition(0));
+        if (!vm.fromChatHistory)
+            view.recyclerView.post(() -> scrollToPosition(0));
         view.recyclerView.addOnLayoutChangeListener((v, i, i1, i2, i3, i4, i5, i6, i7) -> {
             if (i3 < i7) { // bottom < oldBottom
                 scrollToPosition(0);
@@ -170,7 +191,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private void listener() {
         view.call.setOnClickListener(v -> {
-            if (null==callingService)return;
+            if (null == callingService) return;
             IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
                 vm.isVideoCall = keyCode != 1;
                 if (vm.isSingleChat) {
@@ -241,8 +262,12 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                     && vm.messages.getValue().size() >= vm.count) {
                     vm.loadHistoryMessage();
                 }
+//                if (vm.fromChatHistory && firstVisiblePosition < 2) {
+//                    vm.loadHistoryMessageReverse();
+//                }
                 if (vm.isSingleChat)
                     vm.sendMsgReadReceipt(firstVisiblePosition, lastVisiblePosition);
+
             }
         });
 
@@ -312,7 +337,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             List<String> ids = data.getStringArrayListExtra(Constant.K_RESULT);
             SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall, false,
                 ids, vm.groupID);
-            if (null==callingService)return;
+            if (null == callingService) return;
             callingService.call(signalingInfo);
         }
     }

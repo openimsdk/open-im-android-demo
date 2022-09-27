@@ -72,29 +72,31 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private MessageAdapter messageAdapter;
     private Observer<String> inputObserver;
-    Message startMsg = null; // 消息体，取界面上显示的消息体对象
+    public Message startMsg = null; // 消息体，取界面上显示的消息体对象/搜索时的起始坐标
     public String otherSideID = ""; // 接受消息Id
     public String groupID = ""; // 接受消息的群ID
     public boolean isSingleChat = true; //是否单聊 false 群聊
     public boolean isSuperGroup = false;//是否超级大群
     public boolean isVideoCall = true;//是否是视频通话
+    public boolean fromChatHistory = false;//从查看聊天记录跳转过来
+    public boolean firstChatHistory = true;// //用于第一次消息定位
     public int count = 20; //条数
     public Message loading, forwardMsg;
+    //上次recyclerView 的高度
+    private int lastOffsetY = 0;
+    private boolean isSetChanged;
 
-    @Override
-    protected void viewCreate() {
-        super.viewCreate();
+
+    public void init() {
         loading = new Message();
         loading.setContentType(Constant.LOADING);
         //获取会话信息
         getConversationInfo();
         //标记所有消息已读
         markReaded(null);
-        if (isSingleChat) {
-            //加载消息记录
-            loadHistoryMessage();
+        if (isSingleChat)
             listener();
-        }
+
         IMEvent.getInstance().addAdvanceMsgListener(this);
     }
 
@@ -111,7 +113,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     data.getConversationType() == Constant.SessionType.SUPER_GROUP;
                 if (!isSingleChat) {
                     //加载消息记录
-                    loadHistoryMessage();
+                    if (fromChatHistory)
+                        loadHistoryMessageReverse();
+                    else
+                        loadHistoryMessage();
                 }
                 conversationInfo.setValue(data);
                 getConversationRecvMessageOpt(data.getConversationID());
@@ -174,7 +179,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
                     @Override
                     public void onSuccess(List<Message> data) {
-                        handleMessage(data);
+                        handleMessage(data, false);
                     }
                 }, otherSideID, groupID, null, startMsg, count);
         } else {
@@ -186,14 +191,14 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
                 @Override
                 public void onSuccess(List<Message> data) {
-                    handleMessage(data);
+                    handleMessage(data, false);
                 }
 
             }, otherSideID, groupID, null, startMsg, count);
         }
     }
 
-    private void handleMessage(List<Message> data) {
+    private void handleMessage(List<Message> data, boolean isReverse) {
         for (Message datum : data) {
             IMUtil.buildExpandInfo(datum);
         }
@@ -211,6 +216,12 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         if (list.isEmpty()) {
             IMUtil.calChatTimeInterval(data);
             messages.setValue(data);
+            return;
+        }
+        if (isReverse) {
+            list.addAll(0, data);
+            IMUtil.calChatTimeInterval(list);
+            messageAdapter.notifyItemRangeInserted(0,data.size());
             return;
         }
         removeLoading(list);
@@ -495,6 +506,33 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     null, messageTypeLists, 0,
                     0, page, count);
     }
+
+    public void loadHistoryMessageReverse() {
+        if (isSuperGroup) {
+
+        } else {
+            OpenIMClient.getInstance().messageManager.getHistoryMessageListReverse(
+                new OnBase<List<Message>>() {
+                    @Override
+                    public void onError(int code, String error) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(List<Message> data) {
+                        if (firstChatHistory) {
+                            data.add(0, startMsg);
+                            firstChatHistory = false;
+                        }
+                        handleMessage(data, true);
+                    }
+
+                }, otherSideID, groupID, null, startMsg, count*50);
+        }
+
+    }
+
+
 
     public interface ViewAction extends IView {
         void scrollToPosition(int position);

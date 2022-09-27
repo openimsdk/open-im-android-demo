@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,6 +33,7 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
@@ -40,7 +42,7 @@ import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SearchResultItem;
 
 @Route(path = Routes.Conversation.CHAT_HISTORY)
-public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChatHistorySearchBinding> {
+public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChatHistorySearchBinding> implements ChatVM.ViewAction   {
     private final Handler handler = new Handler();
     private int page = 1;
     public MutableLiveData<String> inputKey = new MutableLiveData<>("");
@@ -89,7 +91,6 @@ public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChat
         adapter = new RecyclerViewAdapter<Message, ViewHol.ContactItemHolder>(ViewHol.ContactItemHolder.class) {
 
 
-
             @Override
             public void onBindView(@NonNull ViewHol.ContactItemHolder holder, Message data, int position) {
                 holder.viewBinding.avatar.load(data.getSenderFaceUrl());
@@ -97,12 +98,18 @@ public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChat
                 holder.viewBinding.time.setText(TimeUtil.getTimeString(data.getSendTime()));
 
                 SpannableStringBuilder spannableString = new SpannableStringBuilder(data.getContent());
-                int index=data.getContent().indexOf(inputKey.getValue());
-                ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
-                spannableString.setSpan(colorSpan,index,index+inputKey.getValue().length(),
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                holder.viewBinding.lastMsg.setText(spannableString);
-
+                int index = data.getContent().indexOf(inputKey.getValue());
+                if (index != -1) {
+                    ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
+                    spannableString.setSpan(colorSpan, index, index + inputKey.getValue().length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.viewBinding.lastMsg.setText(spannableString);
+                }
+                holder.viewBinding.getRoot().setOnClickListener(v -> {
+                    vm.startMsg = data;
+                    startActivity(new Intent(ChatHistorySearchActivity.this,
+                        ChatActivity.class).putExtra(Constant.K_FROM, true));
+                });
             }
         };
         view.recyclerview.setAdapter(adapter);
@@ -141,5 +148,15 @@ public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChat
                 }, 500);
             }
         });
+    }
+
+    @Override
+    public void scrollToPosition(int position) {
+
+    }
+
+    @Override
+    public void closePage() {
+
     }
 }

@@ -69,6 +69,7 @@ public class Constant {
     public static final String K_NOTICE = "notice";
     public static final String K_NAME = "name";
     public static final String K_RESULT = "result";
+    public static final String K_FROM = "from";
     //好友红点
     public static final String K_FRIEND_NUM = "k_friend_num";
     //群红点

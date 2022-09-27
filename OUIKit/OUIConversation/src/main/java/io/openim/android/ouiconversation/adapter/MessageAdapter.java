@@ -67,4 +67,8 @@ public class MessageAdapter extends RecyclerView.Adapter {
     public void bindRecyclerView(RecyclerView recyclerView) {
         this.recyclerView = recyclerView;
     }
+
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
+    }
 }
