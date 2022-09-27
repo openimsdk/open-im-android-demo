@@ -58,7 +58,9 @@ public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChat
     }
 
     private void listener() {
+        view.cancel.setOnClickListener(v -> finish());
         inputKey.observe(this, s -> {
+            view.notFind.setVisibility(View.GONE);
             if (s.isEmpty()) {
                 isStartSearch = false;
                 view.recyclerview.setVisibility(View.GONE);
@@ -100,6 +102,7 @@ public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChat
                 spannableString.setSpan(colorSpan,index,index+inputKey.getValue().length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 holder.viewBinding.lastMsg.setText(spannableString);
+
             }
         };
         view.recyclerview.setAdapter(adapter);

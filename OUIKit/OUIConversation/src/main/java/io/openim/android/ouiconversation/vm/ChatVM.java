@@ -483,7 +483,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
                      @Override
                      public void onSuccess(SearchResult data) {
-                         searchMessageItems.getValue().clear();
+                         if (page == 1)
+                             searchMessageItems.getValue().clear();
                          if (data.getTotalCount() != 0) {
                              searchMessageItems.getValue().addAll(data.getSearchResultItems().get(0).getMessageList());
                          }
