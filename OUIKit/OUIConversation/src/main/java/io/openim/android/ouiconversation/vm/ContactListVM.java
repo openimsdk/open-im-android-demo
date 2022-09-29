@@ -144,6 +144,20 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     }
 
+    //置顶/取消置顶 会话
+    public void pinConversation(ConversationInfo conversationInfo, boolean isPinned) {
+        OpenIMClient.getInstance().conversationManager.pinConversation(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                conversationInfo.setPinned(isPinned);
+            }
+        }, conversationInfo.getConversationID(), isPinned);
+    }
+
     public interface ViewAction extends IView {
         void onErr(String msg);
     }

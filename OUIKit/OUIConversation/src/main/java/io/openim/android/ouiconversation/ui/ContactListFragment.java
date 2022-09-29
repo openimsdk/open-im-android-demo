@@ -46,6 +46,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.ConversationInfo;
 
 @Route(path = Routes.Conversation.CONTACT_LIST)
@@ -90,9 +91,11 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             delete.setTextColor(getContext().getColor(android.R.color.white));
             delete.setBackgroundColor(Color.parseColor("#FFAB41"));
 
-
+            MsgConversation conversationInfo = vm.conversations.getValue().get(position);
             SwipeMenuItem top = new SwipeMenuItem(getContext());
-            top.setText(R.string.top);
+            top.setText(conversationInfo
+                .conversationInfo.isPinned()?
+                io.openim.android.ouicore.R.string.cancel_top:R.string.top);
             top.setHeight(MATCH_PARENT);
             top.setWidth(Common.dp2px(73));
             top.setTextSize(16);
@@ -107,7 +110,9 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         view.recyclerView.setOnItemMenuClickListener((menuBridge, adapterPosition) -> {
             int menuPosition = menuBridge.getPosition();
             if (menuPosition == 0) {
-
+                MsgConversation conversationInfo = vm.conversations.getValue().get(adapterPosition);
+                vm.pinConversation(conversationInfo.conversationInfo,
+                    !conversationInfo.conversationInfo.isPinned());
             } else {
                 MsgConversation conversationInfo = vm.conversations.getValue().get(adapterPosition);
                 vm.conversations.getValue().remove(conversationInfo);
@@ -178,7 +183,6 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         public List<MsgConversation> getConversationInfos() {
             return conversationInfos;
         }
-
 
 
         @Override

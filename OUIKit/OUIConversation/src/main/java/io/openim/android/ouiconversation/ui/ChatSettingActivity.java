@@ -15,6 +15,7 @@ import java.util.List;
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.ActivityChatSettingBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
+import io.openim.android.ouiconversation.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
@@ -28,6 +29,7 @@ import io.openim.android.sdk.models.UserInfo;
 
 public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding> implements ChatVM.ViewAction {
 
+    ContactListVM contactListVM=new ContactListVM();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         bindVMByCache(ChatVM.class);
@@ -41,11 +43,14 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
     }
 
     private void click() {
+        view.topSlideButton.setOnSlideButtonClickListener(is -> {
+            contactListVM.pinConversation(vm.conversationInfo.getValue(),is);
+        });
         view.searchChat.setOnClickListener(v -> {
-            startActivity(new Intent(this,ChatHistorySearchActivity.class));
+            startActivity(new Intent(this, ChatHistorySearchActivity.class));
         });
         view.chatbg.setOnClickListener(view1 -> {
-            startActivity(new Intent(this,SetChatBgActivity.class));
+            startActivity(new Intent(this, SetChatBgActivity.class));
         });
 
         view.noDisturb.setOnSlideButtonClickListener(is -> {
@@ -72,6 +77,9 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
     private void initView() {
         vm.notDisturbStatus.observe(this, integer -> {
             view.noDisturb.setChecked(integer == 2);
+        });
+        vm.conversationInfo.observe(this, conversationInfo -> {
+            view.topSlideButton.post(() -> view.topSlideButton.setCheckedWithAnimation(conversationInfo.isPinned()));
         });
 
         List<String> uid = new ArrayList<>();

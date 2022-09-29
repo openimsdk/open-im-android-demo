@@ -132,4 +132,7 @@
     <string name="result">相关结果</string>
     <string name="in_week">本周内</string>
     <string name="in_month">本月内</string>
+    <string name="cancel_top">取消置顶</string>
+    <string name="msg_dont_disturb">消息免打扰</string>
+    <string name="top_chat">置顶聊天</string>
 </resources>
