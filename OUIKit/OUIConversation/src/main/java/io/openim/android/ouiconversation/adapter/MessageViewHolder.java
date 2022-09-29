@@ -686,7 +686,7 @@ public class MessageViewHolder {
             showMsgExMenu(view.content);
 
             view.content.setOnClickListener(v -> {
-                openFile(v.getContext(), message);
+                GetFilePathFromUri.openFile(v.getContext(), message);
             });
         }
 
@@ -703,29 +703,11 @@ public class MessageViewHolder {
             showMsgExMenu(view.content2);
 
             view.content2.setOnClickListener(v -> {
-                openFile(v.getContext(), message);
+               GetFilePathFromUri.openFile(v.getContext(), message);
             });
         }
 
-        private void openFile(Context context, Message message) {
-            Intent it = new Intent(Intent.ACTION_VIEW);
-            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            String path = message.getFileElem().getFilePath();
-            if (!TextUtils.isEmpty(path) && GetFilePathFromUri.fileIsExists(path)) {
-                try {
-                    if (MediaFileUtil.isAudioType(path)) {
-                        it.setDataAndType(Uri.parse(path), "audio/MP3");
-                        context.startActivity(it);
-                        return;
-                    }
-                } catch (Exception ignored) {
-                }
-            } else {
-                path = message.getFileElem().getSourceUrl();
-            }
-            it.setDataAndType(Uri.parse(path), "*/*");
-            context.startActivity(it);
-        }
+
     }
 
     public static class LocationView extends MessageViewHolder.MsgViewHolder {

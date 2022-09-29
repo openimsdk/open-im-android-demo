@@ -89,4 +89,21 @@ public class TimeUtil {
         return v < 10 ? ("0" + v) : (v + "");
     }
 
+
+    //本周/本月/月
+    public static  String getTimeRules(long time) {
+        Calendar calendar = Calendar.getInstance();
+        int currentWeek = calendar.get(Calendar.WEEK_OF_YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH);
+        calendar.setTime(new Date(time));
+        int paramWeek = calendar.get(Calendar.WEEK_OF_YEAR);
+        int paramMonth = calendar.get(Calendar.MONTH);
+        if (paramWeek == currentWeek) {
+            return BaseApp.inst().getString(R.string.in_week);
+        }
+        if (paramMonth == currentMonth) {
+            return BaseApp.inst().getString(R.string.in_month);
+        }
+        return paramMonth + "月";
+    }
 }

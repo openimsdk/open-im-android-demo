@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -25,8 +26,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class GetFilePathFromUri {
+import io.openim.android.sdk.models.Message;
 
+public class GetFilePathFromUri {
+    //打开文件
+    public static  void openFile(Context context, Message message) {
+        Intent it = new Intent(Intent.ACTION_VIEW);
+        it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        String path = message.getFileElem().getFilePath();
+        if (!TextUtils.isEmpty(path) && GetFilePathFromUri.fileIsExists(path)) {
+            try {
+                if (MediaFileUtil.isAudioType(path)) {
+                    it.setDataAndType(Uri.parse(path), "audio/MP3");
+                    context.startActivity(it);
+                    return;
+                }
+            } catch (Exception ignored) {
+            }
+        } else {
+            path = message.getFileElem().getSourceUrl();
+        }
+        it.setDataAndType(Uri.parse(path), "*/*");
+        context.startActivity(it);
+    }
 
     //判断文件是否存在
     public static boolean fileIsExists(String filePath) {

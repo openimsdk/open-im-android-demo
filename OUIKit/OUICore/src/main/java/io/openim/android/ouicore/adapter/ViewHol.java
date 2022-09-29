@@ -12,6 +12,8 @@ import io.openim.android.ouicore.databinding.ItemImgTxtBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonSelectBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonStickyBinding;
 import io.openim.android.ouicore.databinding.LayoutContactItemBinding;
+import io.openim.android.ouicore.databinding.ViewImageBinding;
+import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
 
 public class ViewHol {
 
@@ -55,9 +57,27 @@ public class ViewHol {
         public LayoutContactItemBinding viewBinding;
 
         public ContactItemHolder(@NonNull View itemView) {
-            super(LayoutContactItemBinding.inflate(LayoutInflater.from(itemView.getContext()),(ViewGroup) itemView, false).getRoot());
-            this.viewBinding = LayoutContactItemBinding.bind(this.itemView);;
+            super(LayoutContactItemBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
+            this.viewBinding = LayoutContactItemBinding.bind(this.itemView);
+            ;
         }
     }
 
+    public static class RecyclerViewHolder extends RecyclerView.ViewHolder {
+        public ViewRecyclerViewBinding viewBinding;
+
+        public RecyclerViewHolder(@NonNull View itemView) {
+            super(ViewRecyclerViewBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
+            this.viewBinding = ViewRecyclerViewBinding.bind(this.itemView);
+        }
+    }
+
+    public static class ImageViewHolder extends RecyclerView.ViewHolder {
+        public ViewImageBinding view;
+
+        public ImageViewHolder(@NonNull View itemView) {
+            super(ViewImageBinding.inflate(LayoutInflater.from(itemView.getContext()),(ViewGroup) itemView, false).getRoot());
+            view = ViewImageBinding.bind(this.itemView);
+        }
+    }
 }

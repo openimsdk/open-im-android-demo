@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouiconversation.databinding.ActivityChatBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
@@ -96,7 +97,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             vm.notificationMsg.setValue(notificationMsg);
 
         if (fromChatHistory) {
-            ChatVM chatVM = (ChatVM) BaseApp.inst().getVMByCache(ChatVM.class);
+            ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
             vm.startMsg = chatVM.startMsg;
             vm.otherSideID = chatVM.otherSideID;
             vm.isSingleChat = chatVM.isSingleChat;
@@ -126,8 +127,11 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     private void initView() {
         bottomInputCote = new BottomInputCote(this, view.layoutInputCote, hasMicrophone);
         bottomInputCote.setChatVM(vm);
-        if (vm.fromChatHistory)
+        if (vm.fromChatHistory) {
             view.layoutInputCote.getRoot().setVisibility(View.GONE);
+            view.call.setVisibility(View.GONE);
+            view.more.setVisibility(View.GONE);
+        }
 
         LinearLayoutMg linearLayoutManager = new LinearLayoutMg(this);
         //倒叙
@@ -222,6 +226,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 .navigation(this, Constant.Event.FORWARD);
         });
         vm.enableMultipleSelect.observe(this, o -> {
+            if (null == o) return;
             int px = Common.dp2px(22);
             if (o) {
                 view.choiceMenu.setVisibility(View.VISIBLE);

@@ -42,7 +42,7 @@ import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SearchResultItem;
 
 @Route(path = Routes.Conversation.CHAT_HISTORY)
-public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChatHistorySearchBinding> implements ChatVM.ViewAction   {
+public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChatHistorySearchBinding> implements ChatVM.ViewAction {
     private final Handler handler = new Handler();
     private int page = 1;
     public MutableLiveData<String> inputKey = new MutableLiveData<>("");
@@ -60,6 +60,13 @@ public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChat
     }
 
     private void listener() {
+        view.picture.setOnClickListener(v -> startActivity(new Intent(this,
+            MediaHistoryActivity.class).putExtra(Constant.K_RESULT, true)));
+        view.video.setOnClickListener(v -> startActivity(new Intent(this,
+            MediaHistoryActivity.class)));
+        view.file.setOnClickListener(v -> startActivity(new Intent(this,
+            FileHistoryActivity.class)));
+
         view.cancel.setOnClickListener(v -> finish());
         inputKey.observe(this, s -> {
             view.notFind.setVisibility(View.GONE);

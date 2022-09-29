@@ -130,4 +130,6 @@
     <string name="view_chat_history">查看聊天记录</string>
     <string name="not_find">没有找到</string>
     <string name="result">相关结果</string>
+    <string name="in_week">本周内</string>
+    <string name="in_month">本月内</string>
 </resources>

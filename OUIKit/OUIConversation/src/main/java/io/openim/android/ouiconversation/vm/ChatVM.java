@@ -33,6 +33,7 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.FixSizeLinkedList;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 
@@ -53,6 +54,8 @@ import io.openim.android.sdk.models.UserInfo;
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener {
     //搜索的本地消息
     public MutableLiveData<List<Message>> searchMessageItems = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<Message>> addSearchMessageItems = new MutableLiveData<>(new ArrayList<>());
+
     //会话信息
     public MutableLiveData<ConversationInfo> conversationInfo = new MutableLiveData<>();
     public MutableLiveData<Integer> notDisturbStatus = new MutableLiveData<>(0);
@@ -68,7 +71,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     MutableLiveData<Boolean> isNoData = new MutableLiveData<>(false);
 
     //开启多选
-    public MutableLiveData<Boolean> enableMultipleSelect = new MutableLiveData(false);
+    public MutableLiveData<Boolean> enableMultipleSelect = new MutableLiveData();
 
     private MessageAdapter messageAdapter;
     private Observer<String> inputObserver;
@@ -221,7 +224,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         if (isReverse) {
             list.addAll(0, data);
             IMUtil.calChatTimeInterval(list);
-            messageAdapter.notifyItemRangeInserted(0,data.size());
+            messageAdapter.notifyItemRangeInserted(0, data.size());
             return;
         }
         removeLoading(list);
@@ -476,12 +479,20 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }, Arrays.asList(cid), status);
     }
 
-    public void searchLocalMessages(String key, int page) {
-        List<String> keys = new ArrayList<>();
-        keys.add(key);
-        List<Integer> messageTypeLists = new ArrayList<>();
-        messageTypeLists.add(Constant.MsgType.TXT);
-        messageTypeLists.add(Constant.MsgType.MENTION);
+    public void searchLocalMessages(String key, int page, Integer... messageTypes) {
+        List<String> keys = null;
+        if (!TextUtils.isEmpty(key)) {
+            keys = new ArrayList<>();
+            keys.add(key);
+        }
+        List<Integer> messageTypeLists;
+        if (null == messageTypes) {
+            messageTypeLists = new ArrayList<>();
+            messageTypeLists.add(Constant.MsgType.TXT);
+            messageTypeLists.add(Constant.MsgType.MENTION);
+        } else
+            messageTypeLists = Arrays.asList(messageTypes);
+
         String conversationID = conversationInfo.getValue().getConversationID();
         OpenIMClient.getInstance()
             .messageManager
@@ -494,10 +505,12 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
                      @Override
                      public void onSuccess(SearchResult data) {
-                         if (page == 1)
+                         if (page == 1) {
                              searchMessageItems.getValue().clear();
+                         }
                          if (data.getTotalCount() != 0) {
                              searchMessageItems.getValue().addAll(data.getSearchResultItems().get(0).getMessageList());
+                             addSearchMessageItems.setValue(data.getSearchResultItems().get(0).getMessageList());
                          }
                          searchMessageItems.setValue(searchMessageItems.getValue());
                      }
@@ -527,11 +540,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                         handleMessage(data, true);
                     }
 
-                }, otherSideID, groupID, null, startMsg, count*50);
+                }, otherSideID, groupID, null, startMsg, count * 50);
         }
 
     }
-
 
 
     public interface ViewAction extends IView {

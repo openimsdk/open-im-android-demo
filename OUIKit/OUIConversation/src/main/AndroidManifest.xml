@@ -13,6 +13,12 @@
 
     <application android:theme="@style/Theme.Demo">
         <activity
+            android:name=".ui.FileHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.MediaHistoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.SetChatBgActivity"
             android:exported="false" />
         <activity

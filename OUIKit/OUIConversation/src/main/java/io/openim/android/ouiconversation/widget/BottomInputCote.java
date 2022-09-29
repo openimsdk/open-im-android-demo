@@ -153,42 +153,6 @@ public class BottomInputCote {
             view.fragmentContainer.setVisibility(VISIBLE);
             switchFragment(emojiFragment);
         });
-
-//        view.chatInput.setOnKeyListener((v, keyCode, event) -> {
-//            //监听删除操作，找到最靠近删除的一个Span，然后整体删除
-//            if (keyCode == KeyEvent.KEYCODE_DEL && event.getAction() == KeyEvent.ACTION_DOWN) {
-//                final int selectionStart = Selection.getSelectionStart(view.chatInput.getText());
-//                final int selectionEnd = Selection.getSelectionEnd(view.chatInput.getText());
-//
-//                final ForegroundColorSpan spans[] = view.chatInput.getText().getSpans(selectionStart - 1, selectionEnd, ForegroundColorSpan.class);
-//                for (ForegroundColorSpan span : spans) {
-//                    if (span == null) {
-//                        continue;
-//                    }
-//                    if (view.chatInput.getText().getSpanEnd(span) == selectionStart) {
-//                        final int spanStart = view.chatInput.getText().getSpanStart(span);
-//                        final int spanEnd = view.chatInput.getText().getSpanEnd(span);
-//                        Selection.setSelection(view.chatInput.getText(), spanStart, spanEnd);
-//                        view.chatInput.getText().delete(spanStart + 1, spanEnd);
-//                    }
-//                    List<Message> atMessages = vm.atMessages.getValue();
-//                    Iterator iterator = atMessages.iterator();
-//                    while (iterator.hasNext()) {
-//                        Message message = (Message) iterator.next();
-//                        try {
-//                            MsgExpand msgExpand = (MsgExpand) message.getExt();
-//                            if (msgExpand.spanHashCode == span.hashCode()) {
-//                                iterator.remove();
-//                            }
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//            }
-//            return false;
-//        });
-
     }
 
     private void initFragment() {
