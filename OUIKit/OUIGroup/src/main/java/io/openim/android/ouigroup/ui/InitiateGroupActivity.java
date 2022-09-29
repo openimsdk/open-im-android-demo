@@ -286,7 +286,6 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                     .putStringArrayListExtra(Constant.K_RESULT, ids));
                 finish();
                 return;
-
             }
             createLauncher.launch(new Intent(this, CreateGroupActivity.class));
         });

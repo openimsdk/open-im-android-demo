@@ -87,8 +87,7 @@ public class FriendVM extends BaseViewModel {
             @Override
             public void onSuccess(List<UserInfo> data) {
                 waitDialog.dismiss();
-                if (data.isEmpty()) return;
-                blackListUser.setValue(data);
+                blackListUser.setValue(null == data ? new ArrayList<>() : data);
             }
         });
     }

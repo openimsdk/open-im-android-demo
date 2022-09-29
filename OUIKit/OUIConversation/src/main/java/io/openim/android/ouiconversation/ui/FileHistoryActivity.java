@@ -43,8 +43,20 @@ public class FileHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHisto
 
     private void listener() {
         vm.searchMessageItems.observe(this, list -> {
-            if (list.isEmpty())return;
-            adapter.notifyItemRangeChanged(list.size()-vm.count,list.size());
+            if (list.isEmpty()) return;
+            adapter.notifyItemRangeChanged(list.size() - vm.count, list.size());
+        });
+        view.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) view.recyclerView.getLayoutManager();
+                int lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
+                if (lastVisiblePosition == vm.searchMessageItems.getValue().size() - 1
+                    && vm.searchMessageItems.getValue().size() >= vm.count) {
+                    page++;
+                    searchLocalMessages();
+                }
+            }
         });
     }
 
@@ -64,10 +76,10 @@ public class FileHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHisto
 
                 holder.v.avatar.load(data.getSenderFaceUrl());
                 holder.v.nickName.setText(data.getSenderNickname());
-                holder.v.time.setText(TimeUtil.getTime(data.getSendTime() / 1000, TimeUtil.yearTimeFormat));
+                holder.v.time.setText(TimeUtil.getTime(data.getSendTime() , TimeUtil.yearTimeFormat));
                 holder.v.title.setText(data.getFileElem().getFileName());
                 holder.v.size.setText(ByteUtil.bytes2kb(data.getFileElem().getFileSize()));
-                holder.v.item.setOnClickListener(v ->   GetFilePathFromUri.openFile(v.getContext(), data));
+                holder.v.item.setOnClickListener(v -> GetFilePathFromUri.openFile(v.getContext(), data));
             }
         });
         adapter.setItems(vm.searchMessageItems.getValue());

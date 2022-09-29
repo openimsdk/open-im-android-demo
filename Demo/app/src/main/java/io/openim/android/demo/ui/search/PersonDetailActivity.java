@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
+import androidx.lifecycle.Observer;
+
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
@@ -15,6 +17,7 @@ import java.util.List;
 
 import io.openim.android.demo.databinding.ActivityPersonDetailBinding;
 import io.openim.android.demo.ui.user.PersonDataActivity;
+import io.openim.android.demo.vm.FriendVM;
 import io.openim.android.demo.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
@@ -22,6 +25,7 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
+import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.models.FriendshipInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
@@ -29,6 +33,9 @@ import io.openim.android.sdk.models.UserInfo;
 @Route(path = Routes.Main.PERSON_DETAIL)
 public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonDetailBinding> {
     private boolean formChat;
+    private FriendVM friendVM = new FriendVM();
+    private WaitDialog waitDialog;
+    private FriendshipInfo friendshipInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,15 +44,22 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         super.onCreate(savedInstanceState);
 
         sink();
+        init();
 
         listener();
         vm.searchContent = getIntent().getStringExtra(Constant.K_ID);
         vm.searchPerson();
 
         formChat = getIntent().getBooleanExtra(Constant.K_RESULT, false);
-
-
         click();
+    }
+
+    private void init() {
+        waitDialog = new WaitDialog(this);
+        friendVM.waitDialog = waitDialog;
+        friendVM.setContext(this);
+        friendVM.setIView(this);
+        waitDialog.show();
     }
 
 
@@ -82,7 +96,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         });
 
         view.call.setOnClickListener(v -> {
-            if (null==callingService)return;
+            if (null == callingService) return;
             IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
                 List<String> ids = new ArrayList<>();
                 ids.add(vm.searchContent);
@@ -102,6 +116,26 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     }
 
     private void listener() {
+        friendVM.blackListUser.observe(this, userInfos -> {
+            boolean isCon = false;
+            for (UserInfo userInfo : userInfos) {
+                if (userInfo.getUserID()
+                    .equals(vm.searchContent)) {
+                    isCon = true;
+                    break;
+                }
+            }
+            if (null!=friendshipInfo){
+                if (friendshipInfo.getResult() == 1 || isCon) {
+                    view.userInfo.setVisibility(formChat ? View.VISIBLE : View.GONE);
+                    view.addFriend.setVisibility(View.GONE);
+                    view.part.setVisibility(View.VISIBLE);
+                } else {
+                    view.addFriend.setVisibility(View.VISIBLE);
+                    view.part.setVisibility(View.GONE);
+                }
+            }
+        });
         vm.userInfo.observe(this, v -> {
             if (null != v && !v.isEmpty()) {
                 vm.checkFriend(v);
@@ -117,15 +151,8 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         });
         vm.friendshipInfo.observe(this, v -> {
             if (null != v && !v.isEmpty()) {
-                FriendshipInfo friendshipInfo = v.get(0);
-                if (friendshipInfo.getResult() == 1 || friendshipInfo.getResult() == 0) {
-                    view.userInfo.setVisibility(formChat ? View.VISIBLE : View.GONE);
-                    view.addFriend.setVisibility(View.GONE);
-                    view.part.setVisibility(View.VISIBLE);
-                } else {
-                    view.addFriend.setVisibility(View.VISIBLE);
-                    view.part.setVisibility(View.GONE);
-                }
+                friendshipInfo = v.get(0);
+                friendVM.getBlacklist();
             }
 
         });
