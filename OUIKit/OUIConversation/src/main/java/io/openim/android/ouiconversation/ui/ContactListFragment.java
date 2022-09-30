@@ -20,6 +20,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -81,7 +82,6 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
     @SuppressLint("NewApi")
     private void init() {
         view.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
         SwipeMenuCreator mSwipeMenuCreator = (leftMenu, rightMenu, position) -> {
             SwipeMenuItem delete = new SwipeMenuItem(getContext());
             delete.setText(R.string.remove);
@@ -94,8 +94,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             MsgConversation conversationInfo = vm.conversations.getValue().get(position);
             SwipeMenuItem top = new SwipeMenuItem(getContext());
             top.setText(conversationInfo
-                .conversationInfo.isPinned()?
-                io.openim.android.ouicore.R.string.cancel_top:R.string.top);
+                .conversationInfo.isPinned() ?
+                io.openim.android.ouicore.R.string.cancel_top : R.string.top);
             top.setHeight(MATCH_PARENT);
             top.setWidth(Common.dp2px(73));
             top.setTextSize(16);
@@ -147,6 +147,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
         adapter = new CustomAdapter(getContext());
         view.recyclerView.setAdapter(adapter);
+        view.recyclerView.addHeaderView(createHeaderView());
+
 
 //        view.recyclerView.addItemDecoration(new DefaultItemDecoration(getActivity().getColor(android.R.color.transparent), 1, 36));
         vm.conversations.observe(getActivity(), v -> {
@@ -154,6 +156,12 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             adapter.setConversationInfos(v);
             adapter.notifyDataSetChanged();
         });
+    }
+
+    private View createHeaderView() {
+        View header = getLayoutInflater().inflate(R.layout.view_search, view.recyclerView, false);
+//        header.setOnClickListener(v ->);
+        return header;
     }
 
 

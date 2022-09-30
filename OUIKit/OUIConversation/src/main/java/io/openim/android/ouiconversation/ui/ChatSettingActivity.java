@@ -37,7 +37,6 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
         bindViewDataBinding(ActivityChatSettingBinding.inflate(getLayoutInflater()));
         sink();
 
-
         initView();
         click();
     }

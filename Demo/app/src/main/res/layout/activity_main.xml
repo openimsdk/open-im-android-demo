@@ -9,8 +9,7 @@
 
     </data>
 
-    <LinearLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -28,15 +27,15 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingLeft="22dp"
+                android:paddingLeft="20dp"
                 android:paddingTop="15dp"
-                android:paddingRight="22dp"
+                android:paddingRight="20dp"
                 android:paddingBottom="15dp">
 
                 <io.openim.android.ouicore.widget.AvatarImage
                     android:id="@+id/avatar"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="@dimen/avatar_size"
+                    android:layout_height="@dimen/avatar_size"
                     android:src="@mipmap/ic_my_friend" />
 
                 <TextView
@@ -80,8 +79,8 @@
                     android:id="@+id/callRecord"
                     android:layout_width="31dp"
                     android:layout_height="31dp"
-                    android:padding="5dp"
                     android:layout_marginRight="15dp"
+                    android:padding="5dp"
                     android:src="@mipmap/ic_call_white" />
 
                 <ImageView
@@ -95,6 +94,8 @@
 
 
         </androidx.cardview.widget.CardView>
+
+
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -168,17 +169,16 @@
                         android:id="@+id/badge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:visibility="gone"
                         android:layout_centerHorizontal="true"
-                        android:paddingLeft="45dp">
+                        android:layout_marginTop="10dp"
+                        android:paddingLeft="45dp"
+                        android:visibility="gone">
 
                         <include
                             layout="@layout/view_badge"
                             android:layout_width="8dp"
                             android:layout_height="8dp"
-                            android:visibility="visible"
-                           />
+                            android:visibility="visible" />
                     </LinearLayout>
 
                 </RelativeLayout>

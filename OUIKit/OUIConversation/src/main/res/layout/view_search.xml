@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.openim.android.ouicore.widget.SearchView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/searchView"
+    android:layout_width="match_parent"
+    android:layout_height="34dp"
+    android:layout_marginLeft="20dp"
+    android:layout_marginTop="12dp"
+    android:layout_marginRight="20dp"
+    android:layout_marginBottom="3dp"
+    android:clickable="false"
+    android:hint="@string/search"
+    tools:ignore="MissingDefaultResource" />

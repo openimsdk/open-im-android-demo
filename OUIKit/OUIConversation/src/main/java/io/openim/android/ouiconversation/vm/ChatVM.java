@@ -114,13 +114,11 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             public void onSuccess(ConversationInfo data) {
                 isSuperGroup =
                     data.getConversationType() == Constant.SessionType.SUPER_GROUP;
-                if (!isSingleChat) {
-                    //加载消息记录
-                    if (fromChatHistory)
-                        loadHistoryMessageReverse();
-                    else
-                        loadHistoryMessage();
-                }
+                //加载消息记录
+                if (fromChatHistory)
+                    loadHistoryMessageReverse();
+                else
+                    loadHistoryMessage();
                 conversationInfo.setValue(data);
                 getConversationRecvMessageOpt(data.getConversationID());
             }

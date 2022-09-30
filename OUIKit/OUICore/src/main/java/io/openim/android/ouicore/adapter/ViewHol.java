@@ -59,7 +59,6 @@ public class ViewHol {
         public ContactItemHolder(@NonNull View itemView) {
             super(LayoutContactItemBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
             this.viewBinding = LayoutContactItemBinding.bind(this.itemView);
-            ;
         }
     }
 

@@ -4,15 +4,15 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingLeft="22dp"
-    android:paddingTop="9dp"
-    android:paddingRight="22dp"
-    android:paddingBottom="9dp">
+    android:paddingLeft="20dp"
+    android:paddingTop="7dp"
+    android:paddingRight="20dp"
+    android:paddingBottom="7dp">
 
     <io.openim.android.ouicore.widget.AvatarImage
         android:id="@+id/avatar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/avatar_size"
+        android:layout_height="@dimen/avatar_size"
         android:src="@mipmap/ic_my_friend" />
 
     <LinearLayout
