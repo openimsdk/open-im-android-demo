@@ -1,4 +1,4 @@
-package io.openim.android.demo.vm;
+package io.openim.android.ouicore.vm;
 
 import android.widget.Toast;
 
@@ -7,12 +7,10 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.openim.android.demo.R;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.FriendshipInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.UserInfo;

@@ -21,7 +21,7 @@ import java.util.List;
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivitySearchPersonBinding;
 import io.openim.android.demo.databinding.LayoutSearchItemBinding;
-import io.openim.android.demo.vm.SearchVM;
+import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;

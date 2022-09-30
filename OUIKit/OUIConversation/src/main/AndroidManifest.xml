@@ -13,6 +13,9 @@
 
     <application android:theme="@style/Theme.Demo">
         <activity
+            android:name=".ui.SearchActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.FileHistoryActivity"
             android:exported="false" />
         <activity

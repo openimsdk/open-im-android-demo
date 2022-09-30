@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityAddFriendBinding;
-import io.openim.android.demo.vm.SearchVM;
+import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.SinkHelper;
 

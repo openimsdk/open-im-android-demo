@@ -7,7 +7,7 @@
 
         <variable
             name="SearchVM"
-            type="io.openim.android.demo.vm.SearchVM" />
+            type="io.openim.android.ouicore.vm.SearchVM" />
 
         <import type="android.view.View" />
     </data>
