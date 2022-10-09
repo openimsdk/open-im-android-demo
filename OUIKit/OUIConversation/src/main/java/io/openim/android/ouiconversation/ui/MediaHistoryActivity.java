@@ -40,13 +40,12 @@ public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHist
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMediaHistoryBinding.inflate(getLayoutInflater()));
         sink();
-
+        vm.addSearchMessageItems.getValue().clear();
         isPicture = getIntent().getBooleanExtra(Constant.K_RESULT, false);
         initView();
         listener();
 
         searchLocalMessages();
-
     }
 
     @Override

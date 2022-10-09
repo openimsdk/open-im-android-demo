@@ -77,10 +77,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         view.groupId.setOnClickListener(v -> startActivity(new Intent(this, ShareQrcodeActivity.class).putExtra(ShareQrcodeActivity.IS_QRCODE, false)));
         view.bulletin.setOnClickListener(v -> startActivity(new Intent(this, GroupBulletinActivity.class)));
         view.groupMember.setOnClickListener(v -> {
-            if (vm.groupMembers.getValue().size() > SUPER_GROUP_LIMIT)
-                startActivity(new Intent(this, SuperGroupMemberActivity.class));
-            else
-                startActivity(new Intent(this, GroupMemberActivity.class));
+            gotoMemberList();
         });
         view.groupName.setOnClickListener(v -> {
             if (vm.isOwner()) {
@@ -173,7 +170,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     holder.view.img.load(data.getFaceURL());
                 }
                 holder.view.txt.setVisibility(View.GONE);
-                holder.view.getRoot().setOnClickListener(v -> startActivity(new Intent(GroupMaterialActivity.this, GroupMemberActivity.class)));
+                holder.view.getRoot().setOnClickListener(v -> gotoMemberList());
             }
 
         };
@@ -204,5 +201,13 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
         });
 
+    }
+
+    private void gotoMemberList() {
+        if (vm.groupMembers.getValue().isEmpty()) return;
+        if (vm.groupMembers.getValue().size() > SUPER_GROUP_LIMIT)
+            startActivity(new Intent(GroupMaterialActivity.this, SuperGroupMemberActivity.class));
+        else
+            startActivity(new Intent(GroupMaterialActivity.this, GroupMemberActivity.class));
     }
 }

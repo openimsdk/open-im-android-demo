@@ -29,6 +29,7 @@ import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.ReadReceiptInfo;
 import io.openim.android.sdk.models.RevokedInfo;
+import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
 
@@ -95,6 +96,16 @@ public class IMEvent {
 
             @Override
             public void onHangup(SignalingInfo s) {
+
+            }
+
+            @Override
+            public void onRoomParticipantConnected(RoomCallingInfo s) {
+
+            }
+
+            @Override
+            public void onRoomParticipantDisconnected(RoomCallingInfo s) {
 
             }
         });

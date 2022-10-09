@@ -141,4 +141,6 @@
     <string name="cancel_top">取消置顶</string>
     <string name="msg_dont_disturb">消息免打扰</string>
     <string name="top_chat">置顶聊天</string>
+    <string name="person_unRead">人未读</string>
+    <string name="friend_add">你们已成为好友，可以开始聊天了</string>
 </resources>

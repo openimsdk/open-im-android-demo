@@ -62,6 +62,7 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgMergeRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
 import io.openim.android.ouiconversation.ui.PreviewActivity;
+import io.openim.android.ouiconversation.widget.SendStateView;
 import io.openim.android.ouicore.utils.EmojiUtil;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouiconversation.widget.InputExpandFragment;
@@ -192,12 +193,26 @@ public class MessageViewHolder {
             }
         }
 
+        int getHaveReadCount() {
+            List<String> hasReadUserIDList = message.getAttachedInfoElem().getGroupHasReadInfo().getHasReadUserIDList();
+            return null == hasReadUserIDList ? 0 : hasReadUserIDList.size();
+        }
+
+        int getNeedReadCount() {
+            return message.getAttachedInfoElem().getGroupHasReadInfo().getGroupMemberCount();
+        }
+
         /**
          * 统一处理
          */
         private void unite() {
-            MsgExpand msgExpand = (MsgExpand) message.getExt();
             TextView notice = itemView.findViewById(R.id.notice);
+            AvatarImage avatarImage = itemView.findViewById(R.id.avatar);
+            CheckBox checkBox = itemView.findViewById(R.id.choose);
+            SendStateView sendStateView = itemView.findViewById(R.id.sendState2);
+            TextView unRead = itemView.findViewById(R.id.unRead);
+
+            MsgExpand msgExpand = (MsgExpand) message.getExt();
             if (msgExpand.isShowTime) {
                 //显示时间
                 String time = TimeUtil.getTimeString(message.getSendTime());
@@ -206,8 +221,6 @@ public class MessageViewHolder {
             } else
                 notice.setVisibility(View.GONE);
 
-
-            AvatarImage avatarImage = itemView.findViewById(R.id.avatar);
             if (null != avatarImage)
                 avatarImage.setOnLongClickListener(v -> {
                     if (chatVM.isSingleChat) return false;
@@ -220,7 +233,6 @@ public class MessageViewHolder {
                     return false;
                 });
 
-            CheckBox checkBox = itemView.findViewById(R.id.choose);
             if (chatVM.enableMultipleSelect.getValue()
                 && message.getContentType() != Constant.MsgType.NOTICE) {
                 checkBox.setVisibility(View.VISIBLE);
@@ -232,6 +244,21 @@ public class MessageViewHolder {
                 checkBox.setVisibility(View.GONE);
             }
             ((LinearLayout.LayoutParams) checkBox.getLayoutParams()).topMargin = msgExpand.isShowTime ? Common.dp2px(15) : 0;
+
+            sendStateView.setOnClickListener(v -> {
+                chatVM.messages.getValue().remove(message);
+                chatVM.sendMsg(message);
+            });
+
+            int viewType = message.getContentType();
+            unRead.setVisibility(View.GONE);
+            if (isOwn && !chatVM.isSingleChat && viewType < Constant.MsgType.NOTICE && viewType != Constant.MsgType.REVOKE) {
+                int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;
+                if (unreadCount > 0) {
+                    unRead.setVisibility(View.VISIBLE);
+                    unRead.setText(unreadCount + chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
+                }
+            }
 
         }
 
@@ -358,10 +385,7 @@ public class MessageViewHolder {
             TextView textView = itemView.findViewById(R.id.notice);
             textView.setVisibility(View.VISIBLE);
             String tips = message.getNotificationElem().getDefaultTips();
-            if (message.getContentType() == Constant.MsgType.REVOKE)
-                textView.setText(message.getSenderNickname() + textView.getContext().getString(io.openim.android.ouicore.R.string.revoke_tips));
-            else
-                textView.setText(tips);
+            textView.setText(tips);
         }
 
         @Override
@@ -425,6 +449,7 @@ public class MessageViewHolder {
         void bindRight(View itemView, Message message) {
             LayoutMsgTxtRightBinding v = LayoutMsgTxtRightBinding.bind(itemView);
             v.avatar2.load(message.getSenderFaceUrl());
+            v.sendState2.setSendState(message.getStatus());
             showMsgExMenu(v.content2);
 
             if (!handleSequence(v.content2))
@@ -703,7 +728,7 @@ public class MessageViewHolder {
             showMsgExMenu(view.content2);
 
             view.content2.setOnClickListener(v -> {
-               GetFilePathFromUri.openFile(v.getContext(), message);
+                GetFilePathFromUri.openFile(v.getContext(), message);
             });
         }
 

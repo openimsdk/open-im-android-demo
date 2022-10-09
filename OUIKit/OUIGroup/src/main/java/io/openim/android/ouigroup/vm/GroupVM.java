@@ -65,8 +65,6 @@ public class GroupVM extends SocialityVM {
         super.viewCreate();
         loginCertificate = LoginCertificate.getCache(getContext());
     }
-
-
     /**
      * 获取群组信息
      */
@@ -185,6 +183,7 @@ public class GroupVM extends SocialityVM {
      */
     public void getGroupMemberList() {
         if (!superGroupMembers.getValue().isEmpty())return; //表示走了超级大群逻辑
+
         exGroupMembers.getValue().clear();
         exGroupManagement.getValue().clear();
         groupLetters.getValue().clear();

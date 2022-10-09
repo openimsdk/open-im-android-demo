@@ -8,6 +8,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+        <io.openim.android.ouiconversation.widget.SendStateView
+            android:id="@+id/sendState2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/content2" />
 
         <TextView
             android:id="@+id/content2"

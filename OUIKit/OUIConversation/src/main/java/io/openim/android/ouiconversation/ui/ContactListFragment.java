@@ -160,7 +160,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
     private View createHeaderView() {
         View header = getLayoutInflater().inflate(R.layout.view_search, view.recyclerView, false);
-        header.setOnClickListener(v ->startActivity(new Intent(getActivity(),SearchActivity.class)));
+//        header.setOnClickListener(v ->startActivity(new Intent(getActivity(),SearchActivity.class)));
         return header;
     }
 
@@ -217,8 +217,6 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             viewHolder.viewBinding.badge.badge.setText(msgConversation.conversationInfo.getUnreadCount() + "");
             viewHolder.viewBinding.time.setText(TimeUtil.getTimeString(msgConversation.conversationInfo.getLatestMsgSendTime()));
         }
-
-
         @Override
         public int getItemCount() {
             return null == conversationInfos ? 0 : conversationInfos.size();

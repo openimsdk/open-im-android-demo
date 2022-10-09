@@ -58,7 +58,6 @@ public class Constant {
         public static final int GROUP_CHAT = 2;
         /// 大群
         public static final int SUPER_GROUP = 3;
-
         /// 通知
         public static final int NOTIFICATION = 4;
     }
@@ -141,4 +140,61 @@ public class Constant {
         /// 群公告提示
         public static final int groupNotification = 4;
     }
+
+
+    public static class MsgNotification {
+        /// 好友已添加
+        public static final int friendAddedNotification = 1204;
+
+        /// 群已被创建
+        public static final int groupCreatedNotification = 1501;
+
+        /// 群资料改变
+        public static final int groupInfoSetNotification = 1502;
+
+        /// 进群申请
+        public static final int joinGroupApplicationNotification = 1503;
+
+        /// 群成员退出
+        public static  final int memberQuitNotification = 1504;
+
+        /// 群申请被接受
+        public static final int groupApplicationAcceptedNotification = 1505;
+
+        /// 群申请被拒绝
+        public static final int groupApplicationRejectedNotification = 1506;
+
+        /// 群拥有者权限转移
+        public static final int groupOwnerTransferredNotification = 1507;
+
+        /// 群成员被踢出群
+        public static final int memberKickedNotification = 1508;
+
+        /// 邀请进群
+        public static final int memberInvitedNotification = 1509;
+
+        /// 群成员进群
+        public static final int memberEnterNotification = 1510;
+
+        /// 解散群
+        public static final int dismissGroupNotification = 1511;
+
+        public static final int groupNotificationEnd = 1599;
+
+        /// 群成员被禁言
+        public static final int groupMemberMutedNotification = 1512;
+
+        /// 群成员被取消禁言
+        public static final int groupMemberCancelMutedNotification = 1513;
+
+        /// 群禁言
+        public static final int groupMutedNotification = 1514;
+
+        /// 取消群禁言
+        public static final int groupCancelMutedNotification = 1515;
+
+        /// 群成员信息改变
+        public static final int groupMemberInfoChangedNotification = 1516;
+    }
+
 }

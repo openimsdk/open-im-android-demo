@@ -25,10 +25,17 @@ import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.AtMsgInfo;
 import io.openim.android.ouicore.entity.AtUsersInfo;
+import io.openim.android.ouicore.entity.EnterGroupNotification;
+import io.openim.android.ouicore.entity.GroupNotification;
+import io.openim.android.ouicore.entity.GroupRightsTransferNotification;
+import io.openim.android.ouicore.entity.JoinKickedGroupNotification;
 import io.openim.android.ouicore.entity.LocationInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.entity.MsgExpand;
+import io.openim.android.ouicore.entity.MuteMemberNotification;
+import io.openim.android.ouicore.entity.QuitGroupNotification;
+import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
@@ -36,8 +43,10 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.EmojiUtil;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.SignalingInfo;
@@ -126,11 +135,129 @@ public class IMUtil {
                 handleAt(msgExpand);
             }
             handleEmoji(msgExpand, msg);
+            if (msg.getSessionType() != Constant.SessionType.SINGLE_CHAT)
+                handleGroupNotification(msg);
         } catch (Exception e) {
             e.printStackTrace();
         }
         msg.setExt(msgExpand);
         return msg;
+    }
+
+    /**
+     * 处理群通知
+     */
+    private static void handleGroupNotification(Message msg) {
+        String detail = msg.getNotificationElem().getDetail();
+        String tips = "";
+        switch (msg.getContentType()) {
+            case Constant.MsgType.REVOKE: {
+                //a 撤回了一条消息
+                tips = msg.getSenderNickname() + BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips);
+                break;
+            }
+            case Constant.MsgNotification.groupCreatedNotification: {
+                GroupNotification groupNotification = GsonHel.fromJson(detail, GroupNotification.class);
+                tips = String.format(" %s 创建了群聊", groupNotification.opUser.getNickname());
+                break;
+            }
+            case Constant.MsgNotification.groupInfoSetNotification: {
+                GroupNotification groupNotification = GsonHel.fromJson(detail, GroupNotification.class);
+//                if (groupNotification.group.getNotification() != null &&
+//                    !groupNotification.group.getNotification().isEmpty()) {
+//                return isConversation
+//                    ? notification.group!.notification!
+//                    : null;
+//            }
+                // a 修改了群资料
+                tips = String.format(" %s 修改了群资料", groupNotification.opUser.getNickname());
+                break;
+            }
+            case Constant.MsgNotification.memberQuitNotification: {
+                QuitGroupNotification quitUser = GsonHel.fromJson(detail, QuitGroupNotification.class);
+                // a 退出了群聊
+                tips = String.format(" %s 退出了群聊", quitUser.quitUser.getNickname());
+                break;
+            }
+            case Constant.MsgNotification.memberInvitedNotification: {
+                JoinKickedGroupNotification invitedUserList = GsonHel.fromJson(detail, JoinKickedGroupNotification.class);
+                // a 邀请 b 加入群聊
+                StringBuilder stringBuffer = new StringBuilder();
+                for (GroupMembersInfo groupMembersInfo : invitedUserList.invitedUserList) {
+                    stringBuffer.append(groupMembersInfo.getNickname()).append(",");
+                }
+                String b = stringBuffer.substring(0, stringBuffer.length() - 1);
+                tips = String.format("%s 邀请 %s 加入群聊", invitedUserList.opUser.getNickname(), b);
+                break;
+            }
+            case Constant.MsgNotification.memberKickedNotification: {
+                JoinKickedGroupNotification invitedUserList = GsonHel.fromJson(detail, JoinKickedGroupNotification.class);
+                // b 被 a 踢出群聊
+                StringBuilder stringBuffer = new StringBuilder();
+                for (GroupMembersInfo groupMembersInfo : invitedUserList.kickedUserList) {
+                    stringBuffer.append(groupMembersInfo.getNickname()).append(",");
+                }
+                String b = stringBuffer.substring(0, stringBuffer.length() - 1);
+                tips = String.format("%s 被 %s 踢出群聊", b, invitedUserList.opUser.getNickname());
+                break;
+            }
+
+            case Constant.MsgNotification.memberEnterNotification: {
+                EnterGroupNotification entrantUser = GsonHel.fromJson(detail, EnterGroupNotification.class);
+                // a 加入了群聊
+                tips = String.format("%s 加入了群聊", entrantUser.entrantUser.getNickname());
+                break;
+            }
+
+            case Constant.MsgNotification.dismissGroupNotification: {
+                GroupNotification groupNotification = GsonHel.fromJson(detail, GroupNotification.class);
+                // a 解散了群聊
+                tips = String.format("%s 解散了群聊", groupNotification.opUser.getNickname());
+                break;
+            }
+            case Constant.MsgNotification.groupOwnerTransferredNotification: {
+                GroupRightsTransferNotification transferredGroupNotification = GsonHel.fromJson(detail, GroupRightsTransferNotification.class);
+
+                // a 将群转让给了 b
+                tips = String.format("%s 将群转让给了 %s", transferredGroupNotification.opUser.getNickname(),
+                    transferredGroupNotification.newGroupOwner.getNickname());
+                break;
+            }
+            case Constant.MsgNotification.groupMemberMutedNotification: {
+                MuteMemberNotification memberNotification = GsonHel.fromJson(detail, MuteMemberNotification.class);
+                // b 被 a 禁言
+                tips = String.format("%s 被 %s 禁言%s", memberNotification.mutedUser.getNickname()
+                    , memberNotification.opUser.getNickname(), TimeUtil.secondFormat(memberNotification
+                        .mutedSeconds, true));
+                break;
+            }
+
+            case Constant.MsgNotification.groupMemberCancelMutedNotification: {
+                MuteMemberNotification memberNotification = GsonHel.fromJson(detail, MuteMemberNotification.class);
+                // b 被 a 取消了禁言
+                tips = String.format("%s 被 %s 取消了禁言", memberNotification.mutedUser.getNickname(), memberNotification.opUser.getNickname());
+                break;
+            }
+
+            case Constant.MsgNotification.groupMutedNotification: {
+                MuteMemberNotification memberNotification = GsonHel.fromJson(detail, MuteMemberNotification.class);
+                // a 开起了群禁言
+                tips = String.format("%s 开起了群禁言", memberNotification.opUser.getNickname());
+            }
+            break;
+            case Constant.MsgNotification.groupCancelMutedNotification: {
+                MuteMemberNotification memberNotification = GsonHel.fromJson(detail, MuteMemberNotification.class);
+                // a 开起了群禁言
+                tips = String.format("%s 关闭了群禁言", memberNotification.opUser.getNickname());
+            }
+            break;
+            case Constant.MsgNotification.friendAddedNotification: {
+                // 你们已成为好友
+                tips = BaseApp.inst().getString(R.string.friend_add);
+                break;
+            }
+        }
+        msg.getNotificationElem().setDefaultTips(tips);
     }
 
     private static void handleEmoji(MsgExpand expand, Message msg) {
