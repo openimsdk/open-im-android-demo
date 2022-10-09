@@ -1,5 +1,6 @@
 package io.openim.android.ouicore.im;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -25,6 +26,7 @@ import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.AtMsgInfo;
 import io.openim.android.ouicore.entity.AtUsersInfo;
+import io.openim.android.ouicore.entity.BurnAfterReadingNotification;
 import io.openim.android.ouicore.entity.EnterGroupNotification;
 import io.openim.android.ouicore.entity.GroupNotification;
 import io.openim.android.ouicore.entity.GroupRightsTransferNotification;
@@ -135,8 +137,7 @@ public class IMUtil {
                 handleAt(msgExpand);
             }
             handleEmoji(msgExpand, msg);
-            if (msg.getSessionType() != Constant.SessionType.SINGLE_CHAT)
-                handleGroupNotification(msg);
+            handleGroupNotification(msg);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -147,18 +148,23 @@ public class IMUtil {
     /**
      * 处理群通知
      */
+    @SuppressLint("StringFormatInvalid")
     private static void handleGroupNotification(Message msg) {
         String detail = msg.getNotificationElem().getDetail();
-        String tips = "";
+        String tips = "123";
+        Context ctx = BaseApp.inst();
         switch (msg.getContentType()) {
+            case Constant.MsgType.ADVANCED_REVOKE:
             case Constant.MsgType.REVOKE: {
                 //a 撤回了一条消息
-                tips = msg.getSenderNickname() + BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips);
+                tips = String.format(ctx.getString(io.openim.android.ouicore.R.string.revoke_tips),
+                    msg.getSenderNickname());
                 break;
             }
             case Constant.MsgNotification.groupCreatedNotification: {
                 GroupNotification groupNotification = GsonHel.fromJson(detail, GroupNotification.class);
-                tips = String.format(" %s 创建了群聊", groupNotification.opUser.getNickname());
+                //a 创建了群聊
+                tips = String.format(ctx.getString(R.string.created_group), groupNotification.opUser.getNickname());
                 break;
             }
             case Constant.MsgNotification.groupInfoSetNotification: {
@@ -170,13 +176,13 @@ public class IMUtil {
 //                    : null;
 //            }
                 // a 修改了群资料
-                tips = String.format(" %s 修改了群资料", groupNotification.opUser.getNickname());
+                tips = String.format(ctx.getString(R.string.change_group_data), groupNotification.opUser.getNickname());
                 break;
             }
             case Constant.MsgNotification.memberQuitNotification: {
                 QuitGroupNotification quitUser = GsonHel.fromJson(detail, QuitGroupNotification.class);
                 // a 退出了群聊
-                tips = String.format(" %s 退出了群聊", quitUser.quitUser.getNickname());
+                tips = String.format(ctx.getString(R.string.quit_group2), quitUser.quitUser.getNickname());
                 break;
             }
             case Constant.MsgNotification.memberInvitedNotification: {
@@ -187,7 +193,7 @@ public class IMUtil {
                     stringBuffer.append(groupMembersInfo.getNickname()).append(",");
                 }
                 String b = stringBuffer.substring(0, stringBuffer.length() - 1);
-                tips = String.format("%s 邀请 %s 加入群聊", invitedUserList.opUser.getNickname(), b);
+                tips = String.format(ctx.getString(R.string.invited_tips), invitedUserList.opUser.getNickname(), b);
                 break;
             }
             case Constant.MsgNotification.memberKickedNotification: {
@@ -198,66 +204,74 @@ public class IMUtil {
                     stringBuffer.append(groupMembersInfo.getNickname()).append(",");
                 }
                 String b = stringBuffer.substring(0, stringBuffer.length() - 1);
-                tips = String.format("%s 被 %s 踢出群聊", b, invitedUserList.opUser.getNickname());
+                tips = String.format(ctx.getString(R.string.kicked_group_tips), b, invitedUserList.opUser.getNickname());
                 break;
             }
-
             case Constant.MsgNotification.memberEnterNotification: {
                 EnterGroupNotification entrantUser = GsonHel.fromJson(detail, EnterGroupNotification.class);
                 // a 加入了群聊
-                tips = String.format("%s 加入了群聊", entrantUser.entrantUser.getNickname());
+                tips = String.format(ctx.getString(R.string.join_group2), entrantUser.entrantUser.getNickname());
                 break;
             }
-
             case Constant.MsgNotification.dismissGroupNotification: {
                 GroupNotification groupNotification = GsonHel.fromJson(detail, GroupNotification.class);
                 // a 解散了群聊
-                tips = String.format("%s 解散了群聊", groupNotification.opUser.getNickname());
+                tips = String.format(ctx.getString(R.string.dismiss_group), groupNotification.opUser.getNickname());
                 break;
             }
             case Constant.MsgNotification.groupOwnerTransferredNotification: {
                 GroupRightsTransferNotification transferredGroupNotification = GsonHel.fromJson(detail, GroupRightsTransferNotification.class);
 
                 // a 将群转让给了 b
-                tips = String.format("%s 将群转让给了 %s", transferredGroupNotification.opUser.getNickname(),
+                tips = String.format(ctx.getString(R.string.transferred_group), transferredGroupNotification.opUser.getNickname(),
                     transferredGroupNotification.newGroupOwner.getNickname());
                 break;
             }
             case Constant.MsgNotification.groupMemberMutedNotification: {
                 MuteMemberNotification memberNotification = GsonHel.fromJson(detail, MuteMemberNotification.class);
                 // b 被 a 禁言
-                tips = String.format("%s 被 %s 禁言%s", memberNotification.mutedUser.getNickname()
+                tips = String.format(ctx.getString(R.string.Muted_group), memberNotification.mutedUser.getNickname()
                     , memberNotification.opUser.getNickname(), TimeUtil.secondFormat(memberNotification
                         .mutedSeconds, TimeUtil.secondFormatZh));
                 break;
             }
-
             case Constant.MsgNotification.groupMemberCancelMutedNotification: {
                 MuteMemberNotification memberNotification = GsonHel.fromJson(detail, MuteMemberNotification.class);
                 // b 被 a 取消了禁言
-                tips = String.format("%s 被 %s 取消了禁言", memberNotification.mutedUser.getNickname(), memberNotification.opUser.getNickname());
+                tips = String.format(ctx.getString(R.string.cancel_muted), memberNotification.mutedUser.getNickname(), memberNotification.opUser.getNickname());
                 break;
             }
-
             case Constant.MsgNotification.groupMutedNotification: {
                 MuteMemberNotification memberNotification = GsonHel.fromJson(detail, MuteMemberNotification.class);
                 // a 开起了群禁言
-                tips = String.format("%s 开起了群禁言", memberNotification.opUser.getNickname());
+                tips = String.format(ctx.getString(R.string.start_muted), memberNotification.opUser.getNickname());
+                break;
             }
-            break;
             case Constant.MsgNotification.groupCancelMutedNotification: {
                 MuteMemberNotification memberNotification = GsonHel.fromJson(detail, MuteMemberNotification.class);
                 // a 开起了群禁言
-                tips = String.format("%s 关闭了群禁言", memberNotification.opUser.getNickname());
+                tips = String.format(ctx.getString(R.string.close_muted), memberNotification.opUser.getNickname());
+                break;
             }
-            break;
             case Constant.MsgNotification.friendAddedNotification: {
                 // 你们已成为好友
                 tips = BaseApp.inst().getString(R.string.friend_add);
                 break;
             }
+            case Constant.MsgNotification.burnAfterReadingNotification: {
+                BurnAfterReadingNotification burnAfterReadingNotification = GsonHel.fromJson(detail, BurnAfterReadingNotification.class);
+                tips = burnAfterReadingNotification.isPrivate ? ctx.getString(R.string.start_burn_after_read)
+                    : ctx.getString(R.string.stop_burn_after_read);
+                break;
+            }
+
+            case Constant.MsgNotification.groupMemberInfoChangedNotification: {
+                GroupNotification groupNotification = GsonHel.fromJson(detail, GroupNotification.class);
+                tips = String.format(ctx.getString(R.string.edit_data), groupNotification.opUser.getNickname());
+                break;
+            }
         }
-        msg.getNotificationElem().setDefaultTips(tips);
+        msg.getNotificationElem().setDefaultTips(tips.trim());
     }
 
     private static void handleEmoji(MsgExpand expand, Message msg) {

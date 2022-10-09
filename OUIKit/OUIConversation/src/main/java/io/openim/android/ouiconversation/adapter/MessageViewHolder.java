@@ -111,7 +111,9 @@ public class MessageViewHolder {
         if (viewType == Constant.MsgType.LOCATION)
             return new LocationView(parent);
 
-        if (viewType >= Constant.MsgType.NOTICE || viewType == Constant.MsgType.REVOKE)
+        if (viewType >= Constant.MsgType.NOTICE
+            || viewType == Constant.MsgType.REVOKE
+            || viewType == Constant.MsgType.ADVANCED_REVOKE)
             return new NoticeView(parent);
 
         if (viewType == Constant.MsgType.MERGE)
@@ -379,13 +381,17 @@ public class MessageViewHolder {
             super(itemView);
         }
 
-        @SuppressLint("SetTextI18n")
+        @SuppressLint({"SetTextI18n", "StringFormatInvalid"})
         @Override
         public void bindData(Message message, int position) {
             TextView textView = itemView.findViewById(R.id.notice);
             textView.setVisibility(View.VISIBLE);
-            String tips = message.getNotificationElem().getDefaultTips();
-            textView.setText(tips);
+            if (message.getContentType() >= Constant.MsgType.NOTICE) {
+                String tips = message.getNotificationElem().getDefaultTips();
+                textView.setText(tips);
+            } else
+                textView.setText(String.format(textView.getContext().getString(io.openim.android.ouicore.R.string.revoke_tips),
+                    message.getSenderNickname()));
         }
 
         @Override
@@ -454,7 +460,6 @@ public class MessageViewHolder {
 
             if (!handleSequence(v.content2))
                 v.content2.setText(message.getContent());
-
         }
 
     }

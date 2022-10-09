@@ -17,4 +17,7 @@ public class GroupNotification {
 
     /// 产生影响的群成员列表
     public List<GroupMembersInfo> memberList;
+
+    /// 资料发生改变的成员
+    GroupMembersInfo changedUser;
 }

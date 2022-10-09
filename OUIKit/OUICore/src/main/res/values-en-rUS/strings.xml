@@ -137,4 +137,19 @@
     <string name="top_chat">置顶聊天</string>
     <string name="person_unRead">人未读</string>
     <string name="friend_add">你们已成为好友，可以开始聊天了</string>
+    <string name="created_group">%s 创建了群聊</string>
+    <string name="change_group_data">%s 修改了群资料</string>
+    <string name="quit_group2">%s 退出了群聊</string>
+    <string name="invited_tips">%s 邀请 %s 加入群聊</string>
+    <string name="kicked_group_tips">%s 被 %s 踢出群聊</string>
+    <string name="join_group2">%s 加入了群聊</string>
+    <string name="dismiss_group">%s 解散了群聊</string>
+    <string name="transferred_group">%s 将群转让给了 %s</string>
+    <string name="Muted_group">%s 被 %s 禁言%s</string>
+    <string name="cancel_muted">%s 被 %s 取消了禁言</string>
+    <string name="start_muted">%s 开起了群禁言</string>
+    <string name="close_muted">%s 关闭了群禁言</string>
+    <string name="edit_data">%s 编辑了自己的群成员资料</string>
+    <string name="start_burn_after_read">已开启阅后即焚</string>
+    <string name="stop_burn_after_read">已关闭阅后即焚</string>
 </resources>

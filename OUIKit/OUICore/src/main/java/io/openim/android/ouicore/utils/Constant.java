@@ -112,6 +112,8 @@ public class Constant {
         public static final int CUSTOMIZE = 110;
         //            * 111:撤回消息回执<br/>
         public static final int REVOKE = 111;
+        //2.3.0版本的消息撤回类型，兼容单人撤回，群撤回，新增群主管理员撤回成员信息
+        public static final int ADVANCED_REVOKE = 118;
         //            * 112:C2C已读回执<br/>
         public static final int ALREADY_READ = 112;
         //            * 113:正在输入状态
@@ -156,7 +158,7 @@ public class Constant {
         public static final int joinGroupApplicationNotification = 1503;
 
         /// 群成员退出
-        public static  final int memberQuitNotification = 1504;
+        public static final int memberQuitNotification = 1504;
 
         /// 群申请被接受
         public static final int groupApplicationAcceptedNotification = 1505;
@@ -193,6 +195,8 @@ public class Constant {
         /// 取消群禁言
         public static final int groupCancelMutedNotification = 1515;
 
+        /// 阅后即焚
+        public static final int  burnAfterReadingNotification = 1701;
         /// 群成员信息改变
         public static final int groupMemberInfoChangedNotification = 1516;
     }

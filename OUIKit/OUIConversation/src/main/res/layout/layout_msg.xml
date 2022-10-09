@@ -32,7 +32,8 @@
                 android:paddingTop="5dp"
                 android:textColor="#ff999999"
                 android:textSize="12sp"
-                android:visibility="gone" />
+                android:visibility="gone"
+                />
 
             <ViewStub
                 android:id="@+id/left"

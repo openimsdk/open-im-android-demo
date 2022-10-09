@@ -149,6 +149,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             if (null == v) return;
             messageAdapter.setMessages(v);
             messageAdapter.notifyDataSetChanged();
+            if (!vm.fromChatHistory)
+                scrollToPosition(0);
         });
         view.recyclerView.setOnTouchListener((v, event) -> {
             bottomInputCote.clearFocus();
@@ -156,8 +158,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             bottomInputCote.setExpandHide();
             return false;
         });
-        if (!vm.fromChatHistory)
-            view.recyclerView.post(() -> scrollToPosition(0));
+
         view.recyclerView.addOnLayoutChangeListener((v, i, i1, i2, i3, i4, i5, i6, i7) -> {
             if (i3 < i7) { // bottom < oldBottom
                 scrollToPosition(0);
