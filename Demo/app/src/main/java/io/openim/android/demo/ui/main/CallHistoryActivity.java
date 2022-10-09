@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -141,7 +142,7 @@ public class CallHistoryActivity extends BaseActivity<BaseViewModel, ActivityCal
 
                 String duration = "";
                 if (data.getDuration() != 0)
-                    duration = TimeUtil.secondFormat(data.getDuration() / 1000, true);
+                    duration = TimeUtil.secondFormat(data.getDuration() / 1000, TimeUtil.secondFormatZh);
                 holder.v.description.setText(data.isIncomingCall() ?
                     getString(io.openim.android.ouicore.R.string.inbound) + duration :
                     getString(io.openim.android.ouicore.R.string.outbound) + duration);

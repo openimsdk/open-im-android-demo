@@ -228,7 +228,7 @@ public class IMUtil {
                 // b 被 a 禁言
                 tips = String.format("%s 被 %s 禁言%s", memberNotification.mutedUser.getNickname()
                     , memberNotification.opUser.getNickname(), TimeUtil.secondFormat(memberNotification
-                        .mutedSeconds, true));
+                        .mutedSeconds, TimeUtil.secondFormatZh));
                 break;
             }
 

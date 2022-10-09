@@ -57,7 +57,7 @@ public class GroupVM extends SocialityVM {
     public MutableLiveData<List<FriendInfo>> selectedFriendInfo = new MutableLiveData<>(new ArrayList<>());
     public LoginCertificate loginCertificate;
 
-    public int page = 0;
+    public int page = 1;
     public int pageSize = 20;
 
     @Override
