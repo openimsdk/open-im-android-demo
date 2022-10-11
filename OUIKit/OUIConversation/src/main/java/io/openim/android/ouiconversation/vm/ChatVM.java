@@ -179,8 +179,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return String.join("/", pList);
         }
-        return getContext().getString(io.openim.android.ouicore.
-            R.string.online);
+        return "";
     }
 
     public interface UserOnlineStatusListener {
