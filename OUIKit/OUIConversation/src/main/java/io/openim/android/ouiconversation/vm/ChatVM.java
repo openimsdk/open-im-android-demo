@@ -24,6 +24,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.AtMsgInfo;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
@@ -341,6 +342,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onRecvGroupMessageReadReceipt(List<ReadReceiptInfo> list) {
+        if (isSingleChat) return;
         try {
             for (ReadReceiptInfo readInfo : list) {
                 if (readInfo.getGroupID().equals(groupID)) {
@@ -352,12 +354,12 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                         if (!uidList.contains(readInfo.getUserID()) &&
                             (readInfo.getMsgIDList().contains(e.getClientMsgID()))) {
                             uidList.add(readInfo.getUserID());
+                            e.getAttachedInfoElem().getGroupHasReadInfo().setHasReadUserIDList(uidList);
+                            messageAdapter.notifyItemChanged(messages.getValue().indexOf(e));
                         }
-                        e.getAttachedInfoElem().getGroupHasReadInfo().setHasReadUserIDList(uidList);
                     }
                 }
             }
-            messageAdapter.notifyDataSetChanged();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -391,7 +393,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         msg.setStatus(Constant.Send_State.SENDING);
         messages.getValue().add(0, IMUtil.buildExpandInfo(msg));
         messageAdapter.notifyItemInserted(0);
-
         IView.scrollToPosition(0);
 
         OfflinePushInfo offlinePushInfo = new OfflinePushInfo();  // 离线推送的消息备注；不为null

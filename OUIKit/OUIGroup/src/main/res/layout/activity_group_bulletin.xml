@@ -7,7 +7,7 @@
 
         <variable
             name="GroupVM"
-            type="io.openim.android.ouigroup.vm.GroupVM" />
+            type="io.openim.android.ouicore.vm.GroupVM" />
 
         <import type="android.view.View" />
     </data>

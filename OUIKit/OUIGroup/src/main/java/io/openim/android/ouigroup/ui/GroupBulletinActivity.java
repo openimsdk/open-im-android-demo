@@ -1,15 +1,12 @@
 package io.openim.android.ouigroup.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
 
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityGroupBulletinBinding;
-import io.openim.android.ouigroup.vm.GroupVM;
+import io.openim.android.ouicore.vm.GroupVM;
 
 public class GroupBulletinActivity extends BaseActivity<GroupVM, ActivityGroupBulletinBinding> {
 

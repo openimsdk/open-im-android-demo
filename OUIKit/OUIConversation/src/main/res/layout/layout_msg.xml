@@ -50,11 +50,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
+                android:text=""
                 android:layout_marginTop="4dp"
                 android:layout_marginRight="@dimen/avatar_size"
                 android:textColor="#ff5496eb"
                 android:textSize="10sp" />
-
         </LinearLayout>
     </LinearLayout>
 

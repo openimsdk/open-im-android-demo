@@ -30,7 +30,7 @@ import io.openim.android.ouicore.widget.SingleInfoModifyActivity;
 import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityGroupMaterialBinding;
 
-import io.openim.android.ouigroup.vm.GroupVM;
+import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.models.GroupMembersInfo;

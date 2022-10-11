@@ -152,4 +152,6 @@
     <string name="edit_data">%s 编辑了自己的群成员资料</string>
     <string name="start_burn_after_read">已开启阅后即焚</string>
     <string name="stop_burn_after_read">已关闭阅后即焚</string>
+    <string name="readed">已读 %s</string>
+    <string name="unread">未读 %s</string>
 </resources>

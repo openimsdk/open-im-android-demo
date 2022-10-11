@@ -61,6 +61,7 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgMergeLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgMergeRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
+import io.openim.android.ouiconversation.ui.MsgReadStatusActivity;
 import io.openim.android.ouiconversation.ui.PreviewActivity;
 import io.openim.android.ouiconversation.widget.SendStateView;
 import io.openim.android.ouicore.utils.EmojiUtil;
@@ -207,6 +208,7 @@ public class MessageViewHolder {
         /**
          * 统一处理
          */
+        @SuppressLint("SetTextI18n")
         private void unite() {
             TextView notice = itemView.findViewById(R.id.notice);
             AvatarImage avatarImage = itemView.findViewById(R.id.avatar);
@@ -253,13 +255,22 @@ public class MessageViewHolder {
             });
 
             int viewType = message.getContentType();
-            unRead.setVisibility(View.GONE);
-            if (isOwn && !chatVM.isSingleChat && viewType < Constant.MsgType.NOTICE && viewType != Constant.MsgType.REVOKE) {
+            if (isOwn && !chatVM.isSingleChat && viewType < Constant.MsgType.NOTICE
+                && viewType != Constant.MsgType.REVOKE
+                && viewType != Constant.MsgType.ADVANCED_REVOKE) {
                 int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;
                 if (unreadCount > 0) {
                     unRead.setVisibility(View.VISIBLE);
                     unRead.setText(unreadCount + chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
+                    unRead.setOnClickListener(v -> {
+                        v.getContext().startActivity(
+                            new Intent(v.getContext(), MsgReadStatusActivity.class)
+                                .putExtra(Constant.K_GROUP_ID, message.getGroupID())
+                                .putStringArrayListExtra(Constant.K_ID, (ArrayList<String>) message.getAttachedInfoElem().getGroupHasReadInfo().getHasReadUserIDList()));
+                    });
                 }
+            } else {
+                unRead.setVisibility(View.GONE);
             }
 
         }

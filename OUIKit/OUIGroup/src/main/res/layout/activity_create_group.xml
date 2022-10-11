@@ -5,7 +5,7 @@
 
         <variable
             name="GroupVM"
-            type="io.openim.android.ouigroup.vm.GroupVM" />
+            type="io.openim.android.ouicore.vm.GroupVM" />
     </data>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

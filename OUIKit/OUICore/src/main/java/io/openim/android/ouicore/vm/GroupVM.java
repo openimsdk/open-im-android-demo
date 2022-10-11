@@ -1,4 +1,4 @@
-package io.openim.android.ouigroup.vm;
+package io.openim.android.ouicore.vm;
 
 import android.text.TextUtils;
 
@@ -22,10 +22,10 @@ import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.Common;
 
 
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouigroup.R;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
@@ -51,20 +51,22 @@ public class GroupVM extends SocialityVM {
     public MutableLiveData<List<ExGroupMemberInfo>> exGroupManagement = new MutableLiveData<>(new ArrayList<>());
     //群字母导航
     public MutableLiveData<List<String>> groupLetters = new MutableLiveData<>(new ArrayList<>());
-
     //封装过的好友信息 用于字母导航
     public String groupId;
     public MutableLiveData<List<FriendInfo>> selectedFriendInfo = new MutableLiveData<>(new ArrayList<>());
     public LoginCertificate loginCertificate;
 
-    public int page = 1;
+    public int page = 0;
     public int pageSize = 20;
+    //已读Ids
+    public List<String> hasReadIDList = new ArrayList<>();
 
     @Override
     protected void viewCreate() {
         super.viewCreate();
         loginCertificate = LoginCertificate.getCache(getContext());
     }
+
     /**
      * 获取群组信息
      */
@@ -178,11 +180,45 @@ public class GroupVM extends SocialityVM {
         }, groupId, 0, start, pageSize);
     }
 
+    List<String> getNextHasReadIds() {
+        int start = page * pageSize;
+        if (start > hasReadIDList.size()) return null;
+        int end = start + pageSize;
+        if (end > hasReadIDList.size())
+            end = hasReadIDList.size();
+        return hasReadIDList.subList(start, end);
+    }
+
+    public void loadHasReadGroupMembersInfo() {
+        List<String> ids = getNextHasReadIds();
+        if (null == ids) return;
+        getGroupMembersInfo(ids, true);
+    }
+
+    public void getGroupMembersInfo(List<String> ids, boolean isAddUp) {
+        OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new OnBase<List<GroupMembersInfo>>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error + code);
+            }
+
+            @Override
+            public void onSuccess(List<GroupMembersInfo> data) {
+                if (data.isEmpty()) return;
+                if (isAddUp) {
+                    superGroupMembers.getValue().addAll(data);
+                    superGroupMembers.setValue(superGroupMembers.getValue());
+                } else
+                    superGroupMembers.setValue(data);
+            }
+        }, groupId, ids);
+    }
+
     /**
      * 获取群成员信息
      */
     public void getGroupMemberList() {
-        if (!superGroupMembers.getValue().isEmpty())return; //表示走了超级大群逻辑
+        if (!superGroupMembers.getValue().isEmpty()) return; //表示走了超级大群逻辑
 
         exGroupMembers.getValue().clear();
         exGroupManagement.getValue().clear();

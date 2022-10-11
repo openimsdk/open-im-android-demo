@@ -3,11 +3,7 @@ package io.openim.android.ouigroup.ui;
 
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -18,13 +14,10 @@ import java.util.List;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
-import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityGroupDetailBinding;
-import io.openim.android.ouigroup.vm.GroupVM;
-import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.GroupMembersInfo;
 

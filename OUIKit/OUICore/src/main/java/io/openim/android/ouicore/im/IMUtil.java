@@ -151,7 +151,7 @@ public class IMUtil {
     @SuppressLint("StringFormatInvalid")
     private static void handleGroupNotification(Message msg) {
         String detail = msg.getNotificationElem().getDetail();
-        String tips = "123";
+        String tips = "";
         Context ctx = BaseApp.inst();
         switch (msg.getContentType()) {
             case Constant.MsgType.ADVANCED_REVOKE:

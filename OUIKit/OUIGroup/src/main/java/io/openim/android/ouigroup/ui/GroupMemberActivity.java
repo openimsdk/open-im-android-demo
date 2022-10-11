@@ -1,7 +1,6 @@
 package io.openim.android.ouigroup.ui;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -13,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +21,9 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityGroupMemberBinding;
 
-import io.openim.android.ouigroup.vm.GroupVM;
-import io.openim.android.sdk.models.FriendInfo;
+import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemberBinding> {

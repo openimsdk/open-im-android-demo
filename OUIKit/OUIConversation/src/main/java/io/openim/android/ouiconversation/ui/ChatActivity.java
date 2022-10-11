@@ -271,9 +271,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 //                if (vm.fromChatHistory && firstVisiblePosition < 2) {
 //                    vm.loadHistoryMessageReverse();
 //                }
-                if (vm.isSingleChat)
-                    vm.sendMsgReadReceipt(firstVisiblePosition, lastVisiblePosition);
-
+                vm.sendMsgReadReceipt(firstVisiblePosition, lastVisiblePosition);
             }
         });
 

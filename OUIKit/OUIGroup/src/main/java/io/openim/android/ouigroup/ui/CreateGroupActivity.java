@@ -13,13 +13,12 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.entity.LoginCertificate;
-import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
 import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityCreateGroupBinding;
-import io.openim.android.ouigroup.vm.GroupVM;
+import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
 

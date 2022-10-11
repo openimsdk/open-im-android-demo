@@ -9,15 +9,13 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.yzq.zxinglibrary.encode.CodeCreator;
 
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.entity.LocationInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityGroupQrCodeBinding;
-import io.openim.android.ouigroup.vm.GroupVM;
+import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.models.GroupInfo;
 
 @Route(path = Routes.Group.SHARE_QRCODE)

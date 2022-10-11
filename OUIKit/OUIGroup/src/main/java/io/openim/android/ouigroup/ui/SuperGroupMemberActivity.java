@@ -12,18 +12,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
-import io.openim.android.ouicore.entity.ExGroupMemberInfo;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouigroup.databinding.ActivityGroupMemberBinding;
 import io.openim.android.ouigroup.databinding.ActivitySuperGroupMemberBinding;
-import io.openim.android.ouigroup.vm.GroupVM;
+import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySuperGroupMemberBinding> {
