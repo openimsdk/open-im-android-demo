@@ -32,6 +32,7 @@ public class Parameter {
     public String buildJson() {
         return GsonHel.toJson(jsonMap);
     }
+
     public RequestBody buildJsonBody() {
         return RequestBody.create(MediaType.parse("application/json; charset=utf-8"), buildJson());
     }

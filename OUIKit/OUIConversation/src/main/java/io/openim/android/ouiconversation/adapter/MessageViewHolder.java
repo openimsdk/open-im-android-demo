@@ -213,7 +213,6 @@ public class MessageViewHolder {
             TextView notice = itemView.findViewById(R.id.notice);
             AvatarImage avatarImage = itemView.findViewById(R.id.avatar);
             CheckBox checkBox = itemView.findViewById(R.id.choose);
-            SendStateView sendStateView = itemView.findViewById(R.id.sendState2);
             TextView unRead = itemView.findViewById(R.id.unRead);
 
             MsgExpand msgExpand = (MsgExpand) message.getExt();
@@ -249,10 +248,14 @@ public class MessageViewHolder {
             }
             ((LinearLayout.LayoutParams) checkBox.getLayoutParams()).topMargin = msgExpand.isShowTime ? Common.dp2px(15) : 0;
 
-            sendStateView.setOnClickListener(v -> {
-                chatVM.messages.getValue().remove(message);
-                chatVM.sendMsg(message);
-            });
+            if (isOwn){
+                SendStateView sendStateView = itemView.findViewById(R.id.sendState2);
+                sendStateView.setOnClickListener(v -> {
+                    chatVM.messages.getValue().remove(message);
+                    chatVM.sendMsg(message);
+                });
+            }
+
 
             int viewType = message.getContentType();
             if (isOwn && !chatVM.isSingleChat && viewType < Constant.MsgType.NOTICE

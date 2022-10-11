@@ -81,6 +81,36 @@
                         android:textColor="#ff999999"
                         android:textSize="10sp"
                         android:visibility="@{ChatVM.typing? View.VISIBLE:View.GONE}" />
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="@{ChatVM.typing? View.GONE :View.VISIBLE}">
+
+                        <LinearLayout
+                            android:gravity="center_vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <View
+                                android:id="@+id/leftBg"
+                                android:layout_width="6dp"
+                                android:layout_height="6dp"
+                                android:background="@drawable/sty_radius_max_10cc64"
+                                android:visibility="gone" />
+
+                            <TextView
+                                android:layout_marginLeft="5dp"
+                                android:id="@+id/onlineStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#ff999999"
+                                android:textSize="10sp" />
+                        </LinearLayout>
+
+                    </FrameLayout>
+
                 </LinearLayout>
 
 
@@ -113,7 +143,7 @@
             <ImageView
                 android:id="@+id/chatBg"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"

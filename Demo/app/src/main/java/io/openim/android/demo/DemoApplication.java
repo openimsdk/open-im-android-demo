@@ -46,7 +46,6 @@ public class DemoApplication extends BaseApp {
         ARouter.openLog();
         ARouter.openDebug();
 
-
     }
 
 

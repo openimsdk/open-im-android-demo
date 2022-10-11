@@ -3,8 +3,6 @@ package io.openim.android.ouicore.utils;
 public class Routes {
     public static class Service {
         public final static String CALLING = "/CallingService/CallingServiceImp";
-
-        public static final String MAIN = "/MainService/ProviderService";
         public static final String CONVERSATION = "/ConversationService/IBridgeImpl";
     }
 

@@ -168,6 +168,23 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             Constant.K_SET_BACKGROUND + (vm.isSingleChat ? vm.otherSideID : vm.groupID));
         if (!chatBg.isEmpty())
             Glide.with(this).load(chatBg).into(view.chatBg);
+
+
+        if (vm.isSingleChat) {
+            vm.getUserOnlineStatus(onlineStatus -> {
+                boolean isOnline = onlineStatus.status.equals("online");
+                view.leftBg.setVisibility(View.VISIBLE);
+                if (isOnline) {
+                    view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_max_10cc64);
+                    view.onlineStatus.setText(String.format(getString(io.openim.android.ouicore.R.string.online),
+                        vm.handlePlatformCode(onlineStatus.detailPlatformStatus)));
+                } else {
+                    view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_max_ff999999);
+                    view.onlineStatus.setText(io.openim.android.ouicore.R.string.offline);
+                }
+            });
+        }
+
     }
 
     //记录原始窗口高度

@@ -160,4 +160,10 @@
     <string name="stop_burn_after_read">已关闭阅后即焚</string>
     <string name="readed">已读 %s</string>
     <string name="unread">未读 %s</string>
+    <string name="offline">离线</string>
+    <string name="online">%s在线</string>
+    <string name="mobile_phone">手机</string>
+    <string name="pc">电脑</string>
+    <string name="Web">Web</string>
+    <string name="webMiniOnline">小程序</string>
 </resources>

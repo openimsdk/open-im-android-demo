@@ -2,7 +2,9 @@ package io.openim.android.ouiconversation.vm;
 
 
 import static io.openim.android.ouicore.utils.Common.UIHandler;
+import static io.openim.android.ouicore.utils.Common.md5;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -12,6 +14,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 
+import com.alibaba.android.arouter.launcher.ARouter;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,8 +27,16 @@ import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.AtMsgInfo;
+import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
+import io.openim.android.ouicore.entity.OnlineStatus;
+import io.openim.android.ouicore.net.RXRetrofit.N;
+import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
+import io.openim.android.ouicore.net.RXRetrofit.Parameter;
+import io.openim.android.ouicore.net.bage.Base;
+import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.services.OneselfService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.base.BaseViewModel;
@@ -34,6 +47,7 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.FixSizeLinkedList;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
@@ -53,6 +67,7 @@ import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.SearchResult;
 import io.openim.android.sdk.models.SearchResultItem;
 import io.openim.android.sdk.models.UserInfo;
+import okhttp3.ResponseBody;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener {
     //搜索的本地消息
@@ -97,10 +112,79 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         getConversationInfo();
         //标记所有消息已读
         markReaded(null);
-        if (isSingleChat)
-            listener();
 
         IMEvent.getInstance().addAdvanceMsgListener(this);
+
+        if (isSingleChat) {
+            listener();
+        }
+    }
+
+    //获取在线状态
+    public void getUserOnlineStatus(UserOnlineStatusListener userOnlineStatusListener) {
+        List<String> uIds = new ArrayList<>();
+        uIds.add(otherSideID);
+        Parameter parameter = new Parameter()
+            .add("userIDList", uIds)
+            .add("operationID", System.currentTimeMillis() + "");
+
+        N.API(OneselfService.class)
+            .getUsersOnlineStatus(BaseApp.inst().loginCertificate.token, parameter.buildJsonBody())
+            .compose(N.IOMain())
+            .subscribe(new NetObserver<ResponseBody>(getContext()) {
+
+                @Override
+                public void onSuccess(ResponseBody o) {
+                    try {
+                        String body = o.string();
+                        Base<List<OnlineStatus>> base = GsonHel.dataArray(body, OnlineStatus.class);
+                        if (base.errCode != 0) {
+                            IView.toast(base.errMsg);
+                            return;
+                        }
+                        if (null == base.data || base.data.isEmpty()) return;
+                        userOnlineStatusListener.onResult(base.data.get(0));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                @Override
+                protected void onFailure(Throwable e) {
+                    IView.toast(e.getMessage());
+                }
+            });
+    }
+
+    public String handlePlatformCode(List<OnlineStatus.DetailPlatformStatus> detailPlatformStatus) {
+        List<String> pList = new ArrayList<>();
+        for (OnlineStatus.DetailPlatformStatus platform : detailPlatformStatus) {
+            if (platform.platform.equals("Android") || platform.platform.equals("IOS")) {
+                pList.add(getContext().getString(io.openim.android.ouicore.
+                    R.string.mobile_phone));
+            } else if (platform.platform.equals("Windows")) {
+                pList.add(getContext().getString(io.openim.android.ouicore.
+                    R.string.pc));
+            } else if (platform.platform.equals("Web")) {
+                pList.add(getContext().getString(io.openim.android.ouicore.
+                    R.string.Web));
+            } else if (platform.platform.equals("MiniWeb")) {
+                pList.add(getContext().getString(io.openim.android.ouicore.
+                    R.string.webMiniOnline));
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return String.join("/", pList);
+        }
+        return getContext().getString(io.openim.android.ouicore.
+            R.string.online);
+    }
+
+    public interface UserOnlineStatusListener {
+        void onResult(OnlineStatus onlineStatus);
     }
 
     private void getConversationInfo() {
@@ -283,9 +367,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         markReaded(msgIds);
     }
 
-    private Runnable typRunnable = () -> {
-        typing.set(false);
-    };
+    private Runnable typRunnable = () -> typing.set(false);
 
     /// 是当前聊天窗口
     Boolean isCurrentChat(Message message) {
@@ -328,11 +410,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         //清除列表小红点
         markReaded(null);
         //标记本条消息已读
-        if (isSingleChat) {
-            List<String> ids = new ArrayList<>();
-            ids.add(msg.getClientMsgID());
-            markReaded(ids);
-        }
+        List<String> ids = new ArrayList<>();
+        ids.add(msg.getClientMsgID());
+        markReaded(ids);
     }
 
     @Override
