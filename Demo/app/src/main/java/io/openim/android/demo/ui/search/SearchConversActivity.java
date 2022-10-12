@@ -51,7 +51,7 @@ public class SearchConversActivity extends BaseActivity<SearchVM, ActivitySearch
         view.searchView.getEditText().requestFocus();
         view.searchView.getEditText().setHint(vm.isPerson ? io.openim.android.ouicore.R.string.search_by_id : R.string.search_group_by_id);
         view.searchView.getEditText().setOnKeyListener((v, keyCode, event) -> {
-            vm.searchContent = view.searchView.getEditText().getText().toString();
+            vm.searchContent.setValue(view.searchView.getEditText().getText().toString());
             vm.search();
             return false;
         });
@@ -62,7 +62,7 @@ public class SearchConversActivity extends BaseActivity<SearchVM, ActivitySearch
         view.recyclerView.setAdapter(recyclerViewAdapter);
 
         vm.userInfo.observe(this, v -> {
-            if (vm.searchContent.isEmpty()||null==v) return;
+            if (vm.searchContent.getValue().isEmpty()||null==v) return;
             List<String> userIDs = new ArrayList<>();
             for (UserInfo userInfo : v) {
                 userIDs.add(userInfo.getUserID());
@@ -70,7 +70,7 @@ public class SearchConversActivity extends BaseActivity<SearchVM, ActivitySearch
             bindDate(recyclerViewAdapter, userIDs);
         });
         vm.groupsInfo.observe(this, v -> {
-            if (vm.searchContent.isEmpty()) return;
+            if (vm.searchContent.getValue().isEmpty()) return;
             List<String> groupIds = new ArrayList<>();
             for (GroupInfo groupInfo : v) {
                 groupIds.add(groupInfo.getGroupID());

@@ -45,7 +45,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         init();
 
         listener();
-        vm.searchContent = getIntent().getStringExtra(Constant.K_ID);
+        vm.searchContent.setValue(getIntent().getStringExtra(Constant.K_ID));
         vm.searchPerson();
 
         formChat = getIntent().getBooleanExtra(Constant.K_RESULT, false);
@@ -70,7 +70,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                     finish();
                 } else {
                     ARouter.getInstance().build(Routes.Conversation.CHAT)
-                        .withString(Constant.K_ID, vm.searchContent)
+                        .withString(Constant.K_ID, vm.searchContent.getValue())
                         .withString(Constant.K_NAME, vm.userInfo.getValue().get(0).getNickname())
                         .navigation();
                 }
@@ -79,7 +79,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
 
 
         view.addFriend.setOnClickListener(v -> {
-            startActivity(new Intent(this, SendVerifyActivity.class).putExtra(Constant.K_ID, vm.searchContent));
+            startActivity(new Intent(this, SendVerifyActivity.class).putExtra(Constant.K_ID, vm.searchContent.getValue()));
         });
         view.part.setOnClickListener(v -> {
             CommonDialog commonDialog = new CommonDialog(this);
@@ -89,7 +89,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
             mainView.confirm.setOnClickListener(v1 -> {
                 commonDialog.dismiss();
-                vm.deleteFriend(vm.searchContent);
+                vm.deleteFriend(vm.searchContent.getValue());
             });
         });
 
@@ -97,7 +97,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             if (null == callingService) return;
             IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
                 List<String> ids = new ArrayList<>();
-                ids.add(vm.searchContent);
+                ids.add(vm.searchContent.getValue());
                 SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1, true,
                     ids, null);
                 callingService.call(signalingInfo);

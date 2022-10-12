@@ -166,4 +166,8 @@
     <string name="pc">电脑</string>
     <string name="Web">Web</string>
     <string name="webMiniOnline">小程序</string>
+    <string name="synthesis">综合</string>
+    <string name="group">群组</string>
+    <string name="contact">联系人</string>
+    <string name="two_related_chats">%1$s条相关聊天记录</string>
 </resources>

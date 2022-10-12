@@ -3,19 +3,44 @@ package io.openim.android.ouicore.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import io.openim.android.ouicore.databinding.ItemFile2Binding;
 import io.openim.android.ouicore.databinding.ItemGroupShowBinding;
 import io.openim.android.ouicore.databinding.ItemImgTxtBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonSelectBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonStickyBinding;
 import io.openim.android.ouicore.databinding.LayoutContactItemBinding;
+import io.openim.android.ouicore.databinding.ViewDividingLineBinding;
 import io.openim.android.ouicore.databinding.ViewImageBinding;
 import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
+import io.openim.android.ouicore.utils.Common;
 
 public class ViewHol {
+
+    public static class DivisionItemViewHo extends RecyclerView.ViewHolder {
+        public final ViewDividingLineBinding view;
+
+        public DivisionItemViewHo(@NonNull View itemView, int height) {
+            super(ViewDividingLineBinding.inflate(LayoutInflater.from(itemView.getContext()),
+                (ViewGroup) itemView, false).getRoot());
+            view = ViewDividingLineBinding.bind(this.itemView);
+            view.getRoot().getLayoutParams().height = height;
+        }
+    }
+
+    public static class FileItemViewHo extends RecyclerView.ViewHolder {
+        public final ItemFile2Binding view;
+
+        public FileItemViewHo(@NonNull View itemView) {
+            super(ItemFile2Binding.inflate(LayoutInflater.from(itemView.getContext()),
+                (ViewGroup) itemView, false).getRoot());
+            view = ItemFile2Binding.bind(this.itemView);
+        }
+    }
 
     public static class ItemViewHo extends RecyclerView.ViewHolder {
         public final ItemPsrsonSelectBinding view;
@@ -75,7 +100,7 @@ public class ViewHol {
         public ViewImageBinding view;
 
         public ImageViewHolder(@NonNull View itemView) {
-            super(ViewImageBinding.inflate(LayoutInflater.from(itemView.getContext()),(ViewGroup) itemView, false).getRoot());
+            super(ViewImageBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
             view = ViewImageBinding.bind(this.itemView);
         }
     }

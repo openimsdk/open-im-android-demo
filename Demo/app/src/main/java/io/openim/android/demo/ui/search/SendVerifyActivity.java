@@ -25,7 +25,7 @@ public class SendVerifyActivity extends BaseActivity<SearchVM, ActivitySendVerif
         setLightStatus();
         SinkHelper.get(this).setTranslucentStatus(view.getRoot());
 
-        vm.searchContent = getIntent().getStringExtra(Constant.K_ID);
+        vm.searchContent.setValue(getIntent().getStringExtra(Constant.K_ID));
         vm.isPerson = getIntent().getBooleanExtra(Constant.K_IS_PERSON, true);
         listener();
         click();

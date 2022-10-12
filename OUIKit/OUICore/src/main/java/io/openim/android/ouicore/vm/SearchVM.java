@@ -1,33 +1,45 @@
 package io.openim.android.ouicore.vm;
 
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.FriendshipInfo;
 import io.openim.android.sdk.models.GroupInfo;
+import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.SearchResult;
+import io.openim.android.sdk.models.SearchResultItem;
 import io.openim.android.sdk.models.UserInfo;
 
 public class SearchVM extends BaseViewModel {
 
-    public MutableLiveData<List<GroupInfo>> groupsInfo = new MutableLiveData<>();
-    public MutableLiveData<List<UserInfo>> userInfo = new MutableLiveData<>();
-    public MutableLiveData<List<FriendshipInfo>> friendshipInfo = new MutableLiveData<>();
+    public MutableLiveData<List<SearchResultItem>> messageItems = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<SearchResultItem>> fileItems = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<GroupInfo>> groupsInfo = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<UserInfo>> userInfo = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<FriendInfo>> friendInfo = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<FriendshipInfo>> friendshipInfo = new MutableLiveData<>(new ArrayList<>());
 
     public MutableLiveData<String> hail = new MutableLiveData<>();
     public MutableLiveData<String> remark = new MutableLiveData<>();
     //用户 或群组id
-    public String searchContent = "";
+    public MutableLiveData<String> searchContent = new MutableLiveData<>("");
 
-    //y 搜索人 n 搜索群
+    //true 搜索人 false 搜索群
     public boolean isPerson = false;
+    public int page;
+    public int pageSize;
 
     public void searchPerson() {
         searchPerson(null);
@@ -36,7 +48,7 @@ public class SearchVM extends BaseViewModel {
     public void searchPerson(List<String> ids) {
         if (null == ids) {
             ids = new ArrayList<>(); // 用户ID集合
-            ids.add(searchContent);
+            ids.add(searchContent.getValue());
         }
         //兼容旧版
         OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
@@ -84,9 +96,9 @@ public class SearchVM extends BaseViewModel {
             }
         };
         if (isPerson)
-            OpenIMClient.getInstance().friendshipManager.addFriend(callBack, searchContent, hail.getValue());
+            OpenIMClient.getInstance().friendshipManager.addFriend(callBack, searchContent.getValue(), hail.getValue());
         else
-            OpenIMClient.getInstance().groupManager.joinGroup(callBack, searchContent, hail.getValue(), 2);
+            OpenIMClient.getInstance().groupManager.joinGroup(callBack, searchContent.getValue(), hail.getValue(), 2);
     }
 
     public void search() {
@@ -98,7 +110,7 @@ public class SearchVM extends BaseViewModel {
 
     private void searchGroup() {
         List<String> groupIds = new ArrayList<>(); // 群ID集合
-        groupIds.add(searchContent);
+        groupIds.add(searchContent.getValue());
         OpenIMClient.getInstance().groupManager.getGroupsInfo(new OnBase<List<GroupInfo>>() {
             @Override
             public void onError(int code, String error) {
@@ -110,7 +122,98 @@ public class SearchVM extends BaseViewModel {
                 groupsInfo.setValue(data);
             }
         }, groupIds);
+    }
 
+    public void searchFriendV2() {
+        OpenIMClient.getInstance().friendshipManager.searchFriends(new OnBase<List<FriendInfo>>() {
+            @Override
+            public void onError(int code, String error) {
+
+            }
+
+            @Override
+            public void onSuccess(List<FriendInfo> data) {
+                if (page == 1) {
+                    friendInfo.getValue().clear();
+                }
+                if (!data.isEmpty()) {
+                    friendInfo.getValue().addAll(data);
+                }
+                friendInfo.setValue(friendInfo.getValue());
+            }
+        }, buildKeyWord(), false, true, true);
+    }
+
+    public void searchGroupV2() {
+        OpenIMClient.getInstance().groupManager.searchGroups(new OnBase<List<GroupInfo>>() {
+            @Override
+            public void onError(int code, String error) {
+            }
+
+            @Override
+            public void onSuccess(List<GroupInfo> data) {
+                if (page == 1) {
+                    groupsInfo.getValue().clear();
+                }
+                if (!data.isEmpty()) {
+                    groupsInfo.getValue().addAll(data);
+                }
+                groupsInfo.setValue(groupsInfo.getValue());
+            }
+        }, buildKeyWord(), false, true);
+    }
+
+    public void searchLocalMessages(String key, Integer... messageTypes) {
+        List<String> keys = null;
+        if (!TextUtils.isEmpty(key)) {
+            keys = new ArrayList<>();
+            keys.add(key);
+        }
+        List<Integer> messageTypeLists;
+        if (0 == messageTypes.length) {
+            messageTypeLists = new ArrayList<>();
+            messageTypeLists.add(Constant.MsgType.TXT);
+            messageTypeLists.add(Constant.MsgType.MENTION);
+        } else {
+            messageTypeLists = Arrays.asList(messageTypes);
+        }
+        MutableLiveData<List<SearchResultItem>> items;
+        List<Integer> type;
+        if ((type = Arrays.asList(messageTypes)).size()
+            == 1 && type.get(0) == Constant.MsgType.FILE) {
+            items = fileItems;
+        } else {
+            items = messageItems;
+        }
+        OpenIMClient.getInstance()
+            .messageManager
+            .searchLocalMessages
+                (new OnBase<SearchResult>() {
+                     @Override
+                     public void onError(int code, String error) {
+                         IView.toast(error + code);
+                     }
+
+                     @Override
+                     public void onSuccess(SearchResult data) {
+                         if (page == 1) {
+                             items.getValue().clear();
+                         }
+                         if (data.getTotalCount() != 0) {
+                             items.getValue().addAll(data.getSearchResultItems());
+                         }
+                         items.setValue(items.getValue());
+                     }
+                 }, null,
+                    keys, 0,
+                    null, messageTypeLists, 0,
+                    0, page, pageSize);
+    }
+
+    private List<String> buildKeyWord() {
+        List<String> keyWords = new ArrayList<>();
+        keyWords.add(searchContent.getValue());
+        return keyWords;
     }
 
     /**
@@ -131,5 +234,13 @@ public class SearchVM extends BaseViewModel {
                 IView.onSuccess(data);
             }
         }, uid);
+    }
+
+    public void clearData() {
+        messageItems.getValue().clear();
+        fileItems.getValue().clear();
+        groupsInfo.getValue().clear();
+        userInfo.getValue().clear();
+        friendInfo.getValue().clear();
     }
 }

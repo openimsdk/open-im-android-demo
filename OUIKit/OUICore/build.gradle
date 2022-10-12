@@ -73,11 +73,12 @@ dependencies {
     api 'com.github.yuzhiqiang1993:zxing:2.2.9'
     api 'com.github.lihangleo2:ShadowLayout:2.0.1'
     api 'com.github.maogedadada:SortLetter-Master:1.0.9'
+    api 'com.google.android.material:material:1.5.0'
 
     implementation 'com.alibaba:arouter-api:1.5.2'
 
     //openIM sdk
-    api 'io.openim:android-sdk:2.3.4@aar'
+    api 'io.openim:android-sdk:2.3.4.2@aar'
     api 'io.openim:core-sdk:2.3.4@aar'
     implementation 'com.google.code.gson:gson:2.9.0'
 
