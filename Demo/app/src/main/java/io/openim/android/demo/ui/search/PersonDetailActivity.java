@@ -30,6 +30,7 @@ import io.openim.android.sdk.models.UserInfo;
 
 @Route(path = Routes.Main.PERSON_DETAIL)
 public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonDetailBinding> {
+    //从聊天界面过来
     private boolean formChat;
     private FriendVM friendVM = new FriendVM();
     private WaitDialog waitDialog;

@@ -50,6 +50,7 @@
     </LinearLayout>
 
     <include
+        android:id="@+id/divider"
         layout="@layout/view_dividing_line"
         android:layout_width="match_parent"
         android:layout_height="5dp" />

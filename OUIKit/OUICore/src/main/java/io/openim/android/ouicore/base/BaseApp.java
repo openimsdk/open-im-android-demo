@@ -39,6 +39,14 @@ public class BaseApp extends Application {
         }
     }
 
+    public void removeCacheVM(Class<?> cl) {
+        String key = cl.getCanonicalName();
+        BaseViewModel viewModel = BaseApp.viewModels.get(key);
+        if (null != viewModel) {
+            BaseApp.viewModels.remove(key);
+        }
+    }
+
     private void realmInit() {
         Realm.init(this);
         String realmName = "open_im_db";

@@ -88,7 +88,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     MutableLiveData<Boolean> isNoData = new MutableLiveData<>(false);
 
     //开启多选
-    public MutableLiveData<Boolean> enableMultipleSelect = new MutableLiveData(false);
+    public MutableLiveData<Boolean> enableMultipleSelect = new MutableLiveData();
 
     private MessageAdapter messageAdapter;
     private Observer<String> inputObserver;

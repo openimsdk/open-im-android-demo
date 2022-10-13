@@ -120,7 +120,6 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
             BaseApp.viewModels.remove(key);
             vm.context.clear();
         }
-
     }
 
     @Override

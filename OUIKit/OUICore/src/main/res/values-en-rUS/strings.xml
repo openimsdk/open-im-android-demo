@@ -164,4 +164,6 @@
     <string name="group">群组</string>
     <string name="contact">联系人</string>
     <string name="two_related_chats">%1$s条相关聊天记录</string>
+    <string name="say_more">查看更多</string>
+    <string name="sender">发送者</string>
 </resources>

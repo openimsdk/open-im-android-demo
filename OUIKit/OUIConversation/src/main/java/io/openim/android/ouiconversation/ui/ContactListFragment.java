@@ -20,11 +20,11 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.yanzhenjie.recyclerview.SwipeMenuCreator;
 import com.yanzhenjie.recyclerview.SwipeMenuItem;
 
@@ -32,23 +32,18 @@ import java.util.List;
 
 import io.openim.android.ouiconversation.R;
 
-import io.openim.android.ouiconversation.adapter.MessageViewHolder;
 import io.openim.android.ouiconversation.databinding.FragmentContactListBinding;
 import io.openim.android.ouiconversation.vm.ContactListVM;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
-import io.openim.android.ouicore.databinding.LayoutContactItemBinding;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.im.IMUtil;
-import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.models.ConversationInfo;
 
 @Route(path = Routes.Conversation.CONTACT_LIST)
 public class ContactListFragment extends BaseFragment<ContactListVM> implements ContactListVM.ViewAction {
@@ -160,7 +155,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
     private View createHeaderView() {
         View header = getLayoutInflater().inflate(R.layout.view_search, view.recyclerView, false);
-        header.setOnClickListener(v ->startActivity(new Intent(getActivity(),SearchActivity.class)));
+        header.setOnClickListener(v -> startActivity(new Intent(getActivity(),SearchActivity.class)));
         return header;
     }
 
@@ -217,6 +212,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             viewHolder.viewBinding.badge.badge.setText(msgConversation.conversationInfo.getUnreadCount() + "");
             viewHolder.viewBinding.time.setText(TimeUtil.getTimeString(msgConversation.conversationInfo.getLatestMsgSendTime()));
         }
+
         @Override
         public int getItemCount() {
             return null == conversationInfos ? 0 : conversationInfos.size();

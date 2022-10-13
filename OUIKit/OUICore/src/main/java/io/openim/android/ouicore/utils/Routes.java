@@ -23,7 +23,10 @@ public class Routes {
         public final static String CONTACT_LIST = "/conversation/ContactListFragment";
         //聊天页
         public final static String CHAT = "/conversation/ChatActivity";
+
         public static final String CHAT_HISTORY = "/conversation/ChatHistorySearchActivity";
+        //全局搜索
+        public final static String SEARCH = "/conversation/SearchActivity";
     }
 
     //群组
