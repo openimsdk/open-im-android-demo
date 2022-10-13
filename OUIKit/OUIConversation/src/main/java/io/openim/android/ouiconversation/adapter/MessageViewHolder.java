@@ -224,7 +224,7 @@ public class MessageViewHolder {
             } else
                 notice.setVisibility(View.GONE);
 
-            if (null != avatarImage)
+            if (null != avatarImage) {
                 avatarImage.setOnLongClickListener(v -> {
                     if (chatVM.isSingleChat) return false;
                     List<Message> atMessages = chatVM.atMessages.getValue();
@@ -235,6 +235,13 @@ public class MessageViewHolder {
                     chatVM.atMessages.setValue(atMessages);
                     return false;
                 });
+                avatarImage.setOnClickListener(v -> {
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                        .withString(Constant.K_ID, message.getSendID())
+                        .navigation();
+                });
+            }
+
 
             if (chatVM.enableMultipleSelect.getValue()
                 && message.getContentType() != Constant.MsgType.NOTICE) {
@@ -248,7 +255,7 @@ public class MessageViewHolder {
             }
             ((LinearLayout.LayoutParams) checkBox.getLayoutParams()).topMargin = msgExpand.isShowTime ? Common.dp2px(15) : 0;
 
-            if (isOwn){
+            if (isOwn) {
                 SendStateView sendStateView = itemView.findViewById(R.id.sendState2);
                 sendStateView.setOnClickListener(v -> {
                     chatVM.messages.getValue().remove(message);
@@ -275,6 +282,7 @@ public class MessageViewHolder {
             } else {
                 unRead.setVisibility(View.GONE);
             }
+
 
         }
 

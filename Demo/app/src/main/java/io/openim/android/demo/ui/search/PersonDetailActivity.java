@@ -64,7 +64,8 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
 
     private void click() {
         view.userInfo.setOnClickListener(v -> {
-            startActivity(new Intent(this, PersonDataActivity.class));
+            startActivity(new Intent(this, PersonDataActivity.class).putExtra(Constant.K_ID, vm.userInfo.getValue()
+                .get(0).getUserID()));
         });
         view.sendMsg.setOnClickListener(v -> {
                 if (formChat) {
@@ -124,12 +125,13 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                     break;
                 }
             }
-            if (null!=friendshipInfo){
+            if (null != friendshipInfo) {
                 if (friendshipInfo.getResult() == 1 || isCon) {
-                    view.userInfo.setVisibility(formChat ? View.VISIBLE : View.GONE);
+                    view.userInfo.setVisibility(View.VISIBLE);
                     view.addFriend.setVisibility(View.GONE);
                     view.part.setVisibility(View.VISIBLE);
                 } else {
+                    view.userInfo.setVisibility(View.GONE);
                     view.addFriend.setVisibility(View.VISIBLE);
                     view.part.setVisibility(View.GONE);
                 }

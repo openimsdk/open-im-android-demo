@@ -72,11 +72,26 @@
                         android:paddingRight="20dp"
                         android:paddingBottom="19dp">
 
-                        <io.openim.android.ouicore.widget.AvatarImage
-                            android:id="@+id/avatar"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@mipmap/ic_my_group" />
+                        <RelativeLayout
+                            android:id="@+id/avatarEdit"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp">
+
+                            <io.openim.android.ouicore.widget.AvatarImage
+                                android:id="@+id/avatar"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:src="@mipmap/ic_my_group" />
+
+                            <ImageView
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"
+                                android:layout_alignParentRight="true"
+                                android:layout_alignParentBottom="true"
+                                android:src="@mipmap/ic_edit"
+                                android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}" />
+                        </RelativeLayout>
+
 
                         <TextView
                             android:layout_width="154dp"

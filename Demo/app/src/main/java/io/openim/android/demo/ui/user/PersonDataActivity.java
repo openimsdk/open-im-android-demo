@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -45,8 +46,14 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         sink();
         init();
         listener();
-        chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
-        vm.getUserInfo(chatVM.otherSideID);
+        String uid = getIntent().getStringExtra(Constant.K_ID);
+        if (TextUtils.isEmpty(uid)) {
+            chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
+            vm.getUserInfo(chatVM.otherSideID);
+        } else
+            vm.getUserInfo(uid);
+
+
     }
 
     @Override

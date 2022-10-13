@@ -100,7 +100,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             modifyData.editT = exGroupMemberInfo.groupMembersInfo.getNickname();
             infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
         });
-        view.avatar.setOnClickListener(v -> {
+        view.avatarEdit.setOnClickListener(v -> {
+            if (!vm.isGroupOwner.getValue()) return;
             albumDialog.show();
         });
 
