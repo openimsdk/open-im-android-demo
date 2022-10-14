@@ -241,9 +241,8 @@ public class MessageViewHolder {
                         .navigation();
                 });
             }
-
-
-            if (chatVM.enableMultipleSelect.getValue()
+            if (null != chatVM.enableMultipleSelect.getValue() &&
+                chatVM.enableMultipleSelect.getValue()
                 && message.getContentType() != Constant.MsgType.NOTICE) {
                 checkBox.setVisibility(View.VISIBLE);
                 checkBox.setChecked(msgExpand.isChoice);
@@ -265,7 +264,8 @@ public class MessageViewHolder {
 
 
             int viewType = message.getContentType();
-            if (isOwn && !chatVM.isSingleChat && viewType < Constant.MsgType.NOTICE
+            if (isOwn && !chatVM.isSingleChat
+                && viewType < Constant.MsgType.NOTICE
                 && viewType != Constant.MsgType.REVOKE
                 && viewType != Constant.MsgType.ADVANCED_REVOKE) {
                 int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;

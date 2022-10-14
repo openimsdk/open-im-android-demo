@@ -21,6 +21,7 @@ import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.CallHistory;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.vm.GroupVM;
@@ -79,7 +80,8 @@ public class MsgReadStatusActivity extends BaseActivity<GroupVM, ActivityMsgRead
 
     private void listener() {
         vm.groupsInfo.observe(this, groupInfo -> {
-            view.title2.setText(String.format(getString(io.openim.android.ouicore.R.string.unread), (groupInfo.getMemberCount() - vm.hasReadIDList.size() - 1) + ""));
+            view.title2.setText(String.format(getString(io.openim.android.ouicore.R.string.unread),
+                (groupInfo.getMemberCount() - vm.hasReadIDList.size() - 1) + ""));
         });
         view.menu1.setOnClickListener(view1 -> {
             isRead = true;
@@ -96,7 +98,8 @@ public class MsgReadStatusActivity extends BaseActivity<GroupVM, ActivityMsgRead
                 Iterator<GroupMembersInfo> iterator = groupMembersInfos.iterator();
                 while (iterator.hasNext()) {
                     GroupMembersInfo groupMembersInfo = iterator.next();
-                    if (vm.hasReadIDList.contains(groupMembersInfo.getUserID()))
+                    if (vm.hasReadIDList.contains(groupMembersInfo.getUserID())
+                        || groupMembersInfo.getUserID().equals(BaseApp.inst().loginCertificate.userID))
                         iterator.remove();
                 }
             }
