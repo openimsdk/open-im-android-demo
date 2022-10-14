@@ -258,7 +258,9 @@ public class MessageViewHolder {
 
             int viewType = message.getContentType();
             if (isOwn && !chatVM.isSingleChat
-                && viewType < Constant.MsgType.NOTICE) {
+                && viewType < Constant.MsgType.NOTICE
+                && viewType != Constant.MsgType.REVOKE
+                && viewType != Constant.MsgType.ADVANCED_REVOKE) {
                 int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;
                 if (unreadCount > 0) {
                     unRead.setVisibility(View.VISIBLE);
