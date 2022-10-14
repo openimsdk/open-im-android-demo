@@ -29,7 +29,8 @@ import io.openim.android.sdk.models.UserInfo;
 
 public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding> implements ChatVM.ViewAction {
 
-    ContactListVM contactListVM=new ContactListVM();
+    ContactListVM contactListVM = new ContactListVM();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         bindVMByCache(ChatVM.class);
@@ -43,7 +44,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
     private void click() {
         view.topSlideButton.setOnSlideButtonClickListener(is -> {
-            contactListVM.pinConversation(vm.conversationInfo.getValue(),is);
+            contactListVM.pinConversation(vm.conversationInfo.getValue(), is);
         });
         view.searchChat.setOnClickListener(v -> {
             startActivity(new Intent(this, ChatHistorySearchActivity.class));
@@ -68,7 +69,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             commonDialog.getMainView().cancel.setOnClickListener(view1 -> commonDialog.dismiss());
             commonDialog.getMainView().confirm.setOnClickListener(view1 -> {
                 commonDialog.dismiss();
-                vm.clearC2CHistory(vm.otherSideID);
+                vm.clearCHistory(vm.otherSideID);
             });
         });
     }

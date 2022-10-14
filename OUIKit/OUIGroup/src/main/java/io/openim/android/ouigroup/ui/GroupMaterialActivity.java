@@ -20,10 +20,14 @@ import java.util.List;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
+import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
 import io.openim.android.ouicore.widget.SingleInfoModifyActivity;
@@ -33,6 +37,7 @@ import io.openim.android.ouigroup.databinding.ActivityGroupMaterialBinding;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
+import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 @Route(path = Routes.Group.MATERIAL)
@@ -42,6 +47,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     private PhotographAlbumDialog albumDialog;
     private ActivityResultLauncher infoModifyLauncher;
     private int infoModifyType;
+    private IConversationBridge iConversationBridge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +60,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
         sink();
 
+        init();
         initView();
         click();
 
@@ -67,7 +74,20 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
     }
 
+    void init() {
+        iConversationBridge = (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();
+    }
+
     private void click() {
+        view.topSlideButton.setOnSlideButtonClickListener(is -> {
+            if (null == iConversationBridge) return;
+            iConversationBridge.pinConversation(iConversationBridge.getConversationInfo(), is);
+        });
+        view.noDisturb.setOnSlideButtonClickListener(is -> {
+            if (null == iConversationBridge) return;
+            iConversationBridge.setConversationRecvMessageOpt(is ? 2 : 0,
+                iConversationBridge.getConversationInfo().getConversationID());
+        });
         view.chatHistory.setOnClickListener(v -> {
             ARouter.getInstance()
                 .build(Routes.Conversation.CHAT_HISTORY)
@@ -77,7 +97,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         view.groupId.setOnClickListener(v -> startActivity(new Intent(this, ShareQrcodeActivity.class).putExtra(ShareQrcodeActivity.IS_QRCODE, false)));
         view.bulletin.setOnClickListener(v -> startActivity(new Intent(this, GroupBulletinActivity.class)));
         view.groupMember.setOnClickListener(v -> {
-            gotoMemberList();
+            gotoMemberList(false);
         });
         view.groupName.setOnClickListener(v -> {
             if (vm.isOwner()) {
@@ -112,7 +132,20 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                 vm.quitGroup();
             }
         });
-
+        view.transferPermissions.setOnClickListener(v -> {
+            gotoMemberList(true);
+        });
+        view.clearRecord.setOnClickListener(v ->
+        {
+            CommonDialog commonDialog = new CommonDialog(this);
+            commonDialog.show();
+            commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.clear_chat_tips);
+            commonDialog.getMainView().cancel.setOnClickListener(view1 -> commonDialog.dismiss());
+            commonDialog.getMainView().confirm.setOnClickListener(view1 -> {
+                commonDialog.dismiss();
+                iConversationBridge.clearCHistory(vm.groupId);
+            });
+        });
     }
 
     @Override
@@ -150,7 +183,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     vm.updataGroup(vm.groupId, null, s, null, null, null);
                 }
             }, path);
-
         });
 
         view.recyclerview.setLayoutManager(new GridLayoutManager(this, spanCount));
@@ -171,7 +203,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     holder.view.img.load(data.getFaceURL());
                 }
                 holder.view.txt.setVisibility(View.GONE);
-                holder.view.getRoot().setOnClickListener(v -> gotoMemberList());
+                holder.view.getRoot().setOnClickListener(v -> gotoMemberList(false));
             }
 
         };
@@ -180,7 +212,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             view.avatar.load(groupInfo.getFaceURL());
             vm.getGroupMemberList();
         });
-
         vm.groupMembers.observe(this, groupMembersInfos -> {
             boolean owner;
             int end = (owner = vm.isOwner()) ? spanCount - 2 : spanCount - 1;
@@ -202,13 +233,23 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
         });
 
+        iConversationBridge.setNotDisturbStatusListener(this, data -> {
+            view.noDisturb.post(() -> view.noDisturb.setCheckedWithAnimation(data == 2));
+        });
+        iConversationBridge.setConversationInfoChangeListener(this, data -> {
+            view.topSlideButton.post(() -> view.topSlideButton.setCheckedWithAnimation(data.isPinned()));
+        });
+
+
     }
 
-    private void gotoMemberList() {
+    private void gotoMemberList(boolean transferPermissions) {
         if (vm.groupMembers.getValue().isEmpty()) return;
         if (vm.groupMembers.getValue().size() > SUPER_GROUP_LIMIT)
-            startActivity(new Intent(GroupMaterialActivity.this, SuperGroupMemberActivity.class));
+            startActivity(new Intent(GroupMaterialActivity.this, SuperGroupMemberActivity.class)
+                .putExtra(Constant.K_FROM, transferPermissions));
         else
-            startActivity(new Intent(GroupMaterialActivity.this, GroupMemberActivity.class));
+            startActivity(new Intent(GroupMaterialActivity.this, GroupMemberActivity.class)
+                .putExtra(Constant.K_FROM, transferPermissions));
     }
 }

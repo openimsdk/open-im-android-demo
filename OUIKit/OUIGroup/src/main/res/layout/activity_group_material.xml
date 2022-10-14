@@ -231,6 +231,7 @@
                         <include layout="@layout/view_dividing_line" />
 
                         <LinearLayout
+                            android:id="@+id/transferPermissions"
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:gravity="center_vertical"
@@ -335,35 +336,6 @@
                         </LinearLayout>
                     </LinearLayout>
 
-                    <include layout="@layout/view_dividing_line" />
-
-                    <LinearLayout
-                        android:id="@+id/chatHistory"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:background="@color/white"
-                        android:gravity="center_vertical"
-                        android:paddingLeft="22dp"
-                        android:paddingRight="22dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/view_chat_history"
-                            android:textColor="#ff333333"
-                            android:textSize="16sp" />
-
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="6dp"
-                            android:src="@mipmap/ic_right" />
-
-                    </LinearLayout>
-
-
                     <LinearLayout
                         android:id="@+id/groupId"
                         android:layout_width="match_parent"
@@ -396,6 +368,108 @@
 
                         </LinearLayout>
                     </LinearLayout>
+
+
+                    <LinearLayout
+                        android:id="@+id/chatHistory"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@color/white"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="22dp"
+                        android:paddingRight="22dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/view_chat_history"
+                            android:textColor="#ff333333"
+                            android:textSize="16sp" />
+
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="6dp"
+                            android:src="@mipmap/ic_right" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/notDisturb"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@color/white"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="22dp"
+                        android:paddingRight="22dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/msg_dont_disturb"
+                            android:textColor="#ff333333"
+                            android:textSize="16sp" />
+
+                        <io.openim.android.ouicore.widget.SlideButton
+                            android:id="@+id/no_disturb"
+                            android:layout_width="38dp"
+                            android:layout_height="23dp" />
+                    </LinearLayout>
+
+
+                    <include layout="@layout/view_dividing_line" />
+
+                    <LinearLayout
+                        android:id="@+id/topChat"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@color/white"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="22dp"
+                        android:paddingRight="22dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/top_chat"
+                            android:textColor="#ff333333"
+                            android:textSize="16sp" />
+
+                        <io.openim.android.ouicore.widget.SlideButton
+                            android:id="@+id/topSlideButton"
+                            android:layout_width="38dp"
+                            android:layout_height="23dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/clearRecord"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@color/white"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="22dp"
+                        android:paddingRight="22dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/clear_chat_record"
+                            android:textColor="#ff333333"
+                            android:textSize="16sp" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@mipmap/ic_right" />
+                    </LinearLayout>
+
 
                     <TextView
                         android:id="@+id/quitGroup"

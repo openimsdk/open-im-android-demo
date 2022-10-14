@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.services.CallingService;
 
 import io.openim.android.ouicore.utils.Routes;
@@ -46,6 +47,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         if (null != vm) {
             vm.viewCreate();
         }
+
     }
 
     protected void bindViewDataBinding(A viewDataBinding) {
@@ -77,7 +79,6 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         if (null == this.vm) return;
         this.vm.setContext(this);
         this.vm.setIView(this);
-
     }
 
     protected void setLightStatus() {
@@ -89,10 +90,14 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     @Override
     protected void onPause() {
         super.onPause();
-        if (isFinishing() && null != vm) {
-            vm.viewDestroy();
+        if (null != vm) {
+            vm.viewPause();
+            if (isFinishing()) {
+                vm.viewDestroy();
+            }
         }
     }
+
 
     public void toBack(View view) {
         finish();
@@ -126,6 +131,8 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     protected void onResume() {
         super.onResume();
         bind();
+        if (null != vm)
+            vm.viewResume();
     }
 
 

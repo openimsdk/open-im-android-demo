@@ -123,6 +123,19 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         }
     }
 
+    @Override
+    protected void onResume() {
+        if (vm.viewPause) {
+            //从Pause 到 Resume  把当前显示的msg 标记为已读
+            LinearLayoutMg linearLayoutManager = (LinearLayoutMg) view.recyclerView.getLayoutManager();
+            if (null == linearLayoutManager) return;
+            int firstVisiblePosition = linearLayoutManager.findFirstCompletelyVisibleItemPosition();
+            int lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
+            vm.sendMsgReadReceipt(firstVisiblePosition, lastVisiblePosition);
+        }
+        super.onResume();
+    }
+
     @SuppressLint({"ClickableViewAccessibility", "NotifyDataSetChanged"})
     private void initView() {
         bottomInputCote = new BottomInputCote(this, view.layoutInputCote, hasMicrophone);

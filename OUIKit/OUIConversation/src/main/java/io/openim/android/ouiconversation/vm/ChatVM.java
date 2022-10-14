@@ -90,6 +90,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     //开启多选
     public MutableLiveData<Boolean> enableMultipleSelect = new MutableLiveData();
 
+    public boolean viewPause = false;
     private MessageAdapter messageAdapter;
     private Observer<String> inputObserver;
     public Message startMsg = null; // 消息体，取界面上显示的消息体对象/搜索时的起始坐标
@@ -118,6 +119,16 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         if (isSingleChat) {
             listener();
         }
+    }
+
+    @Override
+    protected void viewPause() {
+        viewPause = true;
+    }
+
+    @Override
+    protected void viewResume() {
+        viewPause = false;
     }
 
     //获取在线状态
@@ -356,14 +367,14 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public void sendMsgReadReceipt(int firstVisiblePosition, int lastVisiblePosition) {
         int size = messages.getValue().size();
         if (lastVisiblePosition > size || firstVisiblePosition < 0) return;
-
         List<Message> megs = messages.getValue().subList(firstVisiblePosition, lastVisiblePosition);
         List<String> msgIds = new ArrayList<>();
         for (Message meg : megs) {
-            if (!meg.isRead() && meg.getSendID().equals(otherSideID))
+            if (!meg.isRead() && !meg.getSendID().equals(BaseApp.inst().loginCertificate.userID))
                 msgIds.add(meg.getClientMsgID());
         }
-        markReaded(msgIds);
+        if (!msgIds.isEmpty())
+            markReaded(msgIds);
     }
 
     private Runnable typRunnable = () -> typing.set(false);
@@ -411,7 +422,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         //标记本条消息已读
         List<String> ids = new ArrayList<>();
         ids.add(msg.getClientMsgID());
-        markReaded(ids);
+        if (!viewPause)
+            markReaded(ids);
     }
 
     @Override
@@ -570,24 +582,45 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         IView.closePage();
     }
 
-    public void clearC2CHistory(String uid) {
+    public void clearCHistory(String id) {
         WaitDialog waitDialog = new WaitDialog(getContext());
         waitDialog.show();
-        OpenIMClient.getInstance().messageManager
-            .clearC2CHistoryMessageFromLocalAndSvr(new OnBase<String>() {
-                @Override
-                public void onError(int code, String error) {
-                    waitDialog.dismiss();
-                    IView.toast(error + code);
-                }
+        if (isSingleChat) {
+            OpenIMClient.getInstance().messageManager
+                .clearC2CHistoryMessageFromLocalAndSvr(new OnBase<String>() {
+                    @Override
+                    public void onError(int code, String error) {
+                        waitDialog.dismiss();
+                        IView.toast(error + code);
+                    }
 
-                @Override
-                public void onSuccess(String data) {
-                    waitDialog.dismiss();
-                    messages.getValue().clear();
-                    IView.toast(getContext().getString(io.openim.android.ouicore.R.string.clear_succ));
-                }
-            }, uid);
+                    @Override
+                    public void onSuccess(String data) {
+                        waitDialog.dismiss();
+                        messages.getValue().clear();
+                        messageAdapter.notifyDataSetChanged();
+                        IView.toast(getContext().getString(io.openim.android.ouicore.R.string.clear_succ));
+                    }
+                }, id);
+        } else {
+            OpenIMClient.getInstance().messageManager
+                .clearGroupHistoryMessageFromLocalAndSvr(new OnBase<String>() {
+                    @Override
+                    public void onError(int code, String error) {
+                        waitDialog.dismiss();
+                        IView.toast(error + code);
+                    }
+
+                    @Override
+                    public void onSuccess(String data) {
+                        waitDialog.dismiss();
+                        messages.getValue().clear();
+                        messageAdapter.notifyDataSetChanged();
+                        IView.toast(getContext().getString(io.openim.android.ouicore.R.string.clear_succ));
+                    }
+                }, id);
+        }
+
 
     }
 

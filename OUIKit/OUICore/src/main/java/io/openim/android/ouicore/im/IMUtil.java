@@ -442,4 +442,12 @@ public class IMUtil {
             callingService.stopAudioVideoService(from);
         from.finish();
     }
+
+    /**
+     * 成功监听
+     * @param <T>
+     */
+    public interface OnSuccessListener<T> {
+        void onSuccess(T data);
+    }
 }

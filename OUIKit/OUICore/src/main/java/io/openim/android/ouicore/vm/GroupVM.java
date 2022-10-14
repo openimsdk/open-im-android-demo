@@ -18,6 +18,7 @@ import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
 
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.Common;
 
@@ -395,6 +396,23 @@ public class GroupVM extends SocialityVM {
             }
         }, groupId));
     }
+
+    public void transferGroupOwner(String uid, IMUtil.OnSuccessListener onSuccessListener) {
+        OpenIMClient.getInstance().groupManager
+            .transferGroupOwner(new OnBase<String>() {
+                @Override
+                public void onError(int code, String error) {
+                    IView.toast(error + code);
+                }
+
+                @Override
+                public void onSuccess(String data) {
+                    getGroupsInfo();
+                    onSuccessListener.onSuccess(data);
+                }
+            }, groupId, uid);
+    }
+
 
     private void close(CommonDialog commonDialog) {
         IConversationBridge iConversationBridge = (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();

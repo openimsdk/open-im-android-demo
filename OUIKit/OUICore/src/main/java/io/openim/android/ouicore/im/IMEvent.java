@@ -1,6 +1,8 @@
 package io.openim.android.ouicore.im;
 
 
+import android.widget.Toast;
+
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
@@ -207,17 +209,24 @@ public class IMEvent {
         public void onKickedOffline() {
             // 当前用户被踢下线，此时可以 UI 提示用户“您已经在其他端登录了当前账号，是否重新登录？”
             L.d("当前用户被踢下线");
-
-            CallingService callingService = (CallingService) ARouter.getInstance()
-                .build(Routes.Service.CALLING).navigation();
-            if (null != callingService)
-                callingService.stopAudioVideoService(BaseApp.inst());
+            Toast.makeText(BaseApp.inst(), BaseApp.inst().getString(
+                io.openim.android.ouicore.R.string.kicked_offline_tips),
+                Toast.LENGTH_SHORT).show();
+            for (OnConnListener onConnListener : connListeners) {
+                onConnListener.onKickedOffline();
+            }
         }
 
         @Override
         public void onUserTokenExpired() {
             // 登录票据已经过期，请使用新签发的 UserSig 进行登录。
             L.d("登录票据已经过期");
+            Toast.makeText(BaseApp.inst(), BaseApp.inst().getString(
+                io.openim.android.ouicore.R.string.token_expired),
+                Toast.LENGTH_SHORT).show();
+            for (OnConnListener onConnListener : connListeners) {
+                onConnListener.onUserTokenExpired();
+            }
         }
     };
 

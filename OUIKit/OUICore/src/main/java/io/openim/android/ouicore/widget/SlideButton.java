@@ -116,9 +116,6 @@ public class SlideButton extends View {
     public void setCheckedWithAnimation(boolean isChecked) {
         Log.i(TAG, "setCheckedWithAnimation: Checked：" + isChecked);
         this.isChecked = isChecked;
-        if (onClickListener != null)
-            onClickListener.onClicked(this.isChecked);
-
         startAnimation(this.isChecked);
     }
 
@@ -135,13 +132,13 @@ public class SlideButton extends View {
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SlideButton);
         mMargin = typedArray.getDimension(R.styleable.SlideButton_sMargin,
-                dip2px(getContext(), 2));
+            dip2px(getContext(), 2));
         mBgColorOn = typedArray.getColor(R.styleable.SlideButton_sBackgroundColorOn,
-                Color.GREEN);
+            Color.GREEN);
         mBgColorOff = typedArray.getColor(R.styleable.SlideButton_sBackgroundColorOff,
-                Color.GRAY);
+            Color.GRAY);
         mButtonColor = typedArray.getColor(R.styleable.SlideButton_sButtonColor,
-                Color.WHITE);
+            Color.WHITE);
         typedArray.recycle();
 
         init();
@@ -226,7 +223,7 @@ public class SlideButton extends View {
             mRadiusPlus = 0;
         //圆角矩形的区域
         RectF rectF = new RectF(mCircleX - mCircleRadius - mRadiusPlus, mCenterY - mCircleRadius,
-                mCircleX + mCircleRadius + mRadiusPlus, mCenterY + mCircleRadius);
+            mCircleX + mCircleRadius + mRadiusPlus, mCenterY + mCircleRadius);
 
         //绘制
         drawRoundRect(canvas, rectF, mCircleRadius, mButtonColor);
@@ -306,7 +303,7 @@ public class SlideButton extends View {
                  * 手指按下的时候在圆钮上则可以滑动，否则不可以
                  */
                 if (mDownX >= mCircleX - mCircleRadius - mMargin * 2 &&
-                        mDownX <= mCircleX + mCircleRadius + mMargin * 2)
+                    mDownX <= mCircleX + mCircleRadius + mMargin * 2)
                     canMove = true;
                 else canMove = false;
                 break;
@@ -326,9 +323,9 @@ public class SlideButton extends View {
                 /**
                  * 轻触按钮切换状态
                  */
-                if (Math.abs(upX - mDownX) < 5)
-                    setCheckedWithAnimation(!isChecked);
-                else {
+                if (Math.abs(upX - mDownX) < 5) {
+                    touchCheck(!isChecked);
+                } else {
                     /**
                      * 手指抬起的时候在按钮里面则可以进行按钮的状态改变等操作，否则取消刚才的动作
                      */
@@ -338,11 +335,17 @@ public class SlideButton extends View {
                     else isChecked = false;
 
                     //开始动画
-                    setCheckedWithAnimation(isChecked);
+                    touchCheck(isChecked);
                 }
                 break;
         }
         return true;
+    }
+
+    private void touchCheck(boolean checked) {
+        setCheckedWithAnimation(checked);
+        if (onClickListener != null)
+            onClickListener.onClicked(checked);
     }
 
     /**

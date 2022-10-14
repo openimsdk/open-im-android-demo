@@ -37,4 +37,13 @@ public class BaseViewModel<T extends IView> extends ViewModel {
     //视图已构建
     protected void viewCreate() {
     }
+
+    protected void viewPause(){
+
+    }
+    protected void viewResume(){
+
+    }
+
+
 }

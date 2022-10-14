@@ -15,13 +15,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
+import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.widget.CommonDialog;
+import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivitySuperGroupMemberBinding;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySuperGroupMemberBinding> {
     private RecyclerViewAdapter adapter;
+    //转让群主权限
+    private boolean isTransferPermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +49,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
             vm.page = 0;
             vm.pageSize = 20;
         }
+        isTransferPermission = getIntent().getBooleanExtra(Constant.K_FROM, false);
     }
 
     private void listener() {
@@ -98,6 +106,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
     }
 
     private void initView() {
+        view.more.setVisibility(isTransferPermission ? View.GONE : View.VISIBLE);
         view.recyclerview.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecyclerViewAdapter<GroupMembersInfo, RecyclerView.ViewHolder>() {
 
@@ -126,6 +135,31 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
                     itemViewHo.view.identity.setTextColor(Color.parseColor("#2691ED"));
                 } else
                     itemViewHo.view.identity.setVisibility(View.GONE);
+
+                if (isTransferPermission) {
+                    itemViewHo.view.getRoot().setOnClickListener(v -> {
+                        if (data.getRoleLevel() == 2)
+                            toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.repeat_group_manager));
+                        else {
+                            CommonDialog commonDialog = new CommonDialog(SuperGroupMemberActivity.this);
+                            commonDialog.getMainView().tips
+                                .setText(String.format(BaseApp.inst().getString(io.openim.
+                                    android.ouicore.R.string.transfer_permission), data.getNickname()));
+                            commonDialog.getMainView().cancel.setOnClickListener(v2 -> {
+                                commonDialog.dismiss();
+                            });
+                            commonDialog.getMainView().confirm.setOnClickListener(v2 -> {
+                                commonDialog.dismiss();
+                                vm.transferGroupOwner(data.getUserID(), data1 -> {
+                                    toast(getString(io.openim.android.ouicore.R.string.transfer_succ));
+                                    finish();
+                                });
+                            });
+                            commonDialog.show();
+                        }
+
+                    });
+                }
             }
         };
         adapter.setItems(vm.superGroupMembers.getValue());

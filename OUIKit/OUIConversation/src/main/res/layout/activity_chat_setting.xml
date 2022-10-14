@@ -211,6 +211,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/topChat"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="12dp"
@@ -236,6 +237,7 @@
         <include layout="@layout/view_dividing_line" />
 
         <LinearLayout
+            android:id="@+id/letbe"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@color/white"

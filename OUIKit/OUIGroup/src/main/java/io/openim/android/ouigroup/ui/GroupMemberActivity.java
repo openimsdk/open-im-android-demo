@@ -18,9 +18,12 @@ import java.util.List;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouigroup.databinding.ActivityGroupMemberBinding;
 
 import io.openim.android.ouicore.vm.GroupVM;
@@ -28,6 +31,8 @@ import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemberBinding> {
     private RecyclerViewAdapter adapter;
+    //转让群主权限
+    private boolean isTransferPermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +41,12 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
         bindViewDataBinding(ActivityGroupMemberBinding.inflate(getLayoutInflater()));
         sink();
 
+        init();
         initView();
         listener();
+    }
+    void init(){
+        isTransferPermission = getIntent().getBooleanExtra(Constant.K_FROM, false);
     }
 
     private void listener() {
@@ -165,6 +174,30 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
                         itemViewHo.view.identity.setTextColor(Color.parseColor("#2691ED"));
                     } else
                         itemViewHo.view.identity.setVisibility(View.GONE);
+
+                    if (isTransferPermission) {
+                        itemViewHo.view.getRoot().setOnClickListener(v -> {
+                            if (data.groupMembersInfo.getRoleLevel() == 2)
+                                toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.repeat_group_manager));
+                            else {
+                                CommonDialog commonDialog = new CommonDialog(GroupMemberActivity.this);
+                                commonDialog.getMainView().tips
+                                    .setText(String.format(BaseApp.inst().getString(io.openim.
+                                        android.ouicore.R.string.transfer_permission), data.groupMembersInfo.getNickname()));
+                                commonDialog.getMainView().cancel.setOnClickListener(v2 -> {
+                                    commonDialog.dismiss();
+                                });
+                                commonDialog.getMainView().confirm.setOnClickListener(v2 -> {
+                                    commonDialog.dismiss();
+                                    vm.transferGroupOwner(data.groupMembersInfo.getUserID(), data1 -> {
+                                        toast(getString(io.openim.android.ouicore.R.string.transfer_succ));
+                                        finish();
+                                    });
+                                });
+                                commonDialog.show();
+                            }
+                        });
+                    }
                 } else {
                     ViewHol.StickyViewHo stickyViewHo = (ViewHol.StickyViewHo) holder;
                     stickyViewHo.view.title.setText(data.sortLetter);

@@ -3,20 +3,10 @@ package io.openim.android.ouiconversation.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Build;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +29,7 @@ import com.bumptech.glide.Glide;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.openim.android.ouiconversation.R;
 
@@ -64,19 +54,16 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
 import io.openim.android.ouiconversation.ui.MsgReadStatusActivity;
 import io.openim.android.ouiconversation.ui.PreviewActivity;
 import io.openim.android.ouiconversation.widget.SendStateView;
-import io.openim.android.ouicore.utils.EmojiUtil;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouiconversation.widget.InputExpandFragment;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.entity.AtUsersInfo;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
-import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.voice.SPlayer;
@@ -225,8 +212,10 @@ public class MessageViewHolder {
                 notice.setVisibility(View.GONE);
 
             if (null != avatarImage) {
+                AtomicBoolean isLongClick = new AtomicBoolean(false);
                 avatarImage.setOnLongClickListener(v -> {
                     if (chatVM.isSingleChat) return false;
+                    isLongClick.set(true);
                     List<Message> atMessages = chatVM.atMessages.getValue();
                     for (Message atMessage : atMessages) {
                         if (atMessage.getSendID().equals(message.getSendID())) return false;
@@ -236,6 +225,10 @@ public class MessageViewHolder {
                     return false;
                 });
                 avatarImage.setOnClickListener(v -> {
+                    if (isLongClick.get()) {
+                        isLongClick.set(false);
+                        return;
+                    }
                     ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
                         .withString(Constant.K_ID, message.getSendID())
                         .navigation();
@@ -265,9 +258,7 @@ public class MessageViewHolder {
 
             int viewType = message.getContentType();
             if (isOwn && !chatVM.isSingleChat
-                && viewType < Constant.MsgType.NOTICE
-                && viewType != Constant.MsgType.REVOKE
-                && viewType != Constant.MsgType.ADVANCED_REVOKE) {
+                && viewType < Constant.MsgType.NOTICE) {
                 int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;
                 if (unreadCount > 0) {
                     unRead.setVisibility(View.VISIBLE);
