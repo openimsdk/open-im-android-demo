@@ -32,6 +32,7 @@ import io.openim.android.ouigroup.databinding.ActivityInitiateGroupBinding;
 import io.openim.android.ouicore.vm.GroupVM;
 
 import io.openim.android.sdk.models.FriendInfo;
+import io.openim.android.sdk.models.GroupMembersInfo;
 
 /**
  * 发起群聊/邀请入群/移除群聊/选择群成员
@@ -245,6 +246,16 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
             vm.exUserInfo.observe(this, v -> {
                 if (null == v || v.isEmpty()) return;
                 List<ExUserInfo> exUserInfos = new ArrayList<>(v);
+                exUserInfos.remove(0);//群主
+                for (ExUserInfo exUserInfo : exUserInfos) {
+                    ExGroupMemberInfo exGroupMemberInfo = new ExGroupMemberInfo();
+                    exGroupMemberInfo.groupMembersInfo = new GroupMembersInfo();
+                    exGroupMemberInfo.groupMembersInfo.setUserID(exUserInfo.userInfo.getFriendInfo().getUserID());
+                    if (vm.exGroupMembers.getValue().contains(exGroupMemberInfo)) {
+                        exUserInfo.isEnabled = false;
+                        exUserInfo.isSelect = true;
+                    }
+                }
                 adapter.setItems(exUserInfos);
             });
         }

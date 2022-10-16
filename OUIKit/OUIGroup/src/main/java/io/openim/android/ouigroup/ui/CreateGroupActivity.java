@@ -41,13 +41,13 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
     }
 
     private void initView() {
-        FriendInfo friendInfo=new FriendInfo();
-        LoginCertificate loginCertificate=LoginCertificate.getCache(this);
+        FriendInfo friendInfo = new FriendInfo();
+        LoginCertificate loginCertificate = LoginCertificate.getCache(this);
         friendInfo.setUserID(loginCertificate.userID);
         friendInfo.setNickname(loginCertificate.nickname);
-        vm.selectedFriendInfo.getValue().add(0,friendInfo);
+        vm.selectedFriendInfo.getValue().add(0, friendInfo);
 
-        view.selectNum.setText(vm.selectedFriendInfo.getValue().size()+1 + "人");
+        view.selectNum.setText(vm.selectedFriendInfo.getValue().size() + "人");
         view.recyclerview.setLayoutManager(new GridLayoutManager(this, 5));
         RecyclerViewAdapter adapter = new RecyclerViewAdapter<FriendInfo, ImageTxtViewHolder>(ImageTxtViewHolder.class) {
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.Observer;
 
 import java.util.List;
 
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.utils.Common;
@@ -200,18 +201,21 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
 
     @Override
     public void onFriendApplicationAccepted(FriendApplicationInfo u) {
-
+        friendDotNum.setValue(friendDotNum.getValue() + 1);
+        cacheFriendDot();
     }
 
     @Override
     public void onFriendApplicationAdded(FriendApplicationInfo u) {
+        if (u.getFromUserID().equals(BaseApp.inst().loginCertificate.userID)) return;
         friendDotNum.setValue(friendDotNum.getValue() + 1);
         cacheFriendDot();
     }
 
     @Override
     public void onFriendApplicationDeleted(FriendApplicationInfo u) {
-
+        friendDotNum.setValue(friendDotNum.getValue() + 1);
+        cacheFriendDot();
     }
 
     @Override

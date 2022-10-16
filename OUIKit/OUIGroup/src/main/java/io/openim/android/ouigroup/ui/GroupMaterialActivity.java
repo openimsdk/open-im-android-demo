@@ -195,7 +195,13 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     layoutParams.width = Common.dp2px(36);
                     layoutParams.height = Common.dp2px(36);
                     layoutParams.topMargin = Common.dp2px(3);
-                    holder.view.img.load(data.getRoleLevel());
+                    int reId;
+                    holder.view.img.load(reId = data.getRoleLevel());
+                    holder.view.getRoot().setOnClickListener(v -> {
+                        startActivity(new Intent(GroupMaterialActivity.this, InitiateGroupActivity.class)
+                            .putExtra(reId == R.mipmap.ic_group_add ? InitiateGroupActivity.IS_INVITE_TO_GROUP
+                                : InitiateGroupActivity.IS_REMOVE_GROUP, true));
+                    });
                 } else {
                     layoutParams.topMargin = 0;
                     layoutParams.width = Common.dp2px(42);
@@ -203,7 +209,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     holder.view.img.load(data.getFaceURL());
                 }
                 holder.view.txt.setVisibility(View.GONE);
-                holder.view.getRoot().setOnClickListener(v -> gotoMemberList(false));
+
             }
 
         };
@@ -230,7 +236,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             }
 
             adapter.setItems(groupMembersInfos1);
-
         });
 
         iConversationBridge.setNotDisturbStatusListener(this, data -> {

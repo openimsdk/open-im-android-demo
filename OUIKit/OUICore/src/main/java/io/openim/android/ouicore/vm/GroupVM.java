@@ -23,7 +23,9 @@ import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.Common;
 
 
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.ouicore.widget.CommonDialog;
@@ -136,6 +138,13 @@ public class GroupVM extends SocialityVM {
 
             @Override
             public void onSuccess(String data) {
+                if (!TextUtils.isEmpty(groupName)) {
+                    Obs.newMessage(Constant.Event.SET_GROUP_NAME,
+                        groupName);
+                }
+                if (!TextUtils.isEmpty(notification)) {
+                    Obs.newMessage(Constant.Event.SET_GROUP_NOTIFICATION);
+                }
                 IView.onSuccess(data);
                 getGroupsInfo();
             }
@@ -160,6 +169,7 @@ public class GroupVM extends SocialityVM {
             public void onSuccess(String data) {
                 IView.onSuccess(data);
                 getGroupsInfo();
+
             }
         }, gid, uid, groupNickname);
     }

@@ -7,6 +7,7 @@ import static io.openim.android.ouicore.utils.Common.md5;
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.text.TextUtils;
+import android.view.View;
 
 import androidx.annotation.RequiresApi;
 import androidx.databinding.ObservableBoolean;
@@ -15,12 +16,14 @@ import androidx.lifecycle.Observer;
 
 
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.bumptech.glide.Glide;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Observable;
 
 
 import io.openim.android.ouiconversation.R;
@@ -47,7 +50,9 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.FixSizeLinkedList;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
@@ -105,6 +110,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     public Message loading, forwardMsg;
     private int lastMinSeq = 0;
+
 
     public void init() {
         loading = new Message();
@@ -199,7 +205,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private void getConversationInfo() {
         if (isSingleChat) {
-            getOneConversation();
+            getOneConversation(null);
         } else {
             List<String> groupIds = new ArrayList<>();
             groupIds.add(groupID);
@@ -215,13 +221,13 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     GroupInfo groupInfo = data.get(0);
                     isSuperGroup =
                         groupInfo.getGroupType() == 2;
-                    getOneConversation();
+                    getOneConversation(null);
                 }
             }, groupIds);
         }
     }
 
-    private void getOneConversation() {
+    public void getOneConversation(IMUtil.OnSuccessListener<ConversationInfo> onSuccessListener) {
         OpenIMClient.getInstance().conversationManager.getOneConversation(new OnBase<ConversationInfo>() {
             @Override
             public void onError(int code, String error) {
@@ -230,6 +236,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
             @Override
             public void onSuccess(ConversationInfo data) {
+                if (null != onSuccessListener) {
+                    onSuccessListener.onSuccess(data);
+                    return;
+                }
                 conversationInfo.setValue(data);
                 loadHistory();
                 getConversationRecvMessageOpt(data.getConversationID());
@@ -424,6 +434,12 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         ids.add(msg.getClientMsgID());
         if (!viewPause)
             markReaded(ids);
+
+        if (msg.getContentType() == Constant.MsgType.BULLETIN) {
+            notificationMsg.setValue(GsonHel.fromJson(msg.getNotificationElem().getDetail()
+                , NotificationMsg.class));
+        }
+
     }
 
     @Override
@@ -482,17 +498,24 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     public void sendMsg(Message msg) {
         msg.setStatus(Constant.Send_State.SENDING);
-        messages.getValue().add(0, IMUtil.buildExpandInfo(msg));
-        messageAdapter.notifyItemInserted(0);
-        IView.scrollToPosition(0);
-
+        if (messages.getValue().contains(msg)) {
+            messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
+        } else {
+            messages.getValue().add(0, IMUtil.buildExpandInfo(msg));
+            messageAdapter.notifyItemInserted(0);
+            IView.scrollToPosition(0);
+        }
         OfflinePushInfo offlinePushInfo = new OfflinePushInfo();  // 离线推送的消息备注；不为null
         OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + code);
-                msg.setStatus(Constant.Send_State.SEND_FAILED);
-                messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
+                if (code != 302)
+                    IView.toast(error + code);
+                UIHandler.postDelayed(() -> {
+                    msg.setStatus(Constant.Send_State.SEND_FAILED);
+                    messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
+                }, 500);
+
             }
 
             @Override

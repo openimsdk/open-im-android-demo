@@ -50,6 +50,10 @@ public class Constant {
         public static final int USER_INFO_UPDATA = 10004;
         //设置背景
         public static final int SET_BACKGROUND = 10005;
+        //设置群名字
+        public static final int SET_GROUP_NAME = 10006;
+        //设置群通知
+        public static final int SET_GROUP_NOTIFICATION = 10007;
     }
 
     //会话类型

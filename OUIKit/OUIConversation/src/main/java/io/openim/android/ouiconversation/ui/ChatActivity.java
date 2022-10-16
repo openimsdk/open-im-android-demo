@@ -37,6 +37,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
@@ -45,6 +46,7 @@ import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
+import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
 
@@ -225,6 +227,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     };
 
     private void listener() {
+        Obs.inst().addObserver(this);
         view.call.setOnClickListener(v -> {
             if (null == callingService) return;
             IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
@@ -378,20 +381,30 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     @Override
     public void update(Observable observable, Object o) {
-        Obs.Message message = (Obs.Message) o;
-        if (message.tag == Constant.Event.SET_BACKGROUND) {
-            String path = "";
-            if (null != message.object) {
-                path = (String) message.object;
-            } else {
-                path = SharedPreferencesUtil.get(this).getString(
-                    Constant.K_SET_BACKGROUND + (vm.isSingleChat ? vm.otherSideID : vm.groupID));
+        try {
+            Obs.Message message = (Obs.Message) o;
+            if (message.tag == Constant.Event.SET_BACKGROUND) {
+                String path = "";
+                if (null != message.object) {
+                    path = (String) message.object;
+                } else {
+                    path = SharedPreferencesUtil.get(this).getString(
+                        Constant.K_SET_BACKGROUND + (vm.isSingleChat ? vm.otherSideID : vm.groupID));
+                }
+                if (path.isEmpty())
+                    view.chatBg.setVisibility(View.GONE);
+                else
+                    Glide.with(this).load(path).into(view.chatBg);
             }
-            if (path.isEmpty())
-                view.chatBg.setVisibility(View.GONE);
-            else
-                Glide.with(this).load(path).into(view.chatBg);
+            if (message.tag == Constant.Event.SET_GROUP_NAME) {
+                vm.conversationInfo.getValue()
+                    .setShowName((String) message.object);
+                vm.conversationInfo.setValue(vm.conversationInfo.getValue());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     public static class LinearLayoutMg extends androidx.recyclerview.widget.LinearLayoutManager {

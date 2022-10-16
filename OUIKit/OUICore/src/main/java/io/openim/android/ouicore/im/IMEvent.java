@@ -368,6 +368,9 @@ public class IMEvent {
             @Override
             public void onFriendApplicationAccepted(FriendApplicationInfo u) {
                 // 发出或收到的好友申请已同意
+                for (OnFriendshipListener friendshipListener : friendshipListeners) {
+                    friendshipListener.onFriendApplicationAccepted(u);
+                }
             }
 
             @Override
@@ -381,13 +384,18 @@ public class IMEvent {
             @Override
             public void onFriendApplicationDeleted(FriendApplicationInfo u) {
                 // 发出或收到的好友申请被删除
+                for (OnFriendshipListener friendshipListener : friendshipListeners) {
+                    friendshipListener.onFriendApplicationDeleted(u);
+                }
             }
 
             @Override
             public void onFriendApplicationRejected(FriendApplicationInfo u) {
                 // 发出或收到的好友申请被拒绝
+                for (OnFriendshipListener friendshipListener : friendshipListeners) {
+                    friendshipListener.onFriendApplicationRejected(u);
+                }
             }
-
 
             @Override
             public void onFriendInfoChanged(FriendInfo u) {

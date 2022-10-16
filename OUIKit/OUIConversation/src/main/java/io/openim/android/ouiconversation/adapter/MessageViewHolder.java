@@ -59,6 +59,7 @@ import io.openim.android.ouiconversation.widget.InputExpandFragment;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.MsgExpand;
+import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
@@ -250,7 +251,6 @@ public class MessageViewHolder {
             if (isOwn) {
                 SendStateView sendStateView = itemView.findViewById(R.id.sendState2);
                 sendStateView.setOnClickListener(v -> {
-                    chatVM.messages.getValue().remove(message);
                     chatVM.sendMsg(message);
                 });
             }
@@ -275,8 +275,6 @@ public class MessageViewHolder {
             } else {
                 unRead.setVisibility(View.GONE);
             }
-
-
         }
 
         /***
@@ -343,7 +341,7 @@ public class MessageViewHolder {
 
                 LayoutMsgExMenuBinding.bind(popupWindow.getContentView())
                     .recyclerview.setLayoutManager(new GridLayoutManager(view.getContext(),
-                    menuIcons.size() < 4 ? menuIcons.size() : 4));
+                        menuIcons.size() < 4 ? menuIcons.size() : 4));
                 adapter.setItems(menuIcons);
 
                 int yDelay = Common.dp2px(5);
