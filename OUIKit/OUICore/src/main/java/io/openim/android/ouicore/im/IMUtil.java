@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
@@ -284,6 +285,7 @@ public class IMUtil {
 
     private static void handleEmoji(MsgExpand expand, Message msg) {
         String content = msg.getContent();
+        if (TextUtils.isEmpty(content))return;
         for (String key : EmojiUtil.emojiFaces.keySet()) {
             int fromIndex = 0;
             if (content.contains(key)) {

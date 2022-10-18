@@ -59,7 +59,7 @@ public class ShareQrcodeActivity extends BaseActivity<GroupVM, ActivityGroupQrCo
         view.tips.setText(tips);
         if (isQrcode) {
             view.avatar.load(vm.groupsInfo.getValue().getFaceURL());
-            qrCodeBitmap = CodeCreator.createQRCode(shareContent, 400, 400, null);
+            qrCodeBitmap = CodeCreator.createQRCode(shareContent, 500, 500, null);
             view.qrCode.setImageBitmap(qrCodeBitmap);
         } else {
             view.qrCodeRl.setVisibility(View.GONE);

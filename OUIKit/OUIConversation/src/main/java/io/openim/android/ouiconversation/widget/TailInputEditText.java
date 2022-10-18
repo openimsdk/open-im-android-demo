@@ -60,41 +60,47 @@ public class TailInputEditText extends AppCompatEditText {
          */
         @Override
         public boolean deleteSurroundingText(int beforeLength, int afterLength) {
-            //监听删除操作，找到最靠近删除的一个Span，然后整体删除
-            final int selectionStart = Selection.getSelectionStart(TailInputEditText.this.getText());
-            final int selectionEnd = Selection.getSelectionEnd(TailInputEditText.this.getText());
-
-            final CharacterStyle characterStyles[] = TailInputEditText.this.getText().getSpans(selectionStart, selectionEnd, CharacterStyle.class);
-            for (CharacterStyle characterStyle : characterStyles) {
-                if (characterStyle == null) {
-                    continue;
-                }
-                if (TailInputEditText.this.getText().getSpanEnd(characterStyle) == selectionStart) {
-                    int spanStart = TailInputEditText.this.getText().getSpanStart(characterStyle);
-                    int spanEnd = TailInputEditText.this.getText().getSpanEnd(characterStyle);
-                    spanStart += 1;
-                    TailInputEditText.this.getText().delete(spanStart, spanEnd);
-                }
-                if (characterStyle instanceof ForegroundColorSpan) {
-                    //表示@消息
-                    List<Message> atMessages = chatVM.atMessages.getValue();
-                    Iterator iterator = atMessages.iterator();
-                    while (iterator.hasNext()) {
-                        Message message = (Message) iterator.next();
-                        try {
-                            MsgExpand msgExpand = (MsgExpand) message.getExt();
-                            if (msgExpand.spanHashCode == characterStyle.hashCode()) {
-                                iterator.remove();
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
+            spansDelete(TailInputEditText.this,chatVM);
             return super.deleteSurroundingText(beforeLength, afterLength);
         }
 
+    }
+
+    /**
+     *  监听删除操作，找到最靠近删除的一个Span，然后整体删除
+     */
+    public static  void spansDelete(TailInputEditText tailInputEditText,ChatVM chatVM) {
+        final int selectionStart = Selection.getSelectionStart(tailInputEditText.getText());
+        final int selectionEnd = Selection.getSelectionEnd(tailInputEditText.getText());
+
+        final CharacterStyle characterStyles[] = tailInputEditText.getText().getSpans(selectionStart, selectionEnd, CharacterStyle.class);
+        for (CharacterStyle characterStyle : characterStyles) {
+            if (characterStyle == null) {
+                continue;
+            }
+            if (tailInputEditText.getText().getSpanEnd(characterStyle) == selectionStart) {
+                int spanStart = tailInputEditText.getText().getSpanStart(characterStyle);
+                int spanEnd = tailInputEditText.getText().getSpanEnd(characterStyle);
+                spanStart += 1;
+                tailInputEditText.getText().delete(spanStart, spanEnd);
+            }
+            if (characterStyle instanceof ForegroundColorSpan) {
+                //表示@消息
+                List<Message> atMessages = chatVM.atMessages.getValue();
+                Iterator iterator = atMessages.iterator();
+                while (iterator.hasNext()) {
+                    Message message = (Message) iterator.next();
+                    try {
+                        MsgExpand msgExpand = (MsgExpand) message.getExt();
+                        if (msgExpand.spanHashCode == characterStyle.hashCode()) {
+                            iterator.remove();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
 }

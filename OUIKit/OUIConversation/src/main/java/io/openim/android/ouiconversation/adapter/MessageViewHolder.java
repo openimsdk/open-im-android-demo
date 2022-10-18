@@ -915,7 +915,7 @@ public class MessageViewHolder {
         void jump(View view, String uid) {
             view.setOnClickListener(v -> ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
                 .withString(Constant.K_ID, uid)
-                .withBoolean(Constant.K_RESULT, true).navigation(view.getContext()));
+                .navigation(view.getContext()));
         }
 
         @Override

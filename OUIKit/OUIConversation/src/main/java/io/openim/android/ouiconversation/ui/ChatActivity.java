@@ -111,17 +111,22 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        getWindow().getDecorView().getViewTreeObserver()
-            .removeOnGlobalLayoutListener(mGlobalLayoutListener);
+        release();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        release();
+    }
+
+    private void release() {
         if (isFinishing()) {
             if (!vm.fromChatHistory)
                 removeCacheVM();
             Obs.inst().deleteObserver(this);
+            getWindow().getDecorView().getViewTreeObserver()
+                .removeOnGlobalLayoutListener(mGlobalLayoutListener);
         }
     }
 
@@ -369,6 +374,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             else
                 forwardMsg = vm.forwardMsg;
             vm.aloneSendMsg(forwardMsg, id, groupId);
+            vm.clearSelectMsg();
         }
         if (requestCode == Constant.Event.CALLING_REQUEST_CODE && null != data) {
             //发起群通话

@@ -40,24 +40,6 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     public  String verificationCode;
 
     public void login() {
-//        BaseApp.inst().loginCertificate=new LoginCertificate();
-//        BaseApp.inst().loginCertificate.userID="lt_40";
-//        BaseApp.inst().loginCertificate.token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVSUQiOiJsdF80MCIsIlBsYXRmb3JtIjoiQW5kcm9pZCIsImV4cCI6MTY2Mjk2NzI1NSwibmJmIjoxNjYyMzYyNDU1LCJpYXQiOjE2NjIzNjI0NTV9.qweEUM8WYjBhVDLWEbj2ixc66DZbrcxlNOQQx_BEB4o";
-//        OpenIMClient.getInstance().login(new OnBase<String>() {
-//            @Override
-//            public void onError(int code, String error) {
-//                IView.err(error);
-//            }
-//
-//            @Override
-//            public void onSuccess(String data) {
-//                BaseApp.inst().loginCertificate.cache(getContext());
-//                //缓存登录信息
-//                IView.jump();
-//            }
-//        }, BaseApp.inst().loginCertificate.userID, BaseApp.inst().loginCertificate.token);
-
-
         Parameter parameter = getParameter(null);
         N.API(OpenIMService.class).login(parameter.buildJsonBody())
             .compose(N.IOMain())

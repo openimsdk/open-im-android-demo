@@ -209,7 +209,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
             viewHolder.viewBinding.lastMsg.setText(lastMsg);
             if (msgConversation.conversationInfo.getRecvMsgOpt() != 0) {
-                viewHolder.viewBinding.noDisturbTips.setVisibility(View.VISIBLE);
+                if (msgConversation.conversationInfo.getUnreadCount() > 0)
+                    viewHolder.viewBinding.noDisturbTips.setVisibility(View.VISIBLE);
                 viewHolder.viewBinding.noDisturbIc.setVisibility(View.VISIBLE);
                 viewHolder.viewBinding.badge.badge.setVisibility(View.GONE);
             } else {

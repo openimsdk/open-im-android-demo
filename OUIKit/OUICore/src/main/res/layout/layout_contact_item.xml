@@ -94,6 +94,7 @@
                 android:id="@+id/noDisturbIc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:src="@mipmap/ic_not_msg" />
 
         </LinearLayout>

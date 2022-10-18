@@ -55,14 +55,26 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, Acti
 
                 holder.viewBinding.lastMsg.setText(IMUtil.getMsgParse(data));
 
-                if (data.getContentType() == Constant.MsgType.MERGE) {
-                    holder.viewBinding.getRoot().setOnClickListener(v -> {
+                holder.viewBinding.getRoot().setOnClickListener(v -> {
+                    if (data.getContentType() == Constant.MsgType.MERGE) {
                         startActivity(new Intent(ChatHistoryDetailsActivity.this,
                             ChatHistoryDetailsActivity.class).putExtra(Constant.K_RESULT,
                             GsonHel.toJson(data.getMergeElem().getMultiMessage())));
-                    });
-                }
-
+                    } else if (
+                        data.getContentType() == Constant.MsgType.PICTURE) {
+                        String url = data.getPictureElem().getSourcePicture().getUrl();
+                        startActivity(
+                            new Intent(v.getContext(),
+                                PreviewActivity.class).putExtra(PreviewActivity.MEDIA_URL, url));
+                    } else if (data.getContentType() == Constant.MsgType.VIDEO) {
+                        String snapshotUrl = data.getVideoElem().getSnapshotUrl();
+                        String url = data.getVideoElem().getVideoUrl();
+                        v.getContext().startActivity(
+                            new Intent(v.getContext(), PreviewActivity.class)
+                                .putExtra(PreviewActivity.MEDIA_URL, url)
+                                .putExtra(PreviewActivity.FIRST_FRAME, snapshotUrl));
+                    }
+                });
             }
         });
     }

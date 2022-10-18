@@ -13,7 +13,9 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LifecycleOwner;
@@ -140,7 +142,12 @@ public class BottomInputCote {
             if (hasFocus)
                 setExpandHide();
         });
-
+        view.chatInput.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                return false;
+            }
+        });
         view.chatMore.setOnClickListener(v -> {
             clearFocus();
             Common.hideKeyboard(BaseApp.inst(), v);
@@ -200,13 +207,21 @@ public class BottomInputCote {
             SpannableStringBuilder spannableString = new SpannableStringBuilder(emojiKey);
             int emojiId = Common.getMipmapId(EmojiUtil.emojiFaces.get(emojiKey));
             Drawable drawable = BaseApp.inst().getResources().getDrawable(emojiId);
-            drawable.setBounds(0, 0, Common.dp2px(22),  Common.dp2px(22));
+            drawable.setBounds(0, 0, Common.dp2px(22), Common.dp2px(22));
             ImageSpan imageSpan = new ImageSpan(drawable);
             spannableString.setSpan(imageSpan, 0, emojiKey.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             view.chatInput.append(spannableString);
         });
 
+        view.chatInput.setOnKeyListener((v, keyCode, event) -> {
+            //监听删除操作，找到最靠近删除的一个Span，然后整体删除
+            if (keyCode == KeyEvent.KEYCODE_DEL
+                && event.getAction() == KeyEvent.ACTION_DOWN) {
+                TailInputEditText.spansDelete((TailInputEditText) v, vm);
+            }
+            return false;
+        });
     }
 
     //设置扩展菜单隐藏

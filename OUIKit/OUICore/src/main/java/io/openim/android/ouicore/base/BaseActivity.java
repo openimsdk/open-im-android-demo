@@ -98,6 +98,13 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (null != vm) {
+            vm.viewDestroy();
+        }
+    }
 
     public void toBack(View view) {
         finish();

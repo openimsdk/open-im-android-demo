@@ -200,6 +200,20 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         return "";
     }
 
+    /**
+     * 清空选择的msg
+     */
+    public void clearSelectMsg() {
+        forwardMsg = null;
+        for (Message message : messageAdapter.getMessages()) {
+            MsgExpand msgExpand = (MsgExpand) message.getExt();
+            if (null != msgExpand) {
+                msgExpand.isChoice = false;
+                message.setExt(msgExpand);
+            }
+        }
+    }
+
     public interface UserOnlineStatusListener {
         void onResult(OnlineStatus onlineStatus);
     }
@@ -493,12 +507,17 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onRecvMessageRevokedV2(RevokedInfo info) {
-        for (Message message : messages.getValue()) {
-            if (message.getClientMsgID().equals(info.getClientMsgID())) {
-                message.setContentType(Constant.MsgType.ADVANCED_REVOKE);
-                messageAdapter.notifyItemChanged(messages.getValue().indexOf(message));
+        try {
+            for (Message message : messages.getValue()) {
+                if (message.getClientMsgID().equals(info.getClientMsgID())) {
+                    message.setContentType(Constant.MsgType.ADVANCED_REVOKE);
+                    messageAdapter.notifyItemChanged(messages.getValue().indexOf(message));
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
 
@@ -709,13 +728,13 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
                      @Override
                      public void onSuccess(SearchResult data) {
-                         for (Message message : data.getSearchResultItems().get(0).getMessageList()) {
-                             IMUtil.buildExpandInfo(message);
-                         }
                          if (page == 1) {
                              searchMessageItems.getValue().clear();
                          }
                          if (data.getTotalCount() != 0) {
+                             for (Message message : data.getSearchResultItems().get(0).getMessageList()) {
+                                 IMUtil.buildExpandInfo(message);
+                             }
                              searchMessageItems.getValue().addAll(data.getSearchResultItems().get(0).getMessageList());
                              addSearchMessageItems.setValue(data.getSearchResultItems().get(0).getMessageList());
                          }
