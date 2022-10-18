@@ -51,6 +51,7 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgMergeLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgMergeRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
+import io.openim.android.ouiconversation.ui.ChatHistoryDetailsActivity;
 import io.openim.android.ouiconversation.ui.MsgReadStatusActivity;
 import io.openim.android.ouiconversation.ui.PreviewActivity;
 import io.openim.android.ouiconversation.widget.SendStateView;
@@ -343,7 +344,7 @@ public class MessageViewHolder {
 
                 LayoutMsgExMenuBinding.bind(popupWindow.getContentView())
                     .recyclerview.setLayoutManager(new GridLayoutManager(view.getContext(),
-                        menuIcons.size() < 4 ? menuIcons.size() : 4));
+                    menuIcons.size() < 4 ? menuIcons.size() : 4));
                 adapter.setItems(menuIcons);
 
                 int yDelay = Common.dp2px(5);
@@ -847,7 +848,7 @@ public class MessageViewHolder {
                 e.printStackTrace();
             }
             showMsgExMenu(view.contentLy);
-            view.contentLy.setOnClickListener(clickJumpDetail);
+            view.contentLy.setOnClickListener(new ClickJumpDetail(mergeElem));
         }
 
         @Override
@@ -863,12 +864,23 @@ public class MessageViewHolder {
                 e.printStackTrace();
             }
             showMsgExMenu(view.contentLy2);
-            view.contentLy2.setOnClickListener(clickJumpDetail);
+            view.contentLy2.setOnClickListener(new ClickJumpDetail(mergeElem));
         }
 
-        private View.OnClickListener clickJumpDetail = v -> {
-//            v.getContext().startActivity(new Intent(v.getContext(), ChatHistoryDetailsActivity.class));
-        };
+        private static class ClickJumpDetail implements View.OnClickListener {
+            MergeElem mergeElem;
+
+            public ClickJumpDetail(MergeElem mergeElem) {
+                this.mergeElem = mergeElem;
+            }
+
+            @Override
+            public void onClick(View v) {
+                v.getContext().startActivity(new Intent(v.getContext(), ChatHistoryDetailsActivity.class)
+                    .putExtra(Constant.K_RESULT, GsonHel.toJson(mergeElem.getMultiMessage())));
+            }
+        }
+
     }
 
 

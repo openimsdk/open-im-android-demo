@@ -27,6 +27,10 @@ public class GsonHel {
         mGson = new GsonBuilder().serializeNulls().create();
     }
 
+    public static Gson getGson() {
+        return mGson;
+    }
+
     public static String toJson(Object object) {
         get();
         return mGson.toJson(object);
@@ -69,12 +73,12 @@ public class GsonHel {
     }
 
 
-    private static class ParameterizedTypeImpl implements ParameterizedType {
+    public static class ParameterizedTypeImpl implements ParameterizedType {
 
         private final Class raw;
         private final Type[] args;
 
-        ParameterizedTypeImpl(Class raw, Type[] args) {
+        public ParameterizedTypeImpl(Class raw, Type[] args) {
             this.raw = raw;
             this.args = args != null ? args : new Type[0];
         }
