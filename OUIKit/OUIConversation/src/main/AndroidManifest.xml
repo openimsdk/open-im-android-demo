@@ -13,10 +13,13 @@
 
     <application android:theme="@style/Theme.Demo">
         <activity
+            android:name=".ui.ChatHistoryDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.MsgReadStatusActivity"
             android:exported="false" />
         <activity
-            android:name="io.openim.android.ouiconversation.ui.SearchActivity"
+            android:name=".ui.SearchActivity"
             android:exported="false" />
         <activity
             android:name=".ui.FileHistoryActivity"
