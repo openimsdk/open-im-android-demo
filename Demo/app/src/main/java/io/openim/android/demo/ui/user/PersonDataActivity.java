@@ -91,7 +91,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
                     break;
                 }
             }
-            view.slideButton.setChecked(isCon);
+            view.slideButton.setCheckedWithAnimation(isCon);
         });
         view.joinBlackList.setOnClickListener(v -> {
             if (view.slideButton.isChecked())

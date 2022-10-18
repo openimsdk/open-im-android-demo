@@ -483,10 +483,10 @@ public class IMUtil {
         //Android 8.0 以上需包添加渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID,
-                CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
+                CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
             manager.createNotificationChannel(notificationChannel);
         }
-        manager.notify(1001, notification);
+        manager.notify((int) msg.getSendTime(), notification);
     }
 
     /**

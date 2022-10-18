@@ -76,7 +76,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
     private void initView() {
         vm.notDisturbStatus.observe(this, integer -> {
-            view.noDisturb.setChecked(integer == 2);
+            view.noDisturb.post(() -> view.noDisturb.setCheckedWithAnimation(integer == 2));
         });
         vm.conversationInfo.observe(this, conversationInfo -> {
             view.topSlideButton.post(() -> view.topSlideButton.setCheckedWithAnimation(conversationInfo.isPinned()));
