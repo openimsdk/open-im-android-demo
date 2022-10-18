@@ -1,6 +1,8 @@
 package io.openim.android.ouicore.base;
 
+import android.app.Activity;
 import android.app.Application;
+import android.os.Bundle;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ public class BaseApp extends Application {
 
     private static BaseApp instance;
     public Realm realm;
+    private int mActivityCount;
 
     public static BaseApp inst() {
         return instance;
@@ -60,5 +63,46 @@ public class BaseApp extends Application {
         super.onCreate();
         instance = this;
         realmInit();
+        activityLifecycleCallback();
     }
+
+    private void activityLifecycleCallback() {
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+            }
+
+            @Override
+            public void onActivityStarted(Activity activity) {
+                mActivityCount++;
+            }
+
+            @Override
+            public void onActivityResumed(Activity activity) {
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity) {
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity) {
+                mActivityCount--;
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity) {
+            }
+        });
+    }
+
+    public boolean isBackground() {
+        return mActivityCount == 0;
+    }
+
+
 }

@@ -283,6 +283,8 @@ public class MessageViewHolder {
          */
         protected void showMsgExMenu(View view) {
             view.setOnLongClickListener(v -> {
+                if (null != chatVM.enableMultipleSelect.getValue()
+                    && chatVM.enableMultipleSelect.getValue()) return true;
                 List<Integer> menuIcons = new ArrayList<>();
                 List<String> menuTitles = new ArrayList<>();
 

@@ -11,6 +11,8 @@ import java.util.List;
 
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
@@ -210,7 +212,7 @@ public class IMEvent {
             // 当前用户被踢下线，此时可以 UI 提示用户“您已经在其他端登录了当前账号，是否重新登录？”
             L.d("当前用户被踢下线");
             Toast.makeText(BaseApp.inst(), BaseApp.inst().getString(
-                io.openim.android.ouicore.R.string.kicked_offline_tips),
+                    io.openim.android.ouicore.R.string.kicked_offline_tips),
                 Toast.LENGTH_SHORT).show();
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onKickedOffline();
@@ -222,7 +224,7 @@ public class IMEvent {
             // 登录票据已经过期，请使用新签发的 UserSig 进行登录。
             L.d("登录票据已经过期");
             Toast.makeText(BaseApp.inst(), BaseApp.inst().getString(
-                io.openim.android.ouicore.R.string.token_expired),
+                    io.openim.android.ouicore.R.string.token_expired),
                 Toast.LENGTH_SHORT).show();
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onUserTokenExpired();
@@ -419,6 +421,10 @@ public class IMEvent {
         OpenIMClient.getInstance().messageManager.setAdvancedMsgListener(new OnAdvanceMsgListener() {
             @Override
             public void onRecvNewMessage(Message msg) {
+                if (msg.getContentType() != Constant.MsgType.TYPING
+                    && BaseApp.inst().isBackground()) {
+                    IMUtil.sendNotice(msg);
+                }
                 // 收到新消息，界面添加新消息
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
                     onAdvanceMsgListener.onRecvNewMessage(msg);
@@ -443,7 +449,10 @@ public class IMEvent {
 
             @Override
             public void onRecvMessageRevokedV2(RevokedInfo info) {
-
+                // 消息成功撤回，从界面移除消息
+                for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
+                    onAdvanceMsgListener.onRecvMessageRevokedV2(info);
+                }
             }
 
             @Override

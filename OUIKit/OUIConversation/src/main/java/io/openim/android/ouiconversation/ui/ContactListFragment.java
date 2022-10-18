@@ -155,7 +155,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
     private View createHeaderView() {
         View header = getLayoutInflater().inflate(R.layout.view_search, view.recyclerView, false);
-        header.setOnClickListener(v -> startActivity(new Intent(getActivity(),SearchActivity.class)));
+        header.setOnClickListener(v -> startActivity(new Intent(getActivity(), SearchActivity.class)));
         return header;
     }
 
@@ -208,8 +208,18 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                     + msgConversation.notificationMsg.group.notification;
 
             viewHolder.viewBinding.lastMsg.setText(lastMsg);
-            viewHolder.viewBinding.badge.badge.setVisibility(msgConversation.conversationInfo.getUnreadCount() != 0 ? View.VISIBLE : View.GONE);
-            viewHolder.viewBinding.badge.badge.setText(msgConversation.conversationInfo.getUnreadCount() + "");
+            if (msgConversation.conversationInfo.getRecvMsgOpt() != 0) {
+                viewHolder.viewBinding.noDisturbTips.setVisibility(View.VISIBLE);
+                viewHolder.viewBinding.noDisturbIc.setVisibility(View.VISIBLE);
+                viewHolder.viewBinding.badge.badge.setVisibility(View.GONE);
+            } else {
+                viewHolder.viewBinding.badge.badge.setVisibility(View.VISIBLE);
+                viewHolder.viewBinding.noDisturbTips.setVisibility(View.GONE);
+                viewHolder.viewBinding.noDisturbIc.setVisibility(View.GONE);
+                viewHolder.viewBinding.badge.badge.setVisibility(msgConversation.conversationInfo.getUnreadCount() != 0 ? View.VISIBLE : View.GONE);
+                viewHolder.viewBinding.badge.badge.setText(msgConversation.conversationInfo.getUnreadCount() + "");
+            }
+
             viewHolder.viewBinding.time.setText(TimeUtil.getTimeString(msgConversation.conversationInfo.getLatestMsgSendTime()));
         }
 

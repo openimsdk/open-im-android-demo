@@ -9,11 +9,26 @@
     android:paddingRight="20dp"
     android:paddingBottom="7dp">
 
-    <io.openim.android.ouicore.widget.AvatarImage
-        android:id="@+id/avatar"
-        android:layout_width="@dimen/avatar_size"
-        android:layout_height="@dimen/avatar_size"
-        android:src="@mipmap/ic_my_friend" />
+    <RelativeLayout
+        android:layout_width="49dp"
+
+        android:layout_height="49dp">
+
+        <io.openim.android.ouicore.widget.AvatarImage
+            android:id="@+id/avatar"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:src="@mipmap/ic_my_friend" />
+
+        <View
+            android:id="@+id/noDisturbTips"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/sty_radius_30_red"
+            android:visibility="gone" />
+    </RelativeLayout>
+
 
     <LinearLayout
         android:layout_width="0dp"
@@ -74,6 +89,12 @@
             <include
                 android:id="@+id/badge"
                 layout="@layout/view_badge" />
+
+            <ImageView
+                android:id="@+id/noDisturbIc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_not_msg" />
 
         </LinearLayout>
     </LinearLayout>

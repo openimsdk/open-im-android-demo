@@ -58,6 +58,7 @@ import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 
 import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
@@ -492,7 +493,12 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onRecvMessageRevokedV2(RevokedInfo info) {
-
+        for (Message message : messages.getValue()) {
+            if (message.getClientMsgID().equals(info.getClientMsgID())) {
+                message.setContentType(Constant.MsgType.ADVANCED_REVOKE);
+                messageAdapter.notifyItemChanged(messages.getValue().indexOf(message));
+            }
+        }
     }
 
 
@@ -597,6 +603,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 int index = messageAdapter.getMessages().indexOf(message);
                 messageAdapter.getMessages().remove(index);
                 messageAdapter.notifyItemRemoved(index);
+                enableMultipleSelect.setValue(false);
             }
         }, message);
     }
@@ -702,6 +709,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
                      @Override
                      public void onSuccess(SearchResult data) {
+                         for (Message message : data.getSearchResultItems().get(0).getMessageList()) {
+                             IMUtil.buildExpandInfo(message);
+                         }
                          if (page == 1) {
                              searchMessageItems.getValue().clear();
                          }

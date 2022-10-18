@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
@@ -32,6 +33,8 @@ import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
+import io.openim.android.ouicore.entity.MsgConversation;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
@@ -104,8 +107,9 @@ public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChat
                 holder.viewBinding.nickName.setText(data.getSenderNickname());
                 holder.viewBinding.time.setText(TimeUtil.getTimeString(data.getSendTime()));
 
-                SpannableStringBuilder spannableString = new SpannableStringBuilder(data.getContent());
-                int index = data.getContent().indexOf(inputKey.getValue());
+                String msg = IMUtil.getMsgParse(data);
+                SpannableStringBuilder spannableString = new SpannableStringBuilder(msg);
+                int index = msg.indexOf(inputKey.getValue());
                 if (index != -1) {
                     ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
                     spannableString.setSpan(colorSpan, index, index + inputKey.getValue().length(),

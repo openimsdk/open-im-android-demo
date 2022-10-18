@@ -219,10 +219,14 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
     }
 
     private void gotoSelectFile() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        fileLauncher.launch(intent);
+        Common.permission(getContext(), () -> {
+                hasStorage = true;
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                fileLauncher.launch(intent);
+            }
+            , hasStorage, Permission.Group.STORAGE);
     }
 
     //去拍摄

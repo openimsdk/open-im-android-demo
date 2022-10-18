@@ -258,6 +258,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.mergeForward.setOnClickListener(v -> {
             ARouter.getInstance().build(Routes.Contact.FORWARD)
                 .navigation(this, Constant.Event.FORWARD);
+            Common.UIHandler.postDelayed(() -> vm.enableMultipleSelect.setValue(false), 300);
         });
         vm.enableMultipleSelect.observe(this, o -> {
             if (null == o) return;

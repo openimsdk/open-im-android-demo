@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">OpenIM</string>
     <string name="group_bulletin">群公告</string>
     <string name="search_by_id">通过用户ID号搜索添加</string>
     <string name="send_succ">发送成功</string>
@@ -171,4 +172,6 @@
     <string name="repeat_group_manager">你已经是群主了</string>
     <string name="transfer_permission">确定将群主转让给：%1$s?</string>
     <string name="transfer_succ">转让成功</string>
+    <string name="msg_notification">消息通知</string>
+    <string name="a_message_is_received">您收到一条消息</string>
 </resources>

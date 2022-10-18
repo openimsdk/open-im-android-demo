@@ -1,10 +1,15 @@
 package io.openim.android.ouicore.im;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.method.LinkMovementMethod;
@@ -14,7 +19,10 @@ import android.text.style.ImageSpan;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
@@ -330,39 +338,43 @@ public class IMUtil {
      */
     public static String getMsgParse(Message msg) {
         String lastMsg = "";
-        switch (msg.getContentType()) {
-            default:
-                lastMsg = msg.getNotificationElem().getDefaultTips();
-                break;
-            case Constant.MsgType.TXT:
-                lastMsg = msg.getContent();
-                break;
-            case Constant.MsgType.PICTURE:
-                lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.picture) + "]";
-                break;
-            case Constant.MsgType.VOICE:
-                lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.voice) + "]";
-                break;
-            case Constant.MsgType.VIDEO:
-                lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.video) + "]";
-                break;
-            case Constant.MsgType.FILE:
-                lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.file) + "]";
-                break;
-            case Constant.MsgType.LOCATION:
-                lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.location) + "]";
-                break;
-            case Constant.MsgType.MENTION:
-                MsgExpand msgExpand = (MsgExpand) msg.getExt();
-                String atTxt = msgExpand.atMsgInfo.text;
-                for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
-                    atTxt = atTxt.replace("@" + atUsersInfo.atUserID, "@" + atUsersInfo.groupNickname);
-                }
-                lastMsg = atTxt;
-                break;
-            case Constant.MsgType.MERGE:
-                lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";
-                break;
+        try {
+            switch (msg.getContentType()) {
+                default:
+                    lastMsg = msg.getNotificationElem().getDefaultTips();
+                    break;
+                case Constant.MsgType.TXT:
+                    lastMsg = msg.getContent();
+                    break;
+                case Constant.MsgType.PICTURE:
+                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.picture) + "]";
+                    break;
+                case Constant.MsgType.VOICE:
+                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.voice) + "]";
+                    break;
+                case Constant.MsgType.VIDEO:
+                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.video) + "]";
+                    break;
+                case Constant.MsgType.FILE:
+                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.file) + "]";
+                    break;
+                case Constant.MsgType.LOCATION:
+                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.location) + "]";
+                    break;
+                case Constant.MsgType.MENTION:
+                    MsgExpand msgExpand = (MsgExpand) msg.getExt();
+                    String atTxt = msgExpand.atMsgInfo.text;
+                    for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
+                        atTxt = atTxt.replace("@" + atUsersInfo.atUserID, "@" + atUsersInfo.groupNickname);
+                    }
+                    lastMsg = atTxt;
+                    break;
+                case Constant.MsgType.MERGE:
+                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return lastMsg;
     }
@@ -443,11 +455,46 @@ public class IMUtil {
         from.finish();
     }
 
+    public static void sendNotice(Message msg) {
+        NotificationManager manager = (NotificationManager) BaseApp.inst()
+            .getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Postcard postcard = ARouter.getInstance()
+            .build(Routes.Main.SPLASH);
+        LogisticsCenter.completion(postcard);
+        Intent hangIntent = new Intent(BaseApp.inst(), postcard.getDestination());
+        PendingIntent hangPendingIntent = PendingIntent.getActivity(BaseApp.inst(),
+            1002,
+            hangIntent, PendingIntent.FLAG_MUTABLE);
+
+        String CHANNEL_ID = "msg_notification";
+        String CHANNEL_NAME = BaseApp.inst().getString(R.string.msg_notification);
+        Notification notification = new NotificationCompat.Builder(BaseApp.inst(), CHANNEL_ID)
+            .setContentTitle(BaseApp.inst().getString(R.string.app_name))
+            .setContentText(BaseApp.inst().getString(R.string.a_message_is_received))
+            .setSmallIcon(R.mipmap.ic_logo)
+            .setContentIntent(hangPendingIntent)
+            .setAutoCancel(true)
+            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
+            .build();
+
+        //Android 8.0 以上需包添加渠道
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID,
+                CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
+            manager.createNotificationChannel(notificationChannel);
+        }
+        manager.notify(1001, notification);
+    }
+
     /**
      * 成功监听
+     *
      * @param <T>
      */
     public interface OnSuccessListener<T> {
         void onSuccess(T data);
     }
+
+
 }
