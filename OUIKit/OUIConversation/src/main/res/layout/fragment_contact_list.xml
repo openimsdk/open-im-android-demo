@@ -8,8 +8,8 @@
     tools:context=".ui.ContactListFragment">
 
     <com.yanzhenjie.recyclerview.SwipeRecyclerView
-        android:layout_width="match_parent"
         android:id="@+id/recyclerView"
-      android:overScrollMode="never"
-        android:layout_height="match_parent" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="never" />
 </LinearLayout>

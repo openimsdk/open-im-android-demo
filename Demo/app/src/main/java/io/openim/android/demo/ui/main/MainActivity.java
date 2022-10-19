@@ -240,8 +240,8 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
     @Override
     public void initDate() {
-        conversationListFragment = (BaseFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
         contactFragment = (BaseFragment) ARouter.getInstance().build(Routes.Contact.HOME).navigation();
+        conversationListFragment = (BaseFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
         personalFragment = PersonalFragment.newInstance();
 
         personalFragment.setPage(3);

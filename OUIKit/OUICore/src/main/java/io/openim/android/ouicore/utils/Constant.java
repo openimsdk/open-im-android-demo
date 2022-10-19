@@ -40,8 +40,8 @@ public class Constant {
 
 
     public static class Event {
-        //已读数量变化
-        public static final int READ_CHANGE = 10001;
+        //会话列表初始
+        public static final int CONTACT_LIST_VM_INIT = 10001;
         //转发选人
         public static final int FORWARD = 10002;
         //音视频通话

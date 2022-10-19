@@ -349,7 +349,7 @@ public class IMEvent {
             @Override
             public void onTotalUnreadMessageCountChanged(int i) {
                 // 未读消息数发送变化
-                L.e("");
+
             }
         });
     }

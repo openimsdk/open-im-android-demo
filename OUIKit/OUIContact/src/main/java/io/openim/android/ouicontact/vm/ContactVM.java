@@ -23,6 +23,7 @@ import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
+import io.openim.android.sdk.models.UserInfo;
 
 public class ContactVM extends BaseViewModel implements OnGroupListener, OnFriendshipListener {
     //群红点数量
@@ -37,6 +38,9 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
     public MutableLiveData<GroupApplicationInfo> groupDetail = new MutableLiveData<>();
     //好友申请详情
     public MutableLiveData<FriendApplicationInfo> friendDetail = new MutableLiveData<>();
+    //常联系的好友
+    public MutableLiveData<UserInfo> frequentContacts = new MutableLiveData<>();
+
 
 
     @Override
@@ -48,6 +52,8 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
         int groupNum = SharedPreferencesUtil.get(getContext()).getInteger(Constant.K_GROUP_NUM);
         friendDotNum.setValue(requestNum);
         dotNum.setValue(groupNum);
+
+
     }
 
     @Override

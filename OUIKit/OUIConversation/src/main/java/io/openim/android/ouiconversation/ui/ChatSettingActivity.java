@@ -4,27 +4,20 @@ package io.openim.android.ouiconversation.ui;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.lifecycle.Observer;
-
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.ActivityChatSettingBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
-import io.openim.android.ouiconversation.vm.ContactListVM;
+import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.models.ConversationInfo;
-import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding> implements ChatVM.ViewAction {

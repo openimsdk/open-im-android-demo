@@ -24,7 +24,6 @@ import android.widget.Toast;
 
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.yanzhenjie.recyclerview.SwipeMenuCreator;
 import com.yanzhenjie.recyclerview.SwipeMenuItem;
 
@@ -33,7 +32,7 @@ import java.util.List;
 import io.openim.android.ouiconversation.R;
 
 import io.openim.android.ouiconversation.databinding.FragmentContactListBinding;
-import io.openim.android.ouiconversation.vm.ContactListVM;
+import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;

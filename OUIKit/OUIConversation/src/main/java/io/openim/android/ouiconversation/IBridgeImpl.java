@@ -7,7 +7,7 @@ import androidx.lifecycle.LifecycleOwner;
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import io.openim.android.ouiconversation.vm.ChatVM;
-import io.openim.android.ouiconversation.vm.ContactListVM;
+import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.im.IMUtil;
