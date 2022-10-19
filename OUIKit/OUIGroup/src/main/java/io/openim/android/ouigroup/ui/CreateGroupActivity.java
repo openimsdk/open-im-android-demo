@@ -81,6 +81,13 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
 
         setResult(RESULT_OK);
         finish();
-
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isFinishing())
+            removeCacheVM();
+    }
+
 }

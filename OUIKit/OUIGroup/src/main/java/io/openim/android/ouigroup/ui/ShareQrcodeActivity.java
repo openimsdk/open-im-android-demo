@@ -52,15 +52,12 @@ public class ShareQrcodeActivity extends BaseActivity<GroupVM, ActivityGroupQrCo
                 view.title.setText(R.string.group_id);
                 tips = getString(io.openim.android.ouicore.R.string.share_group_tips1);
             }
-
         }
         sink();
         view.setGroupVM(vm);
         view.tips.setText(tips);
         if (isQrcode) {
-            view.avatar.load(vm.groupsInfo.getValue().getFaceURL());
-            qrCodeBitmap = CodeCreator.createQRCode(shareContent, 500, 500, null);
-            view.qrCode.setImageBitmap(qrCodeBitmap);
+            bindData(shareContent);
         } else {
             view.qrCodeRl.setVisibility(View.GONE);
             view.groupId.setVisibility(View.VISIBLE);
@@ -69,6 +66,20 @@ public class ShareQrcodeActivity extends BaseActivity<GroupVM, ActivityGroupQrCo
                 toast(getString(io.openim.android.ouicore.R.string.copy_succ));
             });
         }
+        vm.groupsInfo.observe(this, groupInfo -> {
+            bindData(shareContent);
+        });
+    }
+
+    private void bindData(String shareContent) {
+        try {
+            view.avatar.load(vm.groupsInfo.getValue().getFaceURL());
+            qrCodeBitmap = CodeCreator.createQRCode(shareContent, 400, 400, null);
+            view.qrCode.setImageBitmap(qrCodeBitmap);
+        }catch (Exception E){
+            E.printStackTrace();
+        }
+
     }
 
     @Override
