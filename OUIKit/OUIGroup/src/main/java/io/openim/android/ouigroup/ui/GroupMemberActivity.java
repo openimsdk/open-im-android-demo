@@ -45,7 +45,8 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
         initView();
         listener();
     }
-    void init(){
+
+    void init() {
         isTransferPermission = getIntent().getBooleanExtra(Constant.K_FROM, false);
     }
 
@@ -162,15 +163,15 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
                     itemViewHo.view.avatar.load(friendInfo.getFaceURL());
                     itemViewHo.view.nickName.setText(friendInfo.getNickname());
                     itemViewHo.view.select.setVisibility(View.GONE);
-                    if (data.groupMembersInfo.getRoleLevel() == 2) {
+                    if (data.groupMembersInfo.getRoleLevel() == Constant.RoleLevel.GROUP_OWNER) {
                         itemViewHo.view.identity.setVisibility(View.VISIBLE);
                         itemViewHo.view.identity.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_8_fddfa1);
                         itemViewHo.view.identity.setText(io.openim.android.ouicore.R.string.lord);
                         itemViewHo.view.identity.setTextColor(Color.parseColor("#ffff8c00"));
-                    } else if (data.groupMembersInfo.getRoleLevel() == 3) {
+                    } else if (data.groupMembersInfo.getRoleLevel() == Constant.RoleLevel.ADMINISTRATOR) {
                         itemViewHo.view.identity.setVisibility(View.VISIBLE);
                         itemViewHo.view.identity.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_8_a2c9f8);
-                        itemViewHo.view.identity.setText(io.openim.android.ouicore.R.string.lord);
+                        itemViewHo.view.identity.setText(io.openim.android.ouicore.R.string.administrator);
                         itemViewHo.view.identity.setTextColor(Color.parseColor("#2691ED"));
                     } else
                         itemViewHo.view.identity.setVisibility(View.GONE);

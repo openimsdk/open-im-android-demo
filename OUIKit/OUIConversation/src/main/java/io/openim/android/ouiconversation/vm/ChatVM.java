@@ -65,6 +65,7 @@ import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.models.AdvancedMessage;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.GroupInfo;
+import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
@@ -107,8 +108,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public boolean isVideoCall = true;//是否是视频通话
     public boolean fromChatHistory = false;//从查看聊天记录跳转过来
     public boolean firstChatHistory = true;// //用于第一次消息定位
-    public int count = 20; //条数
+    public boolean hasPermission = false;// 为true 则是管理员或群主
 
+    public int count = 20; //条数
     public Message loading, forwardMsg;
     private int lastMinSeq = 0;
 
@@ -125,7 +127,29 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
         if (isSingleChat) {
             listener();
+        } else {
+            getGroupPermissions();
         }
+    }
+
+    /**
+     * 获取自己在这个群的权限
+     */
+    private void getGroupPermissions() {
+        List<String> uid = new ArrayList<>();
+        uid.add(BaseApp.inst().loginCertificate.userID);
+        OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new OnBase<List<GroupMembersInfo>>() {
+            @Override
+            public void onError(int code, String error) {
+
+            }
+
+            @Override
+            public void onSuccess(List<GroupMembersInfo> data) {
+                if (data.isEmpty()) return;
+                hasPermission = data.get(0).getRoleLevel() != Constant.RoleLevel.MEMBER;
+            }
+        }, groupID, uid);
     }
 
     @Override
@@ -601,7 +625,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
             @Override
             public void onSuccess(String data) {
-                message.setContentType(Constant.MsgType.REVOKE);
+                message.setContentType(Constant.MsgType.ADVANCED_REVOKE);
+                if (hasPermission)
+                    message.setSenderNickname(BaseApp.inst().loginCertificate.nickname);
                 messageAdapter.notifyItemChanged(messageAdapter.getMessages().indexOf(message));
             }
         }, message);

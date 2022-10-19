@@ -147,6 +147,14 @@ public class Constant {
         public static final int groupNotification = 4;
     }
 
+    /**
+     * 群身份
+     */
+    public static class RoleLevel {
+        public static final int MEMBER = 1;
+        public static final int GROUP_OWNER = 2;
+        public static final int ADMINISTRATOR = 3;
+    }
 
     public static class MsgNotification {
         /// 好友已添加
@@ -200,7 +208,7 @@ public class Constant {
         public static final int groupCancelMutedNotification = 1515;
 
         /// 阅后即焚
-        public static final int  burnAfterReadingNotification = 1701;
+        public static final int burnAfterReadingNotification = 1701;
         /// 群成员信息改变
         public static final int groupMemberInfoChangedNotification = 1516;
     }

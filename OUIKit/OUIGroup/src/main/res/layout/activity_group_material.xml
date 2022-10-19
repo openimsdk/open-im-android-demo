@@ -203,6 +203,7 @@
                             android:layout_height="50dp"
                             android:gravity="center_vertical"
                             android:paddingLeft="22dp"
+                            android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}"
                             android:paddingRight="22dp">
 
                             <TextView

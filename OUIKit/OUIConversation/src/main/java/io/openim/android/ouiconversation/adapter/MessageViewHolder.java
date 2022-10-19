@@ -330,7 +330,11 @@ public class MessageViewHolder {
                 }
                 menuIcons.add(R.mipmap.ic_delete);
                 menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.delete));
-                if (message.getSendID().equals(BaseApp.inst().loginCertificate.userID)) {
+
+                if (chatVM.hasPermission) {
+                    menuIcons.add(R.mipmap.ic_withdraw);
+                    menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.withdraw));
+                } else if (message.getSendID().equals(BaseApp.inst().loginCertificate.userID)) {
                     //5分钟内可以撤回
                     if (System.currentTimeMillis() - message.getSendTime() < (1000 * 60 * 5)) {
                         menuIcons.add(R.mipmap.ic_withdraw);
