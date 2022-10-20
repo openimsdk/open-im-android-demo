@@ -116,6 +116,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
 
             @Override
             public void setItems(List<ExUserInfo> items) {
+                if (items.isEmpty()) return;
                 lastSticky = items.get(0).sortLetter;
                 items.add(0, getExUserInfo());
                 for (int i = 0; i < items.size(); i++) {
@@ -246,7 +247,6 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
             vm.exUserInfo.observe(this, v -> {
                 if (null == v || v.isEmpty()) return;
                 List<ExUserInfo> exUserInfos = new ArrayList<>(v);
-                exUserInfos.remove(0);//群主
                 for (ExUserInfo exUserInfo : exUserInfos) {
                     ExGroupMemberInfo exGroupMemberInfo = new ExGroupMemberInfo();
                     exGroupMemberInfo.groupMembersInfo = new GroupMembersInfo();

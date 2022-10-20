@@ -213,9 +213,12 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
 
     @Override
     public void onFriendApplicationAdded(FriendApplicationInfo u) {
-        if (u.getFromUserID().equals(BaseApp.inst().loginCertificate.userID)) return;
-        friendDotNum.setValue(friendDotNum.getValue() + 1);
-        cacheFriendDot();
+        try {
+            if (u.getFromUserID().equals(BaseApp.inst().loginCertificate.userID)) return;
+            friendDotNum.setValue(friendDotNum.getValue() + 1);
+            cacheFriendDot();
+        }catch (Exception ignored){
+        }
     }
 
     @Override

@@ -95,7 +95,9 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
         view.qrCode.setOnClickListener(v -> startActivity(new Intent(this, ShareQrcodeActivity.class)));
         view.groupId.setOnClickListener(v -> startActivity(new Intent(this, ShareQrcodeActivity.class).putExtra(ShareQrcodeActivity.IS_QRCODE, false)));
-        view.bulletin.setOnClickListener(v -> startActivity(new Intent(this, GroupBulletinActivity.class)));
+        view.bulletin.setOnClickListener(v -> startActivity(new Intent(this, GroupBulletinActivity.class)
+            .putExtra(Constant.K_RESULT, vm.isOwner())));
+
         view.groupMember.setOnClickListener(v -> {
             gotoMemberList(false);
         });

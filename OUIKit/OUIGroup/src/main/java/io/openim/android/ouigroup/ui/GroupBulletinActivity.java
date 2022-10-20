@@ -5,10 +5,12 @@ import android.view.View;
 
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouigroup.databinding.ActivityGroupBulletinBinding;
 import io.openim.android.ouicore.vm.GroupVM;
 
 public class GroupBulletinActivity extends BaseActivity<GroupVM, ActivityGroupBulletinBinding> {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,7 +20,8 @@ public class GroupBulletinActivity extends BaseActivity<GroupVM, ActivityGroupBu
         view.setGroupVM(vm);
 
         sink();
-
+        boolean isEditValid = getIntent().getBooleanExtra(Constant.K_RESULT, true);
+        view.edit.setVisibility(isEditValid ? View.VISIBLE : View.GONE);
         click();
     }
 

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.List;
 import java.util.Observable;
@@ -110,7 +111,9 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
                 holder.view.avatar.load(data.getFaceURL());
                 holder.view.nickName.setText(data.getNickname());
                 holder.view.getRoot().setOnClickListener(v -> {
-
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                        .withString(Constant.K_ID, data.getUserID())
+                        .navigation();
                 });
             }
         };
