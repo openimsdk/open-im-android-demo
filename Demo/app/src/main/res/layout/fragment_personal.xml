@@ -98,6 +98,35 @@
             android:layout_height="wrap_content"
             android:src="@mipmap/ic_right" />
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/aboutLy"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="23dp"
+        android:paddingRight="23dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_about" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_weight="1"
+            android:text="@string/about_us"
+            android:textColor="#ff333333"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_right" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/quit"

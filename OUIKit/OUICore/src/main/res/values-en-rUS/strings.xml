@@ -175,4 +175,6 @@
     <string name="msg_notification">消息通知</string>
     <string name="a_message_is_received">您收到一条消息</string>
     <string name="administrator">管理员</string>
+    <string name="about_us">关于我们</string>
+    <string name="check_the_new">检查新版本</string>
 </resources>

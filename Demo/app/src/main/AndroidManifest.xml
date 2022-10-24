@@ -12,6 +12,9 @@
         android:theme="@style/Theme.Demo"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ui.user.AboutUsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.main.CallHistoryActivity"
             android:exported="false" />
         <activity
@@ -49,8 +52,8 @@
             android:exported="false" />
         <activity
             android:name=".ui.login.LoginActivity"
-            android:launchMode="singleTask"
-            android:exported="false" />
+            android:exported="false"
+            android:launchMode="singleTask" />
         <activity
             android:name=".SplashActivity"
             android:exported="true"

@@ -9,6 +9,8 @@ import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
@@ -35,6 +37,20 @@ public class Common {
      */
     public final static Handler UIHandler = new Handler(Looper.getMainLooper());
 
+
+    public static String getAppVersionName(Context context) {
+        String versionName = "";
+        try {
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+            versionName = pi.versionName;
+            if (versionName == null || versionName.length() <= 0) {
+                return "";
+            }
+        } catch (Exception e) {
+        }
+        return versionName;
+    }
 
     public static String md5(String content) {
         byte[] hash;
