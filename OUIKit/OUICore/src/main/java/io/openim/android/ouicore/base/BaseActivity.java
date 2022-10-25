@@ -1,7 +1,9 @@
 package io.openim.android.ouicore.base;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,8 +38,10 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         .build(Routes.Service.CALLING).navigation();
 
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState);
         if (null != callingService)
             OpenIMClient.getInstance().signalingManager.setSignalingListener(callingService);

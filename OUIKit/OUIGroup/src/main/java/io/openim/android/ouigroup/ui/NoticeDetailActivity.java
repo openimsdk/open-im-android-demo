@@ -31,7 +31,7 @@ public class NoticeDetailActivity extends BaseActivity<GroupVM, ActivityNoticeDe
         vm.exGroupMembers.observe(this, exGroupMemberInfos -> {
             if (exGroupMemberInfos.isEmpty()) return;
             if (null != notificationMsg) {
-                ExGroupMemberInfo exGroupMemberInfo = vm.getOwnInGroup(notificationMsg.group.creatorUserID);
+                ExGroupMemberInfo exGroupMemberInfo = vm.getOwnInGroup(notificationMsg.group.ownerUserID);
                 if (null==exGroupMemberInfo)return;
                 view.avatar.load(exGroupMemberInfo.groupMembersInfo.getFaceURL());
                 view.name.setText(exGroupMemberInfo.groupMembersInfo.getNickname());

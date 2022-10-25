@@ -27,7 +27,6 @@ public class SendVerifyActivity extends BaseActivity<SearchVM, ActivitySendVerif
 
         vm.searchContent.setValue(getIntent().getStringExtra(Constant.K_ID));
         vm.isPerson = getIntent().getBooleanExtra(Constant.K_IS_PERSON, true);
-        listener();
         click();
     }
 
@@ -37,10 +36,9 @@ public class SendVerifyActivity extends BaseActivity<SearchVM, ActivitySendVerif
         });
     }
 
-    private void listener() {
-        vm.hail.observe(this, v -> {
-            if (v.equals("-1"))
-                finish();
-        });
+
+    @Override
+    public void onSuccess(Object body) {
+        finish();
     }
 }

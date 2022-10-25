@@ -57,7 +57,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="备注"
+                        android:text="@string/remark"
                         android:textColor="#ff333333"
                         android:textSize="18sp" />
 

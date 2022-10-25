@@ -68,6 +68,17 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
     }
 
     private void initView() {
+        view.picture.setOnClickListener(v -> {
+            startActivity(new Intent(this,
+                MediaHistoryActivity.class).putExtra(Constant.K_RESULT, true));
+        });
+        view.video.setOnClickListener(v -> {
+            startActivity(new Intent(this,
+                MediaHistoryActivity.class));
+        });
+        view.file.setOnClickListener(v -> startActivity(new Intent(this,
+            FileHistoryActivity.class)));
+
         vm.notDisturbStatus.observe(this, integer -> {
             view.noDisturb.post(() -> view.noDisturb.setCheckedWithAnimation(integer == 2));
         });

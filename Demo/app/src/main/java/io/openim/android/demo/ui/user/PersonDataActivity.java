@@ -25,6 +25,7 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.SlideButton;
 import io.openim.android.ouicore.widget.WaitDialog;
@@ -37,6 +38,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
     private ChatVM chatVM;
     private FriendVM friendVM = new FriendVM();
     private WaitDialog waitDialog;
+    private String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,14 +48,13 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         sink();
         init();
         listener();
-        String uid = getIntent().getStringExtra(Constant.K_ID);
+        uid = getIntent().getStringExtra(Constant.K_ID);
         if (TextUtils.isEmpty(uid)) {
             chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
-            vm.getUserInfo(chatVM.otherSideID);
+            uid = chatVM.otherSideID;
+            vm.getUserInfo(uid);
         } else
             vm.getUserInfo(uid);
-
-
     }
 
     @Override
@@ -80,13 +81,13 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             if (null == vm.userInfo.getValue()) return;
             resultLauncher.launch(new Intent(this, EditTextActivity.class)
                 .putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.remark))
-                .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.getValue().getRemark()));
+                .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.getValue().getFriendInfo().getRemark()));
         });
         friendVM.blackListUser.observe(this, userInfos -> {
             boolean isCon = false;
             for (UserInfo userInfo : userInfos) {
                 if (userInfo.getUserID()
-                    .equals(chatVM.otherSideID)) {
+                    .equals(uid)) {
                     isCon = true;
                     break;
                 }
@@ -95,7 +96,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         });
         view.joinBlackList.setOnClickListener(v -> {
             if (view.slideButton.isChecked())
-                friendVM.removeBlacklist(chatVM.otherSideID);
+                friendVM.removeBlacklist(uid);
             else {
                 addBlackList();
             }
@@ -104,7 +105,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             if (isChecked)
                 addBlackList();
             else
-                friendVM.removeBlacklist(chatVM.otherSideID);
+                friendVM.removeBlacklist(uid);
         });
     }
 
@@ -119,7 +120,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         });
         commonDialog.getMainView().confirm.setOnClickListener(v -> {
             commonDialog.dismiss();
-            friendVM.addBlacklist(chatVM.otherSideID);
+            friendVM.addBlacklist(uid);
         });
         commonDialog.show();
     }
@@ -140,7 +141,8 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             public void onSuccess(String data) {
                 waitDialog.dismiss();
                 vm.userInfo.getValue().setRemark(resultStr);
+                Obs.newMessage(Constant.Event.USER_INFO_UPDATA);
             }
-        }, chatVM.otherSideID, resultStr);
+        }, uid, resultStr);
     });
 }

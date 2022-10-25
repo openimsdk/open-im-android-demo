@@ -179,7 +179,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 public void onSuccess(ResponseBody o) {
                     try {
                         String body = o.string();
-                        Base<List<OnlineStatus>> base = GsonHel.dataArray(body, OnlineStatus.class);
+                        Base<List<OnlineStatus>> base =GsonHel.dataArray(body, OnlineStatus.class);
                         if (base.errCode != 0) {
                             IView.toast(base.errMsg);
                             return;

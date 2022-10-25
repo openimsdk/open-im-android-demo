@@ -1,14 +1,18 @@
 package io.openim.android.ouicontact.vm;
 
+import android.text.TextUtils;
+
 import androidx.databinding.ObservableInt;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.im.IMEvent;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
@@ -42,7 +46,6 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
     public MutableLiveData<UserInfo> frequentContacts = new MutableLiveData<>();
 
 
-
     @Override
     protected void viewCreate() {
         super.viewCreate();
@@ -52,8 +55,6 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
         int groupNum = SharedPreferencesUtil.get(getContext()).getInteger(Constant.K_GROUP_NUM);
         friendDotNum.setValue(requestNum);
         dotNum.setValue(groupNum);
-
-
     }
 
     @Override
@@ -73,8 +74,8 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
 
             @Override
             public void onSuccess(List<FriendApplicationInfo> data) {
-                if (!data.isEmpty())
-                    friendApply.setValue(data);
+                if (data.isEmpty()) return;
+                friendApply.setValue(data);
             }
         });
     }
@@ -185,9 +186,13 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
             dotNum.getValue());
     }
 
-    private void cacheFriendDot() {
-        SharedPreferencesUtil.get(getContext()).setCache(Constant.K_FRIEND_NUM,
-            friendDotNum.getValue());
+    private void cacheFriendDot(FriendApplicationInfo u) {
+        if (u.getHandleResult() == 0
+            && !u.getFromUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+            friendDotNum.setValue(friendDotNum.getValue() + 1);
+            SharedPreferencesUtil.get(getContext()).setCache(Constant.K_FRIEND_NUM,
+                friendDotNum.getValue());
+        }
     }
 
     @Override
@@ -207,30 +212,21 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
 
     @Override
     public void onFriendApplicationAccepted(FriendApplicationInfo u) {
-        friendDotNum.setValue(friendDotNum.getValue() + 1);
-        cacheFriendDot();
+        cacheFriendDot(u);
     }
 
     @Override
     public void onFriendApplicationAdded(FriendApplicationInfo u) {
-        try {
-            if (u.getFromUserID().equals(BaseApp.inst().loginCertificate.userID)) return;
-            friendDotNum.setValue(friendDotNum.getValue() + 1);
-            cacheFriendDot();
-        }catch (Exception ignored){
-        }
+        cacheFriendDot(u);
     }
 
     @Override
     public void onFriendApplicationDeleted(FriendApplicationInfo u) {
-        friendDotNum.setValue(friendDotNum.getValue() + 1);
-        cacheFriendDot();
     }
 
     @Override
     public void onFriendApplicationRejected(FriendApplicationInfo u) {
-        friendDotNum.setValue(friendDotNum.getValue() + 1);
-        cacheFriendDot();
+        cacheFriendDot(u);
     }
 
     @Override

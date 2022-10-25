@@ -13,12 +13,13 @@
         android:layout_marginRight="14dp" />
 
     <ImageView
+        android:id="@+id/delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:layout_marginRight="20dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="10dp"
         android:layout_alignBottom="@id/recyclerview"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="10dp"
+        android:padding="15dp"
         android:src="@mipmap/ic_emoji_delete" />
 </RelativeLayout>

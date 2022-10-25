@@ -2,6 +2,7 @@ package io.openim.android.ouiconversation.widget;
 
 
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Arrays;
 
+import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.FragmentEmojiBinding;
 import io.openim.android.ouiconversation.databinding.ItemEmojiBinding;
 import io.openim.android.ouicore.utils.EmojiUtil;
@@ -29,6 +31,7 @@ public class EmojiFragment extends BaseFragment<ChatVM> {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v = FragmentEmojiBinding.inflate(inflater);
+
         init();
         return v.getRoot();
     }
@@ -48,6 +51,21 @@ public class EmojiFragment extends BaseFragment<ChatVM> {
         };
         v.recyclerview.setAdapter(adapter);
         adapter.setItems(Arrays.asList(EmojiUtil.emojiFaces.keySet().toArray()));
+
+        v.delete.setOnClickListener(v -> {
+            try {
+                TailInputEditText tailInputEditText = getActivity().
+                    findViewById(R.id.chatInput);
+                int keyCode = KeyEvent.KEYCODE_DEL;
+                KeyEvent keyEventDown = new KeyEvent(KeyEvent.ACTION_DOWN, keyCode);
+                KeyEvent keyEventUp = new KeyEvent(KeyEvent.ACTION_UP, keyCode);
+                tailInputEditText.onKeyDown(keyCode, keyEventDown);
+                tailInputEditText.onKeyUp(keyCode, keyEventUp);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        });
     }
 
     public static class ItemEmojiHolder extends RecyclerView.ViewHolder {

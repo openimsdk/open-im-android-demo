@@ -92,7 +92,12 @@ public class SearchVM extends BaseViewModel {
             @Override
             public void onSuccess(String data) {
                 Toast.makeText(getContext(), "发送成功", Toast.LENGTH_SHORT).show();
-                hail.setValue("-1");
+                IView.onSuccess("");
+//                String remarkStr = remark.getValue();
+//                if (!TextUtils.isEmpty(remarkStr)) {
+//                    OpenIMClient.getInstance().friendshipManager.setFriendRemark(null,
+//                        searchContent.getValue(), remarkStr);
+//                }
             }
         };
         if (isPerson)

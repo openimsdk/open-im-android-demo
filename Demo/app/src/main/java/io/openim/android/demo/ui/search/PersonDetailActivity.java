@@ -14,6 +14,8 @@ import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import io.openim.android.demo.databinding.ActivityPersonDetailBinding;
 import io.openim.android.demo.ui.user.PersonDataActivity;
@@ -21,6 +23,7 @@ import io.openim.android.demo.vm.FriendVM;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
@@ -34,7 +37,7 @@ import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 @Route(path = Routes.Main.PERSON_DETAIL)
-public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonDetailBinding> {
+public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonDetailBinding> implements Observer {
     //从聊天界面过来
     private boolean formChat;
     private FriendVM friendVM = new FriendVM();
@@ -59,6 +62,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     }
 
     private void init() {
+        Obs.inst().addObserver(this);
         waitDialog = new WaitDialog(this);
         friendVM.waitDialog = waitDialog;
         friendVM.setContext(this);
@@ -130,7 +134,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             boolean isCon = false;
             for (UserInfo userInfo : userInfos) {
                 if (userInfo.getUserID()
-                    .equals(vm.searchContent)) {
+                    .equals(vm.searchContent.getValue())) {
                     isCon = true;
                     break;
                 }
@@ -169,4 +173,17 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         });
     }
 
+    @Override
+    public void update(Observable o, Object arg) {
+        Obs.Message message= (Obs.Message) arg;
+        if (message.tag==Constant.Event.USER_INFO_UPDATA){
+            vm.searchPerson();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Obs.inst().deleteObserver(this);
+    }
 }

@@ -45,8 +45,10 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
         LoginCertificate loginCertificate = LoginCertificate.getCache(this);
         friendInfo.setUserID(loginCertificate.userID);
         friendInfo.setNickname(loginCertificate.nickname);
-        vm.selectedFriendInfo.getValue().add(0, friendInfo);
-
+        if (!vm.selectedFriendInfo.getValue().get(0)
+            .getUserID().equals(friendInfo.getUserID())) {
+            vm.selectedFriendInfo.getValue().add(0, friendInfo);
+        }
         view.selectNum.setText(vm.selectedFriendInfo.getValue().size() + "人");
         view.recyclerview.setLayoutManager(new GridLayoutManager(this, 5));
         RecyclerViewAdapter adapter = new RecyclerViewAdapter<FriendInfo, ImageTxtViewHolder>(ImageTxtViewHolder.class) {
@@ -81,13 +83,6 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
 
         setResult(RESULT_OK);
         finish();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (isFinishing())
-            removeCacheVM();
     }
 
 }

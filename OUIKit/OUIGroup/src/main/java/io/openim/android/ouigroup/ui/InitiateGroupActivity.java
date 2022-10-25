@@ -307,6 +307,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         new ActivityResultContracts.StartActivityForResult(),
         result -> {
             if (result.getResultCode() == Activity.RESULT_OK) {
+                removeCacheVM();
                 finish();
             }
         });

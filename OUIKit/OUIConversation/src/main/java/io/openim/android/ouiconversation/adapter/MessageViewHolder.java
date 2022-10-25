@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -346,14 +347,30 @@ public class MessageViewHolder {
                 menuIcons.add(R.mipmap.ic_multiple_choice);
                 menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.multiple_choice));
 
-                LayoutMsgExMenuBinding.bind(popupWindow.getContentView())
-                    .recyclerview.setLayoutManager(new GridLayoutManager(view.getContext(),
+                LayoutMsgExMenuBinding vb = LayoutMsgExMenuBinding.bind(popupWindow.getContentView());
+                vb.recyclerview.setLayoutManager(new GridLayoutManager(view.getContext(),
                     menuIcons.size() < 4 ? menuIcons.size() : 4));
                 adapter.setItems(menuIcons);
 
                 int yDelay = Common.dp2px(5);
                 popupWindow.getContentView().measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-                popupWindow.showAsDropDown(v, -(popupWindow.getContentView().getMeasuredWidth() - v.getMeasuredWidth()) / 2, -(popupWindow.getContentView().getMeasuredHeight() + v.getMeasuredHeight() + yDelay));
+                Rect globalVisibleRect = new Rect();
+                v.getGlobalVisibleRect(globalVisibleRect);
+                int y = (popupWindow.getContentView().getMeasuredHeight() + v.getMeasuredHeight() + yDelay);
+
+                if (globalVisibleRect.top -
+                    BaseApp.inst().getResources()
+                        .getDimension(io.openim.android.ouicore.R.dimen.comm_title_high) > y) {
+                    y = -y;
+                    vb.downArrow.setVisibility(View.VISIBLE);
+                    vb.topArrow.setVisibility(View.GONE);
+                } else {
+                    y = yDelay;
+                    vb.topArrow.setVisibility(View.VISIBLE);
+                    vb.downArrow.setVisibility(View.GONE);
+                }
+                popupWindow.showAsDropDown(v, -(popupWindow.getContentView().getMeasuredWidth() - v.getMeasuredWidth()) / 2,
+                    y);
                 return true;
             });
         }

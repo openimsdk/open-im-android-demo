@@ -124,6 +124,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         if (isFinishing()) {
             if (!vm.fromChatHistory)
                 removeCacheVM();
+
             Obs.inst().deleteObserver(this);
             getWindow().getDecorView().getViewTreeObserver()
                 .removeOnGlobalLayoutListener(mGlobalLayoutListener);
@@ -292,6 +293,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             }
         });
 
+
         view.notice.setOnClickListener(v -> ARouter.getInstance().build(Routes.Group.NOTICE_DETAIL)
             .withSerializable(Constant.K_NOTICE, vm.notificationMsg.getValue()).navigation());
 
@@ -407,6 +409,13 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 vm.conversationInfo.getValue()
                     .setShowName((String) message.object);
                 vm.conversationInfo.setValue(vm.conversationInfo.getValue());
+            }
+            if (message.tag == Constant.Event.USER_INFO_UPDATA) {
+                if (vm.isSingleChat)
+                    vm.getOneConversation(data -> {
+                        vm.conversationInfo.setValue(data);
+                        view.nickName.setText(data.getShowName());
+                    });
             }
         } catch (Exception e) {
             e.printStackTrace();
