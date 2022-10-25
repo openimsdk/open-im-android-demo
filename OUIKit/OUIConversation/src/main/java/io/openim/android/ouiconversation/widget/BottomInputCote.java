@@ -19,6 +19,7 @@ import android.view.View;
 
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouiconversation.databinding.LayoutInputCoteBinding;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.EmojiUtil;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
@@ -36,6 +38,7 @@ import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.AtUserInfo;
+import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.Message;
 
 /**
@@ -160,6 +163,8 @@ public class BottomInputCote {
             view.fragmentContainer.setVisibility(VISIBLE);
             switchFragment(emojiFragment);
         });
+
+
     }
 
     private void initFragment() {
@@ -213,7 +218,6 @@ public class BottomInputCote {
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             view.chatInput.append(spannableString);
         });
-
         view.chatInput.setOnKeyListener((v, keyCode, event) -> {
             //监听删除操作，找到最靠近删除的一个Span，然后整体删除
             if (keyCode == KeyEvent.KEYCODE_DEL
@@ -222,6 +226,25 @@ public class BottomInputCote {
             }
             return false;
         });
+
+        if (!vm.isSingleChat) {
+            vm.groupInfo.observe((LifecycleOwner) context,
+                groupInfo -> {
+                    if (null == groupInfo) return;
+                    if (groupInfo.getStatus()
+                        == Constant.GroupStatus.status3
+                        && !groupInfo.getOwnerUserID()
+                        .equals(BaseApp.inst().loginCertificate.userID)) {
+                        view.root.setIntercept(true);
+                        view.root.setAlpha(0.5f);
+                        view.notice.setVisibility(VISIBLE);
+                    } else {
+                        view.root.setIntercept(false);
+                        view.root.setAlpha(1f);
+                        view.notice.setVisibility(GONE);
+                    }
+                });
+        }
     }
 
     //设置扩展菜单隐藏

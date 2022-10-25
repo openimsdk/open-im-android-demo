@@ -214,4 +214,12 @@ public class Constant {
     public static class CacheKey {
     }
 
+    public static class GroupStatus {
+        //        0正常，1被封，2解散，3禁言
+        public static final int status0 = 0;
+        public static final int status1 = 1;
+        public static final int status2 = 2;
+        public static final int status3 = 3;
+    }
+
 }

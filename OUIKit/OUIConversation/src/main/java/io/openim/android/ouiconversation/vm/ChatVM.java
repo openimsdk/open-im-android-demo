@@ -61,9 +61,11 @@ import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.listener.OnGroupListener;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.models.AdvancedMessage;
 import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
@@ -76,7 +78,7 @@ import io.openim.android.sdk.models.SearchResultItem;
 import io.openim.android.sdk.models.UserInfo;
 import okhttp3.ResponseBody;
 
-public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener {
+public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener, OnGroupListener {
     //搜索的本地消息
     public MutableLiveData<List<Message>> searchMessageItems = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<Message>> addSearchMessageItems = new MutableLiveData<>(new ArrayList<>());
@@ -84,6 +86,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public MutableLiveData<Integer> notDisturbStatus = new MutableLiveData<>(0);
     //通知消息
     public MutableLiveData<ConversationInfo> conversationInfo = new MutableLiveData<>();
+    public MutableLiveData<GroupInfo> groupInfo = new MutableLiveData<>();
     public MutableLiveData<NotificationMsg> notificationMsg = new MutableLiveData<>();
     public MutableLiveData<List<Message>> messages = new MutableLiveData<>(new ArrayList<>());
     //@消息
@@ -104,7 +107,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public String otherSideID = ""; // 接受消息的用户Id
     public String groupID = ""; // 接受消息的群ID
     public boolean isSingleChat = true; //是否单聊 false 群聊
-    public boolean isSuperGroup = false;//是否超级大群
     public boolean isVideoCall = true;//是否是视频通话
     public boolean fromChatHistory = false;//从查看聊天记录跳转过来
     public boolean firstChatHistory = true;// //用于第一次消息定位
@@ -124,11 +126,11 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         markReaded(null);
 
         IMEvent.getInstance().addAdvanceMsgListener(this);
-
         if (isSingleChat) {
             listener();
         } else {
             getGroupPermissions();
+            IMEvent.getInstance().addGroupListener(this);
         }
     }
 
@@ -179,7 +181,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 public void onSuccess(ResponseBody o) {
                     try {
                         String body = o.string();
-                        Base<List<OnlineStatus>> base =GsonHel.dataArray(body, OnlineStatus.class);
+                        Base<List<OnlineStatus>> base = GsonHel.dataArray(body, OnlineStatus.class);
                         if (base.errCode != 0) {
                             IView.toast(base.errMsg);
                             return;
@@ -238,6 +240,56 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }
     }
 
+    @Override
+    public void onGroupApplicationAccepted(GroupApplicationInfo info) {
+
+    }
+
+    @Override
+    public void onGroupApplicationAdded(GroupApplicationInfo info) {
+
+    }
+
+    @Override
+    public void onGroupApplicationDeleted(GroupApplicationInfo info) {
+
+    }
+
+    @Override
+    public void onGroupApplicationRejected(GroupApplicationInfo info) {
+
+    }
+
+    @Override
+    public void onGroupInfoChanged(GroupInfo info) {
+        groupInfo.setValue(info);
+    }
+
+    @Override
+    public void onGroupMemberAdded(GroupMembersInfo info) {
+
+    }
+
+    @Override
+    public void onGroupMemberDeleted(GroupMembersInfo info) {
+
+    }
+
+    @Override
+    public void onGroupMemberInfoChanged(GroupMembersInfo info) {
+
+    }
+
+    @Override
+    public void onJoinedGroupAdded(GroupInfo info) {
+
+    }
+
+    @Override
+    public void onJoinedGroupDeleted(GroupInfo info) {
+
+    }
+
     public interface UserOnlineStatusListener {
         void onResult(OnlineStatus onlineStatus);
     }
@@ -246,24 +298,34 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         if (isSingleChat) {
             getOneConversation(null);
         } else {
-            List<String> groupIds = new ArrayList<>();
-            groupIds.add(groupID);
-            OpenIMClient.getInstance().groupManager.getGroupsInfo(new OnBase<List<GroupInfo>>() {
-                @Override
-                public void onError(int code, String error) {
-                    IView.toast(error + code);
-                }
-
-                @Override
-                public void onSuccess(List<GroupInfo> data) {
-                    if (data.isEmpty()) return;
-                    GroupInfo groupInfo = data.get(0);
-                    isSuperGroup =
-                        groupInfo.getGroupType() == 2;
-                    getOneConversation(null);
-                }
-            }, groupIds);
+            getGroupsInfo(groupID, null);
         }
+    }
+
+    public void getGroupsInfo(String groupID, IMUtil.OnSuccessListener<List<GroupInfo>> onSuccessListener) {
+        List<String> groupIds = new ArrayList<>();
+        groupIds.add(groupID);
+        OpenIMClient.getInstance().groupManager.getGroupsInfo(new OnBase<List<GroupInfo>>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error + code);
+            }
+
+            @Override
+            public void onSuccess(List<GroupInfo> data) {
+                if (data.isEmpty()) return;
+                if (null != onSuccessListener) {
+                    onSuccessListener.onSuccess(data);
+                    return;
+                }
+                groupInfo.setValue(data.get(0));
+                getOneConversation(null);
+            }
+        }, groupIds);
+    }
+
+    private boolean getIsSuperGroup() {
+        return groupInfo.getValue().getGroupType() == 2;
     }
 
     public void getOneConversation(IMUtil.OnSuccessListener<ConversationInfo> onSuccessListener) {
@@ -284,7 +346,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 getConversationRecvMessageOpt(data.getConversationID());
             }
         }, isSingleChat ? otherSideID : groupID, isSingleChat ?
-            Constant.SessionType.SINGLE_CHAT : isSuperGroup ? Constant.SessionType.SUPER_GROUP
+            Constant.SessionType.SINGLE_CHAT : getIsSuperGroup() ? Constant.SessionType.SUPER_GROUP
             : Constant.SessionType.GROUP_CHAT);
     }
 
@@ -300,6 +362,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     protected void viewDestroy() {
         super.viewDestroy();
         IMEvent.getInstance().removeAdvanceMsgListener(this);
+        IMEvent.getInstance().removeGroupListener(this);
         inputMsg.removeObserver(inputObserver);
     }
 
@@ -340,7 +403,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     public void loadHistoryMessage() {
-        if (isSuperGroup) {
+        if (getIsSuperGroup()) {
             OpenIMClient.getInstance().messageManager.getAdvancedHistoryMessageList(
                 new OnBase<AdvancedMessage>() {
                     @Override
@@ -474,11 +537,15 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         if (!viewPause)
             markReaded(ids);
 
-        if (msg.getContentType() == Constant.MsgType.BULLETIN) {
+        statusupdata(msg);
+    }
+
+    private void statusupdata(Message msg) {
+        int contentType = msg.getContentType();
+        if (contentType == Constant.MsgType.BULLETIN) {
             notificationMsg.setValue(GsonHel.fromJson(msg.getNotificationElem().getDetail()
                 , NotificationMsg.class));
         }
-
     }
 
     @Override
