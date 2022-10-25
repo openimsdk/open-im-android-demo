@@ -403,7 +403,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     public void loadHistoryMessage() {
-        if (getIsSuperGroup()) {
+        if (null != groupInfo.getValue()
+            && getIsSuperGroup()) {
             OpenIMClient.getInstance().messageManager.getAdvancedHistoryMessageList(
                 new OnBase<AdvancedMessage>() {
                     @Override
