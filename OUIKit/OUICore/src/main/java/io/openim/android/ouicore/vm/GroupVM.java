@@ -431,4 +431,60 @@ public class GroupVM extends SocialityVM {
         commonDialog.dismiss();
         IView.close();
     }
+
+    public void changeGroupMute(boolean isChecked, IMUtil.OnSuccessListener onSuccessListener) {
+        OpenIMClient.getInstance().groupManager.changeGroupMute(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error + code);
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                if (null != onSuccessListener) onSuccessListener.onSuccess(data);
+            }
+        }, groupId, isChecked);
+    }
+
+    public void setGroupVerification(int needVerification, IMUtil.OnSuccessListener onSuccessListener) {
+        OpenIMClient.getInstance().groupManager.setGroupVerification(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error + code);
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                if (null != onSuccessListener) onSuccessListener.onSuccess(data);
+            }
+        }, groupId, needVerification);
+    }
+
+    public void setGroupLookMemberInfo(int status, IMUtil.OnSuccessListener onSuccessListener) {
+        OpenIMClient.getInstance().groupManager.setGroupLookMemberInfo(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error + code);
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                if (null != onSuccessListener) onSuccessListener.onSuccess(data);
+            }
+        }, groupId, status);
+    }
+
+    public void setGroupApplyMemberFriend(int status, IMUtil.OnSuccessListener onSuccessListener) {
+        OpenIMClient.getInstance().groupManager.setGroupApplyMemberFriend(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error + code);
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                if (null != onSuccessListener) onSuccessListener.onSuccess(data);
+            }
+        }, groupId, status);
+    }
 }

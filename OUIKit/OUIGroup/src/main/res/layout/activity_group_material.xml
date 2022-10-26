@@ -369,6 +369,112 @@
                         </LinearLayout>
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@color/white"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="22dp"
+                        android:paddingRight="22dp"
+                        android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/total_silence"
+                            android:textColor="#ff333333"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#ff999999"
+                            android:textSize="14sp" />
+
+                        <io.openim.android.ouicore.widget.SlideButton
+                            android:id="@+id/totalSilence"
+                            android:layout_width="38dp"
+                            android:layout_height="23dp" />
+
+                    </LinearLayout>
+
+
+                    <include layout="@layout/view_dividing_line" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}">
+
+                        <LinearLayout
+                            android:id="@+id/joinValidation"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@color/white"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="22dp"
+                            android:paddingRight="22dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/join_validation"
+                                android:textColor="#ff333333"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/describe"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#ff999999"
+                                android:textSize="14sp" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="6dp"
+                                android:src="@mipmap/ic_right" />
+                        </LinearLayout>
+
+                        <include layout="@layout/view_dividing_line" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}">
+
+                        <LinearLayout
+                            android:id="@+id/memberPermissions"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@color/white"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="22dp"
+                            android:paddingRight="22dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/memberPermissions"
+                                android:textColor="#ff333333"
+                                android:textSize="16sp" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="6dp"
+                                android:src="@mipmap/ic_right" />
+                        </LinearLayout>
+
+                        <include layout="@layout/view_dividing_line" />
+                    </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/chatHistory"
@@ -450,7 +556,6 @@
                         android:id="@+id/clearRecord"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_marginTop="12dp"
                         android:background="@color/white"
                         android:gravity="center_vertical"
                         android:paddingLeft="22dp"
@@ -470,6 +575,31 @@
                             android:src="@mipmap/ic_right" />
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@color/white"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="22dp"
+                        android:paddingRight="22dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/group_type"
+                            android:textColor="#ff333333"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/groupType"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#ff999999"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/quitGroup"

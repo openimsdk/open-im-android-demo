@@ -29,6 +29,21 @@
         android:textColor="#ff000000"
         android:textSize="16sp" />
 
+    <include layout="@layout/view_dividing_line" />
+
+    <TextView
+        android:id="@+id/menu4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="18dp"
+        android:paddingBottom="18dp"
+        android:text="@string/album"
+        android:textColor="#ff000000"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+
     <include
         layout="@layout/view_dividing_line"
         android:layout_width="match_parent"

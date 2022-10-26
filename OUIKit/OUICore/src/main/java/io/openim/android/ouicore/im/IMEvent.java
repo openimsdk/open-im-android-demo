@@ -1,19 +1,25 @@
 package io.openim.android.ouicore.im;
 
 
+import android.content.res.AssetFileDescriptor;
+import android.os.Build;
 import android.widget.Toast;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 
+import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.MediaPlayerListener;
+import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
@@ -421,9 +427,11 @@ public class IMEvent {
         OpenIMClient.getInstance().messageManager.setAdvancedMsgListener(new OnAdvanceMsgListener() {
             @Override
             public void onRecvNewMessage(Message msg) {
-                if (msg.getContentType() != Constant.MsgType.TYPING
-                    && BaseApp.inst().isBackground() && !msg.isRead()) {
-                    IMUtil.sendNotice(msg);
+                if (msg.getContentType() != Constant.MsgType.TYPING) {
+                    if (BaseApp.inst().isBackground() && !msg.isRead())
+                        IMUtil.sendNotice(msg);
+                    else
+                        IMUtil.playPrompt(msg);
                 }
                 // 收到新消息，界面添加新消息
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
@@ -464,6 +472,7 @@ public class IMEvent {
             }
         });
     }
+
 
 
     // 用户资料变更监听

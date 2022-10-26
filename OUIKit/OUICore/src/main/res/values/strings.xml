@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+
+
     <string name="app_name">OpenIM</string>
     <string name="group_bulletin">群公告</string>
     <string name="search_by_id">通过用户ID号搜索添加</string>
@@ -184,4 +187,15 @@
     <string name="about_us">关于我们</string>
     <string name="check_the_new">检查新版本</string>
     <string name="reply">回复</string>
+    <string name="total_silence">全员禁员</string>
+    <string name="join_validation">进群验证</string>
+    <string name="needVerification">需要发送验证信息</string>
+    <string name="allowAnyoneJoinGroup">允许任何人加群</string>
+    <string name="inviteNotVerification">群成员邀请无需验证</string>
+    <string name="memberPermissions">群成员权限</string>
+    <string name="notViewMemberProfiles">不允许查看其他群成员资料</string>
+    <string name="notAddMemberToFriend">不允许添加群成员为好友</string>
+    <string name="super_group">工作群</string>
+    <string name="ordinary_group">普通群</string>
+    <string name="group_type">群类型</string>
 </resources>

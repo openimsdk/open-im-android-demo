@@ -27,6 +27,7 @@ import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
@@ -36,8 +37,10 @@ import io.openim.android.ouigroup.databinding.ActivityGroupMaterialBinding;
 
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.GroupVerification;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 @Route(path = Routes.Group.MATERIAL)
@@ -79,6 +82,45 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     private void click() {
+        view.memberPermissions.setOnClickListener(v -> {
+            startActivity(new Intent(this, MemberPermissionActivity.class));
+        });
+        view.joinValidation.setOnClickListener(v -> {
+            BottomPopDialog dialog = new BottomPopDialog(this);
+            dialog.show();
+            dialog.getMainView().menu3.setOnClickListener(v1 -> dialog.dismiss());
+            dialog.getMainView().menu1.setText(io.openim.android.ouicore.R.string.allowAnyoneJoinGroup);
+            dialog.getMainView().menu2.setText(io.openim.android.ouicore.R.string.inviteNotVerification);
+            dialog.getMainView().menu4.setVisibility(View.VISIBLE);
+            dialog.getMainView().menu4.setText(io.openim.android.ouicore.R.string.needVerification);
+
+            dialog.getMainView().menu1.setOnClickListener(v1 -> {
+                dialog.dismiss();
+                vm.setGroupVerification(Constant.GroupVerification.directly, data -> {
+                    vm.groupsInfo.getValue().setNeedVerification(Constant.GroupVerification.directly);
+                    vm.groupsInfo.setValue(vm.groupsInfo.getValue());
+                });
+            });
+            dialog.getMainView().menu2.setOnClickListener(v1 -> {
+                dialog.dismiss();
+                vm.setGroupVerification(Constant.GroupVerification.applyNeedVerificationInviteDirectly, data -> {
+                    vm.groupsInfo.getValue().setNeedVerification(Constant.GroupVerification.applyNeedVerificationInviteDirectly);
+                    vm.groupsInfo.setValue(vm.groupsInfo.getValue());
+                });
+            });
+            dialog.getMainView().menu4.setOnClickListener(v1 -> {
+                dialog.dismiss();
+                vm.setGroupVerification(Constant.GroupVerification.allNeedVerification, data -> {
+                    vm.groupsInfo.getValue().setNeedVerification(Constant.GroupVerification.allNeedVerification);
+                    vm.groupsInfo.setValue(vm.groupsInfo.getValue());
+                });
+            });
+        });
+        view.totalSilence.setOnSlideButtonClickListener(isChecked -> {
+            vm.changeGroupMute(isChecked, data -> {
+                view.totalSilence.setCheckedWithAnimation(isChecked);
+            });
+        });
         view.topSlideButton.setOnSlideButtonClickListener(is -> {
             if (null == iConversationBridge) return;
             iConversationBridge.pinConversation(iConversationBridge.getConversationInfo(), is);
@@ -219,6 +261,15 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         vm.groupsInfo.observe(this, groupInfo -> {
             view.avatar.load(groupInfo.getFaceURL());
             vm.getGroupMemberList();
+            view.totalSilence.setCheckedWithAnimation(groupInfo.getStatus() == Constant.GroupStatus.status3);
+
+            view.describe.setText(getJoinGroupOption(groupInfo.getNeedVerification()));
+            view.groupType.setText(groupInfo.getGroupType() == 2 ?
+                getString(io.openim.android.ouicore.R.string.super_group) :
+                getString(io.openim.android.ouicore.R.string.ordinary_group));
+
+            view.quitGroup.setText(getString(vm.isOwner() ? io.openim.android.ouicore.R.string.dissolve_group :
+                io.openim.android.ouicore.R.string.quit_group));
         });
         vm.groupMembers.observe(this, groupMembersInfos -> {
             boolean owner;
@@ -247,7 +298,15 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             view.topSlideButton.post(() -> view.topSlideButton.setCheckedWithAnimation(data.isPinned()));
         });
 
+    }
 
+    String getJoinGroupOption(int value) {
+        if (value == Constant.GroupVerification.allNeedVerification) {
+            return getString(io.openim.android.ouicore.R.string.needVerification);
+        } else if (value == Constant.GroupVerification.directly) {
+            return getString(io.openim.android.ouicore.R.string.allowAnyoneJoinGroup);
+        }
+        return getString(io.openim.android.ouicore.R.string.inviteNotVerification);
     }
 
     private void gotoMemberList(boolean transferPermissions) {

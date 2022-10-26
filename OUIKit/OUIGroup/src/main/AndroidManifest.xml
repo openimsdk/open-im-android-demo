@@ -4,6 +4,9 @@
 
     <application>
         <activity
+            android:name=".ui.MemberPermissionActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.NoticeDetailActivity"
             android:exported="false" />
         <activity

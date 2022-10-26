@@ -106,6 +106,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public Message startMsg = null; // 消息体，取界面上显示的消息体对象/搜索时的起始坐标
     public String otherSideID = ""; // 接受消息的用户Id
     public String groupID = ""; // 接受消息的群ID
+    public String conversationID; //会话id
     public boolean isSingleChat = true; //是否单聊 false 群聊
     public boolean isVideoCall = true;//是否是视频通话
     public boolean fromChatHistory = false;//从查看聊天记录跳转过来
@@ -371,11 +372,32 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
      *
      * @param msgIDs 为null 清除里列表小红点
      */
-    private void markReaded(List<String> msgIDs) {
+    public void markReaded(List<String> msgIDs) {
         if (isSingleChat)
             OpenIMClient.getInstance().messageManager.markC2CMessageAsRead(null, otherSideID, null == msgIDs ? new ArrayList<>() : msgIDs);
         else
             OpenIMClient.getInstance().messageManager.markGroupMessageAsRead(null, groupID, null == msgIDs ? new ArrayList<>() : msgIDs);
+    }
+
+    /**
+     * 标记已读
+     * By conversationID
+     *
+     * @param msgIDs 为null 清除里列表小红点
+     */
+    public void markReadedByConID(String conversationID, List<String> msgIDs, IMUtil.OnSuccessListener onSuccessListener) {
+        OpenIMClient.getInstance().messageManager.markMessageAsReadByConID(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error + code);
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                if (null != onSuccessListener)
+                    onSuccessListener.onSuccess(data);
+            }
+        }, conversationID, null == msgIDs ? new ArrayList<>() : msgIDs);
     }
 
 
@@ -430,7 +452,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     handleMessage(data, false);
                 }
 
-            }, otherSideID, groupID, null, startMsg, count);
+            }, otherSideID, groupID, conversationID, startMsg, count);
         }
     }
 
@@ -542,10 +564,16 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     private void statusupdata(Message msg) {
-        int contentType = msg.getContentType();
-        if (contentType == Constant.MsgType.BULLETIN) {
-            notificationMsg.setValue(GsonHel.fromJson(msg.getNotificationElem().getDetail()
-                , NotificationMsg.class));
+        try {
+            int contentType = msg.getContentType();
+            if (contentType == Constant.MsgType.BULLETIN) {
+                NotificationMsg no = GsonHel.fromJson(msg.getNotificationElem().getDetail()
+                    , NotificationMsg.class);
+                if (!TextUtils.isEmpty(no.group.notification))
+                    notificationMsg.setValue(no);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

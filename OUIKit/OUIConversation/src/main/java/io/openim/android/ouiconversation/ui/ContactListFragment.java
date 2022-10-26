@@ -121,6 +121,14 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             mLastClickTime = nowTime;
 
             MsgConversation msgConversation = vm.conversations.getValue().get(position);
+            if (msgConversation.conversationInfo.getConversationType() == Constant.SessionType.NOTIFICATION) {
+                //系统通知
+                Intent intent = new Intent(getContext(), NotificationActivity.class)
+                    .putExtra(Constant.K_NAME, msgConversation.conversationInfo.getShowName())
+                    .putExtra(Constant.K_ID, msgConversation.conversationInfo.getConversationID());
+                startActivity(intent);
+                return;
+            }
             Intent intent = new Intent(getContext(), ChatActivity.class)
                 .putExtra(Constant.K_NAME, msgConversation.conversationInfo.getShowName());
             if (msgConversation.conversationInfo.getConversationType() == Constant.SessionType.SINGLE_CHAT)
@@ -132,7 +140,6 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
             if (msgConversation.conversationInfo.getGroupAtType() == Constant.SessionType.NOTIFICATION)
                 intent.putExtra(Constant.K_NOTICE, msgConversation.notificationMsg);
-
             startActivity(intent);
             //重置强提醒
             if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification)
@@ -219,8 +226,11 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                 viewHolder.viewBinding.badge.badge.setVisibility(msgConversation.conversationInfo.getUnreadCount() != 0 ? View.VISIBLE : View.GONE);
                 viewHolder.viewBinding.badge.badge.setText(msgConversation.conversationInfo.getUnreadCount() + "");
             }
-
             viewHolder.viewBinding.time.setText(TimeUtil.getTimeString(msgConversation.conversationInfo.getLatestMsgSendTime()));
+
+            viewHolder.viewBinding.getRoot().setBackgroundColor(
+                Color.parseColor(msgConversation.conversationInfo.isPinned()
+                    ? "#FFF3F3F3":"#FFFFFF"));
         }
 
         @Override

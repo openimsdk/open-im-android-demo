@@ -91,9 +91,9 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         ContactVM contactVM = ((ContactFragment) contactFragment).getVM();
         if (null == contactVM) return;
         contactVM.friendDotNum.observe(this, integer -> {
-            view.badge.setVisibility((integer > 0 || contactVM.dotNum.getValue() > 0) ? View.VISIBLE : View.GONE);
+            view.badge.setVisibility((integer > 0 || contactVM.groupDotNum.getValue() > 0) ? View.VISIBLE : View.GONE);
         });
-        contactVM.dotNum.observe(this, integer -> {
+        contactVM.groupDotNum.observe(this, integer -> {
             view.badge.setVisibility((integer > 0 || contactVM.friendDotNum.getValue() > 0) ? View.VISIBLE : View.GONE);
         });
     }

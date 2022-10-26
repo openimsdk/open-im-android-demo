@@ -50,6 +50,7 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgLocation1Binding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgLocation2Binding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgMergeLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgMergeRightBinding;
+import io.openim.android.ouiconversation.databinding.LayoutMsgNoticeLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
 import io.openim.android.ouiconversation.ui.ChatHistoryDetailsActivity;
@@ -102,6 +103,9 @@ public class MessageViewHolder {
         if (viewType == Constant.MsgType.LOCATION)
             return new LocationView(parent);
 
+        if (viewType == Constant.MsgType.OA_NOTICE)
+            return new NotificationItemHo(parent);
+
         if (viewType >= Constant.MsgType.NOTICE
             || viewType == Constant.MsgType.REVOKE
             || viewType == Constant.MsgType.ADVANCED_REVOKE)
@@ -112,6 +116,7 @@ public class MessageViewHolder {
 
         if (viewType == Constant.MsgType.TRANSIT)
             return new BusinessCardView(parent);
+
 
         return new TXTView(parent);
     }
@@ -142,13 +147,13 @@ public class MessageViewHolder {
             return LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_msg, parent, false);
         }
 
-        abstract int getLeftInflatedId();
+        protected abstract int getLeftInflatedId();
 
-        abstract int getRightInflatedId();
+        protected abstract int getRightInflatedId();
 
-        abstract void bindLeft(View itemView, Message message);
+        protected abstract void bindLeft(View itemView, Message message);
 
-        abstract void bindRight(View itemView, Message message);
+        protected abstract void bindRight(View itemView, Message message);
 
         /**
          * 是否是自己发的消息
@@ -432,22 +437,22 @@ public class MessageViewHolder {
         }
 
         @Override
-        int getLeftInflatedId() {
+        protected int getLeftInflatedId() {
             return 0;
         }
 
         @Override
-        int getRightInflatedId() {
+        protected int getRightInflatedId() {
             return 0;
         }
 
         @Override
-        void bindLeft(View itemView, Message message) {
+        protected void bindLeft(View itemView, Message message) {
 
         }
 
         @Override
-        void bindRight(View itemView, Message message) {
+        protected void bindRight(View itemView, Message message) {
 
         }
     }
@@ -460,17 +465,17 @@ public class MessageViewHolder {
         }
 
         @Override
-        int getLeftInflatedId() {
+        protected int getLeftInflatedId() {
             return R.layout.layout_msg_txt_left;
         }
 
         @Override
-        int getRightInflatedId() {
+        protected int getRightInflatedId() {
             return R.layout.layout_msg_txt_right;
         }
 
         @Override
-        void bindLeft(View itemView, Message message) {
+        protected void bindLeft(View itemView, Message message) {
             LayoutMsgTxtLeftBinding v = LayoutMsgTxtLeftBinding.bind(itemView);
             v.avatar.load(message.getSenderFaceUrl());
             v.content.setText(message.getContent());
@@ -489,7 +494,7 @@ public class MessageViewHolder {
         }
 
         @Override
-        void bindRight(View itemView, Message message) {
+        protected void bindRight(View itemView, Message message) {
             LayoutMsgTxtRightBinding v = LayoutMsgTxtRightBinding.bind(itemView);
             v.avatar2.load(message.getSenderFaceUrl());
             v.sendState2.setSendState(message.getStatus());
@@ -508,17 +513,17 @@ public class MessageViewHolder {
         }
 
         @Override
-        int getLeftInflatedId() {
+        protected int getLeftInflatedId() {
             return R.layout.layout_msg_img_left;
         }
 
         @Override
-        int getRightInflatedId() {
+        protected int getRightInflatedId() {
             return R.layout.layout_msg_img_right;
         }
 
         @Override
-        void bindLeft(View itemView, Message message) {
+        protected void bindLeft(View itemView, Message message) {
             LayoutMsgImgLeftBinding v = LayoutMsgImgLeftBinding.bind(itemView);
             String url = message.getPictureElem().getSourcePicture().getUrl();
 
@@ -535,7 +540,7 @@ public class MessageViewHolder {
         }
 
         @Override
-        void bindRight(View itemView, Message message) {
+        protected void bindRight(View itemView, Message message) {
             LayoutMsgImgRightBinding v = LayoutMsgImgRightBinding.bind(itemView);
             v.avatar2.load(message.getSenderFaceUrl());
             String url = message.getPictureElem().getSourcePicture().getUrl();
@@ -593,17 +598,17 @@ public class MessageViewHolder {
         }
 
         @Override
-        int getLeftInflatedId() {
+        protected int getLeftInflatedId() {
             return R.layout.layout_msg_audio_left;
         }
 
         @Override
-        int getRightInflatedId() {
+        protected int getRightInflatedId() {
             return R.layout.layout_msg_audio_right;
         }
 
         @Override
-        void bindLeft(View itemView, Message message) {
+        protected void bindLeft(View itemView, Message message) {
             final LayoutMsgAudioLeftBinding view = LayoutMsgAudioLeftBinding.bind(itemView);
             view.avatar.load(message.getSenderFaceUrl());
             view.sendState.setSendState(message.getStatus());
@@ -613,7 +618,7 @@ public class MessageViewHolder {
         }
 
         @Override
-        void bindRight(View itemView, Message message) {
+        protected void bindRight(View itemView, Message message) {
             final LayoutMsgAudioRightBinding view = LayoutMsgAudioRightBinding.bind(itemView);
             view.avatar2.load(message.getSenderFaceUrl());
             view.sendState2.setSendState(message.getStatus());
@@ -682,7 +687,7 @@ public class MessageViewHolder {
         }
 
         @Override
-        void bindRight(View itemView, Message message) {
+        protected void bindRight(View itemView, Message message) {
             LayoutMsgImgRightBinding view = LayoutMsgImgRightBinding.bind(itemView);
             view.avatar2.load(message.getSenderFaceUrl());
             view.sendState2.setSendState(message.getStatus());
@@ -703,7 +708,7 @@ public class MessageViewHolder {
         }
 
         @Override
-        void bindLeft(View itemView, Message message) {
+        protected void bindLeft(View itemView, Message message) {
             LayoutMsgImgLeftBinding view = LayoutMsgImgLeftBinding.bind(itemView);
             view.avatar.load(message.getSenderFaceUrl());
             view.sendState.setSendState(message.getStatus());
@@ -731,17 +736,17 @@ public class MessageViewHolder {
         }
 
         @Override
-        int getLeftInflatedId() {
+        protected int getLeftInflatedId() {
             return R.layout.layout_msg_file_left;
         }
 
         @Override
-        int getRightInflatedId() {
+        protected int getRightInflatedId() {
             return R.layout.layout_msg_file_right;
         }
 
         @Override
-        void bindLeft(View itemView, Message message) {
+        protected void bindLeft(View itemView, Message message) {
             LayoutMsgFileLeftBinding view = LayoutMsgFileLeftBinding.bind(itemView);
             view.avatar.load(message.getSenderFaceUrl());
 
@@ -758,7 +763,7 @@ public class MessageViewHolder {
         }
 
         @Override
-        void bindRight(View itemView, Message message) {
+        protected void bindRight(View itemView, Message message) {
             LayoutMsgFileRightBinding view = LayoutMsgFileRightBinding.bind(itemView);
             view.avatar2.load(message.getSenderFaceUrl());
 
@@ -784,17 +789,17 @@ public class MessageViewHolder {
         }
 
         @Override
-        int getLeftInflatedId() {
+        protected int getLeftInflatedId() {
             return R.layout.layout_msg_location1;
         }
 
         @Override
-        int getRightInflatedId() {
+        protected int getRightInflatedId() {
             return R.layout.layout_msg_location2;
         }
 
         @Override
-        void bindLeft(View itemView, Message message) {
+        protected void bindLeft(View itemView, Message message) {
             LayoutMsgLocation1Binding view = LayoutMsgLocation1Binding.bind(itemView);
             view.avatar.load(message.getSenderFaceUrl());
             try {
@@ -817,7 +822,7 @@ public class MessageViewHolder {
         }
 
         @Override
-        void bindRight(View itemView, Message message) {
+        protected void bindRight(View itemView, Message message) {
             LayoutMsgLocation2Binding view = LayoutMsgLocation2Binding.bind(itemView);
             view.avatar2.load(message.getSenderFaceUrl());
             try {
@@ -846,18 +851,18 @@ public class MessageViewHolder {
         }
 
         @Override
-        int getLeftInflatedId() {
+        protected int getLeftInflatedId() {
             return R.layout.layout_msg_merge_left;
         }
 
         @Override
-        int getRightInflatedId() {
+        protected int getRightInflatedId() {
             return R.layout.layout_msg_merge_right;
         }
 
 
         @Override
-        void bindLeft(View itemView, Message message) {
+        protected void bindLeft(View itemView, Message message) {
             LayoutMsgMergeLeftBinding view = LayoutMsgMergeLeftBinding.bind(itemView);
             view.sendState.setSendState(message.getStatus());
             MergeElem mergeElem = message.getMergeElem();
@@ -873,7 +878,7 @@ public class MessageViewHolder {
         }
 
         @Override
-        void bindRight(View itemView, Message message) {
+        protected void bindRight(View itemView, Message message) {
             LayoutMsgMergeRightBinding view = LayoutMsgMergeRightBinding.bind(itemView);
             view.sendState2.setSendState(message.getStatus());
             MergeElem mergeElem = message.getMergeElem();
@@ -912,17 +917,17 @@ public class MessageViewHolder {
         }
 
         @Override
-        int getLeftInflatedId() {
+        protected int getLeftInflatedId() {
             return R.layout.layout_msg_card_left;
         }
 
         @Override
-        int getRightInflatedId() {
+        protected int getRightInflatedId() {
             return R.layout.layout_msg_card_right;
         }
 
         @Override
-        void bindLeft(View itemView, Message message) {
+        protected void bindLeft(View itemView, Message message) {
             LayoutMsgCardLeftBinding view = LayoutMsgCardLeftBinding.bind(itemView);
             view.sendState.setSendState(message.getStatus());
             view.avatar.load(message.getSenderFaceUrl());
@@ -940,7 +945,7 @@ public class MessageViewHolder {
         }
 
         @Override
-        void bindRight(View itemView, Message message) {
+        protected void bindRight(View itemView, Message message) {
             LayoutMsgCardRightBinding view = LayoutMsgCardRightBinding.bind(itemView);
             view.sendState2.setSendState(message.getStatus());
             view.avatar2.load(message.getSenderFaceUrl());
@@ -952,4 +957,47 @@ public class MessageViewHolder {
         }
     }
 
+    public static class NotificationItemHo extends MessageViewHolder.MsgViewHolder {
+
+
+        public NotificationItemHo(ViewGroup itemView) {
+            super(itemView);
+        }
+
+        @Override
+        protected int getLeftInflatedId() {
+            return R.layout.layout_msg_notice_left;
+        }
+
+        @Override
+        protected int getRightInflatedId() {
+            return 0;
+        }
+
+        @Override
+        protected void bindLeft(View itemView, Message message) {
+            LayoutMsgNoticeLeftBinding v = LayoutMsgNoticeLeftBinding.bind(itemView);
+            MsgExpand msgExpand = (MsgExpand) message.getExt();
+            v.avatar.load(msgExpand.oaNotification.notificationFaceURL);
+            v.nickName.setText(msgExpand.oaNotification.notificationName);
+            v.title.setText(msgExpand.oaNotification.notificationName);
+            v.content.setText(msgExpand.oaNotification.text);
+           try {
+               if (msgExpand.oaNotification.mixType==1){
+                   v.picture.setVisibility(View.VISIBLE);
+                   Glide.with(v.getRoot().getContext()).load(msgExpand.oaNotification.
+                       pictureElem.getBigPicture().getUrl()).into( v.picture);
+               }else {
+                   v.picture.setVisibility(View.GONE);
+               }
+           }catch (Exception e){
+               e.printStackTrace();
+           }
+        }
+
+        @Override
+        protected void bindRight(View itemView, Message message) {
+
+        }
+    }
 }

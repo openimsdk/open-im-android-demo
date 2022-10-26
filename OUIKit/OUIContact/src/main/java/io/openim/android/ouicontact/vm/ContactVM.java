@@ -31,7 +31,7 @@ import io.openim.android.sdk.models.UserInfo;
 
 public class ContactVM extends BaseViewModel implements OnGroupListener, OnFriendshipListener {
     //群红点数量
-    public MutableLiveData<Integer> dotNum = new MutableLiveData<>(0);
+    public MutableLiveData<Integer> groupDotNum = new MutableLiveData<>(0);
     //好友通知红点
     public MutableLiveData<Integer> friendDotNum = new MutableLiveData<>(0);
     //申请列表
@@ -54,7 +54,7 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
         int requestNum = SharedPreferencesUtil.get(getContext()).getInteger(Constant.K_FRIEND_NUM);
         int groupNum = SharedPreferencesUtil.get(getContext()).getInteger(Constant.K_GROUP_NUM);
         friendDotNum.setValue(requestNum);
-        dotNum.setValue(groupNum);
+        groupDotNum.setValue(groupNum);
     }
 
     @Override
@@ -136,14 +136,12 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
 
     @Override
     public void onGroupApplicationAccepted(GroupApplicationInfo info) {
-        dotNum.setValue(dotNum.getValue() + 1);
-        cacheGroupDot();
+        cacheGroupDot(info);
     }
 
     @Override
     public void onGroupApplicationAdded(GroupApplicationInfo info) {
-        dotNum.setValue(dotNum.getValue() + 1);
-        cacheGroupDot();
+        cacheGroupDot(info);
     }
 
     @Override
@@ -153,7 +151,7 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
 
     @Override
     public void onGroupApplicationRejected(GroupApplicationInfo info) {
-
+        cacheGroupDot(info);
     }
 
     @Override
@@ -181,9 +179,13 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
 
     }
 
-    private void cacheGroupDot() {
-        SharedPreferencesUtil.get(getContext()).setCache(Constant.K_GROUP_NUM,
-            dotNum.getValue());
+    private void cacheGroupDot(GroupApplicationInfo info) {
+        if (info.getHandleResult() == 0
+            && !info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+            groupDotNum.setValue(friendDotNum.getValue() + 1);
+            SharedPreferencesUtil.get(getContext()).setCache(Constant.K_GROUP_NUM,
+                groupDotNum.getValue());
+        }
     }
 
     private void cacheFriendDot(FriendApplicationInfo u) {

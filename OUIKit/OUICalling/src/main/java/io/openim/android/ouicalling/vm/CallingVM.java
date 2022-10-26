@@ -153,10 +153,10 @@ public class CallingVM {
 
                 callViewModel.getParticipants().collect((participants, continuation) -> {
                     if (participants.isEmpty()) return null;
-                    if (!isGroup && !isCallOut && participants.size() == 1) {
-                        callingService.onHangup(null);
-                        return null;
-                    }
+//                    if (!isGroup && !isCallOut && participants.size() == 1) {
+//                        callingService.onHangup(null);
+//                        return null;
+//                    }
                     if (null != onParticipantsChangeListener) {
 //                        List<Participant> participantList = new ArrayList<>();
 //                        for (Participant participant : participants) {

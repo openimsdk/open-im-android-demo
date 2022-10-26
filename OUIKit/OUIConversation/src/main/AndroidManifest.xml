@@ -13,6 +13,9 @@
 
     <application android:theme="@style/Theme.Demo">
         <activity
+            android:name=".ui.NotificationActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.ChatHistoryDetailsActivity"
             android:exported="false" />
         <activity

@@ -24,5 +24,6 @@ public class MsgExpand {
     public int spanHashCode;
     //富文本（at 消息、表情）
     public SpannableStringBuilder sequence;
-
+    //oa 通知
+    public OANotification oaNotification;
 }

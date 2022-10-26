@@ -9,6 +9,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -27,6 +30,7 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -45,6 +49,7 @@ import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.MuteMemberNotification;
+import io.openim.android.ouicore.entity.OANotification;
 import io.openim.android.ouicore.entity.QuitGroupNotification;
 import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.net.bage.GsonHel;
@@ -53,12 +58,15 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.EmojiUtil;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.SignalingInvitationInfo;
@@ -139,6 +147,10 @@ public class IMUtil {
         if (null == msgExpand)
             msgExpand = new MsgExpand();
         try {
+            if (msg.getContentType() == Constant.MsgType.OA_NOTICE) {
+                msgExpand.isShowTime = true;
+                msgExpand.oaNotification = GsonHel.fromJson(msg.getNotificationElem().getDetail(), OANotification.class);
+            }
             if (msg.getContentType() == Constant.MsgType.LOCATION)
                 msgExpand.locationInfo = GsonHel.fromJson(msg.getLocationElem().getDescription(), LocationInfo.class);
             if (msg.getContentType() == Constant.MsgType.MENTION) {
@@ -151,6 +163,7 @@ public class IMUtil {
             e.printStackTrace();
         }
         msg.setExt(msgExpand);
+
         return msg;
     }
 
@@ -285,7 +298,7 @@ public class IMUtil {
 
     private static void handleEmoji(MsgExpand expand, Message msg) {
         String content = msg.getContent();
-        if (TextUtils.isEmpty(content))return;
+        if (TextUtils.isEmpty(content)) return;
         for (String key : EmojiUtil.emojiFaces.keySet()) {
             int fromIndex = 0;
             if (content.contains(key)) {
@@ -373,6 +386,9 @@ public class IMUtil {
                     break;
                 case Constant.MsgType.MERGE:
                     lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";
+                    break;
+                case Constant.MsgType.OA_NOTICE:
+                    lastMsg = ((MsgExpand) msg.getExt()).oaNotification.text;
                     break;
             }
         } catch (Exception e) {
@@ -478,15 +494,29 @@ public class IMUtil {
             .setContentIntent(hangPendingIntent)
             .setAutoCancel(true)
             .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
+            .setSound(Uri.parse("android.resource://" +
+                BaseApp.inst().getPackageName() + "/" + R.raw.message_ring))
             .build();
 
         //Android 8.0 以上需包添加渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID,
                 CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .build();
+            notificationChannel.setSound(Uri.parse("android.resource://" +
+                BaseApp.inst().getPackageName() + "/" + R.raw.message_ring), audioAttributes);
             manager.createNotificationChannel(notificationChannel);
         }
         manager.notify((int) msg.getSendTime(), notification);
+    }
+
+    //播放提示音
+    public static void playPrompt(Message msg) {
+        MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), R.raw.message_ring);
+        MediaPlayerUtil.INSTANCE.playMedia();
     }
 
     /**

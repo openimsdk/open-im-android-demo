@@ -70,7 +70,7 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
 
     private void click() {
         header.groupNotice.setOnClickListener(v -> {
-            vm.dotNum.setValue(0);
+            vm.groupDotNum.setValue(0);
             SharedPreferencesUtil.remove(getContext(), Constant.K_GROUP_NUM);
             startActivity(new Intent(getActivity(), GroupNoticeListActivity.class));
         });
@@ -92,7 +92,7 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
 
 
     private void initView() {
-        vm.dotNum.observe(getActivity(), v -> {
+        vm.groupDotNum.observe(getActivity(), v -> {
             header.badge.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE);
             header.badge.badge.setText(v + "");
         });

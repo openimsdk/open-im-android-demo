@@ -3,24 +3,24 @@ package io.openim.android.ouicore.utils;
 import io.openim.android.ouicore.im.IM;
 
 public class Constant {
-//    public static final String DEFAULT_IP = "121.37.25.71";
-////    public static final String DEFAULT_IP = "43.128.5.63";
-//
-//    //IM sdk api地址
-//    public static final String IM_API_URL = "http://" + DEFAULT_IP + ":10002";
-//    //登录注册手机验 证服务器地址
-//    public static final String APP_AUTH_URL = "http://" + DEFAULT_IP + ":10004";
-//    //web socket
-//    public static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":10001";
+    public static final String DEFAULT_IP = "121.37.25.71";
+//    public static final String DEFAULT_IP = "43.128.5.63";
 
-
-    public static final String DEFAULT_IP = "tangheim.tanghecms.com";
     //IM sdk api地址
-    public static final String IM_API_URL = "https://" + DEFAULT_IP + ":61102";
+    public static final String IM_API_URL = "http://" + DEFAULT_IP + ":10002";
     //登录注册手机验 证服务器地址
-    public static final String APP_AUTH_URL = "https://" + DEFAULT_IP + ":61104";
+    public static final String APP_AUTH_URL = "http://" + DEFAULT_IP + ":10004";
     //web socket
-    public static final String IM_WS_URL = "wss://" + DEFAULT_IP + ":61101";
+    public static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":10001";
+
+
+//    public static final String DEFAULT_IP = "tangheim.tanghecms.com";
+//    //IM sdk api地址
+//    public static final String IM_API_URL = "https://" + DEFAULT_IP + ":61102";
+//    //登录注册手机验 证服务器地址
+//    public static final String APP_AUTH_URL = "https://" + DEFAULT_IP + ":61104";
+//    //web socket
+//    public static final String IM_WS_URL = "wss://" + DEFAULT_IP + ":61101";
 
 
     //存储音频的文件夹
@@ -122,6 +122,8 @@ public class Constant {
         public static final int TYPING = 113;
         //通知消息一般大于1200
         public static final int NOTICE = 1200;
+        //后台发送过来的通知
+        public static final int OA_NOTICE = 1400;
         //群公告
         public static final int BULLETIN = 1502;
     }
@@ -220,6 +222,18 @@ public class Constant {
         public static final int status1 = 1;
         public static final int status2 = 2;
         public static final int status3 = 3;
+    }
+
+    /// 进群验证设置选项
+    public static class GroupVerification {
+        /// 申请需要同意 邀请直接进
+        public static final int applyNeedVerificationInviteDirectly = 0;
+
+        /// 所有人进群需要验证，除了群主管理员邀
+        public static final int allNeedVerification = 1;
+
+        /// 直接进群
+        public static final int directly = 2;
     }
 
 }
