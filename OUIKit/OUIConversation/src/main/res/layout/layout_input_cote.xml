@@ -9,12 +9,12 @@
     </data>
 
     <io.openim.android.ouicore.widget.InterceptLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:focusableInTouchMode="true"
         android:orientation="vertical"
-        android:id="@+id/root"
         android:tag="layout/layout_input_cote_0">
 
         <LinearLayout
@@ -39,38 +39,78 @@
                 android:paddingLeft="10dp" />
 
 
-            <RelativeLayout
+            <LinearLayout
+                android:id="@+id/inputLy"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <io.openim.android.ouiconversation.widget.TailInputEditText
-                    android:id="@+id/chatInput"
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <io.openim.android.ouiconversation.widget.TailInputEditText
+                        android:id="@+id/chatInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/sty_radius_4_white"
+                        android:maxHeight="80dp"
+                        android:minHeight="35dp"
+                        android:paddingStart="3dp"
+                        android:text="@={ChatVM.inputMsg}"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/notice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:text="已开启群禁言"
+                        android:textColor="#ff999999"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/replyLy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
                     android:background="@drawable/sty_radius_4_white"
-                    android:maxHeight="80dp"
-                    android:minHeight="35dp"
-                    android:paddingStart="3dp"
-                    android:text="@={ChatVM.inputMsg}"
-                    android:visibility="visible" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingLeft="3dp"
+                    android:visibility="gone"
+                    android:paddingRight="3dp">
 
-                <TextView
-                    android:id="@+id/notice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:text="已开启群禁言"
-                    android:textColor="#ff999999"
-                    android:textSize="12sp"
-                    android:visibility="gone" />
-            </RelativeLayout>
+                    <TextView
+                        android:id="@+id/replyContent"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="3"
+                        android:textColor="#ff999999"
+                        android:textSize="12sp" />
+
+                    <ImageView
+                        android:id="@+id/cancelReply"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"
+                        android:src="@mipmap/ic_close" />
+                </LinearLayout>
+            </LinearLayout>
+
 
             <Button
                 android:id="@+id/touchSay"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="45dp"
                 android:layout_weight="1"
                 android:text="@string/touch_say"
                 android:visibility="gone" />
@@ -96,7 +136,7 @@
             <Button
                 android:id="@+id/chatSend"
                 android:layout_width="63dp"
-                android:layout_height="43dp"
+                android:layout_height="45dp"
                 android:enabled="true"
                 android:text="@string/send"
                 android:textSize="14sp"

@@ -147,6 +147,9 @@ public class IMUtil {
         if (null == msgExpand)
             msgExpand = new MsgExpand();
         try {
+            if (msg.getContentType() == Constant.MsgType.QUOTE) {
+                buildExpandInfo(msg.getQuoteElem().getQuoteMessage());
+            }
             if (msg.getContentType() == Constant.MsgType.OA_NOTICE) {
                 msgExpand.isShowTime = true;
                 msgExpand.oaNotification = GsonHel.fromJson(msg.getNotificationElem().getDetail(), OANotification.class);
@@ -297,7 +300,8 @@ public class IMUtil {
     }
 
     private static void handleEmoji(MsgExpand expand, Message msg) {
-        String content = msg.getContent();
+        String content = msg.getContentType() == Constant.MsgType.QUOTE ?
+            msg.getQuoteElem().getText() : msg.getContent();
         if (TextUtils.isEmpty(content)) return;
         for (String key : EmojiUtil.emojiFaces.keySet()) {
             int fromIndex = 0;
@@ -387,8 +391,14 @@ public class IMUtil {
                 case Constant.MsgType.MERGE:
                     lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";
                     break;
+                case Constant.MsgType.CARD:
+                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.card) + "]";
+                    break;
                 case Constant.MsgType.OA_NOTICE:
                     lastMsg = ((MsgExpand) msg.getExt()).oaNotification.text;
+                    break;
+                case Constant.MsgType.QUOTE:
+                    lastMsg = msg.getQuoteElem().getText();
                     break;
             }
         } catch (Exception e) {
@@ -473,7 +483,7 @@ public class IMUtil {
         from.finish();
     }
 
-    public static void sendNotice(Message msg) {
+    public static void sendNotice(long id) {
         NotificationManager manager = (NotificationManager) BaseApp.inst()
             .getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -510,11 +520,11 @@ public class IMUtil {
                 BaseApp.inst().getPackageName() + "/" + R.raw.message_ring), audioAttributes);
             manager.createNotificationChannel(notificationChannel);
         }
-        manager.notify((int) msg.getSendTime(), notification);
+        manager.notify((int) id, notification);
     }
 
     //播放提示音
-    public static void playPrompt(Message msg) {
+    public static void playPrompt() {
         MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), R.raw.message_ring);
         MediaPlayerUtil.INSTANCE.playMedia();
     }

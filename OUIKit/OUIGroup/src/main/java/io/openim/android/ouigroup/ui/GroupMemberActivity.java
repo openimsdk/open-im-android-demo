@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
+import com.alibaba.android.arouter.launcher.ARouter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +25,7 @@ import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouigroup.databinding.ActivityGroupMemberBinding;
 
@@ -176,8 +179,9 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
                     } else
                         itemViewHo.view.identity.setVisibility(View.GONE);
 
-                    if (isTransferPermission) {
-                        itemViewHo.view.getRoot().setOnClickListener(v -> {
+
+                    itemViewHo.view.getRoot().setOnClickListener(v -> {
+                        if (isTransferPermission) {
                             if (data.groupMembersInfo.getRoleLevel() == 2)
                                 toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.repeat_group_manager));
                             else {
@@ -197,8 +201,13 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
                                 });
                                 commonDialog.show();
                             }
-                        });
-                    }
+                        } else {
+                            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                                .withString(Constant.K_ID, friendInfo.getUserID())
+                                .navigation();
+                        }
+                    });
+
                 } else {
                     ViewHol.StickyViewHo stickyViewHo = (ViewHol.StickyViewHo) holder;
                     stickyViewHo.view.title.setText(data.sortLetter);

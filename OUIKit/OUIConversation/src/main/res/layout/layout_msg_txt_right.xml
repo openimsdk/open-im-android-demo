@@ -5,15 +5,14 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
         <io.openim.android.ouiconversation.widget.SendStateView
             android:id="@+id/sendState2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
             android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
             android:layout_toLeftOf="@id/content2" />
 
         <TextView
@@ -37,5 +36,37 @@
             android:layout_alignParentRight="true"
             android:src="@mipmap/ic_my_friend" />
 
+        <LinearLayout
+            android:id="@+id/quoteLy2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/content2"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="7dp"
+            android:layout_toLeftOf="@id/avatar2"
+            android:background="@drawable/sty_radius_4_f0f6ff"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/quoteContent2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:ellipsize="end"
+                android:maxWidth="185dp"
+                android:maxLines="3"
+                android:textColor="#ff999999"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/picture2"
+                android:layout_width="@dimen/comm_title_high"
+                android:layout_height="@dimen/comm_title_high"
+                android:layout_marginLeft="8dp"
+                android:scaleType="center"
+                android:visibility="gone" />
+        </LinearLayout>
     </RelativeLayout>
 </FrameLayout>

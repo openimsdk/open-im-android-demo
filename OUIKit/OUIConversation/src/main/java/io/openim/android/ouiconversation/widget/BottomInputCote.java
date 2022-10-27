@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouiconversation.databinding.LayoutInputCoteBinding;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.EmojiUtil;
 import io.openim.android.ouiconversation.vm.ChatVM;
@@ -36,6 +37,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.AtUserInfo;
 import io.openim.android.sdk.models.GroupInfo;
@@ -57,17 +59,19 @@ public class BottomInputCote {
 
 
     @SuppressLint("WrongConstant")
-    public BottomInputCote(Context context, LayoutInputCoteBinding view,
-                           Boolean isMicrophone) {
+    public BottomInputCote(Context context, LayoutInputCoteBinding view) {
         this.context = context;
         this.view = view;
-        this.hasMicrophone = isMicrophone;
+        MThreadTool.executorService.execute(() -> hasMicrophone = AndPermission.hasPermissions(context, Permission.Group.MICROPHONE));
         initFragment();
 
         view.chatSend.setOnClickListener(x -> {
             List<Message> atMessages = vm.atMessages.getValue();
             final Message msg;
-            if (atMessages.isEmpty())
+            if (null != vm.replyMessage.getValue()) {
+                msg = OpenIMClient.getInstance().messageManager.createQuoteMessage(vm.inputMsg.getValue(),
+                    vm.replyMessage.getValue());
+            } else if (atMessages.isEmpty())
                 msg = OpenIMClient.getInstance().messageManager.createTextMessage(vm.inputMsg.getValue());
             else {
                 List<String> atUserIDList = new ArrayList<>();
@@ -101,14 +105,11 @@ public class BottomInputCote {
             }
             if (null != msg) {
                 vm.sendMsg(msg);
-                vm.inputMsg.setValue("");
-                view.chatInput.setText("");
-                vm.atMessages.getValue().clear();
-                vm.emojiMessages.getValue().clear();
+                reset();
             }
         });
         view.voice.setOnCheckedChangeListener((v, isChecked) -> {
-            view.chatInput.setVisibility(isChecked ? GONE : VISIBLE);
+            view.inputLy.setVisibility(isChecked ? GONE : VISIBLE);
             view.chatSend.setVisibility(isChecked ? GONE : VISIBLE);
             view.touchSay.setVisibility(isChecked ? VISIBLE : GONE);
         });
@@ -134,9 +135,6 @@ public class BottomInputCote {
                         // Storage permission are allowed.
                         hasMicrophone = true;
                     })
-                    .onDenied(permissions -> {
-                        // Storage permission are not allowed.
-                    })
                     .start();
             return false;
         });
@@ -145,12 +143,7 @@ public class BottomInputCote {
             if (hasFocus)
                 setExpandHide();
         });
-        view.chatInput.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                return false;
-            }
-        });
+
         view.chatMore.setOnClickListener(v -> {
             clearFocus();
             Common.hideKeyboard(BaseApp.inst(), v);
@@ -163,8 +156,16 @@ public class BottomInputCote {
             view.fragmentContainer.setVisibility(VISIBLE);
             switchFragment(emojiFragment);
         });
+        view.cancelReply.setOnClickListener(v -> vm.replyMessage.setValue(null));
+    }
 
-
+    //消息发出后重置UI
+    private void reset() {
+        vm.inputMsg.setValue("");
+        view.chatInput.setText("");
+        vm.atMessages.getValue().clear();
+        vm.emojiMessages.getValue().clear();
+        vm.replyMessage.setValue(null);
     }
 
     private void initFragment() {
@@ -194,6 +195,7 @@ public class BottomInputCote {
         vmListener();
     }
 
+    @SuppressLint("SetTextI18n")
     private void vmListener() {
         vm.atMessages.observe((LifecycleOwner) context, messages -> {
             if (messages.isEmpty()) return;
@@ -235,6 +237,10 @@ public class BottomInputCote {
                         == Constant.GroupStatus.status3
                         && !groupInfo.getOwnerUserID()
                         .equals(BaseApp.inst().loginCertificate.userID)) {
+                        view.inputLy.setVisibility(VISIBLE);
+                        view.chatSend.setVisibility(VISIBLE);
+                        view.touchSay.setVisibility(GONE);
+
                         view.root.setIntercept(true);
                         view.root.setAlpha(0.5f);
                         view.notice.setVisibility(VISIBLE);
@@ -245,6 +251,14 @@ public class BottomInputCote {
                     }
                 });
         }
+        vm.replyMessage.observe((LifecycleOwner) context, message -> {
+            if (null == message) {
+                view.replyLy.setVisibility(GONE);
+            } else {
+                view.replyLy.setVisibility(VISIBLE);
+                view.replyContent.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
+            }
+        });
     }
 
     //设置扩展菜单隐藏

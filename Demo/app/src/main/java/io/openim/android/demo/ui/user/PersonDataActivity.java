@@ -11,8 +11,12 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.alibaba.android.arouter.launcher.ARouter;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityPersonInfoBinding;
@@ -24,8 +28,10 @@ import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.SlideButton;
 import io.openim.android.ouicore.widget.WaitDialog;
@@ -74,6 +80,16 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
 
 
     private void listener() {
+        view.recommend.setOnClickListener(v -> {
+            Map<String, String> bean = new HashMap();
+            UserInfo userInfo = vm.userInfo.getValue();
+            bean.put("userID", userInfo.getUserID());
+            bean.put("nickname", userInfo.getNickname());
+            bean.put("faceURL", userInfo.getFaceURL());
+            ARouter.getInstance()
+                .build(Routes.Contact.ALL_FRIEND).withString("recommend", GsonHel.toJson(bean))
+            .navigation();
+        });
         view.moreData.setOnClickListener(v -> {
             startActivity(new Intent(this, MoreDataActivity.class));
         });

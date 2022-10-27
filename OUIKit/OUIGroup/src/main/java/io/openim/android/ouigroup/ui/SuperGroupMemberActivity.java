@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.android.arouter.launcher.ARouter;
+
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
@@ -19,6 +21,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivitySuperGroupMemberBinding;
@@ -136,8 +139,9 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
                 } else
                     itemViewHo.view.identity.setVisibility(View.GONE);
 
-                if (isTransferPermission) {
-                    itemViewHo.view.getRoot().setOnClickListener(v -> {
+
+                itemViewHo.view.getRoot().setOnClickListener(v -> {
+                    if (isTransferPermission) {
                         if (data.getRoleLevel() == 2)
                             toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.repeat_group_manager));
                         else {
@@ -157,9 +161,14 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
                             });
                             commonDialog.show();
                         }
+                    } else {
+                        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                            .withString(Constant.K_ID, data.getUserID())
+                            .navigation();
+                    }
+                });
 
-                    });
-                }
+
             }
         };
         adapter.setItems(vm.superGroupMembers.getValue());

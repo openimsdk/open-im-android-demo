@@ -7,13 +7,17 @@ import androidx.lifecycle.LifecycleOwner;
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import io.openim.android.ouiconversation.vm.ChatVM;
+import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.Message;
 
 @Route(path = Routes.Service.CONVERSATION)
 public class IBridgeImpl implements IConversationBridge {
@@ -39,6 +43,7 @@ public class IBridgeImpl implements IConversationBridge {
 
     }
 
+
     @Override
     public void closeChatPage() {
         ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
@@ -46,6 +51,7 @@ public class IBridgeImpl implements IConversationBridge {
             chatVM.closePage();
         }
     }
+
 
     @Override
     public void setConversationRecvMessageOpt(int status, String... cid) {

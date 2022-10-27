@@ -323,6 +323,9 @@ public class IMEvent {
         OpenIMClient.getInstance().conversationManager.setOnConversationListener(new OnConversationListener() {
             @Override
             public void onConversationChanged(List<ConversationInfo> list) {
+                for (ConversationInfo conversationInfo : list) {
+                    promptSoundOrNotification(conversationInfo);
+                }
                 // 已添加的会话发生改变
                 for (OnConversationListener onConversationListener : conversationListeners) {
                     onConversationListener.onConversationChanged(list);
@@ -358,6 +361,16 @@ public class IMEvent {
 
             }
         });
+    }
+
+    private void promptSoundOrNotification(ConversationInfo conversationInfo) {
+        if (conversationInfo.getRecvMsgOpt() == 0 &&
+            conversationInfo.getUnreadCount() != 0) {
+            if (BaseApp.inst().isBackground())
+                IMUtil.sendNotice(conversationInfo.getLatestMsgSendTime());
+            else
+                IMUtil.playPrompt();
+        }
     }
 
     // 好关系发生变化监听
@@ -427,12 +440,6 @@ public class IMEvent {
         OpenIMClient.getInstance().messageManager.setAdvancedMsgListener(new OnAdvanceMsgListener() {
             @Override
             public void onRecvNewMessage(Message msg) {
-                if (msg.getContentType() != Constant.MsgType.TYPING) {
-                    if (BaseApp.inst().isBackground() && !msg.isRead())
-                        IMUtil.sendNotice(msg);
-                    else
-                        IMUtil.playPrompt(msg);
-                }
                 // 收到新消息，界面添加新消息
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
                     onAdvanceMsgListener.onRecvNewMessage(msg);
@@ -472,7 +479,6 @@ public class IMEvent {
             }
         });
     }
-
 
 
     // 用户资料变更监听

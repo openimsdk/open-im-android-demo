@@ -2,38 +2,50 @@ package io.openim.android.ouicontact.ui;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import io.openim.android.ouicontact.R;
 import io.openim.android.ouicontact.databinding.ActivityAllFriendBinding;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SocialityVM;
+import io.openim.android.ouicore.widget.CommonDialog;
+import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.models.FriendInfo;
+import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.OfflinePushInfo;
 
 @Route(path = Routes.Contact.ALL_FRIEND)
 public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFriendBinding> {
 
     private RecyclerViewAdapter<ExUserInfo, RecyclerView.ViewHolder> adapter;
+    //从聊天跳转过来
     private boolean formChat;
+    //从推荐好友跳转过来 带的userinfo
+    private String recommend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +54,7 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
         bindViewDataBinding(ActivityAllFriendBinding.inflate(getLayoutInflater()));
         sink();
         formChat = getIntent().getBooleanExtra("formChat", false);
+        recommend = getIntent().getStringExtra("recommend");
         vm.getAllFriend();
 
         listener();
@@ -102,10 +115,32 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
                     itemViewHo.view.nickName.setText(friendInfo.getNickname());
                     itemViewHo.view.select.setVisibility(View.GONE);
                     itemViewHo.view.getRoot().setOnClickListener(v -> {
+                        if (!TextUtils.isEmpty(recommend)) {
+                            CommonDialog commonDialog = new CommonDialog(AllFriendActivity.this);
+                            commonDialog.show();
+                            LayoutCommonDialogBinding mainView = commonDialog.getMainView();
+                            mainView.tips.setText(String.format(getString(io.openim.android.ouicore.R.string.recommend_who)
+                                , friendInfo.getNickname()));
+                            mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
+                            mainView.confirm.setOnClickListener(v1 -> {
+                                commonDialog.dismiss();
+                                sendCardMessage(friendInfo);
+                            });
+                            return;
+                        }
                         if (formChat) {
-                            setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
-                                GsonHel.toJson(friendInfo)));
-                            finish();
+                            CommonDialog commonDialog = new CommonDialog(AllFriendActivity.this);
+                            commonDialog.show();
+                            LayoutCommonDialogBinding mainView = commonDialog.getMainView();
+                            mainView.tips.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.send_card_confirm));
+                            mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
+                            mainView.confirm.setOnClickListener(v1 -> {
+                                commonDialog.dismiss();
+
+                                setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
+                                    GsonHel.toJson(friendInfo)));
+                                finish();
+                            });
                             return;
                         }
                         ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
@@ -118,6 +153,28 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
             }
         };
         view.recyclerView.setAdapter(adapter);
+    }
+
+    private void sendCardMessage(FriendInfo friendInfo) {
+        Message message = OpenIMClient.getInstance().messageManager.createCardMessage(recommend);
+        OfflinePushInfo offlinePushInfo = new OfflinePushInfo(); // 离线推送的消息备注；不为null
+        OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
+            @Override
+            public void onError(int code, String error) {
+                toast(error + code);
+            }
+
+            @Override
+            public void onProgress(long progress) {
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+                toast(AllFriendActivity.this.
+                    getString(io.openim.android.ouicore.R.string.send_succ));
+                finish();
+            }
+        }, message, friendInfo.getUserID(), null, offlinePushInfo);
     }
 
     @Override

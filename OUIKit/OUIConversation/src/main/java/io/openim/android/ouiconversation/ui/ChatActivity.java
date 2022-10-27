@@ -56,14 +56,11 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private MessageAdapter messageAdapter;
     private BottomInputCote bottomInputCote;
-    private boolean hasMicrophone;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        MThreadTool.executorService.execute(() -> {
-            hasMicrophone = AndPermission.hasPermissions(this, Permission.Group.MICROPHONE);
-        });
+
         initVM();
         super.onCreate(savedInstanceState);
         vm.init();
@@ -81,7 +78,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     private void initVM() {
-        //userId 与 GROUP_ID 互斥
+
         String userId = getIntent().getStringExtra(Constant.K_ID);
         String groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
         boolean fromChatHistory = getIntent().getBooleanExtra(Constant.K_FROM, false);
@@ -146,7 +143,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     @SuppressLint({"ClickableViewAccessibility", "NotifyDataSetChanged"})
     private void initView() {
-        bottomInputCote = new BottomInputCote(this, view.layoutInputCote, hasMicrophone);
+        bottomInputCote = new BottomInputCote(this, view.layoutInputCote);
         bottomInputCote.setChatVM(vm);
         if (vm.fromChatHistory) {
             view.layoutInputCote.getRoot().setVisibility(View.GONE);
@@ -205,7 +202,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 }
             });
         }
-
+        view.waterMark.setText(BaseApp.inst().loginCertificate.nickname);
     }
 
     //记录原始窗口高度
@@ -255,6 +252,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 return false;
             });
         });
+
         view.delete.setOnClickListener(v -> {
             List<Message> selectMsg = getSelectMsg();
             for (Message message : selectMsg) {

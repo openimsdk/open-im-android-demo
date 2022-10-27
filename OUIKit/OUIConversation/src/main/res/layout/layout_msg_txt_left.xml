@@ -16,30 +16,63 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:orientation="vertical"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
-            android:layout_height="wrap_content">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/nickName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#ff666666"
-                android:visibility="gone"
                 android:textSize="12sp"
-                />
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:gravity="center_vertical"
                 android:background="@drawable/sty_radius_unleft_30"
+                android:gravity="center_vertical"
                 android:minHeight="40dp"
                 android:padding="7dp"
                 android:textColor="#ff333333"
                 android:textSize="14sp" />
+
+            <LinearLayout
+                android:id="@+id/quoteLy1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/sty_radius_4_f0f6ff"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:padding="5dp">
+
+                <TextView
+                    android:id="@+id/quoteContent1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="#ff999999"
+                    android:maxWidth="185dp"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:textSize="12sp" />
+
+                <ImageView
+                    android:id="@+id/picture1"
+                    android:visibility="gone"
+                    android:scaleType="center"
+                    android:layout_width="@dimen/comm_title_high"
+                    android:layout_height="@dimen/comm_title_high"
+                    android:layout_marginLeft="8dp" />
+            </LinearLayout>
+
         </LinearLayout>
+
+
 
     </LinearLayout>
 </FrameLayout>

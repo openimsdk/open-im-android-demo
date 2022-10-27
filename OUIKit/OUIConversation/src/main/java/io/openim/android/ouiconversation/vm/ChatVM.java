@@ -82,7 +82,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     //搜索的本地消息
     public MutableLiveData<List<Message>> searchMessageItems = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<Message>> addSearchMessageItems = new MutableLiveData<>(new ArrayList<>());
-
+    //回复消息
+    public MutableLiveData<Message> replyMessage = new MutableLiveData<>();
+    //免打扰状态
     public MutableLiveData<Integer> notDisturbStatus = new MutableLiveData<>(0);
     //通知消息
     public MutableLiveData<ConversationInfo> conversationInfo = new MutableLiveData<>();
@@ -104,6 +106,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     private MessageAdapter messageAdapter;
     private Observer<String> inputObserver;
     public Message startMsg = null; // 消息体，取界面上显示的消息体对象/搜索时的起始坐标
+    //otherSideID 与 GROUP_ID 互斥
     public String otherSideID = ""; // 接受消息的用户Id
     public String groupID = ""; // 接受消息的群ID
     public String conversationID; //会话id
@@ -320,6 +323,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     return;
                 }
                 groupInfo.setValue(data.get(0));
+
                 getOneConversation(null);
             }
         }, groupIds);
@@ -341,6 +345,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 if (null != onSuccessListener) {
                     onSuccessListener.onSuccess(data);
                     return;
+                }
+                if (!isSingleChat) {
+                    data.setShowName(data.getShowName() + "(" + groupInfo.getValue().getMemberCount() + ")");
                 }
                 conversationInfo.setValue(data);
                 loadHistory();
@@ -680,31 +687,40 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }, msg, otherSideID, groupID, offlinePushInfo);
     }
 
+    public void aloneSendMsg(Message msg, String otherSideID, String otherSideGroupID) {
+        aloneSendMsg(msg, otherSideID, otherSideGroupID, null);
+    }
+
     /**
      * 独立发送
      */
-    public void aloneSendMsg(Message msg, String otherSideID, String otherSideGroupID) {
+    public void aloneSendMsg(Message msg, String otherSideID, String otherSideGroupID, OnMsgSendCallback onMsgSendCallback) {
         if (this.otherSideID.equals(otherSideID) || groupID.equals(otherSideGroupID)) {
             //如果转发给本人/本群
             sendMsg(msg);
             return;
         }
-        OfflinePushInfo offlinePushInfo = new OfflinePushInfo();  // 离线推送的消息备注；不为null
-        OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
-            @Override
-            public void onError(int code, String error) {
-                IView.toast(error + code);
-            }
+        OfflinePushInfo offlinePushInfo = new OfflinePushInfo(); // 离线推送的消息备注；不为null
+        if (null == onMsgSendCallback) {
+            onMsgSendCallback = new OnMsgSendCallback() {
+                @Override
+                public void onError(int code, String error) {
+                    IView.toast(error + code);
+                }
 
-            @Override
-            public void onProgress(long progress) {
-            }
+                @Override
+                public void onProgress(long progress) {
+                }
 
-            @Override
-            public void onSuccess(Message message) {
-                IView.toast(getContext().getString(io.openim.android.ouicore.R.string.send_succ));
-            }
-        }, msg, otherSideID, otherSideGroupID, offlinePushInfo);
+                @Override
+                public void onSuccess(Message message) {
+                    if (null != IView)
+                        IView.toast(getContext().
+                            getString(io.openim.android.ouicore.R.string.send_succ));
+                }
+            };
+        }
+        OpenIMClient.getInstance().messageManager.sendMessage(onMsgSendCallback, msg, otherSideID, otherSideGroupID, offlinePushInfo);
     }
 
     /**
@@ -888,6 +904,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }, otherSideID, groupID, null, startMsg, count * 50);
 
 
+    }
+
+    public void toast(String tips) {
+        IView.toast(tips);
     }
 
 

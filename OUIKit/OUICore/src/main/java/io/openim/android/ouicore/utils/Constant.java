@@ -106,8 +106,8 @@ public class Constant {
         public static final int MENTION = 106;
         //            * 107:合并消息<br/>
         public static final int MERGE = 107;
-        //            * 108:转发消息<br/>
-        public static final int TRANSIT = 108;
+        //            * 108:名片消息<br/>
+        public static final int CARD = 108;
         //            * 109:位置消息<br/>
         public static final int LOCATION = 109;
         //            * 110:自定义消息<br/>
@@ -120,6 +120,8 @@ public class Constant {
         public static final int ALREADY_READ = 112;
         //            * 113:正在输入状态
         public static final int TYPING = 113;
+        /// 引用回复
+        public static final int QUOTE = 114;
         //通知消息一般大于1200
         public static final int NOTICE = 1200;
         //后台发送过来的通知

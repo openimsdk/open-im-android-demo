@@ -41,7 +41,7 @@
                 android:focusable="true">
 
 
-                <io.openim.android.ouicore.widget.RoundImageView
+                <ImageView
                     android:id="@+id/content"
                     android:layout_width="140dp"
                     android:layout_height="240dp"
@@ -49,6 +49,7 @@
                     android:layout_marginRight="8dp"
                     android:gravity="center_vertical"
                     android:radius="6dp"
+                    android:scaleType="center"
                     android:src="@mipmap/ic_chat_photo" />
 
                 <ImageView
