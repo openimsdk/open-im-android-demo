@@ -32,6 +32,7 @@ import java.util.List;
 import io.openim.android.ouiconversation.R;
 
 import io.openim.android.ouiconversation.databinding.FragmentContactListBinding;
+import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseApp;
@@ -96,23 +97,37 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             top.setTextColor(getContext().getColor(android.R.color.white));
             top.setBackgroundColor(Color.parseColor("#1B72EC"));
 
+            SwipeMenuItem martRead = new SwipeMenuItem(getContext());
+            martRead.setText(io.openim.android.ouicore.R.string.mark_read);
+            martRead.setHeight(MATCH_PARENT);
+            martRead.setWidth(Common.dp2px(73));
+            martRead.setTextSize(16);
+            martRead.setTextColor(getContext().getColor(android.R.color.white));
+            martRead.setBackgroundColor(Color.parseColor("#C9C9C9"));
+
             //右侧添加菜单
             rightMenu.addMenuItem(top);
+            if (conversationInfo.conversationInfo.getUnreadCount() > 0)
+                rightMenu.addMenuItem(martRead);
             rightMenu.addMenuItem(delete);
         };
         view.recyclerView.setSwipeMenuCreator(mSwipeMenuCreator);
+        ChatVM chatVM = new ChatVM();
         view.recyclerView.setOnItemMenuClickListener((menuBridge, adapterPosition) -> {
             int menuPosition = menuBridge.getPosition();
+            MsgConversation conversationInfo = vm.conversations.getValue().get(adapterPosition);
             if (menuPosition == 0) {
-                MsgConversation conversationInfo = vm.conversations.getValue().get(adapterPosition);
                 vm.pinConversation(conversationInfo.conversationInfo,
                     !conversationInfo.conversationInfo.isPinned());
+            } else if (menuPosition == 1) {
+                chatVM.markReadedByConID(conversationInfo.conversationInfo.getConversationID(),
+                    null, null);
             } else {
-                MsgConversation conversationInfo = vm.conversations.getValue().get(adapterPosition);
                 vm.conversations.getValue().remove(conversationInfo);
                 adapter.notifyItemRemoved(adapterPosition);
                 vm.deleteConversationFromLocalAndSvr(conversationInfo.conversationInfo.getConversationID());
             }
+            menuBridge.closeMenu();
         });
         view.recyclerView.setOnItemClickListener((view, position) -> {
             long nowTime = System.currentTimeMillis();
@@ -230,7 +245,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
             viewHolder.viewBinding.getRoot().setBackgroundColor(
                 Color.parseColor(msgConversation.conversationInfo.isPinned()
-                    ? "#FFF3F3F3":"#FFFFFF"));
+                    ? "#FFF3F3F3" : "#FFFFFF"));
         }
 
         @Override

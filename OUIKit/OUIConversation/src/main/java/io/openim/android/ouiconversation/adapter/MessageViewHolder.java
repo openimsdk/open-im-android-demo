@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.io.File;
@@ -446,13 +447,8 @@ public class MessageViewHolder {
             }
             Glide.with(iv.getContext())
                 .load(url)
+                .placeholder(R.mipmap.ic_chat_photo)
                 .into(iv);
-//            RequestOptions options = RequestOptions.circleCropTransform();
-//
-//            Glide.with(iv.getContext()).asBitmap()
-//                .load(url)
-//                .apply(options)
-//                .into(iv);
             return url;
         }
 
@@ -472,6 +468,7 @@ public class MessageViewHolder {
 
             Glide.with(iv.getContext())
                 .load(snapshotUrl)
+                .placeholder(R.mipmap.ic_chat_photo)
                 .into(iv);
             return snapshotUrl;
         }

@@ -202,4 +202,6 @@
     <string name="recommend_to_friend">把他推荐给朋友</string>
     <string name="recommend_who">确定推荐给%1$s吗？</string>
     <string name="send_card_confirm">确定将该名片发送到本聊天？</string>
+    <string name="bulletin_edit_tips">只有群主或管理员可以编辑</string>
+    <string name="mark_read">标记已读</string>
 </resources>

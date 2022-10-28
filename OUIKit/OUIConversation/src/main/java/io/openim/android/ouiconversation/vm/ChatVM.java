@@ -392,7 +392,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
      *
      * @param msgIDs 为null 清除里列表小红点
      */
-    public void markReadedByConID(String conversationID, List<String> msgIDs, IMUtil.OnSuccessListener onSuccessListener) {
+    public void markReadedByConID(String conversationID, List<String> msgIDs,
+                                  IMUtil.OnSuccessListener onSuccessListener) {
         OpenIMClient.getInstance().messageManager.markMessageAsReadByConID(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
