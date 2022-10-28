@@ -69,7 +69,7 @@ import io.openim.android.sdk.models.SignalingInfo;
 
 
 public class InputExpandFragment extends BaseFragment<ChatVM> {
-    public static List<Integer> menuIcons = Arrays.asList(R.mipmap.ic_chat_photo,
+    public static List<Integer> menuIcons = Arrays.asList(io.openim.android.ouicore.R.mipmap.ic_chat_photo,
         R.mipmap.ic_chat_shoot,
         R.mipmap.ic_tools_video_call,
         R.mipmap.ic_chat_menu_file,

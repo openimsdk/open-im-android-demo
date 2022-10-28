@@ -11,25 +11,42 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.Glide;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 import com.yanzhenjie.permission.runtime.PermissionDef;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.net.RXRetrofit.N;
+import io.openim.android.ouicore.services.OneselfService;
+import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.PictureElem;
+import io.openim.android.sdk.models.VideoElem;
+import io.reactivex.Observable;
 
 public class Common {
     /**
@@ -191,6 +208,96 @@ public class Common {
 
     public interface OnGrantedListener {
         void onGranted();
+    }
+
+
+    //下载图片
+    public static Observable<Boolean> downloadFile(String url, String savePath, Uri insertUri) {
+        return N.API(OneselfService.class)
+            .downloadFileWithDynamicUrlSync(url)
+            .compose(N.computationMain())
+            .map(body -> {
+                    OutputStream outputStream = null;
+                    InputStream inputStream = null;
+                    try {
+                        if (TextUtils.isEmpty(savePath)) {
+                            outputStream = BaseApp.inst().getContentResolver().openOutputStream(insertUri, "rw");
+                        } else {
+                            File file = new File(savePath);
+                            if (!file.exists()) {
+                                file.mkdirs();
+                            }
+                            file = new File(savePath + url.substring(url.lastIndexOf("/")));
+                            outputStream = new FileOutputStream(file);
+                        }
+
+                        byte[] fileReader = new byte[4096];
+                        inputStream = body.byteStream();
+                        while (true) {
+                            int read = inputStream.read(fileReader);
+                            if (read == -1) {
+                                break;
+                            }
+                            outputStream.write(fileReader, 0, read);
+                        }
+                        outputStream.flush();
+                    } catch (IOException e) {
+                        return false;
+                    } finally {
+                        if (inputStream != null) {
+                            inputStream.close();
+                        }
+                        if (outputStream != null) {
+                            outputStream.close();
+                        }
+                    }
+                    return true;
+                }
+            );
+    }
+
+
+    /**
+     * 加载图片
+     * 判断本地是否存在 本地存在直接加载 不存在加载网络
+     *
+     * @return
+     */
+    public static void loadPicture(ImageView iv, PictureElem elem) {
+        String url = elem.getSourcePicture().getUrl();
+        try {
+            String filePath = elem.getSourcePath();
+            if (new File(filePath).exists())
+                url = filePath;
+        } catch (Exception ignore) {
+        }
+        Glide.with(iv.getContext())
+            .load(url)
+            .placeholder(R.mipmap.ic_chat_photo)
+            .centerInside()
+            .into(iv);
+    }
+
+    /**
+     * 加载视频缩略图
+     * 判断本地是否存在 本地存在直接加载 不存在加载网络
+     *
+     * @return
+     */
+    public static void loadVideoSnapshot(ImageView iv, VideoElem elem) {
+        String snapshotUrl = elem.getSnapshotUrl();
+        try {
+            if (null == snapshotUrl) {
+                String filePath = elem.getSnapshotPath();
+                if (new File(filePath).exists())
+                    snapshotUrl = filePath;
+            }
+        } catch (Exception ignore) {
+        }
+        Glide.with(iv.getContext())
+            .load(snapshotUrl)
+            .placeholder(R.mipmap.ic_chat_photo)
+            .into(iv);
     }
 }
 

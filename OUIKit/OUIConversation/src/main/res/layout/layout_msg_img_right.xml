@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -21,15 +22,16 @@
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@id/avatar2">
 
-            <io.openim.android.ouicore.widget.RoundImageView
+            <org.raphets.roundimageview.RoundImageView
                 android:id="@+id/content2"
                 android:layout_width="140dp"
                 android:layout_height="240dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:gravity="center_vertical"
-                android:radius="6dp"
-                android:src="@mipmap/ic_chat_photo" />
+                android:src="@mipmap/ic_chat_photo"
+                app:corner_radius="7dp"
+                app:type="round" />
 
             <ImageView
                 android:id="@+id/videoPlay2"

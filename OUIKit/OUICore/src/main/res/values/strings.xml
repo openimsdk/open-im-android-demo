@@ -204,4 +204,7 @@
     <string name="send_card_confirm">确定将该名片发送到本聊天？</string>
     <string name="bulletin_edit_tips">只有群主或管理员可以编辑</string>
     <string name="mark_read">标记已读</string>
+    <string name="start_download">开始下载</string>
+    <string name="save_succ">保存成功</string>
+    <string name="save_failure">保存失败</string>
 </resources>

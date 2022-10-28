@@ -13,12 +13,17 @@ import io.reactivex.functions.Function;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Url;
 
 public interface OneselfService {
     @POST(Constant.IM_API_URL + "/user/get_users_online_status")
     Observable<ResponseBody> getUsersOnlineStatus(@Header("token") String token,
                                                   @Body RequestBody requestBody);
+
+    @GET
+    Observable<ResponseBody> downloadFileWithDynamicUrlSync(@Url String fileUrl);
 }

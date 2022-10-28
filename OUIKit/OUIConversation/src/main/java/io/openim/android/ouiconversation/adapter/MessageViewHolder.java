@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -84,7 +85,9 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.MergeElem;
 import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.PictureElem;
 import io.openim.android.sdk.models.QuoteElem;
+import retrofit2.http.Url;
 
 public class MessageViewHolder {
     public static RecyclerView.ViewHolder createViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -432,47 +435,6 @@ public class MessageViewHolder {
             this.messageAdapter = messageAdapter;
         }
 
-        /**
-         * 加载图片
-         * 判断本地是否存在 本地存在直接在家 不存在加载网络
-         *
-         * @return
-         */
-        public String loadPicture(ImageView iv, Message message) {
-            String url = message.getPictureElem().getSourcePicture().getUrl();
-            if (messageAdapter.hasStorage) {
-                String filePath = message.getPictureElem().getSourcePath();
-                if (new File(filePath).exists())
-                    url = filePath;
-            }
-            Glide.with(iv.getContext())
-                .load(url)
-                .placeholder(R.mipmap.ic_chat_photo)
-                .into(iv);
-            return url;
-        }
-
-        /**
-         * 加载视频缩略图
-         * 判断本地是否存在 本地存在直接加载 不存在加载网络
-         *
-         * @return
-         */
-        public String loadVideoSnapshot(ImageView iv, Message message) {
-            String snapshotUrl = message.getVideoElem().getSnapshotUrl();
-            if (messageAdapter.hasStorage || null == snapshotUrl) {
-                String filePath = message.getVideoElem().getSnapshotPath();
-                if (new File(filePath).exists())
-                    snapshotUrl = filePath;
-            }
-
-            Glide.with(iv.getContext())
-                .load(snapshotUrl)
-                .placeholder(R.mipmap.ic_chat_photo)
-                .into(iv);
-            return snapshotUrl;
-        }
-
 
         /**
          * 预览图片或视频
@@ -620,10 +582,11 @@ public class MessageViewHolder {
             v.nickName.setVisibility(View.VISIBLE);
             v.nickName.setText(message.getSenderNickname());
             v.avatar.load(message.getSenderFaceUrl());
-            String url = loadPicture(v.content, message);
+            Common.loadPicture(v.content, message.getPictureElem());
 
 
             v.sendState.setSendState(message.getStatus());
+            String url = message.getPictureElem().getSourcePicture().getUrl();
             toPreview(v.content, url, null);
         }
 
@@ -631,9 +594,10 @@ public class MessageViewHolder {
         protected void bindRight(View itemView, Message message) {
             LayoutMsgImgRightBinding v = LayoutMsgImgRightBinding.bind(itemView);
             v.avatar2.load(message.getSenderFaceUrl());
-            String url = loadPicture(v.content2, message);
+            Common.loadPicture(v.content2, message.getPictureElem());
 
             v.sendState2.setSendState(message.getStatus());
+            String url = message.getPictureElem().getSourcePicture().getUrl();
             toPreview(v.content2, url, null);
         }
 
@@ -766,7 +730,8 @@ public class MessageViewHolder {
             view.sendState2.setSendState(message.getStatus());
             view.videoPlay2.setVisibility(View.VISIBLE);
 
-            String snapshotUrl = loadVideoSnapshot(view.content2, message);
+            Common.loadVideoSnapshot(view.content2, message.getVideoElem());
+            String snapshotUrl = message.getVideoElem().getSnapshotUrl();
             toPreview(view.videoPlay2, message.getVideoElem().getVideoUrl(), snapshotUrl);
         }
 
@@ -777,7 +742,8 @@ public class MessageViewHolder {
             view.avatar.load(message.getSenderFaceUrl());
             view.sendState.setSendState(message.getStatus());
             view.videoPlay.setVisibility(View.VISIBLE);
-            String snapshotUrl = loadVideoSnapshot(view.content, message);
+            Common.loadVideoSnapshot(view.content, message.getVideoElem());
+            String snapshotUrl = message.getVideoElem().getSnapshotUrl();
             toPreview(view.videoPlay, message.getVideoElem().getVideoUrl(), snapshotUrl);
         }
     }
@@ -1067,12 +1033,15 @@ public class MessageViewHolder {
                 v.picture1.setVisibility(View.VISIBLE);
                 if (contentType == Constant.MsgType.PICTURE) {
                     v.quoteContent1.setText(message.getSenderNickname() + ":");
-                    toPreview(v.quoteLy1, loadPicture(v.picture1, message), null);
+                    Common.loadPicture(v.picture1, message.getPictureElem());
+                    toPreview(v.quoteLy1, message.getPictureElem()
+                        .getSourcePicture().getUrl(), null);
                 }
                 if (contentType == Constant.MsgType.VIDEO) {
                     v.quoteContent1.setText(message.getSenderNickname() + ":");
+                    Common.loadVideoSnapshot(v.picture1, message.getVideoElem());
                     toPreview(v.quoteLy1, message.getVideoElem().getVideoUrl(),
-                        loadVideoSnapshot(v.picture1, message));
+                        message.getVideoElem().getSnapshotUrl());
                 }
                 if (contentType == Constant.MsgType.LOCATION) {
                     try {
@@ -1112,13 +1081,16 @@ public class MessageViewHolder {
                 if (contentType == Constant.MsgType.PICTURE) {
                     v.quoteContent2.setText(message.getSenderNickname() + ":"
                         + IMUtil.getMsgParse(message));
-                    toPreview(v.quoteLy2, loadPicture(v.picture2, message), null);
+                    Common.loadPicture(v.picture2, message.getPictureElem());
+                    toPreview(v.quoteLy2, message.getPictureElem()
+                        .getSourcePicture().getUrl(), null);
                 }
                 if (contentType == Constant.MsgType.VIDEO) {
                     v.quoteContent2.setText(message.getSenderNickname() + ":"
                         + IMUtil.getMsgParse(message));
+                    Common.loadVideoSnapshot(v.picture2, message.getVideoElem());
                     toPreview(v.quoteLy2, message.getVideoElem().getVideoUrl(),
-                        loadVideoSnapshot(v.picture2, message));
+                        message.getVideoElem().getSnapshotUrl());
                 }
                 if (contentType == Constant.MsgType.LOCATION) {
                     try {

@@ -7,21 +7,42 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black"
-        android:gravity="center"
+
         tools:context=".ui.PreviewActivity">
 
-        <cn.jzvd.JzvdStd
-            android:id="@+id/jzVideo"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <io.openim.android.ouicore.widget.PinchImageView
-            android:id="@+id/pic"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone" />
+            android:gravity="center">
 
+            <cn.jzvd.JzvdStd
+                android:id="@+id/jzVideo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <io.openim.android.ouicore.widget.PinchImageView
+                android:id="@+id/pic"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/download"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="100dp"
+            android:background="@drawable/sty_radius_10_aa666666"
+            android:paddingLeft="20dp"
+            android:paddingTop="5dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="5dp"
+            android:text="下载"
+            android:visibility="gone"
+            android:textColor="@color/white" />
     </RelativeLayout>
 </layout>
 
