@@ -4,6 +4,11 @@ package io.openim.android.ouiconversation.ui;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
@@ -33,7 +38,13 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
         initView();
         click();
+
     }
+
+    private ActivityResultLauncher<Intent> personDetailLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_OK)
+            finish();
+    });
 
     private void click() {
         view.topSlideButton.setOnSlideButtonClickListener(is -> {
@@ -50,10 +61,10 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             vm.setConversationRecvMessageOpt(is ? 2 : 0, vm.conversationInfo.getValue().getConversationID());
         });
         view.user.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                .withString(Constant.K_ID, vm.otherSideID)
-                .withBoolean(Constant.K_RESULT, true)
-                .navigation();
+            Postcard postcard = ARouter.getInstance().build(Routes.Main.PERSON_DETAIL);
+            LogisticsCenter.completion(postcard);
+            personDetailLauncher.launch(new Intent(this, postcard.getDestination())
+                .putExtra(Constant.K_ID, vm.otherSideID).putExtra(Constant.K_RESULT, true));
         });
         view.clearRecord.setOnClickListener(v -> {
             CommonDialog commonDialog = new CommonDialog(this);

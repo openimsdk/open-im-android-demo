@@ -30,6 +30,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.PersonalVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
@@ -205,6 +206,11 @@ public class CallingServiceImp implements CallingService {
 
     @Override
     public void onRoomParticipantDisconnected(RoomCallingInfo s) {
+
+    }
+
+    @Override
+    public void onMeetingStreamChanged(MeetingStreamEvent e) {
 
     }
 

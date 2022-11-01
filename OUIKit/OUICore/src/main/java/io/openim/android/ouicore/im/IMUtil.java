@@ -103,6 +103,13 @@ public class IMUtil {
      */
     public static List<Message> calChatTimeInterval(List<Message> list) {
         Message first = list.get(0);
+        if (list.size() == 1) {
+            MsgExpand msgExpand = (MsgExpand) first.getExt();
+            msgExpand.isShowTime = true;
+            first.setExt(msgExpand);
+            return list;
+        }
+
         long lastShowTimeStamp = first.getSendTime();
         for (int i = 1; i < list.size(); i++) {
             Message message = list.get(i);
@@ -308,6 +315,9 @@ public class IMUtil {
             if (content.contains(key)) {
                 if (null == expand.sequence) {
                     expand.sequence = new SpannableStringBuilder(content);
+                } else {
+                    //已经处理了@消息
+                    content = expand.sequence.toString();
                 }
                 while ((fromIndex = content.indexOf(key, fromIndex)) > -1) {
                     int emojiId = Common.getMipmapId(EmojiUtil.emojiFaces.get(key));
@@ -322,15 +332,20 @@ public class IMUtil {
         }
     }
 
+    private static String atSelf(AtUsersInfo atUsersInfo) {
+        return "@" + (atUsersInfo.atUserID.equals(BaseApp.inst().loginCertificate.userID) ?
+            BaseApp.inst().getString(R.string.you) : atUsersInfo.groupNickname);
+    }
+
     private static void handleAt(MsgExpand msgExpand) {
         if (null == msgExpand.atMsgInfo) return;
         String atTxt = msgExpand.atMsgInfo.text;
         for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
-            atTxt = atTxt.replace("@" + atUsersInfo.atUserID, "@" + atUsersInfo.groupNickname);
+            atTxt = atTxt.replace("@" + atUsersInfo.atUserID, atSelf(atUsersInfo));
         }
         SpannableStringBuilder spannableString = new SpannableStringBuilder(atTxt);
         for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
-            String tag = "@" + atUsersInfo.groupNickname;
+            String tag = atSelf(atUsersInfo);
             ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
             ClickableSpan clickableSpan = new ClickableSpan() {
                 @Override
@@ -384,7 +399,7 @@ public class IMUtil {
                     MsgExpand msgExpand = (MsgExpand) msg.getExt();
                     String atTxt = msgExpand.atMsgInfo.text;
                     for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
-                        atTxt = atTxt.replace("@" + atUsersInfo.atUserID, "@" + atUsersInfo.groupNickname);
+                        atTxt = atTxt.replace("@" + atUsersInfo.atUserID, atSelf(atUsersInfo));
                     }
                     lastMsg = atTxt;
                     break;

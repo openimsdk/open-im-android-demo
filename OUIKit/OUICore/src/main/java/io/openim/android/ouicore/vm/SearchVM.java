@@ -17,6 +17,7 @@ import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.FriendshipInfo;
 import io.openim.android.sdk.models.GroupInfo;
+import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SearchResult;
 import io.openim.android.sdk.models.SearchResultItem;
@@ -30,6 +31,7 @@ public class SearchVM extends BaseViewModel {
     public MutableLiveData<List<UserInfo>> userInfo = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<FriendInfo>> friendInfo = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<FriendshipInfo>> friendshipInfo = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<GroupMembersInfo>> groupMembersInfo = new MutableLiveData<>(new ArrayList<>());
 
     public MutableLiveData<String> hail = new MutableLiveData<>();
     public MutableLiveData<String> remark = new MutableLiveData<>();
@@ -80,6 +82,25 @@ public class SearchVM extends BaseViewModel {
                 friendshipInfo.setValue(data);
             }
         }, uIds);
+
+    }
+
+    public void searchGroupMemberByNickname(String groupId, String key) {
+        List<String> keys = new ArrayList<>(); // 用户ID集合
+        keys.add(key);
+        OpenIMClient.getInstance().groupManager.searchGroupMembers(new OnBase<List<GroupMembersInfo>>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.toast(error+code);
+            }
+
+            @Override
+            public void onSuccess(List<GroupMembersInfo> data) {
+                if (key.isEmpty()) return;
+                groupMembersInfo.getValue().addAll(data);
+                groupMembersInfo.setValue(groupMembersInfo.getValue());
+            }
+        }, groupId, keys, false, true, page, pageSize);
     }
 
     public void addFriend() {
@@ -110,12 +131,12 @@ public class SearchVM extends BaseViewModel {
         if (isPerson)
             searchPerson();
         else
-            searchGroup();
+            searchGroup(searchContent.getValue());
     }
 
-    private void searchGroup() {
+    public void searchGroup(String gid) {
         List<String> groupIds = new ArrayList<>(); // 群ID集合
-        groupIds.add(searchContent.getValue());
+        groupIds.add(gid);
         OpenIMClient.getInstance().groupManager.getGroupsInfo(new OnBase<List<GroupInfo>>() {
             @Override
             public void onError(int code, String error) {
@@ -221,25 +242,7 @@ public class SearchVM extends BaseViewModel {
         return keyWords;
     }
 
-    /**
-     * 移除好友
-     *
-     * @param uid
-     */
-    public void deleteFriend(String uid) {
-        OpenIMClient.getInstance().friendshipManager.deleteFriend(new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-                IView.toast(error);
-            }
 
-            @Override
-            public void onSuccess(String data) {
-                IView.toast(getContext().getString(io.openim.android.ouicore.R.string.delete_friend));
-                IView.onSuccess(data);
-            }
-        }, uid);
-    }
 
     public void clearData() {
         messageItems.getValue().clear();

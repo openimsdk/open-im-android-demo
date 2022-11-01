@@ -36,6 +36,7 @@ import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
+import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.ReadReceiptInfo;
 import io.openim.android.sdk.models.RevokedInfo;
@@ -116,6 +117,11 @@ public class IMEvent {
 
             @Override
             public void onRoomParticipantDisconnected(RoomCallingInfo s) {
+
+            }
+
+            @Override
+            public void onMeetingStreamChanged(MeetingStreamEvent e) {
 
             }
         });

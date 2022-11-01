@@ -282,8 +282,8 @@ public class GroupVM extends SocialityVM {
                 Collections.sort(exGroupManagement.getValue(), (o1, o2) -> {
                     if (o2.groupMembersInfo.getRoleLevel()
                         < o1.groupMembersInfo.getRoleLevel())
-                        return -1;
-                    return 0;
+                        return 0;
+                    return -1;
                 });
                 exGroupMembers.setValue(exGroupMembers.getValue());
             }

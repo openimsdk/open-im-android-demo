@@ -587,12 +587,24 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onRecvC2CReadReceipt(List<ReadReceiptInfo> list) {
-
+        try {
+            for (ReadReceiptInfo readInfo : list) {
+                if (readInfo.getUserID().equals(otherSideID)) {
+                    for (Message message : messages.getValue()) {
+                        if (readInfo.getMsgIDList().contains(message.getClientMsgID())) {
+                            message.setRead(true);
+                            messageAdapter.notifyItemChanged(messages
+                                .getValue().indexOf(message));
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
     public void onRecvGroupMessageReadReceipt(List<ReadReceiptInfo> list) {
-        if (isSingleChat) return;
         try {
             for (ReadReceiptInfo readInfo : list) {
                 if (readInfo.getGroupID().equals(groupID)) {

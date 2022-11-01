@@ -8,10 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
@@ -19,11 +23,9 @@ import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
-import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivitySuperGroupMemberBinding;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.models.GroupMembersInfo;
@@ -45,6 +47,18 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
         listener();
     }
 
+    private ActivityResultLauncher<Intent> searchFriendLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+      try {
+          String uid = result.getData().getStringExtra(Constant.K_ID);
+          ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+              .withString(Constant.K_ID, uid)
+              .withString(Constant.K_GROUP_ID, vm.groupId)
+              .navigation();
+      }catch (Exception ignored){
+
+      }
+    });
+
     void init() {
         if (vm.superGroupMembers.getValue().size() >
             GroupMaterialActivity.SUPER_GROUP_LIMIT) {
@@ -56,6 +70,12 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
     }
 
     private void listener() {
+        view.searchView.setOnClickListener(v -> {
+            Postcard postcard =ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS);
+            LogisticsCenter.completion(postcard);
+            searchFriendLauncher.launch(new Intent(this,postcard.getDestination())
+            .putExtra(Constant.K_GROUP_ID,vm.groupId));
+        });
         view.recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -164,6 +184,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
                     } else {
                         ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
                             .withString(Constant.K_ID, data.getUserID())
+                            .withString(Constant.K_GROUP_ID, vm.groupId)
                             .navigation();
                     }
                 });

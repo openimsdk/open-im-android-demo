@@ -272,7 +272,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                             //联系人
                             FriendInfo da = (FriendInfo) data;
                             contactItemHolder.viewBinding.avatar.load(da.getFaceURL());
-                            spannableStringBind(contactItemHolder.viewBinding.nickName, da.getNickname());
+                            Common.stringBindForegroundColorSpan(contactItemHolder.viewBinding.nickName, da.getNickname(),vm.searchContent.getValue());
                             if (TextUtils.isEmpty(da.getRemark()))
                                 contactItemHolder.viewBinding.bottom.setVisibility(View.GONE);
                             else {
@@ -320,7 +320,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                             contactItemHolder.viewBinding.expand.setVisibility(View.GONE);
                             GroupInfo groupInfo = (GroupInfo) data;
                             contactItemHolder.viewBinding.avatar.load(groupInfo.getFaceURL());
-                            spannableStringBind(contactItemHolder.viewBinding.nickName, groupInfo.getGroupName());
+                            Common.stringBindForegroundColorSpan(contactItemHolder.viewBinding.nickName, groupInfo.getGroupName(), vm.searchContent.getValue());
                             contactItemHolder.viewBinding.getRoot().setOnClickListener(v -> {
                                 BaseApp.inst().removeCacheVM(ChatVM.class);
                                 startActivity(new Intent(SearchActivity.this,
@@ -332,7 +332,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                         ViewHol.FileItemViewHo fileItemViewHo = (ViewHol.FileItemViewHo) holder;
                         fileItemViewHo.view.divider.getRoot().setVisibility(View.GONE);
                         Message da = (Message) data;
-                        spannableStringBind(fileItemViewHo.view.title, da.getFileElem().getFileName());
+                        Common.stringBindForegroundColorSpan(fileItemViewHo.view.title, da.getFileElem().getFileName(), vm.searchContent.getValue());
                         fileItemViewHo.view.size.setText(getString(io.openim.android.ouicore.R.string.sender) + ":" + da.getSenderNickname());
                         fileItemViewHo.view.getRoot().setOnClickListener(v ->
                             GetFilePathFromUri.openFile(SearchActivity.this, da));
@@ -340,22 +340,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                 }
             }
 
-            private void spannableStringBind(TextView textView, String data) {
-                SpannableStringBuilder spannableString = new SpannableStringBuilder(data);
-                String searchContent = vm.searchContent.getValue().toLowerCase(Locale.ROOT);
-                data = data.toLowerCase(Locale.ROOT);
-                int start = data
-                    .indexOf(searchContent);
-                if (start == -1) {
-                    textView.setText(spannableString);
-                    return;
-                }
-                ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
-                spannableString.setSpan(colorSpan, start,
-                    start + searchContent.length(),
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                textView.setText(spannableString);
-            }
+
         });
         adapter.setItems(new ArrayList());
     }

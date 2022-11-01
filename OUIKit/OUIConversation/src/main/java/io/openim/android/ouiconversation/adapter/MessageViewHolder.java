@@ -214,7 +214,7 @@ public class MessageViewHolder {
         /**
          * 统一处理
          */
-        @SuppressLint("SetTextI18n")
+        @SuppressLint({"SetTextI18n"})
         private void unite() {
             TextView notice = itemView.findViewById(R.id.notice);
             AvatarImage avatarImage = itemView.findViewById(R.id.avatar);
@@ -278,23 +278,27 @@ public class MessageViewHolder {
             }
 
             int viewType = message.getContentType();
-            if (isOwn && !chatVM.isSingleChat
+            if (isOwn
                 && viewType < Constant.MsgType.NOTICE
                 && viewType != Constant.MsgType.REVOKE
                 && viewType != Constant.MsgType.ADVANCED_REVOKE) {
-                int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;
-                if (unreadCount > 0) {
-                    unRead.setVisibility(View.VISIBLE);
-                    unRead.setText(unreadCount + chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
-                    unRead.setOnClickListener(v -> {
-                        v.getContext().startActivity(
-                            new Intent(v.getContext(), MsgReadStatusActivity.class)
-                                .putExtra(Constant.K_GROUP_ID, message.getGroupID())
-                                .putStringArrayListExtra(Constant.K_ID, (ArrayList<String>) message.getAttachedInfoElem().getGroupHasReadInfo().getHasReadUserIDList()));
-                    });
+                unRead.setVisibility(View.VISIBLE);
+                if (chatVM.isSingleChat) {
+                    String unread = String.format(chatVM.getContext().getString(io.openim.android.ouicore.R.string.unread), "");
+                    String readed = String.format(chatVM.getContext().getString(io.openim.android.ouicore.R.string.readed), "");
+                    unRead.setText(message.isRead() ? readed : unread);
+                } else {
+                    int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;
+                    if (unreadCount > 0) {
+                        unRead.setText(unreadCount + chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
+                        unRead.setOnClickListener(v -> {
+                            v.getContext().startActivity(
+                                new Intent(v.getContext(), MsgReadStatusActivity.class)
+                                    .putExtra(Constant.K_GROUP_ID, message.getGroupID())
+                                    .putStringArrayListExtra(Constant.K_ID, (ArrayList<String>) message.getAttachedInfoElem().getGroupHasReadInfo().getHasReadUserIDList()));
+                        });
+                    }
                 }
-            } else {
-                unRead.setVisibility(View.GONE);
             }
         }
 
@@ -450,17 +454,6 @@ public class MessageViewHolder {
                     .putExtra(PreviewActivity.FIRST_FRAME, firstFrameUrl)));
         }
 
-        /**
-         * 地图导航
-         *
-         * @param message
-         * @param v
-         */
-        public void toMap(Message message, View v) {
-            v.setOnClickListener(v1 -> v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class)
-                .putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord=" +
-                    message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey)));
-        }
     }
 
 
@@ -536,7 +529,8 @@ public class MessageViewHolder {
             v.avatar.load(message.getSenderFaceUrl());
             v.content.setText(message.getContent());
 
-            if (message.getSessionType() == io.openim.android.ouicore.utils.Constant.SessionType.GROUP_CHAT) {
+            if (message.getSessionType()
+                != io.openim.android.ouicore.utils.Constant.SessionType.SINGLE_CHAT) {
                 v.nickName.setVisibility(View.VISIBLE);
                 v.nickName.setText(message.getSenderNickname());
             } else
@@ -830,7 +824,8 @@ public class MessageViewHolder {
             } catch (Exception e) {
             }
             view.sendState.setSendState(message.getStatus());
-            toMap(message, view.content);
+            view.content.setOnClickListener(v -> Common.toMap(message, v));
+
         }
 
         @Override
@@ -847,7 +842,7 @@ public class MessageViewHolder {
             } catch (Exception e) {
             }
             view.sendState2.setSendState(message.getStatus());
-            toMap(message, view.content2);
+            view.content2.setOnClickListener(v -> Common.toMap(message, v));
         }
     }
 
@@ -1052,7 +1047,8 @@ public class MessageViewHolder {
                         Glide.with(itemView.getContext())
                             .load(msgExpand.locationInfo.url)
                             .into(v.picture1);
-                        toMap(message, v.quoteLy1);
+                        Message finalMessage = message;
+                        v.quoteLy1.setOnClickListener(v1 -> Common.toMap(finalMessage, v1));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1102,7 +1098,10 @@ public class MessageViewHolder {
                         Glide.with(itemView.getContext())
                             .load(msgExpand.locationInfo.url)
                             .into(v.picture2);
-                        toMap(message, v.quoteLy2);
+
+                        Message finalMessage = message;
+                        v.quoteLy2.setOnClickListener(v1 -> Common.toMap(finalMessage, v1));
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

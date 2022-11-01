@@ -207,4 +207,8 @@
     <string name="start_download">开始下载</string>
     <string name="save_succ">保存成功</string>
     <string name="save_failure">保存失败</string>
+    <string name="search_friends">搜索好友</string>
+    <string name="group_nickName">群昵称</string>
+    <string name="join_group_time">入群时间</string>
+    <string name="you">你</string>
 </resources>

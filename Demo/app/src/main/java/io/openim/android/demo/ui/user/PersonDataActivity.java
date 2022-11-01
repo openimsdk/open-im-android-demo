@@ -28,6 +28,7 @@ import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
@@ -78,8 +79,25 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         friendVM.getBlacklist();
     }
 
+    @Override
+    public void onSuccess(Object body) {
+        super.onSuccess(body);
+        setResult(RESULT_OK);
+        finish();
+    }
 
     private void listener() {
+        view.part.setOnClickListener(v -> {
+            CommonDialog commonDialog = new CommonDialog(this);
+            commonDialog.show();
+            LayoutCommonDialogBinding mainView = commonDialog.getMainView();
+            mainView.tips.setText(io.openim.android.ouicore.R.string.delete_friend_tips);
+            mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
+            mainView.confirm.setOnClickListener(v1 -> {
+                commonDialog.dismiss();
+                friendVM.deleteFriend(uid);
+            });
+        });
         view.recommend.setOnClickListener(v -> {
             Map<String, String> bean = new HashMap();
             UserInfo userInfo = vm.userInfo.getValue();
@@ -88,7 +106,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             bean.put("faceURL", userInfo.getFaceURL());
             ARouter.getInstance()
                 .build(Routes.Contact.ALL_FRIEND).withString("recommend", GsonHel.toJson(bean))
-            .navigation();
+                .navigation();
         });
         view.moreData.setOnClickListener(v -> {
             startActivity(new Intent(this, MoreDataActivity.class));
@@ -108,7 +126,8 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
                     break;
                 }
             }
-            view.slideButton.setCheckedWithAnimation(isCon);
+            boolean finalIsCon = isCon;
+            view.slideButton.post(()->view.slideButton.setCheckedWithAnimation(finalIsCon));
         });
         view.joinBlackList.setOnClickListener(v -> {
             if (view.slideButton.isChecked())

@@ -69,16 +69,6 @@ public class PreviewActivity extends BaseActivity<BaseViewModel, ActivityPreview
                     .subscribe(new NetObserver<Boolean>(this) {
                         @Override
                         public void onSuccess(Boolean success) {
-//                            Uri insertUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());
-//                            try {
-//                                OutputStream outputStream = getContentResolver().openOutputStream(insertUri, "rw");
-//                                if (bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)) {
-//                                    toast(getString(io.openim.android.ouicore.R.string.save_succ));
-//                                    return;
-//                                }
-//                            } catch (FileNotFoundException e) {
-//                                e.printStackTrace();
-//                            }
                             if (success)
                                 toast(getString(io.openim.android.ouicore.R.string.save_succ));
                             else

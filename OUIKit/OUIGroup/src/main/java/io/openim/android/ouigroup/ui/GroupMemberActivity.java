@@ -204,6 +204,7 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
                         } else {
                             ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
                                 .withString(Constant.K_ID, friendInfo.getUserID())
+                                .withString(Constant.K_GROUP_ID, friendInfo.getGroupID())
                                 .navigation();
                         }
                     });

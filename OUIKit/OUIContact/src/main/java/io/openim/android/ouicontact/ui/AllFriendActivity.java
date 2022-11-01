@@ -1,5 +1,7 @@
 package io.openim.android.ouicontact.ui;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,6 +13,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
@@ -185,7 +189,25 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
         }
     }
 
+    private ActivityResultLauncher<Intent> searchFriendLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        try {
+            String uid = result.getData().getStringExtra(Constant.K_ID);
+            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                .withString(Constant.K_ID, uid)
+                .navigation();
+        } catch (Exception ignored) {
+
+        }
+    });
+
     private void listener() {
+        view.searchView.setOnClickListener(v ->
+            {
+                Postcard postcard = ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS);
+                LogisticsCenter.completion(postcard);
+                searchFriendLauncher.launch(new Intent(this, postcard.getDestination()));
+            }
+        );
         vm.letters.observe(this, v -> {
             if (null == v || v.isEmpty()) return;
             StringBuilder letters = new StringBuilder();

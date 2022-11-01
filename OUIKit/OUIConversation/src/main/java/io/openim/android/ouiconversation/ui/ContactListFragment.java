@@ -8,11 +8,13 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -156,9 +158,9 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             if (msgConversation.conversationInfo.getGroupAtType() == Constant.SessionType.NOTIFICATION)
                 intent.putExtra(Constant.K_NOTICE, msgConversation.notificationMsg);
             startActivity(intent);
+
             //重置强提醒
-            if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification)
-                OpenIMClient.getInstance().conversationManager.resetConversationGroupAtType(null, msgConversation.conversationInfo.getConversationID());
+            OpenIMClient.getInstance().conversationManager.resetConversationGroupAtType(null, msgConversation.conversationInfo.getConversationID());
         });
 
         adapter = new CustomAdapter(getContext());
@@ -214,6 +216,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             return new ViewHol.ContactItemHolder(viewGroup);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onBindViewHolder(ViewHol.ContactItemHolder viewHolder, final int position) {
             MsgConversation msgConversation = conversationInfos.get(position);
@@ -221,14 +224,6 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             viewHolder.viewBinding.avatar.load(msgConversation.conversationInfo.getFaceURL(), msgConversation.conversationInfo.getConversationType() == Constant.SessionType.GROUP_CHAT);
             viewHolder.viewBinding.nickName.setText(msgConversation.conversationInfo.getShowName());
 
-            String lastMsg = IMUtil.getMsgParse(msgConversation.lastMsg);
-            if (msgConversation.lastMsg.getContentType() == Constant.MsgType.BULLETIN
-                && null != msgConversation.notificationMsg && null != msgConversation.notificationMsg.group
-                && !TextUtils.isEmpty(msgConversation.notificationMsg.group.notification))
-                lastMsg = "[" + context.getString(io.openim.android.ouicore.R.string.group_bulletin) + "]"
-                    + msgConversation.notificationMsg.group.notification;
-
-            viewHolder.viewBinding.lastMsg.setText(lastMsg);
             if (msgConversation.conversationInfo.getRecvMsgOpt() != 0) {
                 if (msgConversation.conversationInfo.getUnreadCount() > 0)
                     viewHolder.viewBinding.noDisturbTips.setVisibility(View.VISIBLE);
@@ -246,6 +241,30 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             viewHolder.viewBinding.getRoot().setBackgroundColor(
                 Color.parseColor(msgConversation.conversationInfo.isPinned()
                     ? "#FFF3F3F3" : "#FFFFFF"));
+
+            String lastMsg = IMUtil.getMsgParse(msgConversation.lastMsg);
+            //强提醒
+            if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification) {
+                String target = "[" + context.getString(io.openim.android.ouicore.R.string.group_bulletin) + "]";
+                try {
+                    lastMsg = target + msgConversation.notificationMsg.group.notification;
+                } catch (Exception e) {
+                    if (!lastMsg.contains(target))
+                        lastMsg = target + "\t"+lastMsg;
+                }
+                Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg,
+                    target, BaseApp.inst()
+                        .getColor(android.R.color.holo_red_dark));
+
+            } else if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.atMe) {
+                String target = "@" + BaseApp.inst()
+                    .getString(io.openim.android.ouicore.R.string.you) ;
+                if (!lastMsg.contains(target))
+                    lastMsg = target + "\t"+lastMsg;
+                Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg, target, BaseApp.inst()
+                    .getColor(android.R.color.holo_red_dark));
+            } else
+                viewHolder.viewBinding.lastMsg.setText(lastMsg);
         }
 
         @Override

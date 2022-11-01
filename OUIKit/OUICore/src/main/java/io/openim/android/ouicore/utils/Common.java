@@ -13,14 +13,19 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -38,11 +43,13 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Locale;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.OneselfService;
+import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.PictureElem;
 import io.openim.android.sdk.models.VideoElem;
@@ -54,6 +61,34 @@ public class Common {
      */
     public final static Handler UIHandler = new Handler(Looper.getMainLooper());
 
+
+    public static  void  stringBindForegroundColorSpan(TextView textView, String data,
+                                  String target){
+        stringBindForegroundColorSpan(textView, data, target,Color.parseColor("#009ad6"));
+    }
+    /**
+     *  设置带背景的目标文字
+     * @param textView
+     * @param data 数据
+     * @param target 目标文字
+     */
+    public static  void stringBindForegroundColorSpan(TextView textView, String data,
+                                                      String target,int bgColor) {
+        SpannableStringBuilder spannableString = new SpannableStringBuilder(data);
+        String searchContent =target.toLowerCase(Locale.ROOT);
+        data = data.toLowerCase(Locale.ROOT);
+        int start = data
+            .indexOf(searchContent);
+        if (start == -1) {
+            textView.setText(spannableString);
+            return;
+        }
+        ForegroundColorSpan colorSpan = new ForegroundColorSpan(bgColor);
+        spannableString.setSpan(colorSpan, start,
+            start + searchContent.length(),
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        textView.setText(spannableString);
+    }
 
     public static String getAppVersionName(Context context) {
         String versionName = "";
@@ -298,6 +333,18 @@ public class Common {
             .load(snapshotUrl)
             .placeholder(R.mipmap.ic_chat_photo)
             .into(iv);
+    }
+
+    /**
+     * 地图导航
+     *
+     * @param message
+     * @param v
+     */
+    public static void toMap(Message message, View v) {
+     v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class)
+            .putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord=" +
+                message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey));
     }
 }
 

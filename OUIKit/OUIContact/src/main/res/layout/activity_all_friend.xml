@@ -47,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="34dp"
                 android:clickable="false"
-                android:hint="@string/search_by_id" />
+                android:hint="@string/search_friends" />
 
         </RelativeLayout>
 

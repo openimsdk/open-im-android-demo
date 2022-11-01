@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <FrameLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -42,68 +41,130 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:background="@color/white"
-                android:orientation="vertical">
+                android:paddingLeft="20dp"
+                android:paddingTop="10dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="10dp">
+
+                <io.openim.android.ouicore.widget.AvatarImage
+                    android:id="@+id/avatar"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@mipmap/ic_my_friend" />
+
+                <TextView
+                    android:id="@+id/nickName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:textColor="#ff333333"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/idLy"
+                android:background="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:gravity="center_vertical"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:paddingLeft="22dp"
+                android:paddingRight="22dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/id"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/userId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/copy"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="8dp"
+                    android:src="@mipmap/ic_copy" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/groupInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:paddingLeft="20dp"
+                android:layout_marginTop="12dp"
+                android:paddingTop="15dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="15dp"
+                android:visibility="gone">
 
                 <LinearLayout
-
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="20dp">
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/nickName"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:text="@string/group_nickName"
                         android:textColor="#ff333333"
-                        android:textSize="20sp" />
+                        android:textSize="18sp" />
 
-                    <io.openim.android.ouicore.widget.AvatarImage
-                        android:id="@+id/avatar"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:src="@mipmap/ic_my_friend" />
-
+                    <TextView
+                        android:id="@+id/groupNickName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
                 </LinearLayout>
-
-                <include layout="@layout/view_dividing_line" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="55dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingLeft="22dp"
-                    android:paddingRight="22dp">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/id"
+                        android:text="@string/join_group_time"
                         android:textColor="#ff333333"
                         android:textSize="18sp" />
 
                     <TextView
-                        android:id="@+id/userId"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/time"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="2"
                         android:textColor="#ff333333"
                         android:textSize="18sp" />
-
                 </LinearLayout>
-
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/userInfo"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:visibility="gone"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:background="@color/white"
                 android:gravity="center_vertical">
 
@@ -133,6 +194,7 @@
 
 
             <LinearLayout
+                android:id="@+id/bottomMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="30dp"
@@ -180,17 +242,7 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/part"
-                android:layout_width="match_parent"
-                android:layout_height="53dp"
-                android:layout_marginBottom="60dp"
-                android:background="@color/white"
-                android:gravity="center"
-                android:text="@string/disassociate"
-                android:textColor="@android:color/holo_red_light"
-                android:textSize="16sp"
-                android:visibility="gone" />
+
         </LinearLayout>
     </FrameLayout>
 

@@ -3,6 +3,7 @@ package io.openim.android.ouigroup.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.github.promeg.pinyinhelper.Pinyin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -226,8 +228,30 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
             });
             vm.exGroupMembers.observe(this, v -> {
                 if (null == v || v.isEmpty()) return;
+                List<ExGroupMemberInfo> groupMemberInfo = new ArrayList<>();
+                groupMemberInfo.addAll(v);
+
+                for (ExGroupMemberInfo memberInfo : vm.exGroupManagement.getValue()) {
+                    if (!memberInfo.groupMembersInfo.getUserID()
+                        .equals(vm.groupsInfo.getValue().getOwnerUserID())) {
+                        String nickName = memberInfo.groupMembersInfo.getNickname();
+                        String letter = Pinyin.toPinyin(nickName.charAt(0));
+                        memberInfo.sortLetter = (letter.charAt(0) + "").trim().toUpperCase();
+
+                        boolean notContain = true;
+                        for (int i = 0; i < v.size(); i++) {
+                            if (v.get(i).sortLetter.equals(memberInfo.sortLetter)) {
+                                groupMemberInfo.add(i, memberInfo);
+                                notContain = false;
+                            }
+                        }
+                        if (notContain)
+                            groupMemberInfo.add(0, memberInfo);
+                    }
+                }
+
                 List<ExUserInfo> exUserInfos = new ArrayList<>();
-                for (ExGroupMemberInfo exGroupMemberInfo : v) {
+                for (ExGroupMemberInfo exGroupMemberInfo : groupMemberInfo) {
                     ExUserInfo exUserInfo = new ExUserInfo();
                     exUserInfo.sortLetter = exGroupMemberInfo.sortLetter;
                     exUserInfo.exGroupMemberInfo = exGroupMemberInfo;
