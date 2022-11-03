@@ -26,6 +26,7 @@
                 android:layout_marginTop="80dp"
                 android:text="@string/open_im"
                 android:textColor="#ff333333"
+                android:id="@+id/welcome"
                 android:textSize="32sp"
                 android:textStyle="bold" />
 

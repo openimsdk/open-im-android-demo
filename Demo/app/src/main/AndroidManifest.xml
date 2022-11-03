@@ -12,6 +12,9 @@
         android:theme="@style/Theme.Demo"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ui.ServerConfigActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.user.AboutUsActivity"
             android:exported="false" />
         <activity

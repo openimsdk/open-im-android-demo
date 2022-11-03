@@ -2,6 +2,7 @@ package io.openim.android.demo.ui.login;
 
 import android.content.Intent;
 
+import io.openim.android.demo.ui.ServerConfigActivity;
 import io.openim.android.demo.ui.main.MainActivity;
 
 import android.database.DatabaseUtils;
@@ -72,6 +73,10 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
     }
 
     private void click() {
+        view.welcome.setOnLongClickListener(v -> {
+            startActivity(new Intent(this, ServerConfigActivity.class));
+            return false;
+        });
         view.phoneTv.setOnClickListener(v -> {
             vm.isPhone.setValue(true);
         });

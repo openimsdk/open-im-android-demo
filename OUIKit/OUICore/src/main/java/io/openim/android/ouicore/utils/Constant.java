@@ -1,27 +1,60 @@
 package io.openim.android.ouicore.utils;
 
+import android.text.TextUtils;
+
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IM;
 
 public class Constant {
-//    public static final String DEFAULT_IP = "121.37.25.71";
-////    public static final String DEFAULT_IP = "43.128.5.63";
-//
-//    //IM sdk api地址
-//    public static final String IM_API_URL = "http://" + DEFAULT_IP + ":10002";
-//    //登录注册手机验 证服务器地址
-//    public static final String APP_AUTH_URL = "http://" + DEFAULT_IP + ":10004";
-//    //web socket
-//    public static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":10001";
+    private static final String DEFAULT_IP = "121.37.25.71";
+//    private static final String DEFAULT_IP = "43.128.5.63";
 
-
-    public static final String DEFAULT_IP = "tangheim.tanghecms.com";
     //IM sdk api地址
-    public static final String IM_API_URL = "https://" + DEFAULT_IP + ":61102";
+    private static final String IM_API_URL = "http://" + DEFAULT_IP + ":10002";
     //登录注册手机验 证服务器地址
-    public static final String APP_AUTH_URL = "https://" + DEFAULT_IP + ":61104";
+    private static final String APP_AUTH_URL = "http://" + DEFAULT_IP + ":10004";
     //web socket
-    public static final String IM_WS_URL = "wss://" + DEFAULT_IP + ":61101";
+    private static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":10001";
 
+//    private static final String DEFAULT_IP = "tangheim.tanghecms.com";
+//    //IM sdk api地址
+//    private static final String IM_API_URL = "https://" + DEFAULT_IP + ":61102";
+//    //登录注册手机验 证服务器地址
+//    private static final String APP_AUTH_URL = "https://" + DEFAULT_IP + ":61104";
+//    //web socket
+//    private static final String IM_WS_URL = "wss://" + DEFAULT_IP + ":61101";
+
+    public static String getImApiUrl() {
+        String url = SharedPreferencesUtil.get(BaseApp.inst())
+            .getString("IM_API_URL");
+        if (TextUtils.isEmpty(url))
+            return IM_API_URL;
+        return url;
+    }
+
+    public static String getAppAuthUrl() {
+        String url = SharedPreferencesUtil.get(BaseApp.inst())
+            .getString("APP_AUTH_URL");
+        if (TextUtils.isEmpty(url))
+            return APP_AUTH_URL;
+        return url;
+    }
+
+    public static String getImWsUrl() {
+        String url = SharedPreferencesUtil.get(BaseApp.inst())
+            .getString("IM_WS_URL");
+        if (TextUtils.isEmpty(url))
+            return IM_WS_URL;
+        return url;
+    }
+
+    public static String getStorageType() {
+        String url = SharedPreferencesUtil.get(BaseApp.inst())
+            .getString("STORAGE_TYPE");
+        if (TextUtils.isEmpty(url))
+            return "minio";
+        return url;
+    }
 
     //存储音频的文件夹
     public static final String AUDIODIR = IM.getStorageDir() + "/audio/";

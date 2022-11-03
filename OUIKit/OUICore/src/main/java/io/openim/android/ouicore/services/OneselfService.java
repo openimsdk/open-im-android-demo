@@ -20,7 +20,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Url;
 
 public interface OneselfService {
-    @POST(Constant.IM_API_URL + "/user/get_users_online_status")
+    @POST("/user/get_users_online_status")
     Observable<ResponseBody> getUsersOnlineStatus(@Header("token") String token,
                                                   @Body RequestBody requestBody);
 

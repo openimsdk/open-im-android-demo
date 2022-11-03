@@ -17,10 +17,13 @@ import io.openim.android.sdk.listener.OnConnListener;
 
 public class IM {
     public static void initSdk() {
-        N.init(new HttpConfig().setBaseUrl(Constant.APP_AUTH_URL));
+        N.init(new HttpConfig().setBaseUrl(Constant.getAppAuthUrl()));
         ///IM 初始化
-        OpenIMClient.getInstance().initSDK(2, Constant.IM_API_URL, Constant.IM_WS_URL, getStorageDir(), 1, "minio",
-            "",IMEvent.getInstance().connListener);
+        OpenIMClient.getInstance().initSDK(2,
+            Constant.getImApiUrl(),
+            Constant.getImWsUrl(), getStorageDir(), 1,
+            Constant.getStorageType(),
+            "", IMEvent.getInstance().connListener);
 
         IMEvent.getInstance().init();
     }

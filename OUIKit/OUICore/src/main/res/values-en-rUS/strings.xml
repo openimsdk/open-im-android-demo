@@ -202,4 +202,5 @@
     <string name="group_nickName">群昵称</string>
     <string name="join_group_time">入群时间</string>
     <string name="you">你</string>
+    <string name="server_config">服务器配置</string>
 </resources>
