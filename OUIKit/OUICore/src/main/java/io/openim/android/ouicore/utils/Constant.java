@@ -6,7 +6,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IM;
 
 public class Constant {
-    private static final String DEFAULT_IP = "121.37.25.71";
+    private static final String DEFAULT_IP = "121.5.182.23";
 //    private static final String DEFAULT_IP = "43.128.5.63";
 
     //IM sdk api地址
