@@ -102,26 +102,27 @@ public class IMUtil {
      * @return
      */
     public static List<Message> calChatTimeInterval(List<Message> list) {
-        Message first = list.get(0);
-        if (list.size() == 1) {
-            MsgExpand msgExpand = (MsgExpand) first.getExt();
-            msgExpand.isShowTime = true;
-            first.setExt(msgExpand);
-            return list;
-        }
-
-        long lastShowTimeStamp = first.getSendTime();
-        for (int i = 1; i < list.size(); i++) {
+        long lastShowTimeStamp = 0;
+        for (int i = list.size() - 1; i >= 0; i--) {
             Message message = list.get(i);
-            if (lastShowTimeStamp - message.getSendTime() > (1000 * 60 * 5)) {
+            MsgExpand msgExpand = (MsgExpand) message.getExt();
+            if (null == msgExpand)
+                msgExpand = new MsgExpand();
+            //重置
+            msgExpand.isShowTime = false;
+            if (lastShowTimeStamp == 0
+                && (message.getContentType() < Constant.MsgType.NOTICE
+                && message.getContentType() != Constant.MsgType.REVOKE
+                && message.getContentType() != Constant.MsgType.ADVANCED_REVOKE)) {
                 lastShowTimeStamp = message.getSendTime();
-                MsgExpand msgExpand = (MsgExpand) message.getExt();
-                if (null == msgExpand) {
-                    msgExpand = new MsgExpand();
-                    message.setExt(msgExpand);
-                }
+                msgExpand.isShowTime = true;
+                continue;
+            }
+            if (message.getSendTime() - lastShowTimeStamp > (1000 * 60 * 5)) {
+                lastShowTimeStamp = message.getSendTime();
                 msgExpand.isShowTime = true;
             }
+            message.setExt(msgExpand);
         }
         return list;
     }
