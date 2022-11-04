@@ -178,7 +178,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
         N.API(OneselfService.class)
             .getUsersOnlineStatus(
-                Constant.getImApiUrl()+"/user/get_users_online_status",
+                Constant.getImApiUrl() + "/user/get_users_online_status",
                 BaseApp.inst().loginCertificate.token,
                 parameter.buildJsonBody())
             .compose(N.IOMain())
@@ -512,13 +512,17 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     //发送消息已读回执
     public void sendMsgReadReceipt(int firstVisiblePosition, int lastVisiblePosition) {
         int size = messages.getValue().size();
-        lastVisiblePosition+=1;
+        lastVisiblePosition += 1;
         if (lastVisiblePosition > size || firstVisiblePosition < 0) return;
         List<Message> megs = messages.getValue().subList(firstVisiblePosition, lastVisiblePosition);
         List<String> msgIds = new ArrayList<>();
-        for (Message meg : megs) {
-            if (!meg.isRead() && !meg.getSendID().equals(BaseApp.inst().loginCertificate.userID))
-                msgIds.add(meg.getClientMsgID());
+        try {
+            for (Message meg : megs) {
+                if (!meg.isRead() && !meg.getSendID().equals(BaseApp.inst().loginCertificate.userID))
+                    msgIds.add(meg.getClientMsgID());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         if (!msgIds.isEmpty())
             markReaded(msgIds);
