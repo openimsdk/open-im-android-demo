@@ -512,6 +512,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     //发送消息已读回执
     public void sendMsgReadReceipt(int firstVisiblePosition, int lastVisiblePosition) {
         int size = messages.getValue().size();
+        lastVisiblePosition+=1;
         if (lastVisiblePosition > size || firstVisiblePosition < 0) return;
         List<Message> megs = messages.getValue().subList(firstVisiblePosition, lastVisiblePosition);
         List<String> msgIds = new ArrayList<>();
