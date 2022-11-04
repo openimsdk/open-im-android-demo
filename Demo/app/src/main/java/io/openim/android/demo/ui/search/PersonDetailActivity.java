@@ -80,6 +80,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         Obs.inst().addObserver(this);
         waitDialog = new WaitDialog(this);
         friendVM.waitDialog = waitDialog;
+        waitDialog.setNotDismiss();
         friendVM.setContext(this);
         friendVM.setIView(this);
         waitDialog.show();

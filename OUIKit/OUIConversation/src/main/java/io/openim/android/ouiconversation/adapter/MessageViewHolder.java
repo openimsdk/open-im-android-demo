@@ -278,6 +278,7 @@ public class MessageViewHolder {
             }
 
             int viewType = message.getContentType();
+            unRead.setVisibility(View.GONE);
             if (isOwn
                 && viewType < Constant.MsgType.NOTICE
                 && viewType != Constant.MsgType.REVOKE
@@ -644,6 +645,10 @@ public class MessageViewHolder {
         protected void bindLeft(View itemView, Message message) {
             final LayoutMsgAudioLeftBinding view = LayoutMsgAudioLeftBinding.bind(itemView);
             view.avatar.load(message.getSenderFaceUrl());
+            if (message.getSessionType() != Constant.SessionType.SINGLE_CHAT) {
+                view.sendNickName.setVisibility(View.VISIBLE);
+                view.sendNickName.setText(message.getSenderNickname());
+            }
             view.sendState.setSendState(message.getStatus());
             view.duration.setText(message.getSoundElem().getDuration() + "``");
             view.content.setOnClickListener(v -> extracted(message, view.lottieView));
@@ -734,8 +739,13 @@ public class MessageViewHolder {
         protected void bindLeft(View itemView, Message message) {
             LayoutMsgImgLeftBinding view = LayoutMsgImgLeftBinding.bind(itemView);
             view.avatar.load(message.getSenderFaceUrl());
+            if (message.getSessionType() != Constant.SessionType.SINGLE_CHAT) {
+                view.sendNickName.setVisibility(View.VISIBLE);
+                view.sendNickName.setText(message.getSenderNickname());
+            }
             view.sendState.setSendState(message.getStatus());
             view.videoPlay.setVisibility(View.VISIBLE);
+
             Common.loadVideoSnapshot(view.content, message.getVideoElem());
             String snapshotUrl = message.getVideoElem().getSnapshotUrl();
             toPreview(view.videoPlay, message.getVideoElem().getVideoUrl(), snapshotUrl);
@@ -814,6 +824,10 @@ public class MessageViewHolder {
         protected void bindLeft(View itemView, Message message) {
             LayoutMsgLocation1Binding view = LayoutMsgLocation1Binding.bind(itemView);
             view.avatar.load(message.getSenderFaceUrl());
+            if (message.getSessionType() != Constant.SessionType.SINGLE_CHAT) {
+                view.nickName.setVisibility(View.VISIBLE);
+                view.nickName.setText(message.getSenderNickname());
+            }
             try {
                 MsgExpand msgExpand = (MsgExpand) message.getExt();
                 view.title.setText(msgExpand.locationInfo.name);
@@ -868,6 +882,11 @@ public class MessageViewHolder {
         protected void bindLeft(View itemView, Message message) {
             LayoutMsgMergeLeftBinding view = LayoutMsgMergeLeftBinding.bind(itemView);
             view.sendState.setSendState(message.getStatus());
+            view.avatar.load(message.getSenderFaceUrl());
+            if (message.getSessionType() != Constant.SessionType.SINGLE_CHAT) {
+                view.sendNickName.setVisibility(View.VISIBLE);
+                view.sendNickName.setText(message.getSenderNickname());
+            }
             MergeElem mergeElem = message.getMergeElem();
             view.content.setText(mergeElem.getTitle());
             try {
@@ -882,6 +901,7 @@ public class MessageViewHolder {
         @Override
         protected void bindRight(View itemView, Message message) {
             LayoutMsgMergeRightBinding view = LayoutMsgMergeRightBinding.bind(itemView);
+            view.avatar2.load(message.getSenderFaceUrl());
             view.sendState2.setSendState(message.getStatus());
             MergeElem mergeElem = message.getMergeElem();
             view.content2.setText(mergeElem.getTitle());
@@ -931,6 +951,10 @@ public class MessageViewHolder {
             LayoutMsgCardLeftBinding view = LayoutMsgCardLeftBinding.bind(itemView);
             view.sendState.setSendState(message.getStatus());
             view.avatar.load(message.getSenderFaceUrl());
+            if (message.getSessionType() != Constant.SessionType.SINGLE_CHAT) {
+                view.sendNickName.setVisibility(View.VISIBLE);
+                view.sendNickName.setText(message.getSenderNickname());
+            }
             String friendInfo = message.getContent();
             FriendInfo friendInfoBean = GsonHel.fromJson(friendInfo, FriendInfo.class);
             view.nickName.setText(friendInfoBean.getNickname());

@@ -52,6 +52,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginRight="@dimen/avatar_size"
                 android:textColor="#ff5496eb"
+                android:visibility="gone"
                 android:textSize="10sp" />
         </LinearLayout>
     </LinearLayout>

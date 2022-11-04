@@ -21,45 +21,60 @@
             android:id="@+id/contentGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
             android:layout_toRightOf="@id/avatar"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/nickName"
+                android:id="@+id/sendNickName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
                 android:layout_marginBottom="2dp"
                 android:textColor="#ff666666"
                 android:textSize="12sp"
                 android:visibility="gone" />
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true">
+                android:orientation="vertical">
 
-                <org.raphets.roundimageview.RoundImageView
-                    android:layout_width="140dp"
-                    android:id="@+id/content"
-                    android:layout_height="240dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:gravity="center_vertical"
-                    android:src="@mipmap/ic_chat_photo"
-                    app:corner_radius="7dp"
-                    app:type="round" />
-
-                <ImageView
-                    android:id="@+id/videoPlay"
+                <TextView
+                    android:id="@+id/nickName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:src="@mipmap/ic_chat_video_play"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginBottom="2dp"
+                    android:textColor="#ff666666"
+                    android:textSize="12sp"
                     android:visibility="gone" />
-            </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <org.raphets.roundimageview.RoundImageView
+                        android:id="@+id/content"
+                        android:layout_width="140dp"
+                        android:layout_height="240dp"
+                        android:layout_marginRight="8dp"
+                        android:gravity="center_vertical"
+                        android:src="@mipmap/ic_chat_photo"
+                        app:corner_radius="7dp"
+                        app:type="round" />
+
+                    <ImageView
+                        android:id="@+id/videoPlay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:src="@mipmap/ic_chat_video_play"
+                        android:visibility="gone" />
+                </RelativeLayout>
+            </LinearLayout>
         </LinearLayout>
 
 

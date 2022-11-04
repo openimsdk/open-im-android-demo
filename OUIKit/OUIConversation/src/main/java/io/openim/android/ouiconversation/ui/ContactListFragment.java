@@ -121,7 +121,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             if (menuPosition == 0) {
                 vm.pinConversation(conversationInfo.conversationInfo,
                     !conversationInfo.conversationInfo.isPinned());
-            } else if (menuPosition == 1) {
+            } else if (menuPosition == 1 && conversationInfo.conversationInfo.getUnreadCount() > 0) {
                 chatVM.markReadedByConID(conversationInfo.conversationInfo.getConversationID(),
                     null, null);
             } else {

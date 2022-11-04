@@ -29,6 +29,7 @@ import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.ouicore.widget.CommonDialog;
+import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
@@ -95,6 +96,9 @@ public class GroupVM extends SocialityVM {
      * 创建群组
      */
     public void createGroup() {
+        WaitDialog waitDialog = new WaitDialog(getContext());
+        waitDialog.setNotDismiss();
+        waitDialog.show();
         List<GroupMemberRole> groupMemberRoles = new ArrayList<>();
         LoginCertificate loginCertificate = LoginCertificate.getCache(getContext());
         for (FriendInfo friendInfo : selectedFriendInfo.getValue()) {
@@ -110,13 +114,16 @@ public class GroupVM extends SocialityVM {
             @Override
             public void onError(int code, String error) {
                 IView.onError(error);
+                waitDialog.dismiss();
             }
 
             @Override
             public void onSuccess(GroupInfo data) {
                 IView.onSuccess(data);
+                Common.UIHandler.postDelayed(waitDialog::dismiss,300);
             }
-        }, groupName.getValue(), null, null, null, 0, null, groupMemberRoles);
+        }, groupName.getValue(), null, null, null,
+            0, null, groupMemberRoles);
     }
 
     /**

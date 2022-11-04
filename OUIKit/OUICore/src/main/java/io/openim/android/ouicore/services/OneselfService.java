@@ -17,12 +17,15 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Url;
 
 public interface OneselfService {
-    @POST("/user/get_users_online_status")
-    Observable<ResponseBody> getUsersOnlineStatus(@Header("token") String token,
-                                                  @Body RequestBody requestBody);
+    @POST
+    Observable<ResponseBody> getUsersOnlineStatus(
+        @Url String url,
+        @Header("token") String token,
+        @Body RequestBody requestBody);
 
     @GET
     Observable<ResponseBody> downloadFileWithDynamicUrlSync(@Url String fileUrl);

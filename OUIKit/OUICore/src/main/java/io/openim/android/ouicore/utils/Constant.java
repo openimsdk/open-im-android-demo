@@ -16,7 +16,7 @@ public class Constant {
     //web socket
     private static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":10001";
 
-//    private static final String DEFAULT_IP = "tangheim.tanghecms.com";
+    //    private static final String DEFAULT_IP = "tangheim.tanghecms.com";
 //    //IM sdk api地址
 //    private static final String IM_API_URL = "https://" + DEFAULT_IP + ":61102";
 //    //登录注册手机验 证服务器地址

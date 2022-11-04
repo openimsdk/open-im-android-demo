@@ -16,60 +16,76 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-
             <LinearLayout
-                android:id="@+id/content"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="7dp"
-                android:background="@drawable/sty_radius_unleft_30"
-                android:gravity="center_vertical"
-                android:minHeight="40dp"
-                android:orientation="vertical"
-                android:padding="7dp">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:gravity="center_vertical"
-                    android:minWidth="200dp"
-                    android:orientation="horizontal"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp">
-
-                    <io.openim.android.ouicore.widget.AvatarImage
-                        android:id="@+id/otherAvatar"
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="12dp"
-                        android:src="@mipmap/ic_my_friend" />
-
-                    <TextView
-                        android:id="@+id/nickName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:textColor="#ff333333"
-                        android:textSize="16sp" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:background="@color/react" />
+                android:layout_marginLeft="8dp"
+                android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/sendNickName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="22dp"
-                    android:paddingTop="4dp"
-                    android:text="@string/card"
-                    android:textColor="#ff999999"
-                    android:textSize="11sp" />
+                    android:layout_marginBottom="2dp"
+                    android:textColor="#ff666666"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/sty_radius_unleft_30"
+                    android:gravity="center_vertical"
+                    android:minHeight="40dp"
+                    android:orientation="vertical"
+                    android:padding="7dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:gravity="center_vertical"
+                        android:minWidth="200dp"
+                        android:orientation="horizontal"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp">
+
+                        <io.openim.android.ouicore.widget.AvatarImage
+                            android:id="@+id/otherAvatar"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="12dp"
+                            android:src="@mipmap/ic_my_friend" />
+
+                        <TextView
+                            android:id="@+id/nickName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:textColor="#ff333333"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:background="@color/react" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="22dp"
+                        android:paddingTop="4dp"
+                        android:text="@string/card"
+                        android:textColor="#ff999999"
+                        android:textSize="11sp" />
+
+                </LinearLayout>
 
             </LinearLayout>
+
 
             <io.openim.android.ouiconversation.widget.SendStateView
                 android:id="@+id/sendState"
