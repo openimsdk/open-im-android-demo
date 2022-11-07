@@ -16,10 +16,10 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginRight="8dp"
-            android:layout_toLeftOf="@id/contentLy2" />
+            android:layout_toLeftOf="@id/content2" />
 
         <LinearLayout
-            android:id="@+id/contentLy2"
+            android:id="@+id/content2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
@@ -33,7 +33,7 @@
 
 
             <TextView
-                android:id="@+id/content2"
+                android:id="@+id/title2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"

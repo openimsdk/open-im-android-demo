@@ -61,6 +61,7 @@ import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.listener.OnGroupListener;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.models.AdvancedMessage;
@@ -78,7 +79,7 @@ import io.openim.android.sdk.models.SearchResultItem;
 import io.openim.android.sdk.models.UserInfo;
 import okhttp3.ResponseBody;
 
-public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener, OnGroupListener {
+public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener, OnGroupListener, OnConversationListener {
     //搜索的本地消息
     public MutableLiveData<List<Message>> searchMessageItems = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<Message>> addSearchMessageItems = new MutableLiveData<>(new ArrayList<>());
@@ -130,6 +131,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         markReaded(null);
 
         IMEvent.getInstance().addAdvanceMsgListener(this);
+        IMEvent.getInstance().addConversationListener(this);
         if (isSingleChat) {
             listener();
         } else {
@@ -297,6 +299,42 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     }
 
+    @Override
+    public void onConversationChanged(List<ConversationInfo> list) {
+       try {
+           for (ConversationInfo info : list) {
+               if (info.getConversationID()
+                   .equals(conversationInfo.getValue().getConversationID()))
+                   conversationInfo.setValue(info);
+           }
+       }catch (Exception ignored){}
+    }
+
+    @Override
+    public void onNewConversation(List<ConversationInfo> list) {
+
+    }
+
+    @Override
+    public void onSyncServerFailed() {
+
+    }
+
+    @Override
+    public void onSyncServerFinish() {
+
+    }
+
+    @Override
+    public void onSyncServerStart() {
+
+    }
+
+    @Override
+    public void onTotalUnreadMessageCountChanged(int i) {
+
+    }
+
     public interface UserOnlineStatusListener {
         void onResult(OnlineStatus onlineStatus);
     }
@@ -349,9 +387,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     onSuccessListener.onSuccess(data);
                     return;
                 }
-                if (!isSingleChat) {
-                    data.setShowName(data.getShowName() + "(" + groupInfo.getValue().getMemberCount() + ")");
-                }
                 conversationInfo.setValue(data);
                 loadHistory();
                 getConversationRecvMessageOpt(data.getConversationID());
@@ -374,6 +409,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         super.viewDestroy();
         IMEvent.getInstance().removeAdvanceMsgListener(this);
         IMEvent.getInstance().removeGroupListener(this);
+        IMEvent.getInstance().removeConversationListener(this);
         inputMsg.removeObserver(inputObserver);
     }
 

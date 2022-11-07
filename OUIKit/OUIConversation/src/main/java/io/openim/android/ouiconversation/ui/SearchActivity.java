@@ -89,6 +89,22 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
             clearData();
             if (s.isEmpty()) return;
             vm.page = 1;
+            if (selectTabIndex == CONTACT_ITEM) {
+                vm.searchFriendV2();
+                return;
+            }
+            if (selectTabIndex == GROUP_ITEM) {
+                vm.searchGroupV2();
+                return;
+            }
+            if (selectTabIndex == CHAT_ITEM) {
+                vm.searchLocalMessages(s);
+                return;
+            }
+            if (selectTabIndex == FILE_ITEM) {
+                vm.searchLocalMessages(s, Constant.MsgType.FILE);
+                return;
+            }
             vm.searchFriendV2();
             vm.searchGroupV2();
             vm.searchLocalMessages(s);
@@ -272,7 +288,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                             //联系人
                             FriendInfo da = (FriendInfo) data;
                             contactItemHolder.viewBinding.avatar.load(da.getFaceURL());
-                            Common.stringBindForegroundColorSpan(contactItemHolder.viewBinding.nickName, da.getNickname(),vm.searchContent.getValue());
+                            Common.stringBindForegroundColorSpan(contactItemHolder.viewBinding.nickName, da.getNickname(), vm.searchContent.getValue());
                             if (TextUtils.isEmpty(da.getRemark()))
                                 contactItemHolder.viewBinding.bottom.setVisibility(View.GONE);
                             else {

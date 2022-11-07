@@ -125,7 +125,6 @@
             android:enabled="@{GroupVM.groupName.length()==0?false:true}"
             android:text="@string/complete_creation"
             android:background="#1B72EC"
-            android:onClick="@{(v)->GroupVM.createGroup()}"
             android:textColor="#ffffffff"
             android:textSize="18sp" />
     </LinearLayout>

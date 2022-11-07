@@ -275,7 +275,9 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                     ExGroupMemberInfo exGroupMemberInfo = new ExGroupMemberInfo();
                     exGroupMemberInfo.groupMembersInfo = new GroupMembersInfo();
                     exGroupMemberInfo.groupMembersInfo.setUserID(exUserInfo.userInfo.getFriendInfo().getUserID());
-                    if (vm.exGroupMembers.getValue().contains(exGroupMemberInfo)) {
+
+                    if (vm.exGroupMembers.getValue().contains(exGroupMemberInfo)
+                        || vm.exGroupManagement.getValue().contains(exGroupMemberInfo)) {
                         exUserInfo.isEnabled = false;
                         exUserInfo.isSelect = true;
                     }

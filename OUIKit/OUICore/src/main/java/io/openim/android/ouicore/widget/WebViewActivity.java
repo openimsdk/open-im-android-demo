@@ -69,6 +69,7 @@ public class WebViewActivity extends BaseActivity<BaseViewModel, ActivityWebView
     }
 
     public void toBack(View v) {
+        setResult(RESULT_CANCELED);
         finish();
     }
 

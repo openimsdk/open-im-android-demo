@@ -14,6 +14,7 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
 import io.openim.android.ouigroup.R;
@@ -62,6 +63,14 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
         };
         view.recyclerview.setAdapter(adapter);
         adapter.setItems(vm.selectedFriendInfo.getValue());
+
+
+        view.submit.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                vm.createGroup();
+            }
+        });
     }
 
     @Override

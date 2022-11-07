@@ -27,6 +27,7 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
@@ -91,6 +92,9 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, Acti
                             break;
                         case Constant.MsgType.LOCATION:
                             Common.toMap(data, v);
+                            break;
+                        case Constant.MsgType.FILE:
+                            GetFilePathFromUri.openFile(v.getContext(), data);
                             break;
                     }
 

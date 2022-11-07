@@ -7,20 +7,17 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,10 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -67,7 +61,6 @@ import io.openim.android.ouiconversation.widget.InputExpandFragment;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.MsgExpand;
-import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
@@ -80,14 +73,11 @@ import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.voice.listener.PlayerListener;
 import io.openim.android.ouicore.voice.player.SMediaPlayer;
 import io.openim.android.ouicore.widget.AvatarImage;
-import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.MergeElem;
 import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.PictureElem;
 import io.openim.android.sdk.models.QuoteElem;
-import retrofit2.http.Url;
 
 public class MessageViewHolder {
     public static RecyclerView.ViewHolder createViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -254,6 +244,7 @@ public class MessageViewHolder {
                     }
                     ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
                         .withString(Constant.K_ID, message.getSendID())
+                        .withString(Constant.K_GROUP_ID, message.getGroupID())
                         .navigation();
                 });
             }
@@ -334,7 +325,7 @@ public class MessageViewHolder {
                                 if (iconRes == R.mipmap.ic_reply) {
                                     chatVM.replyMessage.setValue(message);
                                 }
-                                if (iconRes == R.mipmap.ic_copy) {
+                                if (iconRes == R.mipmap.ic_c_copy) {
                                     Common.copy(message.getContent());
                                     chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
                                 }
@@ -361,7 +352,7 @@ public class MessageViewHolder {
                     view1.recyclerview.setAdapter(adapter);
                 }
                 if (message.getContentType() == Constant.MsgType.TXT) {
-                    menuIcons.add(R.mipmap.ic_copy);
+                    menuIcons.add(R.mipmap.ic_c_copy);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.copy));
                 }
                 menuIcons.add(R.mipmap.ic_delete);
@@ -380,7 +371,8 @@ public class MessageViewHolder {
                 menuIcons.add(R.mipmap.ic_forward);
                 menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.forward));
 
-                if (message.getContentType() != Constant.MsgType.VOICE) {
+                if (message.getContentType() != Constant.MsgType.VOICE
+                    && message.getContentType() != Constant.MsgType.MERGE) {
                     menuIcons.add(R.mipmap.ic_reply);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.reply));
                 }
@@ -888,14 +880,14 @@ public class MessageViewHolder {
                 view.sendNickName.setText(message.getSenderNickname());
             }
             MergeElem mergeElem = message.getMergeElem();
-            view.content.setText(mergeElem.getTitle());
+            view.title1.setText(mergeElem.getTitle());
             try {
                 view.history11.setText(mergeElem.getAbstractList().get(0));
                 view.history12.setText(mergeElem.getAbstractList().get(1));
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            view.contentLy.setOnClickListener(new ClickJumpDetail(mergeElem));
+            view.content.setOnClickListener(new ClickJumpDetail(mergeElem));
         }
 
         @Override
@@ -904,14 +896,14 @@ public class MessageViewHolder {
             view.avatar2.load(message.getSenderFaceUrl());
             view.sendState2.setSendState(message.getStatus());
             MergeElem mergeElem = message.getMergeElem();
-            view.content2.setText(mergeElem.getTitle());
+            view.title2.setText(mergeElem.getTitle());
             try {
                 view.history21.setText(mergeElem.getAbstractList().get(0));
                 view.history22.setText(mergeElem.getAbstractList().get(1));
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            view.contentLy2.setOnClickListener(new ClickJumpDetail(mergeElem));
+            view.content2.setOnClickListener(new ClickJumpDetail(mergeElem));
         }
 
         private static class ClickJumpDetail implements View.OnClickListener {

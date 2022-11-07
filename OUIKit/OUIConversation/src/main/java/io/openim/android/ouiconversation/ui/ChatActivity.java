@@ -18,8 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
 import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
 import java.util.ArrayList;
@@ -27,7 +25,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouiconversation.databinding.ActivityChatBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
@@ -37,16 +34,13 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.im.IMUtil;
-import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
-import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
 
@@ -56,7 +50,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private MessageAdapter messageAdapter;
     private BottomInputCote bottomInputCote;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -326,6 +319,25 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 }
             }
         });
+
+        vm.groupInfo.observe(this, groupInfo -> {
+            bindShowName();
+        });
+        vm.conversationInfo.observe(this, conversationInfo -> {
+            bindShowName();
+        });
+    }
+
+    private void bindShowName() {
+        try {
+            if (vm.isSingleChat)
+                view.nickName.setText(vm.conversationInfo.getValue().getShowName());
+            else
+                view.nickName.setText(vm.conversationInfo.getValue().getShowName()
+                    + "(" + vm.groupInfo.getValue()
+                    .getMemberCount() + ")");
+        } catch (Exception ignored) {
+        }
     }
 
 
@@ -403,18 +415,13 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 else
                     Glide.with(this).load(path).into(view.chatBg);
             }
-            if (message.tag == Constant.Event.SET_GROUP_NAME) {
-                vm.conversationInfo.getValue()
-                    .setShowName((String) message.object);
-                vm.conversationInfo.setValue(vm.conversationInfo.getValue());
-            }
-            if (message.tag == Constant.Event.USER_INFO_UPDATA) {
-                if (vm.isSingleChat)
-                    vm.getOneConversation(data -> {
-                        vm.conversationInfo.setValue(data);
-                        view.nickName.setText(data.getShowName());
-                    });
-            }
+//            if (message.tag == Constant.Event.UPDATA_GROUP_INFO
+//                || message.tag == Constant.Event.USER_INFO_UPDATA) {
+//                vm.getOneConversation(data -> {
+//                    vm.conversationInfo.setValue(data);
+//                    bindShowName();
+//                });
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }

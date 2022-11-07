@@ -68,7 +68,6 @@
                         android:id="@+id/nickName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{ChatVM.conversationInfo.showName}"
                         android:textColor="#ff333333"
                         android:textSize="18sp"
                         android:visibility="visible" />

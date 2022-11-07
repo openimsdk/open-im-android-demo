@@ -110,15 +110,13 @@ public class IMUtil {
                 msgExpand = new MsgExpand();
             //重置
             msgExpand.isShowTime = false;
-            if (lastShowTimeStamp == 0
-                && (message.getContentType() < Constant.MsgType.NOTICE
-                && message.getContentType() != Constant.MsgType.REVOKE
-                && message.getContentType() != Constant.MsgType.ADVANCED_REVOKE)) {
-                lastShowTimeStamp = message.getSendTime();
-                msgExpand.isShowTime = true;
+            if (message.getContentType() >= Constant.MsgType.NOTICE
+                || message.getContentType() == Constant.MsgType.REVOKE
+                || message.getContentType() == Constant.MsgType.ADVANCED_REVOKE)
                 continue;
-            }
-            if (message.getSendTime() - lastShowTimeStamp > (1000 * 60 * 5)) {
+
+            if (lastShowTimeStamp == 0 ||
+                    (message.getSendTime() - lastShowTimeStamp > (1000 * 60 * 5))) {
                 lastShowTimeStamp = message.getSendTime();
                 msgExpand.isShowTime = true;
             }

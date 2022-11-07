@@ -9,13 +9,9 @@ import com.github.promeg.pinyinhelper.Pinyin;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
-import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
 
 import io.openim.android.ouicore.im.IMUtil;
@@ -24,10 +20,8 @@ import io.openim.android.ouicore.utils.Common;
 
 
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
@@ -37,7 +31,6 @@ import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupInviteResult;
 import io.openim.android.sdk.models.GroupMemberRole;
 import io.openim.android.sdk.models.GroupMembersInfo;
-import io.openim.android.sdk.models.UserInfo;
 
 public class GroupVM extends SocialityVM {
     public MutableLiveData<String> groupName = new MutableLiveData<>("");
@@ -114,13 +107,13 @@ public class GroupVM extends SocialityVM {
             @Override
             public void onError(int code, String error) {
                 IView.onError(error);
-                waitDialog.dismiss();
+
             }
 
             @Override
             public void onSuccess(GroupInfo data) {
                 IView.onSuccess(data);
-                Common.UIHandler.postDelayed(waitDialog::dismiss,300);
+                Common.UIHandler.postDelayed(waitDialog::dismiss,200);
             }
         }, groupName.getValue(), null, null, null,
             0, null, groupMemberRoles);
@@ -146,7 +139,7 @@ public class GroupVM extends SocialityVM {
             @Override
             public void onSuccess(String data) {
                 if (!TextUtils.isEmpty(groupName)) {
-                    Obs.newMessage(Constant.Event.SET_GROUP_NAME,
+                    Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO,
                         groupName);
                 }
                 if (!TextUtils.isEmpty(notification)) {
@@ -316,6 +309,9 @@ public class GroupVM extends SocialityVM {
                 IView.toast(getContext().getString(io.openim.android.ouicore.R.string.Invitation_succeeded));
                 getGroupMemberList();
                 IView.onSuccess(null);
+
+                Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO,
+                    groupName);
             }
         }, groupId, userIds, "");
     }
@@ -339,6 +335,9 @@ public class GroupVM extends SocialityVM {
                 IView.toast(getContext().getString(io.openim.android.ouicore.R.string.kicked_out));
                 getGroupMemberList();
                 IView.onSuccess(null);
+
+                Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO,
+                    groupName);
             }
         }, groupId, userIds, "");
     }
