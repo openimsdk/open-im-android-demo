@@ -23,6 +23,8 @@ public interface CallingService extends IProvider, OnSignalingListener {
      */
     void call(SignalingInfo signalingInfo);
 
+    void initKeepAlive(String precessName);
+
     void startAudioVideoService(Context base);
 
     void stopAudioVideoService(Context base);

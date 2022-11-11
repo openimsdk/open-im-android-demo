@@ -34,6 +34,7 @@ import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
+import io.openim.keepalive.Alive;
 import io.realm.Realm;
 import io.realm.RealmAsyncTask;
 import io.realm.RealmResults;
@@ -61,16 +62,13 @@ public class CallingServiceImp implements CallingService {
 
     @Override
     public void startAudioVideoService(Context base) {
-        L.e(TAG, "-----initBackstageAudioVideoService");
-        base.startService(new Intent(base, AudioVideoService.class));
+        Alive.restart(base);
     }
 
     @Override
     public void stopAudioVideoService(Context base) {
-        Intent stopIntent = new Intent(base, AudioVideoService.class);
-        base.stopService(stopIntent);
+        Alive.finishService(base);
     }
-
 
     @Override
     public void setOnServicePriorLoginCallBack(OnServicePriorLoginCallBack onServicePriorLoginCallBack) {
@@ -82,22 +80,9 @@ public class CallingServiceImp implements CallingService {
         return onServicePriorLoginCallBack;
     }
 
-    public static void launchAlarm(Context context) {
-        // alarm唤醒
-        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        if (manager == null) {
-            return;
-        }
-        long INTERVAL_WAKEUP_MS = 10 * 1000; // 10 seconds
-        long triggerAtTime = SystemClock.elapsedRealtime() + INTERVAL_WAKEUP_MS;
-        Intent i = new Intent(context, AudioVideoService.class);
-        PendingIntent pi = PendingIntent.getService(context, 0, i, PendingIntent.FLAG_MUTABLE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            manager.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
-        } else {
-            manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
-        }
+    @Override
+    public void initKeepAlive(String precessName) {
+        Alive.init(context,precessName,AudioVideoService.class);
     }
 
 

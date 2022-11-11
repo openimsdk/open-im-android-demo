@@ -31,7 +31,7 @@ buildscript {
             ],
             coroutines        : [
                 "lib" : "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}",
-                "test": "org.jetbrains.kotlinx:kotlinx-coroutines-test: ${versions.coroutines}",
+//                "test": "org.jetbrains.kotlinx:kotlinx-coroutines-test: ${versions.coroutines}",
             ],
             timber            : "com.github.ajalt:timberkt:1.5.1",
             // lint

@@ -6,7 +6,8 @@ pluginManagement {
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/gradle-plugin' }
         maven {
             allowInsecureProtocol = true
-            url 'http://121.37.25.71:8081/repository/maven2/'
+//            url 'http://121.37.25.71:8081/repository/maven2/'
+            url 'https://open-im-online.rentsoft.cn:51000/repository/maven2/'
         }
         maven { url 'https://jitpack.io' }
 //        google()

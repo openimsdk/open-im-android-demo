@@ -23,7 +23,7 @@ import io.openim.android.sdk.models.UserInfo;
 
 public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnListener {
 
-    private static final String TAG = "MainVM";
+    private static final String TAG = "App";
     public MutableLiveData<String> nickname = new MutableLiveData<>("");
     public MutableLiveData<Integer> visibility = new MutableLiveData<>(View.INVISIBLE);
     public boolean fromLogin, isInitDate;
@@ -39,12 +39,10 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
             callingService.setOnServicePriorLoginCallBack(this::initDate);
 
         BaseApp.inst().loginCertificate = LoginCertificate.getCache(getContext());
-        long status = OpenIMClient.getInstance().getLoginStatus();
-        L.e(TAG, "login status-----[" + status + "]");
-        if (fromLogin || status == 101) {
+        boolean logged = IMUtil.isLogged("App");
+        if (fromLogin || logged) {
             initDate();
-        }
-        if (!IMUtil.isLogged()) {
+        } else {
             OpenIMClient.getInstance().login(new OnBase<String>() {
                 @Override
                 public void onError(int code, String error) {
@@ -55,10 +53,10 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
                 @Override
                 public void onSuccess(String data) {
                     L.e(TAG, "login -----onSuccess");
-                    L.e(TAG, "user_token:" + BaseApp.inst().loginCertificate.token);
                     initDate();
                 }
-            }, BaseApp.inst().loginCertificate.userID, BaseApp.inst().loginCertificate.token);
+            }, BaseApp.inst().loginCertificate.userID,
+                BaseApp.inst().loginCertificate.token);
         }
         if (null != BaseApp.inst().loginCertificate.nickname)
             nickname.setValue(BaseApp.inst().loginCertificate.nickname);
@@ -68,7 +66,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
         if (isInitDate) return;
         isInitDate = true;
         if (null != callingService)
-        callingService.startAudioVideoService(getContext());
+            callingService.startAudioVideoService(getContext());
 
         IView.initDate();
         getSelfUserInfo();

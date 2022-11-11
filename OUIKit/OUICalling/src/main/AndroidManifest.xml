@@ -4,7 +4,9 @@
 
     <application>
 
-        <receiver android:name=".JumpReceiver" />
+        <receiver
+            android:name=".JumpReceiver"
+            android:exported="true" />
 
         <activity
             android:name=".LockPushActivity"
@@ -13,10 +15,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/ThemeWithoutAnim" />
 
-        <service android:name=".service.AudioVideoService" />
         <service
-            android:name=".service.AudioVideoDaemonService"
-            android:process="openim.daemon" />
+            android:name=".service.AudioVideoService"
+            android:exported="true" />
+
     </application>
 
 </manifest>

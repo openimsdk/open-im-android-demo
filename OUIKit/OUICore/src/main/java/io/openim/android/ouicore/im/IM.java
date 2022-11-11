@@ -11,6 +11,7 @@ import io.openim.android.ouicore.net.RXRetrofit.HttpConfig;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnConnListener;
@@ -18,6 +19,7 @@ import io.openim.android.sdk.listener.OnConnListener;
 public class IM {
     public static void initSdk() {
         N.init(new HttpConfig().setBaseUrl(Constant.getAppAuthUrl()));
+        L.e("App", "-----initSdk");
         ///IM 初始化
         OpenIMClient.getInstance().initSDK(2,
             Constant.getImApiUrl(),

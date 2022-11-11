@@ -25,15 +25,15 @@ import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.keepalive.KeepAliveService;
 
-public class AudioVideoService extends Service {
+public class AudioVideoService extends KeepAliveService {
 
-    private static final int NOTIFY_ID = 1000;
     private static final String TAG = "AudioVideoService-----";
+    private static final int NOTIFY_ID = 10000;
 
-    protected void showNotification() {
+    private void showNotification() {
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
         Intent hangIntent = new Intent(this, JumpReceiver.class);
         PendingIntent hangPendingIntent = PendingIntent.getBroadcast(this, 1002,
             hangIntent, PendingIntent.FLAG_MUTABLE);
@@ -54,34 +54,16 @@ public class AudioVideoService extends Service {
                 CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
             manager.createNotificationChannel(notificationChannel);
         }
-
         manager.notify(NOTIFY_ID, notification);
         startForeground(NOTIFY_ID, notification);
-        CallingServiceImp.launchAlarm(this);
-    }
-
-    public class sIBinder extends Binder {
-        public AudioVideoService getService() {
-            return AudioVideoService.this;
-        }
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        L.e(TAG, "onBind");
-        showNotification();
-        CallingService callingService = (CallingService) ARouter.getInstance()
-            .build(Routes.Service.CALLING).navigation();
-        if (null != callingService)
-            OpenIMClient.getInstance().signalingManager.setSignalingListener(callingService);
-        return new sIBinder();
     }
 
     @Override
     public void onCreate() {
         L.e(TAG, "onCreate");
+        showNotification();
         super.onCreate();
+
         CallingService callingService = (CallingService) ARouter.getInstance()
             .build(Routes.Service.CALLING).navigation();
         OpenIMClient.getInstance().signalingManager.setSignalingListener(callingService);
@@ -101,18 +83,9 @@ public class AudioVideoService extends Service {
         });
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        L.e(TAG, "onStartCommand");
-        if (IMUtil.isLogged()) {
-            showNotification();
-        }
-        return super.onStartCommand(intent, flags, startId);
-    }
-
     public void loginOpenIM(OnBase<String> stringOnBase) {
-        if (IMUtil.isLogged()) return;
-
+        if (IMUtil.isLogged("AudioVideoService")) return;
+        L.e(TAG, "logging...");
         BaseApp.inst().loginCertificate = LoginCertificate.getCache(BaseApp.inst());
         if (null != BaseApp.inst().loginCertificate) {
             OpenIMClient.getInstance().login(stringOnBase, BaseApp.inst().loginCertificate.userID,
@@ -122,7 +95,7 @@ public class AudioVideoService extends Service {
 
     @Override
     public void onDestroy() {
-        L.e(TAG, "onDestroy");
         super.onDestroy();
+        L.e(TAG, "onDestroy");
     }
 }

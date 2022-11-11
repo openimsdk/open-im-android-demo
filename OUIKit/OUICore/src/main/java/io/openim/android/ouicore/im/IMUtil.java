@@ -475,9 +475,9 @@ public class IMUtil {
      *
      * @return
      */
-    public static boolean isLogged() {
+    public static boolean isLogged(String tag) {
         long status = OpenIMClient.getInstance().getLoginStatus();
-        L.e(TAG, "login status-----[" + status + "]");
+        L.e(tag, "login status-----[" + status + "]");
         return status == 101 || status == 102;
     }
 

@@ -31,29 +31,33 @@ public class DemoApplication extends BaseApp {
     private static final String TAG = BaseApp.class.getSimpleName();
     public Realm realm;
 
-    @Override
-    protected void attachBaseContext(Context base) {
-        L.e(TAG, "-----attachBaseContext");
-        super.attachBaseContext(base);
-    }
 
     @Override
     public void onCreate() {
-        L.e(TAG, "-----onCreate");
+        L.e("App", "-----onCreate");
         super.onCreate();
 //      if (!isMainProcess()) return;
 
         MultiDex.install(this);
-        //im 初始化
-        IM.initSdk();
-        listenerIMOffline();
-        //音频播放
-        SPlayer.init(this);
-        SPlayer.instance().setCacheDirPath(Constant.AUDIODIR);
         //ARouter init
         ARouter.init(this);
         ARouter.openLog();
         ARouter.openDebug();
+
+        //im 初始化
+        initIM();
+
+        //音频播放
+        SPlayer.init(this);
+        SPlayer.instance().setCacheDirPath(Constant.AUDIODIR);
+    }
+
+    private void initIM() {
+        IM.initSdk();
+        listenerIMOffline();
+        CallingService callingService = (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null != callingService)
+            callingService.initKeepAlive(getPackageName());
     }
 
     private void listenerIMOffline() {
