@@ -100,7 +100,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         });
         view.recommend.setOnClickListener(v -> {
             Map<String, String> bean = new HashMap();
-            UserInfo userInfo = vm.userInfo.getValue();
+            UserInfo userInfo = vm.exUserInfo.getValue().userInfo;
             bean.put("userID", userInfo.getUserID());
             bean.put("nickname", userInfo.getNickname());
             bean.put("faceURL", userInfo.getFaceURL());
@@ -112,10 +112,10 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             startActivity(new Intent(this, MoreDataActivity.class));
         });
         view.remark.setOnClickListener(view -> {
-            if (null == vm.userInfo.getValue()) return;
+            if (null == vm.exUserInfo.getValue()) return;
             resultLauncher.launch(new Intent(this, EditTextActivity.class)
                 .putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.remark))
-                .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.getValue().getFriendInfo().getRemark()));
+                .putExtra(EditTextActivity.INIT_TXT, vm.exUserInfo.getValue().userInfo.getFriendInfo().getRemark()));
         });
         friendVM.blackListUser.observe(this, userInfos -> {
             boolean isCon = false;
@@ -127,7 +127,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
                 }
             }
             boolean finalIsCon = isCon;
-            view.slideButton.post(()->view.slideButton.setCheckedWithAnimation(finalIsCon));
+            view.slideButton.post(() -> view.slideButton.setCheckedWithAnimation(finalIsCon));
         });
         view.joinBlackList.setOnClickListener(v -> {
             if (view.slideButton.isChecked())
@@ -148,7 +148,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         CommonDialog commonDialog = new CommonDialog(this);
         commonDialog.setCanceledOnTouchOutside(false);
         commonDialog.setCancelable(false);
-        commonDialog.getMainView().tips.setText("确认对" + vm.userInfo.getValue().getNickname() + "拉黑吗？");
+        commonDialog.getMainView().tips.setText("确认对" + vm.exUserInfo.getValue().userInfo.getNickname() + "拉黑吗？");
         commonDialog.getMainView().cancel.setOnClickListener(v -> {
             commonDialog.dismiss();
             friendVM.blackListUser.setValue(friendVM.blackListUser.getValue());
@@ -175,7 +175,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             @Override
             public void onSuccess(String data) {
                 waitDialog.dismiss();
-                vm.userInfo.getValue().setRemark(resultStr);
+                vm.exUserInfo.getValue().userInfo.setRemark(resultStr);
                 Obs.newMessage(Constant.Event.USER_INFO_UPDATA);
             }
         }, uid, resultStr);

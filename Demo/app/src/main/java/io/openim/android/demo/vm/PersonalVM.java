@@ -2,11 +2,24 @@ package io.openim.android.demo.vm;
 
 import androidx.lifecycle.MutableLiveData;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.alibaba.fastjson2.JSONObject;
+import com.google.gson.reflect.TypeToken;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import io.openim.android.demo.repository.OpenIMService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.entity.ExtendUserInfo;
+import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.net.RXRetrofit.N;
+import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
+import io.openim.android.ouicore.net.RXRetrofit.Parameter;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.widget.WaitDialog;
@@ -16,7 +29,7 @@ import io.openim.android.sdk.models.UserInfo;
 
 public class PersonalVM extends BaseViewModel {
     public WaitDialog waitDialog;
-    public MutableLiveData<UserInfo> userInfo = new MutableLiveData<>();
+    public MutableLiveData<ExtendUserInfo> exUserInfo = new MutableLiveData<>();
 
     @Override
     protected void viewCreate() {
@@ -34,10 +47,10 @@ public class PersonalVM extends BaseViewModel {
         @Override
         public void onSuccess(String data) {
             waitDialog.dismiss();
-            userInfo.setValue(userInfo.getValue());
+            exUserInfo.setValue(exUserInfo.getValue());
 
-            BaseApp.inst().loginCertificate.nickname = userInfo.getValue().getNickname();
-            BaseApp.inst().loginCertificate.faceURL = userInfo.getValue().getFaceURL();
+            BaseApp.inst().loginCertificate.nickname = exUserInfo.getValue().userInfo.getNickname();
+            BaseApp.inst().loginCertificate.faceURL = exUserInfo.getValue().userInfo.getFaceURL();
             Obs.newMessage(Constant.Event.USER_INFO_UPDATA);
         }
     };
@@ -54,10 +67,45 @@ public class PersonalVM extends BaseViewModel {
             @Override
             public void onSuccess(UserInfo data) {
                 waitDialog.dismiss();
-                userInfo.setValue(data);
+                ExtendUserInfo extendUserInfo = new ExtendUserInfo();
+                extendUserInfo.userInfo = data;
+                exUserInfo.setValue(extendUserInfo);
+
+                getExtendUserInfo();
             }
         });
 
+    }
+
+    private void getExtendUserInfo() {
+        List<String> ids = new ArrayList<>();
+        ids.add(BaseApp.inst().loginCertificate.userID);
+        Parameter parameter = new Parameter()
+            .add("operationID", System.currentTimeMillis() + "")
+            .add("pageNumber", 1)
+            .add("showNumber", 1)
+            .add("userIDList", ids);
+        N.API(OpenIMService.class)
+            .getUsersFullInfo(parameter.buildJsonBody())
+            .map(OpenIMService.turn(ExtendUserInfo.class))
+            .compose(N.IOMain())
+            .subscribe(new NetObserver<ExtendUserInfo>(getContext()) {
+                @Override
+                protected void onFailure(Throwable e) {
+                    IView.toast(e.getMessage());
+                }
+
+                @Override
+                public void onComplete() {
+
+                }
+
+                @Override
+                public void onSuccess(ExtendUserInfo o) {
+                    o.userInfo = exUserInfo.getValue().userInfo;
+                    exUserInfo.setValue(o);
+                }
+            });
     }
 
     public void getUserInfo(String id) {
@@ -75,33 +123,60 @@ public class PersonalVM extends BaseViewModel {
             public void onSuccess(List<UserInfo> data) {
                 waitDialog.dismiss();
                 if (data.isEmpty()) return;
-                userInfo.setValue(data.get(0));
+                ExtendUserInfo extendUserInfo = new ExtendUserInfo();
+                extendUserInfo.userInfo = data.get(0);
+                exUserInfo.setValue(extendUserInfo);
+
+                getExtendUserInfo();
             }
         }, ids);
     }
 
-    public void setSelfInfo(String nickname, String faceURL, int gender, int appMangerLevel, String phoneNumber, long birth, String email, String ex) {
+    public void setSelfInfo() {
         waitDialog.show();
-        OpenIMClient.getInstance().userInfoManager.setSelfInfo(callBack, nickname, faceURL, gender, appMangerLevel, phoneNumber, birth, email, ex);
+        String userInfo = GsonHel.toJson(exUserInfo.getValue().userInfo);
+        Map userInfoMap = JSONObject.parseObject(userInfo, Map.class);
+        //扩展
+        userInfoMap.put("platform", IMUtil.PLATFORM_ID);
+        userInfoMap.put("userID", BaseApp.inst()
+            .loginCertificate.userID);
+        userInfoMap.put("operationID", System.currentTimeMillis() + "");
+
+        N.API(OpenIMService.class)
+            .updateUserInfo(Parameter.buildJsonBody(GsonHel.toJson(userInfoMap)))
+            .compose(N.IOMain())
+            .map(OpenIMService.turn(Object.class))
+
+            .subscribe(new NetObserver<Object>(getContext()) {
+                @Override
+                protected void onFailure(Throwable e) {
+                    callBack.onError(-1, e.getMessage());
+                }
+
+                @Override
+                public void onSuccess(Object o) {
+                    callBack.onSuccess("");
+                }
+            });
     }
 
     public void setNickname(String nickname) {
-        userInfo.getValue().setNickname(nickname);
-        setSelfInfo(nickname, null, 0, 0, null, 0, null, null);
+        exUserInfo.getValue().userInfo.setNickname(nickname);
+        setSelfInfo();
     }
 
     public void setFaceURL(String faceURL) {
-        userInfo.getValue().setFaceURL(faceURL);
-        setSelfInfo(null, faceURL, 0, 0, null, 0, null, null);
+        exUserInfo.getValue().userInfo.setFaceURL(faceURL);
+        setSelfInfo();
     }
 
     public void setGender(int gender) {
-        userInfo.getValue().setGender(gender);
-        setSelfInfo(null, null, gender, 0, null, 0, null, null);
+        exUserInfo.getValue().userInfo.setGender(gender);
+        setSelfInfo();
     }
 
     public void setBirthday(long birth) {
-        userInfo.getValue().setBirth(birth);
-        setSelfInfo(null, null, 0, 0, null, birth, null, null);
+        exUserInfo.getValue().userInfo.setBirth(birth);
+        setSelfInfo();
     }
 }

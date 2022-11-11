@@ -67,7 +67,7 @@ public class TouchVoiceDialog extends BaseDialog {
         //默认时长秒
         AudioRecordManager.getInstance(getContext()).setMaxVoiceDuration(60 * 5);
         //该库内不对文件夹是否存在进行判断，所以请在你的项目中自行判断
-        File mAudioDir = new File(Constant.AUDIODIR);
+        File mAudioDir = new File(Constant.AUDIO_DIR);
         if (!mAudioDir.exists()) {
             mAudioDir.mkdirs();
         }

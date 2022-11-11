@@ -37,6 +37,10 @@ public class Parameter {
         return RequestBody.create(MediaType.parse("application/json; charset=utf-8"), buildJson());
     }
 
+    public static RequestBody buildJsonBody(String jsonParam) {
+        return RequestBody.create(MediaType.parse("application/json; charset=utf-8"), jsonParam);
+    }
+
     public Parameter add(String key, Object oj) {
         put(key, oj);
         return this;

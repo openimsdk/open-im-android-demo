@@ -3,13 +3,14 @@ package io.openim.android.demo;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.multidex.MultiDex;
 
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import java.io.IOException;
 import java.util.List;
 
 import io.openim.android.demo.ui.login.LoginActivity;
@@ -17,6 +18,8 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.im.IM;
 import io.openim.android.ouicore.im.IMEvent;
+import io.openim.android.ouicore.net.RXRetrofit.HttpConfig;
+import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
@@ -24,7 +27,9 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.sdk.listener.OnConnListener;
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
+import okhttp3.Interceptor;
+import okhttp3.Request;
+import okhttp3.Response;
 
 
 public class DemoApplication extends BaseApp {
@@ -44,12 +49,28 @@ public class DemoApplication extends BaseApp {
         ARouter.openLog();
         ARouter.openDebug();
 
+        //net init
+        netInit();
+
         //im 初始化
         initIM();
 
         //音频播放
         SPlayer.init(this);
-        SPlayer.instance().setCacheDirPath(Constant.AUDIODIR);
+        SPlayer.instance().setCacheDirPath(Constant.AUDIO_DIR);
+    }
+
+    private void netInit() {
+        N.init(new HttpConfig().setBaseUrl(Constant.getAppAuthUrl())
+            .addInterceptor(chain -> {
+                String token = "";
+                try {
+                    token = BaseApp.inst().loginCertificate.imToken;
+                } catch (Exception ignored) {
+                }
+                return chain.proceed(chain.request().newBuilder().addHeader("token",
+                    token).build());
+            }));
     }
 
     private void initIM() {

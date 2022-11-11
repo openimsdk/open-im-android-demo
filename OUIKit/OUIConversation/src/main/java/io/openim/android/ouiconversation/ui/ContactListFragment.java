@@ -185,7 +185,10 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
     @Override
     public void onErr(String msg) {
-        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+        try {
+            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+        }catch (Exception ignored){}
+
     }
 
     @Override

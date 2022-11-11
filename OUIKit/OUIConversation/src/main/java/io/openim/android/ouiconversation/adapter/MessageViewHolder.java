@@ -271,6 +271,7 @@ public class MessageViewHolder {
             int viewType = message.getContentType();
             unRead.setVisibility(View.GONE);
             if (isOwn
+                && message.getStatus() == Constant.Send_State.SEND_SUCCESS
                 && viewType < Constant.MsgType.NOTICE
                 && viewType != Constant.MsgType.REVOKE
                 && viewType != Constant.MsgType.ADVANCED_REVOKE) {

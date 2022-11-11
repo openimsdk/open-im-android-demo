@@ -181,7 +181,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         N.API(OneselfService.class)
             .getUsersOnlineStatus(
                 Constant.getImApiUrl() + "/user/get_users_online_status",
-                BaseApp.inst().loginCertificate.token,
+                BaseApp.inst().loginCertificate.imToken,
                 parameter.buildJsonBody())
             .compose(N.IOMain())
             .subscribe(new NetObserver<ResponseBody>(getContext()) {

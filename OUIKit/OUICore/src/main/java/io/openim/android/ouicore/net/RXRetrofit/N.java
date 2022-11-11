@@ -42,24 +42,24 @@ public class N {
     private N(HttpConfig httpConfig) {
         initMap();
         OkHttpClient.Builder build = new OkHttpClient.Builder()
-                .connectTimeout(httpConfig.connectTimeOut, TimeUnit.SECONDS)
-                .readTimeout(httpConfig.readTimeOut, TimeUnit.SECONDS)
-                .writeTimeout(httpConfig.writeTimeOut, TimeUnit.SECONDS);
-
-        if (HttpConfig.isDebug)
-            build.addInterceptor(LogInterceptor());//添加日志拦截器
+            .connectTimeout(httpConfig.connectTimeOut, TimeUnit.SECONDS)
+            .readTimeout(httpConfig.readTimeOut, TimeUnit.SECONDS)
+            .writeTimeout(httpConfig.writeTimeOut, TimeUnit.SECONDS);
 
         if (null != httpConfig.interceptors) {
             for (Interceptor interceptor : httpConfig.interceptors) {
                 build.addInterceptor(interceptor);
             }
         }
+        if (HttpConfig.isDebug)
+            build.addInterceptor(LogInterceptor());//添加日志拦截器
+
         mRetrofit = new Retrofit.Builder()
-                .baseUrl(httpConfig.baseUrl)
-                .addConverterFactory(GsonConverterFactory.create())//添加gson转换器
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())//添加rxjava转换器
-                .client(build.build())
-                .build();
+            .baseUrl(httpConfig.baseUrl)
+            .addConverterFactory(GsonConverterFactory.create())//添加gson转换器
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())//添加rxjava转换器
+            .client(build.build())
+            .build();
     }
 
     public static <T> T API(Class<T> service) {
@@ -73,9 +73,9 @@ public class N {
     }
 
     private static synchronized N getInstance(HttpConfig httpConfig) {
-            if (null == n) {
-                n = new N(httpConfig);
-            }
+        if (null == n) {
+            n = new N(httpConfig);
+        }
         return n;
     }
 
@@ -115,7 +115,7 @@ public class N {
 
     //日志拦截器
     private HttpLoggingInterceptor LogInterceptor() {
-        return new HttpLoggingInterceptor(message -> L.w(TAG,  message)).setLevel(HttpLoggingInterceptor.Level.BODY);//设置打印数据的级别
+        return new HttpLoggingInterceptor(message -> L.w(TAG, message)).setLevel(HttpLoggingInterceptor.Level.BODY);//设置打印数据的级别
     }
 
 

@@ -18,8 +18,7 @@ import io.openim.android.sdk.listener.OnConnListener;
 
 public class IM {
     public static void initSdk() {
-        N.init(new HttpConfig().setBaseUrl(Constant.getAppAuthUrl()));
-        L.e("App", "-----initSdk");
+        L.e("App", "---IM--initSdk");
         ///IM 初始化
         OpenIMClient.getInstance().initSDK(2,
             Constant.getImApiUrl(),

@@ -56,7 +56,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
                     initDate();
                 }
             }, BaseApp.inst().loginCertificate.userID,
-                BaseApp.inst().loginCertificate.token);
+                BaseApp.inst().loginCertificate.imToken);
         }
         if (null != BaseApp.inst().loginCertificate.nickname)
             nickname.setValue(BaseApp.inst().loginCertificate.nickname);

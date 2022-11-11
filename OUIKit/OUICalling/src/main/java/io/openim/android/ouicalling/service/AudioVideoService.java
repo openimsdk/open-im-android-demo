@@ -89,7 +89,7 @@ public class AudioVideoService extends KeepAliveService {
         BaseApp.inst().loginCertificate = LoginCertificate.getCache(BaseApp.inst());
         if (null != BaseApp.inst().loginCertificate) {
             OpenIMClient.getInstance().login(stringOnBase, BaseApp.inst().loginCertificate.userID,
-                BaseApp.inst().loginCertificate.token);
+                BaseApp.inst().loginCertificate.imToken);
         }
     }
 

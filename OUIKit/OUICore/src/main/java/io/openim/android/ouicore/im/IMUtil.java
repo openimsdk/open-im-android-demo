@@ -116,7 +116,7 @@ public class IMUtil {
                 continue;
 
             if (lastShowTimeStamp == 0 ||
-                    (message.getSendTime() - lastShowTimeStamp > (1000 * 60 * 5))) {
+                (message.getSendTime() - lastShowTimeStamp > (1000 * 60 * 5))) {
                 lastShowTimeStamp = message.getSendTime();
                 msgExpand.isShowTime = true;
             }
@@ -490,6 +490,7 @@ public class IMUtil {
     public static void logout(AppCompatActivity from, Class<?> to) {
         from.startActivity(new Intent(from, to));
         LoginCertificate.clear();
+        BaseApp.inst().loginCertificate = null;
         CallingService callingService = (CallingService) ARouter.getInstance()
             .build(Routes.Service.CALLING).navigation();
         if (null != callingService)

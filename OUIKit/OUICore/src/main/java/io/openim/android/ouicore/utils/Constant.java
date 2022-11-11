@@ -6,23 +6,15 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IM;
 
 public class Constant {
-    private static final String DEFAULT_IP = "121.5.182.23";
-//    private static final String DEFAULT_IP = "43.128.5.63";
-
-    //IM sdk api地址
-    private static final String IM_API_URL = "http://" + DEFAULT_IP + ":10002";
+//    private static final String DEFAULT_IP = "test-web.rentsoft.cn";
+    private static final String DEFAULT_IP = "web.rentsoft.cn";
     //登录注册手机验 证服务器地址
-    private static final String APP_AUTH_URL = "http://" + DEFAULT_IP + ":10004";
+    private static final String APP_AUTH_URL = "https://" + DEFAULT_IP + "/chat/";
+    //IM sdk api地址
+    private static final String IM_API_URL = "https://" + DEFAULT_IP + "/api";
     //web socket
-    private static final String IM_WS_URL = "ws://" + DEFAULT_IP + ":10001";
+    private static final String IM_WS_URL = "wss://" + DEFAULT_IP + "/msg_gateway";
 
-    //    private static final String DEFAULT_IP = "tangheim.tanghecms.com";
-//    //IM sdk api地址
-//    private static final String IM_API_URL = "https://" + DEFAULT_IP + ":61102";
-//    //登录注册手机验 证服务器地址
-//    private static final String APP_AUTH_URL = "https://" + DEFAULT_IP + ":61104";
-//    //web socket
-//    private static final String IM_WS_URL = "wss://" + DEFAULT_IP + ":61101";
 
     public static String getImApiUrl() {
         String url = SharedPreferencesUtil.get(BaseApp.inst())
@@ -57,11 +49,11 @@ public class Constant {
     }
 
     //存储音频的文件夹
-    public static final String AUDIODIR = IM.getStorageDir() + "/audio/";
+    public static final String AUDIO_DIR = IM.getStorageDir() + "/audio/";
     //视频存储文件夹
-    public static final String VIDEODIR = IM.getStorageDir() + "/video/";
+    public static final String VIDEO_DIR = IM.getStorageDir() + "/video/";
     //图片存储文件夹
-    public static final String PICTUREDIR = IM.getStorageDir() + "/picture/";
+    public static final String PICTURE_DIR = IM.getStorageDir() + "/picture/";
 
     //二维码
     public static class QR {
@@ -117,6 +109,8 @@ public class Constant {
     public static class Send_State {
         //发送中...
         public static final int SENDING = 1;
+        //发送成功
+        public static final int SEND_SUCCESS = 2;
         //发送失败
         public static final int SEND_FAILED = 3;
     }
