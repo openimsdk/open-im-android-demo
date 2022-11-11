@@ -243,6 +243,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                             if (v.get(i).sortLetter.equals(memberInfo.sortLetter)) {
                                 groupMemberInfo.add(i, memberInfo);
                                 notContain = false;
+                                break;
                             }
                         }
                         if (notContain)

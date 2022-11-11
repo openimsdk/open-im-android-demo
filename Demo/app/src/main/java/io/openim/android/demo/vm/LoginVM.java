@@ -61,7 +61,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
                             public void onSuccess(String data) {
                                 //缓存登录信息
                                 loginCertificate.cache(getContext());
-                                BaseApp.inst().loginCertificate=loginCertificate;
+                                BaseApp.inst().loginCertificate = loginCertificate;
                                 IView.jump();
                             }
                         }, loginCertificate.userID, loginCertificate.imToken);
@@ -83,6 +83,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
         Parameter parameter = new Parameter()
             .add("password", md5(pwd.getValue()))
             .add("platform", 2)
+            .add("usedFor", 1)
             .add("operationID", System.currentTimeMillis() + "")
             .add("verificationCode", verificationCode);
         if (isPhone.getValue()) {
@@ -187,6 +188,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
 
     public void register() {
         Parameter parameter = getParameter(verificationCode);
+        parameter.add("nickname", nickName.getValue());
         WaitDialog waitDialog = showWait();
         N.API(OpenIMService.class).register(parameter.buildJsonBody())
             .map(OpenIMService.turn(LoginCertificate.class))

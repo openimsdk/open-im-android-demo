@@ -11,6 +11,7 @@ public class LoginCertificate {
     public String faceURL;
     public String userID;
     public String imToken;
+    public String chatToken;
 
     public void cache(Context context) {
         SharedPreferencesUtil.get(context).setCache("user.LoginCertificate", GsonHel.toJson(this));

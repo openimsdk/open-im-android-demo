@@ -1,5 +1,6 @@
 package io.openim.android.ouicore.entity;
 
+import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.sdk.models.UserInfo;
 
 /**

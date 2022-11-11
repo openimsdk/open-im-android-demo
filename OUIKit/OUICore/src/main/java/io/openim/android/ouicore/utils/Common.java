@@ -346,5 +346,21 @@ public class Common {
             .putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord=" +
                 message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey));
     }
+
+    /***
+     * 判断字符串是否未null
+     * @param sc
+     * @return
+     */
+    public static Boolean isBlank(CharSequence sc) {
+        if (sc != null && sc.length() > 0) {
+            for (int i = 0; i < sc.length(); i++) {
+                if (!Character.isWhitespace(sc.charAt(i))) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
 

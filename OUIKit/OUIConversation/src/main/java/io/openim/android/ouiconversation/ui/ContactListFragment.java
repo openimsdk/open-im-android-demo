@@ -253,7 +253,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                     lastMsg = target + msgConversation.notificationMsg.group.notification;
                 } catch (Exception e) {
                     if (!lastMsg.contains(target))
-                        lastMsg = target + "\t"+lastMsg;
+                        lastMsg = target + "\t" + lastMsg;
                 }
                 Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg,
                     target, BaseApp.inst()
@@ -261,9 +261,9 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
             } else if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.atMe) {
                 String target = "@" + BaseApp.inst()
-                    .getString(io.openim.android.ouicore.R.string.you) ;
+                    .getString(io.openim.android.ouicore.R.string.you);
                 if (!lastMsg.contains(target))
-                    lastMsg = target + "\t"+lastMsg;
+                    lastMsg = target + "\t" + lastMsg;
                 Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg, target, BaseApp.inst()
                     .getColor(android.R.color.holo_red_dark));
             } else

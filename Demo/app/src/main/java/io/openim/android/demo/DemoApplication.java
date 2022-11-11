@@ -65,7 +65,7 @@ public class DemoApplication extends BaseApp {
             .addInterceptor(chain -> {
                 String token = "";
                 try {
-                    token = BaseApp.inst().loginCertificate.imToken;
+                    token = BaseApp.inst().loginCertificate.chatToken;
                 } catch (Exception ignored) {
                 }
                 return chain.proceed(chain.request().newBuilder().addHeader("token",

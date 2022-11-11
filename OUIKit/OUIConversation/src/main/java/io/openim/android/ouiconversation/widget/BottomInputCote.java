@@ -11,6 +11,7 @@ import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.view.KeyEvent;
@@ -258,6 +259,10 @@ public class BottomInputCote {
                 view.replyLy.setVisibility(VISIBLE);
                 view.replyContent.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
             }
+        });
+
+        vm.inputMsg.observe((LifecycleOwner) context, s -> {
+            view.chatSend.setEnabled(!TextUtils.isEmpty(s) && !Common.isBlank(s));
         });
     }
 

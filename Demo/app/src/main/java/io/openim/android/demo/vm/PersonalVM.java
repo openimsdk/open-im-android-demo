@@ -87,9 +87,9 @@ public class PersonalVM extends BaseViewModel {
             .add("userIDList", ids);
         N.API(OpenIMService.class)
             .getUsersFullInfo(parameter.buildJsonBody())
-            .map(OpenIMService.turn(ExtendUserInfo.class))
+            .map(OpenIMService.turn(HashMap.class))
             .compose(N.IOMain())
-            .subscribe(new NetObserver<ExtendUserInfo>(getContext()) {
+            .subscribe(new NetObserver<HashMap>(getContext()) {
                 @Override
                 protected void onFailure(Throwable e) {
                     IView.toast(e.getMessage());
@@ -101,9 +101,17 @@ public class PersonalVM extends BaseViewModel {
                 }
 
                 @Override
-                public void onSuccess(ExtendUserInfo o) {
-                    o.userInfo = exUserInfo.getValue().userInfo;
-                    exUserInfo.setValue(o);
+                public void onSuccess(HashMap map) {
+                    try {
+                        ArrayList arrayList = (ArrayList) map.get("userFullInfoList");
+                        if (null == arrayList || arrayList.isEmpty()) return;
+                        exUserInfo.getValue().userInfo = GsonHel.getGson().
+                            fromJson(arrayList.get(0).toString(),UserInfo.class);
+                        exUserInfo.setValue(exUserInfo.getValue());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 }
             });
     }
