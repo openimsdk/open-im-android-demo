@@ -231,25 +231,27 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                 List<ExGroupMemberInfo> groupMemberInfo = new ArrayList<>();
                 groupMemberInfo.addAll(v);
 
-                for (ExGroupMemberInfo memberInfo : vm.exGroupManagement.getValue()) {
-                    if (!memberInfo.groupMembersInfo.getUserID()
-                        .equals(vm.groupsInfo.getValue().getOwnerUserID())) {
-                        String nickName = memberInfo.groupMembersInfo.getNickname();
-                        String letter = Pinyin.toPinyin(nickName.charAt(0));
-                        memberInfo.sortLetter = (letter.charAt(0) + "").trim().toUpperCase();
+               try {
+                   for (ExGroupMemberInfo memberInfo : vm.exGroupManagement.getValue()) {
+                       if (!memberInfo.groupMembersInfo.getUserID()
+                           .equals(vm.groupsInfo.getValue().getOwnerUserID())) {
+                           String nickName = memberInfo.groupMembersInfo.getNickname();
+                           String letter = Pinyin.toPinyin(nickName.charAt(0));
+                           memberInfo.sortLetter = (letter.charAt(0) + "").trim().toUpperCase();
 
-                        boolean notContain = true;
-                        for (int i = 0; i < v.size(); i++) {
-                            if (v.get(i).sortLetter.equals(memberInfo.sortLetter)) {
-                                groupMemberInfo.add(i, memberInfo);
-                                notContain = false;
-                                break;
-                            }
-                        }
-                        if (notContain)
-                            groupMemberInfo.add(0, memberInfo);
-                    }
-                }
+                           boolean notContain = true;
+                           for (int i = 0; i < v.size(); i++) {
+                               if (v.get(i).sortLetter.equals(memberInfo.sortLetter)) {
+                                   groupMemberInfo.add(i, memberInfo);
+                                   notContain = false;
+                                   break;
+                               }
+                           }
+                           if (notContain)
+                               groupMemberInfo.add(0, memberInfo);
+                       }
+                   }
+               }catch (Exception e){}
 
                 List<ExUserInfo> exUserInfos = new ArrayList<>();
                 for (ExGroupMemberInfo exGroupMemberInfo : groupMemberInfo) {
