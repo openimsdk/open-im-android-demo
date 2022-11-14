@@ -11,7 +11,7 @@ public class Constant {
     //登录注册手机验 证服务器地址
     private static final String APP_AUTH_URL = "https://" + DEFAULT_IP + "/chat/";
     //IM sdk api地址
-    private static final String IM_API_URL = "https://" + DEFAULT_IP + "/api";
+    private static final String IM_API_URL = "https://" + DEFAULT_IP + "/api/";
     //web socket
     private static final String IM_WS_URL = "wss://" + DEFAULT_IP + "/msg_gateway";
 
