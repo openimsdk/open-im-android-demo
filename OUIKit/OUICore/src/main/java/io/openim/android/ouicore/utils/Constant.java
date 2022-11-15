@@ -6,8 +6,9 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IM;
 
 public class Constant {
-//    private static final String DEFAULT_IP = "test-web.rentsoft.cn";//43
-    private static final String DEFAULT_IP = "web.rentsoft.cn";//121
+    //    private static final String DEFAULT_IP = "test-web.rentsoft.cn";//43
+    public static final String DEFAULT_IP = "web.rentsoft.cn";//121
+
     //登录注册手机验 证服务器地址
     private static final String APP_AUTH_URL = "https://" + DEFAULT_IP + "/chat/";
     //IM sdk api地址
