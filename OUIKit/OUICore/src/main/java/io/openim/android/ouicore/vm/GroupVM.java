@@ -2,6 +2,7 @@ package io.openim.android.ouicore.vm;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -41,7 +42,7 @@ public class GroupVM extends SocialityVM {
     //群所有成员
     public MutableLiveData<List<GroupMembersInfo>> groupMembers = new MutableLiveData<>(new ArrayList<>());
     //超级群成员分页加载
-    public MutableLiveData<List<GroupMembersInfo>> superGroupMembers = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<ExGroupMemberInfo>> superGroupMembers = new MutableLiveData<>(new ArrayList<>());
     //封装过的群成员 用于字母导航
     public MutableLiveData<List<ExGroupMemberInfo>> exGroupMembers = new MutableLiveData<>(new ArrayList<>());
     //群管理
@@ -104,18 +105,18 @@ public class GroupVM extends SocialityVM {
             groupMemberRoles.add(groupMemberRole);
         }
         OpenIMClient.getInstance().groupManager.createGroup(new OnBase<GroupInfo>() {
-            @Override
-            public void onError(int code, String error) {
-                IView.onError(error);
+                                                                @Override
+                                                                public void onError(int code, String error) {
+                                                                    IView.onError(error);
 
-            }
+                                                                }
 
-            @Override
-            public void onSuccess(GroupInfo data) {
-                IView.onSuccess(data);
-                Common.UIHandler.postDelayed(waitDialog::dismiss,200);
-            }
-        }, groupName.getValue(), null, null, null,
+                                                                @Override
+                                                                public void onSuccess(GroupInfo data) {
+                                                                    IView.onSuccess(data);
+                                                                    Common.UIHandler.postDelayed(waitDialog::dismiss, 200);
+                                                                }
+                                                            }, groupName.getValue(), null, null, null,
             0, null, groupMemberRoles);
     }
 
@@ -185,10 +186,21 @@ public class GroupVM extends SocialityVM {
             @Override
             public void onSuccess(List<GroupMembersInfo> data) {
                 if (data.isEmpty()) return;
-                superGroupMembers.getValue().addAll(data);
+                superGroupMembers.getValue().addAll(getExGroupMemberInfos(data));
                 superGroupMembers.setValue(superGroupMembers.getValue());
             }
         }, groupId, 0, start, pageSize);
+    }
+
+    @NonNull
+    private List<ExGroupMemberInfo> getExGroupMemberInfos(List<GroupMembersInfo> data) {
+        List<ExGroupMemberInfo> exGroupMemberInfos = new ArrayList<>();
+        for (GroupMembersInfo datum : data) {
+            ExGroupMemberInfo exGroupMemberInfo = new ExGroupMemberInfo();
+            exGroupMemberInfo.groupMembersInfo = datum;
+            exGroupMemberInfos.add(exGroupMemberInfo);
+        }
+        return exGroupMemberInfos;
     }
 
     List<String> getNextHasReadIds() {
@@ -217,10 +229,10 @@ public class GroupVM extends SocialityVM {
             public void onSuccess(List<GroupMembersInfo> data) {
                 if (data.isEmpty()) return;
                 if (isAddUp) {
-                    superGroupMembers.getValue().addAll(data);
+                    superGroupMembers.getValue().addAll(getExGroupMemberInfos(data));
                     superGroupMembers.setValue(superGroupMembers.getValue());
                 } else
-                    superGroupMembers.setValue(data);
+                    superGroupMembers.setValue(getExGroupMemberInfos(data));
             }
         }, groupId, ids);
     }

@@ -23,6 +23,7 @@ import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.CallHistory;
+import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.models.GroupInfo;
@@ -31,7 +32,7 @@ import io.openim.android.sdk.models.GroupMembersInfo;
 public class MsgReadStatusActivity extends BaseActivity<GroupVM, ActivityMsgReadStatusBinding> {
 
     private boolean isRead = true;
-    private RecyclerViewAdapter<GroupMembersInfo, RecyclerView.ViewHolder> adapter;
+    private RecyclerViewAdapter<ExGroupMemberInfo, RecyclerView.ViewHolder> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +57,7 @@ public class MsgReadStatusActivity extends BaseActivity<GroupVM, ActivityMsgRead
     private void initView() {
         view.title1.setText(String.format(getString(io.openim.android.ouicore.R.string.readed), vm.hasReadIDList.size() + ""));
         view.recyclerview.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RecyclerViewAdapter<GroupMembersInfo, RecyclerView.ViewHolder>() {
+        adapter = new RecyclerViewAdapter<ExGroupMemberInfo, RecyclerView.ViewHolder>() {
 
 
             @NonNull
@@ -66,10 +67,10 @@ public class MsgReadStatusActivity extends BaseActivity<GroupVM, ActivityMsgRead
             }
 
             @Override
-            public void onBindView(@NonNull RecyclerView.ViewHolder holder, GroupMembersInfo data, int position) {
+            public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExGroupMemberInfo data, int position) {
                 ViewHol.ItemViewHo itemViewHo = (ViewHol.ItemViewHo) holder;
-                itemViewHo.view.avatar.load(data.getFaceURL());
-                itemViewHo.view.nickName.setText(data.getNickname());
+                itemViewHo.view.avatar.load(data.groupMembersInfo.getFaceURL());
+                itemViewHo.view.nickName.setText(data.groupMembersInfo.getNickname());
                 itemViewHo.view.select.setVisibility(View.GONE);
                 itemViewHo.view.identity.setVisibility(View.GONE);
             }
@@ -95,11 +96,11 @@ public class MsgReadStatusActivity extends BaseActivity<GroupVM, ActivityMsgRead
         vm.superGroupMembers.observe(this, groupMembersInfos -> {
             if (groupMembersInfos.isEmpty()) return;
             if (!isRead) {
-                Iterator<GroupMembersInfo> iterator = groupMembersInfos.iterator();
+                Iterator<ExGroupMemberInfo> iterator = groupMembersInfos.iterator();
                 while (iterator.hasNext()) {
-                    GroupMembersInfo groupMembersInfo = iterator.next();
-                    if (vm.hasReadIDList.contains(groupMembersInfo.getUserID())
-                        || groupMembersInfo.getUserID().equals(BaseApp.inst().loginCertificate.userID))
+                    ExGroupMemberInfo exGroupMemberInfo = iterator.next();
+                    if (vm.hasReadIDList.contains(exGroupMemberInfo.groupMembersInfo.getUserID())
+                        || exGroupMemberInfo.groupMembersInfo.getUserID().equals(BaseApp.inst().loginCertificate.userID))
                         iterator.remove();
                 }
             }

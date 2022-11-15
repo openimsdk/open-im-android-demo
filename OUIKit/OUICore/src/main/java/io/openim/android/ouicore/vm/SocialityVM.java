@@ -13,6 +13,7 @@ import java.util.List;
 
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.entity.CommEx;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.entity.SortLetter;
 import io.openim.android.ouicore.utils.Common;
@@ -107,9 +108,9 @@ public class SocialityVM extends BaseViewModel {
     }
 
 
-    public class PinyinComparator implements Comparator<SortLetter> {
+    public class PinyinComparator implements Comparator<CommEx> {
 
-        public int compare(SortLetter o1, SortLetter o2) {
+        public int compare(CommEx o1, CommEx o2) {
             //根据ABCDEFG...来排序
             if (o1.sortLetter.equals("#")) {
                 return 1;

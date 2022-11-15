@@ -224,7 +224,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         public void onBindViewHolder(ViewHol.ContactItemHolder viewHolder, final int position) {
             MsgConversation msgConversation = conversationInfos.get(position);
 
-            viewHolder.viewBinding.avatar.load(msgConversation.conversationInfo.getFaceURL(), msgConversation.conversationInfo.getConversationType() == Constant.SessionType.GROUP_CHAT);
+            viewHolder.viewBinding.avatar.load(msgConversation.conversationInfo.getFaceURL(), msgConversation.conversationInfo.getConversationType()
+                != Constant.SessionType.SINGLE_CHAT);
             viewHolder.viewBinding.nickName.setText(msgConversation.conversationInfo.getShowName());
 
             if (msgConversation.conversationInfo.getRecvMsgOpt() != 0) {

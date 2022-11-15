@@ -42,6 +42,7 @@ public class AvatarImage extends RoundImageView {
             Glide.with(getContext())
                 .load(url)
                 .centerCrop()
+                .error(isGroup ? R.mipmap.ic_my_group : io.openim.android.ouicore.R.mipmap.ic_my_friend)
                 .apply(RequestOptions.bitmapTransform(new RoundedCorners(10)))
                 .into(this);
         }

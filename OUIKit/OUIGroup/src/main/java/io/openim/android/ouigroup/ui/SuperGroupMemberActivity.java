@@ -23,6 +23,7 @@ import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
+import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
@@ -30,10 +31,14 @@ import io.openim.android.ouigroup.databinding.ActivitySuperGroupMemberBinding;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
+
 public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySuperGroupMemberBinding> {
     private RecyclerViewAdapter adapter;
     //转让群主权限
     private boolean isTransferPermission;
+    //选择群成员
+    private boolean isSelectGroupMember;
+    private int maxNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +53,15 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
     }
 
     private ActivityResultLauncher<Intent> searchFriendLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-      try {
-          String uid = result.getData().getStringExtra(Constant.K_ID);
-          ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-              .withString(Constant.K_ID, uid)
-              .withString(Constant.K_GROUP_ID, vm.groupId)
-              .navigation();
-      }catch (Exception ignored){
+        try {
+            String uid = result.getData().getStringExtra(Constant.K_ID);
+            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                .withString(Constant.K_ID, uid)
+                .withString(Constant.K_GROUP_ID, vm.groupId)
+                .navigation();
+        } catch (Exception ignored) {
 
-      }
+        }
     });
 
     void init() {
@@ -67,14 +72,16 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
             vm.pageSize = 20;
         }
         isTransferPermission = getIntent().getBooleanExtra(Constant.K_FROM, false);
+        isSelectGroupMember = getIntent().getBooleanExtra("isSelectGroupMember", false);
+        maxNum = getIntent().getIntExtra("maxNum", 9);
     }
 
     private void listener() {
         view.searchView.setOnClickListener(v -> {
-            Postcard postcard =ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS);
+            Postcard postcard = ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS);
             LogisticsCenter.completion(postcard);
-            searchFriendLauncher.launch(new Intent(this,postcard.getDestination())
-            .putExtra(Constant.K_GROUP_ID,vm.groupId));
+            searchFriendLauncher.launch(new Intent(this, postcard.getDestination())
+                .putExtra(Constant.K_GROUP_ID, vm.groupId));
         });
         view.recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -119,8 +126,8 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
 
         vm.superGroupMembers.observe(this, v -> {
             if (v.isEmpty()) return;
-            adapter.notifyItemRangeInserted(vm.exGroupManagement.getValue().size() - vm.pageSize,
-                vm.exGroupManagement.getValue().size());
+            adapter.notifyItemRangeInserted(vm.superGroupMembers.getValue().size() - vm.pageSize,
+                vm.superGroupMembers.getValue().size());
         });
     }
 
@@ -131,7 +138,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
     private void initView() {
         view.more.setVisibility(isTransferPermission ? View.GONE : View.VISIBLE);
         view.recyclerview.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RecyclerViewAdapter<GroupMembersInfo, RecyclerView.ViewHolder>() {
+        adapter = new RecyclerViewAdapter<ExGroupMemberInfo, RecyclerView.ViewHolder>() {
 
 
             @NonNull
@@ -141,17 +148,18 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
             }
 
             @Override
-            public void onBindView(@NonNull RecyclerView.ViewHolder holder, GroupMembersInfo data, int position) {
+            public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExGroupMemberInfo data, int position) {
                 ViewHol.ItemViewHo itemViewHo = (ViewHol.ItemViewHo) holder;
-                itemViewHo.view.avatar.load(data.getFaceURL());
-                itemViewHo.view.nickName.setText(data.getNickname());
+                itemViewHo.view.select.setVisibility(isSelectGroupMember ? View.VISIBLE :View.GONE);
+                itemViewHo.view.avatar.load(data.groupMembersInfo.getFaceURL());
+                itemViewHo.view.nickName.setText(data.groupMembersInfo.getNickname());
                 itemViewHo.view.select.setVisibility(View.GONE);
-                if (data.getRoleLevel() == 2) {
+                if (data.groupMembersInfo.getRoleLevel() == 2) {
                     itemViewHo.view.identity.setVisibility(View.VISIBLE);
                     itemViewHo.view.identity.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_8_fddfa1);
                     itemViewHo.view.identity.setText(io.openim.android.ouicore.R.string.lord);
                     itemViewHo.view.identity.setTextColor(Color.parseColor("#ffff8c00"));
-                } else if (data.getRoleLevel() == 3) {
+                } else if (data.groupMembersInfo.getRoleLevel() == 3) {
                     itemViewHo.view.identity.setVisibility(View.VISIBLE);
                     itemViewHo.view.identity.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_8_a2c9f8);
                     itemViewHo.view.identity.setText(io.openim.android.ouicore.R.string.lord);
@@ -162,19 +170,19 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
 
                 itemViewHo.view.getRoot().setOnClickListener(v -> {
                     if (isTransferPermission) {
-                        if (data.getRoleLevel() == 2)
+                        if (data.groupMembersInfo.getRoleLevel() == 2)
                             toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.repeat_group_manager));
                         else {
                             CommonDialog commonDialog = new CommonDialog(SuperGroupMemberActivity.this);
                             commonDialog.getMainView().tips
                                 .setText(String.format(BaseApp.inst().getString(io.openim.
-                                    android.ouicore.R.string.transfer_permission), data.getNickname()));
+                                    android.ouicore.R.string.transfer_permission), data.groupMembersInfo.getNickname()));
                             commonDialog.getMainView().cancel.setOnClickListener(v2 -> {
                                 commonDialog.dismiss();
                             });
                             commonDialog.getMainView().confirm.setOnClickListener(v2 -> {
                                 commonDialog.dismiss();
-                                vm.transferGroupOwner(data.getUserID(), data1 -> {
+                                vm.transferGroupOwner(data.groupMembersInfo.getUserID(), data1 -> {
                                     toast(getString(io.openim.android.ouicore.R.string.transfer_succ));
                                     finish();
                                 });
@@ -183,7 +191,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
                         }
                     } else {
                         ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                            .withString(Constant.K_ID, data.getUserID())
+                            .withString(Constant.K_ID, data.groupMembersInfo.getUserID())
                             .withString(Constant.K_GROUP_ID, vm.groupId)
                             .navigation();
                     }

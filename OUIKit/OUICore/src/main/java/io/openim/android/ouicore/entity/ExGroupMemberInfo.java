@@ -2,10 +2,8 @@ package io.openim.android.ouicore.entity;
 
 import io.openim.android.sdk.models.GroupMembersInfo;
 
-public class ExGroupMemberInfo  extends SortLetter{
+public class ExGroupMemberInfo extends CommEx {
     public GroupMembersInfo groupMembersInfo;
-    public boolean isSticky = false; //是否是Sticky
-
 
     /**
      * contains 方法
