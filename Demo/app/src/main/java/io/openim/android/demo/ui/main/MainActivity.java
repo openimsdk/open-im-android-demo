@@ -17,6 +17,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.igexin.sdk.PushManager;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 import com.yzq.zxinglibrary.android.CaptureActivity;
@@ -58,6 +59,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     protected void onCreate(Bundle savedInstanceState) {
         hasShoot = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.RECORD_AUDIO);
         AndPermission.with(this).overlay().start();
+        PushManager.getInstance().initialize(this);
 
         bindVM(MainVM.class);
         vm.fromLogin = getIntent().getBooleanExtra(LoginActivity.FORM_LOGIN, false);

@@ -9,6 +9,8 @@ import androidx.multidex.MultiDex;
 
 
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.igexin.sdk.IUserLoggerInterface;
+import com.igexin.sdk.PushManager;
 
 import java.io.IOException;
 import java.util.List;
@@ -49,8 +51,9 @@ public class DemoApplication extends BaseApp {
         ARouter.openLog();
         ARouter.openDebug();
 
+        initPush();
         //net init
-        netInit();
+        initNet();
 
         //im 初始化
         initIM();
@@ -60,7 +63,13 @@ public class DemoApplication extends BaseApp {
         SPlayer.instance().setCacheDirPath(Constant.AUDIO_DIR);
     }
 
-    private void netInit() {
+    private void initPush() {
+        PushManager.getInstance().initialize(this);
+        PushManager.getInstance().setDebugLogger(this, s -> L.i("getui", s));
+
+    }
+
+    private void initNet() {
         N.init(new HttpConfig().setBaseUrl(Constant.getAppAuthUrl())
             .addInterceptor(chain -> {
                 String token = "";
