@@ -113,9 +113,13 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         });
         view.remark.setOnClickListener(view -> {
             if (null == vm.exUserInfo.getValue()) return;
+            String remark = "";
+            try {
+                remark = vm.exUserInfo.getValue().userInfo.getFriendInfo().getRemark();
+            } catch (Exception e){}
             resultLauncher.launch(new Intent(this, EditTextActivity.class)
                 .putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.remark))
-                .putExtra(EditTextActivity.INIT_TXT, vm.exUserInfo.getValue().userInfo.getFriendInfo().getRemark()));
+                .putExtra(EditTextActivity.INIT_TXT, remark));
         });
         friendVM.blackListUser.observe(this, userInfos -> {
             boolean isCon = false;
