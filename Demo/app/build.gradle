@@ -4,6 +4,9 @@ plugins {
 
 
 android {
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
     compileSdk rootProject.ext.androidConfig.compileSdk
 
     viewBinding {
@@ -72,6 +75,10 @@ android {
     }
     buildFeatures {
         viewBinding true
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
     }
 }
 

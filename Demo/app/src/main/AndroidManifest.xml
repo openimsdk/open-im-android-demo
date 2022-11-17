@@ -19,6 +19,7 @@
         android:theme="@style/Theme.Demo"
         android:usesCleartextTraffic="true">
 
+
         <service android:name=".services.GetuiPushService"
             android:exported="false"
             android:label="PushService"

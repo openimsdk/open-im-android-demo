@@ -48,8 +48,8 @@ public class DemoApplication extends BaseApp {
         MultiDex.install(this);
         //ARouter init
         ARouter.init(this);
-        ARouter.openLog();
-        ARouter.openDebug();
+//        ARouter.openimLog();
+//        ARouter.openDebug();
 
         initPush();
         //net init
