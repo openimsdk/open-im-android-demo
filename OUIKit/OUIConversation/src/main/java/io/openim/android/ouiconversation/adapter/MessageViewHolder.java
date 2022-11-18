@@ -130,7 +130,7 @@ public class MessageViewHolder {
         private PopupWindow popupWindow;
         private Message message;
         private RecyclerViewAdapter adapter;
-        private ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
+        protected ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
 
         private boolean leftIsInflated = false, rightIsInflated = false;
         private final ViewStub right;
@@ -663,14 +663,16 @@ public class MessageViewHolder {
         @Override
         protected void bindLeft(View itemView, Message message) {
             final LayoutMsgAudioLeftBinding view = LayoutMsgAudioLeftBinding.bind(itemView);
+            TextView badge = itemView.findViewById(io.openim.android.ouicore.R.id.badge);
+            badge.setVisibility(message.isRead() ? View.GONE : View.VISIBLE);
             view.avatar.load(message.getSenderFaceUrl());
             if (message.getSessionType() != Constant.SessionType.SINGLE_CHAT) {
                 view.sendNickName.setVisibility(View.VISIBLE);
                 view.sendNickName.setText(message.getSenderNickname());
             }
-            view.sendState.setSendState(message.getStatus());
             view.duration.setText(message.getSoundElem().getDuration() + "``");
-            view.content.setOnClickListener(v -> extracted(message, view.lottieView));
+            view.content.setOnClickListener(v -> clickPlay(message,
+                view.lottieView));
         }
 
         @Override
@@ -680,10 +682,15 @@ public class MessageViewHolder {
             view.sendState2.setSendState(message.getStatus());
             view.duration2.setText(message.getSoundElem().getDuration() + "``");
 
-            view.content2.setOnClickListener(v -> extracted(message, view.lottieView2));
+            view.content2.setOnClickListener(v -> clickPlay(message, view.lottieView2));
+        }
+        private void markRead(Message message,
+                              boolean isPrivateChat) {
+            if (isPrivateChat && !isOwn)
+                chatVM.markReaded(message);
         }
 
-        private void extracted(Message message, LottieAnimationView lottieView) {
+        private void clickPlay(Message message, LottieAnimationView lottieView) {
             SPlayer.instance().getMediaPlayer();
             SPlayer.instance().stop();
             SPlayer.instance().playByUrl(message.getSoundElem().getSourceUrl(), new PlayerListener() {
@@ -700,6 +707,8 @@ public class MessageViewHolder {
                 @Override
                 public void onCompletion(SMediaPlayer mediaPlayer) {
                     mediaPlayer.stop();
+                    markRead(message, chatVM.conversationInfo
+                        .getValue().isPrivateChat());
                 }
 
                 @Override
@@ -712,13 +721,17 @@ public class MessageViewHolder {
             SPlayer.instance().getMediaPlayer().setOnPlayStateListener(new SMediaPlayer.OnPlayStateListener() {
                 @Override
                 public void started() {
+                    markRead(message,
+                        !chatVM.conversationInfo.getValue().isPrivateChat());
+
                     playingMessage = message;
                     lottieView.playAnimation();
                 }
 
+
+
                 @Override
                 public void paused() {
-
                 }
 
                 @Override

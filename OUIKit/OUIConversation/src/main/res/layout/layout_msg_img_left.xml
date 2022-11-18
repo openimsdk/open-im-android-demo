@@ -9,6 +9,16 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+        <TextView
+            android:id="@+id/readVanishNum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_centerVertical="true"
+            android:textColor="#ff5496eb"
+            android:layout_toRightOf="@id/sendState"
+            android:textSize="12sp"
+            android:visibility="gone" />
 
         <io.openim.android.ouiconversation.widget.SendStateView
             android:id="@+id/sendState"

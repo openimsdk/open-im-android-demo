@@ -30,6 +30,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
+import javax.annotation.Nullable;
+
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouicore.base.BaseApp;
@@ -491,7 +493,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
      *
      * @param msgs 为null 清除里列表小红点
      */
-    public void markReaded(Message... msgs) {
+    public void markReaded(@Nullable Message... msgs) {
         List<String> msgIDs = new ArrayList<>();
         if (null != msgs) {
             for (Message msg : msgs) {
@@ -649,13 +651,14 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         int size = messages.getValue().size();
         lastVisiblePosition += 1;
         if (lastVisiblePosition > size || firstVisiblePosition < 0) return;
-        List<Message> megs=new ArrayList<>();
+        List<Message> megs = new ArrayList<>();
         megs.addAll(messages.getValue().subList(firstVisiblePosition, lastVisiblePosition));
         Iterator<Message> iterator = megs.iterator();
         while (iterator.hasNext()) {
             Message meg = iterator.next();
             if (meg.isRead()
-                || meg.getContentType()>=Constant.MsgType.NOTICE
+                || meg.getContentType() >= Constant.MsgType.NOTICE
+                || meg.getContentType()==Constant.MsgType.VOICE
                 || meg.getSendID().equals(BaseApp.inst().loginCertificate.userID))
                 iterator.remove();
         }
@@ -707,8 +710,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         //清除列表小红点
         markReaded(null);
 
-        //标记本条消息已读
-        if (!viewPause)
+        //标记本条消息已读 语音消息需要点播放才算读
+        if (!viewPause && msg.getContentType() != Constant.MsgType.VOICE)
             markReaded(msg);
 
         statusupdata(msg);
