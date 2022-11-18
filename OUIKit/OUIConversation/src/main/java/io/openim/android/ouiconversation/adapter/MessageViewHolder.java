@@ -67,6 +67,7 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.voice.SPlayer;
@@ -204,8 +205,8 @@ public class MessageViewHolder {
         /**
          * 统一处理
          */
-        @SuppressLint({"SetTextI18n"})
         private void unite() {
+            MsgExpand msgExpand = (MsgExpand) message.getExt();
             TextView notice = itemView.findViewById(R.id.notice);
             AvatarImage avatarImage = itemView.findViewById(R.id.avatar);
             CheckBox checkBox = itemView.findViewById(R.id.choose);
@@ -215,7 +216,8 @@ public class MessageViewHolder {
                 contentView = itemView.findViewById(R.id.content2);
             showMsgExMenu(contentView);
 
-            MsgExpand msgExpand = (MsgExpand) message.getExt();
+            readVanishShow(msgExpand);
+
             if (msgExpand.isShowTime) {
                 //显示时间
                 String time = TimeUtil.getTimeString(message.getSendTime());
@@ -280,9 +282,12 @@ public class MessageViewHolder {
                     String unread = String.format(chatVM.getContext().getString(io.openim.android.ouicore.R.string.unread), "");
                     String readed = String.format(chatVM.getContext().getString(io.openim.android.ouicore.R.string.readed), "");
                     unRead.setText(message.isRead() ? readed : unread);
+                    unRead.setTextColor(Color.parseColor(message.isRead()
+                        ? "#ff999999" : "#ff5496eb"));
                 } else {
                     int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;
                     if (unreadCount > 0) {
+                        unRead.setTextColor(Color.parseColor("#ff999999"));
                         unRead.setText(unreadCount + chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
                         unRead.setOnClickListener(v -> {
                             v.getContext().startActivity(
@@ -293,6 +298,27 @@ public class MessageViewHolder {
                     }
                 }
             }
+
+        }
+
+        //阅后即焚显示与添加timer
+        private void readVanishShow(MsgExpand msgExpand) {
+            TextView readVanishNum;
+            if (isOwn)
+                readVanishNum = itemView.findViewById(R.id.readVanishNum2);
+            else
+                readVanishNum = itemView.findViewById(R.id.readVanishNum);
+
+            readVanishNum.setVisibility(View.GONE);
+            if (!chatVM.conversationInfo.getValue().isPrivateChat()) return;
+            if (!message.isRead()) return;
+
+            chatVM.addReadVanish(message);
+            if (msgExpand.readVanishNum > 0) {
+                readVanishNum.setVisibility(View.VISIBLE);
+                readVanishNum.setText(msgExpand.readVanishNum + "s");
+            }
+
         }
 
         /***

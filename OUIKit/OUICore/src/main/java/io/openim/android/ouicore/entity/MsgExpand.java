@@ -26,4 +26,6 @@ public class MsgExpand {
     public SpannableStringBuilder sequence;
     //oa 通知
     public OANotification oaNotification;
+    //阅后即焚倒计时
+    public int readVanishNum;
 }

@@ -22,8 +22,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 import io.openim.android.ouiconversation.R;
@@ -80,6 +84,8 @@ import io.openim.android.sdk.models.UserInfo;
 import okhttp3.ResponseBody;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener, OnGroupListener, OnConversationListener {
+    //阅后即焚Timers
+    HashMap<String, Timer> readVanishTimers = new HashMap<>();
     //搜索的本地消息
     public MutableLiveData<List<Message>> searchMessageItems = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<Message>> addSearchMessageItems = new MutableLiveData<>(new ArrayList<>());
@@ -301,13 +307,14 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onConversationChanged(List<ConversationInfo> list) {
-       try {
-           for (ConversationInfo info : list) {
-               if (info.getConversationID()
-                   .equals(conversationInfo.getValue().getConversationID()))
-                   conversationInfo.setValue(info);
-           }
-       }catch (Exception ignored){}
+        try {
+            for (ConversationInfo info : list) {
+                if (info.getConversationID()
+                    .equals(conversationInfo.getValue().getConversationID()))
+                    conversationInfo.setValue(info);
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -333,6 +340,67 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     @Override
     public void onTotalUnreadMessageCountChanged(int i) {
 
+    }
+
+    /**
+     * 添加到阅后即焚timers
+     *
+     * @param message
+     */
+    public void addReadVanish(Message message) {
+        String id = message.getClientMsgID();
+        if (readVanishTimers.containsKey(id)) return;
+        final int[] countdown = {getReadCountdown(message)};
+        if (countdown[0] <= 0) {
+            deleteMessageFromLocalAndSvr(message);
+            return;
+        }
+        Timer timer = new Timer();
+        readVanishTimers.put(id, timer);
+        MsgExpand msgExpand = (MsgExpand) message.getExt();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                int num = countdown[0]--;
+                msgExpand.readVanishNum = num;
+                message.setExt(msgExpand);
+                if (num > 0) {
+                    int index = messages.getValue().indexOf(message);
+                    UIHandler.post(() -> messageAdapter
+                        .notifyItemChanged(index));
+                    return;
+                }
+                cancel();
+                deleteMessageFromLocalAndSvr(message);
+            }
+        }, 0, 1000);
+    }
+
+    private void deleteMessageFromLocalAndSvr(Message message) {
+        message.setExt(null);
+        OpenIMClient.getInstance().messageManager.deleteMessageFromLocalAndSvr(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+                deleteMessageFromLocalStorage(message);
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                removeMsList(message);
+            }
+        }, message);
+    }
+
+    int getReadCountdown(Message message) {
+        int burnDuration = message.getAttachedInfoElem().getBurnDuration();
+        long hasReadTime = message.getAttachedInfoElem().getHasReadTime();
+        if (hasReadTime > 0) {
+            long end = hasReadTime + (burnDuration * 1000L);
+            long diff = (end - System.currentTimeMillis()) / 1000;
+            return diff < 0 ? 0 : (int) diff;
+        }
+
+        return 0;
     }
 
     public interface UserOnlineStatusListener {
@@ -411,18 +479,49 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         IMEvent.getInstance().removeGroupListener(this);
         IMEvent.getInstance().removeConversationListener(this);
         inputMsg.removeObserver(inputObserver);
+
+        for (Timer value : readVanishTimers.values()) {
+            value.cancel();
+        }
+        readVanishTimers.clear();
     }
 
     /**
      * 标记已读
      *
-     * @param msgIDs 为null 清除里列表小红点
+     * @param msgs 为null 清除里列表小红点
      */
-    public void markReaded(List<String> msgIDs) {
+    public void markReaded(Message... msgs) {
+        List<String> msgIDs = new ArrayList<>();
+        if (null != msgs) {
+            for (Message msg : msgs) {
+                msgIDs.add(msg.getClientMsgID());
+            }
+        }
+        OnBase<String> callBack = new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                if (null != msgs) {
+                    long currentTimeMillis = System.currentTimeMillis();
+                    for (Message msg : msgs) {
+                        msg.setRead(true);
+                        msg.getAttachedInfoElem().setHasReadTime(currentTimeMillis);
+
+                        if (conversationInfo.getValue().isPrivateChat())
+                            messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
+                    }
+                }
+            }
+        };
         if (isSingleChat)
-            OpenIMClient.getInstance().messageManager.markC2CMessageAsRead(null, otherSideID, null == msgIDs ? new ArrayList<>() : msgIDs);
+            OpenIMClient.getInstance().messageManager.markC2CMessageAsRead(callBack, otherSideID, msgIDs);
         else
-            OpenIMClient.getInstance().messageManager.markGroupMessageAsRead(null, groupID, null == msgIDs ? new ArrayList<>() : msgIDs);
+            OpenIMClient.getInstance().messageManager.markGroupMessageAsRead(callBack, groupID, msgIDs);
     }
 
     /**
@@ -550,18 +649,19 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         int size = messages.getValue().size();
         lastVisiblePosition += 1;
         if (lastVisiblePosition > size || firstVisiblePosition < 0) return;
-        List<Message> megs = messages.getValue().subList(firstVisiblePosition, lastVisiblePosition);
-        List<String> msgIds = new ArrayList<>();
-        try {
-            for (Message meg : megs) {
-                if (!meg.isRead() && !meg.getSendID().equals(BaseApp.inst().loginCertificate.userID))
-                    msgIds.add(meg.getClientMsgID());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        List<Message> megs=new ArrayList<>();
+        megs.addAll(messages.getValue().subList(firstVisiblePosition, lastVisiblePosition));
+        Iterator<Message> iterator = megs.iterator();
+        while (iterator.hasNext()) {
+            Message meg = iterator.next();
+            if (meg.isRead()
+                || meg.getContentType()>=Constant.MsgType.NOTICE
+                || meg.getSendID().equals(BaseApp.inst().loginCertificate.userID))
+                iterator.remove();
         }
-        if (!msgIds.isEmpty())
-            markReaded(msgIds);
+        if (!megs.isEmpty())
+            markReaded(megs.toArray(new Message[0]));
+
     }
 
     private Runnable typRunnable = () -> typing.set(false);
@@ -606,11 +706,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
         //清除列表小红点
         markReaded(null);
+
         //标记本条消息已读
-        List<String> ids = new ArrayList<>();
-        ids.add(msg.getClientMsgID());
         if (!viewPause)
-            markReaded(ids);
+            markReaded(msg);
 
         statusupdata(msg);
     }
@@ -635,8 +734,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             for (ReadReceiptInfo readInfo : list) {
                 if (readInfo.getUserID().equals(otherSideID)) {
                     for (Message message : messages.getValue()) {
-                        if (readInfo.getMsgIDList().contains(message.getClientMsgID())) {
+                        if (readInfo.getMsgIDList()
+                            .contains(message.getClientMsgID())) {
                             message.setRead(true);
+                            message.getAttachedInfoElem().setHasReadTime(readInfo.getReadTime());
                             messageAdapter.notifyItemChanged(messages
                                 .getValue().indexOf(message));
                         }
@@ -813,12 +914,16 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
             @Override
             public void onSuccess(String data) {
-                int index = messageAdapter.getMessages().indexOf(message);
-                messageAdapter.getMessages().remove(index);
-                messageAdapter.notifyItemRemoved(index);
-                enableMultipleSelect.setValue(false);
+                removeMsList(message);
             }
         }, message);
+    }
+
+    private void removeMsList(Message message) {
+        int index = messages.getValue().indexOf(message);
+        messageAdapter.getMessages().remove(index);
+        messageAdapter.notifyItemRemoved(index);
+        enableMultipleSelect.setValue(false);
     }
 
     public void closePage() {

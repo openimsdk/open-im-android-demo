@@ -40,6 +40,7 @@ import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
+import io.openim.android.ouicore.widget.CustomItemAnimator;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
@@ -149,6 +150,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         linearLayoutManager.setStackFromEnd(true);
         linearLayoutManager.setReverseLayout(true);
 
+        view.recyclerView.setItemAnimator(new CustomItemAnimator());
         view.recyclerView.setLayoutManager(linearLayoutManager);
         view.recyclerView.addItemDecoration(new DefaultItemDecoration(this.getResources().getColor(android.R.color.transparent), 1, Common.dp2px(16)));
         messageAdapter = new MessageAdapter();

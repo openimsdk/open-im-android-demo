@@ -4,9 +4,6 @@ plugins {
 
 
 android {
-    lint {
-        baseline = file("lint-baseline.xml")
-    }
     compileSdk rootProject.ext.androidConfig.compileSdk
 
     viewBinding {

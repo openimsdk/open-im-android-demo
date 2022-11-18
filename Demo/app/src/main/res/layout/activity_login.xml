@@ -19,7 +19,6 @@
             android:paddingLeft="40dp"
             android:paddingRight="40dp">
 
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -28,6 +27,8 @@
                 android:textColor="#ff333333"
                 android:id="@+id/welcome"
                 android:textSize="32sp"
+                android:clickable="true"
+                android:focusable="true"
                 android:textStyle="bold" />
 
             <LinearLayout
