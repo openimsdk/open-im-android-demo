@@ -311,6 +311,7 @@ public class MessageViewHolder {
 
             readVanishNum.setVisibility(View.GONE);
             if (!chatVM.conversationInfo.getValue().isPrivateChat()) return;
+            if (!message.getAttachedInfoElem().isPrivateChat()) return;
             if (!message.isRead()) return;
 
             chatVM.addReadVanish(message);
