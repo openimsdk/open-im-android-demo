@@ -107,13 +107,13 @@ public class GroupVM extends SocialityVM {
         OpenIMClient.getInstance().groupManager.createGroup(new OnBase<GroupInfo>() {
                                                                 @Override
                                                                 public void onError(int code, String error) {
-                                                                    IView.onError(error);
+                                                                    getIView().onError(error);
 
                                                                 }
 
                                                                 @Override
                                                                 public void onSuccess(GroupInfo data) {
-                                                                    IView.onSuccess(data);
+                                                                    getIView().onSuccess(data);
                                                                     Common.UIHandler.postDelayed(waitDialog::dismiss, 200);
                                                                 }
                                                             }, groupName.getValue(), null, null, null,
@@ -134,7 +134,7 @@ public class GroupVM extends SocialityVM {
         OpenIMClient.getInstance().groupManager.setGroupInfo(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-                IView.onError(error);
+                getIView().onError(error);
             }
 
             @Override
@@ -146,7 +146,7 @@ public class GroupVM extends SocialityVM {
                 if (!TextUtils.isEmpty(notification)) {
                     Obs.newMessage(Constant.Event.SET_GROUP_NOTIFICATION);
                 }
-                IView.onSuccess(data);
+                getIView().onSuccess(data);
                 getGroupsInfo();
             }
         }, groupID, groupName, faceURL, notification, introduction, ex);
@@ -168,7 +168,7 @@ public class GroupVM extends SocialityVM {
 
             @Override
             public void onSuccess(String data) {
-                IView.onSuccess(data);
+                getIView().onSuccess(data);
                 getGroupsInfo();
 
             }
@@ -180,7 +180,7 @@ public class GroupVM extends SocialityVM {
         OpenIMClient.getInstance().groupManager.getGroupMemberList(new OnBase<List<GroupMembersInfo>>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + "-" + code);
+                getIView().toast(error + "-" + code);
             }
 
             @Override
@@ -222,7 +222,7 @@ public class GroupVM extends SocialityVM {
         OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new OnBase<List<GroupMembersInfo>>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override
@@ -249,7 +249,7 @@ public class GroupVM extends SocialityVM {
         OpenIMClient.getInstance().groupManager.getGroupMemberList(new OnBase<List<GroupMembersInfo>>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + "-" + code);
+                getIView().toast(error + "-" + code);
             }
 
             @Override
@@ -313,14 +313,14 @@ public class GroupVM extends SocialityVM {
         OpenIMClient.getInstance().groupManager.inviteUserToGroup(new OnBase<List<GroupInviteResult>>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error);
+                getIView().toast(error);
             }
 
             @Override
             public void onSuccess(List<GroupInviteResult> data) {
-                IView.toast(getContext().getString(io.openim.android.ouicore.R.string.Invitation_succeeded));
+                getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.Invitation_succeeded));
                 getGroupMemberList();
-                IView.onSuccess(null);
+                getIView().onSuccess(null);
 
                 Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO,
                     groupName);
@@ -339,14 +339,14 @@ public class GroupVM extends SocialityVM {
         OpenIMClient.getInstance().groupManager.kickGroupMember(new OnBase<List<GroupInviteResult>>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error);
+                getIView().toast(error);
             }
 
             @Override
             public void onSuccess(List<GroupInviteResult> data) {
-                IView.toast(getContext().getString(io.openim.android.ouicore.R.string.kicked_out));
+                getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.kicked_out));
                 getGroupMemberList();
-                IView.onSuccess(null);
+                getIView().onSuccess(null);
 
                 Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO,
                     groupName);
@@ -393,12 +393,12 @@ public class GroupVM extends SocialityVM {
         commonDialog.getMainView().confirm.setOnClickListener(v -> OpenIMClient.getInstance().groupManager.dismissGroup(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override
             public void onSuccess(String data) {
-                IView.toast(getContext().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
+                getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
                 close(commonDialog);
             }
         }, groupId));
@@ -413,12 +413,12 @@ public class GroupVM extends SocialityVM {
         commonDialog.getMainView().confirm.setOnClickListener(v -> OpenIMClient.getInstance().groupManager.quitGroup(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override
             public void onSuccess(String data) {
-                IView.toast(getContext().getString(io.openim.android.ouicore.R.string.quit_group_tips2));
+                getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.quit_group_tips2));
                 close(commonDialog);
 
             }
@@ -430,7 +430,7 @@ public class GroupVM extends SocialityVM {
             .transferGroupOwner(new OnBase<String>() {
                 @Override
                 public void onError(int code, String error) {
-                    IView.toast(error + code);
+                    getIView().toast(error + code);
                 }
 
                 @Override
@@ -447,14 +447,14 @@ public class GroupVM extends SocialityVM {
         iConversationBridge.deleteConversationFromLocalAndSvr(groupId);
         iConversationBridge.closeChatPage();
         commonDialog.dismiss();
-        IView.close();
+        getIView().close();
     }
 
     public void changeGroupMute(boolean isChecked, IMUtil.OnSuccessListener onSuccessListener) {
         OpenIMClient.getInstance().groupManager.changeGroupMute(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override
@@ -468,7 +468,7 @@ public class GroupVM extends SocialityVM {
         OpenIMClient.getInstance().groupManager.setGroupVerification(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override
@@ -482,7 +482,7 @@ public class GroupVM extends SocialityVM {
         OpenIMClient.getInstance().groupManager.setGroupLookMemberInfo(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override
@@ -496,7 +496,7 @@ public class GroupVM extends SocialityVM {
         OpenIMClient.getInstance().groupManager.setGroupApplyMemberFriend(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override

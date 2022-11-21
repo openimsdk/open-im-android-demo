@@ -200,7 +200,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                         String body = o.string();
                         Base<List<OnlineStatus>> base = GsonHel.dataArray(body, OnlineStatus.class);
                         if (base.errCode != 0) {
-                            IView.toast(base.errMsg);
+                            getIView().toast(base.errMsg);
                             return;
                         }
                         if (null == base.data || base.data.isEmpty()) return;
@@ -215,7 +215,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
                 @Override
                 protected void onFailure(Throwable e) {
-                    IView.toast(e.getMessage());
+                    getIView().toast(e.getMessage());
                 }
             });
     }
@@ -423,7 +423,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         OpenIMClient.getInstance().groupManager.getGroupsInfo(new OnBase<List<GroupInfo>>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override
@@ -448,7 +448,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         OpenIMClient.getInstance().conversationManager.getOneConversation(new OnBase<ConversationInfo>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error);
+                getIView().toast(error);
             }
 
             @Override
@@ -537,7 +537,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         OpenIMClient.getInstance().messageManager.markMessageAsReadByConID(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override
@@ -579,7 +579,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 new OnBase<AdvancedMessage>() {
                     @Override
                     public void onError(int code, String error) {
-                        IView.toast(error + code);
+                        getIView().toast(error + code);
                     }
 
                     @Override
@@ -660,7 +660,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 if (meg.isRead()
                     || meg.getContentType() >= Constant.MsgType.NOTICE
                     || meg.getContentType() == Constant.MsgType.VOICE
-                    || (null==meg.getSendID()||meg.getSendID().equals(BaseApp.inst().loginCertificate.userID)))
+                    || (null == meg.getSendID() || meg.getSendID().equals(BaseApp.inst().loginCertificate.userID)))
                     iterator.remove();
             }
         } catch (Exception ignored) {
@@ -706,7 +706,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         messages.getValue().add(0, IMUtil.buildExpandInfo(msg));
         IMUtil.calChatTimeInterval(messages.getValue());
         UIHandler.post(() -> {
-            IView.scrollToPosition(0);
+            getIView().scrollToPosition(0);
             messageAdapter.notifyItemInserted(0);
         });
 
@@ -819,14 +819,14 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         } else {
             messages.getValue().add(0, IMUtil.buildExpandInfo(msg));
             messageAdapter.notifyItemInserted(0);
-            IView.scrollToPosition(0);
+            getIView().scrollToPosition(0);
         }
         OfflinePushInfo offlinePushInfo = new OfflinePushInfo();  // 离线推送的消息备注；不为null
         OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
             @Override
             public void onError(int code, String error) {
                 if (code != 302)
-                    IView.toast(error + code);
+                    getIView().toast(error + code);
                 UIHandler.postDelayed(() -> {
                     msg.setStatus(Constant.Send_State.SEND_FAILED);
                     messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
@@ -868,7 +868,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             onMsgSendCallback = new OnMsgSendCallback() {
                 @Override
                 public void onError(int code, String error) {
-                    IView.toast(error + code);
+                    getIView().toast(error + code);
                 }
 
                 @Override
@@ -877,9 +877,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
                 @Override
                 public void onSuccess(Message message) {
-                    if (null != IView)
-                        IView.toast(getContext().
-                            getString(io.openim.android.ouicore.R.string.send_succ));
+                    getIView().toast(getContext().
+                        getString(io.openim.android.ouicore.R.string.send_succ));
                 }
             };
         }
@@ -895,7 +894,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         OpenIMClient.getInstance().messageManager.revokeMessageV2(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override
@@ -915,7 +914,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         OpenIMClient.getInstance().messageManager.deleteMessageFromLocalStorage(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + "(" + code + ")");
+                getIView().toast(error + "(" + code + ")");
             }
 
             @Override
@@ -933,7 +932,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     public void closePage() {
-        IView.closePage();
+        getIView().closePage();
     }
 
     public void clearCHistory(String id) {
@@ -945,7 +944,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     @Override
                     public void onError(int code, String error) {
                         waitDialog.dismiss();
-                        IView.toast(error + code);
+                        getIView().toast(error + code);
                     }
 
                     @Override
@@ -953,7 +952,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                         waitDialog.dismiss();
                         messages.getValue().clear();
                         messageAdapter.notifyDataSetChanged();
-                        IView.toast(getContext().getString(io.openim.android.ouicore.R.string.clear_succ));
+                        getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.clear_succ));
                     }
                 }, id);
         } else {
@@ -962,7 +961,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     @Override
                     public void onError(int code, String error) {
                         waitDialog.dismiss();
-                        IView.toast(error + code);
+                        getIView().toast(error + code);
                     }
 
                     @Override
@@ -970,7 +969,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                         waitDialog.dismiss();
                         messages.getValue().clear();
                         messageAdapter.notifyDataSetChanged();
-                        IView.toast(getContext().getString(io.openim.android.ouicore.R.string.clear_succ));
+                        getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.clear_succ));
                     }
                 }, id);
         }
@@ -1027,7 +1026,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 (new OnBase<SearchResult>() {
                      @Override
                      public void onError(int code, String error) {
-                         IView.toast(error + code);
+                         getIView().toast(error + code);
                          L.e("");
                      }
 
@@ -1074,7 +1073,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     public void toast(String tips) {
-        IView.toast(tips);
+        getIView().toast(tips);
     }
 
 

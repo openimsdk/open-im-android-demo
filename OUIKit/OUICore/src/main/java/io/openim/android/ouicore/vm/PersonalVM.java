@@ -28,7 +28,7 @@ public class PersonalVM extends BaseViewModel {
         @Override
         public void onError(int code, String error) {
             waitDialog.dismiss();
-            IView.toast(error + code);
+            getIView().toast(error + code);
         }
 
         @Override
@@ -48,7 +48,7 @@ public class PersonalVM extends BaseViewModel {
             @Override
             public void onError(int code, String error) {
                 waitDialog.dismiss();
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override
@@ -68,7 +68,7 @@ public class PersonalVM extends BaseViewModel {
             @Override
             public void onError(int code, String error) {
                 waitDialog.dismiss();
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override

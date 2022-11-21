@@ -66,7 +66,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         OpenIMClient.getInstance().conversationManager.getAllConversationList(new OnBase<List<ConversationInfo>>() {
             @Override
             public void onError(int code, String error) {
-                IView.onErr(error);
+                getIView().onErr(error);
             }
 
             @Override
@@ -89,7 +89,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         OpenIMClient.getInstance().conversationManager.setOneConversationPrivateChat(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-                IView.onErr(error);
+                getIView().onErr(error);
             }
 
             @Override

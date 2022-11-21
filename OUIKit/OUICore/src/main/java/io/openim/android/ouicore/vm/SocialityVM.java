@@ -37,7 +37,7 @@ public class SocialityVM extends BaseViewModel {
         OpenIMClient.getInstance().groupManager.getJoinedGroupList(new OnBase<List<GroupInfo>>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + "(" + code + ")");
+                getIView().toast(error + "(" + code + ")");
             }
 
             @Override
@@ -63,7 +63,7 @@ public class SocialityVM extends BaseViewModel {
         OpenIMClient.getInstance().friendshipManager.getFriendList(new OnBase<List<UserInfo>>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + "(" + code + ")");
+                getIView().toast(error + "(" + code + ")");
             }
 
             @Override

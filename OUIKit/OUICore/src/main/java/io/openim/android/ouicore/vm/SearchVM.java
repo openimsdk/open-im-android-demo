@@ -91,7 +91,7 @@ public class SearchVM extends BaseViewModel {
         OpenIMClient.getInstance().groupManager.searchGroupMembers(new OnBase<List<GroupMembersInfo>>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error+code);
+                getIView().toast(error+code);
             }
 
             @Override
@@ -113,7 +113,7 @@ public class SearchVM extends BaseViewModel {
             @Override
             public void onSuccess(String data) {
                 Toast.makeText(getContext(), "发送成功", Toast.LENGTH_SHORT).show();
-                IView.onSuccess("");
+                getIView().onSuccess("");
 //                String remarkStr = remark.getValue();
 //                if (!TextUtils.isEmpty(remarkStr)) {
 //                    OpenIMClient.getInstance().friendshipManager.setFriendRemark(null,
@@ -217,7 +217,7 @@ public class SearchVM extends BaseViewModel {
                 (new OnBase<SearchResult>() {
                      @Override
                      public void onError(int code, String error) {
-                         IView.toast(error + code);
+                         getIView().toast(error + code);
                      }
 
                      @Override

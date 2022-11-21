@@ -41,7 +41,7 @@ public class PersonalVM extends BaseViewModel {
         @Override
         public void onError(int code, String error) {
             waitDialog.dismiss();
-            IView.toast(error + code);
+            getIView().toast(error + code);
         }
 
         @Override
@@ -61,7 +61,7 @@ public class PersonalVM extends BaseViewModel {
             @Override
             public void onError(int code, String error) {
                 waitDialog.dismiss();
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override
@@ -92,7 +92,7 @@ public class PersonalVM extends BaseViewModel {
             .subscribe(new NetObserver<HashMap>(getContext()) {
                 @Override
                 protected void onFailure(Throwable e) {
-                    IView.toast(e.getMessage());
+                    getIView().toast(e.getMessage());
                 }
 
                 @Override
@@ -124,7 +124,7 @@ public class PersonalVM extends BaseViewModel {
             @Override
             public void onError(int code, String error) {
                 waitDialog.dismiss();
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override

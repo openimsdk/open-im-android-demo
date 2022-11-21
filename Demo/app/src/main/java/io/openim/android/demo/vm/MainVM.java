@@ -46,8 +46,8 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
             OpenIMClient.getInstance().login(new OnBase<String>() {
                 @Override
                 public void onError(int code, String error) {
-                    IView.toast(error + code);
-                    IView.jump();
+                    getIView().toast(error + code);
+                    getIView().jump();
                 }
 
                 @Override
@@ -68,7 +68,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
         if (null != callingService)
             callingService.startAudioVideoService(getContext());
 
-        IView.initDate();
+        getIView().initDate();
         getSelfUserInfo();
         onConnectSuccess();
     }
@@ -77,7 +77,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
         OpenIMClient.getInstance().userInfoManager.getSelfUserInfo(new OnBase<UserInfo>() {
             @Override
             public void onError(int code, String error) {
-                IView.toast(error + code);
+                getIView().toast(error + code);
             }
 
             @Override

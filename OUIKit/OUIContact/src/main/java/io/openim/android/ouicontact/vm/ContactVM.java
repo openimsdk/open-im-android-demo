@@ -100,7 +100,7 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
     private OnBase onBase = new OnBase<String>() {
         @Override
         public void onError(int code, String error) {
-            IView.toast(error);
+            getIView().toast(error);
         }
 
         @Override
@@ -109,7 +109,7 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
                 getRecvGroupApplicationList();
             if (null != friendDetail)
                 getRecvFriendApplicationList();
-            IView.onSuccess(null);
+            getIView().onSuccess(null);
         }
     };
 

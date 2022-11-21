@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import io.openim.android.ouicore.im.IMEvent;
+import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
 
 import io.openim.android.ouicore.utils.Routes;
@@ -129,6 +130,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         if (null != vm)
             vm.viewResume();
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -143,6 +145,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        N.clearDispose(this);
         if (null != vm && isRelease) {
             vm.viewDestroy();
         }

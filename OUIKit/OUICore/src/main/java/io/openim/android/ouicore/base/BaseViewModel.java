@@ -12,7 +12,7 @@ import io.openim.android.sdk.listener.OnBase;
 
 public class BaseViewModel<T extends IView> extends ViewModel {
     public WeakReference<Context> context;
-    protected T IView;
+    private WeakReference<T> IView;
 
     public Context getContext() {
         return context.get();
@@ -27,8 +27,13 @@ public class BaseViewModel<T extends IView> extends ViewModel {
     }
 
     public void setIView(T iView) {
-        this.IView = iView;
+        this.IView = new WeakReference<T>(iView);
     }
+
+    public T getIView() {
+        return IView.get();
+    }
+
 
     //视图销毁时
     protected void viewDestroy() {
@@ -38,10 +43,11 @@ public class BaseViewModel<T extends IView> extends ViewModel {
     protected void viewCreate() {
     }
 
-    protected void viewPause(){
+    protected void viewPause() {
 
     }
-    protected void viewResume(){
+
+    protected void viewResume() {
 
     }
 

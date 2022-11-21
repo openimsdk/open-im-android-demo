@@ -34,6 +34,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
@@ -116,6 +117,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             if (!vm.fromChatHistory)
                 removeCacheVM();
 
+            N.clearDispose(this);
+            view.waterMark.onDestroy();
             Obs.inst().deleteObserver(this);
             getWindow().getDecorView().getViewTreeObserver()
                 .removeOnGlobalLayoutListener(mGlobalLayoutListener);

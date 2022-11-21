@@ -54,7 +54,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
                         OpenIMClient.getInstance().login(new OnBase<String>() {
                             @Override
                             public void onError(int code, String error) {
-                                IView.err(error);
+                                getIView().err(error);
                             }
 
                             @Override
@@ -62,7 +62,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
                                 //缓存登录信息
                                 loginCertificate.cache(getContext());
                                 BaseApp.inst().loginCertificate = loginCertificate;
-                                IView.jump();
+                                getIView().jump();
                             }
                         }, loginCertificate.userID, loginCertificate.imToken);
 
@@ -73,7 +73,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
 
                 @Override
                 protected void onFailure(Throwable e) {
-                    IView.err(e.getMessage());
+                    getIView().err(e.getMessage());
                 }
             });
     }
@@ -104,7 +104,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
             .subscribe(new NetObserver<Object>(getContext()) {
                 @Override
                 public void onSuccess(Object o) {
-                    IView.succ(null);
+                    getIView().succ(null);
                 }
 
                 @Override
@@ -115,7 +115,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
 
                 @Override
                 protected void onFailure(Throwable e) {
-                    IView.err(e.getMessage());
+                    getIView().err(e.getMessage());
                 }
             });
 
@@ -176,12 +176,12 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
                 @Override
                 public void onSuccess(HashMap o) {
                     LoginVM.this.verificationCode = verificationCode;
-                    IView.succ("checkVerificationCode");
+                    getIView().succ("checkVerificationCode");
                 }
 
                 @Override
                 protected void onFailure(Throwable e) {
-                    IView.err(e.getMessage());
+                    getIView().err(e.getMessage());
                 }
             });
     }
@@ -204,12 +204,12 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
                 public void onSuccess(LoginCertificate o) {
                     setSelfInfo();
                     o.cache(getContext());
-                    IView.jump();
+                    getIView().jump();
                 }
 
                 @Override
                 protected void onFailure(Throwable e) {
-                    IView.toast(e.getMessage());
+                    getIView().toast(e.getMessage());
                 }
             });
     }
