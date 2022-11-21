@@ -17,7 +17,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:orientation="vertical">
@@ -93,6 +93,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp" />
+
+            <TextView
+                android:id="@+id/readVanishNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:textColor="#ff5496eb"
+                android:textSize="12sp"
+                android:visibility="gone" />
         </LinearLayout>
 
 

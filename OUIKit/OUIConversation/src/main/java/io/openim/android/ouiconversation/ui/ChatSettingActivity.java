@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.lifecycle.Observer;
 
 import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import io.openim.android.ouiconversation.databinding.ActivityChatSettingBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
@@ -23,6 +25,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding> implements ChatVM.ViewAction {
@@ -38,7 +41,6 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
         initView();
         click();
-
     }
 
     private ActivityResultLauncher<Intent> personDetailLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -47,6 +49,33 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
     });
 
     private void click() {
+        view.picture.setOnClickListener(v -> {
+            startActivity(new Intent(this,
+                MediaHistoryActivity.class).putExtra(Constant.K_RESULT, true));
+        });
+        view.video.setOnClickListener(v -> {
+            startActivity(new Intent(this,
+                MediaHistoryActivity.class));
+        });
+        view.file.setOnClickListener(v -> startActivity(new Intent(this,
+            FileHistoryActivity.class)));
+
+        view.readVanish.setOnSlideButtonClickListener(isChecked -> {
+            OpenIMClient.getInstance().conversationManager
+                .setOneConversationPrivateChat(new OnBase<String>() {
+                                                   @Override
+                                                   public void onError(int code, String error) {
+                                                       toast(error + code);
+                                                       view.readVanish.setCheckedWithAnimation(!isChecked);
+                                                   }
+
+                                                   @Override
+                                                   public void onSuccess(String data) {
+                                                       view.readVanish.setCheckedWithAnimation(isChecked);
+                                                   }
+                                               },
+                    vm.conversationInfo.getValue().getConversationID(), isChecked);
+        });
         view.topSlideButton.setOnSlideButtonClickListener(is -> {
             contactListVM.pinConversation(vm.conversationInfo.getValue(), is);
         });
@@ -79,16 +108,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
     }
 
     private void initView() {
-        view.picture.setOnClickListener(v -> {
-            startActivity(new Intent(this,
-                MediaHistoryActivity.class).putExtra(Constant.K_RESULT, true));
-        });
-        view.video.setOnClickListener(v -> {
-            startActivity(new Intent(this,
-                MediaHistoryActivity.class));
-        });
-        view.file.setOnClickListener(v -> startActivity(new Intent(this,
-            FileHistoryActivity.class)));
+        view.readVanish.setCheckedWithAnimation(vm.conversationInfo.getValue().isPrivateChat());
 
         vm.notDisturbStatus.observe(this, integer -> {
             view.noDisturb.post(() -> view.noDisturb.setCheckedWithAnimation(integer == 2));

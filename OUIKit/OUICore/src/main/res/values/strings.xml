@@ -212,4 +212,5 @@
     <string name="join_group_time">入群时间</string>
     <string name="you">你</string>
     <string name="server_config">服务器配置</string>
+    <string name="read_vanish">阅后即焚</string>
 </resources>

@@ -114,9 +114,11 @@ public class SlideButton extends View {
      * @param isChecked 按钮的状态
      */
     public void setCheckedWithAnimation(boolean isChecked) {
-        Log.i(TAG, "setCheckedWithAnimation: Checked：" + isChecked);
-        this.isChecked = isChecked;
-        startAnimation(this.isChecked);
+        post(() -> {
+            Log.i(TAG, "setCheckedWithAnimation: Checked：" + isChecked);
+            SlideButton.this.isChecked = isChecked;
+            startAnimation(isChecked);
+        });
     }
 
     public SlideButton(Context context) {

@@ -9,12 +9,19 @@
 
 
         <LinearLayout
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@id/avatar2"
             android:gravity="center_vertical"
             android:orientation="horizontal">
+            <TextView
+                android:id="@+id/readVanishNum2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="8dp"
+                android:textSize="12sp"
+                android:textColor="#ff5496eb"
+                android:visibility="gone" />
 
             <io.openim.android.ouiconversation.widget.SendStateView
                 android:id="@+id/sendState2"
@@ -31,6 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:layout_marginRight="7dp"
+                android:maxWidth="@dimen/msg_max_width"
                 android:background="@drawable/sty_radius_unright_30"
                 android:gravity="center_vertical"
                 android:minHeight="40dp"
@@ -48,6 +56,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="2dp"
+                        android:minWidth="120dp"
                         android:textColor="#ff333333"
                         android:textSize="15sp" />
 

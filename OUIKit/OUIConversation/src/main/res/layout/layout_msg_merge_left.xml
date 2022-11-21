@@ -10,6 +10,18 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+        <TextView
+            android:id="@+id/readVanishNum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:textColor="#ff5496eb"
+            android:textSize="12sp"
+            android:layout_toEndOf="@id/sendState"
+            android:layout_centerVertical="true"
+            android:visibility="gone" />
+
         <io.openim.android.ouiconversation.widget.SendStateView
             android:id="@+id/sendState"
             android:layout_width="wrap_content"
@@ -43,6 +55,8 @@
                 android:background="@drawable/sty_radius_unleft_30"
                 android:gravity="center_vertical"
                 android:minHeight="40dp"
+                android:minWidth="@dimen/msg_min_width"
+                android:maxWidth="@dimen/msg_max_width"
                 android:orientation="vertical"
                 android:padding="7dp">
 

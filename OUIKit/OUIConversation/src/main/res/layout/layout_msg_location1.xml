@@ -15,7 +15,7 @@
             android:src="@mipmap/ic_my_friend" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
             android:orientation="vertical">
@@ -79,6 +79,15 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="8dp" />
 
+        <TextView
+            android:id="@+id/readVanishNum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:textColor="#ff5496eb"
+            android:textSize="12sp"
+            android:visibility="gone" />
 
     </LinearLayout>
 

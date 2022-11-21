@@ -84,6 +84,20 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
             }
         });
     }
+    public  void setOneConversationPrivateChat(IMUtil.OnSuccessListener<String> onSuccessListener,
+                                               String cid, boolean isChecked){
+        OpenIMClient.getInstance().conversationManager.setOneConversationPrivateChat(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+                IView.onErr(error);
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                onSuccessListener.onSuccess(data);
+            }
+        },cid,isChecked);
+    }
 
     /**
      * 更新常联系

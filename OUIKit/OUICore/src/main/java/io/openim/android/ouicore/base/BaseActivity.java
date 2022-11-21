@@ -30,6 +30,7 @@ import io.openim.android.sdk.OpenIMClient;
 
 
 public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> extends AppCompatActivity implements IView {
+    private boolean isRelease = true;
 
     protected T vm;
     protected A view;
@@ -91,24 +92,6 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (null != vm) {
-            vm.viewPause();
-            if (isFinishing()) {
-                vm.viewDestroy();
-            }
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (null != vm) {
-            vm.viewDestroy();
-        }
-    }
 
     public void toBack(View view) {
         finish();
@@ -125,6 +108,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         String key = vm.getCanonicalName();
         if (BaseApp.viewModels.containsKey(key)) {
             this.vm = (T) BaseApp.viewModels.get(key);
+            isRelease = false;
             bind();
         }
     }
@@ -144,6 +128,24 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         bind();
         if (null != vm)
             vm.viewResume();
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (null != vm) {
+            vm.viewPause();
+            if (isFinishing() && isRelease) {
+                vm.viewDestroy();
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (null != vm && isRelease) {
+            vm.viewDestroy();
+        }
     }
 
 
@@ -196,32 +198,5 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         finish();
     }
 
-//    @RequiresApi(api = Build.VERSION_CODES.O)
-//    private void createNotificationChannel(String channelId, String channelName) {
-//        NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
-//        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-//        notificationManager.createNotificationChannel(notificationChannel);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            createNotificationChannel("default","default");
-//        }
-//        ProvideService locationService = (ProvideService) ARouter.getInstance()
-//            .build(Routes.Service.PROVISION).navigation();
-//        Intent intent = new Intent(this, locationService.getSpecifyClass());
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-//
-//        NotificationCompat.Builder mBuilder =
-//            new NotificationCompat.Builder(this, "default")
-//                .setSmallIcon(R.mipmap.ic_logo)
-//                .setContentTitle("My notification")
-//                .setContentText("Hello World!")
-//                .setPriority(Notification.PRIORITY_MAX)
-////                .setContentIntent(pendingIntent)
-//                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//                .setFullScreenIntent(pendingIntent, true);
-//
-//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-//        notificationManager.notify(255, mBuilder.build());
-//    }
 
 }

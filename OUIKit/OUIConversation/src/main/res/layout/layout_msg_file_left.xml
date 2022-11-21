@@ -5,8 +5,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -23,6 +22,7 @@
                 android:layout_marginTop="2dp"
                 android:background="@drawable/sty_radius_unleft_30"
                 android:gravity="center_vertical"
+                android:maxWidth="@dimen/msg_max_width"
                 android:minHeight="40dp"
                 android:orientation="horizontal"
                 android:padding="7dp">
@@ -45,6 +45,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="2dp"
+                        android:minWidth="120dp"
                         android:textColor="#ff333333"
                         android:textSize="15sp" />
 
@@ -67,6 +68,16 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_toLeftOf="@id/content2" />
+
+            <TextView
+                android:id="@+id/readVanishNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:textColor="#ff5496eb"
+                android:textSize="12sp"
+                android:visibility="gone" />
         </LinearLayout>
 
 

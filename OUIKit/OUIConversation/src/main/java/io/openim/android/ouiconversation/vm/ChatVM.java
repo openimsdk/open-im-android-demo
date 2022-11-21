@@ -654,13 +654,16 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         List<Message> megs = new ArrayList<>();
         megs.addAll(messages.getValue().subList(firstVisiblePosition, lastVisiblePosition));
         Iterator<Message> iterator = megs.iterator();
-        while (iterator.hasNext()) {
-            Message meg = iterator.next();
-            if (meg.isRead()
-                || meg.getContentType() >= Constant.MsgType.NOTICE
-                || meg.getContentType()==Constant.MsgType.VOICE
-                || meg.getSendID().equals(BaseApp.inst().loginCertificate.userID))
-                iterator.remove();
+        try {
+            while (iterator.hasNext()) {
+                Message meg = iterator.next();
+                if (meg.isRead()
+                    || meg.getContentType() >= Constant.MsgType.NOTICE
+                    || meg.getContentType() == Constant.MsgType.VOICE
+                    || (null==meg.getSendID()||meg.getSendID().equals(BaseApp.inst().loginCertificate.userID)))
+                    iterator.remove();
+            }
+        } catch (Exception ignored) {
         }
         if (!megs.isEmpty())
             markReaded(megs.toArray(new Message[0]));

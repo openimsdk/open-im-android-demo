@@ -3,11 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="right"
         android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/readVanishNum2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:textColor="#ff5496eb"
+            android:textSize="12sp"
+            android:layout_gravity="center_vertical"
+            android:visibility="gone" />
 
         <io.openim.android.ouiconversation.widget.SendStateView
             android:id="@+id/sendState2"
@@ -17,9 +27,9 @@
             android:layout_marginRight="8dp" />
 
         <LinearLayout
+            android:id="@+id/content2"
             android:layout_width="222dp"
             android:layout_height="wrap_content"
-            android:id="@+id/content2"
             android:layout_marginRight="12dp"
             android:background="@drawable/sty_radius_6_stroke_e6e6e6"
             android:orientation="vertical">
@@ -31,9 +41,9 @@
                 android:layout_marginLeft="12dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginRight="12dp"
-                android:text="成都市中小企业服务中心"
-                android:maxLines="1"
                 android:ellipsize="end"
+                android:maxLines="1"
+                android:text="成都市中小企业服务中心"
                 android:textColor="#ff333333"
                 android:textSize="14sp" />
 
@@ -43,8 +53,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"
-                android:maxLines="1"
                 android:ellipsize="end"
+                android:maxLines="1"
                 android:text="四川省成都市武侯区府城大道西段…"
                 android:textColor="#ff999999"
                 android:textSize="12sp" />
