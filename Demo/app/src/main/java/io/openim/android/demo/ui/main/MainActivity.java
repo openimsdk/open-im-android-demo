@@ -25,6 +25,7 @@ import com.yzq.zxinglibrary.bean.ZxingConfig;
 
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
@@ -52,12 +53,18 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
     private int mCurrentTabIndex;
     private BaseFragment lastFragment, conversationListFragment, contactFragment, personalFragment;
-    private boolean hasScanPermission, hasShoot;
+    private boolean hasScanPermission;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        hasShoot = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.RECORD_AUDIO);
+        runOnUiThread(() -> {
+            hasScanPermission = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
+            AtomicBoolean hasShoot = new AtomicBoolean(AndPermission.hasPermissions(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO));
+            Common.permission(MainActivity.this, () -> {
+            }, hasShoot.get(), Permission.CAMERA, Permission.RECORD_AUDIO);
+        });
+
         AndPermission.with(this).overlay().start();
         PushManager.getInstance().initialize(this);
 
@@ -75,7 +82,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         vm.visibility.observe(this, v -> view.isOnline.setVisibility(v));
         click();
 
-        hasScanPermission = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
+
     }
 
     @Override
@@ -103,24 +110,12 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     @Override
     protected void onResume() {
         super.onResume();
-        if (!hasShoot) {
-            AndPermission.with(this)
-                .runtime()
-                .permission(Permission.CAMERA, Permission.RECORD_AUDIO)
-                .onGranted(permissions -> {
-                    // Storage permission are allowed.
-                    hasShoot = true;
-                })
-                .onDenied(permissions -> {
-                    // Storage permission are not allowed.
-                })
-                .start();
-        }
+
     }
 
     private void click() {
         view.callRecord.setOnClickListener(view -> {
-            startActivity(new Intent(this,CallHistoryActivity.class));
+            startActivity(new Intent(this, CallHistoryActivity.class));
         });
         showPopupWindow();
         view.menuGroup.setOnCheckedChangeListener((group, checkedId) -> {
@@ -147,18 +142,10 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
             LayoutAddActionBinding view = LayoutAddActionBinding.inflate(getLayoutInflater());
             view.scan.setOnClickListener(c -> {
                 popupWindow.dismiss();
-                if (hasScanPermission)
+                Common.permission(MainActivity.this, () -> {
+                    hasScanPermission = true;
                     jumpScan();
-                else {
-                    AndPermission.with(this).runtime()
-                        .permission(Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE)
-                        .onGranted(data -> {
-                            jumpScan();
-                        })
-                        .onDenied(data -> {
-                        }).start();
-                }
-
+                }, hasScanPermission, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
             });
             view.addFriend.setOnClickListener(c -> {
                 popupWindow.dismiss();

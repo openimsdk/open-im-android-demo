@@ -54,6 +54,16 @@ public class SearchView extends LinearLayout {
         ImageView imageView = findViewById(R.id.clearIv);
         imageView.setVisibility(isClear ? VISIBLE : GONE);
         imageView.setOnClickListener(this::onClick);
+
+        if (clickable){
+            editText.setFocusable(true);
+            editText.setClickable(true);
+            editText.setEnabled(true);
+        }else {
+            editText.setFocusable(false);
+            editText.setClickable(false);
+            editText.setEnabled(false);
+        }
     }
 
     public EditText getEditText() {

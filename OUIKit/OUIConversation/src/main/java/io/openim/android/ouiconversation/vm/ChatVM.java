@@ -821,33 +821,36 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             messageAdapter.notifyItemInserted(0);
             getIView().scrollToPosition(0);
         }
-        OfflinePushInfo offlinePushInfo = new OfflinePushInfo();  // 离线推送的消息备注；不为null
-        OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
-            @Override
-            public void onError(int code, String error) {
-                if (code != 302)
-                    getIView().toast(error + code);
-                UIHandler.postDelayed(() -> {
-                    msg.setStatus(Constant.Send_State.SEND_FAILED);
-                    messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
-                }, 500);
-            }
+        UIHandler.post(() -> {
+            msg.setExt(null);//必须重置 不然android8.0 gson 会崩溃
+            OfflinePushInfo offlinePushInfo = new OfflinePushInfo();  // 离线推送的消息备注；不为null
+            OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
+                @Override
+                public void onError(int code, String error) {
+                    if (code != 302)
+                        getIView().toast(error + code);
+                    UIHandler.postDelayed(() -> {
+                        msg.setStatus(Constant.Send_State.SEND_FAILED);
+                        messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
+                    }, 500);
+                }
 
-            @Override
-            public void onProgress(long progress) {
-                L.e("");
-            }
+                @Override
+                public void onProgress(long progress) {
+                    L.e("");
+                }
 
-            @Override
-            public void onSuccess(Message message) {
-                // 返回新的消息体；替换发送传入的，不然撤回消息会有bug
-                int index = messages.getValue().indexOf(msg);
-                messages.getValue().remove(index);
-                messages.getValue().add(index, IMUtil.buildExpandInfo(message));
-                IMUtil.calChatTimeInterval(messages.getValue());
-                messageAdapter.notifyItemChanged(index);
-            }
-        }, msg, otherSideID, groupID, offlinePushInfo);
+                @Override
+                public void onSuccess(Message message) {
+                    // 返回新的消息体；替换发送传入的，不然撤回消息会有bug
+                    int index = messages.getValue().indexOf(msg);
+                    messages.getValue().remove(index);
+                    messages.getValue().add(index, IMUtil.buildExpandInfo(message));
+                    IMUtil.calChatTimeInterval(messages.getValue());
+                    messageAdapter.notifyItemChanged(index);
+                }
+            }, msg, otherSideID, groupID, offlinePushInfo);
+        });
     }
 
     public void aloneSendMsg(Message msg, String otherSideID, String otherSideGroupID) {
