@@ -23,7 +23,7 @@ public class MsgExpand {
     //用于在消息输入框监听删除键时 判断删除对应@的人
     public int spanHashCode;
     //富文本（at 消息、表情）
-    public SpannableStringBuilder sequence;
+    public transient  SpannableStringBuilder sequence;
     //oa 通知
     public OANotification oaNotification;
     //阅后即焚倒计时
