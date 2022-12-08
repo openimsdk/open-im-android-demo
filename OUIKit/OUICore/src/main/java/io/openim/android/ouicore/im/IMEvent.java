@@ -31,6 +31,7 @@ import io.openim.android.sdk.listener.OnSignalingListener;
 import io.openim.android.sdk.listener.OnUserListener;
 import io.openim.android.sdk.models.BlacklistInfo;
 import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.CustomSignalingInfo;
 import io.openim.android.sdk.models.FriendApplicationInfo;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
@@ -122,6 +123,11 @@ public class IMEvent {
 
             @Override
             public void onMeetingStreamChanged(MeetingStreamEvent e) {
+
+            }
+
+            @Override
+            public void onReceiveCustomSignal(CustomSignalingInfo s) {
 
             }
         });
