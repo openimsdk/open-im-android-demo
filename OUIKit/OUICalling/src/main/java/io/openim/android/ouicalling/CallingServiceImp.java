@@ -218,6 +218,8 @@ public class CallingServiceImp implements CallingService {
         ids.add(callDialog.callingVM.isCallOut ?
             signalingInfo.getInvitation().getInviteeUserIDList().get(0)
             : signalingInfo.getInvitation().getInviterUserID());
+
+        boolean isCallOut=!callDialog.callingVM.isCallOut;
         OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
             @Override
             public void onError(int code, String error) {
@@ -232,7 +234,7 @@ public class CallingServiceImp implements CallingService {
                     CallHistory callHistory = new CallHistory(
                         signalingInfo.getInvitation().getRoomID(),
                         userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(),
-                        signalingInfo.getInvitation().getMediaType(), false, !callDialog.callingVM.isCallOut,
+                        signalingInfo.getInvitation().getMediaType(), false,isCallOut ,
                         System.currentTimeMillis(), 0
                     );
                     realm.insert(callHistory);
