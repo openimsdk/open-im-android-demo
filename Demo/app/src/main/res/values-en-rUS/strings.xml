@@ -46,5 +46,6 @@
     <string name="address_book">通讯录</string>
     <string name="send_succ">发送成功</string>
     <string name="nickname">昵称</string>
+    <string name="Invite_add_friends">邀请对方扫码，添加好友</string>
 
 </resources>

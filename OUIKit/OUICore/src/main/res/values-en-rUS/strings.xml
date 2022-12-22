@@ -204,4 +204,14 @@
     <string name="you">你</string>
     <string name="server_config">服务器配置</string>
     <string name="read_vanish">阅后即焚</string>
+    <string name="general_group">普通群</string>
+    <string name="work_group">工作群</string>
+    <string name="create_word_group">创建工作群</string>
+    <string name="my_qr">我的二维码</string>
+    <string name="scan_qr_card">扫描二维码名片</string>
+    <string name="account_setting">账号设置</string>
+    <string name="not_disturb">勿扰模式</string>
+    <string name="clear_chat_all_record">确认清空所有聊天记录</string>
+    <string name="cleared">已清理</string>
+    <string name="blackList">通讯黑名单</string>
 </resources>

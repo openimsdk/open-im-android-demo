@@ -6,7 +6,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IM;
 
 public class Constant {
-//        public static final String DEFAULT_IP = "test-web.rentsoft.cn";//43
+    //        public static final String DEFAULT_IP = "test-web.rentsoft.cn";//43
     public static final String DEFAULT_IP = "web.rentsoft.cn";//121
 
     //登录注册手机验 证服务器地址
@@ -18,34 +18,26 @@ public class Constant {
 
 
     public static String getImApiUrl() {
-        String url = SharedPreferencesUtil.get(BaseApp.inst())
-            .getString("IM_API_URL");
-        if (TextUtils.isEmpty(url))
-            return IM_API_URL;
+        String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("IM_API_URL");
+        if (TextUtils.isEmpty(url)) return IM_API_URL;
         return url;
     }
 
     public static String getAppAuthUrl() {
-        String url = SharedPreferencesUtil.get(BaseApp.inst())
-            .getString("APP_AUTH_URL");
-        if (TextUtils.isEmpty(url))
-            return APP_AUTH_URL;
+        String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("APP_AUTH_URL");
+        if (TextUtils.isEmpty(url)) return APP_AUTH_URL;
         return url;
     }
 
     public static String getImWsUrl() {
-        String url = SharedPreferencesUtil.get(BaseApp.inst())
-            .getString("IM_WS_URL");
-        if (TextUtils.isEmpty(url))
-            return IM_WS_URL;
+        String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("IM_WS_URL");
+        if (TextUtils.isEmpty(url)) return IM_WS_URL;
         return url;
     }
 
     public static String getStorageType() {
-        String url = SharedPreferencesUtil.get(BaseApp.inst())
-            .getString("STORAGE_TYPE");
-        if (TextUtils.isEmpty(url))
-            return "minio";
+        String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("STORAGE_TYPE");
+        if (TextUtils.isEmpty(url)) return "minio";
         return url;
     }
 
@@ -266,5 +258,14 @@ public class Constant {
         /// 直接进群
         public static final int directly = 2;
     }
+
+    public static class GroupType {
+        /// 普通群
+        public   static final int general = 0;
+
+        /// 工作群
+        public  static final int work = 2;
+    }
+
 
 }

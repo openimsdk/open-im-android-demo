@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.openim.android.demo">
-
-    <!-- getui-->
+    <!-- getui -->
     <queries>
         <intent>
             <action android:name="com.getui.sdk.action" />
@@ -14,18 +13,28 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_splash"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/Theme.Demo"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".ui.user.BlackListActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".ui.user.AccountSettingActivity"
+            android:exported="false"></activity>
 
-
-        <service android:name=".services.GetuiPushService"
+        <service
+            android:name=".services.GetuiPushService"
             android:exported="false"
             android:label="PushService"
-            android:process=":pushservice"
-            />
+            android:process=":pushservice" />
+
         <activity
             android:name=".ui.ServerConfigActivity"
             android:exported="false" />

@@ -46,8 +46,7 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
         LoginCertificate loginCertificate = LoginCertificate.getCache(this);
         friendInfo.setUserID(loginCertificate.userID);
         friendInfo.setNickname(loginCertificate.nickname);
-        if (!vm.selectedFriendInfo.getValue().get(0)
-            .getUserID().equals(friendInfo.getUserID())) {
+        if (!vm.selectedFriendInfo.getValue().get(0).getUserID().equals(friendInfo.getUserID())) {
             vm.selectedFriendInfo.getValue().add(0, friendInfo);
         }
         view.selectNum.setText(vm.selectedFriendInfo.getValue().size() + "人");
@@ -68,7 +67,7 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
         view.submit.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                vm.createGroup();
+                vm.createGroup(getIntent().getBooleanExtra(Constant.K_RESULT, false));
             }
         });
     }
@@ -85,10 +84,7 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
 
         Toast.makeText(this, getString(R.string.create_succ), Toast.LENGTH_SHORT).show();
         GroupInfo groupInfo = (GroupInfo) body;
-        ARouter.getInstance().build(Routes.Conversation.CHAT)
-            .withString(Constant.K_GROUP_ID, groupInfo.getGroupID())
-            .withString(io.openim.android.ouicore.utils.Constant.K_NAME, groupInfo.getGroupName())
-            .navigation();
+        ARouter.getInstance().build(Routes.Conversation.CHAT).withString(Constant.K_GROUP_ID, groupInfo.getGroupID()).withString(io.openim.android.ouicore.utils.Constant.K_NAME, groupInfo.getGroupName()).navigation();
 
         setResult(RESULT_OK);
         finish();

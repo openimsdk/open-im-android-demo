@@ -15,6 +15,11 @@ public class Routes {
         public final static String HOME = "/main/MainActivity";
 
         public final static String SPLASH = "/main/SplashActivity";
+
+        //添加
+        public static final String ADD_CONVERS = "/main/AddConversActivity";
+
+        public static final String CALL_HISTORY = "/main/CallHistoryActivity";
     }
 
     //会话相关

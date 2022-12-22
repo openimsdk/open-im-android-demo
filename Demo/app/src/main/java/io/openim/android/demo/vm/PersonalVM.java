@@ -51,6 +51,7 @@ public class PersonalVM extends BaseViewModel {
 
             BaseApp.inst().loginCertificate.nickname = exUserInfo.getValue().userInfo.getNickname();
             BaseApp.inst().loginCertificate.faceURL = exUserInfo.getValue().userInfo.getFaceURL();
+            BaseApp.inst().loginCertificate.globalRecvMsgOpt = exUserInfo.getValue().userInfo.getGlobalRecvMsgOpt();
             Obs.newMessage(Constant.Event.USER_INFO_UPDATA);
         }
     };
@@ -80,40 +81,38 @@ public class PersonalVM extends BaseViewModel {
     private void getExtendUserInfo() {
         List<String> ids = new ArrayList<>();
         ids.add(BaseApp.inst().loginCertificate.userID);
-        Parameter parameter = new Parameter()
-            .add("operationID", System.currentTimeMillis() + "")
-            .add("pageNumber", 1)
-            .add("showNumber", 1)
-            .add("userIDList", ids);
-        N.API(OpenIMService.class)
-            .getUsersFullInfo(parameter.buildJsonBody())
-            .map(OpenIMService.turn(HashMap.class))
-            .compose(N.IOMain())
-            .subscribe(new NetObserver<HashMap>(getContext()) {
-                @Override
-                protected void onFailure(Throwable e) {
-                    getIView().toast(e.getMessage());
+        Parameter parameter = new Parameter().add("operationID", System.currentTimeMillis() + "").add("pageNumber", 1).add("showNumber", 1).add("userIDList", ids);
+        N.API(OpenIMService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OpenIMService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
+            @Override
+            protected void onFailure(Throwable e) {
+                getIView().toast(e.getMessage());
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+
+            @Override
+            public void onSuccess(HashMap map) {
+                try {
+                    ArrayList arrayList = (ArrayList) map.get("userFullInfoList");
+                    if (null == arrayList || arrayList.isEmpty()) return;
+                    String json = GsonHel.getGson().toJson(exUserInfo.getValue().userInfo);
+                    HashMap map1 = JSONObject.parseObject(json, HashMap.class);
+                    HashMap map2 = JSONObject.parseObject(arrayList.get(0).toString(), HashMap.class);
+                    map1.putAll(map2);
+
+                    exUserInfo.getValue().userInfo = GsonHel.getGson().fromJson(GsonHel.toJson(map1), UserInfo.class);
+                    exUserInfo.setValue(exUserInfo.getValue());
+                    BaseApp.inst().loginCertificate.globalRecvMsgOpt = exUserInfo.getValue().userInfo.getGlobalRecvMsgOpt();
+                    BaseApp.inst().loginCertificate.cache(BaseApp.inst());
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
-                @Override
-                public void onComplete() {
-
-                }
-
-                @Override
-                public void onSuccess(HashMap map) {
-                    try {
-                        ArrayList arrayList = (ArrayList) map.get("userFullInfoList");
-                        if (null == arrayList || arrayList.isEmpty()) return;
-                        exUserInfo.getValue().userInfo = GsonHel.getGson().
-                            fromJson(arrayList.get(0).toString(),UserInfo.class);
-                        exUserInfo.setValue(exUserInfo.getValue());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
+            }
+        });
     }
 
     public void getUserInfo(String id) {
@@ -146,14 +145,10 @@ public class PersonalVM extends BaseViewModel {
         Map userInfoMap = JSONObject.parseObject(userInfo, Map.class);
         //扩展
         userInfoMap.put("platform", IMUtil.PLATFORM_ID);
-        userInfoMap.put("userID", BaseApp.inst()
-            .loginCertificate.userID);
+        userInfoMap.put("userID", BaseApp.inst().loginCertificate.userID);
         userInfoMap.put("operationID", System.currentTimeMillis() + "");
 
-        N.API(OpenIMService.class)
-            .updateUserInfo(Parameter.buildJsonBody(GsonHel.toJson(userInfoMap)))
-            .compose(N.IOMain())
-            .map(OpenIMService.turn(Object.class))
+        N.API(OpenIMService.class).updateUserInfo(Parameter.buildJsonBody(GsonHel.toJson(userInfoMap))).compose(N.IOMain()).map(OpenIMService.turn(Object.class))
 
             .subscribe(new NetObserver<Object>(getContext()) {
                 @Override

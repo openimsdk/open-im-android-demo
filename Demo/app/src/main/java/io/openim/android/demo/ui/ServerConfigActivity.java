@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import io.openim.android.demo.R;
+import io.openim.android.demo.SplashActivity;
 import io.openim.android.demo.databinding.ActivityServerConfigBinding;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
@@ -83,7 +84,10 @@ public class ServerConfigActivity extends BaseActivity<BaseViewModel, ActivitySe
     }
 
     private void restart() {
-        throw new NullPointerException();
+        Intent intent = new Intent(BaseApp.inst(), SplashActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        BaseApp.inst().startActivity(intent);
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     public static class ServerConfigVM {

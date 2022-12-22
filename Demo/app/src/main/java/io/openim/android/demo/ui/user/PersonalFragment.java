@@ -67,6 +67,9 @@ public class PersonalFragment extends BaseFragment implements Observer {
     }
 
     private void listener() {
+        view.accountSetting.setOnClickListener(v->{
+            startActivity(new Intent(getActivity(),AccountSettingActivity.class));
+        });
         view.aboutLy.setOnClickListener(v -> {
             startActivity(new Intent(getActivity(),AboutUsActivity.class));
         });

@@ -322,7 +322,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                 finish();
                 return;
             }
-            createLauncher.launch(new Intent(this, CreateGroupActivity.class));
+            createLauncher.launch(getIntent().setClass(this, CreateGroupActivity.class));
         });
     }
 

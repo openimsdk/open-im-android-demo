@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import io.openim.android.ouicontact.databinding.FragmentContactMainBinding;
 import io.openim.android.ouicontact.databinding.ViewContactHeaderBinding;
 import io.openim.android.ouicontact.vm.ContactVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
@@ -40,7 +42,7 @@ import io.openim.android.sdk.models.UserInfo;
 
 @Route(path = Routes.Contact.HOME)
 public class ContactFragment extends BaseFragment<ContactVM> implements Observer {
-    private ViewSwipeRecyclerViewBinding view;
+    private FragmentContactMainBinding view;
     private ViewContactHeaderBinding header;
     private RecyclerViewAdapter adapter;
     private ContactListVM contactListVM;
@@ -55,7 +57,8 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = ViewSwipeRecyclerViewBinding.inflate(getLayoutInflater());
+        view = FragmentContactMainBinding.inflate(getLayoutInflater());
+
         header = ViewContactHeaderBinding.inflate(getLayoutInflater());
 
         initView();
@@ -69,6 +72,13 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
     }
 
     private void click() {
+        view.addFriend.setOnClickListener(view1 -> {
+            ARouter.getInstance().build(Routes.Main.ADD_CONVERS)
+                .navigation();
+        });
+        view.search.setOnClickListener(view1 -> {
+            ARouter.getInstance().build(Routes.Conversation.SEARCH).navigation();
+        });
         header.groupNotice.setOnClickListener(v -> {
             vm.groupDotNum.setValue(0);
             SharedPreferencesUtil.remove(getContext(), Constant.K_GROUP_NUM);
@@ -101,7 +111,6 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
             header.newFriendNoticeBadge.badge.setText(v + "");
         });
 
-
         view.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         adapter = new RecyclerViewAdapter<UserInfo, ViewHol.ItemViewHo>(ViewHol.ItemViewHo.class) {
 
@@ -109,11 +118,11 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
             @Override
             public void onBindView(@NonNull ViewHol.ItemViewHo holder, UserInfo data, int position) {
                 holder.view.avatar.load(data.getFaceURL());
+                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.view.avatar.getLayoutParams();
+                layoutParams.leftMargin = Common.dp2px(10);
                 holder.view.nickName.setText(data.getNickname());
                 holder.view.getRoot().setOnClickListener(v -> {
-                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                        .withString(Constant.K_ID, data.getUserID())
-                        .navigation();
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, data.getUserID()).navigation();
                 });
             }
         };

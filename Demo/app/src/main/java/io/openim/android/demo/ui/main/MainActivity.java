@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
-import io.openim.android.demo.databinding.LayoutAddActionBinding;
 import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.demo.ui.search.AddConversActivity;
 import io.openim.android.demo.ui.search.PersonDetailActivity;
@@ -38,6 +37,7 @@ import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.demo.vm.MainVM;
 import io.openim.android.ouicontact.ui.ContactFragment;
 import io.openim.android.ouicontact.vm.ContactVM;
+import io.openim.android.ouiconversation.ui.ContactListFragment;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
@@ -47,19 +47,18 @@ import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.widget.BottomPopDialog;
 
 @Route(path = Routes.Main.HOME)
-public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction, Observer {
+public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
 
     private int mCurrentTabIndex;
     private BaseFragment lastFragment, conversationListFragment, contactFragment, personalFragment;
-    private boolean hasScanPermission;
-
+    private ActivityResultLauncher<Intent> resultLauncher = Common.getCaptureActivityLauncher(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         runOnUiThread(() -> {
-            hasScanPermission = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
             AtomicBoolean hasShoot = new AtomicBoolean(AndPermission.hasPermissions(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO));
             Common.permission(MainActivity.this, () -> {
             }, hasShoot.get(), Permission.CAMERA, Permission.RECORD_AUDIO);
@@ -76,25 +75,18 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         sink();
 
         view.setMainVM(vm);
-        initView();
-        Obs.inst().addObserver(this);
 
-        vm.visibility.observe(this, v -> view.isOnline.setVisibility(v));
+
+        vm.visibility.observe(this, v -> {
+            View view = findViewById(io.openim.android.ouiconversation.R.id.isOnline);
+            if (null != view) {
+                view.setVisibility(v);
+            }
+        });
+
         click();
-
-
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Obs.inst().deleteObserver(this);
-    }
-
-    private void initView() {
-        view.avatar.load(BaseApp.inst().loginCertificate.faceURL);
-        view.nickname.setText(BaseApp.inst().loginCertificate.nickname);
-    }
 
     private void bindDot() {
         ContactVM contactVM = ((ContactFragment) contactFragment).getVM();
@@ -107,107 +99,16 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-    }
 
     private void click() {
-        view.callRecord.setOnClickListener(view -> {
-            startActivity(new Intent(this, CallHistoryActivity.class));
-        });
-        showPopupWindow();
         view.menuGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.men1)
-                switchFragment(conversationListFragment);
-            if (checkedId == R.id.men2)
-                switchFragment(contactFragment);
+            if (checkedId == R.id.men1) switchFragment(conversationListFragment);
+            if (checkedId == R.id.men2) switchFragment(contactFragment);
 
-            view.header.setVisibility(View.VISIBLE);
-            SinkHelper.get(this).setTranslucentStatus(view.getRoot());
             if (checkedId == R.id.men3) {
                 switchFragment(personalFragment);
-                view.header.setVisibility(View.GONE);
-                view.getRoot().setPadding(0, 0, 0, 0);
             }
         });
-    }
-
-    private void showPopupWindow() {
-        view.addFriend.setOnClickListener(v -> {
-            //初始化一个PopupWindow，width和height都是WRAP_CONTENT
-            PopupWindow popupWindow = new PopupWindow(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            LayoutAddActionBinding view = LayoutAddActionBinding.inflate(getLayoutInflater());
-            view.scan.setOnClickListener(c -> {
-                popupWindow.dismiss();
-                Common.permission(MainActivity.this, () -> {
-                    hasScanPermission = true;
-                    jumpScan();
-                }, hasScanPermission, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
-            });
-            view.addFriend.setOnClickListener(c -> {
-                popupWindow.dismiss();
-                startActivity(new Intent(this, AddConversActivity.class));
-            });
-            view.addGroup.setOnClickListener(c -> {
-                popupWindow.dismiss();
-                startActivity(new Intent(this, AddConversActivity.class)
-                    .putExtra(AddConversActivity.IS_PERSON, false));
-            });
-            view.createGroup.setOnClickListener(c -> {
-                popupWindow.dismiss();
-                ARouter.getInstance().build(Routes.Group.CREATE_GROUP).navigation();
-            });
-            //设置PopupWindow的视图内容
-            popupWindow.setContentView(view.getRoot());
-            //点击空白区域PopupWindow消失，这里必须先设置setBackgroundDrawable，否则点击无反应
-            popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
-            popupWindow.setOutsideTouchable(true);
-
-            //设置PopupWindow消失监听
-            popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                @Override
-                public void onDismiss() {
-
-                }
-            });
-            //PopupWindow在targetView下方弹出
-            popupWindow.showAsDropDown(v);
-
-        });
-    }
-
-
-    private final ActivityResultLauncher<Intent> captureActivityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() != Activity.RESULT_OK || null == result.getData()) return;
-        String content = result.getData().getStringExtra(com.yzq.zxinglibrary.common.Constant.CODED_CONTENT);
-
-        if (content.contains(Constant.QR.QR_ADD_FRIEND)) {
-            String userId = content.substring(content.lastIndexOf("/") + 1);
-            if (!TextUtils.isEmpty(userId))
-                startActivity(new Intent(this, PersonDetailActivity.class).putExtra(Constant.K_ID, userId));
-        } else if (content.contains(Constant.QR.QR_JOIN_GROUP)) {
-            String groupId = content.substring(content.lastIndexOf("/") + 1);
-            if (!TextUtils.isEmpty(groupId))
-                ARouter.getInstance().build(Routes.Group.DETAIL)
-                    .withString(io.openim.android.ouicore.utils.Constant.K_GROUP_ID, groupId).navigation();
-        }
-    });
-
-    /**
-     * 跳转到扫一扫
-     */
-    private void jumpScan() {
-        Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
-        ZxingConfig config = new ZxingConfig();
-        config.setPlayBeep(true);//是否播放扫描声音 默认为true
-        config.setShake(true);//是否震动  默认为true
-        config.setDecodeBarCode(true);//是否扫描条形码 默认为true
-        config.setFullScreenScan(false);//是否全屏扫描  默认为true  设为false则只会在扫描框中扫描
-        intent.putExtra(com.yzq.zxinglibrary.common.Constant.INTENT_ZXING_CONFIG, config);
-        captureActivityLauncher.launch(intent);
     }
 
 
@@ -229,8 +130,8 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
     @Override
     public void initDate() {
-        contactFragment = (BaseFragment) ARouter.getInstance().build(Routes.Contact.HOME).navigation();
-        conversationListFragment = (BaseFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
+        contactFragment = (ContactFragment) ARouter.getInstance().build(Routes.Contact.HOME).navigation();
+        conversationListFragment = (ContactListFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
         personalFragment = PersonalFragment.newInstance();
 
         personalFragment.setPage(3);
@@ -241,6 +142,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
             switchFragment(contactFragment);
         }
         if (null != conversationListFragment) {
+            ((ContactListFragment) conversationListFragment).setResultLauncher(resultLauncher);
             conversationListFragment.setPage(1);
             switchFragment(conversationListFragment);
         }
@@ -273,11 +175,5 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         }
     }
 
-    @Override
-    public void update(Observable observable, Object o) {
-        Obs.Message message = (Obs.Message) o;
-        if (message.tag == Constant.Event.USER_INFO_UPDATA) {
-            initView();
-        }
-    }
+
 }

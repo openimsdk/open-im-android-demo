@@ -89,7 +89,7 @@ public class GroupVM extends SocialityVM {
     /**
      * 创建群组
      */
-    public void createGroup() {
+    public void createGroup(boolean isWordGroup) {
         WaitDialog waitDialog = new WaitDialog(getContext());
         waitDialog.setNotDismiss();
         waitDialog.show();
@@ -99,25 +99,24 @@ public class GroupVM extends SocialityVM {
             GroupMemberRole groupMemberRole = new GroupMemberRole();
             if (friendInfo.getUserID().equals(loginCertificate.userID)) {
                 groupMemberRole.setRoleLevel(2);
-            } else
-                groupMemberRole.setRoleLevel(1);
+            } else groupMemberRole.setRoleLevel(1);
             groupMemberRole.setUserID(friendInfo.getUserID());
             groupMemberRoles.add(groupMemberRole);
         }
         OpenIMClient.getInstance().groupManager.createGroup(new OnBase<GroupInfo>() {
-                                                                @Override
-                                                                public void onError(int code, String error) {
-                                                                    getIView().onError(error);
+            @Override
+            public void onError(int code, String error) {
+                getIView().onError(error);
 
-                                                                }
+            }
 
-                                                                @Override
-                                                                public void onSuccess(GroupInfo data) {
-                                                                    getIView().onSuccess(data);
-                                                                    Common.UIHandler.postDelayed(waitDialog::dismiss, 200);
-                                                                }
-                                                            }, groupName.getValue(), null, null, null,
-            0, null, groupMemberRoles);
+            @Override
+            public void onSuccess(GroupInfo data) {
+                getIView().onSuccess(data);
+                Common.UIHandler.postDelayed(waitDialog::dismiss, 200);
+            }
+        }, groupName.getValue(), null, null, null,
+            isWordGroup ? Constant.GroupType.work : Constant.GroupType.general, null, groupMemberRoles);
     }
 
     /**
@@ -140,8 +139,7 @@ public class GroupVM extends SocialityVM {
             @Override
             public void onSuccess(String data) {
                 if (!TextUtils.isEmpty(groupName)) {
-                    Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO,
-                        groupName);
+                    Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO, groupName);
                 }
                 if (!TextUtils.isEmpty(notification)) {
                     Obs.newMessage(Constant.Event.SET_GROUP_NOTIFICATION);
@@ -207,8 +205,7 @@ public class GroupVM extends SocialityVM {
         int start = page * pageSize;
         if (start > hasReadIDList.size()) return null;
         int end = start + pageSize;
-        if (end > hasReadIDList.size())
-            end = hasReadIDList.size();
+        if (end > hasReadIDList.size()) end = hasReadIDList.size();
         return hasReadIDList.subList(start, end);
     }
 
@@ -231,8 +228,7 @@ public class GroupVM extends SocialityVM {
                 if (isAddUp) {
                     superGroupMembers.getValue().addAll(getExGroupMemberInfos(data));
                     superGroupMembers.setValue(superGroupMembers.getValue());
-                } else
-                    superGroupMembers.setValue(getExGroupMemberInfos(data));
+                } else superGroupMembers.setValue(getExGroupMemberInfos(data));
             }
         }, groupId, ids);
     }
@@ -268,8 +264,7 @@ public class GroupVM extends SocialityVM {
                         continue;
                     }
                     String nickName = "0";
-                    if (!TextUtils.isEmpty(datum.getNickname()))
-                        nickName = datum.getNickname();
+                    if (!TextUtils.isEmpty(datum.getNickname())) nickName = datum.getNickname();
                     String letter = Pinyin.toPinyin(nickName.charAt(0));
                     letter = (letter.charAt(0) + "").trim().toUpperCase();
                     if (!Common.isAlpha(letter)) {
@@ -292,8 +287,7 @@ public class GroupVM extends SocialityVM {
 
                 Collections.sort(exGroupMembers.getValue(), new PinyinComparator());
                 Collections.sort(exGroupManagement.getValue(), (o1, o2) -> {
-                    if (o2.groupMembersInfo.getRoleLevel()
-                        < o1.groupMembersInfo.getRoleLevel())
+                    if (o2.groupMembersInfo.getRoleLevel() < o1.groupMembersInfo.getRoleLevel())
                         return 0;
                     return -1;
                 });
@@ -322,8 +316,7 @@ public class GroupVM extends SocialityVM {
                 getGroupMemberList();
                 getIView().onSuccess(null);
 
-                Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO,
-                    groupName);
+                Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO, groupName);
             }
         }, groupId, userIds, "");
     }
@@ -348,8 +341,7 @@ public class GroupVM extends SocialityVM {
                 getGroupMemberList();
                 getIView().onSuccess(null);
 
-                Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO,
-                    groupName);
+                Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO, groupName);
             }
         }, groupId, userIds, "");
     }
@@ -365,12 +357,10 @@ public class GroupVM extends SocialityVM {
         groupMembersInfo.setUserID(userID);
         memberInfo.groupMembersInfo = groupMembersInfo;
         int index = exGroupManagement.getValue().indexOf(memberInfo);
-        if (index != -1)
-            return exGroupManagement.getValue().get(index);
+        if (index != -1) return exGroupManagement.getValue().get(index);
 
         index = exGroupMembers.getValue().indexOf(memberInfo);
-        if (index != -1)
-            return exGroupMembers.getValue().get(index);
+        if (index != -1) return exGroupMembers.getValue().get(index);
         return null;
     }
 
@@ -426,19 +416,18 @@ public class GroupVM extends SocialityVM {
     }
 
     public void transferGroupOwner(String uid, IMUtil.OnSuccessListener onSuccessListener) {
-        OpenIMClient.getInstance().groupManager
-            .transferGroupOwner(new OnBase<String>() {
-                @Override
-                public void onError(int code, String error) {
-                    getIView().toast(error + code);
-                }
+        OpenIMClient.getInstance().groupManager.transferGroupOwner(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
+                getIView().toast(error + code);
+            }
 
-                @Override
-                public void onSuccess(String data) {
-                    getGroupsInfo();
-                    onSuccessListener.onSuccess(data);
-                }
-            }, groupId, uid);
+            @Override
+            public void onSuccess(String data) {
+                getGroupsInfo();
+                onSuccessListener.onSuccess(data);
+            }
+        }, groupId, uid);
     }
 
 
