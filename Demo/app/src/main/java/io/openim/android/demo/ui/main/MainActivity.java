@@ -105,8 +105,10 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
             if (checkedId == R.id.men1) switchFragment(conversationListFragment);
             if (checkedId == R.id.men2) switchFragment(contactFragment);
 
+            SinkHelper.get(this).setTranslucentStatus(view.getRoot());
             if (checkedId == R.id.men3) {
                 switchFragment(personalFragment);
+                view.getRoot().setPadding(0, 0, 0, 0);
             }
         });
     }
