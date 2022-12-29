@@ -45,7 +45,7 @@ import io.openim.android.sdk.models.GroupMembersInfo;
 
 @Route(path = Routes.Group.MATERIAL)
 public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMaterialBinding> {
-    public static final int SUPER_GROUP_LIMIT = 200;
+
     int spanCount = 7;
     private PhotographAlbumDialog albumDialog;
     private ActivityResultLauncher infoModifyLauncher;
@@ -70,8 +70,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         infoModifyLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() != RESULT_OK) return;
             String var = result.getData().getStringExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA);
-            if (infoModifyType == 1)
-                vm.updataGroup(vm.groupId, var, null, null, null, null);
+            if (infoModifyType == 1) vm.updataGroup(vm.groupId, var, null, null, null, null);
             if (infoModifyType == 2)
                 vm.setGroupMemberNickname(vm.groupId, vm.loginCertificate.userID, var);
         });
@@ -127,18 +126,14 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
         view.noDisturb.setOnSlideButtonClickListener(is -> {
             if (null == iConversationBridge) return;
-            iConversationBridge.setConversationRecvMessageOpt(is ? 2 : 0,
-                iConversationBridge.getConversationInfo().getConversationID());
+            iConversationBridge.setConversationRecvMessageOpt(is ? 2 : 0, iConversationBridge.getConversationInfo().getConversationID());
         });
         view.chatHistory.setOnClickListener(v -> {
-            ARouter.getInstance()
-                .build(Routes.Conversation.CHAT_HISTORY)
-                .navigation();
+            ARouter.getInstance().build(Routes.Conversation.CHAT_HISTORY).navigation();
         });
         view.qrCode.setOnClickListener(v -> startActivity(new Intent(this, ShareQrcodeActivity.class)));
         view.groupId.setOnClickListener(v -> startActivity(new Intent(this, ShareQrcodeActivity.class).putExtra(ShareQrcodeActivity.IS_QRCODE, false)));
-        view.bulletin.setOnClickListener(v -> startActivity(new Intent(this, GroupBulletinActivity.class)
-            .putExtra(Constant.K_RESULT, vm.isOwner())));
+        view.bulletin.setOnClickListener(v -> startActivity(new Intent(this, GroupBulletinActivity.class).putExtra(Constant.K_RESULT, vm.isOwner())));
 
         view.groupMember.setOnClickListener(v -> {
             gotoMemberList(false);
@@ -179,8 +174,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         view.transferPermissions.setOnClickListener(v -> {
             gotoMemberList(true);
         });
-        view.clearRecord.setOnClickListener(v ->
-        {
+        view.clearRecord.setOnClickListener(v -> {
             CommonDialog commonDialog = new CommonDialog(this);
             commonDialog.show();
             commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.clear_chat_tips);
@@ -195,8 +189,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     @Override
     protected void onPause() {
         super.onPause();
-        if (isFinishing())
-            removeCacheVM();
+        if (isFinishing()) removeCacheVM();
     }
 
 
@@ -207,8 +200,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     private void initView() {
-        if (vm.isOwner())
-            view.quitGroup.setText(io.openim.android.ouicore.R.string.dissolve_group);
+        if (vm.isOwner()) view.quitGroup.setText(io.openim.android.ouicore.R.string.dissolve_group);
         albumDialog = new PhotographAlbumDialog(this);
         albumDialog.setOnSelectResultListener(path -> {
             OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
@@ -242,9 +234,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     int reId;
                     holder.view.img.load(reId = data.getRoleLevel());
                     holder.view.getRoot().setOnClickListener(v -> {
-                        startActivity(new Intent(GroupMaterialActivity.this, InitiateGroupActivity.class)
-                            .putExtra(reId == R.mipmap.ic_group_add ? InitiateGroupActivity.IS_INVITE_TO_GROUP
-                                : InitiateGroupActivity.IS_REMOVE_GROUP, true));
+                        startActivity(new Intent(GroupMaterialActivity.this, InitiateGroupActivity.class).putExtra(reId == R.mipmap.ic_group_add ? InitiateGroupActivity.IS_INVITE_TO_GROUP : InitiateGroupActivity.IS_REMOVE_GROUP, true));
                     });
                 } else {
                     layoutParams.topMargin = 0;
@@ -264,12 +254,9 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             view.totalSilence.setCheckedWithAnimation(groupInfo.getStatus() == Constant.GroupStatus.status3);
 
             view.describe.setText(getJoinGroupOption(groupInfo.getNeedVerification()));
-            view.groupType.setText(groupInfo.getGroupType() == 2 ?
-                getString(io.openim.android.ouicore.R.string.super_group) :
-                getString(io.openim.android.ouicore.R.string.ordinary_group));
+            view.groupType.setText(groupInfo.getGroupType() == 2 ? getString(io.openim.android.ouicore.R.string.super_group) : getString(io.openim.android.ouicore.R.string.ordinary_group));
 
-            view.quitGroup.setText(getString(vm.isOwner() ? io.openim.android.ouicore.R.string.dissolve_group :
-                io.openim.android.ouicore.R.string.quit_group));
+            view.quitGroup.setText(getString(vm.isOwner() ? io.openim.android.ouicore.R.string.dissolve_group : io.openim.android.ouicore.R.string.quit_group));
         });
         vm.groupMembers.observe(this, groupMembersInfos -> {
             boolean owner;
@@ -311,11 +298,9 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
     private void gotoMemberList(boolean transferPermissions) {
         if (vm.groupMembers.getValue().isEmpty()) return;
-        if (vm.groupMembers.getValue().size() > SUPER_GROUP_LIMIT)
-            startActivity(new Intent(GroupMaterialActivity.this, SuperGroupMemberActivity.class)
-                .putExtra(Constant.K_FROM, transferPermissions));
+        if (vm.groupMembers.getValue().size() > Constant.SUPER_GROUP_LIMIT)
+            startActivity(new Intent(GroupMaterialActivity.this, SuperGroupMemberActivity.class).putExtra(Constant.K_FROM, transferPermissions));
         else
-            startActivity(new Intent(GroupMaterialActivity.this, GroupMemberActivity.class)
-                .putExtra(Constant.K_FROM, transferPermissions));
+            startActivity(new Intent(GroupMaterialActivity.this, GroupMemberActivity.class).putExtra(Constant.K_FROM, transferPermissions));
     }
 }

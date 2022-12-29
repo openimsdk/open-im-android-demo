@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
@@ -31,7 +32,7 @@ import io.openim.android.ouigroup.databinding.ActivitySuperGroupMemberBinding;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
-
+@Route(path = Routes.Group.SUPER_GROUP_MEMBER)
 public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySuperGroupMemberBinding> {
     private RecyclerViewAdapter adapter;
     //转让群主权限
@@ -66,13 +67,13 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
 
     void init() {
         if (vm.superGroupMembers.getValue().size() >
-            GroupMaterialActivity.SUPER_GROUP_LIMIT) {
+            Constant.SUPER_GROUP_LIMIT) {
             vm.superGroupMembers.getValue().clear();
             vm.page = 0;
             vm.pageSize = 20;
         }
         isTransferPermission = getIntent().getBooleanExtra(Constant.K_FROM, false);
-        isSelectGroupMember = getIntent().getBooleanExtra("isSelectGroupMember", false);
+        isSelectGroupMember = getIntent().getBooleanExtra("isSelectMember", false);
         maxNum = getIntent().getIntExtra("maxNum", 9);
     }
 
@@ -153,7 +154,6 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
                 itemViewHo.view.select.setVisibility(isSelectGroupMember ? View.VISIBLE :View.GONE);
                 itemViewHo.view.avatar.load(data.groupMembersInfo.getFaceURL());
                 itemViewHo.view.nickName.setText(data.groupMembersInfo.getNickname());
-                itemViewHo.view.select.setVisibility(View.GONE);
                 if (data.groupMembersInfo.getRoleLevel() == 2) {
                     itemViewHo.view.identity.setVisibility(View.VISIBLE);
                     itemViewHo.view.identity.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_8_fddfa1);
@@ -166,6 +166,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
                     itemViewHo.view.identity.setTextColor(Color.parseColor("#2691ED"));
                 } else
                     itemViewHo.view.identity.setVisibility(View.GONE);
+
 
 
                 itemViewHo.view.getRoot().setOnClickListener(v -> {
