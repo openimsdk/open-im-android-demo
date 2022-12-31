@@ -38,7 +38,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
     //转让群主权限
     private boolean isTransferPermission;
     //选择群成员
-    private boolean isSelectGroupMember;
+    private boolean isSelectMember;
     private int maxNum;
 
     @Override
@@ -73,7 +73,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
             vm.pageSize = 20;
         }
         isTransferPermission = getIntent().getBooleanExtra(Constant.K_FROM, false);
-        isSelectGroupMember = getIntent().getBooleanExtra("isSelectMember", false);
+        isSelectMember = getIntent().getBooleanExtra("isSelectMember", false);
         maxNum = getIntent().getIntExtra("maxNum", 9);
     }
 
@@ -151,7 +151,8 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
             @Override
             public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExGroupMemberInfo data, int position) {
                 ViewHol.ItemViewHo itemViewHo = (ViewHol.ItemViewHo) holder;
-                itemViewHo.view.select.setVisibility(isSelectGroupMember ? View.VISIBLE :View.GONE);
+                itemViewHo.view.select.setVisibility(isSelectMember ? View.VISIBLE :View.GONE);
+                itemViewHo.view.select.setChecked(data.isSelect);
                 itemViewHo.view.avatar.load(data.groupMembersInfo.getFaceURL());
                 itemViewHo.view.nickName.setText(data.groupMembersInfo.getNickname());
                 if (data.groupMembersInfo.getRoleLevel() == 2) {
@@ -170,6 +171,11 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
 
 
                 itemViewHo.view.getRoot().setOnClickListener(v -> {
+                    if (isSelectMember){
+                        data.isSelect=!data.isSelect;
+                        notifyItemChanged(position);
+                        return;
+                    }
                     if (isTransferPermission) {
                         if (data.groupMembersInfo.getRoleLevel() == 2)
                             toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.repeat_group_manager));
