@@ -214,4 +214,6 @@
     <string name="clear_chat_all_record">确认清空所有聊天记录</string>
     <string name="cleared">已清理</string>
     <string name="blackList">通讯黑名单</string>
+    <string name="select_tips">最多选择 %1$d 个人</string>
+    <string name="selected_tips">已选择：%1$d人</string>
 </resources>

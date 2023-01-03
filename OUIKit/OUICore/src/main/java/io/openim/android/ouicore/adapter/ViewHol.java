@@ -104,4 +104,13 @@ public class ViewHol {
             view = ViewImageBinding.bind(this.itemView);
         }
     }
+
+    public static class CrossTxtTxtHolder extends RecyclerView.ViewHolder {
+        public ViewImageBinding view;
+
+        public CrossTxtTxtHolder(@NonNull View itemView) {
+            super(ViewImageBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
+            view = ViewImageBinding.bind(this.itemView);
+        }
+    }
 }

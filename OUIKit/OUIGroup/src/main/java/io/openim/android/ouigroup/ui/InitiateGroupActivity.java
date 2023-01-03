@@ -173,13 +173,14 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                     else
                         itemViewHo.view.item.setOnClickListener(v -> {
                             if (isSelectMember && selectMemberNum >= maxNum) {
-                                toast("最多能选择" + maxNum + "人");
+                                toast(String.format(getString(io.openim.android.ouicore.R.string.select_tips)
+                                    ,maxNum));
                                 return;
                             }
                             data.isSelect = !data.isSelect;
                             notifyItemChanged(position);
                             selectMemberNum = getSelectNum();
-                            view.selectNum.setText("已选择：" + selectMemberNum + "人");
+                            view.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectMemberNum));
                             if (isSelectMember)
                                 view.submit.setText("确定（" + selectMemberNum + "/" + maxNum + "）");
                             else
