@@ -4,12 +4,9 @@
 
     <application>
         <activity
-            android:name=".SelectedMemberActivity"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
+            android:name=".ui.SelectedMemberActivity"
+            android:exported="false"/>
+
         <activity
             android:name=".ui.MemberPermissionActivity"
             android:exported="false" />

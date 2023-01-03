@@ -27,6 +27,7 @@ import io.openim.android.ouicontact.databinding.ActivitySearchFriendsBinding;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
@@ -76,7 +77,8 @@ public class SearchFriendsActivity extends BaseActivity<SearchVM, ActivitySearch
                 final FriendInfo finalDa1 = da2;
                 holder.view.getRoot().setOnClickListener(v -> {
                     setResult(RESULT_OK, new Intent().putExtra(Constant.K_ID, isSearchGroupMember ? finalDa.getUserID()
-                        : finalDa1.getUserID()));
+                        : finalDa1.getUserID()).putExtra(Constant.K_RESULT,isSearchGroupMember ? GsonHel.toJson(finalDa)
+                        :GsonHel.toJson(finalDa1)));
                     finish();
                 });
             }

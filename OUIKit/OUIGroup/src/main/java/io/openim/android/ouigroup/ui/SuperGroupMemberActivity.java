@@ -19,16 +19,18 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import java.util.ArrayList;
+
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivitySuperGroupMemberBinding;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.models.GroupMembersInfo;
@@ -58,11 +60,41 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
     private ActivityResultLauncher<Intent> searchFriendLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         try {
             String uid = result.getData().getStringExtra(Constant.K_ID);
-            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, uid).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
+            if (isSelectMember) {
+                String resultJson = result.getData().getStringExtra(Constant.K_RESULT);
+                GroupMembersInfo groupMembersInfo = GsonHel.fromJson(resultJson, GroupMembersInfo.class);
+                ExGroupMemberInfo exGroupMemberInfo = new ExGroupMemberInfo();
+                exGroupMemberInfo.isSelect = true;
+                exGroupMemberInfo.groupMembersInfo = groupMembersInfo;
+                int index = vm.superGroupMembers.getValue().indexOf(exGroupMemberInfo);
+                if (index != -1) {
+                    vm.superGroupMembers.getValue().get(index).isSelect = true;
+                } else {
+                    vm.superGroupMembers.getValue().add(exGroupMemberInfo);
+                }
+                adapter.notifyItemChanged(index);
+                updataSelectedNum();
+            } else {
+                ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, uid).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
+            }
         } catch (Exception ignored) {
 
         }
     });
+    private ActivityResultLauncher<Intent> selectMemberLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_OK) {
+            adapter.notifyDataSetChanged();
+            updataSelectedNum();
+        }
+    });
+
+    private void updataSelectedNum() {
+        selectNum = 0;
+        for (ExGroupMemberInfo exGroupMemberInfo : vm.superGroupMembers.getValue()) {
+            if (exGroupMemberInfo.isSelect) selectNum++;
+        }
+        view.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectNum));
+    }
 
     void init() {
         if (vm.superGroupMembers.getValue().size() > Constant.SUPER_GROUP_LIMIT) {
@@ -76,6 +108,17 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
     }
 
     private void listener() {
+        view.submit.setOnClickListener(v -> {
+            ArrayList<String> ids = new ArrayList<>();
+            for (ExGroupMemberInfo exGroupMemberInfo : vm.superGroupMembers.getValue()) {
+                if (exGroupMemberInfo.isSelect)
+                    ids.add(exGroupMemberInfo.groupMembersInfo.getUserID());
+            }
+            setResult(RESULT_OK, new Intent().putStringArrayListExtra(Constant.K_RESULT, ids));
+            finish();
+
+            BaseApp.inst().removeCacheVM(GroupVM.class);
+        });
         view.searchView.setOnClickListener(v -> {
             Postcard postcard = ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS);
             LogisticsCenter.completion(postcard);
@@ -130,6 +173,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
 
     private void initView() {
         view.more.setVisibility(isTransferPermission ? View.GONE : View.VISIBLE);
+        view.selectMemberGroup.setVisibility(isSelectMember ? View.VISIBLE : View.GONE);
         view.recyclerview.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecyclerViewAdapter<ExGroupMemberInfo, RecyclerView.ViewHolder>() {
 
@@ -175,8 +219,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
                         view.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectNum));
                         view.submit.setEnabled(selectNum > 0);
                         view.selectLy.setOnClickListener(selectNum > 0 ? (View.OnClickListener) v1 -> {
-                            startActivity(new Intent(SuperGroupMemberActivity.this,
-                                SelectedMemberActivity.class));
+                            selectMemberLauncher.launch(new Intent(SuperGroupMemberActivity.this, SelectedMemberActivity.class));
                         } : null);
                         return;
                     }

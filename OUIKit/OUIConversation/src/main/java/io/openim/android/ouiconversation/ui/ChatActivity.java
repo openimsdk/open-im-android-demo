@@ -325,7 +325,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 .withInt("max_num", 9)
                 .navigation(this, Constant.Event.CALLING_REQUEST_CODE);
         } else
-            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withBoolean("isSelectMember", true).withInt("max_num", 9).withString(Constant.K_GROUP_ID, vm.groupID).navigation(this, Constant.Event.CALLING_REQUEST_CODE);
+            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withBoolean("isSelectMember", true)
+                .withInt("max_num", 9).withString(Constant.K_GROUP_ID, vm.groupID).navigation(this, Constant.Event.CALLING_REQUEST_CODE);
     }
 
     private void bindShowName() {
