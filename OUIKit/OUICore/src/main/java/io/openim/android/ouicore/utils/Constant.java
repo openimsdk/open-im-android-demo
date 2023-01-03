@@ -50,8 +50,8 @@ public class Constant {
 
     //二维码
     public static class QR {
-        public static final String QR_ADD_FRIEND = "addFriend";
-        public static final String QR_JOIN_GROUP = "joinGroup";
+        public static final String QR_ADD_FRIEND = "io.openim.app/addFriend";
+        public static final String QR_JOIN_GROUP = "io.openim.app/joinGroup";
     }
 
 
@@ -261,11 +261,13 @@ public class Constant {
 
     public static class GroupType {
         /// 普通群
-        public   static final int general = 0;
+        public static final int general = 0;
 
         /// 工作群
-        public  static final int work = 2;
+        public static final int work = 2;
     }
 
+    //超级群
+    public static final int SUPER_GROUP_LIMIT = 250;
 
 }
