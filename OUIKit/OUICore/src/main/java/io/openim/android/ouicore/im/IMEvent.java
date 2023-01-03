@@ -37,6 +37,7 @@ import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
+import io.openim.android.sdk.models.KeyValue;
 import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.ReadReceiptInfo;
@@ -480,6 +481,20 @@ public class IMEvent {
                 // 消息成功撤回，从界面移除消息
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
                     onAdvanceMsgListener.onRecvMessageRevokedV2(info);
+                }
+            }
+
+            @Override
+            public void onRecvMessageExtensionsChanged(String msgID, List<KeyValue> list) {
+                for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
+                    onAdvanceMsgListener.onRecvMessageExtensionsChanged(msgID,list);
+                }
+            }
+
+            @Override
+            public void onRecvMessageExtensionsDeleted(String msgID, List<String> list) {
+                for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
+                    onAdvanceMsgListener.onRecvMessageExtensionsDeleted(msgID,list);
                 }
             }
 

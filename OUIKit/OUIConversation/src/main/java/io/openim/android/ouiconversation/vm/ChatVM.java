@@ -75,6 +75,7 @@ import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
+import io.openim.android.sdk.models.KeyValue;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
@@ -808,6 +809,16 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+    @Override
+    public void onRecvMessageExtensionsChanged(String msgID, List<KeyValue> list) {
+
+    }
+
+    @Override
+    public void onRecvMessageExtensionsDeleted(String msgID, List<String> list) {
 
     }
 
