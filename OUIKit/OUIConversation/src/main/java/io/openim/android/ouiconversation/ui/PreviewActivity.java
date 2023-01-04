@@ -11,6 +11,9 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 
@@ -84,6 +87,8 @@ public class PreviewActivity extends BaseActivity<BaseViewModel, ActivityPreview
         } else if (MediaFileUtil.isVideoType(url)) {
             view.jzVideo.setVisibility(View.VISIBLE);
             view.jzVideo.setUp(url, "");
+            view.jzVideo.posterImageView.setScaleType(ImageView.ScaleType.CENTER);
+
             Glide.with(this)
                 .load(firstFrame)
                 .into(view.jzVideo.posterImageView);
