@@ -3,6 +3,8 @@ package io.openim.android.ouiconversation.widget;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
@@ -12,6 +14,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.view.KeyEvent;
@@ -70,8 +73,7 @@ public class BottomInputCote {
             List<Message> atMessages = vm.atMessages.getValue();
             final Message msg;
             if (null != vm.replyMessage.getValue()) {
-                msg = OpenIMClient.getInstance().messageManager.createQuoteMessage(vm.inputMsg.getValue(),
-                    vm.replyMessage.getValue());
+                msg = OpenIMClient.getInstance().messageManager.createQuoteMessage(vm.inputMsg.getValue(), vm.replyMessage.getValue());
             } else if (atMessages.isEmpty())
                 msg = OpenIMClient.getInstance().messageManager.createTextMessage(vm.inputMsg.getValue());
             else {
@@ -89,8 +91,7 @@ public class BottomInputCote {
 
                     try {
                         for (ForegroundColorSpan span : spans) {
-                            if (span == null)
-                                continue;
+                            if (span == null) continue;
                             MsgExpand msgExpand = (MsgExpand) atMessage.getExt();
                             if (msgExpand.spanHashCode == span.hashCode()) {
                                 final int spanStart = view.chatInput.getText().getSpanStart(span);
@@ -126,23 +127,17 @@ public class BottomInputCote {
                 });
             }
 
-            if (hasMicrophone)
-                touchVoiceDialog.show();
+            if (hasMicrophone) touchVoiceDialog.show();
             else
-                AndPermission.with(context)
-                    .runtime()
-                    .permission(Permission.Group.MICROPHONE)
-                    .onGranted(permissions -> {
-                        // Storage permission are allowed.
-                        hasMicrophone = true;
-                    })
-                    .start();
+                AndPermission.with(context).runtime().permission(Permission.Group.MICROPHONE).onGranted(permissions -> {
+                    // Storage permission are allowed.
+                    hasMicrophone = true;
+                }).start();
             return false;
         });
 
         view.chatInput.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus)
-                setExpandHide();
+            if (hasFocus) setExpandHide();
         });
 
         view.chatMore.setOnClickListener(v -> {
@@ -158,7 +153,24 @@ public class BottomInputCote {
             switchFragment(emojiFragment);
         });
         view.cancelReply.setOnClickListener(v -> vm.replyMessage.setValue(null));
+        view.chatInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                view.chatSend.setVisibility(s.toString().isEmpty() ? GONE : VISIBLE);
+            }
+        });
     }
+
 
     //消息发出后重置UI
     private void reset() {
@@ -178,8 +190,7 @@ public class BottomInputCote {
     }
 
     public void dispatchTouchEvent(MotionEvent event) {
-        if (null != touchVoiceDialog)
-            touchVoiceDialog.dispatchTouchEvent(event);
+        if (null != touchVoiceDialog) touchVoiceDialog.dispatchTouchEvent(event);
     }
 
     public void clearFocus() {
@@ -205,8 +216,7 @@ public class BottomInputCote {
             spannableString.setSpan(colorSpan, 0, spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             Message lastMsg = messages.get(messages.size() - 1);
             MsgExpand msgExpand = (MsgExpand) lastMsg.getExt();
-            if (null != msgExpand)
-                msgExpand.spanHashCode = colorSpan.hashCode();
+            if (null != msgExpand) msgExpand.spanHashCode = colorSpan.hashCode();
             view.chatInput.append(spannableString);
         });
         vm.emojiMessages.observe((LifecycleOwner) context, messages -> {
@@ -217,40 +227,34 @@ public class BottomInputCote {
             Drawable drawable = BaseApp.inst().getResources().getDrawable(emojiId);
             drawable.setBounds(0, 0, Common.dp2px(22), Common.dp2px(22));
             ImageSpan imageSpan = new ImageSpan(drawable);
-            spannableString.setSpan(imageSpan, 0, emojiKey.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString.setSpan(imageSpan, 0, emojiKey.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             view.chatInput.append(spannableString);
         });
         view.chatInput.setOnKeyListener((v, keyCode, event) -> {
             //监听删除操作，找到最靠近删除的一个Span，然后整体删除
-            if (keyCode == KeyEvent.KEYCODE_DEL
-                && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if (keyCode == KeyEvent.KEYCODE_DEL && event.getAction() == KeyEvent.ACTION_DOWN) {
                 TailInputEditText.spansDelete((TailInputEditText) v, vm);
             }
             return false;
         });
 
         if (!vm.isSingleChat) {
-            vm.groupInfo.observe((LifecycleOwner) context,
-                groupInfo -> {
-                    if (null == groupInfo) return;
-                    if (groupInfo.getStatus()
-                        == Constant.GroupStatus.status3
-                        && !groupInfo.getOwnerUserID()
-                        .equals(BaseApp.inst().loginCertificate.userID)) {
-                        view.inputLy.setVisibility(VISIBLE);
-                        view.chatSend.setVisibility(VISIBLE);
-                        view.touchSay.setVisibility(GONE);
+            vm.groupInfo.observe((LifecycleOwner) context, groupInfo -> {
+                if (null == groupInfo) return;
+                if (groupInfo.getStatus() == Constant.GroupStatus.status3 && !groupInfo.getOwnerUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+                    view.inputLy.setVisibility(VISIBLE);
+                    view.chatSend.setVisibility(VISIBLE);
+                    view.touchSay.setVisibility(GONE);
 
-                        view.root.setIntercept(true);
-                        view.root.setAlpha(0.5f);
-                        view.notice.setVisibility(VISIBLE);
-                    } else {
-                        view.root.setIntercept(false);
-                        view.root.setAlpha(1f);
-                        view.notice.setVisibility(GONE);
-                    }
-                });
+                    view.root.setIntercept(true);
+                    view.root.setAlpha(0.5f);
+                    view.notice.setVisibility(VISIBLE);
+                } else {
+                    view.root.setIntercept(false);
+                    view.root.setAlpha(1f);
+                    view.notice.setVisibility(GONE);
+                }
+            });
         }
         vm.replyMessage.observe((LifecycleOwner) context, message -> {
             if (null == message) {
