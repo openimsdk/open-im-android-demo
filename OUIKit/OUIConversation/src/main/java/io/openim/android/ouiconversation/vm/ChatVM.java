@@ -833,7 +833,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             getIView().scrollToPosition(0);
         }
         UIHandler.post(() -> {
-            msg.setExt(null);//必须重置 不然android8.0 gson 会崩溃
+            msg.setExt(null);//必须重置
             OfflinePushInfo offlinePushInfo = new OfflinePushInfo();  // 离线推送的消息备注；不为null
             OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
                 @Override

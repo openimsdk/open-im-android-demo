@@ -214,7 +214,6 @@ public class Common {
     }
 
 
-    @SuppressLint("WrongConstant")
     public static void permission(Context context, OnGrantedListener onGrantedListener, boolean hasPermission, String... permissions) {
         if (hasPermission) onGrantedListener.onGranted();
         else {

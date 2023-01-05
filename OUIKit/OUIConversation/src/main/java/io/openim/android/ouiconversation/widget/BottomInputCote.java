@@ -66,7 +66,6 @@ public class BottomInputCote {
     public BottomInputCote(Context context, LayoutInputCoteBinding view) {
         this.context = context;
         this.view = view;
-        MThreadTool.executorService.execute(() -> hasMicrophone = AndPermission.hasPermissions(context, Permission.Group.MICROPHONE));
         initFragment();
 
         view.chatSend.setOnClickListener(x -> {
@@ -111,9 +110,10 @@ public class BottomInputCote {
             }
         });
         view.voice.setOnCheckedChangeListener((v, isChecked) -> {
+            clearFocus();
             view.inputLy.setVisibility(isChecked ? GONE : VISIBLE);
-            view.chatSend.setVisibility(isChecked ? GONE : VISIBLE);
             view.touchSay.setVisibility(isChecked ? VISIBLE : GONE);
+            setExpandHide();
         });
         view.touchSay.setOnLongClickListener(v -> {
             if (null == touchVoiceDialog) {
@@ -126,13 +126,10 @@ public class BottomInputCote {
                     }
                 });
             }
-
-            if (hasMicrophone) touchVoiceDialog.show();
-            else
-                AndPermission.with(context).runtime().permission(Permission.Group.MICROPHONE).onGranted(permissions -> {
-                    // Storage permission are allowed.
-                    hasMicrophone = true;
-                }).start();
+            Common.permission(context, () -> {
+                touchVoiceDialog.show();
+                hasMicrophone = true;
+            }, hasMicrophone, Permission.Group.MICROPHONE);
             return false;
         });
 
@@ -141,12 +138,14 @@ public class BottomInputCote {
         });
 
         view.chatMore.setOnClickListener(v -> {
+            view.voice.setChecked(false);
             clearFocus();
             Common.hideKeyboard(BaseApp.inst(), v);
             view.fragmentContainer.setVisibility(VISIBLE);
             switchFragment(inputExpandFragment);
         });
         view.emoji.setOnClickListener(v -> {
+            view.voice.setChecked(false);
             clearFocus();
             Common.hideKeyboard(BaseApp.inst(), v);
             view.fragmentContainer.setVisibility(VISIBLE);

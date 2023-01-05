@@ -11,7 +11,7 @@
     <io.openim.android.ouicore.widget.InterceptLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/root"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:animateLayoutChanges="true"
         android:focusableInTouchMode="true"
         android:orientation="vertical"
@@ -35,10 +35,10 @@
                 android:id="@+id/voice"
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
-                android:layout_marginRight="10dp"
                 android:button="@null"
+                android:layout_marginRight="-12dp"
                 android:drawableLeft="@drawable/selector_chat_checkbox"
-                android:paddingLeft="10dp" />
+                />
 
 
             <LinearLayout
@@ -58,7 +58,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/sty_radius_4_white"
                         android:maxHeight="80dp"
-                        android:minHeight="35dp"
+                        android:minHeight="36dp"
                         android:paddingStart="3dp"
                         android:text="@={ChatVM.inputMsg}"
                         android:visibility="visible" />
@@ -112,8 +112,8 @@
             <Button
                 android:id="@+id/touchSay"
                 android:layout_width="0dp"
-                android:layout_height="45dp"
                 android:layout_weight="1"
+                android:layout_height="43dp"
                 android:text="@string/touch_say"
                 android:visibility="gone" />
 
