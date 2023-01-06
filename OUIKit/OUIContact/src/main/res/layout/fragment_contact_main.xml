@@ -47,7 +47,7 @@
     </androidx.cardview.widget.CardView>
     .
 
-    <com.yanzhenjie.recyclerview.SwipeRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.yanzhenjie.recyclerview.SwipeRecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

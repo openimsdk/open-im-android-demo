@@ -38,7 +38,6 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        AndPermission.with(this).overlay().start();
         super.onCreate(savedInstanceState);
         bindVM(LoginVM.class, true);
         bindViewDataBinding(ActivityLoginBinding.inflate(getLayoutInflater()));

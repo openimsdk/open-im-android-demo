@@ -152,7 +152,8 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         CommonDialog commonDialog = new CommonDialog(this);
         commonDialog.setCanceledOnTouchOutside(false);
         commonDialog.setCancelable(false);
-        commonDialog.getMainView().tips.setText("确认对" + vm.exUserInfo.getValue().userInfo.getNickname() + "拉黑吗？");
+        commonDialog.getMainView().tips.setText("确认对" + vm.exUserInfo.getValue().
+            userInfo.getFriendInfo().getNickname() + "拉黑吗？");
         commonDialog.getMainView().cancel.setOnClickListener(v -> {
             commonDialog.dismiss();
             friendVM.blackListUser.setValue(friendVM.blackListUser.getValue());

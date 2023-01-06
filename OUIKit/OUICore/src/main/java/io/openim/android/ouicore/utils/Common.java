@@ -215,9 +215,12 @@ public class Common {
 
 
     public static void permission(Context context, OnGrantedListener onGrantedListener, boolean hasPermission, String... permissions) {
-        if (hasPermission) onGrantedListener.onGranted();
+        if (hasPermission)
+            onGrantedListener.onGranted();
         else {
-            AndPermission.with(context).runtime().permission(permissions).onGranted(permission -> {
+            AndPermission.with(context).runtime()
+                .permission(permissions)
+                .onGranted(permission -> {
                 // Storage permission are allowed.
                 onGrantedListener.onGranted();
             }).onDenied(permission -> {

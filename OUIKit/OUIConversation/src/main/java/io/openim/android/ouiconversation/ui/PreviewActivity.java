@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.runtime.Permission;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,10 +46,12 @@ public class PreviewActivity extends BaseActivity<BaseViewModel, ActivityPreview
 
     public static final String MEDIA_URL = "media_url";
     public static final String FIRST_FRAME = "first_frame";
+    private boolean hasWrite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        runOnUiThread(() -> hasWrite = AndPermission.hasPermissions(this, Permission.WRITE_EXTERNAL_STORAGE));
         bindViewDataBinding(ActivityPreviewBinding.inflate(getLayoutInflater()));
         SinkHelper.get(this).setTranslucentStatus(null);
         initView();
@@ -61,21 +65,21 @@ public class PreviewActivity extends BaseActivity<BaseViewModel, ActivityPreview
         if (MediaFileUtil.isImageType(url)) {
             view.pic.setVisibility(View.VISIBLE);
             view.download.setVisibility(View.VISIBLE);
-            Glide.with(this)
-                .load(url)
-                .into(view.pic);
+            Glide.with(this).load(url).fitCenter().into(view.pic);
             view.pic.setOnClickListener(v -> finish());
             view.download.setOnClickListener(v -> {
-                toast(getString(io.openim.android.ouicore.R.string.start_download));
-                Common.downloadFile(url,null,
-                    getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues()))
-                    .subscribe(new NetObserver<Boolean>(this) {
+                Common.permission(this, () -> {
+                    hasWrite = true;
+                    toast(getString(io.openim.android.ouicore.R.string.start_download));
+                    Common.downloadFile(url, null, getContentResolver()
+                        .insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues()))
+                        .subscribe(new NetObserver<Boolean>(PreviewActivity.this) {
                         @Override
                         public void onSuccess(Boolean success) {
                             if (success)
                                 toast(getString(io.openim.android.ouicore.R.string.save_succ));
                             else
-                                toast(getString(io.openim.android.ouicore.R.string.save_failure));
+                                toast(getString(io.openim.android.ouicore.R.string.save_photo_album));
                         }
 
                         @Override
@@ -83,15 +87,15 @@ public class PreviewActivity extends BaseActivity<BaseViewModel, ActivityPreview
                             toast(e.getMessage());
                         }
                     });
+                }, hasWrite, Permission.WRITE_EXTERNAL_STORAGE);
+
             });
         } else if (MediaFileUtil.isVideoType(url)) {
             view.jzVideo.setVisibility(View.VISIBLE);
             view.jzVideo.setUp(url, "");
             view.jzVideo.posterImageView.setScaleType(ImageView.ScaleType.CENTER);
 
-            Glide.with(this)
-                .load(firstFrame)
-                .into(view.jzVideo.posterImageView);
+            Glide.with(this).load(firstFrame).into(view.jzVideo.posterImageView);
         }
 
     }

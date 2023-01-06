@@ -58,7 +58,6 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = FragmentContactMainBinding.inflate(getLayoutInflater());
-
         header = ViewContactHeaderBinding.inflate(getLayoutInflater());
 
         initView();

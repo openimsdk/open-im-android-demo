@@ -48,7 +48,7 @@ public class FriendVM extends BaseViewModel {
                 waitDialog.dismiss();
                 Iterator<UserInfo> iterator = blackListUser.getValue().iterator();
                 while (iterator.hasNext()) {
-                    if (((UserInfo) iterator.next()).getUserID().equals(uid))
+                    if (iterator.next().getUserID().equals(uid))
                         iterator.remove();
                 }
                 blackListUser.setValue(blackListUser.getValue());

@@ -56,7 +56,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         initVM();
         super.onCreate(savedInstanceState);
         vm.init();

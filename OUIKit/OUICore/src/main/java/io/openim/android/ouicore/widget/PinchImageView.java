@@ -20,7 +20,7 @@ import java.util.Queue;
 /**
  * 手势图片控件
  */
-public class PinchImageView extends AppCompatImageView {
+public class  PinchImageView extends AppCompatImageView {
 
 
     ////////////////////////////////配置参数////////////////////////////////

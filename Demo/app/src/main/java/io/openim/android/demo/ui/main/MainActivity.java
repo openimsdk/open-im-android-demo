@@ -55,18 +55,19 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     private int mCurrentTabIndex;
     private BaseFragment lastFragment, conversationListFragment, contactFragment, personalFragment;
     private ActivityResultLauncher<Intent> resultLauncher = Common.getCaptureActivityLauncher(this);
+    private boolean hasShoot = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         runOnUiThread(() -> {
-            AtomicBoolean hasShoot = new AtomicBoolean(AndPermission.hasPermissions(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO));
+            hasShoot = AndPermission.hasPermissions(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO);
             Common.permission(MainActivity.this, () -> {
-            }, hasShoot.get(), Permission.CAMERA, Permission.RECORD_AUDIO);
+                hasShoot = true;
+                AndPermission.with(this).overlay().start();
+            }, hasShoot, Permission.CAMERA, Permission.RECORD_AUDIO);
         });
 
-        AndPermission.with(this).overlay().start();
         PushManager.getInstance().initialize(this);
-
         bindVM(MainVM.class);
         vm.fromLogin = getIntent().getBooleanExtra(LoginActivity.FORM_LOGIN, false);
         super.onCreate(savedInstanceState);

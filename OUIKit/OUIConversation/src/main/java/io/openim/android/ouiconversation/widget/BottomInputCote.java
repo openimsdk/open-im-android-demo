@@ -52,7 +52,7 @@ import io.openim.android.sdk.models.Message;
  */
 public class BottomInputCote {
 
-    private boolean hasMicrophone;
+    private boolean hasMicrophone=false;
     private ChatVM vm;
     private Context context;
 
@@ -67,6 +67,8 @@ public class BottomInputCote {
         this.context = context;
         this.view = view;
         initFragment();
+        Common.UIHandler.postDelayed(() ->
+            hasMicrophone=AndPermission.hasPermissions(context,Permission.Group.MICROPHONE), 300);
 
         view.chatSend.setOnClickListener(x -> {
             List<Message> atMessages = vm.atMessages.getValue();

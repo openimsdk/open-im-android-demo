@@ -225,4 +225,5 @@
     <string name="blackList">通讯黑名单</string>
     <string name="select_tips">最多选择 %1$d 个人</string>
     <string name="selected_tips">已选择：%1$d人</string>
+    <string name="save_photo_album">图片已保存至相册</string>
 </resources>
