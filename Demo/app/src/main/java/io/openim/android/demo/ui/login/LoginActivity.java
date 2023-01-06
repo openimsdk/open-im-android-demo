@@ -68,7 +68,7 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
             view.loginContent.edt2.setText("");
             submitEnabled();
             view.loginContent.edt1.setHint(v ? getString(R.string.input_phone) : getString(R.string.input_mail));
-            view.loginContent.registerTv.setText(v ? getString(R.string.phone_register) : getString(R.string.mail_register));
+            view.registerTv.setText(v ? getString(R.string.phone_register) : getString(R.string.mail_register));
         });
         vm.account.observe(this, v -> submitEnabled());
         vm.pwd.observe(this, v -> submitEnabled());
@@ -94,7 +94,7 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
         view.loginContent.clear.setOnClickListener(v -> view.loginContent.edt1.setText(""));
         view.loginContent.eyes.setOnCheckedChangeListener((buttonView, isChecked) -> view.loginContent.edt2.setTransformationMethod(isChecked ? HideReturnsTransformationMethod.getInstance() : PasswordTransformationMethod.getInstance()));
         view.protocol.setOnCheckedChangeListener((buttonView, isChecked) -> submitEnabled());
-        view.loginContent.registerTv.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
+        view.registerTv.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
 
         view.submit.setOnClickListener(v -> {
             waitDialog.show();

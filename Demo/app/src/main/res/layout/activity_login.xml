@@ -38,6 +38,7 @@
                 android:layout_marginBottom="30dp">
 
                 <LinearLayout
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
@@ -62,12 +63,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="32dp"
+                    android:visibility="gone"
                     android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/mailTv"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:text="@string/mail"
                         android:textColor="#333333"
                         android:textSize="14sp" />
@@ -82,11 +84,17 @@
                 </LinearLayout>
 
             </LinearLayout>
+            <TextView
+                android:layout_width="56dp"
+                android:layout_height="20dp"
+                android:text="手机号码"
+                android:textColor="#ff171a1d"
+                android:textSize="14sp"
+                />
 
             <include
                 android:id="@+id/login_content"
                 layout="@layout/layout_login" />
-
         </LinearLayout>
 
 
@@ -106,7 +114,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="80dp"
+
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -131,6 +139,40 @@
                 android:text="@string/protocol"
                 android:textColor="#ff1d6bed"
                 android:textSize="12sp" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="80dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/forgotPasswordTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/forgot_password"
+                android:textColor="#ff0089ff"
+                android:textSize="12sp" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="#FFA2A3A5"/>
+
+            <TextView
+                android:id="@+id/registerTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/phone_register"
+                android:padding="4dp"
+                android:textColor="#ff0089ff"
+                android:textSize="12sp" />
+
         </LinearLayout>
 
     </LinearLayout>

@@ -92,32 +92,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#EAEAEA" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:orientation="horizontal">
+                android:text="用短信验证码登录"
+                android:layout_marginTop="10dp"
+                android:textColor="#ff0089ff"
+                android:textSize="12sp"
+                />
 
-                <TextView
-                    android:id="@+id/forgotPasswordTv"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/forgot_password"
-                    android:textColor="#ff333333"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/registerTv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/phone_register"
-                    android:padding="4dp"
-                    android:textColor="#ff1d6bed"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
 
         </LinearLayout>
 
