@@ -37,7 +37,6 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
         SinkHelper.get(this).setTranslucentStatus(view.getRoot());
         view.setLoginVM(vm);
 
-
         initView();
         listener();
     }
@@ -49,13 +48,20 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
         view.clear.setOnClickListener(v -> view.edt1.setText(""));
 
         view.submit.setOnClickListener(v -> {
-            vm.getVerificationCode();
+            vm.getVerificationCode(1);
         });
     }
 
     private void initView() {
         view.tips.setText(vm.isPhone.getValue() ? getString(R.string.phone_register) : getString(R.string.mail_register));
         view.edt1.setHint(vm.isPhone.getValue() ? getString(R.string.input_phone) : getString(R.string.input_mail));
+        if (vm.isFindPassword){
+            view.tips.setText(R.string.phone_num);
+            view.title.setText(R.string.forgot_password);
+            view.protocolLy.setVisibility(View.GONE);
+            view.submit.setText(io.openim.android.ouicore.R.string.get_vc);
+            view.protocol.setChecked(true);
+        }
     }
 
     private void submitEnabled() {
@@ -63,7 +69,7 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
         view.submit.setEnabled(!id.isEmpty() && view.protocol.isChecked());
 
         view.submit.setOnClickListener(v -> {
-            vm.getVerificationCode();
+            vm.getVerificationCode(vm.isFindPassword?2:1);
         });
     }
 

@@ -21,6 +21,9 @@ import android.widget.Toast;
 
 import com.yanzhenjie.permission.AndPermission;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityLoginBinding;
 import io.openim.android.demo.vm.LoginVM;
@@ -28,6 +31,7 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.widget.WaitDialog;
 
@@ -35,6 +39,12 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
 
     public static final String FORM_LOGIN = "form_login";
     private WaitDialog waitDialog;
+    //是否是验证码登录
+    private boolean isVCLogin = false;
+    private Timer timer;
+    //验证码倒计时
+    private int countdown = 60;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +84,7 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
         vm.pwd.observe(this, v -> submitEnabled());
     }
 
-    private final GestureDetector gestureDetector =
-        new GestureDetector(BaseApp.inst(), new GestureDetector.SimpleOnGestureListener() {
+    private final GestureDetector gestureDetector = new GestureDetector(BaseApp.inst(), new GestureDetector.SimpleOnGestureListener() {
         @Override
         public boolean onDoubleTap(MotionEvent e) {
             startActivity(new Intent(LoginActivity.this, ServerConfigActivity.class));
@@ -98,8 +107,37 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
 
         view.submit.setOnClickListener(v -> {
             waitDialog.show();
-            vm.login();
+            vm.login(isVCLogin?3:1);
         });
+        view.loginContent.vcLogin.setOnClickListener(v -> {
+            isVCLogin = !isVCLogin;
+            updateEdit2();
+        });
+        view.loginContent.getVC.setOnClickListener(v -> {
+            //正在倒计时中...不触发操作
+            if (countdown != 60) return;
+            vm.getVerificationCode(3);
+        });
+        view.forgotPasswordTv.setOnClickListener(v -> {
+//            vm.isFindPassword=true;
+//            startActivity(new Intent(this,RegisterActivity.class));
+        });
+    }
+
+    private void updateEdit2() {
+        if (isVCLogin) {
+            view.loginContent.vcTitle.setText(io.openim.android.ouicore.R.string.vc);
+            view.loginContent.vcLogin.setText(io.openim.android.ouicore.R.string.password_login);
+            view.loginContent.getVC.setVisibility(View.VISIBLE);
+            view.loginContent.eyes.setVisibility(View.GONE);
+            view.loginContent.edt2.setHint(R.string.input_verification_code);
+        } else {
+            view.loginContent.vcTitle.setText(R.string.password);
+            view.loginContent.vcLogin.setText(io.openim.android.ouicore.R.string.vc_login);
+            view.loginContent.getVC.setVisibility(View.GONE);
+            view.loginContent.eyes.setVisibility(View.VISIBLE);
+            view.loginContent.edt2.setHint(R.string.input_password);
+        }
     }
 
     private void submitEnabled() {
@@ -108,8 +146,7 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
 
     @Override
     public void jump() {
-        startActivity(new Intent(this, MainActivity.class).putExtra(FORM_LOGIN,
-            true));
+        startActivity(new Intent(this, MainActivity.class).putExtra(FORM_LOGIN, true));
         waitDialog.dismiss();
         finish();
     }
@@ -122,11 +159,39 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
 
     @Override
     public void succ(Object o) {
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                countdown--;
+                runOnUiThread(new TimerTask() {
+                    @Override
+                    public void run() {
+                        view.loginContent.getVC.setText(countdown + "s");
+                    }
+                });
 
+                if (countdown <= 0) {
+                    view.loginContent.getVC.setText(io.openim.android.ouicore.R.string.get_vc);
+                    countdown = 60;
+                    timer.cancel();
+                    timer = null;
+                }
+            }
+        }, 0, 1000);
     }
 
     @Override
     public void initDate() {
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (null != timer) {
+            timer.cancel();
+            timer = null;
+        }
     }
 }

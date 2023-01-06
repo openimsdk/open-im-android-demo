@@ -2,6 +2,7 @@
 <layout>
 
     <data>
+
         <variable
             name="loginVM"
             type="io.openim.android.demo.vm.LoginVM" />
@@ -51,6 +52,7 @@
                 android:background="#EAEAEA" />
 
             <TextView
+                android:id="@+id/vcTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
@@ -86,20 +88,33 @@
                     android:button="@null"
                     android:drawableEnd="@drawable/selector_open_eyes"
                     android:paddingRight="8dp" />
+                <TextView
+                    android:id="@+id/getVC"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/get_vc"
+                    android:visibility="gone"
+                    android:textColor="#ff0089ff"
+                    android:textSize="17sp"
+                    />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#EAEAEA" />
+
             <TextView
+                android:id="@+id/vcLogin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="用短信验证码登录"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
+                android:paddingTop="5dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="5dp"
+                android:text="@string/vc_login"
                 android:textColor="#ff0089ff"
-                android:textSize="12sp"
-                />
+                android:textSize="12sp" />
 
 
         </LinearLayout>

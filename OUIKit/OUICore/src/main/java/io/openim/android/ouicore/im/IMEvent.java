@@ -377,13 +377,16 @@ public class IMEvent {
     }
 
     private void promptSoundOrNotification(ConversationInfo conversationInfo) {
-        if (BaseApp.inst().loginCertificate.globalRecvMsgOpt == 2) return;
-        if (conversationInfo.getRecvMsgOpt() == 0 &&
-            conversationInfo.getUnreadCount() != 0) {
-            if (BaseApp.inst().isBackground())
-                IMUtil.sendNotice(conversationInfo.getLatestMsgSendTime());
-            else
-                IMUtil.playPrompt();
+        try {
+            if (BaseApp.inst().loginCertificate.globalRecvMsgOpt == 2) return;
+            if (conversationInfo.getRecvMsgOpt() == 0 &&
+                conversationInfo.getUnreadCount() != 0) {
+                if (BaseApp.inst().isBackground())
+                    IMUtil.sendNotice(conversationInfo.getLatestMsgSendTime());
+                else
+                    IMUtil.playPrompt();
+            }
+        }catch (Exception ignored){
         }
     }
 

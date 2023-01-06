@@ -31,7 +31,7 @@ import io.openim.android.sdk.listener.OnBase;
 import okhttp3.ResponseBody;
 
 public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
-    public static final int MAX_COUNTDOWN = 10;
+    public static final int MAX_COUNTDOWN = 60;
 
     public MutableLiveData<String> account = new MutableLiveData<>("");
     public MutableLiveData<String> pwd = new MutableLiveData<>("");
@@ -40,84 +40,79 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     public MutableLiveData<String> nickName = new MutableLiveData<>("");
 
     public String verificationCode;
+    //是否是找回密码
+    public boolean isFindPassword = false;
 
-    public void login() {
-        Parameter parameter = getParameter(null);
-        N.API(OpenIMService.class).login(parameter.buildJsonBody())
-            .compose(N.IOMain())
-            .map(OpenIMService.turn(LoginCertificate.class))
-            .subscribe(new NetObserver<LoginCertificate>(getContext()) {
+    public void login(int usedFor) {
+        Parameter parameter = getParameter(pwd.getValue(), usedFor);
+        N.API(OpenIMService.class).login(parameter.buildJsonBody()).compose(N.IOMain()).map(OpenIMService.turn(LoginCertificate.class)).subscribe(new NetObserver<LoginCertificate>(getContext()) {
 
-                @Override
-                public void onSuccess(LoginCertificate loginCertificate) {
-                    try {
-                        OpenIMClient.getInstance().login(new OnBase<String>() {
-                            @Override
-                            public void onError(int code, String error) {
-                                getIView().err(error);
-                            }
+            @Override
+            public void onSuccess(LoginCertificate loginCertificate) {
+                try {
+                    OpenIMClient.getInstance().login(new OnBase<String>() {
+                        @Override
+                        public void onError(int code, String error) {
+                            getIView().err(error);
+                        }
 
-                            @Override
-                            public void onSuccess(String data) {
-                                //缓存登录信息
-                                loginCertificate.cache(getContext());
-                                BaseApp.inst().loginCertificate = loginCertificate;
-                                getIView().jump();
-                            }
-                        }, loginCertificate.userID, loginCertificate.imToken);
+                        @Override
+                        public void onSuccess(String data) {
+                            //缓存登录信息
+                            loginCertificate.cache(getContext());
+                            BaseApp.inst().loginCertificate = loginCertificate;
+                            getIView().jump();
+                        }
+                    }, loginCertificate.userID, loginCertificate.imToken);
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+            }
 
-                @Override
-                protected void onFailure(Throwable e) {
-                    getIView().err(e.getMessage());
-                }
-            });
+            @Override
+            protected void onFailure(Throwable e) {
+                getIView().err(e.getMessage());
+            }
+        });
     }
 
     @NonNull
-    private Parameter getParameter(String verificationCode) {
-        Parameter parameter = new Parameter()
-            .add("password", md5(pwd.getValue()))
+    private Parameter getParameter(String verificationCode, int usedFor) {
+        Parameter parameter = new Parameter().add("password", usedFor == 3 ? null : md5(pwd.getValue()))
             .add("platform", 2)
-            .add("usedFor", 1)
+            .add("usedFor", usedFor)
             .add("operationID", System.currentTimeMillis() + "")
-            .add("verificationCode", verificationCode);
+            .add("verificationCode", usedFor == 3 ? verificationCode : null);
         if (isPhone.getValue()) {
             parameter.add("phoneNumber", account.getValue());
             parameter.add("areaCode", "+86");
-        } else
-            parameter.add("email", account.getValue());
+        } else parameter.add("email", account.getValue());
         return parameter;
     }
 
-    public void getVerificationCode() {
-        Parameter parameter = getParameter(null);
+    public void getVerificationCode(int usedFor) {
+        Parameter parameter = getParameter(null, usedFor);
         WaitDialog waitDialog = showWait();
-        N.API(OpenIMService.class)
-            .getVerificationCode(parameter.buildJsonBody())
+        N.API(OpenIMService.class).getVerificationCode(parameter.buildJsonBody())
             .map(OpenIMService.turn(Object.class))
-            .compose(N.IOMain())
-            .subscribe(new NetObserver<Object>(getContext()) {
-                @Override
-                public void onSuccess(Object o) {
-                    getIView().succ(null);
-                }
+            .compose(N.IOMain()).subscribe(new NetObserver<Object>(getContext()) {
+            @Override
+            public void onSuccess(Object o) {
+                getIView().succ(o);
+            }
 
-                @Override
-                public void onComplete() {
-                    super.onComplete();
-                    waitDialog.dismiss();
-                }
+            @Override
+            public void onComplete() {
+                super.onComplete();
+                waitDialog.dismiss();
+            }
 
-                @Override
-                protected void onFailure(Throwable e) {
-                    getIView().err(e.getMessage());
-                }
-            });
+            @Override
+            protected void onFailure(Throwable e) {
+                getIView().err(e.getMessage());
+            }
+        });
 
     }
 
@@ -132,8 +127,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     private Timer timer;
 
     public void countdown() {
-        if (null == timer)
-            timer = new Timer();
+        if (null == timer) timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -161,71 +155,64 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
      * 检查验证码并注册
      */
     public void checkVerificationCode(String verificationCode) {
-        Parameter parameter = getParameter(verificationCode);
+        Parameter parameter = getParameter(verificationCode, 1);
         WaitDialog waitDialog = showWait();
-        N.API(OpenIMService.class).checkVerificationCode(parameter.buildJsonBody())
-            .map(OpenIMService.turn(HashMap.class))
-            .compose(N.IOMain())
-            .subscribe(new NetObserver<HashMap>(getContext()) {
-                @Override
-                public void onComplete() {
-                    super.onComplete();
-                    waitDialog.dismiss();
-                }
+        N.API(OpenIMService.class).checkVerificationCode(parameter.buildJsonBody()).map(OpenIMService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
+            @Override
+            public void onComplete() {
+                super.onComplete();
+                waitDialog.dismiss();
+            }
 
-                @Override
-                public void onSuccess(HashMap o) {
-                    LoginVM.this.verificationCode = verificationCode;
-                    getIView().succ("checkVerificationCode");
-                }
+            @Override
+            public void onSuccess(HashMap o) {
+                LoginVM.this.verificationCode = verificationCode;
+                getIView().succ("checkVerificationCode");
+            }
 
-                @Override
-                protected void onFailure(Throwable e) {
-                    getIView().err(e.getMessage());
-                }
-            });
+            @Override
+            protected void onFailure(Throwable e) {
+                getIView().err(e.getMessage());
+            }
+        });
     }
 
     public void register() {
-        Parameter parameter = getParameter(verificationCode);
+        Parameter parameter = getParameter(verificationCode, 1);
         parameter.add("nickname", nickName.getValue());
         WaitDialog waitDialog = showWait();
-        N.API(OpenIMService.class).register(parameter.buildJsonBody())
-            .map(OpenIMService.turn(LoginCertificate.class))
-            .compose(N.IOMain())
-            .subscribe(new NetObserver<LoginCertificate>(context.get()) {
-                @Override
-                public void onComplete() {
-                    super.onComplete();
-                    waitDialog.dismiss();
-                }
+        N.API(OpenIMService.class).register(parameter.buildJsonBody()).map(OpenIMService.turn(LoginCertificate.class)).compose(N.IOMain()).subscribe(new NetObserver<LoginCertificate>(context.get()) {
+            @Override
+            public void onComplete() {
+                super.onComplete();
+                waitDialog.dismiss();
+            }
 
-                @Override
-                public void onSuccess(LoginCertificate o) {
-                    setSelfInfo();
-                    o.cache(getContext());
-                    getIView().jump();
-                }
+            @Override
+            public void onSuccess(LoginCertificate o) {
+                setSelfInfo();
+                o.cache(getContext());
+                getIView().jump();
+            }
 
-                @Override
-                protected void onFailure(Throwable e) {
-                    getIView().toast(e.getMessage());
-                }
-            });
+            @Override
+            protected void onFailure(Throwable e) {
+                getIView().toast(e.getMessage());
+            }
+        });
     }
 
     ///设置个人信息
     public void setSelfInfo() {
         OpenIMClient.getInstance().userInfoManager.setSelfInfo(new OnBase<String>() {
-                                                                   @Override
-                                                                   public void onError(int code, String error) {
-                                                                   }
+            @Override
+            public void onError(int code, String error) {
+            }
 
-                                                                   @Override
-                                                                   public void onSuccess(String data) {
-                                                                   }
-                                                               }, nickName.getValue(), null, 0, 0,
-            null, 0, null, null);
+            @Override
+            public void onSuccess(String data) {
+            }
+        }, nickName.getValue(), null, 0, 0, null, 0, null, null);
     }
 
     public interface ViewAction extends IView {

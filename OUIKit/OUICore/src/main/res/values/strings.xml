@@ -226,4 +226,8 @@
     <string name="select_tips">最多选择 %1$d 个人</string>
     <string name="selected_tips">已选择：%1$d人</string>
     <string name="save_photo_album">图片已保存至相册</string>
+    <string name="vc_login">用短信验证码登录</string>
+    <string name="vc">验证码</string>
+    <string name="password_login">密码登录</string>
+    <string name="get_vc">获取验证码</string>
 </resources>

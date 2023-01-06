@@ -40,7 +40,7 @@ public class VerificationCodeActivity extends BaseActivity<LoginVM, ActivityVeri
             if (vm.countdown.getValue() != 0) return;
             vm.countdown.setValue(vm.MAX_COUNTDOWN);
             vm.countdown();
-            vm.getVerificationCode();
+            vm.getVerificationCode(vm.isFindPassword?2:1);
         });
 
         view.codeEditText.setOnTextFinishListener((text, length) -> {
