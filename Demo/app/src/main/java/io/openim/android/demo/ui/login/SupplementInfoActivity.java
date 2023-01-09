@@ -17,9 +17,10 @@ public class SupplementInfoActivity extends BaseActivity<LoginVM, ActivitySupple
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         bindVMByCache(LoginVM.class);
+        super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivitySupplementInfoBinding.inflate(getLayoutInflater()));
+        sink();
         view.setLoginVM(vm);
     }
 

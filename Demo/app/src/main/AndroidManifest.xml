@@ -19,6 +19,13 @@
         android:theme="@style/Theme.Demo"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ui.login.ResetPasswordActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".ui.user.BlackListActivity"
             android:exported="false">
             <meta-data
@@ -27,7 +34,7 @@
         </activity>
         <activity
             android:name=".ui.user.AccountSettingActivity"
-            android:exported="false"></activity>
+            android:exported="false" />
 
         <service
             android:name=".services.GetuiPushService"

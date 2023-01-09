@@ -49,6 +49,7 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        BaseApp.inst().removeCacheVM(LoginVM.class);
         bindVM(LoginVM.class, true);
         bindViewDataBinding(ActivityLoginBinding.inflate(getLayoutInflater()));
         setLightStatus();
@@ -107,7 +108,7 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
 
         view.submit.setOnClickListener(v -> {
             waitDialog.show();
-            vm.login(isVCLogin?3:1);
+            vm.login(isVCLogin?vm.pwd.getValue():null,3);
         });
         view.loginContent.vcLogin.setOnClickListener(v -> {
             isVCLogin = !isVCLogin;
@@ -119,8 +120,8 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
             vm.getVerificationCode(3);
         });
         view.forgotPasswordTv.setOnClickListener(v -> {
-//            vm.isFindPassword=true;
-//            startActivity(new Intent(this,RegisterActivity.class));
+            vm.isFindPassword=true;
+            startActivity(new Intent(this,RegisterActivity.class));
         });
     }
 

@@ -23,9 +23,10 @@ public class VerificationCodeActivity extends BaseActivity<LoginVM, ActivityVeri
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         bindVMByCache(LoginVM.class);
+        super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityVerificationCodeBinding.inflate(getLayoutInflater()));
+        sink();
         view.setLoginVM(vm);
         vm.countdown();
 
@@ -40,11 +41,11 @@ public class VerificationCodeActivity extends BaseActivity<LoginVM, ActivityVeri
             if (vm.countdown.getValue() != 0) return;
             vm.countdown.setValue(vm.MAX_COUNTDOWN);
             vm.countdown();
-            vm.getVerificationCode(vm.isFindPassword?2:1);
+            vm.getVerificationCode(vm.isFindPassword ? 2 : 1);
         });
 
         view.codeEditText.setOnTextFinishListener((text, length) -> {
-            vm.checkVerificationCode(text.toString());
+            vm.checkVerificationCode(text.toString(), vm.isFindPassword ? 2 : 1);
         });
     }
 
@@ -65,8 +66,13 @@ public class VerificationCodeActivity extends BaseActivity<LoginVM, ActivityVeri
     @Override
     public void succ(Object o) {
         if (o.equals("checkVerificationCode")) {
-            startActivity(new Intent(this, SupplementInfoActivity.class)
-                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            finish();
+            if (vm.isFindPassword) {
+                startActivity(new Intent(this,
+                    ResetPasswordActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            } else {
+                startActivity(new Intent(this, SupplementInfoActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            }
         }
     }
 

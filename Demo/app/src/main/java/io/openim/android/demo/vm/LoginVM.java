@@ -2,6 +2,8 @@ package io.openim.android.demo.vm;
 
 import static io.openim.android.ouicore.utils.Common.md5;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
@@ -34,6 +36,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     public static final int MAX_COUNTDOWN = 60;
 
     public MutableLiveData<String> account = new MutableLiveData<>("");
+    //密码或验证码
     public MutableLiveData<String> pwd = new MutableLiveData<>("");
     public MutableLiveData<Boolean> isPhone = new MutableLiveData<>(true);
     public MutableLiveData<Integer> countdown = new MutableLiveData<>(MAX_COUNTDOWN);
@@ -43,8 +46,8 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     //是否是找回密码
     public boolean isFindPassword = false;
 
-    public void login(int usedFor) {
-        Parameter parameter = getParameter(pwd.getValue(), usedFor);
+    public void login(String verificationCode, int usedFor) {
+        Parameter parameter = getParameter(verificationCode, usedFor);
         N.API(OpenIMService.class).login(parameter.buildJsonBody()).compose(N.IOMain()).map(OpenIMService.turn(LoginCertificate.class)).subscribe(new NetObserver<LoginCertificate>(getContext()) {
 
             @Override
@@ -77,13 +80,19 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
         });
     }
 
+    /**
+     * @param verificationCode
+     * @param usedFor          1注册 2重置 3登录
+     * @return
+     */
     @NonNull
     private Parameter getParameter(String verificationCode, int usedFor) {
-        Parameter parameter = new Parameter().add("password", usedFor == 3 ? null : md5(pwd.getValue()))
+        Parameter parameter = new Parameter()
+            .add("password", TextUtils.isEmpty(verificationCode) ? md5(pwd.getValue()) : null)
             .add("platform", 2)
             .add("usedFor", usedFor)
             .add("operationID", System.currentTimeMillis() + "")
-            .add("verificationCode", usedFor == 3 ? verificationCode : null);
+            .add("verificationCode", verificationCode);
         if (isPhone.getValue()) {
             parameter.add("phoneNumber", account.getValue());
             parameter.add("areaCode", "+86");
@@ -91,12 +100,13 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
         return parameter;
     }
 
+    /**
+     * @param usedFor 1注册 2重置 3登录
+     */
     public void getVerificationCode(int usedFor) {
         Parameter parameter = getParameter(null, usedFor);
         WaitDialog waitDialog = showWait();
-        N.API(OpenIMService.class).getVerificationCode(parameter.buildJsonBody())
-            .map(OpenIMService.turn(Object.class))
-            .compose(N.IOMain()).subscribe(new NetObserver<Object>(getContext()) {
+        N.API(OpenIMService.class).getVerificationCode(parameter.buildJsonBody()).map(OpenIMService.turn(Object.class)).compose(N.IOMain()).subscribe(new NetObserver<Object>(getContext()) {
             @Override
             public void onSuccess(Object o) {
                 getIView().succ(o);
@@ -154,8 +164,8 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     /**
      * 检查验证码并注册
      */
-    public void checkVerificationCode(String verificationCode) {
-        Parameter parameter = getParameter(verificationCode, 1);
+    public void checkVerificationCode(String verificationCode, int usedFor) {
+        Parameter parameter = getParameter(verificationCode, usedFor);
         WaitDialog waitDialog = showWait();
         N.API(OpenIMService.class).checkVerificationCode(parameter.buildJsonBody()).map(OpenIMService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
             @Override
@@ -168,6 +178,32 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
             public void onSuccess(HashMap o) {
                 LoginVM.this.verificationCode = verificationCode;
                 getIView().succ("checkVerificationCode");
+            }
+
+            @Override
+            protected void onFailure(Throwable e) {
+                getIView().err(e.getMessage());
+            }
+        });
+    }
+
+    public void resetPassword(String password) {
+        Parameter parameter = getParameter(verificationCode, 2);
+        //这里要把密码传入
+        parameter.add("password", md5(password));
+        WaitDialog waitDialog = showWait();
+        N.API(OpenIMService.class).resetPassword(parameter.buildJsonBody())
+            .map(OpenIMService.turn(HashMap.class))
+            .compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
+            @Override
+            public void onComplete() {
+                super.onComplete();
+                waitDialog.dismiss();
+            }
+
+            @Override
+            public void onSuccess(HashMap o) {
+                getIView().succ(null);
             }
 
             @Override
@@ -214,6 +250,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
             }
         }, nickName.getValue(), null, 0, 0, null, 0, null, null);
     }
+
 
     public interface ViewAction extends IView {
         ///跳转

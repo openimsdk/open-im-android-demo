@@ -33,8 +33,7 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
         super.onCreate(savedInstanceState);
         bindVMByCache(LoginVM.class);
         bindViewDataBinding(ActivityRegisterBinding.inflate(getLayoutInflater()));
-        setLightStatus();
-        SinkHelper.get(this).setTranslucentStatus(view.getRoot());
+        sink();
         view.setLoginVM(vm);
 
         initView();
@@ -48,7 +47,8 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
         view.clear.setOnClickListener(v -> view.edt1.setText(""));
 
         view.submit.setOnClickListener(v -> {
-            vm.getVerificationCode(1);
+//            startActivity(new Intent(this,ResetPasswordActivity.class));
+            vm.getVerificationCode(vm.isFindPassword?2:1);
         });
     }
 
@@ -67,10 +67,6 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
     private void submitEnabled() {
         id = view.edt1.getText().toString();
         view.submit.setEnabled(!id.isEmpty() && view.protocol.isChecked());
-
-        view.submit.setOnClickListener(v -> {
-            vm.getVerificationCode(vm.isFindPassword?2:1);
-        });
     }
 
     public void back(View view) {

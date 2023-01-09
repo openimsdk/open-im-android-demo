@@ -4,16 +4,16 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "io.openim.android.arglasses",
+  "applicationId": "io.openim.android.demo",
   "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 11,
-      "versionName": "1.1.2",
-      "outputFile": "arglasses-release.apk"
+      "versionCode": 14,
+      "versionName": "1.1.4",
+      "outputFile": "app-release.apk"
     }
   ],
   "elementType": "File"

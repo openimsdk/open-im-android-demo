@@ -220,4 +220,9 @@
     <string name="vc">验证码</string>
     <string name="password_login">密码登录</string>
     <string name="get_vc">获取验证码</string>
+    <string name="set_password">请设置账号密码</string>
+    <string name="login_tips">登陆密码用于登陆OpenIM账号</string>
+    <string name="login_tips2">需6～20位字符</string>
+    <string name="confirm_modification">确认修改</string>
+    <string name="login_tips3">密码长度在6~20个字符之间</string>
 </resources>
