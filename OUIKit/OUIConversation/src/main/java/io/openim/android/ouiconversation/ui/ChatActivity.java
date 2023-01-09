@@ -232,7 +232,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                     callingService.call(signalingInfo);
                 } else {
                     toSelectMember();
-
                 }
                 return false;
             });
@@ -314,7 +313,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
     }
 
-    private void toSelectMember() {
+    public void toSelectMember() {
         if (vm.groupInfo.getValue().getMemberCount() > Constant.SUPER_GROUP_LIMIT) {
             GroupVM groupVM = new GroupVM();
             groupVM.groupId=vm.groupID;

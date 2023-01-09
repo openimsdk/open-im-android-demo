@@ -60,7 +60,8 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         runOnUiThread(() -> {
-            hasShoot = AndPermission.hasPermissions(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO);
+            hasShoot = AndPermission.hasPermissions(MainActivity.this, Permission.CAMERA,
+                Permission.RECORD_AUDIO);
             Common.permission(MainActivity.this, () -> {
                 hasShoot = true;
                 AndPermission.with(this).overlay().start();

@@ -67,8 +67,6 @@ public class BottomInputCote {
         this.context = context;
         this.view = view;
         initFragment();
-        Common.UIHandler.postDelayed(() ->
-            hasMicrophone=AndPermission.hasPermissions(context,Permission.Group.MICROPHONE), 300);
 
         view.chatSend.setOnClickListener(x -> {
             List<Message> atMessages = vm.atMessages.getValue();
@@ -112,6 +110,8 @@ public class BottomInputCote {
             }
         });
         view.voice.setOnCheckedChangeListener((v, isChecked) -> {
+            hasMicrophone=AndPermission.hasPermissions(context,Permission.Group.MICROPHONE);
+
             clearFocus();
             view.inputLy.setVisibility(isChecked ? GONE : VISIBLE);
             view.touchSay.setVisibility(isChecked ? VISIBLE : GONE);

@@ -58,6 +58,7 @@ import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.FriendInfo;
@@ -66,18 +67,8 @@ import io.openim.android.sdk.models.SignalingInfo;
 
 
 public class InputExpandFragment extends BaseFragment<ChatVM> {
-    public static List<Integer> menuIcons = Arrays.asList(io.openim.android.ouicore.R.mipmap.ic_chat_photo,
-        R.mipmap.ic_chat_shoot,
-        R.mipmap.ic_tools_video_call,
-        R.mipmap.ic_chat_menu_file,
-        R.mipmap.ic_chat_location,
-        R.mipmap.ic_business_card);
-    public static List<String> menuTitles = Arrays.asList(BaseApp.inst().getString(io.openim.android.ouicore.R.string.album),
-        BaseApp.inst().getString(io.openim.android.ouicore.R.string.shoot), BaseApp.inst().getString(io.openim.android.ouicore.R.string.video_calls),
-        BaseApp.inst().getString(io.openim.android.ouicore.R.string.file),
-        BaseApp.inst().getString(io.openim.android.ouicore.R.string.location),
-        BaseApp.inst().getString(io.openim.android.ouicore.R.string.business_card)
-    );
+    public static List<Integer> menuIcons = Arrays.asList(io.openim.android.ouicore.R.mipmap.ic_chat_photo, R.mipmap.ic_chat_shoot, R.mipmap.ic_tools_video_call, R.mipmap.ic_chat_menu_file, R.mipmap.ic_chat_location, R.mipmap.ic_business_card);
+    public static List<String> menuTitles = Arrays.asList(BaseApp.inst().getString(io.openim.android.ouicore.R.string.album), BaseApp.inst().getString(io.openim.android.ouicore.R.string.shoot), BaseApp.inst().getString(io.openim.android.ouicore.R.string.video_calls), BaseApp.inst().getString(io.openim.android.ouicore.R.string.file), BaseApp.inst().getString(io.openim.android.ouicore.R.string.location), BaseApp.inst().getString(io.openim.android.ouicore.R.string.business_card));
 
     FragmentInputExpandBinding v;
     //权限
@@ -128,11 +119,9 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                             gotoShareLocation();
                             break;
                         case 5:
-                            Postcard postcard = ARouter.getInstance()
-                                .build(Routes.Contact.ALL_FRIEND);
+                            Postcard postcard = ARouter.getInstance().build(Routes.Contact.ALL_FRIEND);
                             LogisticsCenter.completion(postcard);
-                            businessCardLauncher.launch(new Intent(getContext(), postcard.getDestination())
-                                .putExtra("formChat", true));
+                            businessCardLauncher.launch(new Intent(getContext(), postcard.getDestination()).putExtra("formChat", true));
                             break;
                     }
                 });
@@ -146,28 +135,31 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
     private void goToCall() {
         Common.permission(getContext(), () -> {
             hasStorage = true;
-            CallingService callingService = (CallingService) ARouter.getInstance()
-                .build(Routes.Service.CALLING).navigation();
+            CallingService callingService = (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
             if (null == callingService) return;
             IMUtil.showBottomPopMenu(getContext(), (v1, keyCode, event) -> {
                 vm.isVideoCall = keyCode != 1;
                 if (vm.isSingleChat) {
                     List<String> ids = new ArrayList<>();
                     ids.add(vm.otherSideID);
-                    SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
-                        vm.isSingleChat,
-                        ids, null);
+                    SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall, vm.isSingleChat, ids, null);
                     callingService.call(signalingInfo);
                 } else {
-                    ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
-                        .withBoolean("isSelectMember", true)
-                        .withInt("max_num", 9)
-                        .withString(Constant.K_GROUP_ID, vm.groupID)
-                        .navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
+                    toSelectMember();
                 }
                 return false;
             });
         }, hasStorage, Permission.Group.STORAGE);
+    }
+
+    public void toSelectMember() {
+        if (vm.groupInfo.getValue().getMemberCount() > Constant.SUPER_GROUP_LIMIT) {
+            GroupVM groupVM = new GroupVM();
+            groupVM.groupId = vm.groupID;
+            BaseApp.inst().putVM(groupVM);
+            ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER).withBoolean("isSelectMember", true).withInt("max_num", 9).navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
+        } else
+            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withBoolean("isSelectMember", true).withInt("max_num", 9).withString(Constant.K_GROUP_ID, vm.groupID).navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
     }
 
     private final ActivityResultLauncher<Intent> businessCardLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -179,8 +171,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         bean.put("userID", friendInfoBean.getUserID());
         bean.put("nickname", friendInfoBean.getNickname());
         bean.put("faceURL", friendInfoBean.getFaceURL());
-        Message message = OpenIMClient.getInstance().messageManager
-            .createCardMessage(GsonHel.toJson(bean));
+        Message message = OpenIMClient.getInstance().messageManager.createCardMessage(GsonHel.toJson(bean));
         vm.sendMsg(message);
     });
 
@@ -200,118 +191,101 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
     @SuppressLint("WrongConstant")
     private void gotoShareLocation() {
         if (hasLocation) {
-            shareLocationLauncher.launch(new Intent(getActivity(), WebViewActivity.class).putExtra(WebViewActivity.ACTION,
-                WebViewActivity.LOCATION));
+            shareLocationLauncher.launch(new Intent(getActivity(), WebViewActivity.class).putExtra(WebViewActivity.ACTION, WebViewActivity.LOCATION));
         } else {
-            AndPermission.with(this).runtime().permission(Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION)
-                .onDenied(data -> {
-                })
-                .onGranted(data -> {
-                    hasLocation = true;
-                    shareLocationLauncher.launch(new Intent(getActivity(), WebViewActivity.class).putExtra(WebViewActivity.ACTION,
-                        WebViewActivity.LOCATION));
-                }).start();
+            AndPermission.with(this).runtime().permission(Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION).onDenied(data -> {
+            }).onGranted(data -> {
+                hasLocation = true;
+                shareLocationLauncher.launch(new Intent(getActivity(), WebViewActivity.class).putExtra(WebViewActivity.ACTION, WebViewActivity.LOCATION));
+            }).start();
         }
 
     }
 
     private void gotoSelectFile() {
         Common.permission(getContext(), () -> {
-                hasStorage = true;
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("*/*");
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                fileLauncher.launch(intent);
-            }
-            , hasStorage, Permission.Group.STORAGE);
+            hasStorage = true;
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("*/*");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            fileLauncher.launch(intent);
+        }, hasStorage, Permission.Group.STORAGE);
     }
 
     //去拍摄
     private void goToShoot() {
-        if (hasShoot)
-            shootLauncher.launch(new Intent(getActivity(), ShootActivity.class));
+        if (hasShoot) shootLauncher.launch(new Intent(getActivity(), ShootActivity.class));
         else {
-            AndPermission.with(this)
-                .runtime()
-                .permission(Permission.CAMERA, Permission.RECORD_AUDIO)
-                .onGranted(permissions -> {
-                    // Storage permission are allowed.
-                    hasShoot = true;
-                    shootLauncher.launch(new Intent(getActivity(), ShootActivity.class));
-                })
-                .onDenied(permissions -> {
-                    // Storage permission are not allowed.
-                })
-                .start();
+            AndPermission.with(this).runtime().permission(Permission.CAMERA, Permission.RECORD_AUDIO).onGranted(permissions -> {
+                // Storage permission are allowed.
+                hasShoot = true;
+                shootLauncher.launch(new Intent(getActivity(), ShootActivity.class));
+            }).onDenied(permissions -> {
+                // Storage permission are not allowed.
+            }).start();
         }
     }
 
-    private final ActivityResultLauncher<Intent> fileLauncher = registerForActivityResult(
-        new ActivityResultContracts.StartActivityForResult(),
-        result -> {
-            if (result.getResultCode() == Activity.RESULT_OK) {
-                Intent data = result.getData();
-                if (null != data) {
-                    Uri uri = data.getData();
-                    if (null != uri) {
-                        String filePath = GetFilePathFromUri.getFileAbsolutePath(getContext(), uri);
-                        if (MediaFileUtil.isImageType(filePath)) {
-                            Message msg = OpenIMClient.getInstance().messageManager.createImageMessageFromFullPath(filePath);
-                            vm.sendMsg(msg);
-                            return;
-                        }
-                        if (MediaFileUtil.isVideoType(filePath)) {
-                            Glide.with(this).asBitmap().load(filePath).into(new SimpleTarget<Bitmap>() {
-                                @Override
-                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                                    String firstFame = MediaFileUtil.saveBitmap(resource, Constant.PICTURE_DIR);
-                                    long duration = MediaFileUtil.getDuration(filePath);
-                                    Message msg = OpenIMClient.getInstance().messageManager
-                                        .createVideoMessageFromFullPath(filePath, MediaFileUtil.getFileType(filePath).mimeType, duration, firstFame);
-                                    vm.sendMsg(msg);
-                                }
-                            });
-                            return;
-                        }
-                        if (null != filePath) {
-                            Message msg = OpenIMClient.getInstance().messageManager.createFileMessageFromFullPath(filePath, new File(filePath).getName());
-                            vm.sendMsg(msg);
-                        }
+    private final ActivityResultLauncher<Intent> fileLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            Intent data = result.getData();
+            if (null != data) {
+                Uri uri = data.getData();
+                if (null != uri) {
+                    String filePath = GetFilePathFromUri.getFileAbsolutePath(getContext(), uri);
+                    if (MediaFileUtil.isImageType(filePath)) {
+                        Message msg = OpenIMClient.getInstance().messageManager.createImageMessageFromFullPath(filePath);
+                        vm.sendMsg(msg);
+                        return;
                     }
-                }
-            }
-        });
-    private final ActivityResultLauncher<Intent> captureLauncher = registerForActivityResult(
-        new ActivityResultContracts.StartActivityForResult(),
-        result -> {
-            if (result.getResultCode() == Activity.RESULT_OK) {
-                Intent data = result.getData();
-                List<String> files = Matisse.obtainPathResult(data);
-
-                for (String file : files) {
-                    Message msg = null;
-                    if (MediaFileUtil.isImageType(file)) {
-                        msg = OpenIMClient.getInstance().messageManager.createImageMessageFromFullPath(file);
-                    }
-                    if (MediaFileUtil.isVideoType(file)) {
-                        Glide.with(this).asBitmap().load(file).into(new SimpleTarget<Bitmap>() {
+                    if (MediaFileUtil.isVideoType(filePath)) {
+                        Glide.with(this).asBitmap().load(filePath).into(new SimpleTarget<Bitmap>() {
                             @Override
                             public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                                 String firstFame = MediaFileUtil.saveBitmap(resource, Constant.PICTURE_DIR);
-                                long duration = MediaFileUtil.getDuration(file);
-                                Message msg = OpenIMClient.getInstance().messageManager
-                                    .createVideoMessageFromFullPath(file, MediaFileUtil.getFileType(file).mimeType, duration, firstFame);
+                                long duration = MediaFileUtil.getDuration(filePath);
+                                Message msg = OpenIMClient.getInstance().messageManager.createVideoMessageFromFullPath(filePath, MediaFileUtil.getFileType(filePath).mimeType, duration, firstFame);
                                 vm.sendMsg(msg);
                             }
                         });
-                        continue;
+                        return;
                     }
-                    if (null == msg)
-                        msg = OpenIMClient.getInstance().messageManager.createTextMessage("[" + getString(R.string.unsupported_type) + "]");
-                    vm.sendMsg(msg);
+                    if (null != filePath) {
+                        Message msg = OpenIMClient.getInstance().messageManager.createFileMessageFromFullPath(filePath, new File(filePath).getName());
+                        vm.sendMsg(msg);
+                    }
                 }
             }
-        });
+        }
+    });
+    private final ActivityResultLauncher<Intent> captureLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            Intent data = result.getData();
+            List<String> files = Matisse.obtainPathResult(data);
+
+            for (String file : files) {
+                Message msg = null;
+                if (MediaFileUtil.isImageType(file)) {
+                    msg = OpenIMClient.getInstance().messageManager.createImageMessageFromFullPath(file);
+                }
+                if (MediaFileUtil.isVideoType(file)) {
+                    Glide.with(this).asBitmap().load(file).into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            String firstFame = MediaFileUtil.saveBitmap(resource, Constant.PICTURE_DIR);
+                            long duration = MediaFileUtil.getDuration(file);
+                            Message msg = OpenIMClient.getInstance().messageManager.createVideoMessageFromFullPath(file, MediaFileUtil.getFileType(file).mimeType, duration, firstFame);
+                            vm.sendMsg(msg);
+                        }
+                    });
+                    continue;
+                }
+                if (null == msg)
+                    msg = OpenIMClient.getInstance().messageManager.createTextMessage("[" + getString(R.string.unsupported_type) + "]");
+                vm.sendMsg(msg);
+            }
+        }
+    });
 
     private final ActivityResultLauncher<Intent> shootLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
@@ -324,8 +298,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                 String firstFrameUrl = result.getData().getStringExtra("firstFrameUrl");
                 MediaFileUtil.MediaFileType mediaFileType = MediaFileUtil.getFileType(fileUrl);
                 long duration = MediaFileUtil.getDuration(fileUrl);
-                Message msg = OpenIMClient.getInstance().messageManager
-                    .createVideoMessageFromFullPath(fileUrl, mediaFileType.mimeType, duration, firstFrameUrl);
+                Message msg = OpenIMClient.getInstance().messageManager.createVideoMessageFromFullPath(fileUrl, mediaFileType.mimeType, duration, firstFrameUrl);
                 vm.sendMsg(msg);
             }
         }
@@ -333,33 +306,20 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
 
     @SuppressLint("WrongConstant")
     private void showMediaPicker() {
-        if (hasStorage)
-            goMediaPicker();
+        if (hasStorage) goMediaPicker();
         else
-            AndPermission.with(this)
-                .runtime()
-                .permission(Permission.Group.STORAGE)
-                .onGranted(permissions -> {
-                    // Storage permission are allowed.
-                    hasStorage = true;
-                    goMediaPicker();
-                })
-                .onDenied(permissions -> {
-                    // Storage permission are not allowed.
-                })
-                .start();
+            AndPermission.with(this).runtime().permission(Permission.Group.STORAGE).onGranted(permissions -> {
+                // Storage permission are allowed.
+                hasStorage = true;
+                goMediaPicker();
+            }).onDenied(permissions -> {
+                // Storage permission are not allowed.
+            }).start();
     }
 
 
     private void goMediaPicker() {
-        Matisse.from(getActivity())
-            .choose(MimeType.ofAll())
-            .countable(true)
-            .maxSelectable(9)
-            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-            .thumbnailScale(0.85f)
-            .imageEngine(new GlideEngine())
-            .forResult(captureLauncher);
+        Matisse.from(getActivity()).choose(MimeType.ofAll()).countable(true).maxSelectable(9).restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED).thumbnailScale(0.85f).imageEngine(new GlideEngine()).forResult(captureLauncher);
     }
 
 
