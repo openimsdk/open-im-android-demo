@@ -64,8 +64,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         sink();
         view.setChatVM(vm);
 
-        Obs.inst().addObserver(this);
-
         initView();
         listener();
         setTouchClearFocus(false);
@@ -73,7 +71,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     private void initVM() {
-
         String userId = getIntent().getStringExtra(Constant.K_ID);
         String groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
         boolean fromChatHistory = getIntent().getBooleanExtra(Constant.K_FROM, false);
@@ -314,7 +311,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     public void toSelectMember() {
-        if (vm.groupInfo.getValue().getMemberCount() > Constant.SUPER_GROUP_LIMIT) {
             GroupVM groupVM = new GroupVM();
             groupVM.groupId=vm.groupID;
             BaseApp.inst().putVM(groupVM);
@@ -322,9 +318,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 .withBoolean("isSelectMember", true)
                 .withInt("max_num", 9)
                 .navigation(this, Constant.Event.CALLING_REQUEST_CODE);
-        } else
-            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withBoolean("isSelectMember", true)
-                .withInt("max_num", 9).withString(Constant.K_GROUP_ID, vm.groupID).navigation(this, Constant.Event.CALLING_REQUEST_CODE);
     }
 
     private void bindShowName() {
@@ -385,6 +378,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         if (requestCode == Constant.Event.CALLING_REQUEST_CODE && null != data) {
             //发起群通话
             List<String> ids = data.getStringArrayListExtra(Constant.K_RESULT);
+            //邀请列表中移除自己
+            ids.remove(BaseApp.inst().loginCertificate.userID);
             SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall, false, ids, vm.groupID);
             if (null == callingService) return;
             callingService.call(signalingInfo);
@@ -404,6 +399,11 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 }
                 if (path.isEmpty()) view.chatBg.setVisibility(View.GONE);
                 else Glide.with(this).load(path).into(view.chatBg);
+            }
+            if (message.tag==Constant.Event.INSERT_MSG){
+                vm.messages.getValue().clear();
+                vm.startMsg=null;
+                vm.loadHistoryMessage();
             }
 //            if (message.tag == Constant.Event.UPDATA_GROUP_INFO
 //                || message.tag == Constant.Event.USER_INFO_UPDATA) {

@@ -71,3 +71,6 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
+//configurations {
+//    all*.exclude group:'a.a.a.a', module:'OUICalling'
+//}

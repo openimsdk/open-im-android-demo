@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
 
@@ -185,7 +186,20 @@ public class GroupVM extends SocialityVM {
             public void onSuccess(List<GroupMembersInfo> data) {
                 if (data.isEmpty()) return;
                 superGroupMembers.getValue().addAll(getExGroupMemberInfos(data));
+                buildOwnSelect();
                 superGroupMembers.setValue(superGroupMembers.getValue());
+            }
+
+            private void buildOwnSelect() {
+                ExGroupMemberInfo own=new ExGroupMemberInfo();
+                own.groupMembersInfo=new  GroupMembersInfo();
+                own.groupMembersInfo.setUserID(BaseApp.inst().loginCertificate.userID);
+                int index=superGroupMembers.getValue().indexOf(own);
+                if (index>-1){
+                    ExGroupMemberInfo exGroupMemberInfo=superGroupMembers.getValue().get(index);
+                    exGroupMemberInfo.isSelect=true;
+                    exGroupMemberInfo.isEnabled=false;
+                }
             }
         }, groupId, 0, start, pageSize);
     }

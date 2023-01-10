@@ -60,8 +60,7 @@ public class CallingVM {
     private List<TextureViewRenderer> remoteSpeakerVideoViews;
 
 
-    public CallingVM(CallingService callingService,
-                     boolean isCallOut) {
+    public CallingVM(CallingService callingService, boolean isCallOut) {
         this.callingService = callingService;
         this.isCallOut = isCallOut;
 
@@ -121,11 +120,9 @@ public class CallingVM {
             }
         };
         if (isGroup)
-            OpenIMClient.getInstance().signalingManager.signalingInviteInGroup(certificateOnBase,
-                signalingInfo);
+            OpenIMClient.getInstance().signalingManager.signalingInviteInGroup(certificateOnBase, signalingInfo);
         else
-            OpenIMClient.getInstance().signalingManager.signalingInvite(certificateOnBase,
-                signalingInfo);
+            OpenIMClient.getInstance().signalingManager.signalingInvite(certificateOnBase, signalingInfo);
     }
 
     /**
@@ -144,8 +141,7 @@ public class CallingVM {
             @Override
             public void resumeWith(@NonNull Object o) {
                 audioManager.setSpeakerphoneOn(true);
-                if (!isVideoCalls)
-                    callViewModel.setCameraEnabled(false);
+                if (!isVideoCalls) callViewModel.setCameraEnabled(false);
 
                 localVideoTrack = callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
                 if (null != localVideoTrack && null != localSpeakerVideoView)
@@ -169,8 +165,7 @@ public class CallingVM {
                         for (int i = 0; i < participants.size(); i++) {
                             Participant participant = participants.get(i);
                             if (participant instanceof RemoteParticipant) {
-                                for (TextureViewRenderer remoteSpeakerVideoView
-                                    : remoteSpeakerVideoViews) {
+                                for (TextureViewRenderer remoteSpeakerVideoView : remoteSpeakerVideoViews) {
                                     callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoView, participant, new Continuation<Unit>() {
                                         @NonNull
                                         @Override
@@ -216,8 +211,7 @@ public class CallingVM {
                 int hour = (minute / 60);
                 if (hour != 0)
                     timeStr.postValue(repair0(hour) + ":" + repair0(minute) + ":" + repair0(second));
-                else
-                    timeStr.postValue(repair0(minute) + ":" + repair0(second));
+                else timeStr.postValue(repair0(minute) + ":" + repair0(second));
             }
         }, 0, 1000);
     }
@@ -238,18 +232,28 @@ public class CallingVM {
             signalingCancel(signalingInfo);
             return;
         }
-        OpenIMClient.getInstance().signalingManager
-            .signalingHungUp(callBackDismissUI, signalingInfo);
+        OpenIMClient.getInstance().signalingManager.signalingHungUp(callBackDismissUI, signalingInfo);
     }
 
     private void dismissUI() {
-        if (null != dismissListener)
-            dismissListener.onDismiss(null);
+        if (null != dismissListener) dismissListener.onDismiss(null);
     }
 
     private void signalingCancel(SignalingInfo signalingInfo) {
         if (isCallOut)
-            OpenIMClient.getInstance().signalingManager.signalingCancel(callBackDismissUI, signalingInfo);
+            OpenIMClient.getInstance().signalingManager.signalingCancel(new OnBase<SignalingCertificate>() {
+                @Override
+                public void onError(int code, String error) {
+                    L.e(CallingServiceImp.TAG, error + "-" + code);
+                    dismissUI();
+                }
+
+                @Override
+                public void onSuccess(SignalingCertificate data) {
+                    renewalDB(signalingInfo.getInvitation().getRoomID(), v -> v.setFailedState(1));
+                    dismissUI();
+                }
+            }, signalingInfo);
         else
             OpenIMClient.getInstance().signalingManager.signalingReject(callBackDismissUI, signalingInfo);
     }
@@ -302,11 +306,9 @@ public class CallingVM {
     }
 
 
-    public void renewalDB(SignalingInfo signalingInfo, OnRenewalDBListener onRenewalDBListener) {
+    public void renewalDB(String roomID, OnRenewalDBListener onRenewalDBListener) {
         BaseApp.inst().realm.executeTransactionAsync(realm -> {
-            CallHistory callHistory = realm.where(CallHistory.class)
-                .equalTo("roomID",
-                    signalingInfo.getInvitation().getRoomID()).findFirst();
+            CallHistory callHistory = realm.where(CallHistory.class).equalTo("roomID", roomID).findFirst();
             if (null == callHistory) return;
             onRenewalDBListener.onRenewal(callHistory);
         });

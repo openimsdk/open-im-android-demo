@@ -70,6 +70,8 @@ public class Constant {
         public static final int UPDATA_GROUP_INFO = 10006;
         //设置群通知
         public static final int SET_GROUP_NOTIFICATION = 10007;
+        //插入了消息到本地
+        public static final int INSERT_MSG = 10008;
     }
 
     //会话类型

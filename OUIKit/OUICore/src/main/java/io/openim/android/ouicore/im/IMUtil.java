@@ -40,6 +40,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.AtMsgInfo;
 import io.openim.android.ouicore.entity.AtUsersInfo;
 import io.openim.android.ouicore.entity.BurnAfterReadingNotification;
+import io.openim.android.ouicore.entity.CallHistory;
 import io.openim.android.ouicore.entity.EnterGroupNotification;
 import io.openim.android.ouicore.entity.GroupNotification;
 import io.openim.android.ouicore.entity.GroupRightsTransferNotification;
@@ -81,10 +82,11 @@ public class IMUtil {
      */
     public static Comparator<MsgConversation> simpleComparator() {
         return (a, b) -> {
-            if ((a.conversationInfo.isPinned() && b.conversationInfo.isPinned()) ||
-                (!a.conversationInfo.isPinned() && !b.conversationInfo.isPinned())) {
-                long aCompare = Math.max(a.conversationInfo.getDraftTextTime(), a.conversationInfo.getLatestMsgSendTime());
-                long bCompare = Math.max(b.conversationInfo.getDraftTextTime(), b.conversationInfo.getLatestMsgSendTime());
+            if ((a.conversationInfo.isPinned() && b.conversationInfo.isPinned()) || (!a.conversationInfo.isPinned() && !b.conversationInfo.isPinned())) {
+                long aCompare = Math.max(a.conversationInfo.getDraftTextTime(),
+                    a.conversationInfo.getLatestMsgSendTime());
+                long bCompare = Math.max(b.conversationInfo.getDraftTextTime(),
+                    b.conversationInfo.getLatestMsgSendTime());
                 return Long.compare(bCompare, aCompare);
             } else if (a.conversationInfo.isPinned() && !b.conversationInfo.isPinned()) {
                 return -1;
@@ -106,17 +108,13 @@ public class IMUtil {
         for (int i = list.size() - 1; i >= 0; i--) {
             Message message = list.get(i);
             MsgExpand msgExpand = (MsgExpand) message.getExt();
-            if (null == msgExpand)
-                msgExpand = new MsgExpand();
+            if (null == msgExpand) msgExpand = new MsgExpand();
             //重置
             msgExpand.isShowTime = false;
-            if (message.getContentType() >= Constant.MsgType.NOTICE
-                || message.getContentType() == Constant.MsgType.REVOKE
-                || message.getContentType() == Constant.MsgType.ADVANCED_REVOKE)
+            if (message.getContentType() >= Constant.MsgType.NOTICE || message.getContentType() == Constant.MsgType.REVOKE || message.getContentType() == Constant.MsgType.ADVANCED_REVOKE)
                 continue;
 
-            if (lastShowTimeStamp == 0 ||
-                (message.getSendTime() - lastShowTimeStamp > (1000 * 60 * 5))) {
+            if (lastShowTimeStamp == 0 || (message.getSendTime() - lastShowTimeStamp > (1000 * 60 * 5))) {
                 lastShowTimeStamp = message.getSendTime();
                 msgExpand.isShowTime = true;
             }
@@ -125,7 +123,8 @@ public class IMUtil {
         return list;
     }
 
-    public static Message createMergerMessage(boolean isSingleChat, String otherSideName, List<Message> list) {
+    public static Message createMergerMessage(boolean isSingleChat, String otherSideName,
+                                              List<Message> list) {
         String title = "";
         List<String> summaryList = new ArrayList<>();
         for (Message message : list) {
@@ -133,14 +132,14 @@ public class IMUtil {
             if (summaryList.size() >= 2) break;
         }
         if (isSingleChat) {
-            title = LoginCertificate.getCache(BaseApp.inst()).nickname
-                + BaseApp.inst().getString(R.string.and) + otherSideName
-                + BaseApp.inst().getString(R.string.chat_history);
+            title =
+                LoginCertificate.getCache(BaseApp.inst()).nickname + BaseApp.inst().getString(R.string.and) + otherSideName + BaseApp.inst().getString(R.string.chat_history);
         } else {
             title = BaseApp.inst().getString(R.string.group_chat_history);
         }
 
-        return OpenIMClient.getInstance().messageManager.createMergerMessage(list, title, summaryList);
+        return OpenIMClient.getInstance().messageManager.createMergerMessage(list, title,
+            summaryList);
     }
 
     /**
@@ -150,18 +149,29 @@ public class IMUtil {
      */
     public static Message buildExpandInfo(Message msg) {
         MsgExpand msgExpand = (MsgExpand) msg.getExt();
-        if (null == msgExpand)
-            msgExpand = new MsgExpand();
+        if (null == msgExpand) msgExpand = new MsgExpand();
         try {
+            if (msg.getContentType() == Constant.MsgType.CUSTOMIZE) {
+                msgExpand.callHistory = GsonHel.fromJson(msg.getCustomElem().getData(),
+                    CallHistory.class);
+                int second = msgExpand.callHistory.getDuration() / 1000;
+                String secondFormat = TimeUtil.secondFormat(second,
+                    TimeUtil.secondFormat);
+                msgExpand.callDuration =
+                    BaseApp.inst().getString(io.openim.android.ouicore.R.string.call_time)
+                        + (second < 60 ? ("00:" + secondFormat) : secondFormat);
+            }
             if (msg.getContentType() == Constant.MsgType.QUOTE) {
                 buildExpandInfo(msg.getQuoteElem().getQuoteMessage());
             }
             if (msg.getContentType() == Constant.MsgType.OA_NOTICE) {
                 msgExpand.isShowTime = true;
-                msgExpand.oaNotification = GsonHel.fromJson(msg.getNotificationElem().getDetail(), OANotification.class);
+                msgExpand.oaNotification = GsonHel.fromJson(msg.getNotificationElem().getDetail()
+                    , OANotification.class);
             }
             if (msg.getContentType() == Constant.MsgType.LOCATION)
-                msgExpand.locationInfo = GsonHel.fromJson(msg.getLocationElem().getDescription(), LocationInfo.class);
+                msgExpand.locationInfo = GsonHel.fromJson(msg.getLocationElem().getDescription(),
+                    LocationInfo.class);
             if (msg.getContentType() == Constant.MsgType.MENTION) {
                 msgExpand.atMsgInfo = GsonHel.fromJson(msg.getContent(), AtMsgInfo.class);
                 handleAt(msgExpand);
@@ -188,18 +198,22 @@ public class IMUtil {
             case Constant.MsgType.ADVANCED_REVOKE:
             case Constant.MsgType.REVOKE: {
                 //a 撤回了一条消息
-                tips = String.format(ctx.getString(io.openim.android.ouicore.R.string.revoke_tips),
-                    msg.getSenderNickname());
+                tips =
+                    String.format(ctx.getString(io.openim.android.ouicore.R.string.revoke_tips),
+                        msg.getSenderNickname());
                 break;
             }
             case Constant.MsgNotification.groupCreatedNotification: {
-                GroupNotification groupNotification = GsonHel.fromJson(detail, GroupNotification.class);
+                GroupNotification groupNotification = GsonHel.fromJson(detail,
+                    GroupNotification.class);
                 //a 创建了群聊
-                tips = String.format(ctx.getString(R.string.created_group), groupNotification.opUser.getNickname());
+                tips = String.format(ctx.getString(R.string.created_group),
+                    groupNotification.opUser.getNickname());
                 break;
             }
             case Constant.MsgNotification.groupInfoSetNotification: {
-                GroupNotification groupNotification = GsonHel.fromJson(detail, GroupNotification.class);
+                GroupNotification groupNotification = GsonHel.fromJson(detail,
+                    GroupNotification.class);
 //                if (groupNotification.group.getNotification() != null &&
 //                    !groupNotification.group.getNotification().isEmpty()) {
 //                return isConversation
@@ -207,81 +221,104 @@ public class IMUtil {
 //                    : null;
 //            }
                 // a 修改了群资料
-                tips = String.format(ctx.getString(R.string.change_group_data), groupNotification.opUser.getNickname());
+                tips = String.format(ctx.getString(R.string.change_group_data),
+                    groupNotification.opUser.getNickname());
                 break;
             }
             case Constant.MsgNotification.memberQuitNotification: {
-                QuitGroupNotification quitUser = GsonHel.fromJson(detail, QuitGroupNotification.class);
+                QuitGroupNotification quitUser = GsonHel.fromJson(detail,
+                    QuitGroupNotification.class);
                 // a 退出了群聊
-                tips = String.format(ctx.getString(R.string.quit_group2), quitUser.quitUser.getNickname());
+                tips = String.format(ctx.getString(R.string.quit_group2),
+                    quitUser.quitUser.getNickname());
                 break;
             }
             case Constant.MsgNotification.memberInvitedNotification: {
-                JoinKickedGroupNotification invitedUserList = GsonHel.fromJson(detail, JoinKickedGroupNotification.class);
+                JoinKickedGroupNotification invitedUserList = GsonHel.fromJson(detail,
+                    JoinKickedGroupNotification.class);
                 // a 邀请 b 加入群聊
                 StringBuilder stringBuffer = new StringBuilder();
                 for (GroupMembersInfo groupMembersInfo : invitedUserList.invitedUserList) {
                     stringBuffer.append(groupMembersInfo.getNickname()).append(",");
                 }
                 String b = stringBuffer.substring(0, stringBuffer.length() - 1);
-                tips = String.format(ctx.getString(R.string.invited_tips), invitedUserList.opUser.getNickname(), b);
+                tips = String.format(ctx.getString(R.string.invited_tips),
+                    invitedUserList.opUser.getNickname(), b);
                 break;
             }
             case Constant.MsgNotification.memberKickedNotification: {
-                JoinKickedGroupNotification invitedUserList = GsonHel.fromJson(detail, JoinKickedGroupNotification.class);
+                JoinKickedGroupNotification invitedUserList = GsonHel.fromJson(detail,
+                    JoinKickedGroupNotification.class);
                 // b 被 a 踢出群聊
                 StringBuilder stringBuffer = new StringBuilder();
                 for (GroupMembersInfo groupMembersInfo : invitedUserList.kickedUserList) {
                     stringBuffer.append(groupMembersInfo.getNickname()).append(",");
                 }
                 String b = stringBuffer.substring(0, stringBuffer.length() - 1);
-                tips = String.format(ctx.getString(R.string.kicked_group_tips), b, invitedUserList.opUser.getNickname());
+                tips = String.format(ctx.getString(R.string.kicked_group_tips), b,
+                    invitedUserList.opUser.getNickname());
                 break;
             }
             case Constant.MsgNotification.memberEnterNotification: {
-                EnterGroupNotification entrantUser = GsonHel.fromJson(detail, EnterGroupNotification.class);
+                EnterGroupNotification entrantUser = GsonHel.fromJson(detail,
+                    EnterGroupNotification.class);
                 // a 加入了群聊
-                tips = String.format(ctx.getString(R.string.join_group2), entrantUser.entrantUser.getNickname());
+                tips = String.format(ctx.getString(R.string.join_group2),
+                    entrantUser.entrantUser.getNickname());
                 break;
             }
             case Constant.MsgNotification.dismissGroupNotification: {
-                GroupNotification groupNotification = GsonHel.fromJson(detail, GroupNotification.class);
+                GroupNotification groupNotification = GsonHel.fromJson(detail,
+                    GroupNotification.class);
                 // a 解散了群聊
-                tips = String.format(ctx.getString(R.string.dismiss_group), groupNotification.opUser.getNickname());
+                tips = String.format(ctx.getString(R.string.dismiss_group),
+                    groupNotification.opUser.getNickname());
                 break;
             }
             case Constant.MsgNotification.groupOwnerTransferredNotification: {
-                GroupRightsTransferNotification transferredGroupNotification = GsonHel.fromJson(detail, GroupRightsTransferNotification.class);
+                GroupRightsTransferNotification transferredGroupNotification =
+                    GsonHel.fromJson(detail, GroupRightsTransferNotification.class);
 
                 // a 将群转让给了 b
-                tips = String.format(ctx.getString(R.string.transferred_group), transferredGroupNotification.opUser.getNickname(),
+                tips = String.format(ctx.getString(R.string.transferred_group),
+                    transferredGroupNotification.opUser.getNickname(),
                     transferredGroupNotification.newGroupOwner.getNickname());
                 break;
             }
             case Constant.MsgNotification.groupMemberMutedNotification: {
-                MuteMemberNotification memberNotification = GsonHel.fromJson(detail, MuteMemberNotification.class);
+                MuteMemberNotification memberNotification = GsonHel.fromJson(detail,
+                    MuteMemberNotification.class);
                 // b 被 a 禁言
-                tips = String.format(ctx.getString(R.string.Muted_group), memberNotification.mutedUser.getNickname()
-                    , memberNotification.opUser.getNickname(), TimeUtil.secondFormat(memberNotification
-                        .mutedSeconds, TimeUtil.secondFormatZh));
+                tips = String.format(ctx.getString(R.string.Muted_group),
+                    memberNotification.mutedUser.getNickname(),
+                    memberNotification.opUser.getNickname(),
+                    TimeUtil.secondFormat(memberNotification.mutedSeconds,
+                        TimeUtil.secondFormatZh));
                 break;
             }
             case Constant.MsgNotification.groupMemberCancelMutedNotification: {
-                MuteMemberNotification memberNotification = GsonHel.fromJson(detail, MuteMemberNotification.class);
+                MuteMemberNotification memberNotification = GsonHel.fromJson(detail,
+                    MuteMemberNotification.class);
                 // b 被 a 取消了禁言
-                tips = String.format(ctx.getString(R.string.cancel_muted), memberNotification.mutedUser.getNickname(), memberNotification.opUser.getNickname());
+                tips = String.format(ctx.getString(R.string.cancel_muted),
+                    memberNotification.mutedUser.getNickname(),
+                    memberNotification.opUser.getNickname());
                 break;
             }
             case Constant.MsgNotification.groupMutedNotification: {
-                MuteMemberNotification memberNotification = GsonHel.fromJson(detail, MuteMemberNotification.class);
+                MuteMemberNotification memberNotification = GsonHel.fromJson(detail,
+                    MuteMemberNotification.class);
                 // a 开起了群禁言
-                tips = String.format(ctx.getString(R.string.start_muted), memberNotification.opUser.getNickname());
+                tips = String.format(ctx.getString(R.string.start_muted),
+                    memberNotification.opUser.getNickname());
                 break;
             }
             case Constant.MsgNotification.groupCancelMutedNotification: {
-                MuteMemberNotification memberNotification = GsonHel.fromJson(detail, MuteMemberNotification.class);
+                MuteMemberNotification memberNotification = GsonHel.fromJson(detail,
+                    MuteMemberNotification.class);
                 // a 开起了群禁言
-                tips = String.format(ctx.getString(R.string.close_muted), memberNotification.opUser.getNickname());
+                tips = String.format(ctx.getString(R.string.close_muted),
+                    memberNotification.opUser.getNickname());
                 break;
             }
             case Constant.MsgNotification.friendAddedNotification: {
@@ -290,15 +327,19 @@ public class IMUtil {
                 break;
             }
             case Constant.MsgNotification.burnAfterReadingNotification: {
-                BurnAfterReadingNotification burnAfterReadingNotification = GsonHel.fromJson(detail, BurnAfterReadingNotification.class);
-                tips = burnAfterReadingNotification.isPrivate ? ctx.getString(R.string.start_burn_after_read)
-                    : ctx.getString(R.string.stop_burn_after_read);
+                BurnAfterReadingNotification burnAfterReadingNotification =
+                    GsonHel.fromJson(detail, BurnAfterReadingNotification.class);
+                tips = burnAfterReadingNotification.isPrivate ?
+                    ctx.getString(R.string.start_burn_after_read) :
+                    ctx.getString(R.string.stop_burn_after_read);
                 break;
             }
 
             case Constant.MsgNotification.groupMemberInfoChangedNotification: {
-                GroupNotification groupNotification = GsonHel.fromJson(detail, GroupNotification.class);
-                tips = String.format(ctx.getString(R.string.edit_data), groupNotification.opUser.getNickname());
+                GroupNotification groupNotification = GsonHel.fromJson(detail,
+                    GroupNotification.class);
+                tips = String.format(ctx.getString(R.string.edit_data),
+                    groupNotification.opUser.getNickname());
                 break;
             }
         }
@@ -323,8 +364,8 @@ public class IMUtil {
                     Drawable drawable = BaseApp.inst().getResources().getDrawable(emojiId, null);
                     drawable.setBounds(0, 0, Common.dp2px(22), Common.dp2px(22));
                     ImageSpan imageSpan = new ImageSpan(drawable);
-                    expand.sequence.setSpan(imageSpan, fromIndex, fromIndex + key.length()
-                        , Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    expand.sequence.setSpan(imageSpan, fromIndex, fromIndex + key.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     fromIndex += 1;//往后继续查
                 }
             }
@@ -349,16 +390,13 @@ public class IMUtil {
             ClickableSpan clickableSpan = new ClickableSpan() {
                 @Override
                 public void onClick(View view) {
-                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                        .withString(Constant.K_ID, atUsersInfo.atUserID).navigation(view.getContext());
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, atUsersInfo.atUserID).navigation(view.getContext());
                 }
             };
             int start = spannableString.toString().indexOf(tag);
             int end = spannableString.toString().indexOf(tag) + tag.length();
-            spannableString.setSpan(colorSpan, start, end
-                , Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannableString.setSpan(clickableSpan, start, end,
-                Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+            spannableString.setSpan(colorSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString.setSpan(clickableSpan, start, end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
         }
         msgExpand.sequence = spannableString;
     }
@@ -370,6 +408,7 @@ public class IMUtil {
      * @return
      */
     public static String getMsgParse(Message msg) {
+        MsgExpand msgExpand = (MsgExpand) msg.getExt();
         String lastMsg = "";
         try {
             switch (msg.getContentType()) {
@@ -380,22 +419,26 @@ public class IMUtil {
                     lastMsg = msg.getContent();
                     break;
                 case Constant.MsgType.PICTURE:
-                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.picture) + "]";
+                    lastMsg =
+                        "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.picture) + "]";
                     break;
                 case Constant.MsgType.VOICE:
-                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.voice) + "]";
+                    lastMsg =
+                        "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.voice) + "]";
                     break;
                 case Constant.MsgType.VIDEO:
-                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.video) + "]";
+                    lastMsg =
+                        "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.video) + "]";
                     break;
                 case Constant.MsgType.FILE:
-                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.file) + "]";
+                    lastMsg =
+                        "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.file) + "]";
                     break;
                 case Constant.MsgType.LOCATION:
-                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.location) + "]";
+                    lastMsg =
+                        "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.location) + "]";
                     break;
                 case Constant.MsgType.MENTION:
-                    MsgExpand msgExpand = (MsgExpand) msg.getExt();
                     String atTxt = msgExpand.atMsgInfo.text;
                     for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
                         atTxt = atTxt.replace("@" + atUsersInfo.atUserID, atSelf(atUsersInfo));
@@ -403,16 +446,24 @@ public class IMUtil {
                     lastMsg = atTxt;
                     break;
                 case Constant.MsgType.MERGE:
-                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";
+                    lastMsg =
+                        "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";
                     break;
                 case Constant.MsgType.CARD:
-                    lastMsg = "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.card) + "]";
+                    lastMsg =
+                        "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.card) + "]";
                     break;
                 case Constant.MsgType.OA_NOTICE:
                     lastMsg = ((MsgExpand) msg.getExt()).oaNotification.text;
                     break;
                 case Constant.MsgType.QUOTE:
                     lastMsg = msg.getQuoteElem().getText();
+                    break;
+                case Constant.MsgType.CUSTOMIZE:
+                    boolean isAudio = msgExpand.callHistory.getType().equals("audio");
+                    lastMsg =
+                        "[" + (isAudio ? BaseApp.inst().getString(R.string.voice_calls)
+                            : BaseApp.inst().getString(R.string.video_calls)) +"]";
                     break;
             }
         } catch (Exception e) {
@@ -491,48 +542,34 @@ public class IMUtil {
         from.startActivity(new Intent(from, to));
         LoginCertificate.clear();
         BaseApp.inst().loginCertificate = null;
-        CallingService callingService = (CallingService) ARouter.getInstance()
-            .build(Routes.Service.CALLING).navigation();
-        if (null != callingService)
-            callingService.stopAudioVideoService(from);
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null != callingService) callingService.stopAudioVideoService(from);
         from.finish();
     }
 
     public static void sendNotice(long id) {
-        NotificationManager manager = (NotificationManager) BaseApp.inst()
-            .getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager manager =
+            (NotificationManager) BaseApp.inst().getSystemService(Context.NOTIFICATION_SERVICE);
 
-        Postcard postcard = ARouter.getInstance()
-            .build(Routes.Main.SPLASH);
+        Postcard postcard = ARouter.getInstance().build(Routes.Main.SPLASH);
         LogisticsCenter.completion(postcard);
         Intent hangIntent = new Intent(BaseApp.inst(), postcard.getDestination());
-        PendingIntent hangPendingIntent = PendingIntent.getActivity(BaseApp.inst(),
-            1002,
+        PendingIntent hangPendingIntent = PendingIntent.getActivity(BaseApp.inst(), 1002,
             hangIntent, PendingIntent.FLAG_MUTABLE);
 
         String CHANNEL_ID = "msg_notification";
         String CHANNEL_NAME = BaseApp.inst().getString(R.string.msg_notification);
-        Notification notification = new NotificationCompat.Builder(BaseApp.inst(), CHANNEL_ID)
-            .setContentTitle(BaseApp.inst().getString(R.string.app_name))
-            .setContentText(BaseApp.inst().getString(R.string.a_message_is_received))
-            .setSmallIcon(R.mipmap.ic_logo)
-            .setContentIntent(hangPendingIntent)
-            .setAutoCancel(true)
-            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
-            .setSound(Uri.parse("android.resource://" +
-                BaseApp.inst().getPackageName() + "/" + R.raw.message_ring))
-            .build();
+        Notification notification =
+            new NotificationCompat.Builder(BaseApp.inst(), CHANNEL_ID).setContentTitle(BaseApp.inst().getString(R.string.app_name)).setContentText(BaseApp.inst().getString(R.string.a_message_is_received)).setSmallIcon(R.mipmap.ic_logo).setContentIntent(hangPendingIntent).setAutoCancel(true).setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE).setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring)).build();
 
         //Android 8.0 以上需包添加渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID,
                 CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
-            AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                .build();
-            notificationChannel.setSound(Uri.parse("android.resource://" +
-                BaseApp.inst().getPackageName() + "/" + R.raw.message_ring), audioAttributes);
+            AudioAttributes audioAttributes =
+                new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).setUsage(AudioAttributes.USAGE_NOTIFICATION).build();
+            notificationChannel.setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring), audioAttributes);
             manager.createNotificationChannel(notificationChannel);
         }
         manager.notify((int) id, notification);

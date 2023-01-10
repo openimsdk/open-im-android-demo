@@ -31,6 +31,7 @@ import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
+import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivitySuperGroupMemberBinding;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.models.GroupMembersInfo;
@@ -114,6 +115,11 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
                 if (exGroupMemberInfo.isSelect)
                     ids.add(exGroupMemberInfo.groupMembersInfo.getUserID());
             }
+            if (ids.size() == 1
+                && ids.get(0).equals(BaseApp.inst().loginCertificate.userID)) {
+                toast(getString(io.openim.android.ouicore.R.string.group_call_tips3));
+                return;
+            }
             setResult(RESULT_OK, new Intent().putStringArrayListExtra(Constant.K_RESULT, ids));
             finish();
 
@@ -163,6 +169,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
 
         vm.superGroupMembers.observe(this, v -> {
             if (v.isEmpty()) return;
+            updataSelectedNum();
             adapter.notifyItemRangeInserted(vm.superGroupMembers.getValue().size() - vm.pageSize, vm.superGroupMembers.getValue().size());
         });
     }
@@ -206,6 +213,10 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
 
                 itemViewHo.view.getRoot().setOnClickListener(v -> {
                     if (isSelectMember) {
+                        if (!data.isEnabled) {
+                            toast(getString(io.openim.android.ouicore.R.string.group_call_tips));
+                            return;
+                        }
                         boolean isSelect = !data.isSelect;
                         if (selectNum >= maxNum && isSelect) {
                             toast(String.format(getString(io.openim.android.ouicore.R.string.select_tips), maxNum));

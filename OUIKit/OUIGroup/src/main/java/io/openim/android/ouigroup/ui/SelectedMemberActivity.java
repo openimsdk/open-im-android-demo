@@ -56,6 +56,10 @@ public class SelectedMemberActivity extends BaseActivity<GroupVM, ActivitySelect
                 holder.view.menu.setText(io.openim.android.ouicore.R.string.delete);
                 holder.view.menu.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
                 holder.view.menu.setOnClickListener(v -> {
+                    if (!data.isEnabled){
+                        toast(getString(io.openim.android.ouicore.R.string.group_call_tips));
+                        return;
+                    }
                     int index = vm.superGroupMembers.getValue().indexOf(data);
                     vm.superGroupMembers.getValue().get(index).isSelect = false;
                     adapter.getItems().remove(data);

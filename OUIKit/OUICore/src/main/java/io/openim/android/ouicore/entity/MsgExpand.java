@@ -28,4 +28,9 @@ public class MsgExpand {
     public OANotification oaNotification;
     //阅后即焚倒计时
     public int readVanishNum;
+    //呼叫记录 ------
+    public  CallHistory callHistory;
+    //呼叫时长
+    public  String callDuration;
+    // ------
 }

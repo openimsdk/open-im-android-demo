@@ -111,6 +111,7 @@ public class GroupCallDialog extends CallDialog {
 
     @Override
     public void bindData(SignalingInfo signalingInfo) {
+        super.signalingInfo = signalingInfo;
         callingVM.isGroup = signalingInfo.getInvitation().getInviteeUserIDList().size() > 1;
         callingVM.setVideoCalls("video".equals(signalingInfo.getInvitation()
             .getMediaType()));

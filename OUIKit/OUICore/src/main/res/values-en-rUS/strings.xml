@@ -225,4 +225,11 @@
     <string name="login_tips2">需6～20位字符</string>
     <string name="confirm_modification">确认修改</string>
     <string name="login_tips3">密码长度在6~20个字符之间</string>
+    <string name="group_call_tips">发起群视频自己必须参与</string>
+    <string name="group_call_tips2">至少选择一个成员</string>
+    <string name="group_call_tips3">不能和自己群视频</string>
+    <string name="call_time">通话时长\t</string>
+    <string name="conn_failed">连接失败</string>
+    <string name="ot_refuses">对方已拒绝</string>
+    <string name="cancelled">已取消</string>
 </resources>

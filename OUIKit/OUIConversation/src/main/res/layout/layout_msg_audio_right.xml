@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:ignore="MissingDefaultResource">
 
     <RelativeLayout
@@ -17,8 +17,8 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="8dp"
             android:layout_toLeftOf="@id/sendState2"
-            android:textSize="12sp"
             android:textColor="#ff5496eb"
+            android:textSize="12sp"
             android:visibility="gone" />
 
         <io.openim.android.ouiconversation.widget.SendStateView
@@ -43,6 +43,12 @@
             android:textColor="#ff333333"
             android:textSize="14sp">
 
+            <ImageView
+                android:id="@+id/icon2"
+                android:visibility="gone"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
             <TextView
                 android:id="@+id/duration2"
                 android:layout_width="wrap_content"
@@ -57,9 +63,9 @@
                 android:id="@+id/lottieView2"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
+                android:rotation="180"
                 app:lottie_fileName="voice_blue.json"
                 app:lottie_loop="true"
-                android:rotation="180"
                 app:lottie_progress="1"
                 app:lottie_speed="1.3" />
         </LinearLayout>

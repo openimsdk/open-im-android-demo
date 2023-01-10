@@ -97,6 +97,8 @@ public class CallingServiceImp implements CallingService {
         L.e(TAG, "----onInvitationCancelled-----");
         Common.UIHandler.post(() -> {
             if (null == callDialog) return;
+            callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getRoomID(),
+                callHistory -> callHistory.setFailedState(1));
             callDialog.dismiss();
         });
     }
@@ -112,7 +114,7 @@ public class CallingServiceImp implements CallingService {
         Common.UIHandler.post(() -> {
             if (null == callDialog) return;
             callDialog.otherSideAccepted();
-            callDialog.callingVM.renewalDB(signalingInfo,
+            callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getRoomID(),
                 callHistory -> callHistory.setSuccess(true));
         });
     }
@@ -127,8 +129,11 @@ public class CallingServiceImp implements CallingService {
         L.e(TAG, "----onInviteeRejected-----");
         Common.UIHandler.post(() -> {
             if (null == callDialog) return;
-            callDialog.callingVM.renewalDB(signalingInfo,
-                callHistory -> callHistory.setSuccess(false));
+            callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getRoomID(),
+                callHistory -> {
+                    callHistory.setSuccess(false);
+                    callHistory.setFailedState(2);
+                });
             callDialog.dismiss();
         });
 
@@ -174,11 +179,18 @@ public class CallingServiceImp implements CallingService {
     }
 
     @Override
+    public void call(SignalingInfo signalingInfo) {
+        this.signalingInfo = signalingInfo;
+        showCalling(null, true);
+    }
+
+
+    @Override
     public void onHangup(SignalingInfo signalingInfo) {
         L.e(TAG, "----onHangup-----");
         Common.UIHandler.post(() -> {
             if (null == callDialog) return;
-            callDialog.callingVM.renewalDB(signalingInfo,
+            callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getRoomID(),
                 callHistory -> callHistory.setDuration(
                     (int) (System.currentTimeMillis() - callHistory.getDate())));
             callDialog.dismiss();
@@ -206,12 +218,6 @@ public class CallingServiceImp implements CallingService {
     }
 
 
-    @Override
-    public void call(SignalingInfo signalingInfo) {
-        this.signalingInfo = signalingInfo;
-        showCalling(null, true);
-    }
-
     private void insetDB() {
         if (callDialog.callingVM.isGroup) return;
         List<String> ids = new ArrayList<>();
@@ -234,7 +240,8 @@ public class CallingServiceImp implements CallingService {
                     CallHistory callHistory = new CallHistory(
                         signalingInfo.getInvitation().getRoomID(),
                         userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(),
-                        signalingInfo.getInvitation().getMediaType(), false,isCallOut ,
+                        signalingInfo.getInvitation().getMediaType(), false,
+                        0,isCallOut ,
                         System.currentTimeMillis(), 0
                     );
                     realm.insert(callHistory);

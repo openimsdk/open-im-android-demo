@@ -11,6 +11,8 @@ public class CallHistory extends RealmObject {
     private String faceURL;
     private String type;
     private boolean success;
+    //失败状态 0连接中 1取消 2对方拒绝
+    private int failedState;
     private boolean incomingCall;
     private long date;
     private int duration;
@@ -19,16 +21,29 @@ public class CallHistory extends RealmObject {
     public CallHistory() {
     }
 
-    public CallHistory(String roomID, String userID, String nickname, String faceURL, String type, boolean success, boolean incomingCall, long date, int duration) {
+    public CallHistory(String roomID, String userID, String nickname, String faceURL, String type, boolean success, int failedState, boolean incomingCall, long date, int duration) {
         this.roomID = roomID;
         this.userID = userID;
         this.nickname = nickname;
         this.faceURL = faceURL;
         this.type = type;
         this.success = success;
+        this.failedState = failedState;
         this.incomingCall = incomingCall;
         this.date = date;
         this.duration = duration;
+    }
+
+    public int getFailedState() {
+        return failedState;
+    }
+
+    /**
+     *
+     * @param failedState 失败状态 0连接中 1取消 2对方拒绝
+     */
+    public void setFailedState(int failedState) {
+        this.failedState = failedState;
     }
 
     public String getRoomID() {

@@ -26,13 +26,18 @@ import io.openim.android.ouicalling.vm.CallingVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.entity.CallHistory;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerListener;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
 
@@ -42,6 +47,7 @@ public class CallDialog extends BaseDialog {
     protected Context context;
     private DialogCallBinding view;
     public CallingVM callingVM;
+    protected SignalingInfo signalingInfo;
 
 
     public CallDialog(@NonNull Context context, CallingService callingService) {
@@ -55,8 +61,7 @@ public class CallDialog extends BaseDialog {
      * @param callingService 通话服务
      * @param isCallOut      是否呼出
      */
-    public CallDialog(@NonNull Context context, CallingService callingService,
-                      boolean isCallOut) {
+    public CallDialog(@NonNull Context context, CallingService callingService, boolean isCallOut) {
         super(context);
         this.context = context;
         callingVM = new CallingVM(callingService, isCallOut);
@@ -98,9 +103,9 @@ public class CallDialog extends BaseDialog {
     }
 
     public void bindData(SignalingInfo signalingInfo) {
+        this.signalingInfo = signalingInfo;
         callingVM.isGroup = signalingInfo.getInvitation().getInviteeUserIDList().size() > 1;
-        callingVM.setVideoCalls("video".equals(signalingInfo.getInvitation()
-            .getMediaType()));
+        callingVM.setVideoCalls("video".equals(signalingInfo.getInvitation().getMediaType()));
         if (!callingVM.isVideoCalls) {
             view.timeTv.setVisibility(View.GONE);
             view.headTips.setVisibility(View.GONE);
@@ -131,8 +136,8 @@ public class CallDialog extends BaseDialog {
         try {
             ArrayList<String> ids = new ArrayList<>();
             ids.add(callingVM.isCallOut ?
-                signalingInfo.getInvitation().getInviteeUserIDList().get(0)
-                : signalingInfo.getInvitation().getInviterUserID());
+                signalingInfo.getInvitation().getInviteeUserIDList().get(0) :
+                signalingInfo.getInvitation().getInviterUserID());
 
             OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
                 @Override
@@ -168,14 +173,16 @@ public class CallDialog extends BaseDialog {
     public void listener(SignalingInfo signalingInfo) {
         callingVM.timeStr.observeForever(bindTime);
         view.micIsOn.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            view.micIsOn.setText(isChecked ? context.getString(io.openim.android.ouicore.R.string.microphone_on)
-                : context.getString(io.openim.android.ouicore.R.string.microphone_off));
+            view.micIsOn.setText(isChecked ?
+                context.getString(io.openim.android.ouicore.R.string.microphone_on) :
+                context.getString(io.openim.android.ouicore.R.string.microphone_off));
             //关闭麦克风
             callingVM.callViewModel.setMicEnabled(isChecked);
         });
         view.speakerIsOn.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            view.speakerIsOn.setText(isChecked ? context.getString(io.openim.android.ouicore.R.string.speaker_on)
-                : context.getString(io.openim.android.ouicore.R.string.speaker_off));
+            view.speakerIsOn.setText(isChecked ?
+                context.getString(io.openim.android.ouicore.R.string.speaker_on) :
+                context.getString(io.openim.android.ouicore.R.string.speaker_off));
             // 打开扬声器
             callingVM.audioManager.setSpeakerphoneOn(isChecked);
         });
@@ -183,9 +190,8 @@ public class CallDialog extends BaseDialog {
         view.hangUp.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                callingVM.renewalDB(signalingInfo,
-                    callHistory -> callHistory.setDuration((int)
-                        (System.currentTimeMillis() - callHistory.getDate())));
+                callingVM.renewalDB(signalingInfo.getInvitation().getRoomID(),
+                    callHistory -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
 
                 callingVM.signalingHungUp(signalingInfo);
             }
@@ -210,9 +216,8 @@ public class CallDialog extends BaseDialog {
                         changeView();
 
                         BaseApp.inst().realm.executeTransactionAsync(realm -> {
-                            CallHistory callHistory = realm.where(CallHistory.class)
-                                .equalTo("roomID",
-                                    signalingInfo.getInvitation().getRoomID()).findFirst();
+                            CallHistory callHistory = realm.where(CallHistory.class).equalTo(
+                                "roomID", signalingInfo.getInvitation().getRoomID()).findFirst();
                             if (null == callHistory) return;
                             callHistory.setSuccess(true);
                         });
@@ -234,27 +239,27 @@ public class CallDialog extends BaseDialog {
     public void show() {
         try {
             Common.wakeUp(context);
-            AssetFileDescriptor assetFileDescriptor = BaseApp.inst().getAssets().openFd("incoming_call_ring.mp3");
+            AssetFileDescriptor assetFileDescriptor = BaseApp.inst().getAssets().openFd(
+                "incoming_call_ring.mp3");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), assetFileDescriptor);
             }
             MediaPlayerUtil.INSTANCE.setMediaListener(new MediaPlayerListener() {
-                                                          @Override
-                                                          public void finish() {
-                                                              MediaPlayerUtil.INSTANCE.playMedia();
-                                                          }
+                @Override
+                public void finish() {
+                    MediaPlayerUtil.INSTANCE.playMedia();
+                }
 
-                                                          @Override
-                                                          public void onErr(int what) {
+                @Override
+                public void onErr(int what) {
 
-                                                          }
+                }
 
-                                                          @Override
-                                                          public void prepare() {
-                                                              MediaPlayerUtil.INSTANCE.playMedia();
-                                                          }
-                                                      }
-            );
+                @Override
+                public void prepare() {
+                    MediaPlayerUtil.INSTANCE.playMedia();
+                }
+            });
             MediaPlayerUtil.INSTANCE.prepareAsync();
 
         } catch (IOException e) {
@@ -272,12 +277,45 @@ public class CallDialog extends BaseDialog {
             callingVM.audioManager.setSpeakerphoneOn(true);
             callingVM.timeStr.removeObserver(bindTime);
             callingVM.unBindView();
+            insertChatHistory();
             super.dismiss();
             ((CallingServiceImp) callingVM.callingService).callDialog = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+    }
+
+    private void insertChatHistory() {
+        boolean isGroup = callingVM.isGroup;
+        if (!isShowing() || isGroup || (null != signalingInfo && TextUtils.isEmpty(signalingInfo.getInvitation().getRoomID())))
+            return;
+        String roomID = signalingInfo.getInvitation().getRoomID();
+        String senderID = isGroup ? BaseApp.inst().loginCertificate.userID :
+            signalingInfo.getInvitation().getInviterUserID();
+        String receiver = signalingInfo.getInvitation().getInviteeUserIDList().get(0);
+
+        BaseApp.inst().realm.executeTransactionAsync(realm -> {
+            CallHistory callHistory =
+                realm.where(CallHistory.class).equalTo("roomID", roomID).findFirst();
+            if (null == callHistory) return;
+            callHistory = realm.copyFromRealm(callHistory);
+            String data = GsonHel.toJson(callHistory);
+            Message message = OpenIMClient.getInstance().messageManager.createCustomMessage(data,
+                "", "");
+            OnBase<String> callBack = new OnBase<String>() {
+                @Override
+                public void onError(int code, String error) {
+                }
+
+                @Override
+                public void onSuccess(String data) {
+                    Obs.newMessage(Constant.Event.INSERT_MSG);
+                }
+            };
+            OpenIMClient.getInstance().messageManager.insertSingleMessageToLocalStorage(callBack,
+                message, receiver, senderID);
+        });
     }
 
     public void otherSideAccepted() {

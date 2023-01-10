@@ -153,13 +153,10 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
     }
 
     public void toSelectMember() {
-        if (vm.groupInfo.getValue().getMemberCount() > Constant.SUPER_GROUP_LIMIT) {
             GroupVM groupVM = new GroupVM();
             groupVM.groupId = vm.groupID;
             BaseApp.inst().putVM(groupVM);
             ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER).withBoolean("isSelectMember", true).withInt("max_num", 9).navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
-        } else
-            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withBoolean("isSelectMember", true).withInt("max_num", 9).withString(Constant.K_GROUP_ID, vm.groupID).navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
     }
 
     private final ActivityResultLauncher<Intent> businessCardLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
