@@ -56,7 +56,6 @@ public class CallingServiceImp implements CallingService {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-
         }
     };
 
