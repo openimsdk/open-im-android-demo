@@ -87,6 +87,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         });
 
         click();
+        view.men1.setChecked(true);
     }
 
 

@@ -232,4 +232,5 @@
     <string name="conn_failed">连接失败</string>
     <string name="ot_refuses">对方已拒绝</string>
     <string name="cancelled">已取消</string>
+    <string name="label">标签</string>
 </resources>

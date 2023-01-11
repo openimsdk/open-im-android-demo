@@ -97,6 +97,9 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
         header.myGroup.setOnClickListener(v -> {
             startActivity(new Intent(getActivity(), MyGroupActivity.class));
         });
+        header.labelLy.setOnClickListener(v -> {
+            startActivity(new Intent(getActivity(),LabelActivity.class));
+        });
     }
 
 
@@ -127,6 +130,9 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
         };
         view.recyclerView.setAdapter(adapter);
         view.recyclerView.addHeaderView(header.getRoot());
+
+
+
     }
 
     private void bindData() {
