@@ -249,7 +249,6 @@
 
         </LinearLayout>
         <LinearLayout
-            android:visibility="gone"
             android:id="@+id/labelLy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

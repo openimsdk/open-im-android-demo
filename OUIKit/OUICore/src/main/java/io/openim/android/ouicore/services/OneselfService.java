@@ -51,7 +51,10 @@ public interface OneselfService {
      * @param requestBody
      * @return
      */
-    @POST("office/get_user_tags")
-    Observable<ResponseBody> getTags(@Body RequestBody requestBody);
+    @POST
+    Observable<ResponseBody> getTags(
+        @Url String url,
+        @Header("token") String token,
+        @Body RequestBody requestBody);
 
 }

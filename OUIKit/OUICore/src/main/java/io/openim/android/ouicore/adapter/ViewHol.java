@@ -14,6 +14,7 @@ import io.openim.android.ouicore.databinding.ItemImgTxtBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonSelectBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonStickyBinding;
 import io.openim.android.ouicore.databinding.LayoutContactItemBinding;
+import io.openim.android.ouicore.databinding.LayoutLabelItemBinding;
 import io.openim.android.ouicore.databinding.ViewDividingLineBinding;
 import io.openim.android.ouicore.databinding.ViewImageBinding;
 import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
@@ -105,12 +106,13 @@ public class ViewHol {
         }
     }
 
-    public static class CrossTxtTxtHolder extends RecyclerView.ViewHolder {
-        public ViewImageBinding view;
+    public static   class LabelItem extends RecyclerView.ViewHolder{
+        public final LayoutLabelItemBinding view;
 
-        public CrossTxtTxtHolder(@NonNull View itemView) {
-            super(ViewImageBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
-            view = ViewImageBinding.bind(this.itemView);
+        public LabelItem(@NonNull View itemView) {
+            super(LayoutLabelItemBinding.inflate(LayoutInflater.from(itemView.getContext()),
+                (ViewGroup) itemView, false).getRoot());
+            view = LayoutLabelItemBinding.bind(this.itemView);
         }
     }
 }

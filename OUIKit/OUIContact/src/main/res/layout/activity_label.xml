@@ -5,7 +5,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/white">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -39,26 +40,47 @@
 
             </androidx.cardview.widget.CardView>
 
-            <io.openim.android.ouicore.widget.SearchView
-                android:id="@+id/input"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_margin="10dp"
-                android:clickable="false" />
 
-            <androidx.recyclerview.widget.RecyclerView
+
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:id="@+id/recyclerView"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:background="@color/def_bg"
+                android:orientation="vertical">
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white">
+
+                    <io.openim.android.ouicore.widget.SearchView
+                        android:id="@+id/input"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/white"
+                        android:clickable="false" />
+                </FrameLayout>
+
+                <com.yanzhenjie.recyclerview.SwipeRecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white" />
+            </LinearLayout>
         </LinearLayout>
 
         <ImageView
             android:id="@+id/add"
-            android:layout_alignParentBottom="true"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_alignParentRight="true"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:background="@mipmap/ic_add_big" />
+            android:layout_alignParentBottom="true"
+            android:background="@mipmap/ic_add_big2" />
     </RelativeLayout>
 
 </layout>
