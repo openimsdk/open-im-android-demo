@@ -1,5 +1,4 @@
 <resources>
-    <string name="remove">移除</string>
     <string name="top">置顶</string>
     <string name="typing">正在输入…</string>
     <string name="unsupported_type">暂不支持的消息类型</string>

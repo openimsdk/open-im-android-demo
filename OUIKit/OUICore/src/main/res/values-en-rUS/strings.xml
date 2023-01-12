@@ -233,4 +233,11 @@
     <string name="ot_refuses">对方已拒绝</string>
     <string name="cancelled">已取消</string>
     <string name="label">标签</string>
+    <string name="remove">移除</string>
+    <string name="cretate_label">新建标签</string>
+    <string name="label_name">标签名字</string>
+    <string name="label_member">标签成员</string>
+    <string name="create_label_tips">请输入标签名称</string>
+    <string name="create_label_tips2">请填写标签名</string>
+    <string name="create_succ">创建成功</string>
 </resources>

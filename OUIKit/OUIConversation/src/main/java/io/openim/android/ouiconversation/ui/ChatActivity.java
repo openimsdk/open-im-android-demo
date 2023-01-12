@@ -315,8 +315,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             groupVM.groupId=vm.groupID;
             BaseApp.inst().putVM(groupVM);
             ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
-                .withBoolean("isSelectMember", true)
-                .withInt("max_num", 9)
+                .withBoolean(Constant.IS_SELECT_MEMBER, true)
+                .withInt(Constant.K_SIZE, 9)
                 .navigation(this, Constant.Event.CALLING_REQUEST_CODE);
     }
 

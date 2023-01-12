@@ -107,7 +107,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         view.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         SwipeMenuCreator mSwipeMenuCreator = (leftMenu, rightMenu, position) -> {
             SwipeMenuItem delete = new SwipeMenuItem(getContext());
-            delete.setText(R.string.remove);
+            delete.setText(io.openim.android.ouicore.R.string.remove);
             delete.setHeight(MATCH_PARENT);
             delete.setWidth(Common.dp2px(73));
             delete.setTextSize(16);

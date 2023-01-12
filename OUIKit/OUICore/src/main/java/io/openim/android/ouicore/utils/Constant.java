@@ -92,11 +92,21 @@ public class Constant {
     public static final String K_NAME = "name";
     public static final String K_RESULT = "result";
     public static final String K_FROM = "from";
+    public static final String K_SIZE = "size";
     //好友红点
     public static final String K_FRIEND_NUM = "k_friend_num";
     //群红点
     public static final String K_GROUP_NUM = "k_group_num";
     public static final String K_SET_BACKGROUND = "set_background";
+
+    //邀请入群
+    public static final String IS_INVITE_TO_GROUP = "isInviteToGroup";
+    //移除群聊
+    public static final String IS_REMOVE_GROUP = "isRemoveGroup";
+    //选择群成员
+    public static final String IS_SELECT_MEMBER = "isSelectMember";
+    //选择好友
+    public static final String IS_SELECT_FRIEND = "isSelectFriend";
 
     /**
      * 发送状态

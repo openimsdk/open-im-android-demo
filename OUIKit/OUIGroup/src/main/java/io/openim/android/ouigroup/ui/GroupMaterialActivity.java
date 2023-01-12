@@ -234,7 +234,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     int reId;
                     holder.view.img.load(reId = data.getRoleLevel());
                     holder.view.getRoot().setOnClickListener(v -> {
-                        startActivity(new Intent(GroupMaterialActivity.this, InitiateGroupActivity.class).putExtra(reId == R.mipmap.ic_group_add ? InitiateGroupActivity.IS_INVITE_TO_GROUP : InitiateGroupActivity.IS_REMOVE_GROUP, true));
+                        startActivity(new Intent(GroupMaterialActivity.this, InitiateGroupActivity.class).putExtra(reId == R.mipmap.ic_group_add ? Constant.IS_INVITE_TO_GROUP : Constant.IS_REMOVE_GROUP, true));
                     });
                 } else {
                     layoutParams.topMargin = 0;

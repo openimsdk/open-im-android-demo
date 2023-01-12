@@ -46,15 +46,6 @@ public interface OneselfService {
     Observable<ResponseBody> downloadFileWithDynamicUrlSync(@Url String fileUrl);
 
 
-    /**
-     * 获取标签
-     * @param requestBody
-     * @return
-     */
-    @POST
-    Observable<ResponseBody> getTags(
-        @Url String url,
-        @Header("token") String token,
-        @Body RequestBody requestBody);
+
 
 }

@@ -62,12 +62,12 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
             view.addFriend.setOnClickListener(v1 -> {
                 popupWindow.dismiss();
                 startActivity(new Intent(this, InitiateGroupActivity.class)
-                    .putExtra(InitiateGroupActivity.IS_INVITE_TO_GROUP, true));
+                    .putExtra(Constant.IS_INVITE_TO_GROUP, true));
             });
             view.deleteFriend.setOnClickListener(v1 -> {
                 popupWindow.dismiss();
                 startActivity(new Intent(this, InitiateGroupActivity.class)
-                    .putExtra(InitiateGroupActivity.IS_REMOVE_GROUP, true));
+                    .putExtra(Constant.IS_REMOVE_GROUP, true));
             });
             //设置PopupWindow的视图内容
             popupWindow.setContentView(view.getRoot());

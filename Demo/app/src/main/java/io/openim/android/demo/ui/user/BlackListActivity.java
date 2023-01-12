@@ -30,6 +30,7 @@ public class BlackListActivity extends BaseActivity<FriendVM, ActivityBlackListB
         bindVM(FriendVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityBlackListBinding.inflate(getLayoutInflater()));
+        sink();
         initView();
         vm.getBlacklist();
         listener();
@@ -39,7 +40,7 @@ public class BlackListActivity extends BaseActivity<FriendVM, ActivityBlackListB
         view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         SwipeMenuCreator mSwipeMenuCreator = (leftMenu, rightMenu, position) -> {
             SwipeMenuItem delete = new SwipeMenuItem(this);
-            delete.setText(io.openim.android.ouiconversation.R.string.remove);
+            delete.setText(io.openim.android.ouicore.R.string.remove);
             delete.setHeight(MATCH_PARENT);
             delete.setWidth(Common.dp2px(73));
             delete.setTextSize(16);

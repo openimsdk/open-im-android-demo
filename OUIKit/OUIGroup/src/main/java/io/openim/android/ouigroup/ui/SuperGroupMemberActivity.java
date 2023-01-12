@@ -104,8 +104,8 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
             vm.pageSize = 20;
         }
         isTransferPermission = getIntent().getBooleanExtra(Constant.K_FROM, false);
-        isSelectMember = getIntent().getBooleanExtra("isSelectMember", false);
-        maxNum = getIntent().getIntExtra("maxNum", 9);
+        isSelectMember = getIntent().getBooleanExtra(Constant.IS_SELECT_MEMBER, false);
+        maxNum = getIntent().getIntExtra(Constant.K_SIZE, 9);
     }
 
     private void listener() {
@@ -147,11 +147,11 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
             view.deleteFriend.setVisibility(vm.isOwner() ? View.VISIBLE : View.GONE);
             view.addFriend.setOnClickListener(v1 -> {
                 popupWindow.dismiss();
-                startActivity(new Intent(this, InitiateGroupActivity.class).putExtra(InitiateGroupActivity.IS_INVITE_TO_GROUP, true));
+                startActivity(new Intent(this, InitiateGroupActivity.class).putExtra(Constant.IS_INVITE_TO_GROUP, true));
             });
             view.deleteFriend.setOnClickListener(v1 -> {
                 popupWindow.dismiss();
-                startActivity(new Intent(this, InitiateGroupActivity.class).putExtra(InitiateGroupActivity.IS_REMOVE_GROUP, true));
+                startActivity(new Intent(this, InitiateGroupActivity.class).putExtra(Constant.IS_REMOVE_GROUP, true));
             });
             //设置PopupWindow的视图内容
             popupWindow.setContentView(view.getRoot());

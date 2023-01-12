@@ -88,4 +88,5 @@ dependencies {
     api 'com.contrarywind:Android-PickerView:4.1.9'
     api 'com.github.AurelionX:WaterMarkView:1.1.2'
     api 'org.raphets:roundimageview:1.2.0'
+    api 'com.github.simonebortolin:FlowLayoutManager:1.8.0'
 }

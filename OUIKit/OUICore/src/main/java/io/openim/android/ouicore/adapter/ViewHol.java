@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.openim.android.ouicore.databinding.ItemFile2Binding;
 import io.openim.android.ouicore.databinding.ItemGroupShowBinding;
 import io.openim.android.ouicore.databinding.ItemImgTxtBinding;
+import io.openim.android.ouicore.databinding.ItemLabelMemberBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonSelectBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonStickyBinding;
 import io.openim.android.ouicore.databinding.LayoutContactItemBinding;
@@ -113,6 +114,15 @@ public class ViewHol {
             super(LayoutLabelItemBinding.inflate(LayoutInflater.from(itemView.getContext()),
                 (ViewGroup) itemView, false).getRoot());
             view = LayoutLabelItemBinding.bind(this.itemView);
+        }
+    }
+    public static   class LabelMemberItem extends RecyclerView.ViewHolder{
+        public final ItemLabelMemberBinding view;
+
+        public LabelMemberItem(@NonNull View itemView) {
+            super(ItemLabelMemberBinding.inflate(LayoutInflater.from(itemView.getContext()),
+                (ViewGroup) itemView, false).getRoot());
+            view = ItemLabelMemberBinding.bind(this.itemView);
         }
     }
 }

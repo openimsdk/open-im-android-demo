@@ -25,6 +25,7 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.ExUserInfo;
 
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 
@@ -45,36 +46,28 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
     private RecyclerViewAdapter<ExUserInfo, RecyclerView.ViewHolder> adapter;
 
 
-    //邀请入群
-    public static final String IS_INVITE_TO_GROUP = "isInviteToGroup";
-    //移除群聊
-    public static final String IS_REMOVE_GROUP = "isRemoveGroup";
-    //选择群成员
-    public static final String IS_SELECT_MEMBER = "isSelectMember";
-    public static final String MAX_NUM = "max_num";
-
     private boolean isInviteToGroup = false;
     private boolean isRemoveGroup = false;
     private boolean isSelectMember = false;
+    private boolean isSelectFriend = false;
     private int maxNum;
 
     //选择的人数
     private int selectMemberNum;
+    private String title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        isInviteToGroup = getIntent().getBooleanExtra(IS_INVITE_TO_GROUP, false);
-        isRemoveGroup = getIntent().getBooleanExtra(IS_REMOVE_GROUP, false);
-
-        isSelectMember = getIntent().getBooleanExtra(IS_SELECT_MEMBER, false);
-        maxNum = getIntent().getIntExtra(MAX_NUM, 0);
+        isInviteToGroup = getIntent().getBooleanExtra(Constant.IS_INVITE_TO_GROUP, false);
+        isRemoveGroup = getIntent().getBooleanExtra(Constant.IS_REMOVE_GROUP, false);
+        isSelectMember = getIntent().getBooleanExtra(Constant.IS_SELECT_MEMBER, false);
+        isSelectFriend = getIntent().getBooleanExtra(Constant.IS_SELECT_FRIEND, false);
+        maxNum = getIntent().getIntExtra(Constant.K_SIZE, 0);
         String groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
+        title = getIntent().getStringExtra(Constant.K_NAME);
 
-        if (isInviteToGroup
-            || isRemoveGroup)
-            bindVMByCache(GroupVM.class);
-        else
-            bindVM(GroupVM.class, true);
+        if (isInviteToGroup || isRemoveGroup) bindVMByCache(GroupVM.class);
+        else bindVM(GroupVM.class, true);
 
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityInitiateGroupBinding.inflate(getLayoutInflater()));
@@ -92,9 +85,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!isInviteToGroup
-            && !isRemoveGroup)
-            removeCacheVM();
+        if (!isInviteToGroup && !isRemoveGroup) removeCacheVM();
     }
 
     private void initView() {
@@ -107,6 +98,8 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
             view.title.setText(io.openim.android.ouicore.R.string.selete_member);
             view.submit.setText("确定（0/" + maxNum + "）");
         }
+        if (!TextUtils.isEmpty(title))
+            view.title.setText(title);
 
         view.scrollView.fullScroll(View.FOCUS_DOWN);
         view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -146,15 +139,16 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
 
             @NonNull
             @Override
-            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                if (viewType == ITEM)
-                    return new ViewHol.ItemViewHo(parent);
+            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+                                                              int viewType) {
+                if (viewType == ITEM) return new ViewHol.ItemViewHo(parent);
 
                 return new ViewHol.StickyViewHo(parent);
             }
 
             @Override
-            public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExUserInfo data, int position) {
+            public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExUserInfo data,
+                                   int position) {
                 if (getItemViewType(position) == ITEM) {
                     ViewHol.ItemViewHo itemViewHo = (ViewHol.ItemViewHo) holder;
                     if (isRemoveGroup || isSelectMember) {
@@ -168,25 +162,21 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                     }
                     itemViewHo.view.select.setVisibility(View.VISIBLE);
                     itemViewHo.view.select.setChecked(data.isSelect);
-                    if (!data.isEnabled)
-                        itemViewHo.view.item.setOnClickListener(null);
-                    else
-                        itemViewHo.view.item.setOnClickListener(v -> {
-                            if (isSelectMember && selectMemberNum >= maxNum) {
-                                toast(String.format(getString(io.openim.android.ouicore.R.string.select_tips)
-                                    ,maxNum));
-                                return;
-                            }
-                            data.isSelect = !data.isSelect;
-                            notifyItemChanged(position);
-                            selectMemberNum = getSelectNum();
-                            view.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectMemberNum));
-                            if (isSelectMember)
-                                view.submit.setText("确定（" + selectMemberNum + "/" + maxNum + "）");
-                            else
-                                view.submit.setText("确定（" + selectMemberNum + "/999）");
-                            view.submit.setEnabled(selectMemberNum > 0);
-                        });
+                    if (!data.isEnabled) itemViewHo.view.item.setOnClickListener(null);
+                    else itemViewHo.view.item.setOnClickListener(v -> {
+                        if (isSelectMember && selectMemberNum >= maxNum) {
+                            toast(String.format(getString(io.openim.android.ouicore.R.string.select_tips), maxNum));
+                            return;
+                        }
+                        data.isSelect = !data.isSelect;
+                        notifyItemChanged(position);
+                        selectMemberNum = getSelectNum();
+                        view.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectMemberNum));
+                        if (isSelectMember)
+                            view.submit.setText("确定（" + selectMemberNum + "/" + maxNum + "）");
+                        else view.submit.setText("确定（" + selectMemberNum + "/999）");
+                        view.submit.setEnabled(selectMemberNum > 0);
+                    });
                 } else {
                     ViewHol.StickyViewHo stickyViewHo = (ViewHol.StickyViewHo) holder;
                     stickyViewHo.view.title.setText(data.sortLetter);
@@ -232,27 +222,26 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                 List<ExGroupMemberInfo> groupMemberInfo = new ArrayList<>();
                 groupMemberInfo.addAll(v);
 
-               try {
-                   for (ExGroupMemberInfo memberInfo : vm.exGroupManagement.getValue()) {
-                       if (!memberInfo.groupMembersInfo.getUserID()
-                           .equals(vm.groupsInfo.getValue().getOwnerUserID())) {
-                           String nickName = memberInfo.groupMembersInfo.getNickname();
-                           String letter = Pinyin.toPinyin(nickName.charAt(0));
-                           memberInfo.sortLetter = (letter.charAt(0) + "").trim().toUpperCase();
+                try {
+                    for (ExGroupMemberInfo memberInfo : vm.exGroupManagement.getValue()) {
+                        if (!memberInfo.groupMembersInfo.getUserID().equals(vm.groupsInfo.getValue().getOwnerUserID())) {
+                            String nickName = memberInfo.groupMembersInfo.getNickname();
+                            String letter = Pinyin.toPinyin(nickName.charAt(0));
+                            memberInfo.sortLetter = (letter.charAt(0) + "").trim().toUpperCase();
 
-                           boolean notContain = true;
-                           for (int i = 0; i < v.size(); i++) {
-                               if (v.get(i).sortLetter.equals(memberInfo.sortLetter)) {
-                                   groupMemberInfo.add(i, memberInfo);
-                                   notContain = false;
-                                   break;
-                               }
-                           }
-                           if (notContain)
-                               groupMemberInfo.add(0, memberInfo);
-                       }
-                   }
-               }catch (Exception e){}
+                            boolean notContain = true;
+                            for (int i = 0; i < v.size(); i++) {
+                                if (v.get(i).sortLetter.equals(memberInfo.sortLetter)) {
+                                    groupMemberInfo.add(i, memberInfo);
+                                    notContain = false;
+                                    break;
+                                }
+                            }
+                            if (notContain) groupMemberInfo.add(0, memberInfo);
+                        }
+                    }
+                } catch (Exception e) {
+                }
 
                 List<ExUserInfo> exUserInfos = new ArrayList<>();
                 for (ExGroupMemberInfo exGroupMemberInfo : groupMemberInfo) {
@@ -280,8 +269,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                     exGroupMemberInfo.groupMembersInfo = new GroupMembersInfo();
                     exGroupMemberInfo.groupMembersInfo.setUserID(exUserInfo.userInfo.getFriendInfo().getUserID());
 
-                    if (vm.exGroupMembers.getValue().contains(exGroupMemberInfo)
-                        || vm.exGroupManagement.getValue().contains(exGroupMemberInfo)) {
+                    if (vm.exGroupMembers.getValue().contains(exGroupMemberInfo) || vm.exGroupManagement.getValue().contains(exGroupMemberInfo)) {
                         exUserInfo.isEnabled = false;
                         exUserInfo.isSelect = true;
                     }
@@ -293,10 +281,10 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         view.sortView.setOnLetterChangedListener((letter, position) -> {
             for (int i = 0; i < adapter.getItems().size(); i++) {
                 ExUserInfo exUserInfo = adapter.getItems().get(i);
-                if (!exUserInfo.isSticky)
-                    continue;
+                if (!exUserInfo.isSticky) continue;
                 if (exUserInfo.sortLetter.equalsIgnoreCase(letter)) {
-                    View viewByPosition = view.recyclerView.getLayoutManager().findViewByPosition(i);
+                    View viewByPosition =
+                        view.recyclerView.getLayoutManager().findViewByPosition(i);
                     if (viewByPosition != null) {
                         view.scrollView.smoothScrollTo(0, viewByPosition.getTop());
                     }
@@ -305,25 +293,36 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
             }
         });
         view.submit.setOnClickListener(v -> {
-            if (isInviteToGroup) {
-                vm.inviteUserToGroup(vm.selectedFriendInfo.getValue());
-                return;
-            }
-            if (isRemoveGroup) {
-                vm.kickGroupMember(vm.selectedFriendInfo.getValue());
-                return;
-            }
-            if (isSelectMember) {
-                ArrayList<String> ids = new ArrayList<>();
-                for (FriendInfo friendInfo : vm.selectedFriendInfo.getValue()) {
-                    ids.add(friendInfo.getUserID());
+            try {
+                if (isInviteToGroup) {
+                    vm.inviteUserToGroup(vm.selectedFriendInfo.getValue());
+                    return;
                 }
-                setResult(RESULT_OK, new Intent()
-                    .putStringArrayListExtra(Constant.K_RESULT, ids));
-                finish();
-                return;
-            }
-            createLauncher.launch(getIntent().setClass(this, CreateGroupActivity.class));
+                if (isRemoveGroup) {
+                    vm.kickGroupMember(vm.selectedFriendInfo.getValue());
+                    return;
+                }
+                if (isSelectMember) {
+                    ArrayList<String> ids = new ArrayList<>();
+                    for (FriendInfo friendInfo : vm.selectedFriendInfo.getValue()) {
+                        ids.add(friendInfo.getUserID());
+                    }
+                    setResult(RESULT_OK,
+                        new Intent().putStringArrayListExtra(Constant.K_RESULT, ids));
+                    finish();
+                    return;
+                }
+                if (isSelectFriend) {
+                    setResult(RESULT_OK,
+                        new Intent()
+                            .putExtra(Constant.K_RESULT,
+                                GsonHel.toJson( vm.selectedFriendInfo.getValue())));
+                    finish();
+                    return;
+                }
+                createLauncher.launch(getIntent().setClass(this,
+                    CreateGroupActivity.class));
+            }catch (Exception ignored){}
         });
     }
 
@@ -333,13 +332,12 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         finish();
     }
 
-    private final ActivityResultLauncher<Intent> createLauncher = registerForActivityResult(
-        new ActivityResultContracts.StartActivityForResult(),
-        result -> {
-            if (result.getResultCode() == Activity.RESULT_OK) {
-                removeCacheVM();
-                finish();
-            }
-        });
+    private final ActivityResultLauncher<Intent> createLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            removeCacheVM();
+            finish();
+        }
+    });
 
 }

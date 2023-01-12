@@ -6,13 +6,13 @@
     android:orientation="vertical"
     android:paddingLeft="22dp"
     android:paddingTop="10dp"
-    android:paddingRight="22dp"
-    android:paddingBottom="10dp">
+    android:paddingRight="22dp">
 
     <TextView
+        android:id="@+id/name"
+        android:text="1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/name"
         android:textColor="#ff333333"
         android:textSize="18sp" />
 
@@ -21,7 +21,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
+        android:text="1"
         android:textColor="#ffadadad"
+        android:layout_marginBottom="11dp"
         android:textSize="12sp" />
 
+    <include layout="@layout/view_dividing_line"/>
 </LinearLayout>

@@ -49,8 +49,8 @@
             app:tabIndicatorColor="@color/purple_200"
             app:tabIndicatorFullWidth="false"
             app:tabMaxWidth="200dp"
-            app:tabMinWidth="100dp"
-            app:tabMode="fixed"
+            app:tabMinWidth="70dp"
+            app:tabMode="scrollable"
             app:tabRippleColor="@color/white"
             app:tabSelectedTextColor="@color/purple_200"
             app:tabTextColor="#FF999999" />
