@@ -18,10 +18,12 @@ import java.util.List;
 import io.openim.android.ouiconversation.databinding.ActivityChatSettingBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
@@ -49,6 +51,27 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
     });
 
     private void click() {
+        view.addChat.setOnClickListener(v -> {
+            BottomPopDialog dialog = new BottomPopDialog(this);
+            dialog.show();
+            dialog.getMainView().menu3.setOnClickListener(v1 -> dialog.dismiss());
+            dialog.getMainView().menu1.setText(io.openim.android.ouicore.R.string.general_group);
+            dialog.getMainView().menu2.setText(io.openim.android.ouicore.R.string.work_group);
+
+            dialog.getMainView().menu1.setOnClickListener(v1 -> {
+                dialog.dismiss();
+                ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
+                    .withString(Constant.K_ID,vm.otherSideID)
+                    .navigation();
+            });
+            dialog.getMainView().menu2.setOnClickListener(v1 -> {
+                dialog.dismiss();
+                ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
+                    .withString(Constant.K_ID,vm.otherSideID)
+                    .withBoolean(Constant.K_RESULT, true)
+                    .navigation();
+            });
+        });
         view.picture.setOnClickListener(v -> {
             startActivity(new Intent(this,
                 MediaHistoryActivity.class).putExtra(Constant.K_RESULT, true));

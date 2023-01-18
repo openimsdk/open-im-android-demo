@@ -55,6 +55,8 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
     //选择的人数
     private int selectMemberNum;
     private String title;
+    //默认已选择的id
+    private String defSelectId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         maxNum = getIntent().getIntExtra(Constant.K_SIZE, 0);
         String groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
         title = getIntent().getStringExtra(Constant.K_NAME);
+        defSelectId = getIntent().getStringExtra(Constant.K_ID);
 
         if (isInviteToGroup || isRemoveGroup) bindVMByCache(GroupVM.class);
         else bindVM(GroupVM.class, true);
@@ -77,8 +80,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         if (isSelectMember) {
             vm.groupId = groupId;
             vm.getGroupMemberList();
-        } else
-            vm.getAllFriend();
+        } else vm.getAllFriend();
         listener();
     }
 
@@ -92,14 +94,12 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         sink();
         if (isInviteToGroup)
             view.title.setText(io.openim.android.ouicore.R.string.Invite_to_the_group);
-        if (isRemoveGroup)
-            view.title.setText(io.openim.android.ouicore.R.string.remove_group);
+        if (isRemoveGroup) view.title.setText(io.openim.android.ouicore.R.string.remove_group);
         if (isSelectMember) {
             view.title.setText(io.openim.android.ouicore.R.string.selete_member);
             view.submit.setText("确定（0/" + maxNum + "）");
         }
-        if (!TextUtils.isEmpty(title))
-            view.title.setText(title);
+        if (!TextUtils.isEmpty(title)) view.title.setText(title);
 
         view.scrollView.fullScroll(View.FOCUS_DOWN);
         view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -121,6 +121,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                         items.add(i, getExUserInfo());
                     }
                 }
+
                 super.setItems(items);
             }
 
@@ -181,9 +182,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                     ViewHol.StickyViewHo stickyViewHo = (ViewHol.StickyViewHo) holder;
                     stickyViewHo.view.title.setText(data.sortLetter);
                 }
-
             }
-
         };
         view.recyclerView.setAdapter(adapter);
     }
@@ -192,7 +191,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         List<FriendInfo> friendInfos = new ArrayList<>();
         int num = 0;
         for (ExUserInfo item : adapter.getItems()) {
-            if (item.isSelect && item.isEnabled) {
+            if (item.isSelect) {
                 num++;
                 if (isRemoveGroup || isSelectMember) {
                     FriendInfo friendInfo = new FriendInfo();
@@ -221,7 +220,6 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                 if (null == v || v.isEmpty()) return;
                 List<ExGroupMemberInfo> groupMemberInfo = new ArrayList<>();
                 groupMemberInfo.addAll(v);
-
                 try {
                     for (ExGroupMemberInfo memberInfo : vm.exGroupManagement.getValue()) {
                         if (!memberInfo.groupMembersInfo.getUserID().equals(vm.groupsInfo.getValue().getOwnerUserID())) {
@@ -269,7 +267,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                     exGroupMemberInfo.groupMembersInfo = new GroupMembersInfo();
                     exGroupMemberInfo.groupMembersInfo.setUserID(exUserInfo.userInfo.getFriendInfo().getUserID());
 
-                    if (vm.exGroupMembers.getValue().contains(exGroupMemberInfo) || vm.exGroupManagement.getValue().contains(exGroupMemberInfo)) {
+                    if (vm.exGroupMembers.getValue().contains(exGroupMemberInfo) || vm.exGroupManagement.getValue().contains(exGroupMemberInfo) || exUserInfo.userInfo.getUserID().equals(defSelectId)) {
                         exUserInfo.isEnabled = false;
                         exUserInfo.isSelect = true;
                     }
@@ -307,22 +305,20 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                     for (FriendInfo friendInfo : vm.selectedFriendInfo.getValue()) {
                         ids.add(friendInfo.getUserID());
                     }
-                    setResult(RESULT_OK,
-                        new Intent().putStringArrayListExtra(Constant.K_RESULT, ids));
+                    setResult(RESULT_OK, new Intent().putStringArrayListExtra(Constant.K_RESULT,
+                        ids));
                     finish();
                     return;
                 }
                 if (isSelectFriend) {
-                    setResult(RESULT_OK,
-                        new Intent()
-                            .putExtra(Constant.K_RESULT,
-                                GsonHel.toJson( vm.selectedFriendInfo.getValue())));
+                    setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
+                        GsonHel.toJson(vm.selectedFriendInfo.getValue())));
                     finish();
                     return;
                 }
-                createLauncher.launch(getIntent().setClass(this,
-                    CreateGroupActivity.class));
-            }catch (Exception ignored){}
+                createLauncher.launch(getIntent().setClass(this, CreateGroupActivity.class));
+            } catch (Exception ignored) {
+            }
         });
     }
 
@@ -334,10 +330,10 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
 
     private final ActivityResultLauncher<Intent> createLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == Activity.RESULT_OK) {
-            removeCacheVM();
-            finish();
-        }
-    });
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                removeCacheVM();
+                finish();
+            }
+        });
 
 }

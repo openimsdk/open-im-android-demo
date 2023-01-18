@@ -228,11 +228,13 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         });
         view.createGroup.setOnClickListener(c -> {
             popupWindow.dismiss();
-            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).navigation();
+            ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
+                .navigation();
         });
         view.createWordGroup.setOnClickListener(c -> {
             popupWindow.dismiss();
-            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withBoolean(Constant.K_RESULT, true).navigation();
+            ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
+                .withBoolean(Constant.K_RESULT, true).navigation();
         });
         //设置PopupWindow的视图内容
         popupWindow.setContentView(view.getRoot());

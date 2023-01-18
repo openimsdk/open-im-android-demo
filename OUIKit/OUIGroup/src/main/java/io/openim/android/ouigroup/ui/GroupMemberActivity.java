@@ -55,19 +55,17 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
 
     private void listener() {
         view.more.setOnClickListener(v -> {
-            PopupWindow popupWindow = new PopupWindow(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            PopupWindow popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
             LayoutMemberActionBinding view = LayoutMemberActionBinding.inflate(getLayoutInflater());
             view.deleteFriend.setVisibility(vm.isOwner() ? View.VISIBLE : View.GONE);
             view.addFriend.setOnClickListener(v1 -> {
                 popupWindow.dismiss();
-                startActivity(new Intent(this, InitiateGroupActivity.class)
-                    .putExtra(Constant.IS_INVITE_TO_GROUP, true));
+                startActivity(new Intent(this, InitiateGroupActivity.class).putExtra(Constant.IS_INVITE_TO_GROUP, true));
             });
             view.deleteFriend.setOnClickListener(v1 -> {
                 popupWindow.dismiss();
-                startActivity(new Intent(this, InitiateGroupActivity.class)
-                    .putExtra(Constant.IS_REMOVE_GROUP, true));
+                startActivity(new Intent(this, InitiateGroupActivity.class).putExtra(Constant.IS_REMOVE_GROUP, true));
             });
             //设置PopupWindow的视图内容
             popupWindow.setContentView(view.getRoot());
@@ -100,10 +98,10 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
             }
             for (int i = 0; i < adapter.getItems().size(); i++) {
                 ExGroupMemberInfo exGroupMemberInfo = (ExGroupMemberInfo) adapter.getItems().get(i);
-                if (!exGroupMemberInfo.isSticky)
-                    continue;
+                if (!exGroupMemberInfo.isSticky) continue;
                 if (exGroupMemberInfo.sortLetter.equalsIgnoreCase(letter)) {
-                    View viewByPosition = view.recyclerView.getLayoutManager().findViewByPosition(i);
+                    View viewByPosition =
+                        view.recyclerView.getLayoutManager().findViewByPosition(i);
                     if (viewByPosition != null) {
                         view.scrollView.smoothScrollTo(0, viewByPosition.getTop());
                     }
@@ -124,8 +122,10 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
 
             @Override
             public void setItems(List<ExGroupMemberInfo> items) {
-                lastSticky = items.get(0).sortLetter;
-                items.add(0, getexGroupMemberInfo());
+                if (!items.isEmpty()){
+                    lastSticky = items.get(0).sortLetter;
+                    items.add(0, getexGroupMemberInfo());
+                }
                 for (int i = 0; i < items.size(); i++) {
                     ExGroupMemberInfo userInfo = items.get(i);
                     if (!lastSticky.equals(userInfo.sortLetter)) {
@@ -151,15 +151,16 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
 
             @NonNull
             @Override
-            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                if (viewType == ITEM)
-                    return new ViewHol.ItemViewHo(parent);
+            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+                                                              int viewType) {
+                if (viewType == ITEM) return new ViewHol.ItemViewHo(parent);
 
                 return new ViewHol.StickyViewHo(parent);
             }
 
             @Override
-            public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExGroupMemberInfo data, int position) {
+            public void onBindView(@NonNull RecyclerView.ViewHolder holder,
+                                   ExGroupMemberInfo data, int position) {
                 if (getItemViewType(position) == ITEM) {
                     ViewHol.ItemViewHo itemViewHo = (ViewHol.ItemViewHo) holder;
                     GroupMembersInfo friendInfo = data.groupMembersInfo;
@@ -176,8 +177,7 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
                         itemViewHo.view.identity.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_8_a2c9f8);
                         itemViewHo.view.identity.setText(io.openim.android.ouicore.R.string.administrator);
                         itemViewHo.view.identity.setTextColor(Color.parseColor("#2691ED"));
-                    } else
-                        itemViewHo.view.identity.setVisibility(View.GONE);
+                    } else itemViewHo.view.identity.setVisibility(View.GONE);
 
 
                     itemViewHo.view.getRoot().setOnClickListener(v -> {
@@ -185,16 +185,16 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
                             if (data.groupMembersInfo.getRoleLevel() == 2)
                                 toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.repeat_group_manager));
                             else {
-                                CommonDialog commonDialog = new CommonDialog(GroupMemberActivity.this);
-                                commonDialog.getMainView().tips
-                                    .setText(String.format(BaseApp.inst().getString(io.openim.
-                                        android.ouicore.R.string.transfer_permission), data.groupMembersInfo.getNickname()));
+                                CommonDialog commonDialog =
+                                    new CommonDialog(GroupMemberActivity.this);
+                                commonDialog.getMainView().tips.setText(String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.transfer_permission), data.groupMembersInfo.getNickname()));
                                 commonDialog.getMainView().cancel.setOnClickListener(v2 -> {
                                     commonDialog.dismiss();
                                 });
                                 commonDialog.getMainView().confirm.setOnClickListener(v2 -> {
                                     commonDialog.dismiss();
-                                    vm.transferGroupOwner(data.groupMembersInfo.getUserID(), data1 -> {
+                                    vm.transferGroupOwner(data.groupMembersInfo.getUserID(),
+                                        data1 -> {
                                         toast(getString(io.openim.android.ouicore.R.string.transfer_succ));
                                         finish();
                                     });
@@ -202,10 +202,7 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
                                 commonDialog.show();
                             }
                         } else {
-                            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                                .withString(Constant.K_ID, friendInfo.getUserID())
-                                .withString(Constant.K_GROUP_ID, friendInfo.getGroupID())
-                                .navigation();
+                            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, friendInfo.getUserID()).withString(Constant.K_GROUP_ID, friendInfo.getGroupID()).navigation();
                         }
                     });
 
@@ -219,13 +216,14 @@ public class GroupMemberActivity extends BaseActivity<GroupVM, ActivityGroupMemb
 
 
         vm.exGroupMembers.observe(this, v -> {
-            if (v.isEmpty()) return;
             List<ExGroupMemberInfo> exGroupMemberInfos = new ArrayList<>();
             exGroupMemberInfos.addAll(vm.exGroupMembers.getValue());
             view.recyclerView.setAdapter(adapter);
             Common.UIHandler.post(() -> {
                 adapter.setItems(exGroupMemberInfos);
-                exGroupMemberInfos.addAll(0, vm.exGroupManagement.getValue());
+                if (!exGroupMemberInfos.isEmpty())
+                    exGroupMemberInfos.addAll(0, vm.exGroupManagement.getValue());
+                else exGroupMemberInfos.addAll(vm.exGroupManagement.getValue());
                 adapter.notifyItemRangeInserted(0, vm.exGroupManagement.getValue().size());
             });
         });

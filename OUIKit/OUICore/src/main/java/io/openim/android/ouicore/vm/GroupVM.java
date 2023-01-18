@@ -274,6 +274,7 @@ public class GroupVM extends SocialityVM {
                     exGroupMemberInfo.groupMembersInfo = datum;
                     if (datum.getRoleLevel() > 1) {
                         //群管理单独存放
+                        exGroupMemberInfo.sortLetter="";
                         exGroupManagement.getValue().add(exGroupMemberInfo);
                         continue;
                     }

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
@@ -71,13 +72,16 @@ public class SocialityVM extends BaseViewModel {
                 if (data.isEmpty()) return;
 
                 List<ExUserInfo> exInfos = new ArrayList<>();
+                //不在24个字母中的开头
                 List<ExUserInfo> otInfos = new ArrayList<>();
                 for (UserInfo datum : data) {
                     ExUserInfo exUserInfo = new ExUserInfo();
                     exUserInfo.userInfo = datum;
                     String letter = "";
                     try {
-                        letter = String.valueOf(Pinyin.toPinyin(exUserInfo.userInfo.getFriendInfo().getNickname().charAt(0)).charAt(0));
+                        letter = String.valueOf(Pinyin.toPinyin(exUserInfo.userInfo
+                            .getFriendInfo().getNickname().charAt(0)).charAt(0));
+                        letter=letter.toUpperCase(Locale.ROOT);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

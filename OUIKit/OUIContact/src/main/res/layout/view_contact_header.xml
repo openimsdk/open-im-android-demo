@@ -248,6 +248,12 @@
 
 
         </LinearLayout>
+        <include
+            layout="@layout/view_dividing_line"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="90dp" />
+
         <LinearLayout
             android:id="@+id/labelLy"
             android:layout_width="match_parent"

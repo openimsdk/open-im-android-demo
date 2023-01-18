@@ -56,8 +56,7 @@ public class CallingVM {
     //是否是群
     public boolean isGroup;
 
-    private TextureViewRenderer localSpeakerVideoView;
-    private List<TextureViewRenderer> remoteSpeakerVideoViews;
+    private List<TextureViewRenderer> remoteSpeakerVideoViews, localSpeakerVideoViews;
 
 
     public CallingVM(CallingService callingService, boolean isCallOut) {
@@ -75,6 +74,14 @@ public class CallingVM {
         }
     }
 
+    public void initLocalSpeakerVideoView(TextureViewRenderer... viewRenderers) {
+        localSpeakerVideoViews = Arrays.asList(viewRenderers);
+        for (TextureViewRenderer viewRenderer : viewRenderers) {
+            callViewModel.getRoom().initVideoRenderer(viewRenderer);
+        }
+    }
+
+
     public void setOnParticipantsChangeListener(OnParticipantsChangeListener onParticipantsChangeListener) {
         this.onParticipantsChangeListener = onParticipantsChangeListener;
     }
@@ -83,10 +90,6 @@ public class CallingVM {
         this.dismissListener = dismissListener;
     }
 
-    public void setLocalSpeakerVideoView(TextureViewRenderer localSpeakerVideoView) {
-        this.localSpeakerVideoView = localSpeakerVideoView;
-        callViewModel.getRoom().initVideoRenderer(localSpeakerVideoView);
-    }
 
     public void setVideoCalls(boolean videoCalls) {
         isVideoCalls = videoCalls;
@@ -120,9 +123,11 @@ public class CallingVM {
             }
         };
         if (isGroup)
-            OpenIMClient.getInstance().signalingManager.signalingInviteInGroup(certificateOnBase, signalingInfo);
+            OpenIMClient.getInstance().signalingManager.signalingInviteInGroup(certificateOnBase,
+                signalingInfo);
         else
-            OpenIMClient.getInstance().signalingManager.signalingInvite(certificateOnBase, signalingInfo);
+            OpenIMClient.getInstance().signalingManager.signalingInvite(certificateOnBase,
+                signalingInfo);
     }
 
     /**
@@ -143,9 +148,13 @@ public class CallingVM {
                 audioManager.setSpeakerphoneOn(true);
                 if (!isVideoCalls) callViewModel.setCameraEnabled(false);
 
-                localVideoTrack = callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
-                if (null != localVideoTrack && null != localSpeakerVideoView)
-                    localVideoTrack.addRenderer(localSpeakerVideoView);
+                localVideoTrack =
+                    callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
+                if (null != localVideoTrack && null != localSpeakerVideoViews && !localSpeakerVideoViews.isEmpty()) {
+                    for (TextureViewRenderer localSpeakerVideoView : localSpeakerVideoViews) {
+                        localVideoTrack.addRenderer(localSpeakerVideoView);
+                    }
+                }
 
                 callViewModel.getParticipants().collect((participants, continuation) -> {
                     if (participants.isEmpty()) return null;
@@ -165,19 +174,21 @@ public class CallingVM {
                         for (int i = 0; i < participants.size(); i++) {
                             Participant participant = participants.get(i);
                             if (participant instanceof RemoteParticipant) {
-                                for (TextureViewRenderer remoteSpeakerVideoView : remoteSpeakerVideoViews) {
-                                    callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoView, participant, new Continuation<Unit>() {
-                                        @NonNull
-                                        @Override
-                                        public CoroutineContext getContext() {
-                                            return EmptyCoroutineContext.INSTANCE;
-                                        }
+                                for (TextureViewRenderer remoteSpeakerVideoView :
+                                    remoteSpeakerVideoViews) {
+                                    callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoView,
+                                        participant, new Continuation<Unit>() {
+                                            @NonNull
+                                            @Override
+                                            public CoroutineContext getContext() {
+                                                return EmptyCoroutineContext.INSTANCE;
+                                            }
 
-                                        @Override
-                                        public void resumeWith(@NonNull Object o) {
+                                            @Override
+                                            public void resumeWith(@NonNull Object o) {
 
-                                        }
-                                    });
+                                            }
+                                        });
                                 }
                             }
                         }
@@ -232,7 +243,8 @@ public class CallingVM {
             signalingCancel(signalingInfo);
             return;
         }
-        OpenIMClient.getInstance().signalingManager.signalingHungUp(callBackDismissUI, signalingInfo);
+        OpenIMClient.getInstance().signalingManager.signalingHungUp(callBackDismissUI,
+            signalingInfo);
     }
 
     private void dismissUI() {
@@ -255,7 +267,8 @@ public class CallingVM {
                 }
             }, signalingInfo);
         else
-            OpenIMClient.getInstance().signalingManager.signalingReject(callBackDismissUI, signalingInfo);
+            OpenIMClient.getInstance().signalingManager.signalingReject(callBackDismissUI,
+                signalingInfo);
     }
 
     public void signalingAccept(SignalingInfo signalingInfo, OnBase onBase) {
@@ -285,13 +298,18 @@ public class CallingVM {
             cancelTimer();
             if (null != localVideoTrack) {
                 localVideoTrack.stop();
-                if (null != localSpeakerVideoView)
-                    localVideoTrack.removeRenderer(localSpeakerVideoView);
+                if (null != localSpeakerVideoViews) {
+                    for (TextureViewRenderer localSpeakerVideoView
+                        : localSpeakerVideoViews) {
+                        localVideoTrack.removeRenderer(localSpeakerVideoView);
+                    }
+                }
             }
             for (TextureViewRenderer textureViewRenderer : remoteSpeakerVideoViews) {
                 Object videoTask = textureViewRenderer.getTag();
                 if (null != videoTask) {
-                    ((VideoTrack) videoTask).removeRenderer(textureViewRenderer);
+                    ((VideoTrack) videoTask)
+                        .removeRenderer(textureViewRenderer);
                 }
             }
             L.e("unBindView");
@@ -308,7 +326,8 @@ public class CallingVM {
 
     public void renewalDB(String roomID, OnRenewalDBListener onRenewalDBListener) {
         BaseApp.inst().realm.executeTransactionAsync(realm -> {
-            CallHistory callHistory = realm.where(CallHistory.class).equalTo("roomID", roomID).findFirst();
+            CallHistory callHistory =
+                realm.where(CallHistory.class).equalTo("roomID", roomID).findFirst();
             if (null == callHistory) return;
             onRenewalDBListener.onRenewal(callHistory);
         });

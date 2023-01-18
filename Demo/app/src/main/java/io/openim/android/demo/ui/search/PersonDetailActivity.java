@@ -88,9 +88,9 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         vm.searchPerson();
     }
 
-    private ActivityResultLauncher<Intent> personDataActivityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK)
-            onSuccess(null);
+    private ActivityResultLauncher<Intent> personDataActivityLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_OK) onSuccess(null);
     });
 
     private void click() {
@@ -99,30 +99,26 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             toast(getString(io.openim.android.ouicore.R.string.copy_succ));
         });
         view.userInfo.setOnClickListener(v -> {
-            personDataActivityLauncher.launch(new Intent(this, PersonDataActivity.class).putExtra(Constant.K_ID, vm.userInfo.getValue()
-                .get(0).getUserID()));
+            personDataActivityLauncher.launch(new Intent(this, PersonDataActivity.class).putExtra(Constant.K_ID, vm.userInfo.getValue().get(0).getUserID()));
         });
         view.sendMsg.setOnClickListener(v -> {
-                if (!formChat) {
-                    ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
-                    if (null != chatVM) {
-                        AppCompatActivity compatActivity = (AppCompatActivity) chatVM.getContext();
-                        compatActivity.finish();
-                        overridePendingTransition(0, 0);
-                    }
-                    runOnUiThread(() -> ARouter.getInstance().build(Routes.Conversation.CHAT)
-                        .withString(Constant.K_ID, vm.searchContent.getValue())
-                        .withString(Constant.K_NAME, vm.userInfo.getValue().get(0).getNickname())
-                        .navigation());
+            if (!formChat) {
+                ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
+                if (null != chatVM) {
+                    AppCompatActivity compatActivity = (AppCompatActivity) chatVM.getContext();
+                    compatActivity.finish();
+                    overridePendingTransition(0, 0);
                 }
-                setResult(RESULT_OK);
-                finish();
+                runOnUiThread(() -> ARouter.getInstance().build(Routes.Conversation.CHAT).withString(Constant.K_ID, vm.searchContent.getValue()).withString(Constant.K_NAME, vm.userInfo.getValue().get(0).getNickname()).navigation());
             }
-        );
+            setResult(RESULT_OK);
+            finish();
+        });
 
 
         view.addFriend.setOnClickListener(v -> {
-            startActivity(new Intent(this, SendVerifyActivity.class).putExtra(Constant.K_ID, vm.searchContent.getValue()));
+            startActivity(new Intent(this, SendVerifyActivity.class).putExtra(Constant.K_ID,
+                vm.searchContent.getValue()));
         });
 
 
@@ -131,8 +127,8 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
                 List<String> ids = new ArrayList<>();
                 ids.add(vm.searchContent.getValue());
-                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1, true,
-                    ids, null);
+                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1, true, ids,
+                    null);
                 callingService.call(signalingInfo);
                 return false;
             });
@@ -164,19 +160,19 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 view.idLy.setVisibility(View.GONE);
             } else {
                 view.idLy.setVisibility(View.VISIBLE);
-                if (!oneself() && isFriend)
-                    view.userInfo.setVisibility(View.VISIBLE);
+                if (!oneself() && isFriend) view.userInfo.setVisibility(View.VISIBLE);
             }
             // 不允许添加组成员为好友
-            view.addFriend.setVisibility((applyMemberFriend = groupInfo.getApplyMemberFriend() == 1
-                || isFriend) ? View.GONE : View.VISIBLE);
+            applyMemberFriend =
+                groupInfo.getApplyMemberFriend() == 1;
+            view.addFriend.setVisibility((applyMemberFriend || isFriend) ? View.GONE : View.VISIBLE);
+            view.idLy.setVisibility(applyMemberFriend ? View.GONE : View.VISIBLE);
         });
 
         friendVM.blackListUser.observe(this, userInfos -> {
             boolean isCon = false;
             for (UserInfo userInfo : userInfos) {
-                if (userInfo.getUserID()
-                    .equals(vm.searchContent.getValue())) {
+                if (userInfo.getUserID().equals(vm.searchContent.getValue())) {
                     isCon = true;
                     break;
                 }
@@ -209,8 +205,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 view.nickName.setText(nickName);
                 view.userId.setText(userInfo.getUserID());
                 view.avatar.load(userInfo.getFaceURL());
-                if (oneself())
-                    view.bottomMenu.setVisibility(View.GONE);
+                if (oneself()) view.bottomMenu.setVisibility(View.GONE);
             }
         });
         vm.friendshipInfo.observe(this, v -> {

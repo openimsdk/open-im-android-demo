@@ -75,10 +75,10 @@
                 android:textSize="17dp"
                 android:textStyle="bold"
                 app:strokeBackground="@drawable/bg_edit_vercode"
-                app:strokeHeight="45dp"
+                app:strokeHeight="42dp"
                 app:strokeLength="6"
-                app:strokePadding="12dp"
-                app:strokeWidth="45dp" />
+                app:strokePadding="11dp"
+                app:strokeWidth="42dp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"

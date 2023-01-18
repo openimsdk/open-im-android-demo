@@ -1,245 +1,297 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:alpha="0.8"
-        android:background="#000000"
-        android:clipToPadding="true"
-        android:fitsSystemWindows="true"
-        android:keepScreenOn="true"
-        tools:context="io.openim.android.ouicalling.CallDialog">
+        android:animateLayoutChanges="true"
+        android:background="@android:color/transparent">
 
-
-        <io.livekit.android.renderer.TextureViewRenderer
-            android:id="@+id/remoteSpeakerVideoView"
+        <RelativeLayout
+            android:id="@+id/home"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:alpha="0.8"
+            android:background="#000000"
+            android:clipToPadding="true"
+            android:fitsSystemWindows="true"
+            android:keepScreenOn="true"
+            tools:context="io.openim.android.ouicalling.CallDialog">
 
-        <io.livekit.android.renderer.TextureViewRenderer
-            android:id="@+id/localSpeakerVideoView"
+
+            <io.livekit.android.renderer.TextureViewRenderer
+                android:id="@+id/remoteSpeakerVideoView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <io.livekit.android.renderer.TextureViewRenderer
+                android:id="@+id/localSpeakerVideoView"
+                android:layout_width="107dp"
+                android:layout_height="197dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="48dp"
+                android:layout_marginRight="15dp" />
+
+            <ImageView
+                android:id="@+id/zoomOut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="22dp"
+                android:layout_marginTop="40dp"
+                android:src="@mipmap/ic_zoom_out" />
+
+            <TextView
+                android:id="@+id/timeTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="45dp"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <LinearLayout
+                android:id="@+id/headTips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/zoomOut"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="35dp"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <io.openim.android.ouicore.widget.AvatarImage
+                    android:id="@+id/avatar"
+                    android:layout_width="78dp"
+                    android:layout_height="78dp"
+                    android:src="@mipmap/ic_my_friend" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:textColor="#ffffffff"
+                        android:textSize="32sp" />
+
+                    <TextView
+                        android:id="@+id/callingTips"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Invite_a_video_call"
+                        android:textColor="#ffffffff"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/audioCall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/zoomOut"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="35dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <io.openim.android.ouicore.widget.AvatarImage
+                    android:id="@+id/avatar2"
+                    android:layout_width="78dp"
+                    android:layout_height="78dp"
+                    android:src="@mipmap/ic_my_friend" />
+
+                <TextView
+                    android:id="@+id/name2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="29dp"
+                    android:textColor="#ffffffff"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/callingTips2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Invite_a_audio_call"
+                    android:textColor="#ffffffff"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/ask"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="68dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/reject"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_marginBottom="15dp"
+                        android:background="@drawable/sty_radius_30_red"
+                        android:padding="20dp"
+                        android:src="@mipmap/ic_hang_up" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:shadowColor="#80000000"
+                        android:text="@string/hang_up"
+                        android:textColor="#ffffffff"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/answer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="100dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_marginBottom="15dp"
+                        android:background="@drawable/sty_radius_30_29e3a0"
+                        android:padding="20dp"
+                        android:src="@mipmap/ic_answer" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:shadowColor="#80000000"
+                        android:text="@string/answer"
+                        android:textColor="#ffffffff"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/callingMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="45dp"
+                android:layout_marginRight="45dp"
+                android:layout_marginBottom="68dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <CheckBox
+                    android:id="@+id/micIsOn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:drawableTop="@drawable/selector_mic"
+                    android:drawablePadding="15dp"
+                    android:text="@string/microphone_on"
+                    android:textColor="#ffffffff"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:id="@+id/hangUp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_marginBottom="15dp"
+                        android:background="@drawable/sty_radius_30_red"
+                        android:padding="20dp"
+                        android:src="@mipmap/ic_hang_up" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:shadowColor="#80000000"
+                        android:text="@string/hang_up"
+                        android:textColor="#ffffffff"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <CheckBox
+                    android:id="@+id/speakerIsOn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:drawableTop="@drawable/selector_speaker"
+                    android:drawablePadding="15dp"
+                    android:text="@string/speaker_on"
+                    android:textColor="#ffffffff"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/shrink"
             android:layout_width="107dp"
             android:layout_height="197dp"
             android:layout_alignParentRight="true"
             android:layout_marginTop="48dp"
-            android:layout_marginRight="13dp" />
-
-        <ImageView
-            android:id="@+id/zoomOut"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="22dp"
-            android:layout_marginTop="40dp"
-            android:src="@mipmap/ic_zoom_out" />
-
-        <TextView
-            android:id="@+id/timeTv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="45dp"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
-
-        <LinearLayout
-            android:id="@+id/headTips"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/zoomOut"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="35dp"
-            android:orientation="horizontal"
+            android:layout_marginRight="13dp"
+            android:alpha="0.8"
+            android:background="@drawable/sty_radius_6_eeeeee"
+            android:clipToPadding="true"
+            android:fitsSystemWindows="true"
+            android:gravity="center"
+            android:keepScreenOn="true"
+            android:orientation="vertical"
             android:visibility="visible">
 
-            <io.openim.android.ouicore.widget.AvatarImage
-                android:id="@+id/avatar"
-                android:layout_width="78dp"
-                android:layout_height="78dp"
-                android:src="@mipmap/ic_my_friend" />
+            <io.livekit.android.renderer.TextureViewRenderer
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="25dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:textColor="#ffffffff"
-                    android:textSize="32sp" />
+                <io.openim.android.ouicore.widget.AvatarImage
+                    android:id="@+id/sAvatar"
+                    android:layout_width="68dp"
+                    android:layout_height="68dp"
+                    android:layout_marginBottom="10dp"
+                    android:src="@mipmap/ic_my_friend" />
 
                 <TextView
-                    android:id="@+id/callingTips"
+                    android:id="@+id/sTips"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/Invite_a_video_call"
+                    android:text="等待接通"
                     android:textColor="#ffffffff"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/audioCall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/zoomOut"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="35dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <io.openim.android.ouicore.widget.AvatarImage
-                android:id="@+id/avatar2"
-                android:layout_width="78dp"
-                android:layout_height="78dp"
-                android:src="@mipmap/ic_my_friend" />
-
-            <TextView
-                android:id="@+id/name2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="29dp"
-                android:textColor="#ffffffff"
-                android:textSize="24sp" />
-
-            <TextView
-                android:id="@+id/callingTips2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/Invite_a_audio_call"
-                android:textColor="#ffffffff"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/ask"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="68dp"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:id="@+id/reject"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_marginBottom="15dp"
-                    android:background="@drawable/sty_radius_30_red"
-                    android:padding="20dp"
-                    android:src="@mipmap/ic_hang_up" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:shadowColor="#80000000"
-                    android:text="@string/hang_up"
-                    android:textColor="#ffffffff"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/answer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="100dp"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_marginBottom="15dp"
-                    android:background="@drawable/sty_radius_30_29e3a0"
-                    android:padding="20dp"
-                    android:src="@mipmap/ic_answer" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:shadowColor="#80000000"
-                    android:text="@string/answer"
-                    android:textColor="#ffffffff"
-                    android:textSize="16sp" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/callingMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="45dp"
-            android:layout_marginRight="45dp"
-            android:layout_marginBottom="68dp"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <CheckBox
-                android:id="@+id/micIsOn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@null"
-                android:drawableTop="@drawable/selector_mic"
-                android:drawablePadding="15dp"
-                android:text="@string/microphone_on"
-                android:textColor="#ffffffff"
-                android:textSize="16sp" />
-
-            <LinearLayout
-                android:id="@+id/hangUp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_marginBottom="15dp"
-                    android:background="@drawable/sty_radius_30_red"
-                    android:padding="20dp"
-                    android:src="@mipmap/ic_hang_up" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:shadowColor="#80000000"
-                    android:text="@string/hang_up"
-                    android:textColor="#ffffffff"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <CheckBox
-                android:id="@+id/speakerIsOn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@null"
-                android:drawableTop="@drawable/selector_speaker"
-                android:drawablePadding="15dp"
-                android:text="@string/speaker_on"
-                android:textColor="#ffffffff"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
+        </RelativeLayout>
 
     </RelativeLayout>
 

@@ -87,8 +87,8 @@
     <string name="Invite_a_video_call">邀请你进行视频通话</string>
     <string name="hang_up">挂断</string>
     <string name="answer">接听</string>
-    <string name="microphone_on">麦克风已开起</string>
-    <string name="speaker_on">扬声器已开起</string>
+    <string name="microphone_on">麦克风已开启</string>
+    <string name="speaker_on">扬声器已开启</string>
     <string name="microphone_off">麦克风已关闭</string>
     <string name="speaker_off">扬声器已关闭</string>
     <string name="voice_calls">语音通话</string>
@@ -250,4 +250,5 @@
     <string name="create_label_tips">请输入标签名称</string>
     <string name="create_label_tips2">请填写标签名</string>
     <string name="create_succ">创建成功</string>
+    <string name="create_label_tips3">请选择成员</string>
 </resources>

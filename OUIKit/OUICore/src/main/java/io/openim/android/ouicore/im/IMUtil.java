@@ -154,12 +154,14 @@ public class IMUtil {
             if (msg.getContentType() == Constant.MsgType.CUSTOMIZE) {
                 msgExpand.callHistory = GsonHel.fromJson(msg.getCustomElem().getData(),
                     CallHistory.class);
+                if (TextUtils.isEmpty(msgExpand.callHistory.getRoomID())) return msg;
+                //当callHistory.getRoomID 不null 表示我们本地插入的呼叫记录
+                msg.setContentType(Constant.MsgType.LOCAL_CALL_HISTORY);
+
                 int second = msgExpand.callHistory.getDuration() / 1000;
-                String secondFormat = TimeUtil.secondFormat(second,
-                    TimeUtil.secondFormat);
+                String secondFormat = TimeUtil.secondFormat(second, TimeUtil.secondFormat);
                 msgExpand.callDuration =
-                    BaseApp.inst().getString(io.openim.android.ouicore.R.string.call_time)
-                        + (second < 60 ? ("00:" + secondFormat) : secondFormat);
+                    BaseApp.inst().getString(io.openim.android.ouicore.R.string.call_time) + (second < 60 ? ("00:" + secondFormat) : secondFormat);
             }
             if (msg.getContentType() == Constant.MsgType.QUOTE) {
                 buildExpandInfo(msg.getQuoteElem().getQuoteMessage());
@@ -459,11 +461,10 @@ public class IMUtil {
                 case Constant.MsgType.QUOTE:
                     lastMsg = msg.getQuoteElem().getText();
                     break;
-                case Constant.MsgType.CUSTOMIZE:
+                case Constant.MsgType.LOCAL_CALL_HISTORY:
                     boolean isAudio = msgExpand.callHistory.getType().equals("audio");
-                    lastMsg =
-                        "[" + (isAudio ? BaseApp.inst().getString(R.string.voice_calls)
-                            : BaseApp.inst().getString(R.string.video_calls)) +"]";
+                    lastMsg = "[" + (isAudio ? BaseApp.inst().getString(R.string.voice_calls) :
+                        BaseApp.inst().getString(R.string.video_calls)) + "]";
                     break;
             }
         } catch (Exception e) {

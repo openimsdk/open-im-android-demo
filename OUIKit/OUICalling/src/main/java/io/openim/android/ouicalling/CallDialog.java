@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -73,7 +74,7 @@ public class CallDialog extends BaseDialog {
     }
 
     public void initRendererView() {
-        callingVM.setLocalSpeakerVideoView(view.localSpeakerVideoView);
+        callingVM.initLocalSpeakerVideoView(view.localSpeakerVideoView);
         callingVM.initRemoteVideoRenderer(view.remoteSpeakerVideoView);
     }
 
@@ -83,7 +84,7 @@ public class CallDialog extends BaseDialog {
         window.requestFeature(Window.FEATURE_NO_TITLE);
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(view.getRoot());
-        //状态栏透明
+        //背景状态栏透明
         window.setDimAmount(1f);
         WindowManager.LayoutParams params = getWindow().getAttributes();
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -150,6 +151,7 @@ public class CallDialog extends BaseDialog {
                     if (data.isEmpty()) return;
                     UserInfo userInfo = data.get(0);
                     view.avatar.load(userInfo.getFaceURL());
+                    view.sAvatar.load(userInfo.getFaceURL());
                     view.name.setText(userInfo.getNickname());
                     //audio call
                     view.avatar2.load(userInfo.getFaceURL());
@@ -225,6 +227,18 @@ public class CallDialog extends BaseDialog {
                 });
             }
         });
+        view.zoomOut.setOnClickListener(v -> {
+            shrink(true);
+        });
+        view.shrink.setOnClickListener(v -> {
+            shrink(false);
+        });
+    }
+
+    private void shrink(boolean isShrink) {
+        view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
+        getWindow().setDimAmount(isShrink ? 0f : 1f);
+        view.shrink.setVisibility(isShrink ? View.VISIBLE : View.GONE);
     }
 
 
@@ -306,6 +320,7 @@ public class CallDialog extends BaseDialog {
             OnBase<String> callBack = new OnBase<String>() {
                 @Override
                 public void onError(int code, String error) {
+                    L.e("");
                 }
 
                 @Override

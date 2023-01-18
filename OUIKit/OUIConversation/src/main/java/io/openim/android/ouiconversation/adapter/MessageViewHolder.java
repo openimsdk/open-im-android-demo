@@ -112,7 +112,8 @@ public class MessageViewHolder {
 
         if (viewType == Constant.MsgType.QUOTE) return new QuoteTXTView(parent);
 
-        if (viewType == Constant.MsgType.CUSTOMIZE) return new CallHistoryView(parent);
+        if (viewType == Constant.MsgType.LOCAL_CALL_HISTORY)
+            return new CallHistoryView(parent);
 
         return new TXTView(parent);
     }
@@ -234,7 +235,10 @@ public class MessageViewHolder {
                         isLongClick.set(false);
                         return;
                     }
-                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, message.getSendID()).withString(Constant.K_GROUP_ID, message.getGroupID()).navigation();
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                        .withString(Constant.K_ID, message.getSendID())
+                        .withString(Constant.K_GROUP_ID, message.getGroupID())
+                        .navigation();
                 });
             }
             if (null != chatVM.enableMultipleSelect.getValue() && chatVM.enableMultipleSelect.getValue() && message.getContentType() != Constant.MsgType.NOTICE) {
@@ -258,7 +262,9 @@ public class MessageViewHolder {
 
             int viewType = message.getContentType();
             unRead.setVisibility(View.GONE);
-            if (isOwn && message.getStatus() == Constant.Send_State.SEND_SUCCESS && viewType < Constant.MsgType.NOTICE && viewType != Constant.MsgType.REVOKE && viewType != Constant.MsgType.CUSTOMIZE && viewType != Constant.MsgType.ADVANCED_REVOKE) {
+            if (isOwn && message.getStatus() == Constant.Send_State.SEND_SUCCESS && viewType < Constant.MsgType.NOTICE && viewType
+                != Constant.MsgType.REVOKE && viewType != Constant.MsgType.LOCAL_CALL_HISTORY
+                && viewType != Constant.MsgType.ADVANCED_REVOKE) {
                 unRead.setVisibility(View.VISIBLE);
                 if (chatVM.isSingleChat) {
                     String unread =
@@ -1034,7 +1040,7 @@ public class MessageViewHolder {
 
         private CallHistory callHistory;
         private MsgExpand msgExpand;
-        private boolean isAudio;
+        private boolean isAudio = false;
 
         public CallHistoryView(ViewGroup parent) {
             super(parent);

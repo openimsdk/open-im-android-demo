@@ -125,6 +125,8 @@ public class Constant {
     public static final int LOADING = 201;
 
     public static class MsgType {
+        //本地呼叫记录
+        public static final int LOCAL_CALL_HISTORY = -110;
         //            * 101:文本消息<br/>
         public static final int TXT = 101;
         //            * 102:图片消息<br/>

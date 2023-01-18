@@ -12,6 +12,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
@@ -34,7 +35,6 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
         sink();
 
         initView();
-
     }
 
     public void toBack(View view) {
@@ -46,7 +46,8 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
         LoginCertificate loginCertificate = LoginCertificate.getCache(this);
         friendInfo.setUserID(loginCertificate.userID);
         friendInfo.setNickname(loginCertificate.nickname);
-        if (!vm.selectedFriendInfo.getValue().get(0).getUserID().equals(friendInfo.getUserID())) {
+        if (!vm.selectedFriendInfo.getValue().get(0)
+            .getUserID().equals(friendInfo.getUserID())) {
             vm.selectedFriendInfo.getValue().add(0, friendInfo);
         }
         view.selectNum.setText(vm.selectedFriendInfo.getValue().size() + "人");
@@ -58,7 +59,6 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
                 holder.view.img.load(data.getFaceURL());
                 holder.view.txt.setText(data.getNickname());
             }
-
         };
         view.recyclerview.setAdapter(adapter);
         adapter.setItems(vm.selectedFriendInfo.getValue());
@@ -67,7 +67,8 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
         view.submit.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                vm.createGroup(getIntent().getBooleanExtra(Constant.K_RESULT, false));
+                vm.createGroup(getIntent()
+                    .getBooleanExtra(Constant.K_RESULT, false));
             }
         });
     }
@@ -82,9 +83,13 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
     public void onSuccess(Object body) {
         super.onSuccess(body);
 
+        BaseApp.inst().removeCacheVM(GroupVM.class);
         Toast.makeText(this, getString(R.string.create_succ), Toast.LENGTH_SHORT).show();
         GroupInfo groupInfo = (GroupInfo) body;
-        ARouter.getInstance().build(Routes.Conversation.CHAT).withString(Constant.K_GROUP_ID, groupInfo.getGroupID()).withString(io.openim.android.ouicore.utils.Constant.K_NAME, groupInfo.getGroupName()).navigation();
+        ARouter.getInstance().build(Routes.Conversation.CHAT)
+            .withString(Constant.K_GROUP_ID, groupInfo.getGroupID())
+            .withString(io.openim.android.ouicore.utils.Constant.K_NAME,
+                groupInfo.getGroupName()).navigation();
 
         setResult(RESULT_OK);
         finish();

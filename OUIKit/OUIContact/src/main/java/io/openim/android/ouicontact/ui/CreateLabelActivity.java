@@ -61,6 +61,10 @@ public class CreateLabelActivity extends BaseActivity<LabelVM, ActivityCreateLab
                 toast(getString(io.openim.android.ouicore.R.string.create_label_tips2));
                 return;
             }
+            if (null==friendInfos||friendInfos.isEmpty()){
+                toast(getString(io.openim.android.ouicore.R.string.create_label_tips3));
+                return;
+            }
             List<String> ids=new ArrayList<>();
             for (FriendInfo friendInfo : friendInfos) {
                 ids.add(friendInfo.getUserID());
