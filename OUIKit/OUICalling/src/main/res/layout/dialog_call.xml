@@ -264,13 +264,15 @@
             android:gravity="center"
             android:keepScreenOn="true"
             android:orientation="vertical"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <io.livekit.android.renderer.TextureViewRenderer
+                android:id="@+id/remoteSpeakerVideoView2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
             <LinearLayout
+                android:id="@+id/waiting"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.livekit.android.renderer.TextureViewRenderer;
 import io.openim.android.ouicalling.databinding.DialogCallBinding;
 import io.openim.android.ouicalling.vm.CallingVM;
 import io.openim.android.ouicore.base.BaseApp;
@@ -75,7 +76,8 @@ public class CallDialog extends BaseDialog {
 
     public void initRendererView() {
         callingVM.initLocalSpeakerVideoView(view.localSpeakerVideoView);
-        callingVM.initRemoteVideoRenderer(view.remoteSpeakerVideoView);
+        callingVM.initRemoteVideoRenderer(view.remoteSpeakerVideoView,
+            view.remoteSpeakerVideoView2);
     }
 
     private void initView() {
@@ -239,6 +241,9 @@ public class CallDialog extends BaseDialog {
         view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
         getWindow().setDimAmount(isShrink ? 0f : 1f);
         view.shrink.setVisibility(isShrink ? View.VISIBLE : View.GONE);
+        view.sTips.setText(callingVM.isCallOut ? context.getString(io.openim.android.ouicore.
+            R.string.waiting_tips2):
+            context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
     }
 
 
@@ -246,6 +251,7 @@ public class CallDialog extends BaseDialog {
         view.headTips.setVisibility(View.GONE);
         view.ask.setVisibility(View.GONE);
         view.callingMenu.setVisibility(View.VISIBLE);
+        view.waiting.setVisibility(View.GONE);
     }
 
 
@@ -339,6 +345,7 @@ public class CallDialog extends BaseDialog {
         view.headTips.setVisibility(View.GONE);
         MediaPlayerUtil.INSTANCE.pause();
         MediaPlayerUtil.INSTANCE.release();
+        view.waiting.setVisibility(View.GONE);
     }
 
 }

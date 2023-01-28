@@ -241,4 +241,6 @@
     <string name="create_label_tips2">请填写标签名</string>
     <string name="create_succ">创建成功</string>
     <string name="create_label_tips3">请选择成员</string>
+    <string name="waiting_tips2">等待接受</string>
+    <string name="waiting_tips3">邀请你通话</string>
 </resources>
