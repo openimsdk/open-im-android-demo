@@ -71,6 +71,7 @@ import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.SignalingInvitationInfo;
+import io.openim.android.sdk.models.SoundElem;
 
 public class IMUtil {
     //android PlatformID 2
@@ -580,6 +581,24 @@ public class IMUtil {
     public static void playPrompt() {
         MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), R.raw.message_ring);
         MediaPlayerUtil.INSTANCE.playMedia();
+    }
+
+    /**
+     * 获取语音播放路径 本地没有取网络
+     *
+     * @param soundElem
+     * @return
+     */
+    public static String getSoundPath(SoundElem soundElem) {
+        String path = "";
+        try {
+            path = soundElem.getSoundPath();
+            if (TextUtils.isEmpty(path))
+                path = soundElem.getSourceUrl();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return path;
     }
 
     /**

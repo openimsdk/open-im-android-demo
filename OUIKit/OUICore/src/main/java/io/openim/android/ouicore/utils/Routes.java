@@ -20,6 +20,8 @@ public class Routes {
         public static final String ADD_CONVERS = "/main/AddConversActivity";
 
         public static final String CALL_HISTORY = "/main/CallHistoryActivity";
+        //搜索id
+        public static final String SEARCH_CONVER = "/main/SearchContactActivity";
     }
 
     //会话相关

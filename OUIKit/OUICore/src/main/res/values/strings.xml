@@ -187,7 +187,7 @@
     <string name="about_us">关于我们</string>
     <string name="check_the_new">检查新版本</string>
     <string name="reply">回复</string>
-    <string name="total_silence">全员禁员</string>
+    <string name="total_silence">全员禁言</string>
     <string name="join_validation">进群验证</string>
     <string name="needVerification">需要发送验证信息</string>
     <string name="allowAnyoneJoinGroup">允许任何人加群</string>

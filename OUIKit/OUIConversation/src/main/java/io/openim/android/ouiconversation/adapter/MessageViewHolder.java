@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -103,7 +104,9 @@ public class MessageViewHolder {
 
         if (viewType == Constant.MsgType.OA_NOTICE) return new NotificationItemHo(parent);
 
-        if (viewType >= Constant.MsgType.NOTICE || viewType == Constant.MsgType.REVOKE || viewType == Constant.MsgType.ADVANCED_REVOKE)
+        if (viewType >= Constant.MsgType.NOTICE
+            || viewType == Constant.MsgType.REVOKE
+            || viewType == Constant.MsgType.ADVANCED_REVOKE)
             return new NoticeView(parent);
 
         if (viewType == Constant.MsgType.MERGE) return new MergeView(parent);
@@ -678,9 +681,11 @@ public class MessageViewHolder {
         }
 
         private void clickPlay(Message message, LottieAnimationView lottieView) {
+           String sourceUrl=message.getSoundElem().getSourceUrl();
+           if (TextUtils.isEmpty(sourceUrl))return;
             SPlayer.instance().getMediaPlayer();
             SPlayer.instance().stop();
-            SPlayer.instance().playByUrl(message.getSoundElem().getSourceUrl(),
+            SPlayer.instance().playByUrl(sourceUrl,
                 new PlayerListener() {
                     @Override
                     public void LoadSuccess(SMediaPlayer mediaPlayer) {

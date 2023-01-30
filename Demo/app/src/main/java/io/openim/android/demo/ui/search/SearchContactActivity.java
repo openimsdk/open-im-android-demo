@@ -1,7 +1,6 @@
 package io.openim.android.demo.ui.search;
 
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
@@ -21,20 +21,29 @@ import java.util.List;
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivitySearchPersonBinding;
 import io.openim.android.demo.databinding.LayoutSearchItemBinding;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
+import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.UserInfo;
 
-public class SearchConversActivity extends BaseActivity<SearchVM, ActivitySearchPersonBinding> {
+@Route(path = Routes.Main.SEARCH_CONVER)
+public class SearchContactActivity extends BaseActivity<SearchVM, ActivitySearchPersonBinding> {
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        bindVMByCache(SearchVM.class);
+        SearchVM searchVM = BaseApp.inst().getVMByCache(SearchVM.class);
+        if (null == searchVM) {
+            bindVM(SearchVM.class);
+            vm.isPerson=true;
+        }
+        else bindVMByCache(SearchVM.class);
+
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivitySearchPersonBinding.inflate(getLayoutInflater()));
         view.setSearchVM(vm);
@@ -49,7 +58,8 @@ public class SearchConversActivity extends BaseActivity<SearchVM, ActivitySearch
         view.searchView.getEditText().setFocusable(true);
         view.searchView.getEditText().setFocusableInTouchMode(true);
         view.searchView.getEditText().requestFocus();
-        view.searchView.getEditText().setHint(vm.isPerson ? io.openim.android.ouicore.R.string.search_by_id : R.string.search_group_by_id);
+        view.searchView.getEditText().setHint(vm.isPerson ?
+            io.openim.android.ouicore.R.string.search_by_id : R.string.search_group_by_id);
         view.searchView.getEditText().setOnKeyListener((v, keyCode, event) -> {
             vm.searchContent.setValue(view.searchView.getEditText().getText().toString());
             vm.search();
@@ -62,7 +72,7 @@ public class SearchConversActivity extends BaseActivity<SearchVM, ActivitySearch
         view.recyclerView.setAdapter(recyclerViewAdapter);
 
         vm.userInfo.observe(this, v -> {
-            if (vm.searchContent.getValue().isEmpty()||null==v) return;
+            if (vm.searchContent.getValue().isEmpty() || null == v) return;
             List<String> userIDs = new ArrayList<>();
             for (UserInfo userInfo : v) {
                 userIDs.add(userInfo.getUserID());
@@ -125,8 +135,7 @@ public class SearchConversActivity extends BaseActivity<SearchVM, ActivitySearch
                 if (isPerson)
                     context.startActivity(new Intent(context, PersonDetailActivity.class).putExtra(Constant.K_ID, title));
                 else
-                    ARouter.getInstance().build(Routes.Group.DETAIL)
-                        .withString(io.openim.android.ouicore.utils.Constant.K_GROUP_ID, title).navigation();
+                    ARouter.getInstance().build(Routes.Group.DETAIL).withString(io.openim.android.ouicore.utils.Constant.K_GROUP_ID, title).navigation();
             });
         }
 

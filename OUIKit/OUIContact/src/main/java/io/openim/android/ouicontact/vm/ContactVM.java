@@ -131,7 +131,8 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
 
     //群拒绝
     public void refuse() {
-        OpenIMClient.getInstance().groupManager.acceptGroupApplication(onBase, groupDetail.getValue().getGroupID(), groupDetail.getValue().getUserID(), "");
+        OpenIMClient.getInstance().groupManager.refuseGroupApplication(onBase,
+            groupDetail.getValue().getGroupID(), groupDetail.getValue().getUserID(), "");
     }
 
     @Override

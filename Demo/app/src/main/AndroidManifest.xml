@@ -76,7 +76,7 @@
             android:name=".ui.search.PersonDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.search.SearchConversActivity"
+            android:name=".ui.search.SearchContactActivity"
             android:exported="false" />
         <activity
             android:name=".ui.search.AddConversActivity"
