@@ -7,6 +7,7 @@ import android.content.res.AssetFileDescriptor;
 import android.os.Build;
 
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -102,6 +103,8 @@ public class CallDialog extends BaseDialog {
             params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
         }
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
         window.setAttributes(params);
     }
 
@@ -244,6 +247,11 @@ public class CallDialog extends BaseDialog {
         view.sTips.setText(callingVM.isCallOut ? context.getString(io.openim.android.ouicore.
             R.string.waiting_tips2):
             context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.height =isShrink? ViewGroup.LayoutParams.WRAP_CONTENT:ViewGroup.LayoutParams.MATCH_PARENT;
+        params.width = isShrink? ViewGroup.LayoutParams.WRAP_CONTENT:ViewGroup.LayoutParams.MATCH_PARENT;
+        params.gravity= isShrink?(Gravity.TOP|Gravity.END):Gravity.CENTER;
+        getWindow().setAttributes(params);
     }
 
 

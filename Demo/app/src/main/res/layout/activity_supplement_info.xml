@@ -83,7 +83,7 @@
             android:layout_height="@dimen/button_height"
             android:layout_marginLeft="32dp"
             android:layout_marginRight="32dp"
-            android:enabled="@{LoginVM.nickName.length()!=0 &amp;&amp; LoginVM.pwd.length()!=0}"
+            android:enabled="@{LoginVM.nickName.length()!=0 &amp;&amp; LoginVM.pwd.length()>=6}"
             android:onClick="@{(v)->LoginVM.register()}"
             android:text="@string/join_im"
             android:textColor="#ffffffff"

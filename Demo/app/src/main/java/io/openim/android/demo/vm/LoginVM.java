@@ -87,12 +87,8 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
      */
     @NonNull
     private Parameter getParameter(String verificationCode, int usedFor) {
-        Parameter parameter = new Parameter()
-            .add("password", TextUtils.isEmpty(verificationCode) ? md5(pwd.getValue()) : null)
-            .add("platform", 2)
-            .add("usedFor", usedFor)
-            .add("operationID", System.currentTimeMillis() + "")
-            .add("verificationCode", verificationCode);
+        Parameter parameter = new Parameter().add("password",
+            TextUtils.isEmpty(verificationCode) ? md5(pwd.getValue()) : null).add("platform", 2).add("usedFor", usedFor).add("operationID", System.currentTimeMillis() + "").add("verificationCode", verificationCode);
         if (isPhone.getValue()) {
             parameter.add("phoneNumber", account.getValue());
             parameter.add("areaCode", "+86");
@@ -192,9 +188,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
         //这里要把密码传入
         parameter.add("password", md5(password));
         WaitDialog waitDialog = showWait();
-        N.API(OpenIMService.class).resetPassword(parameter.buildJsonBody())
-            .map(OpenIMService.turn(HashMap.class))
-            .compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
+        N.API(OpenIMService.class).resetPassword(parameter.buildJsonBody()).map(OpenIMService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
             @Override
             public void onComplete() {
                 super.onComplete();
@@ -214,8 +208,9 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     }
 
     public void register() {
-        Parameter parameter = getParameter(verificationCode, 1);
-        parameter.add("nickname", nickName.getValue());
+        Parameter parameter = getParameter(verificationCode, 1).add("password",
+            md5(pwd.getValue())).add("nickname", nickName.getValue());
+
         WaitDialog waitDialog = showWait();
         N.API(OpenIMService.class).register(parameter.buildJsonBody()).map(OpenIMService.turn(LoginCertificate.class)).compose(N.IOMain()).subscribe(new NetObserver<LoginCertificate>(context.get()) {
             @Override

@@ -5,8 +5,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:animateLayoutChanges="true"
-        android:background="@android:color/transparent">
+        >
 
         <RelativeLayout
             android:id="@+id/home"
@@ -254,11 +253,10 @@
             android:id="@+id/shrink"
             android:layout_width="107dp"
             android:layout_height="197dp"
-            android:layout_alignParentRight="true"
             android:layout_marginTop="48dp"
             android:layout_marginRight="13dp"
             android:alpha="0.8"
-            android:background="@drawable/sty_radius_6_eeeeee"
+            android:background="@drawable/sty_radius_6_000000"
             android:clipToPadding="true"
             android:fitsSystemWindows="true"
             android:gravity="center"
