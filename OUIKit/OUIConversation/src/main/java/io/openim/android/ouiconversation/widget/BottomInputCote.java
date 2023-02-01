@@ -6,6 +6,8 @@ import static android.view.View.VISIBLE;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -20,7 +22,9 @@ import android.text.style.ImageSpan;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
@@ -52,7 +56,7 @@ import io.openim.android.sdk.models.Message;
  */
 public class BottomInputCote {
 
-    private boolean hasMicrophone=false;
+    private boolean hasMicrophone = false;
     private ChatVM vm;
     private Context context;
 
@@ -72,15 +76,18 @@ public class BottomInputCote {
             List<Message> atMessages = vm.atMessages.getValue();
             final Message msg;
             if (null != vm.replyMessage.getValue()) {
-                msg = OpenIMClient.getInstance().messageManager.createQuoteMessage(vm.inputMsg.getValue(), vm.replyMessage.getValue());
+                msg =
+                    OpenIMClient.getInstance().messageManager.createQuoteMessage(vm.inputMsg.getValue(), vm.replyMessage.getValue());
             } else if (atMessages.isEmpty())
-                msg = OpenIMClient.getInstance().messageManager.createTextMessage(vm.inputMsg.getValue());
+                msg =
+                    OpenIMClient.getInstance().messageManager.createTextMessage(vm.inputMsg.getValue());
             else {
                 List<String> atUserIDList = new ArrayList<>();
                 List<AtUserInfo> atUserInfoList = new ArrayList<>();
 
                 Editable msgEdit = view.chatInput.getText();
-                final ForegroundColorSpan spans[] = view.chatInput.getText().getSpans(0, view.chatInput.getText().length(), ForegroundColorSpan.class);
+                final ForegroundColorSpan spans[] = view.chatInput.getText().getSpans(0,
+                    view.chatInput.getText().length(), ForegroundColorSpan.class);
                 for (Message atMessage : atMessages) {
                     atUserIDList.add(atMessage.getSendID());
                     AtUserInfo atUserInfo = new AtUserInfo();
@@ -95,14 +102,16 @@ public class BottomInputCote {
                             if (msgExpand.spanHashCode == span.hashCode()) {
                                 final int spanStart = view.chatInput.getText().getSpanStart(span);
                                 final int spanEnd = view.chatInput.getText().getSpanEnd(span);
-                                msgEdit.replace(spanStart, spanEnd, " @" + atMessage.getSendID() + " ");
+                                msgEdit.replace(spanStart, spanEnd,
+                                    " @" + atMessage.getSendID() + " ");
                             }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-                msg = OpenIMClient.getInstance().messageManager.createTextAtMessage(msgEdit.toString(), atUserIDList, atUserInfoList, null);
+                msg =
+                    OpenIMClient.getInstance().messageManager.createTextAtMessage(msgEdit.toString(), atUserIDList, atUserInfoList, null);
             }
             if (null != msg) {
                 vm.sendMsg(msg);
@@ -110,7 +119,7 @@ public class BottomInputCote {
             }
         });
         view.voice.setOnCheckedChangeListener((v, isChecked) -> {
-            hasMicrophone=AndPermission.hasPermissions(context,Permission.Group.MICROPHONE);
+            hasMicrophone = AndPermission.hasPermissions(context, Permission.Group.MICROPHONE);
 
             clearFocus();
             view.inputLy.setVisibility(isChecked ? GONE : VISIBLE);
@@ -123,7 +132,8 @@ public class BottomInputCote {
                 touchVoiceDialog.setOnSelectResultListener((code, audioPath, duration) -> {
                     if (code == 0) {
                         //录音结束
-                        Message message = OpenIMClient.getInstance().messageManager.createSoundMessageFromFullPath(audioPath.getPath(), duration);
+                        Message message =
+                            OpenIMClient.getInstance().messageManager.createSoundMessageFromFullPath(audioPath.getPath(), duration);
                         vm.sendMsg(message);
                     }
                 });
@@ -137,6 +147,10 @@ public class BottomInputCote {
 
         view.chatInput.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) setExpandHide();
+
+//            InputMethodManager inputMethodManager =
+//                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+//            inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
         });
 
         view.chatMore.setOnClickListener(v -> {
@@ -212,9 +226,11 @@ public class BottomInputCote {
     private void vmListener() {
         vm.atMessages.observe((LifecycleOwner) context, messages -> {
             if (messages.isEmpty()) return;
-            SpannableString spannableString = new SpannableString("@" + messages.get(messages.size() - 1).getSenderNickname() + "\t");
+            SpannableString spannableString =
+                new SpannableString("@" + messages.get(messages.size() - 1).getSenderNickname() + "\t");
             ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
-            spannableString.setSpan(colorSpan, 0, spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString.setSpan(colorSpan, 0, spannableString.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             Message lastMsg = messages.get(messages.size() - 1);
             MsgExpand msgExpand = (MsgExpand) lastMsg.getExt();
             if (null != msgExpand) msgExpand.spanHashCode = colorSpan.hashCode();
@@ -228,7 +244,8 @@ public class BottomInputCote {
             Drawable drawable = BaseApp.inst().getResources().getDrawable(emojiId);
             drawable.setBounds(0, 0, Common.dp2px(22), Common.dp2px(22));
             ImageSpan imageSpan = new ImageSpan(drawable);
-            spannableString.setSpan(imageSpan, 0, emojiKey.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString.setSpan(imageSpan, 0, emojiKey.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             view.chatInput.append(spannableString);
         });
         view.chatInput.setOnKeyListener((v, keyCode, event) -> {
@@ -283,7 +300,8 @@ public class BottomInputCote {
     private void switchFragment(BaseFragment fragment) {
         try {
             if (fragment != null && !fragment.isVisible() && mCurrentTabIndex != fragment.getPage()) {
-                FragmentTransaction transaction = ((BaseActivity) context).getSupportFragmentManager().beginTransaction();
+                FragmentTransaction transaction =
+                    ((BaseActivity) context).getSupportFragmentManager().beginTransaction();
                 if (!fragment.isAdded()) {
                     transaction.add(view.fragmentContainer.getId(), fragment);
                 }

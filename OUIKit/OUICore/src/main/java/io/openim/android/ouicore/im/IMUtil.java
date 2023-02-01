@@ -493,7 +493,9 @@ public class IMUtil {
         signalingInvitationInfo.setInviteeUserIDList(inviteeUserIDs);
         signalingInvitationInfo.setRoomID(String.valueOf(UUID.randomUUID()));
         signalingInvitationInfo.setTimeout(30);
-        signalingInvitationInfo.setMediaType(isVideoCalls ? "video" : "audio");
+
+        signalingInvitationInfo.setMediaType(isVideoCalls ? Constant.MediaType.VIDEO :
+            Constant.MediaType.AUDIO);
         signalingInvitationInfo.setPlatformID(IMUtil.PLATFORM_ID);
         signalingInvitationInfo.setSessionType(isSingleChat ? 1 : 2);
         signalingInvitationInfo.setGroupID(groupID);
@@ -593,8 +595,7 @@ public class IMUtil {
         String path = "";
         try {
             path = soundElem.getSoundPath();
-            if (TextUtils.isEmpty(path))
-                path = soundElem.getSourceUrl();
+            if (TextUtils.isEmpty(path)) path = soundElem.getSourceUrl();
         } catch (Exception e) {
             e.printStackTrace();
         }

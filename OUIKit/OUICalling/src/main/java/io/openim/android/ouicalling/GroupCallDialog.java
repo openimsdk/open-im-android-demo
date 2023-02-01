@@ -28,6 +28,7 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.sdk.OpenIMClient;
@@ -113,7 +114,7 @@ public class GroupCallDialog extends CallDialog {
     public void bindData(SignalingInfo signalingInfo) {
         super.signalingInfo = signalingInfo;
         callingVM.isGroup = signalingInfo.getInvitation().getInviteeUserIDList().size() > 1;
-        callingVM.setVideoCalls("video".equals(signalingInfo.getInvitation()
+        callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation()
             .getMediaType()));
 
         if (callingVM.isCallOut) {

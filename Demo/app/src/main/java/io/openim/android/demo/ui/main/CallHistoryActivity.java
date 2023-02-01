@@ -31,6 +31,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.entity.CallHistory;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
@@ -39,7 +40,8 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 @Route(path = Routes.Main.CALL_HISTORY)
-public class CallHistoryActivity extends BaseActivity<BaseViewModel, ActivityCallHistoryActicityBinding> {
+public class CallHistoryActivity extends BaseActivity<BaseViewModel,
+    ActivityCallHistoryActicityBinding> {
 
     private int page = 0;
     private int pageSize = 20;
@@ -63,8 +65,10 @@ public class CallHistoryActivity extends BaseActivity<BaseViewModel, ActivityCal
         view.content.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) view.content.getLayoutManager();
-                int lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
+                LinearLayoutManager linearLayoutManager =
+                    (LinearLayoutManager) view.content.getLayoutManager();
+                int lastVisiblePosition =
+                    linearLayoutManager.findLastCompletelyVisibleItemPosition();
                 if (lastVisiblePosition == recyclerViewAdapter.getItems().size() - 1 && recyclerViewAdapter.getItems().size() >= pageSize) {
                     page++;
                     loadHistory();
@@ -121,9 +125,11 @@ public class CallHistoryActivity extends BaseActivity<BaseViewModel, ActivityCal
 
     void init() {
         view.content.setLayoutManager(new LinearLayoutManager(this));
-        view.content.setAdapter(recyclerViewAdapter = new RecyclerViewAdapter<CallHistory, CallHistoryItem>(CallHistoryItem.class) {
+        view.content.setAdapter(recyclerViewAdapter = new RecyclerViewAdapter<CallHistory,
+            CallHistoryItem>(CallHistoryItem.class) {
             @Override
-            public void onBindView(@NonNull CallHistoryItem holder, CallHistory data, int position) {
+            public void onBindView(@NonNull CallHistoryItem holder, CallHistory data,
+                                   int position) {
                 int color;
                 if (data.isSuccess()) {
                     color = Color.parseColor("#333333");
@@ -135,19 +141,26 @@ public class CallHistoryActivity extends BaseActivity<BaseViewModel, ActivityCal
 
                 holder.v.avatar.load(data.getFaceURL());
                 holder.v.nickName.setText(data.getNickname());
-                holder.v.action.setText("[" + (data.getType().equals("audio") ? getString(io.openim.android.ouicore.R.string.voice) : getString(io.openim.android.ouicore.R.string.video)) + "] " + TimeUtil.getTime(data.getDate(), TimeUtil.yearTimeFormat));
+                holder.v.action.setText("[" + (data.getType().equals(Constant.MediaType.VIDEO)
+                    ? getString(io.openim.android.ouicore.R.string.voice)
+                    : getString(io.openim.android.ouicore.R.string.video))
+                    + "] " + TimeUtil.getTime(data.getDate(), TimeUtil.yearTimeFormat));
 
                 String duration = "";
                 if (data.getDuration() != 0)
-                    duration = TimeUtil.secondFormat(data.getDuration() / 1000, TimeUtil.secondFormatZh);
-                holder.v.description.setText(data.isIncomingCall() ? getString(io.openim.android.ouicore.R.string.inbound) + duration : getString(io.openim.android.ouicore.R.string.outbound) + duration);
+                    duration = TimeUtil.secondFormat(data.getDuration() / 1000,
+                        TimeUtil.secondFormatZh);
+                holder.v.description.setText(data.isIncomingCall() ?
+                    getString(io.openim.android.ouicore.R.string.inbound) + duration :
+                    getString(io.openim.android.ouicore.R.string.outbound) + duration);
 
                 holder.v.getRoot().setOnClickListener(view1 -> {
                     if (null == callingService) return;
                     IMUtil.showBottomPopMenu(CallHistoryActivity.this, (v1, keyCode, event) -> {
                         List<String> ids = new ArrayList<>();
                         ids.add(data.getUserID());
-                        SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1, true, ids, null);
+                        SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1,
+                            true, ids, null);
                         callingService.call(signalingInfo);
                         return false;
                     });
@@ -162,7 +175,8 @@ public class CallHistoryActivity extends BaseActivity<BaseViewModel, ActivityCal
         public ItemCallHistoryBinding v;
 
         public CallHistoryItem(@NonNull View itemView) {
-            super(ItemCallHistoryBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
+            super(ItemCallHistoryBinding.inflate(LayoutInflater.from(itemView.getContext()),
+                (ViewGroup) itemView, false).getRoot());
             v = ItemCallHistoryBinding.bind(this.itemView);
         }
     }

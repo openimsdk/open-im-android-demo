@@ -284,4 +284,8 @@ public class Constant {
     //超级群
     public static final int SUPER_GROUP_LIMIT = 250;
 
+    public static class MediaType {
+        public static final String VIDEO = "video";
+        public static final String AUDIO = "audio";
+    }
 }

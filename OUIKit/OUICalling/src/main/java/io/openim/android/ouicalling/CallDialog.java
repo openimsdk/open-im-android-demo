@@ -12,10 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.lifecycle.Observer;
 
 
@@ -95,23 +97,38 @@ public class CallDialog extends BaseDialog {
         setCancelable(false);
         setCanceledOnTouchOutside(false);
 
-        window.setBackgroundDrawableResource(android.R.color.transparent);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         } else {
             params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
         }
-        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
         window.setAttributes(params);
+
+        window.setBackgroundDrawableResource(android.R.color.transparent);
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+
+
+    }
+    //收起/展开
+    private void shrink(boolean isShrink) {
+        view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
+        getWindow().setDimAmount(isShrink ? 0f : 1f);
+        view.shrink.setVisibility(isShrink ? View.VISIBLE : View.GONE);
+        view.sTips.setText(callingVM.isCallOut ? context.getString(io.openim.android.ouicore.
+            R.string.waiting_tips2):
+            context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.height =isShrink? ViewGroup.LayoutParams.WRAP_CONTENT:ViewGroup.LayoutParams.MATCH_PARENT;
+        params.width = isShrink? ViewGroup.LayoutParams.WRAP_CONTENT:ViewGroup.LayoutParams.MATCH_PARENT;
+        params.gravity= isShrink?(Gravity.TOP|Gravity.END):Gravity.CENTER;
+        getWindow().setAttributes(params);
     }
 
     public void bindData(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
         callingVM.isGroup = signalingInfo.getInvitation().getInviteeUserIDList().size() > 1;
-        callingVM.setVideoCalls("video".equals(signalingInfo.getInvitation().getMediaType()));
+        callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
         if (!callingVM.isVideoCalls) {
             view.timeTv.setVisibility(View.GONE);
             view.headTips.setVisibility(View.GONE);
@@ -240,19 +257,7 @@ public class CallDialog extends BaseDialog {
         });
     }
 
-    private void shrink(boolean isShrink) {
-        view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
-        getWindow().setDimAmount(isShrink ? 0f : 1f);
-        view.shrink.setVisibility(isShrink ? View.VISIBLE : View.GONE);
-        view.sTips.setText(callingVM.isCallOut ? context.getString(io.openim.android.ouicore.
-            R.string.waiting_tips2):
-            context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
-        WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.height =isShrink? ViewGroup.LayoutParams.WRAP_CONTENT:ViewGroup.LayoutParams.MATCH_PARENT;
-        params.width = isShrink? ViewGroup.LayoutParams.WRAP_CONTENT:ViewGroup.LayoutParams.MATCH_PARENT;
-        params.gravity= isShrink?(Gravity.TOP|Gravity.END):Gravity.CENTER;
-        getWindow().setAttributes(params);
-    }
+
 
 
     public void changeView() {

@@ -4,8 +4,10 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:clipToPadding="true"
+        android:fitsSystemWindows="true"
+        android:keepScreenOn="true"
+        android:layout_height="match_parent">
 
         <RelativeLayout
             android:id="@+id/home"
@@ -13,9 +15,6 @@
             android:layout_height="match_parent"
             android:alpha="0.8"
             android:background="#000000"
-            android:clipToPadding="true"
-            android:fitsSystemWindows="true"
-            android:keepScreenOn="true"
             tools:context="io.openim.android.ouicalling.CallDialog">
 
 
