@@ -3,7 +3,7 @@
 
 ext {
     //模块单独运行
-    isModule=false
+    isModule=true
 
     //android 配置
     androidConfig = [
@@ -22,6 +22,7 @@ ext {
             "OUIGroup" : "io.openim.android.ouigroup",
             "OUIContact" : "io.openim.android.ouicontact",
             "OUICalling" : "io.openim.android.ouicalling",
+            "OUIMoments" : "io.openim.android.ouimoments",
     ]
 
 }
