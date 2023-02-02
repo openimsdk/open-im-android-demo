@@ -3,10 +3,13 @@ package io.openim.android.ouimoments.widgets.videolist.target;
 import android.media.MediaPlayer;
 import android.os.Build;
 
-import com.bumptech.glide.request.animation.GlideAnimation;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.target.ViewTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import java.io.File;
 
@@ -27,13 +30,15 @@ public class VideoLoadTarget extends ViewTarget<TextureVideoView, File> implemen
         mLoadMvpView = mvpView;
     }
 
+
     @Override
-    public void onResourceReady(File resource, GlideAnimation<? super File> glideAnimation) {
+    public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
         mLoadMvpView.videoResourceReady(resource.getAbsolutePath());
     }
 
     @Override
     public void getSize(SizeReadyCallback cb) {
+        super.getSize(cb);
         cb.onSizeReady(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL);
     }
 

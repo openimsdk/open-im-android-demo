@@ -125,7 +125,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
             boolean hasFavort = circleItem.hasFavort();
             boolean hasComment = circleItem.hasComment();
 
-            Glide.with(context).load(headImg).diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(R.color.bg_no_photo).transform(new GlideCircleTransform(context)).into(holder.headIv);
+            Glide.with(context).load(headImg).diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(R.color.bg_no_photo).transform(new GlideCircleTransform()).into(holder.headIv);
 
             holder.nameTv.setText(name);
             holder.timeTv.setText(createTime);

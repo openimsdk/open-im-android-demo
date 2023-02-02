@@ -32,15 +32,15 @@ android {
         }
         //getui
         manifestPlaceholders = [
-            GETUI_APPID: "jvT8ptKzMF9givfGLvV6B5",
+            GETUI_APPID: "",
 
             XIAOMI_APP_ID   : "",
             XIAOMI_APP_KEY  : "",
             MEIZU_APP_ID    : "",
             MEIZU_APP_KEY   : "",
-            HUAWEI_APP_ID   : "107381795",
-            OPPO_APP_KEY    : "e4aa862e2bde493b81a22d13a8c90dec",
-            OPPO_APP_SECRET : "019d8ca5c0104f3d896dd2643cd672e8",
+            HUAWEI_APP_ID   : "",
+            OPPO_APP_KEY    : "",
+            OPPO_APP_SECRET : "",
             VIVO_APP_ID     : "",
             VIVO_APP_KEY    : "",
             // 荣耀相关应用参数

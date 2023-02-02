@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.Registry;
+import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader;
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheFactory;
 import com.bumptech.glide.load.model.GlideUrl;
@@ -55,10 +56,11 @@ public class VideoListGlideModule implements GlideModule {
         }, DiskCache.Factory.DEFAULT_DISK_CACHE_SIZE));
     }
 
-    @Override
-    public void registerComponents(Context context, Glide glide) {
-        glide.register(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(sClient));
-    }
+
+//    @Override
+//    public void registerComponents(Context context, Glide glide) {
+//        glide.register(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(sClient));
+//    }
 
     public static OkHttpUrlLoader getOkHttpUrlLoader() {
         return sOkHttpUrlLoader;

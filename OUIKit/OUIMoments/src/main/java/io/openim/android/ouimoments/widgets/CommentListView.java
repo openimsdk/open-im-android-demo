@@ -2,7 +2,6 @@ package io.openim.android.ouimoments.widgets;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.annotation.NonNull;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -15,10 +14,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import io.openim.android.ouimoments.MyApplication;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.bean.CommentItem;
 import io.openim.android.ouimoments.spannable.CircleMovementMethod;
@@ -173,7 +174,7 @@ public class CommentListView extends LinearLayout {
         subjectSpanText.setSpan(new SpannableClickable(itemColor){
                                     @Override
                                     public void onClick(View widget) {
-                                        Toast.makeText(MyApplication.getContext(), textStr + " &id = " + id, Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(BaseApp.inst(), textStr + " &id = " + id, Toast.LENGTH_SHORT).show();
                                     }
                                 }, 0, subjectSpanText.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

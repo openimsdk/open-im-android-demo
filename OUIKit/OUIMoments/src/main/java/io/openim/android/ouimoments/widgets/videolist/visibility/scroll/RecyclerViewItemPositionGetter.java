@@ -1,12 +1,12 @@
 package io.openim.android.ouimoments.widgets.videolist.visibility.scroll;
 
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 /**
- * This class is an API for {@link com.waynell.videolist.visibility.calculator.ListItemsVisibilityCalculator}
  * Using this class is can access all the data from RecyclerView
  *
  * @author Wayne

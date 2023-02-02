@@ -2,7 +2,6 @@ package io.openim.android.ouimoments.widgets;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.annotation.NonNull;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -12,9 +11,11 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
-import io.openim.android.ouimoments.MyApplication;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.bean.FavortItem;
 import io.openim.android.ouimoments.spannable.CircleMovementMethod;
@@ -99,7 +100,7 @@ public class PraiseListView extends TextView{
     private SpannableString setImageSpan(){
         String text = "  ";
         SpannableString imgSpanText = new SpannableString(text);
-        imgSpanText.setSpan(new ImageSpan(MyApplication.getContext(), R.drawable.icon_praise, DynamicDrawableSpan.ALIGN_BASELINE),
+        imgSpanText.setSpan(new ImageSpan(BaseApp.inst(), R.drawable.icon_praise, DynamicDrawableSpan.ALIGN_BASELINE),
                 0 , 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         return imgSpanText;
     }

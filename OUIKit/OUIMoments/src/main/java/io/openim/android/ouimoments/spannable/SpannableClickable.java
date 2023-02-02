@@ -4,7 +4,7 @@ import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.view.View;
 
-import io.openim.android.ouimoments.MyApplication;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouimoments.R;
 
 /**
@@ -21,7 +21,7 @@ public abstract class SpannableClickable extends ClickableSpan implements View.O
     private int textColor ;
 
     public SpannableClickable() {
-        this.textColor = MyApplication.getContext().getResources().getColor(DEFAULT_COLOR_ID);
+        this.textColor = BaseApp.inst().getResources().getColor(DEFAULT_COLOR_ID);
     }
 
     public SpannableClickable(int textColor){

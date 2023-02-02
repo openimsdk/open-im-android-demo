@@ -10,7 +10,7 @@ import android.text.style.ClickableSpan;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
-import io.openim.android.ouimoments.MyApplication;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouimoments.R;
 
 /**
@@ -41,8 +41,8 @@ public class CircleMovementMethod extends BaseMovementMethod {
     }
 
     public CircleMovementMethod(){
-        this.textViewBgColor = MyApplication.getContext().getResources().getColor(DEFAULT_COLOR_ID);
-        this.clickableSpanBgClor = MyApplication.getContext().getResources().getColor(DEFAULT_CLICKABLEA_COLOR_ID);
+        this.textViewBgColor = BaseApp.inst().getResources().getColor(DEFAULT_COLOR_ID);
+        this.clickableSpanBgClor =  BaseApp.inst().getResources().getColor(DEFAULT_CLICKABLEA_COLOR_ID);
     }
 
     /**
@@ -51,7 +51,7 @@ public class CircleMovementMethod extends BaseMovementMethod {
      */
     public CircleMovementMethod(int clickableSpanBgClor){
         this.clickableSpanBgClor = clickableSpanBgClor;
-        this.textViewBgColor = MyApplication.getContext().getResources().getColor(DEFAULT_COLOR_ID);
+        this.textViewBgColor =  BaseApp.inst().getResources().getColor(DEFAULT_COLOR_ID);
     }
 
     /**

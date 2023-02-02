@@ -10,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.core.view.ViewCompat;
+import androidx.core.view.ViewPropertyAnimatorListener;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
@@ -124,12 +127,12 @@ public class CircleVideoView extends LinearLayout implements VideoLoadMvpView, L
                 // load video file
                 videoState = STATE_ACTIVED;
                 progressTarget.start();
-                Glide.with(getContext())
+//                Glide.with(getContext())
 //                        .using(VideoListGlideModule.getOkHttpUrlLoader(), InputStream.class)
-                        .load(new GlideUrl(videoUrl))
-                        .as(File.class)
-                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                        .into(progressTarget);
+//                        .load(new GlideUrl(videoUrl))
+//                        .as(File.class)
+//                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+//                        .into(progressTarget);
 
                 videoButton.setVisibility(View.INVISIBLE);
                 if(onPlayClickListener!=null){
