@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -30,6 +31,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouimoments.R;
 
 /**
@@ -59,10 +61,13 @@ public class ImagePagerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActionBar actionBar = getSupportActionBar();
+        if (null != actionBar)
+            actionBar.hide();
         setContentView(R.layout.activity_imagepager);
+        SinkHelper.get(this).setTranslucentStatus(null);
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         guideGroup = (LinearLayout) findViewById(R.id.guideGroup);
-
         getIntentData();
 
         ImageAdapter mAdapter = new ImageAdapter(this);

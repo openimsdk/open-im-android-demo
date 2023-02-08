@@ -3,11 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 
-    <io.openim.moments.widgets.MultiImageView
+    <io.openim.android.ouimoments.widgets.MultiImageView
         android:id="@+id/multiImagView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp" >
-    </io.openim.moments.widgets.MultiImageView>
+    </io.openim.android.ouimoments.widgets.MultiImageView>
 
 </LinearLayout>

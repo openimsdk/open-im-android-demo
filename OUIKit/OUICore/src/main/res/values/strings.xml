@@ -253,4 +253,7 @@
     <string name="create_label_tips3">请选择成员</string>
     <string name="waiting_tips2">等待接受</string>
     <string name="waiting_tips3">邀请你通话</string>
+    <string name="word_circle">工作圈</string>
+    <string name="star">赞</string>
+    <string name="comment">评论</string>
 </resources>

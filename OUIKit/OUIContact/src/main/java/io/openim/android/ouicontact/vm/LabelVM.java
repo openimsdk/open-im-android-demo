@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.openim.android.ouicontact.ni.NiService;
+import io.openim.android.ouicore.services.NiService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.entity.UserLabel;

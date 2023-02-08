@@ -5,6 +5,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 
+import java.io.IOException;
+
 import io.openim.android.ouicore.net.RXRetrofit.Exception.NetworkException;
 import io.openim.android.ouicore.net.RXRetrofit.Exception.RXRetrofitException;
 import io.openim.android.ouicore.base.BaseApp;

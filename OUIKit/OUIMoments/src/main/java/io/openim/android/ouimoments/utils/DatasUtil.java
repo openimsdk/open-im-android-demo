@@ -120,22 +120,22 @@ public class DatasUtil {
 		p6.h = 467;
 
 		PhotoInfo p7 = new PhotoInfo();
-		p7.url = "http://pica.nipic.com/2007-10-17/20071017111345564_2.jpg";
+        p7.url = "http://c.hiphotos.baidu.com/image/pic/item/7dd98d1001e939011b9c86d07fec54e737d19645.jpg";
 		p7.w = 1024;
 		p7.h = 640;
 
 		PhotoInfo p8 = new PhotoInfo();
-		p8.url = "http://pic4.nipic.com/20091101/3672704_160309066949_2.jpg";
+        p8.url = "http://c.hiphotos.baidu.com/image/pic/item/7dd98d1001e939011b9c86d07fec54e737d19645.jpg";
 		p8.w = 1024;
 		p8.h = 768;
 
 		PhotoInfo p9 = new PhotoInfo();
-		p9.url = "http://pic4.nipic.com/20091203/1295091_123813163959_2.jpg";
+        p9.url = "http://c.hiphotos.baidu.com/image/pic/item/7dd98d1001e939011b9c86d07fec54e737d19645.jpg";
 		p9.w = 1024;
 		p9.h = 640;
 
 		PhotoInfo p10 = new PhotoInfo();
-		p10.url = "http://pic31.nipic.com/20130624/8821914_104949466000_2.jpg";
+        p10.url = "http://c.hiphotos.baidu.com/image/pic/item/7dd98d1001e939011b9c86d07fec54e737d19645.jpg";
 		p10.w = 1024;
 		p10.h = 768;
 

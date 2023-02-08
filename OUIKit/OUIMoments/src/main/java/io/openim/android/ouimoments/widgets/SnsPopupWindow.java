@@ -69,8 +69,8 @@ public class SnsPopupWindow extends PopupWindow implements OnClickListener{
 		initItemData();
 	}
 	private void initItemData() {
-		addAction(new ActionItem("赞"));
-		addAction(new ActionItem("评论"));
+		addAction(new ActionItem(getContentView().getContext().getString(io.openim.android.ouicore.R.string.star)));
+		addAction(new ActionItem(getContentView().getContext().getString(io.openim.android.ouicore.R.string.comment)));
 	}
 
 	public void showPopupWindow(View parent){

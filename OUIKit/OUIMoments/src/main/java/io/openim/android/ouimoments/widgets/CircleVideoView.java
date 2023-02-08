@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorListener;
 
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
@@ -21,6 +22,7 @@ import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 import java.io.File;
 import java.io.InputStream;
 
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.widgets.videolist.VideoListGlideModule;
 import io.openim.android.ouimoments.widgets.videolist.model.VideoLoadMvpView;
@@ -48,7 +50,7 @@ public class CircleVideoView extends LinearLayout implements VideoLoadMvpView, L
     private int videoState = STATE_IDLE;
 
     private int postion;;
-    private String videoUrl;
+    private String videoUrl,imgUrl;
 
     private OnPlayClickListener onPlayClickListener;
     private String videoLocalPath;
@@ -77,7 +79,7 @@ public class CircleVideoView extends LinearLayout implements VideoLoadMvpView, L
     }
 
     public void setVideoImgUrl(String imgUrl){
-
+        this.imgUrl=imgUrl;
         Glide.with(getContext())
                 .load(imgUrl)
                 .placeholder(new ColorDrawable(0xffdcdcdc))
@@ -121,23 +123,13 @@ public class CircleVideoView extends LinearLayout implements VideoLoadMvpView, L
             @Override
             public void onClick(View v) {
                 if(TextUtils.isEmpty(videoUrl)){
-                    Toast.makeText(getContext(), "video url is empty...", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "video url is empty...",
+                        Toast.LENGTH_LONG).show();
                     return;
                 }
-                // load video file
-                videoState = STATE_ACTIVED;
-                progressTarget.start();
-//                Glide.with(getContext())
-//                        .using(VideoListGlideModule.getOkHttpUrlLoader(), InputStream.class)
-//                        .load(new GlideUrl(videoUrl))
-//                        .as(File.class)
-//                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-//                        .into(progressTarget);
-
-                videoButton.setVisibility(View.INVISIBLE);
-                if(onPlayClickListener!=null){
-                    onPlayClickListener.onPlayClick(postion);
-                }
+                ARouter.getInstance().build(Routes.Conversation.PREVIEW)
+                    .withString("media_url",videoUrl)
+                    .withString("first_frame",imgUrl).navigation();
             }
         });
 

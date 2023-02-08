@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.ouimoments.MainActivity;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.activity.ImagePagerActivity;
@@ -125,7 +127,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
             boolean hasFavort = circleItem.hasFavort();
             boolean hasComment = circleItem.hasComment();
 
-            Glide.with(context).load(headImg).diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(R.color.bg_no_photo).transform(new GlideCircleTransform()).into(holder.headIv);
+            holder.headIv.load(headImg);
 
             holder.nameTv.setText(name);
             holder.timeTv.setText(createTime);
@@ -218,14 +220,14 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
 
             final SnsPopupWindow snsPopupWindow = holder.snsPopupWindow;
             //判断是否已点赞
-            String curUserFavortId = circleItem.getCurUserFavortId(DatasUtil.curUser.getId());
+            String curUserFavortId = circleItem.getCurUserFavortId(BaseApp.inst().loginCertificate.userID);
             if(!TextUtils.isEmpty(curUserFavortId)){
                 snsPopupWindow.getmActionItems().get(0).mTitle = "取消";
             }else{
                 snsPopupWindow.getmActionItems().get(0).mTitle = "赞";
             }
             snsPopupWindow.update();
-            snsPopupWindow.setmItemClickListener(new PopupItemClickListener(circlePosition, circleItem, curUserFavortId));
+            snsPopupWindow.setmItemClickListener(new PopupItemClickListener(circlePosition, circleItem, circleItem.getId()));
             holder.snsBtn.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view) {
@@ -263,7 +265,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                                     for(PhotoInfo photoInfo : photos){
                                         photoUrls.add(photoInfo.url);
                                     }
-                                    ImagePagerActivity.startImagePagerActivity(((MainActivity) context), photoUrls, position, imageSize);
+                                    ImagePagerActivity.startImagePagerActivity(context, photoUrls, position, imageSize);
 
 
                                 }
@@ -308,18 +310,25 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
 
         public HeaderViewHolder(View itemView) {
             super(itemView);
+          try {
+              AvatarImage avatarImage =itemView.findViewById(R.id.headIv);
+              TextView name =itemView.findViewById(R.id.name);
+              avatarImage.load(BaseApp.inst().loginCertificate.faceURL);
+              name.setText(BaseApp.inst().loginCertificate.nickname);
+          }catch (Exception ignored){
+          }
         }
     }
 
     private class PopupItemClickListener implements SnsPopupWindow.OnItemClickListener{
-        private String mFavorId;
+        private String momentID;
         //动态在列表中的位置
         private int mCirclePosition;
         private long mLasttime = 0;
         private CircleItem mCircleItem;
 
         public PopupItemClickListener(int circlePosition, CircleItem circleItem, String favorId){
-            this.mFavorId = favorId;
+            this.momentID = favorId;
             this.mCirclePosition = circlePosition;
             this.mCircleItem = circleItem;
         }
@@ -332,10 +341,11 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                         return;
                     mLasttime = System.currentTimeMillis();
                     if(presenter != null){
-                        if ("赞".equals(actionitem.mTitle.toString())) {
-                            presenter.addFavort(mCirclePosition);
+                        if (BaseApp.inst().getString(io.openim.android.ouicore.R.string.star)
+                            .equals(actionitem.mTitle.toString())) {
+                            presenter.addFavort(mCirclePosition,momentID);
                         } else {//取消点赞
-                            presenter.deleteFavort(mCirclePosition, mFavorId);
+                            presenter.deleteFavort(mCirclePosition, momentID);
                         }
                     }
                     break;

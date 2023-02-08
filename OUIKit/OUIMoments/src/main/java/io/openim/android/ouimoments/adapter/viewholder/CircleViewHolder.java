@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.widgets.CommentListView;
 import io.openim.android.ouimoments.widgets.ExpandTextView;
@@ -28,7 +29,7 @@ public abstract class CircleViewHolder extends RecyclerView.ViewHolder implement
 
     public int viewType;
 
-    public ImageView headIv;
+    public AvatarImage headIv;
     public TextView nameTv;
     public TextView urlTipTv;
     /** 动态的内容 */
@@ -55,7 +56,7 @@ public abstract class CircleViewHolder extends RecyclerView.ViewHolder implement
 
         initSubView(viewType, viewStub);
 
-        headIv = (ImageView) itemView.findViewById(R.id.headIv);
+        headIv = (AvatarImage) itemView.findViewById(R.id.headIv);
         nameTv = (TextView) itemView.findViewById(R.id.nameTv);
         digLine = itemView.findViewById(R.id.lin_dig);
 

@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.openim.android.ouimoments">
 
     <application android:theme="@style/Theme.Demo">
+
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+        <activity android:name=".activity.ImagePagerActivity"
+            android:exported="false"/>
 
     </application>
 

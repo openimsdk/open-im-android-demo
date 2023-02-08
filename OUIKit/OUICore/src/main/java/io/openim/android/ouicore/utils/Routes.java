@@ -34,6 +34,8 @@ public class Routes {
         public static final String CHAT_HISTORY = "/conversation/ChatHistorySearchActivity";
         //全局搜索
         public final static String SEARCH = "/conversation/SearchActivity";
+        //预览图片或视频
+        public static final String PREVIEW = "/conversation/PreviewActivity";
     }
 
     //群组

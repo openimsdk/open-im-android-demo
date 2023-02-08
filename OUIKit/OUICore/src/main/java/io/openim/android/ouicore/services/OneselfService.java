@@ -25,20 +25,18 @@ public interface OneselfService {
         return responseBody -> {
             String body = responseBody.string();
             Base<T> base = GsonHel.dataObject(body, tClass);
-            if (base.errCode == 0)
-                return null == base.data ? tClass.newInstance() : base.data;
+            if (base.errCode == 0) return null == base.data ? tClass.newInstance() : base.data;
             throw new RXRetrofitException(base.errCode, base.errMsg);
         };
     }
 
     @POST
-    Observable<ResponseBody> getUsersOnlineStatus(
-        @Url String url,
-        @Header("token") String token,
-        @Body RequestBody requestBody);
+    Observable<ResponseBody> getUsersOnlineStatus(@Url String url, @Header("token") String token,
+                                                  @Body RequestBody requestBody);
 
     /**
      * 下载文件
+     *
      * @param fileUrl
      * @return
      */

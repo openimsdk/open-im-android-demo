@@ -5,13 +5,6 @@ if (isModule) {
 }
 
 android {
-//    viewBinding {
-//        enabled = true
-//    }
-//    dataBinding{
-//        enabled = true
-//    }
-
 
     compileSdk rootProject.ext.androidConfig.compileSdk
 
