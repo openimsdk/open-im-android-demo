@@ -354,7 +354,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
     @Override
     public void update(Observable observable, Object o) {
         Obs.Message message = (Obs.Message) o;
-        if (message.tag == Constant.Event.USER_INFO_UPDATA) {
+        if (message.tag == Constant.Event.USER_INFO_UPDATE) {
             initHeader();
         }
     }

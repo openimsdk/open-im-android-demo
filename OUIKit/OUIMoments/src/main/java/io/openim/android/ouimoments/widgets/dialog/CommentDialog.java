@@ -30,12 +30,14 @@ public class CommentDialog extends Dialog implements
 	private Context mContext;
 	private CirclePresenter mPresenter;
 	private CommentItem mCommentItem;
+	private String momentID;
 	private int mCirclePosition;
 
 	public CommentDialog(Context context, CirclePresenter presenter,
-			CommentItem commentItem, int circlePosition) {
+			CommentItem commentItem, String momentID,int circlePosition) {
 		super(context, R.style.comment_dialog);
 		mContext = context;
+        this.momentID=momentID;
 		this.mPresenter = presenter;
 		this.mCommentItem = commentItem;
 		this.mCirclePosition = circlePosition;
@@ -88,7 +90,7 @@ public class CommentDialog extends Dialog implements
 			break;
 		case R.id.deleteTv:
 			if (mPresenter != null && mCommentItem != null) {
-				mPresenter.deleteComment(mCirclePosition, mCommentItem.getId());
+				mPresenter.deleteComment(momentID,mCirclePosition, mCommentItem.getId());
 			}
 			dismiss();
 			break;

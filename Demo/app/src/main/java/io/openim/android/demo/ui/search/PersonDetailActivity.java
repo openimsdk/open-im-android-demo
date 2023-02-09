@@ -239,7 +239,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     @Override
     public void update(Observable o, Object arg) {
         Obs.Message message = (Obs.Message) arg;
-        if (message.tag == Constant.Event.USER_INFO_UPDATA) {
+        if (message.tag == Constant.Event.USER_INFO_UPDATE) {
             vm.searchPerson();
         }
     }

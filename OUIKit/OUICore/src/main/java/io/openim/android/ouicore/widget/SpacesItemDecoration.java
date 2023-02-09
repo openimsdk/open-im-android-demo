@@ -8,15 +8,21 @@ import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
     private float mDividerHeight = 1; //线的高度
     private Paint mPaint;           //画笔将自己做出来的分割线矩形画出颜色
     private float margin = 0;       //左右偏移量
+    private List<Integer> notDrawIndex = new ArrayList<>();
 
     public SpacesItemDecoration() {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);          //抗锯齿
         mPaint.setColor(Color.GRAY);        //默认颜色
+        notDrawIndex.add(0); //第一个ItemView不需要绘制
     }
 
     //通过建造者模式来设置三个属性
@@ -40,7 +46,8 @@ public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
 
     //在这里就已经把宽度的偏移给做好了
     @Override
-    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+    public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
+                               RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
         //第一个ItemView不需要在上面绘制分割线
         if (parent.getChildAdapterPosition(view) != 0) {
@@ -48,6 +55,11 @@ public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
             outRect.top = (int) mDividerHeight;//指相对itemView顶部的偏移量
         }
     }
+
+    public void addNotDrawIndex(Integer... index) {
+        notDrawIndex.addAll(Arrays.asList(index));
+    }
+
     //这里主要是绘制颜色的
     @Override
     public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
@@ -58,8 +70,9 @@ public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
         for (int i = 0; i < childCount; i++) {
             View view = parent.getChildAt(i);
             int index = parent.getChildAdapterPosition(view);
+
             //第一个ItemView不需要绘制
-            if (index == 0) {
+            if (notDrawIndex.contains(index)) {
                 continue;//跳过本次循环体中尚未执行的语句，立即进行下一次的循环条件判断
             }
             float dividerTop = view.getTop() - mDividerHeight;

@@ -709,10 +709,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         //标记本条消息已读 语音消息需要点播放才算读
         if (!viewPause && msg.getContentType() != Constant.MsgType.VOICE) markReaded(msg);
 
-        statusupdata(msg);
+        statusUPDATE(msg);
     }
 
-    private void statusupdata(Message msg) {
+    private void statusUPDATE(Message msg) {
         try {
             int contentType = msg.getContentType();
             if (contentType == Constant.MsgType.BULLETIN) {

@@ -74,7 +74,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
                     vm.superGroupMembers.getValue().add(exGroupMemberInfo);
                 }
                 adapter.notifyItemChanged(index);
-                updataSelectedNum();
+                UPDATESelectedNum();
             } else {
                 ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, uid).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
             }
@@ -85,11 +85,11 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
     private ActivityResultLauncher<Intent> selectMemberLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK) {
             adapter.notifyDataSetChanged();
-            updataSelectedNum();
+            UPDATESelectedNum();
         }
     });
 
-    private void updataSelectedNum() {
+    private void UPDATESelectedNum() {
         selectNum = 0;
         for (ExGroupMemberInfo exGroupMemberInfo : vm.superGroupMembers.getValue()) {
             if (exGroupMemberInfo.isSelect) selectNum++;
@@ -169,7 +169,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
 
         vm.superGroupMembers.observe(this, v -> {
             if (v.isEmpty()) return;
-            updataSelectedNum();
+            UPDATESelectedNum();
             adapter.notifyItemRangeInserted(vm.superGroupMembers.getValue().size() - vm.pageSize, vm.superGroupMembers.getValue().size());
         });
     }

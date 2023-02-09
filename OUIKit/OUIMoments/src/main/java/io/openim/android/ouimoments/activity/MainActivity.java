@@ -121,12 +121,12 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         SpacesItemDecoration divItemDecoration=new SpacesItemDecoration();
+        divItemDecoration.addNotDrawIndex(1);
         recyclerView.addItemDecoration(divItemDecoration);
         recyclerView.getRecyclerView()
         .setItemAnimator(new CustomItemAnimator());
         recyclerView.getMoreProgressView().getLayoutParams().width =
             ViewGroup.LayoutParams.MATCH_PARENT;
-
         recyclerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -282,6 +282,11 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
     }
 
     @Override
+    public void updateAdapterIndex(int index) {
+        circleAdapter.notifyItemChanged(index);
+    }
+
+    @Override
     public void update2DeleteCircle(String circleId) {
         List<CircleItem> circleItems = circleAdapter.getDatas();
         for (int i = 0; i < circleItems.size(); i++) {
@@ -299,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
         if (addItem != null) {
             CircleItem item = (CircleItem) circleAdapter.getDatas().get(circlePosition);
             item.getFavorters().add(addItem);
-            circleAdapter.notifyItemRangeChanged(circlePosition,circlePosition+1);
+            circleAdapter.notifyItemChanged(circlePosition+1);
         }
     }
 
@@ -394,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
         //int listviewOffset = mScreenHeight - mSelectCircleItemH - mCurrentKeyboardH -
         // mEditTextBodyHeight;
         int listviewOffset =
-            screenHeight - selectCircleItemH - currentKeyboardH - editTextBodyHeight - titleBar.getHeight();
+            screenHeight - selectCircleItemH - currentKeyboardH - editTextBodyHeight ;
         if (commentConfig.commentType == CommentConfig.Type.REPLY) {
             //回复评论的情况
             listviewOffset = listviewOffset + selectCommentItemOffset;

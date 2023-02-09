@@ -181,7 +181,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             public void onSuccess(String data) {
                 waitDialog.dismiss();
                 vm.exUserInfo.getValue().userInfo.setRemark(resultStr);
-                Obs.newMessage(Constant.Event.USER_INFO_UPDATA);
+                Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
             }
         }, uid, resultStr);
     });

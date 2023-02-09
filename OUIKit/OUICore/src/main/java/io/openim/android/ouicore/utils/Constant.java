@@ -63,11 +63,11 @@ public class Constant {
         //音视频通话
         public static final int CALLING_REQUEST_CODE = 10003;
         //用户信息更新
-        public static final int USER_INFO_UPDATA = 10004;
+        public static final int USER_INFO_UPDATE = 10004;
         //设置背景
         public static final int SET_BACKGROUND = 10005;
         //群信息更新
-        public static final int UPDATA_GROUP_INFO = 10006;
+        public static final int UPDATE_GROUP_INFO = 10006;
         //设置群通知
         public static final int SET_GROUP_NOTIFICATION = 10007;
         //插入了消息到本地

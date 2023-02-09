@@ -130,7 +130,7 @@ public class GroupVM extends SocialityVM {
      * @param introduction 群简介
      * @param ex           其他信息
      */
-    public void updataGroup(String groupID, String groupName, String faceURL, String notification, String introduction, String ex) {
+    public void UPDATEGroup(String groupID, String groupName, String faceURL, String notification, String introduction, String ex) {
         OpenIMClient.getInstance().groupManager.setGroupInfo(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -140,7 +140,7 @@ public class GroupVM extends SocialityVM {
             @Override
             public void onSuccess(String data) {
                 if (!TextUtils.isEmpty(groupName)) {
-                    Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO, groupName);
+                    Obs.newMessage(Constant.Event.UPDATE_GROUP_INFO, groupName);
                 }
                 if (!TextUtils.isEmpty(notification)) {
                     Obs.newMessage(Constant.Event.SET_GROUP_NOTIFICATION);
@@ -331,7 +331,7 @@ public class GroupVM extends SocialityVM {
                 getGroupMemberList();
                 getIView().onSuccess(null);
 
-                Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO, groupName);
+                Obs.newMessage(Constant.Event.UPDATE_GROUP_INFO, groupName);
             }
         }, groupId, userIds, "");
     }
@@ -356,7 +356,7 @@ public class GroupVM extends SocialityVM {
                 getGroupMemberList();
                 getIView().onSuccess(null);
 
-                Obs.newMessage(Constant.Event.UPDATA_GROUP_INFO, groupName);
+                Obs.newMessage(Constant.Event.UPDATE_GROUP_INFO, groupName);
             }
         }, groupId, userIds, "");
     }

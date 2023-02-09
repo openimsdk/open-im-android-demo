@@ -13,6 +13,7 @@ import io.openim.android.ouimoments.bean.FavortItem;
 public interface CircleContract {
 
     interface View extends BaseView{
+        void updateAdapterIndex(int index);
         void update2DeleteCircle(String circleId);
         void update2AddFavorite(int circlePosition, FavortItem addItem);
         void update2DeleteFavort(int circlePosition, String favortId);
@@ -27,7 +28,7 @@ public interface CircleContract {
         void deleteCircle(final String circleId);
         void addFavort(final int circlePosition,final String mFavorId);
         void deleteFavort(final int circlePosition, final String favortId);
-        void deleteComment(final int circlePosition, final String commentId);
+        void deleteComment(String momentID,final int circlePosition, final String commentId);
 
     }
 }

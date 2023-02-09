@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -47,6 +48,7 @@ public class ImagePagerActivity extends AppCompatActivity {
     public ImageSize imageSize;
     private int startPos;
     private ArrayList<String> imgUrls;
+    private GestureDetector mGestureDetector;
 
 
     public static void startImagePagerActivity(Context context, List<String> imgUrls, int position, ImageSize imageSize){
@@ -69,6 +71,14 @@ public class ImagePagerActivity extends AppCompatActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         guideGroup = (LinearLayout) findViewById(R.id.guideGroup);
         getIntentData();
+        mGestureDetector = new GestureDetector(this,
+            new GestureDetector.SimpleOnGestureListener(){
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    finish();
+                    return false;
+                }
+            });
 
         ImageAdapter mAdapter = new ImageAdapter(this);
         mAdapter.setDatas(imgUrls);
@@ -123,6 +133,7 @@ public class ImagePagerActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
+        mGestureDetector.onTouchEvent(ev);
         try{
             return super.dispatchTouchEvent(ev);
         }catch (Exception e){

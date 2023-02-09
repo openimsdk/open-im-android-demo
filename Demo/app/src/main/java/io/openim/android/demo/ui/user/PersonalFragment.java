@@ -116,7 +116,7 @@ public class PersonalFragment extends BaseFragment implements Observer {
     @Override
     public void update(Observable observable, Object o) {
         Obs.Message message = (Obs.Message) o;
-        if (message.tag == Constant.Event.USER_INFO_UPDATA) {
+        if (message.tag == Constant.Event.USER_INFO_UPDATE) {
             view.avatar.load(BaseApp.inst().loginCertificate.faceURL);
             view.name.setText(BaseApp.inst().loginCertificate.nickname);
         }

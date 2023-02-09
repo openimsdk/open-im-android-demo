@@ -14,6 +14,7 @@ public class CommentConfig {
 
     }
 
+    public String momentID;
     public int circlePosition;
     public int commentPosition;
     public Type commentType;

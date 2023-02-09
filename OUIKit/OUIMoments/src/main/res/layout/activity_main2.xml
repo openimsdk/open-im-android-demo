@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_aeaeae"
+    android:background="@color/white"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:context="io.openim.android.ouimoments.activity.MainActivity" >
