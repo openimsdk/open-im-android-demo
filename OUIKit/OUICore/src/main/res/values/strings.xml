@@ -257,4 +257,7 @@
     <string name="star">赞</string>
     <string name="comment">评论</string>
     <string name="new_msg_tips">%1$s条新消息</string>
+    <string name="coments_null_tips">评论内容不能为空...</string>
+    <string name="moments">朋友圈</string>
+    <string name="to_user_moments">%1$s的动态</string>
 </resources>

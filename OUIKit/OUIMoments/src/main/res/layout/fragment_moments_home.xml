@@ -1,36 +1,33 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:fitsSystemWindows="true"
-    android:orientation="vertical"
-    tools:context="io.openim.android.ouimoments.activity.MainActivity" >
-
+    tools:context="io.openim.android.ouimoments.ui.CircleFragment">
 
     <RelativeLayout
         android:id="@+id/bodyLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
 
         <com.malinskiy.superrecyclerview.SuperRecyclerView
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:mainLayoutId="@layout/layout_recyclerview_verticalscroll"
             app:layout_moreProgress="@layout/view_more_progress"
+            app:mainLayoutId="@layout/layout_recyclerview_verticalscroll"
             app:recyclerClipToPadding="true"
             app:scrollbarStyle="outsideOverlay" />
 
         <include
+            layout="@layout/layout_editview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            layout="@layout/layout_editview"/>
+            android:layout_alignParentBottom="true" />
 
-        <com.mikhaellopez.circularprogressbar.CircularProgressBar
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+        <com.mikhaellopez.circularprogressbar.CircularProgressBar xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/video_progress"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -43,4 +40,6 @@
 
     </RelativeLayout>
 
-</LinearLayout>
+    <include layout="@layout/layout_main_titlebar" />
+
+</RelativeLayout>

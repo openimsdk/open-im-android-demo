@@ -1,26 +1,28 @@
 package io.openim.android.ouimoments.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.widget.AvatarImage;
-import io.openim.android.ouimoments.MainActivity;
 import io.openim.android.ouimoments.R;
-import io.openim.android.ouimoments.activity.ImagePagerActivity;
+import io.openim.android.ouimoments.ToUserMomentsActivity;
+import io.openim.android.ouimoments.ui.ImagePagerActivity;
 import io.openim.android.ouimoments.adapter.viewholder.CircleViewHolder;
 import io.openim.android.ouimoments.adapter.viewholder.ImageViewHolder;
 import io.openim.android.ouimoments.adapter.viewholder.URLViewHolder;
@@ -33,7 +35,6 @@ import io.openim.android.ouimoments.bean.FavortItem;
 import io.openim.android.ouimoments.bean.PhotoInfo;
 import io.openim.android.ouimoments.mvp.presenter.CirclePresenter;
 import io.openim.android.ouimoments.utils.DatasUtil;
-import io.openim.android.ouimoments.utils.GlideCircleTransform;
 import io.openim.android.ouimoments.utils.UrlUtils;
 import io.openim.android.ouimoments.widgets.CircleVideoView;
 import io.openim.android.ouimoments.widgets.CommentListView;
@@ -42,9 +43,6 @@ import io.openim.android.ouimoments.widgets.MultiImageView;
 import io.openim.android.ouimoments.widgets.PraiseListView;
 import io.openim.android.ouimoments.widgets.SnsPopupWindow;
 import io.openim.android.ouimoments.widgets.dialog.CommentDialog;
-import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.listener.OnWorkMomentsListener;
 
 /**
  * Created by yiwei on 16/5/17.
@@ -116,22 +114,27 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position) {
-
         if (getItemViewType(position) == TYPE_HEAD) {
             try {
                 HeaderViewHolder holder = (HeaderViewHolder) viewHolder;
-                holder.headIv.load(BaseApp.inst().loginCertificate.faceURL);
-                holder.nameTv.setText(BaseApp.inst().loginCertificate.nickname);
-//                holder.newMsgTips.setVisibility(TextUtils.isEmpty(presenter.unReadCount)?View.GONE
-//                    :View.VISIBLE);
-                holder.newMsgTips.setText(String.format(context.getString(io.openim.android.ouicore.R.string.new_msg_tips),
-                    presenter.unReadCount));
-                holder.newMsgTips.setOnClickListener(v -> {
-                    presenter.unReadCount=null;
-                    holder.newMsgTips.setVisibility(View.GONE);
-                    //TODO JUMP
+                if (presenter.isSpecifiedUser()){
+                    holder.headIv.load(presenter.user.getHeadUrl());
+                    holder.nameTv.setText(presenter.user.getName());
+                }else {
+                    holder.headIv.load(BaseApp.inst().loginCertificate.faceURL);
+                    holder.nameTv.setText(BaseApp.inst().loginCertificate.nickname);
+                }
+                if (!presenter.isSpecifiedUser()){
+                    holder.newMsgTips.setVisibility(TextUtils.isEmpty(presenter.unReadCount) ?
+                        View.GONE : View.VISIBLE);
+                    holder.newMsgTips.setText(String.format(context.getString(io.openim.android.ouicore.R.string.new_msg_tips), presenter.unReadCount));
+                    holder.newMsgTips.setOnClickListener(v -> {
+                        presenter.unReadCount = null;
+                        holder.newMsgTips.setVisibility(View.GONE);
+                        //TODO JUMP
 
-                });
+                    });
+                }
             } catch (Exception ignored) {
             }
         } else {
@@ -149,7 +152,9 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
             boolean hasComment = circleItem.hasComment();
 
             holder.headIv.load(headImg);
-
+            if (!presenter.isSpecifiedUser()) holder.headIv.setOnClickListener(v -> {
+                context.startActivity(new Intent(context, ToUserMomentsActivity.class).putExtra(Constant.K_RESULT, circleItem.getUser()));
+            });
             holder.nameTv.setText(name);
             holder.timeTv.setText(createTime);
 

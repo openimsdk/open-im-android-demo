@@ -1,15 +1,14 @@
-package io.openim.android.ouimoments.activity;
+package io.openim.android.ouimoments.ui;
 
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -17,23 +16,21 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.bumptech.glide.Glide;
-import com.malinskiy.superrecyclerview.OnMoreListener;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 
 import java.util.List;
 
+import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
 import io.openim.android.ouicore.widget.SpacesItemDecoration;
 import io.openim.android.ouimoments.R;
@@ -42,19 +39,17 @@ import io.openim.android.ouimoments.bean.CircleItem;
 import io.openim.android.ouimoments.bean.CommentConfig;
 import io.openim.android.ouimoments.bean.CommentItem;
 import io.openim.android.ouimoments.bean.FavortItem;
+import io.openim.android.ouimoments.bean.User;
 import io.openim.android.ouimoments.mvp.contract.CircleContract;
 import io.openim.android.ouimoments.mvp.presenter.CirclePresenter;
 import io.openim.android.ouimoments.utils.CommonUtils;
-import io.openim.android.ouimoments.utils.DatasUtil;
 import io.openim.android.ouimoments.widgets.CommentListView;
-import io.openim.android.ouimoments.widgets.DivItemDecoration;
 import io.openim.android.ouimoments.widgets.TitleBar;
-import io.openim.android.ouimoments.widgets.dialog.UpLoadDialog;
 
 
-public class MainActivity extends AppCompatActivity implements CircleContract.View {
+public class CircleFragment extends BaseFragment implements CircleContract.View {
 
-    protected static final String TAG = MainActivity.class.getSimpleName();
+    protected static final String TAG = CircleFragment.class.getSimpleName();
     private CircleAdapter circleAdapter;
     private LinearLayout edittextbody;
     private EditText editText;
@@ -73,88 +68,113 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
     private LinearLayoutManager layoutManager;
     private TitleBar titleBar;
 
-
-    private UpLoadDialog uploadDialog;
     private SwipeRefreshLayout.OnRefreshListener refreshListener;
     private boolean hasStorage = false;
 
 
+    public static CircleFragment newInstance(User user) {
+        Bundle args = new Bundle();
+        args.putSerializable(Constant.K_RESULT, user);
+        CircleFragment fragment = new CircleFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
-        presenter = new CirclePresenter(this);
-        initView();
-
-        initPermission();
-
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_moments_home, container);
+        initTitle(view);
+        initView(view);
         //实现自动下拉刷新功能
-        recyclerView.getSwipeToRefresh().post(new Runnable() {
-            @Override
-            public void run() {
-                recyclerView.setRefreshing(true);//执行下拉刷新的动画
-                refreshListener.onRefresh();//执行数据加载操作
-            }
+        recyclerView.getSwipeToRefresh().post(() -> {
+            recyclerView.setRefreshing(true);//执行下拉刷新的动画
+            refreshListener.onRefresh();//执行数据加载操作
         });
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initPermission();
+        presenter = new CirclePresenter(this);
+        if (getArguments() != null) {
+            presenter.user = (User) getArguments().getSerializable(Constant.K_RESULT);
+        }
     }
 
 
     private void initPermission() {
-        Common.permission(this, () -> hasStorage = true, hasStorage, Permission.Group.STORAGE);
+        Common.UIHandler.post(() -> {
+            hasStorage = AndPermission.hasPermissions(getActivity(), Permission.Group.STORAGE);
+            Common.permission(getActivity(), () -> hasStorage = true, hasStorage,
+                Permission.Group.STORAGE);
+        });
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         if (presenter != null) {
             presenter.recycle();
         }
         super.onDestroy();
     }
 
-    @SuppressLint({"ClickableViewAccessibility", "InlinedApi"})
-    private void initView() {
+    /**
+     * 获取 recyclerView 的Y滑动距离
+     *
+     * @return
+     */
+    public int getScrolledYDistance() {
+        int position = layoutManager.findFirstVisibleItemPosition();
+        View firstVisibleItem = layoutManager.findViewByPosition(position);
+        if (null != firstVisibleItem) {
+            int itemHeight = firstVisibleItem.getHeight();
+            return (position) * itemHeight - firstVisibleItem.getTop();
+        }
+        return 0;
+    }
 
-//        initTitle();
-        initUploadDialog();
-
-        recyclerView = (SuperRecyclerView) findViewById(R.id.recyclerView);
-        layoutManager = new LinearLayoutManager(this);
+    @SuppressLint("ClickableViewAccessibility")
+    private void initView(View mainView) {
+        bodyLayout = (RelativeLayout) mainView.findViewById(R.id.bodyLayout);
+        recyclerView = (SuperRecyclerView) mainView.findViewById(R.id.recyclerView);
+        layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-        SpacesItemDecoration divItemDecoration=new SpacesItemDecoration();
+        SpacesItemDecoration divItemDecoration = new SpacesItemDecoration();
         divItemDecoration.addNotDrawIndex(1);
         recyclerView.addItemDecoration(divItemDecoration);
-        recyclerView.getRecyclerView()
-        .setItemAnimator(new CustomItemAnimator());
+        recyclerView.getRecyclerView().setItemAnimator(new CustomItemAnimator());
         recyclerView.getMoreProgressView().getLayoutParams().width =
             ViewGroup.LayoutParams.MATCH_PARENT;
-        recyclerView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (edittextbody.getVisibility() == View.VISIBLE) {
-                    updateEditTextBodyVisible(View.GONE, null);
-                    return true;
-                }
-                return false;
+        recyclerView.setOnTouchListener((v, event) -> {
+            if (edittextbody.getVisibility() == View.VISIBLE) {
+                updateEditTextBodyVisible(View.GONE, null);
+                return true;
             }
+            return false;
         });
-
-        refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        presenter.loadData(CirclePresenter.TYPE_PULLREFRESH);
-                    }
-                }, 2000);
-            }
-        };
+        refreshListener = () -> presenter.loadData(CirclePresenter.TYPE_PULLREFRESH);
         recyclerView.setRefreshListener(refreshListener);
 
         recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                int alpha = getScrolledYDistance();
+                if (alpha >= 255) {
+                    alpha = 255;
+                }
+                //标题栏渐变
+                // a:alpha透明度 r:红 g：绿 b蓝
+                //没有透明效果
+                // titlebar.setBackgroundColor(Color.rgb(57, 174, 255));
+                //透明效果是由参数1决定的，透明范围[0,255]
+                // titlebar.setBackgroundColor(Color.argb(alpha, 57, 174, 255));
+                titleBar.getBackground().setAlpha(alpha);
             }
 
             @Override
@@ -167,14 +187,13 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
 //                }
             }
         });
-
-        circleAdapter = new CircleAdapter(this);
+        circleAdapter = new CircleAdapter(getActivity());
         circleAdapter.setCirclePresenter(presenter);
         recyclerView.setAdapter(circleAdapter);
 
-        edittextbody = (LinearLayout) findViewById(R.id.editTextBodyLl);
-        editText = (EditText) findViewById(R.id.circleEt);
-        sendIv = (ImageView) findViewById(R.id.sendIv);
+        edittextbody = (LinearLayout) mainView.findViewById(R.id.editTextBodyLl);
+        editText = (EditText) mainView.findViewById(R.id.circleEt);
+        sendIv = (ImageView) mainView.findViewById(R.id.sendIv);
         sendIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -182,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
                     //发布评论
                     String content = editText.getText().toString().trim();
                     if (TextUtils.isEmpty(content)) {
-                        Toast.makeText(MainActivity.this, "评论内容不能为空...", Toast.LENGTH_SHORT).show();
+                        toast(getString(io.openim.android.ouicore.R.string.coments_null_tips));
                         return;
                     }
                     presenter.addComment(content, commentConfig);
@@ -190,33 +209,39 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
                 updateEditTextBodyVisible(View.GONE, null);
             }
         });
-
         setViewTreeObserver();
     }
 
-    private void initUploadDialog() {
-        uploadDialog = new UpLoadDialog(this);
-    }
 
-    private void initTitle() {
-
-        titleBar = findViewById(R.id.main_title_bar);
-        titleBar.setTitle("朋友圈");
+    private void initTitle(View mainView) {
+        titleBar = mainView.findViewById(R.id.main_title_bar);
+        if (presenter.isSpecifiedUser()) {
+            titleBar.setLeftImageResource(com.yzq.zxinglibrary.R.drawable.ic_back);
+            titleBar.setTitle(String.format(getString(io.openim.android.ouicore.R.string.to_user_moments), presenter.user.getName()));
+            titleBar.setLeftClickListener(v -> getActivity().finish());
+        } else titleBar.setTitle(getString(io.openim.android.ouicore.R.string.moments));
         titleBar.setTitleColor(getResources().getColor(R.color.white));
-        titleBar.setBackgroundColor(getResources().getColor(R.color.title_bg));
+        titleBar.setBackgroundColor(Color.parseColor("#FF022234"));
 
-        TextView textView = (TextView) titleBar.addAction(new TitleBar.TextAction("发布视频") {
-            @Override
-            public void performAction(View view) {
-                //Toast.makeText(MainActivity.this, "敬请期待...", Toast.LENGTH_SHORT).show();
-            }
-        });
-        textView.setTextColor(getResources().getColor(R.color.white));
+        if (!presenter.isSpecifiedUser()) {
+            titleBar.addAction(new TitleBar.ImageAction(R.drawable.ic_moments_new_message) {
+                @Override
+                public void performAction(View view) {
+
+                }
+            });
+            titleBar.addAction(new TitleBar.ImageAction(R.drawable.ic_plus_add) {
+                @Override
+                public void performAction(View view) {
+
+                }
+            });
+        }
     }
 
 
     private void setViewTreeObserver() {
-        bodyLayout = (RelativeLayout) findViewById(R.id.bodyLayout);
+
         final ViewTreeObserver swipeRefreshLayoutVTO = bodyLayout.getViewTreeObserver();
         swipeRefreshLayoutVTO.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -268,17 +293,14 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
         return result;
     }
 
-
-    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
             if (edittextbody != null && edittextbody.getVisibility() == View.VISIBLE) {
-                //edittextbody.setVisibility(View.GONE);
                 updateEditTextBodyVisible(View.GONE, null);
                 return true;
             }
         }
-        return super.onKeyDown(keyCode, event);
+        return false;
     }
 
     @Override
@@ -292,8 +314,7 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
         for (int i = 0; i < circleItems.size(); i++) {
             if (circleId.equals(circleItems.get(i).getId())) {
                 circleItems.remove(i);
-                circleAdapter.notifyDataSetChanged();
-                //circleAdapter.notifyItemRemoved(i+1);
+                circleAdapter.notifyItemRemoved(i + 1);
                 return;
             }
         }
@@ -304,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
         if (addItem != null) {
             CircleItem item = (CircleItem) circleAdapter.getDatas().get(circlePosition);
             item.getFavorters().add(addItem);
-            circleAdapter.notifyItemChanged(circlePosition+1);
+            circleAdapter.notifyItemChanged(circlePosition + 1);
         }
     }
 
@@ -315,8 +336,7 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
         for (int i = 0; i < items.size(); i++) {
             if (favortId.equals(items.get(i).getId())) {
                 items.remove(i);
-                circleAdapter.notifyDataSetChanged();
-                //circleAdapter.notifyItemChanged(circlePosition+1);
+                circleAdapter.notifyItemChanged(circlePosition + 1);
                 return;
             }
         }
@@ -327,8 +347,7 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
         if (addItem != null) {
             CircleItem item = (CircleItem) circleAdapter.getDatas().get(circlePosition);
             item.getComments().add(addItem);
-            circleAdapter.notifyDataSetChanged();
-            //circleAdapter.notifyItemChanged(circlePosition+1);
+            circleAdapter.notifyItemChanged(circlePosition + 1);
         }
         //清空评论文本
         editText.setText("");
@@ -341,8 +360,7 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
         for (int i = 0; i < items.size(); i++) {
             if (commentId.equals(items.get(i).getId())) {
                 items.remove(i);
-                circleAdapter.notifyDataSetChanged();
-                //circleAdapter.notifyItemChanged(circlePosition+1);
+                circleAdapter.notifyItemChanged(circlePosition + 1);
                 return;
             }
         }
@@ -399,7 +417,7 @@ public class MainActivity extends AppCompatActivity implements CircleContract.Vi
         //int listviewOffset = mScreenHeight - mSelectCircleItemH - mCurrentKeyboardH -
         // mEditTextBodyHeight;
         int listviewOffset =
-            screenHeight - selectCircleItemH - currentKeyboardH - editTextBodyHeight ;
+            screenHeight - selectCircleItemH - currentKeyboardH - editTextBodyHeight;
         if (commentConfig.commentType == CommentConfig.Type.REPLY) {
             //回复评论的情况
             listviewOffset = listviewOffset + selectCommentItemOffset;

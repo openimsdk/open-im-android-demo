@@ -1,4 +1,4 @@
-package io.openim.android.ouimoments.activity;
+package io.openim.android.ouimoments.ui;
 
 import android.content.Context;
 import android.content.Intent;

@@ -54,7 +54,7 @@ import okhttp3.ResponseBody;
  */
 public class CirclePresenter implements CircleContract.Presenter {
 
-    private static final  String TAG="---CirclePresenter---";
+    private static final String TAG = "---CirclePresenter---";
     public final static int TYPE_PULLREFRESH = 1;
     public final static int TYPE_UPLOADREFRESH = 2;
     public static int pageIndex = 1, pageSize = 20;
@@ -62,28 +62,41 @@ public class CirclePresenter implements CircleContract.Presenter {
     private CircleContract.View view;
     public String unReadCount;
 
+    /**
+     * momentsUserID 不为null，表示获取指定用户的朋友圈数据
+     */
+    public User user;
+
+    /**
+     * 是否是获取指定用户的朋友圈数据
+     *
+     * @return
+     */
+    public boolean isSpecifiedUser() {
+        return null != user && !TextUtils.isEmpty(user.getId());
+    }
+
     public CirclePresenter(CircleContract.View view) {
         circleModel = new CircleModel();
         this.view = view;
 
-        OpenIMClient.getInstance().workMomentsManager.setWorkMomentsListener(() -> OpenIMClient.getInstance().workMomentsManager.getWorkMomentsUnReadCount(
-            new OnBase<String>() {
-                @Override
-                public void onError(int code, String error) {
+        OpenIMClient.getInstance().workMomentsManager.setWorkMomentsListener(() -> OpenIMClient.getInstance().workMomentsManager.getWorkMomentsUnReadCount(new OnBase<String>() {
+            @Override
+            public void onError(int code, String error) {
 
-                }
+            }
 
-                @Override
-                public void onSuccess(String data) {
-                       unReadCount=data;
-                       view.updateAdapterIndex(0);
-                }
-            }));
+            @Override
+            public void onSuccess(String data) {
+                unReadCount = data;
+                view.updateAdapterIndex(0);
+            }
+        }));
     }
 
     //    String? userID
     public void loadData(int loadType) {
-        loadData(loadType, null);
+        loadData(loadType, isSpecifiedUser() ? user.getId() : null);
     }
 
     public void loadData(int loadType, String userID) {
@@ -318,11 +331,8 @@ public class CirclePresenter implements CircleContract.Presenter {
      */
     public void deleteComment(String momentID, final int circlePosition, final String commentId) {
         N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office/delete_comment",
-            BaseApp.inst().loginCertificate.imToken, NiService.buildParameter()
-                .add("workMomentID"
-                , momentID).add("contentID", commentId).
-                buildJsonBody()).compose(N.IOMain())
-            .map(OneselfService.turn(Object.class)).subscribe(new NetObserver<Object>(TAG) {
+            BaseApp.inst().loginCertificate.imToken, NiService.buildParameter().add("workMomentID"
+                , momentID).add("contentID", commentId).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Object.class)).subscribe(new NetObserver<Object>(TAG) {
             @Override
             public void onSuccess(Object o) {
                 if (view != null) {

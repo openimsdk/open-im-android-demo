@@ -8,11 +8,11 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="220dp">
+        android:layout_height="200dp">
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_head_bg" />
 
@@ -22,6 +22,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="50dp"
             android:gravity="top"
+            android:visibility="gone"
             android:text="@string/word_circle"
             android:textColor="@color/white"
             android:textSize="20sp" />
@@ -53,6 +54,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginTop="48dp"
             android:padding="5dp"
+            android:visibility="gone"
             android:src="@drawable/ic_plus_add" />
 
         <ImageView
@@ -63,6 +65,7 @@
             android:layout_marginRight="5dp"
             android:layout_toLeftOf="@id/add"
             android:padding="5dp"
+            android:visibility="gone"
             android:src="@drawable/ic_moments_new_message" />
     </RelativeLayout>
     <TextView

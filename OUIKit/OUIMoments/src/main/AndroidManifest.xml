@@ -7,7 +7,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
-        <activity android:name=".activity.ImagePagerActivity"
+        <activity android:name=".ui.ImagePagerActivity"
             android:exported="false"/>
 
     </application>
