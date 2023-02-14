@@ -807,6 +807,11 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     }
 
+    @Override
+    public void onRecvMessageExtensionsAdded(String msgID, List<KeyValue> list) {
+
+    }
+
 
     public void sendMsg(Message msg) {
         msg.setStatus(Constant.Send_State.SENDING);

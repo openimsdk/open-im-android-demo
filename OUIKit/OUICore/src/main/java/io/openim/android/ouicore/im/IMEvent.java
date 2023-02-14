@@ -502,6 +502,13 @@ public class IMEvent {
             }
 
             @Override
+            public void onRecvMessageExtensionsAdded(String msgID, List<KeyValue> list) {
+                for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
+                    onAdvanceMsgListener.onRecvMessageExtensionsAdded(msgID,list);
+                }
+            }
+
+            @Override
             public void onRecvGroupMessageReadReceipt(List<ReadReceiptInfo> list) {
                 // 消息被阅读回执，将消息标记为已读
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
