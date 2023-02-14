@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<io.openim.android.ouicore.widget.InterceptLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -10,11 +10,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <io.openim.android.ouicore.widget.AvatarImage
-            android:layout_width="42dp"
-            android:layout_height="42dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:id="@+id/avatar"
             android:src="@mipmap/ic_my_friend"
             android:textColor="#ffffffff"
@@ -35,14 +36,26 @@
                 android:textColor="#ff333333"
                 android:textSize="16sp"
                 android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/action"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:textColor="#ff333333"
-                android:textSize="12sp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:id="@+id/star"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="3dp"
+                    android:src="@drawable/ic_moments_star"/>
+                <TextView
+                    android:id="@+id/action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ff333333"
+                    android:text="sasasasas"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/time"
@@ -53,14 +66,17 @@
         </LinearLayout>
 
         <RelativeLayout
+            android:id="@+id/media"
             android:layout_width="80dp"
             android:layout_height="70dp">
             <ImageView
                 android:id="@+id/img"
                 android:layout_width="80dp"
+                android:scaleType="centerCrop"
                 android:layout_height="70dp"
                 android:background="@color/img_bg" />
             <ImageView
+                android:id="@+id/play"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_centerVertical="true"
@@ -72,6 +88,7 @@
             android:id="@+id/content"
             android:layout_width="100dp"
             android:ellipsize="end"
+            android:gravity="center"
             android:maxLines="4"
             android:layout_height="70dp"/>
 
@@ -83,4 +100,4 @@
         android:layout_height="1dp"
         android:layout_marginTop="12dp" />
 
-</LinearLayout>
+</io.openim.android.ouicore.widget.InterceptLinearLayout>

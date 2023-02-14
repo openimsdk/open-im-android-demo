@@ -80,7 +80,11 @@ public class CirclePresenter implements CircleContract.Presenter {
         circleModel = new CircleModel();
         this.view = view;
 
-        OpenIMClient.getInstance().workMomentsManager.setWorkMomentsListener(()-> OpenIMClient.getInstance().workMomentsManager.getWorkMomentsUnReadCount(new OnBase<String>() {
+        OpenIMClient.getInstance().workMomentsManager.setWorkMomentsListener(this::getWorkMomentsUnReadCount);
+    }
+
+    public void getWorkMomentsUnReadCount() {
+        OpenIMClient.getInstance().workMomentsManager.getWorkMomentsUnReadCount(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
             }
@@ -88,14 +92,17 @@ public class CirclePresenter implements CircleContract.Presenter {
             @Override
             public void onSuccess(String data) {
                 try {
-                    Map map =GsonHel.getGson().fromJson(data,Map.class);
-                    unReadCount = String.valueOf(map.get("unreadCount"));
-                    view.updateAdapterIndex(0);
-                }catch (Exception e){
+                    Map map = JSONObject.parseObject(data, Map.class);
+                    int size= (int) map.get("unreadCount");
+                    if (size>0){
+                        unReadCount = String.valueOf(size);
+                        view.updateAdapterIndex(0);
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-        })) ;
+        });
     }
 
     //    String? userID
@@ -128,7 +135,7 @@ public class CirclePresenter implements CircleContract.Presenter {
         };
         if (TextUtils.isEmpty(userID)) {
             N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office" +
-                "/get_user_friend_work_moments", BaseApp.inst().loginCertificate.imToken,
+                    "/get_user_friend_work_moments", BaseApp.inst().loginCertificate.imToken,
                 parameter.buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(MomentsBean.class)).subscribe(netObserver);
         } else {
             N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office/get_user_work_moments"

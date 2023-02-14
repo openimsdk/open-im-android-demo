@@ -30,11 +30,12 @@
                     android:textColor="#ff333333"
                     android:textSize="18sp" />
                 <TextView
+                    android:id="@+id/clear"
                     android:layout_centerVertical="true"
                     android:layout_alignParentRight="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="清空"
+                    android:text="@string/clear_null"
                     android:padding="5dp"
                     android:layout_marginRight="12dp"
                     android:textColor="#ff333333"

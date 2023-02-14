@@ -96,6 +96,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         recyclerView.getSwipeToRefresh().post(() -> {
             recyclerView.setRefreshing(true);//执行下拉刷新的动画
             refreshListener.onRefresh();//执行数据加载操作
+            presenter.getWorkMomentsUnReadCount();
         });
         return viewBinding.getRoot();
     }

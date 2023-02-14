@@ -1,5 +1,6 @@
 package io.openim.android.ouimoments;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -14,6 +15,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActionBar actionBar = getSupportActionBar();
+        if (null != actionBar) actionBar.hide();
         setContentView(R.layout.activity_moments_home);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

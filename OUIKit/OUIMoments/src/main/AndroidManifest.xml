@@ -3,7 +3,13 @@
     package="io.openim.android.ouimoments">
 
     <application android:theme="@style/Theme.Demo">
-
+        <activity
+            android:name=".ui.MomentsDetailActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="false" />

@@ -20,6 +20,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.ouimoments.R;
+import io.openim.android.ouimoments.ui.MsgDetailActivity;
 import io.openim.android.ouimoments.ui.ToUserMomentsActivity;
 import io.openim.android.ouimoments.ui.ImagePagerActivity;
 import io.openim.android.ouimoments.adapter.viewholder.CircleViewHolder;
@@ -131,7 +132,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                         presenter.unReadCount = null;
                         holder.newMsgTips.setVisibility(View.GONE);
                         //TODO JUMP
-
+                        context.startActivity(new Intent(context, MsgDetailActivity.class));
                     });
                 }
             } catch (Exception ignored) {

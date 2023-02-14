@@ -250,5 +250,9 @@
     <string name="moments">朋友圈</string>
     <string name="to_user_moments">%1$s的动态</string>
     <string name="msg">消息</string>
+    <string name="star_tips">为你点赞</string>
+    <string name="star_tips2">评论了</string>
+    <string name="about_you">提到了你</string>
+    <string name="clear_null">清空</string>
 
 </resources>
