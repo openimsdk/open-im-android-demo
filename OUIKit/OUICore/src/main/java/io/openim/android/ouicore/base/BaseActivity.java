@@ -36,8 +36,8 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     protected T vm;
     protected A view;
     private String vmCanonicalName;
-    protected CallingService callingService = (CallingService) ARouter.getInstance()
-        .build(Routes.Service.CALLING).navigation();
+    protected CallingService callingService =
+        (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
 
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -48,8 +48,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         if (null != callingService)
             OpenIMClient.getInstance().signalingManager.setSignalingListener(callingService);
         ActionBar actionBar = getSupportActionBar();
-        if (null != actionBar)
-            actionBar.hide();
+        if (null != actionBar) actionBar.hide();
         if (null != vm) {
             vm.viewCreate();
         }
@@ -89,8 +88,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     protected void setLightStatus() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
     }
 
@@ -128,8 +126,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     protected void onResume() {
         super.onResume();
         bind();
-        if (null != vm)
-            vm.viewResume();
+        if (null != vm) vm.viewResume();
     }
 
     @Override
@@ -165,7 +162,8 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
             v.getGlobalVisibleRect(outRect);
             if (!outRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
                 v.clearFocus(); //在根布局添加focusableInTouchMode="true"
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm =
+                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (imm != null) {
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                 }
@@ -177,9 +175,13 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     /**
      * 沉侵式状态栏
      */
-    public void sink() {
+    public void sink(View view) {
         setLightStatus();
-        SinkHelper.get(this).setTranslucentStatus(view.getRoot());
+        SinkHelper.get(this).setTranslucentStatus(view);
+    }
+
+    public void sink() {
+        sink(view.getRoot());
     }
 
     @Override

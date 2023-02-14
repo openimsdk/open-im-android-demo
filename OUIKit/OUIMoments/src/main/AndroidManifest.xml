@@ -7,9 +7,23 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
-        <activity android:name=".ui.ImagePagerActivity"
-            android:exported="false"/>
-
+        <activity
+            android:name=".ui.ImagePagerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.MsgDetailActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".ToUserMomentsActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
     </application>
 
 </manifest>

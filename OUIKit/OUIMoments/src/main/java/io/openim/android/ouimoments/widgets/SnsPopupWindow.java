@@ -89,16 +89,12 @@ public class SnsPopupWindow extends PopupWindow implements OnClickListener{
 	@Override
 	public void onClick(View view) {
 		dismiss();
-		switch (view.getId()) {
-		case R.id.digBtn:
-			mItemClickListener.onItemClick(mActionItems.get(0), 0);
-			break;
-		case R.id.commentBtn:
-			mItemClickListener.onItemClick(mActionItems.get(1), 1);
-			break;
-		default:
-			break;
-		}
+        int id = view.getId();
+        if (id == R.id.digBtn) {
+            mItemClickListener.onItemClick(mActionItems.get(0), 0);
+        } else if (id == R.id.commentBtn) {
+            mItemClickListener.onItemClick(mActionItems.get(1), 1);
+        }
 	}
 	
 	/**

@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
@@ -46,6 +47,7 @@ import io.openim.android.ouiconversation.databinding.FragmentContactListBinding;
 import io.openim.android.ouiconversation.databinding.LayoutAddActionBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.utils.Obs;
+import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseApp;
@@ -96,6 +98,9 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = FragmentContactListBinding.inflate(getLayoutInflater());
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) view.title.getLayoutParams();
+        lp.setMargins(0, SinkHelper.getStatusBarHeight(getContext()), 0, 0);
+        view.title.setLayoutParams(lp);
         init();
         return view.getRoot();
     }

@@ -71,9 +71,19 @@
                             android:text="@string/address_book"
                             android:textColor="#ff1b72ec"
                             android:textSize="10sp" />
-
                         <RadioButton
                             android:id="@+id/men3"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:button="@null"
+                            android:drawableTop="@drawable/selector_moments"
+                            android:gravity="center"
+                            android:text="@string/moments"
+                            android:textColor="#ff1b72ec"
+                            android:textSize="10sp" />
+                        <RadioButton
+                            android:id="@+id/men4"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"

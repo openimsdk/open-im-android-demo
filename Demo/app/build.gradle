@@ -112,5 +112,6 @@ dependencies {
         implementation project(':OUIGroup')
         implementation project(':OUIContact')
         implementation project(':OUICalling')
+        implementation project(':OUIMoments')
     }
 }

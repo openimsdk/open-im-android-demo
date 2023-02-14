@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:fitsSystemWindows="true"
     tools:context="io.openim.android.ouimoments.ui.CircleFragment">
 
     <RelativeLayout
@@ -11,9 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.malinskiy.superrecyclerview.SuperRecyclerView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/recyclerView"
+        <com.malinskiy.superrecyclerview.SuperRecyclerView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/superRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_moreProgress="@layout/view_more_progress"
@@ -40,6 +38,13 @@
 
     </RelativeLayout>
 
-    <include layout="@layout/layout_main_titlebar" />
+    <FrameLayout
+        android:id="@+id/titleBarFl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/layout_main_titlebar" />
+    </FrameLayout>
+
 
 </RelativeLayout>

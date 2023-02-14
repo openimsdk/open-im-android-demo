@@ -80,23 +80,20 @@ public class CommentDialog extends Dialog implements
 
 	@Override
 	public void onClick(View v) {
-		switch (v.getId()) {
-		case R.id.copyTv:
-			if (mCommentItem != null) {
-				ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
-				clipboard.setText(mCommentItem.getContent());
-			}
-			dismiss();
-			break;
-		case R.id.deleteTv:
-			if (mPresenter != null && mCommentItem != null) {
-				mPresenter.deleteComment(momentID,mCirclePosition, mCommentItem.getId());
-			}
-			dismiss();
-			break;
-		default:
-			break;
-		}
+        int id = v.getId();
+        if (id == R.id.copyTv) {
+            if (mCommentItem != null) {
+                ClipboardManager clipboard =
+                    (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                clipboard.setText(mCommentItem.getContent());
+            }
+            dismiss();
+        } else if (id == R.id.deleteTv) {
+            if (mPresenter != null && mCommentItem != null) {
+                mPresenter.deleteComment(momentID, mCirclePosition, mCommentItem.getId());
+            }
+            dismiss();
+        }
 	}
 
 }

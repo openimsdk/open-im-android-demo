@@ -2,6 +2,7 @@ package io.openim.android.ouimoments.ui;
 
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -13,15 +14,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
@@ -31,6 +35,8 @@ import java.util.List;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
 import io.openim.android.ouicore.widget.SpacesItemDecoration;
 import io.openim.android.ouimoments.R;
@@ -40,12 +46,12 @@ import io.openim.android.ouimoments.bean.CommentConfig;
 import io.openim.android.ouimoments.bean.CommentItem;
 import io.openim.android.ouimoments.bean.FavortItem;
 import io.openim.android.ouimoments.bean.User;
+import io.openim.android.ouimoments.databinding.FragmentMomentsHomeBinding;
 import io.openim.android.ouimoments.mvp.contract.CircleContract;
 import io.openim.android.ouimoments.mvp.presenter.CirclePresenter;
 import io.openim.android.ouimoments.utils.CommonUtils;
 import io.openim.android.ouimoments.widgets.CommentListView;
 import io.openim.android.ouimoments.widgets.TitleBar;
-
 
 public class CircleFragment extends BaseFragment implements CircleContract.View {
 
@@ -70,6 +76,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
 
     private SwipeRefreshLayout.OnRefreshListener refreshListener;
     private boolean hasStorage = false;
+    private FragmentMomentsHomeBinding viewBinding;
 
 
     public static CircleFragment newInstance(User user) {
@@ -85,15 +92,15 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_moments_home, container);
-        initTitle(view);
-        initView(view);
+        viewBinding = FragmentMomentsHomeBinding.inflate(inflater);
+        initTitle(viewBinding.getRoot());
+        initView(viewBinding.getRoot());
         //实现自动下拉刷新功能
         recyclerView.getSwipeToRefresh().post(() -> {
             recyclerView.setRefreshing(true);//执行下拉刷新的动画
             refreshListener.onRefresh();//执行数据加载操作
         });
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return viewBinding.getRoot();
     }
 
     @Override
@@ -140,8 +147,8 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
 
     @SuppressLint("ClickableViewAccessibility")
     private void initView(View mainView) {
-        bodyLayout = (RelativeLayout) mainView.findViewById(R.id.bodyLayout);
-        recyclerView = (SuperRecyclerView) mainView.findViewById(R.id.recyclerView);
+        bodyLayout = mainView.findViewById(R.id.bodyLayout);
+        recyclerView = mainView.findViewById(R.id.superRecyclerView);
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         SpacesItemDecoration divItemDecoration = new SpacesItemDecoration();
@@ -175,6 +182,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
                 //透明效果是由参数1决定的，透明范围[0,255]
                 // titlebar.setBackgroundColor(Color.argb(alpha, 57, 174, 255));
                 titleBar.getBackground().setAlpha(alpha);
+                viewBinding.titleBarFl.getBackground().setAlpha(alpha);
             }
 
             @Override
@@ -212,8 +220,15 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         setViewTreeObserver();
     }
 
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+
+        super.onHiddenChanged(hidden);
+    }
 
     private void initTitle(View mainView) {
+        viewBinding.titleBarFl.setPadding(0,SinkHelper.getStatusBarHeight(getContext()),0,0);
+        viewBinding.titleBarFl.setBackgroundColor(Color.parseColor("#FF022234"));
         titleBar = mainView.findViewById(R.id.main_title_bar);
         if (presenter.isSpecifiedUser()) {
             titleBar.setLeftImageResource(com.yzq.zxinglibrary.R.drawable.ic_back);
@@ -223,11 +238,12 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         titleBar.setTitleColor(getResources().getColor(R.color.white));
         titleBar.setBackgroundColor(Color.parseColor("#FF022234"));
 
+
         if (!presenter.isSpecifiedUser()) {
             titleBar.addAction(new TitleBar.ImageAction(R.drawable.ic_moments_new_message) {
                 @Override
                 public void performAction(View view) {
-
+                    startActivity(new Intent(getActivity(), MsgDetailActivity.class));
                 }
             });
             titleBar.addAction(new TitleBar.ImageAction(R.drawable.ic_plus_add) {
@@ -474,7 +490,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
 
     @Override
     public void showError(String errorMsg) {
-
+        Toast.makeText(getActivity(), errorMsg, Toast.LENGTH_LONG).show();
     }
 
 

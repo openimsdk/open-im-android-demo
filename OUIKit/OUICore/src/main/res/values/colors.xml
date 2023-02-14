@@ -13,4 +13,6 @@
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
     <color name="def_bg">#FFF8F8F8</color>
+    <color name="img_bg">#abb1b6</color>
+
 </resources>

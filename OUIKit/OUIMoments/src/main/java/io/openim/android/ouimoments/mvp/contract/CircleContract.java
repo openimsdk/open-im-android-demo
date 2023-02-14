@@ -29,6 +29,13 @@ public interface CircleContract {
         void addFavort(final int circlePosition,final String mFavorId);
         void deleteFavort(final int circlePosition, final String favortId);
         void deleteComment(String momentID,final int circlePosition, final String commentId);
+    }
+
+    interface  MsgDetailPresenter extends BasePresenter{
 
     }
+    interface MsgDetailView extends BaseView{
+
+    }
+
 }
