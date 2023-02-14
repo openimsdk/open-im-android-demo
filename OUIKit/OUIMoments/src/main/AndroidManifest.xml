@@ -18,7 +18,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ToUserMomentsActivity"
+            android:name=".ui.ToUserMomentsActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"

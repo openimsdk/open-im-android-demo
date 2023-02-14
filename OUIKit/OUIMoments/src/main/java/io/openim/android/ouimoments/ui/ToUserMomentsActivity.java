@@ -1,29 +1,31 @@
-package io.openim.android.ouimoments;
+package io.openim.android.ouimoments.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
 
+import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.bean.User;
-import io.openim.android.ouimoments.ui.CircleFragment;
+import io.openim.android.ouimoments.databinding.ActivityMomentsHomeBinding;
 
-public class ToUserMomentsActivity extends AppCompatActivity {
+public class ToUserMomentsActivity extends BaseActivity {
 
     CircleFragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        bindViewDataBinding(ActivityMomentsHomeBinding.inflate(getLayoutInflater()));
+        sink(null);
         User user= (User) getIntent().getSerializableExtra(Constant.K_RESULT);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         fragment = CircleFragment.newInstance(user);
         if (!fragment.isAdded()) {
-            transaction.add(R.id.frameLayout, fragment);
+            transaction.add(R.id.contentFl, fragment);
             transaction.show(fragment).commit();
         }
     }

@@ -54,7 +54,8 @@ public class PreviewActivity extends BaseActivity<BaseViewModel, ActivityPreview
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        runOnUiThread(() -> hasWrite = AndPermission.hasPermissions(this, Permission.WRITE_EXTERNAL_STORAGE));
+        runOnUiThread(() -> hasWrite = AndPermission.hasPermissions(this,
+            Permission.WRITE_EXTERNAL_STORAGE));
         bindViewDataBinding(ActivityPreviewBinding.inflate(getLayoutInflater()));
         SinkHelper.get(this).setTranslucentStatus(null);
         initView();
@@ -68,15 +69,15 @@ public class PreviewActivity extends BaseActivity<BaseViewModel, ActivityPreview
         if (MediaFileUtil.isImageType(url)) {
             view.pic.setVisibility(View.VISIBLE);
             view.download.setVisibility(View.VISIBLE);
-            Glide.with(this).load(url).fitCenter().into(view.pic);
+            Glide.with(this).load(url).centerInside().into(view.pic);
             view.pic.setOnClickListener(v -> finish());
             view.download.setOnClickListener(v -> {
                 Common.permission(this, () -> {
                     hasWrite = true;
                     toast(getString(io.openim.android.ouicore.R.string.start_download));
-                    Common.downloadFile(url, null, getContentResolver()
-                        .insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues()))
-                        .subscribe(new NetObserver<Boolean>(PreviewActivity.this) {
+                    Common.downloadFile(url, null,
+                        getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            new ContentValues())).subscribe(new NetObserver<Boolean>(this) {
                         @Override
                         public void onSuccess(Boolean success) {
                             if (success)
@@ -96,8 +97,9 @@ public class PreviewActivity extends BaseActivity<BaseViewModel, ActivityPreview
         } else if (MediaFileUtil.isVideoType(url)) {
             view.jzVideo.setVisibility(View.VISIBLE);
             view.jzVideo.setUp(url, "");
-            view.jzVideo.posterImageView.setScaleType(ImageView.ScaleType.CENTER);
+            view.jzVideo.startVideoAfterPreloading();
 
+            view.jzVideo.posterImageView.setScaleType(ImageView.ScaleType.CENTER);
             Glide.with(this).load(firstFrame).into(view.jzVideo.posterImageView);
         }
 
@@ -129,5 +131,11 @@ public class PreviewActivity extends BaseActivity<BaseViewModel, ActivityPreview
     protected void onPause() {
         super.onPause();
         Jzvd.releaseAllVideos();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        N.clearDispose(this);
     }
 }

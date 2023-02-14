@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,7 +20,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.ouimoments.R;
-import io.openim.android.ouimoments.ToUserMomentsActivity;
+import io.openim.android.ouimoments.ui.ToUserMomentsActivity;
 import io.openim.android.ouimoments.ui.ImagePagerActivity;
 import io.openim.android.ouimoments.adapter.viewholder.CircleViewHolder;
 import io.openim.android.ouimoments.adapter.viewholder.ImageViewHolder;

@@ -80,18 +80,22 @@ public class CirclePresenter implements CircleContract.Presenter {
         circleModel = new CircleModel();
         this.view = view;
 
-        OpenIMClient.getInstance().workMomentsManager.setWorkMomentsListener(() -> OpenIMClient.getInstance().workMomentsManager.getWorkMomentsUnReadCount(new OnBase<String>() {
+        OpenIMClient.getInstance().workMomentsManager.setWorkMomentsListener(()-> OpenIMClient.getInstance().workMomentsManager.getWorkMomentsUnReadCount(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-
             }
 
             @Override
             public void onSuccess(String data) {
-                unReadCount = data;
-                view.updateAdapterIndex(0);
+                try {
+                    Map map =GsonHel.getGson().fromJson(data,Map.class);
+                    unReadCount = String.valueOf(map.get("unreadCount"));
+                    view.updateAdapterIndex(0);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
-        }));
+        })) ;
     }
 
     //    String? userID
@@ -119,6 +123,7 @@ public class CirclePresenter implements CircleContract.Presenter {
             @Override
             protected void onFailure(Throwable e) {
                 view.showError(e.getMessage());
+                view.setRefreshing(false);
             }
         };
         if (TextUtils.isEmpty(userID)) {

@@ -52,7 +52,6 @@ import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.SystemBarUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
-import io.openim.android.ouimoments.ui.CircleFragment;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
@@ -78,8 +77,8 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         PushManager.getInstance().initialize(this);
         bindVM(MainVM.class);
         vm.fromLogin = getIntent().getBooleanExtra(LoginActivity.FORM_LOGIN, false);
-        super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMainBinding.inflate(getLayoutInflater()));
+        super.onCreate(savedInstanceState);
         sink(null);
 
         view.setMainVM(vm);

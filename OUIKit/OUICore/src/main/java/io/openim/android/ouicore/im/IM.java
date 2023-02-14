@@ -24,7 +24,8 @@ public class IM {
             Constant.getImApiUrl(),
             Constant.getImWsUrl(), getStorageDir(), 1,
             Constant.getStorageType(),
-            null, false, true, IMEvent.getInstance().connListener);
+            null, false, false,
+            false,IMEvent.getInstance().connListener);
 
         IMEvent.getInstance().init();
     }

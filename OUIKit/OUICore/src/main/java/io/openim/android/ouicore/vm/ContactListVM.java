@@ -234,6 +234,11 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     }
 
+    @Override
+    public void onRecvMessageExtensionsAdded(String msgID, List<KeyValue> list) {
+
+    }
+
     //置顶/取消置顶 会话
     public void pinConversation(ConversationInfo conversationInfo, boolean isPinned) {
         OpenIMClient.getInstance().conversationManager.pinConversation(new OnBase<String>() {

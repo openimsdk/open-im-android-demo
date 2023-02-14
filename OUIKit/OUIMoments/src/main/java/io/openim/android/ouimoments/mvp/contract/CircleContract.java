@@ -21,6 +21,7 @@ public interface CircleContract {
         void update2DeleteComment(int circlePosition, String commentId);
         void updateEditTextBodyVisible(int visibility, CommentConfig commentConfig);
         void update2loadData(int loadType, List<CircleItem> datas);
+        void setRefreshing(Boolean isRefresh);
     }
 
     interface Presenter extends BasePresenter{
@@ -31,11 +32,5 @@ public interface CircleContract {
         void deleteComment(String momentID,final int circlePosition, final String commentId);
     }
 
-    interface  MsgDetailPresenter extends BasePresenter{
-
-    }
-    interface MsgDetailView extends BaseView{
-
-    }
 
 }

@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -25,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
@@ -35,7 +33,6 @@ import java.util.List;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
 import io.openim.android.ouicore.widget.SpacesItemDecoration;
@@ -418,6 +415,10 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
                                             maxLastVisiblePosition) -> presenter.loadData(CirclePresenter.TYPE_UPLOADREFRESH), 1);
         }
 
+    }
+    @Override
+    public void setRefreshing(Boolean isRefresh) {
+        recyclerView.setRefreshing(isRefresh);
     }
 
 
