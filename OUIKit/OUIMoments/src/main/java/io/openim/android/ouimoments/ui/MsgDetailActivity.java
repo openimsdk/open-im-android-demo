@@ -19,6 +19,7 @@ import java.util.List;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.CommonDialog;
@@ -75,7 +76,8 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
             public void onBindView(@NonNull MsgDetailViewHolder holder, EXWorkMomentsInfo data,
                                    int position) {
                 holder.view.getRoot().setOnClickListener(v -> {
-                    startActivity(new Intent(MsgDetailActivity.this,MomentsDetailActivity.class));
+                    startActivity(new Intent(MsgDetailActivity.this,MomentsDetailActivity.class).putExtra(Constant.K_ID,
+                        data.workMomentsInfo.getWorkMomentID()));
                 });
                 holder.view.avatar.load(data.workMomentsInfo
                     .getFaceURL());

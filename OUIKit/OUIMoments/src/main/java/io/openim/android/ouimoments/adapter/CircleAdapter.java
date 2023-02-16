@@ -55,7 +55,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
     private static final int STATE_ACTIVED = 1;
     private static final int STATE_DEACTIVED = 2;
     private int videoState = STATE_IDLE;
-    public static final int HEADVIEW_SIZE = 1;
+    public int HEADVIEW_SIZE = 1;
 
     int curPlayIndex = -1;
 
@@ -77,7 +77,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
         }
 
         int itemType = 0;
-        CircleItem item = (CircleItem) datas.get(position - 1);
+        CircleItem item = (CircleItem) datas.get(position - HEADVIEW_SIZE);
         if (CircleItem.TYPE_URL.equals(item.getType())) {
             itemType = CircleViewHolder.TYPE_URL;
         } else if (CircleItem.TYPE_IMG.equals(item.getType())) {
@@ -117,14 +117,14 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
         if (getItemViewType(position) == TYPE_HEAD) {
             try {
                 HeaderViewHolder holder = (HeaderViewHolder) viewHolder;
-                if (presenter.isSpecifiedUser()){
+                if (presenter.isSpecifiedUser()) {
                     holder.headIv.load(presenter.user.getHeadUrl());
                     holder.nameTv.setText(presenter.user.getName());
-                }else {
+                } else {
                     holder.headIv.load(BaseApp.inst().loginCertificate.faceURL);
                     holder.nameTv.setText(BaseApp.inst().loginCertificate.nickname);
                 }
-                if (!presenter.isSpecifiedUser()){
+                if (!presenter.isSpecifiedUser()) {
                     holder.newMsgTips.setVisibility(TextUtils.isEmpty(presenter.unReadCount) ?
                         View.GONE : View.VISIBLE);
                     holder.newMsgTips.setText(String.format(context.getString(io.openim.android.ouicore.R.string.new_msg_tips), presenter.unReadCount));

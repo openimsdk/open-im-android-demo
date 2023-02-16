@@ -10,6 +10,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.bean.User;
 import io.openim.android.ouimoments.databinding.ActivityMomentsHomeBinding;
+import io.openim.android.ouimoments.ui.fragment.CircleFragment;
 
 public class ToUserMomentsActivity extends BaseActivity {
 

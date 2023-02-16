@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <variable
+            name="PushMoments"
+            type="io.openim.android.ouimoments.mvp.presenter.PushMomentsVM" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical"
+        tools:context=".ui.WhoSeeActivity">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/comm_title_high"
+            app:cardElevation="8dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <include
+                    android:id="@+id/back"
+                    layout="@layout/view_back" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/who_see"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/finish"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="12dp"
+                    android:padding="5dp"
+                    android:text="@string/finish"
+                    android:textColor="@color/light_blue_600"
+                    android:textSize="17sp" />
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:onClick="@{()->PushMoments.selectAuth(0)}"
+            android:orientation="horizontal"
+            android:paddingLeft="17dp"
+            android:paddingRight="17dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="17dp"
+                android:layout_marginBottom="20dp"
+                android:src="@mipmap/ic_m_tick"
+                android:visibility="@{PushMoments.param.permission==0?View.VISIBLE:View.INVISIBLE}" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/str_public"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/public_tips"
+                    android:textColor="#ff999999"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <include layout="@layout/view_dividing_line" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:onClick="@{()->PushMoments.selectAuth(1)}"
+            android:orientation="horizontal"
+            android:paddingLeft="17dp"
+            android:paddingRight="17dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="17dp"
+                android:layout_marginBottom="20dp"
+                android:src="@mipmap/ic_m_tick"
+                android:visibility="@{PushMoments.param.permission==1?View.VISIBLE:View.INVISIBLE}" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/str_private"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/str_private_tips"
+                    android:textColor="#ff999999"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <include layout="@layout/view_dividing_line" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="@{()->PushMoments.selectAuth(2)}"
+            android:orientation="horizontal"
+            android:paddingLeft="17dp"
+            android:paddingRight="17dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="17dp"
+                android:layout_marginBottom="20dp"
+                android:src="@mipmap/ic_m_tick"
+                android:visibility="@{PushMoments.param.permission==2?View.VISIBLE:View.INVISIBLE}" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="13dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/part_see"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/part_see_tips"
+                    android:textColor="#ff999999"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:src="@mipmap/ic_m_down" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/partSeeContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="60dp"
+            android:paddingTop="10dp"
+            android:paddingRight="17dp"
+            android:paddingBottom="10dp"
+            android:visibility="@{PushMoments.param.permission==2?View.VISIBLE:View.GONE}">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_group"
+                android:textColor="#ff333333"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingTop="3dp"
+                android:paddingBottom="10dp"
+                android:text="@string/part_see_tips"
+                android:textColor="#ff999999"
+                android:textSize="12sp"
+                android:visibility="invisible" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:text="从通讯录选择"
+                android:textColor="#ff333333"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingTop="3dp"
+                android:text="@string/part_see_tips"
+                android:textColor="#ff999999"
+                android:textSize="12sp"
+                android:visibility="invisible" />
+        </LinearLayout>
+
+        <include layout="@layout/view_dividing_line" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="@{()->PushMoments.selectAuth(3)}"
+            android:orientation="horizontal"
+            android:paddingLeft="17dp"
+            android:paddingRight="17dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="17dp"
+                android:layout_marginBottom="20dp"
+                android:src="@mipmap/ic_m_tick"
+                android:visibility="@{PushMoments.param.permission==3?View.VISIBLE:View.INVISIBLE}" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="13dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/who_invisible"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/who_invisible_tips"
+                    android:textColor="#ff999999"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:src="@mipmap/ic_m_down" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/notSeeContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="60dp"
+            android:paddingTop="10dp"
+            android:paddingRight="17dp"
+            android:paddingBottom="10dp"
+            android:visibility="@{PushMoments.param.permission==3?View.VISIBLE:View.GONE}">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_group"
+                android:textColor="#ff333333"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingTop="3dp"
+                android:paddingBottom="10dp"
+                android:text="@string/part_see_tips"
+                android:textColor="#ff999999"
+                android:textSize="12sp"
+                android:visibility="invisible" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:text="@string/select_user"
+                android:textColor="#ff333333"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingTop="3dp"
+                android:text="@string/part_see_tips"
+                android:textColor="#ff999999"
+                android:textSize="12sp"
+                android:visibility="invisible" />
+        </LinearLayout>
+
+        <include layout="@layout/view_dividing_line" />
+    </LinearLayout>
+</layout>
+

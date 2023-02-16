@@ -3,6 +3,7 @@ package io.openim.android.ouimoments.bean;
 import java.util.List;
 
 public class WorkMoments {
+    public WorkMoments workMoment;
     public String workMomentID;
     public String userID;
     public String content;
@@ -16,3 +17,4 @@ public class WorkMoments {
     public long createTime;
     public int permission;
 }
+

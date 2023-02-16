@@ -1,10 +1,11 @@
-package io.openim.android.ouimoments.ui;
+package io.openim.android.ouimoments.ui.fragment;
 
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -16,6 +17,7 @@ import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -24,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
@@ -33,6 +36,7 @@ import java.util.List;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
 import io.openim.android.ouicore.widget.SpacesItemDecoration;
@@ -44,8 +48,11 @@ import io.openim.android.ouimoments.bean.CommentItem;
 import io.openim.android.ouimoments.bean.FavortItem;
 import io.openim.android.ouimoments.bean.User;
 import io.openim.android.ouimoments.databinding.FragmentMomentsHomeBinding;
+import io.openim.android.ouimoments.databinding.LayoutMomentAddBinding;
 import io.openim.android.ouimoments.mvp.contract.CircleContract;
 import io.openim.android.ouimoments.mvp.presenter.CirclePresenter;
+import io.openim.android.ouimoments.ui.MsgDetailActivity;
+import io.openim.android.ouimoments.ui.PushMomentsActivity;
 import io.openim.android.ouimoments.utils.CommonUtils;
 import io.openim.android.ouimoments.widgets.CommentListView;
 import io.openim.android.ouimoments.widgets.TitleBar;
@@ -53,7 +60,7 @@ import io.openim.android.ouimoments.widgets.TitleBar;
 public class CircleFragment extends BaseFragment implements CircleContract.View {
 
     protected static final String TAG = CircleFragment.class.getSimpleName();
-    private CircleAdapter circleAdapter;
+    public CircleAdapter circleAdapter;
     private LinearLayout edittextbody;
     private EditText editText;
     private ImageView sendIv;
@@ -64,14 +71,14 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
     private int selectCircleItemH;
     private int selectCommentItemOffset;
 
-    private CirclePresenter presenter;
+    public CirclePresenter presenter;
     private CommentConfig commentConfig;
-    private SuperRecyclerView recyclerView;
+    public SuperRecyclerView recyclerView;
     private RelativeLayout bodyLayout;
     private LinearLayoutManager layoutManager;
     private TitleBar titleBar;
 
-    private SwipeRefreshLayout.OnRefreshListener refreshListener;
+    public SwipeRefreshLayout.OnRefreshListener refreshListener;
     private boolean hasStorage = false;
     private FragmentMomentsHomeBinding viewBinding;
 
@@ -144,7 +151,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void initView(View mainView) {
+    public void initView(View mainView) {
         bodyLayout = mainView.findViewById(R.id.bodyLayout);
         recyclerView = mainView.findViewById(R.id.superRecyclerView);
         layoutManager = new LinearLayoutManager(getActivity());
@@ -179,8 +186,10 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
                 // titlebar.setBackgroundColor(Color.rgb(57, 174, 255));
                 //透明效果是由参数1决定的，透明范围[0,255]
                 // titlebar.setBackgroundColor(Color.argb(alpha, 57, 174, 255));
-                titleBar.getBackground().setAlpha(alpha);
-                viewBinding.titleBarFl.getBackground().setAlpha(alpha);
+                try {
+                    titleBar.getBackground().setAlpha(alpha);
+                    viewBinding.titleBarFl.getBackground().setAlpha(alpha);
+                }catch (Exception ignored){}
             }
 
             @Override
@@ -193,9 +202,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
 //                }
             }
         });
-        circleAdapter = new CircleAdapter(getActivity());
-        circleAdapter.setCirclePresenter(presenter);
-        recyclerView.setAdapter(circleAdapter);
+        createAdapter();
 
         edittextbody = (LinearLayout) mainView.findViewById(R.id.editTextBodyLl);
         editText = (EditText) mainView.findViewById(R.id.circleEt);
@@ -218,14 +225,15 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         setViewTreeObserver();
     }
 
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-
-        super.onHiddenChanged(hidden);
+    public void createAdapter() {
+        circleAdapter = new CircleAdapter(getActivity());
+        circleAdapter.setCirclePresenter(presenter);
+        recyclerView.setAdapter(circleAdapter);
     }
 
-    private void initTitle(View mainView) {
-        viewBinding.titleBarFl.setPadding(0,SinkHelper.getStatusBarHeight(getContext()),0,0);
+
+    public void initTitle(View mainView) {
+        viewBinding.titleBarFl.setPadding(0, SinkHelper.getStatusBarHeight(getContext()), 0, 0);
         viewBinding.titleBarFl.setBackgroundColor(Color.parseColor("#FF022234"));
         titleBar = mainView.findViewById(R.id.main_title_bar);
         if (presenter.isSpecifiedUser()) {
@@ -247,15 +255,52 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
             titleBar.addAction(new TitleBar.ImageAction(R.drawable.ic_plus_add) {
                 @Override
                 public void performAction(View view) {
-
+                    showPopupWindow(view);
                 }
             });
         }
     }
+    private void showPopupWindow(View v) {
+        //初始化一个PopupWindow，width和height都是WRAP_CONTENT
+        PopupWindow popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LayoutMomentAddBinding view = LayoutMomentAddBinding.inflate(getLayoutInflater());
+        view.pushPhoto.setOnClickListener(v1 -> {
+            startActivity(new Intent(getActivity(), PushMomentsActivity.class));
+        });
+        //设置PopupWindow的视图内容
+        popupWindow.setContentView(view.getRoot());
+        //点击空白区域PopupWindow消失，这里必须先设置setBackgroundDrawable，否则点击无反应
+        popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
+        popupWindow.setOutsideTouchable(true);
 
+        //PopupWindow在targetView下方弹出
+        popupWindow.showAsDropDown(v);
+    }
 
+    private int mWindowHeight=0;
+    private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener = () -> {
+        Rect r = new Rect();
+        //获取当前窗口实际的可见区域
+        getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
+        int height = r.height();
+        if (height==mWindowHeight)return;
+        if (mWindowHeight == 0) {
+            //一般情况下，这是原始的窗口高度
+            mWindowHeight = height;
+        } else {
+            RelativeLayout.LayoutParams inputLayoutParams = (RelativeLayout.LayoutParams)
+                edittextbody.getLayoutParams();
+            if (mWindowHeight == height) {
+                inputLayoutParams.bottomMargin = 0;
+            } else {
+                //两次窗口高度相减，就是软键盘高度
+                int softKeyboardHeight = mWindowHeight - height;
+                inputLayoutParams.bottomMargin = softKeyboardHeight;
+            }
+            edittextbody.setLayoutParams(inputLayoutParams);
+        }
+    };
     private void setViewTreeObserver() {
-
         final ViewTreeObserver swipeRefreshLayoutVTO = bodyLayout.getViewTreeObserver();
         swipeRefreshLayoutVTO.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -287,7 +332,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
                 }
                 //偏移listview
                 if (layoutManager != null && commentConfig != null) {
-                    layoutManager.scrollToPositionWithOffset(commentConfig.circlePosition + CircleAdapter.HEADVIEW_SIZE, getListviewOffset(commentConfig));
+                    layoutManager.scrollToPositionWithOffset(commentConfig.circlePosition + circleAdapter.HEADVIEW_SIZE, getListviewOffset(commentConfig));
                 }
             }
         });
@@ -328,7 +373,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         for (int i = 0; i < circleItems.size(); i++) {
             if (circleId.equals(circleItems.get(i).getId())) {
                 circleItems.remove(i);
-                circleAdapter.notifyItemRemoved(i + 1);
+                circleAdapter.notifyItemRemoved(i + circleAdapter.HEADVIEW_SIZE);
                 return;
             }
         }
@@ -339,7 +384,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         if (addItem != null) {
             CircleItem item = (CircleItem) circleAdapter.getDatas().get(circlePosition);
             item.getFavorters().add(addItem);
-            circleAdapter.notifyItemChanged(circlePosition + 1);
+            circleAdapter.notifyItemChanged(circlePosition + circleAdapter.HEADVIEW_SIZE);
         }
     }
 
@@ -350,7 +395,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         for (int i = 0; i < items.size(); i++) {
             if (favortId.equals(items.get(i).getId())) {
                 items.remove(i);
-                circleAdapter.notifyItemChanged(circlePosition + 1);
+                circleAdapter.notifyItemChanged(circlePosition + circleAdapter.HEADVIEW_SIZE);
                 return;
             }
         }
@@ -361,7 +406,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         if (addItem != null) {
             CircleItem item = (CircleItem) circleAdapter.getDatas().get(circlePosition);
             item.getComments().add(addItem);
-            circleAdapter.notifyItemChanged(circlePosition + 1);
+            circleAdapter.notifyItemChanged(circlePosition + circleAdapter.HEADVIEW_SIZE);
         }
         //清空评论文本
         editText.setText("");
@@ -374,7 +419,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         for (int i = 0; i < items.size(); i++) {
             if (commentId.equals(items.get(i).getId())) {
                 items.remove(i);
-                circleAdapter.notifyItemChanged(circlePosition + 1);
+                circleAdapter.notifyItemChanged(circlePosition + circleAdapter.HEADVIEW_SIZE);
                 return;
             }
         }
@@ -417,6 +462,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         }
 
     }
+
     @Override
     public void setRefreshing(Boolean isRefresh) {
         recyclerView.setRefreshing(isRefresh);
@@ -450,7 +496,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         int firstPosition = layoutManager.findFirstVisibleItemPosition();
         //只能返回当前可见区域（列表可滚动）的子项
         View selectCircleItem =
-            layoutManager.getChildAt(commentConfig.circlePosition + CircleAdapter.HEADVIEW_SIZE - firstPosition);
+            layoutManager.getChildAt(commentConfig.circlePosition + circleAdapter.HEADVIEW_SIZE - firstPosition);
 
         if (selectCircleItem != null) {
             selectCircleItemH = selectCircleItem.getHeight();
@@ -495,5 +541,9 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         Toast.makeText(getActivity(), errorMsg, Toast.LENGTH_LONG).show();
     }
 
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        presenter.recycle();
+    }
 }

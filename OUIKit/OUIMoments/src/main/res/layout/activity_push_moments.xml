@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical"
+        tools:context=".ui.PushMomentsActivity">
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/comm_title_high"
+            app:cardElevation="8dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <include
+                    android:id="@+id/back"
+                    layout="@layout/view_back" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/push_photo"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/finish"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="12dp"
+                    android:padding="5dp"
+                    android:text="@string/finish"
+                    android:textColor="#ff333333"
+                    android:textSize="17sp" />
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:background="@color/def_bg"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <EditText
+                    android:padding="5dp"
+                    android:id="@+id/content"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:background="@null"
+                    android:gravity="top"
+                    android:maxLength="500"
+                    android:textColor="#ff333333"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/restriction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:text="0/500"
+                    android:textColor="#ff999999"
+                    android:textSize="14sp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:padding="5dp"
+                    android:overScrollMode="never"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+
+                <io.openim.android.ouicore.widget.InterceptLinearLayout
+                    android:id="@+id/whoSeeLy"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/who_see"
+                        android:drawableLeft="@mipmap/ic_m_see"
+                        android:button="@null"
+                        android:background="@null"
+                        android:clickable="false"
+                        android:drawablePadding="10dp"
+                        android:textColor="#ff333333"
+                        android:textSize="14sp" />
+                    <CheckBox
+                        android:id="@+id/whoSee"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:gravity="right|center"
+                        android:paddingLeft="20dp"
+                        android:background="@null"
+                        android:textColor="#ff999999"
+                        android:maxLines="1"
+                        android:clickable="false"
+                        android:ellipsize="end"
+                        android:button="@null"
+                        android:drawablePadding="10dp"
+                        android:drawableRight="@mipmap/ic_right"
+                        android:textSize="14sp"
+                        />
+                </io.openim.android.ouicore.widget.InterceptLinearLayout>
+                <include layout="@layout/view_dividing_line"/>
+                <io.openim.android.ouicore.widget.InterceptLinearLayout
+                    android:id="@+id/reminderWhoLy"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="10dp"
+
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/reminder_who_see"
+                        android:drawableLeft="@mipmap/ic_m_tips"
+                        android:button="@null"
+                        android:clickable="false"
+                        android:drawablePadding="8dp"
+                        android:textColor="#ff333333"
+                        android:background="@null"
+                        android:textSize="14sp" />
+                    <CheckBox
+                        android:id="@+id/reminderWho"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:gravity="right|center"
+                        android:paddingLeft="20dp"
+                        android:textColor="#ff999999"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:clickable="false"
+                        android:background="@null"
+                        android:button="@null"
+                        android:drawablePadding="10dp"
+                        android:drawableRight="@mipmap/ic_right"
+                        android:textSize="14sp"
+                        />
+                </io.openim.android.ouicore.widget.InterceptLinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+
+    </LinearLayout>
+</layout>
+

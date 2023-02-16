@@ -3,6 +3,8 @@ package io.openim.android.ouimoments.mvp.presenter;
 import android.text.TextUtils;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+
 import com.alibaba.fastjson2.JSONObject;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -119,12 +121,14 @@ public class CirclePresenter implements CircleContract.Presenter {
         NetObserver<MomentsBean> netObserver = new NetObserver<MomentsBean>(TAG) {
             @Override
             public void onSuccess(MomentsBean o) {
-                packInContent(o);
-                List<CircleItem> circleData = packInCircleData(o);
+              try {
+                  packInContent(o);
+                  List<CircleItem> circleData = packInCircleData(o);
 
-                if (view != null) {
-                    view.update2loadData(loadType, circleData);
-                }
+                  if (view != null) {
+                      view.update2loadData(loadType, circleData);
+                  }
+              }catch (Exception ignored){}
             }
 
             @Override
@@ -151,48 +155,54 @@ public class CirclePresenter implements CircleContract.Presenter {
     private List<CircleItem> packInCircleData(MomentsBean o) {
         List<CircleItem> circleItems = new ArrayList<>();
         for (WorkMoments workMoment : o.workMoments) {
-            CircleItem item = new CircleItem();
-            item.setType(workMoment.momentsContents.type == 0 ? "2" : "3");
-            item.setUser(new User(workMoment.userID, workMoment.userName, workMoment.faceURL));
-            item.setId(workMoment.workMomentID);
-            item.setContent(workMoment.momentsContents.text);
-            item.setCreateTime(TimeUtil.getTime(workMoment.createTime * 1000L,
-                TimeUtil.monthTimeFormat));
-
-            List<FavortItem> favortItems = new ArrayList<>();
-            for (MomentsUser likeUser : workMoment.likeUsers) {
-                FavortItem favortItem = new FavortItem();
-                favortItem.setId(likeUser.userID);
-                favortItem.setUser(new User(likeUser.userID, likeUser.userName, ""));
-                favortItems.add(favortItem);
-            }
-            item.setFavorters(favortItems);
-
-            List<CommentItem> commentItems = new ArrayList<>();
-            for (Comment comment : workMoment.comments) {
-                CommentItem commentItem = new CommentItem();
-                replaceUser(comment, commentItem);
-                commentItem.setId(comment.contentID);
-                commentItem.setContent(comment.content);
-                commentItems.add(commentItem);
-            }
-            item.setComments(commentItems);
-
-            List<PhotoInfo> photos = new ArrayList<>();
-            for (MomentsMeta meta : workMoment.momentsContents.metas) {
-                if (item.getType().equals(CircleItem.TYPE_VIDEO)) {
-                    item.setVideoUrl(meta.original);
-                    item.setVideoImgUrl(meta.thumb);
-                } else {
-                    PhotoInfo photoInfo = new PhotoInfo();
-                    photoInfo.url = meta.original;
-                    photos.add(photoInfo);
-                }
-            }
-            if (!photos.isEmpty()) item.setPhotos(photos);
+            CircleItem item = getPackInCircleData(workMoment);
             circleItems.add(item);
         }
         return circleItems;
+    }
+
+    @NonNull
+    private CircleItem getPackInCircleData(WorkMoments workMoment) {
+        CircleItem item = new CircleItem();
+        item.setType(workMoment.momentsContents.type == 0 ? "2" : "3");
+        item.setUser(new User(workMoment.userID, workMoment.userName, workMoment.faceURL));
+        item.setId(workMoment.workMomentID);
+        item.setContent(workMoment.momentsContents.text);
+        item.setCreateTime(TimeUtil.getTime(workMoment.createTime * 1000L,
+            TimeUtil.monthTimeFormat));
+
+        List<FavortItem> favortItems = new ArrayList<>();
+        for (MomentsUser likeUser : workMoment.likeUsers) {
+            FavortItem favortItem = new FavortItem();
+            favortItem.setId(likeUser.userID);
+            favortItem.setUser(new User(likeUser.userID, likeUser.userName, ""));
+            favortItems.add(favortItem);
+        }
+        item.setFavorters(favortItems);
+
+        List<CommentItem> commentItems = new ArrayList<>();
+        for (Comment comment : workMoment.comments) {
+            CommentItem commentItem = new CommentItem();
+            replaceUser(comment, commentItem);
+            commentItem.setId(comment.contentID);
+            commentItem.setContent(comment.content);
+            commentItems.add(commentItem);
+        }
+        item.setComments(commentItems);
+
+        List<PhotoInfo> photos = new ArrayList<>();
+        for (MomentsMeta meta : workMoment.momentsContents.metas) {
+            if (item.getType().equals(CircleItem.TYPE_VIDEO)) {
+                item.setVideoUrl(meta.original);
+                item.setVideoImgUrl(meta.thumb);
+            } else {
+                PhotoInfo photoInfo = new PhotoInfo();
+                photoInfo.url = meta.original;
+                photos.add(photoInfo);
+            }
+        }
+        if (!photos.isEmpty()) item.setPhotos(photos);
+        return item;
     }
 
     /**
@@ -216,16 +226,20 @@ public class CirclePresenter implements CircleContract.Presenter {
     public void packInContent(MomentsBean momentsBean) {
         try {
             for (WorkMoments workMoment : momentsBean.workMoments) {
-                Map map = JSONObject.parseObject(workMoment.content, Map.class);
-                JsonElement string = JsonParser.parseString((String) map.get("data"));
-                MomentsContent momentsContent = GsonHel.fromJson(string.toString(),
-                    MomentsContent.class);
-                workMoment.momentsContents = momentsContent.data;
+                packInContent(workMoment);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+    }
+
+    private void packInContent(WorkMoments workMoment) {
+        Map map = JSONObject.parseObject(workMoment.content, Map.class);
+        JsonElement string = JsonParser.parseString((String) map.get("data"));
+        MomentsContent momentsContent = GsonHel.fromJson(string.toString(),
+            MomentsContent.class);
+        workMoment.momentsContents = momentsContent.data;
     }
 
 
@@ -367,7 +381,31 @@ public class CirclePresenter implements CircleContract.Presenter {
             view.updateEditTextBodyVisible(View.VISIBLE, commentConfig);
         }
     }
+    public void getMomentsDetail(String momentID) {
+        N.API(NiService.class).CommNI(Constant.getImApiUrl() + "/office/get_work_moment_by_id",
+            BaseApp.inst().loginCertificate.imToken, NiService.buildParameter().add("workMomentID"
+                , momentID).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(WorkMoments.class))
+            .subscribe(new NetObserver<WorkMoments>(TAG) {
+            @Override
+            public void onSuccess(WorkMoments o) {
+                try {
+                    WorkMoments workMoment=o.workMoment;
+                    packInContent(workMoment);
+                    List<CircleItem> circleItems = new ArrayList<>();
+                    circleItems.add(getPackInCircleData(workMoment)) ;
 
+                    if (view != null) {
+                        view.update2loadData(0, circleItems);
+                    }
+                }catch (Exception ignored){}
+            }
+
+            @Override
+            protected void onFailure(Throwable e) {
+                view.showError(e.getMessage());
+            }
+        });
+    }
 
     /**
      * 清除对外部对象的引用，反正内存泄露。
@@ -377,4 +415,6 @@ public class CirclePresenter implements CircleContract.Presenter {
         OpenIMClient.getInstance().workMomentsManager.setWorkMomentsListener(null);
         this.view = null;
     }
+
+
 }

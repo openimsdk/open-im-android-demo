@@ -66,21 +66,19 @@ public class ImagePagerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActionBar actionBar = getSupportActionBar();
-        if (null != actionBar)
-            actionBar.hide();
+        if (null != actionBar) actionBar.hide();
         setContentView(R.layout.activity_imagepager);
         SinkHelper.get(this).setTranslucentStatus(null);
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         guideGroup = (LinearLayout) findViewById(R.id.guideGroup);
         getIntentData();
-        mGestureDetector = new GestureDetector(this,
-            new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public boolean onSingleTapConfirmed(MotionEvent e) {
-                    finish();
-                    return false;
-                }
-            });
+        mGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                finish();
+                return false;
+            }
+        });
 
         ImageAdapter mAdapter = new ImageAdapter(this);
         mAdapter.setDatas(imgUrls);
@@ -126,8 +124,7 @@ public class ImagePagerActivity extends AppCompatActivity {
                 view.setBackgroundResource(R.drawable.selector_guide_bg);
                 view.setSelected(i == startPos ? true : false);
                 LinearLayout.LayoutParams layoutParams =
-                    new LinearLayout.LayoutParams(getResources().getDimensionPixelSize(R.dimen.gudieview_width),
-                    getResources().getDimensionPixelSize(R.dimen.gudieview_heigh));
+                    new LinearLayout.LayoutParams(getResources().getDimensionPixelSize(R.dimen.gudieview_width), getResources().getDimensionPixelSize(R.dimen.gudieview_heigh));
                 layoutParams.setMargins(10, 0, 0, 0);
                 guideGroup.addView(view, layoutParams);
                 guideViewList.add(view);
@@ -155,8 +152,7 @@ public class ImagePagerActivity extends AppCompatActivity {
         private ImageView smallImageView = null;
 
         public void setDatas(List<String> datas) {
-            if (datas != null)
-                this.datas = datas;
+            if (datas != null) this.datas = datas;
         }
 
         public void setImageSize(ImageSize imageSize) {
@@ -184,8 +180,15 @@ public class ImagePagerActivity extends AppCompatActivity {
                 if (imageSize != null) {
                     //预览imageView
                     smallImageView = new ImageView(context);
-                    FrameLayout.LayoutParams layoutParams =
-                        new FrameLayout.LayoutParams(imageSize.getWidth(), imageSize.getHeight());
+                    FrameLayout.LayoutParams layoutParams;
+                    if (null == imageSize) {
+                        layoutParams =
+                            new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                                FrameLayout.LayoutParams.WRAP_CONTENT);
+                    } else {
+                        layoutParams = new FrameLayout.LayoutParams(imageSize.getWidth(),
+                            imageSize.getHeight());
+                    }
                     layoutParams.gravity = Gravity.CENTER;
                     smallImageView.setLayoutParams(layoutParams);
                     smallImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -196,20 +199,16 @@ public class ImagePagerActivity extends AppCompatActivity {
                 final ProgressBar loading = new ProgressBar(context);
                 FrameLayout.LayoutParams loadingLayoutParams =
                     new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
                 loadingLayoutParams.gravity = Gravity.CENTER;
                 loading.setLayoutParams(loadingLayoutParams);
                 ((FrameLayout) view).addView(loading);
 
                 final String imgurl = datas.get(position);
 
-                Glide.with(context)
-                    .load(imgurl)
-                    .centerInside()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)//缓存多个尺寸
+                Glide.with(context).load(imgurl).centerInside().diskCacheStrategy(DiskCacheStrategy.ALL)//缓存多个尺寸
                     .thumbnail(0.1f)//先显示缩略图  缩略图为原图的1/10
-                    .error(R.drawable.ic_launcher)
-                    .into(new DrawableImageViewTarget(imageView) {
+                    .error(R.drawable.ic_launcher).into(new DrawableImageViewTarget(imageView) {
                         @Override
                         public void onLoadStarted(Drawable placeholder) {
                             super.onLoadStarted(placeholder);

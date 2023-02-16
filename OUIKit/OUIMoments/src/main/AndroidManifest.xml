@@ -4,6 +4,20 @@
 
     <application android:theme="@style/Theme.Demo">
         <activity
+            android:name=".ui.WhoSeeActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".ui.PushMomentsActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".ui.MomentsDetailActivity"
             android:exported="false">
             <meta-data

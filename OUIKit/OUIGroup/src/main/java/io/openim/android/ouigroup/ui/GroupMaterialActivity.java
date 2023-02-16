@@ -218,7 +218,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                 public void onSuccess(String s) {
                     vm.UPDATEGroup(vm.groupId, null, s, null, null, null);
                 }
-            }, path);
+            }, path[0]);
         });
 
         view.recyclerview.setLayoutManager(new GridLayoutManager(this, spanCount));

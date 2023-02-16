@@ -8,7 +8,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.services.MomentsBridge;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouimoments.ui.CircleFragment;
+import io.openim.android.ouimoments.ui.fragment.CircleFragment;
 
 @Route(path = Routes.Service.MOMENTS)
 public class IBridgeImpl implements MomentsBridge {

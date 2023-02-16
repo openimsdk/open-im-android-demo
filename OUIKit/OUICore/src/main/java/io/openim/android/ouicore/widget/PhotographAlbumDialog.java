@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.databinding.DialogPhotographAlbumBinding;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.sdk.OpenIMClient;
@@ -46,6 +47,8 @@ public class PhotographAlbumDialog extends BaseDialog {
     private ActivityResultLauncher<Intent> takePhotoLauncher;
     private ActivityResultLauncher<Intent> albumLauncher;
     private WaitDialog waitDialog;
+    private int maxSelectable = 1;
+    private boolean isToCrop = true;
 
     public PhotographAlbumDialog(@NonNull AppCompatActivity context) {
         super(context);
@@ -73,7 +76,6 @@ public class PhotographAlbumDialog extends BaseDialog {
 
     public void initView() {
         initLauncher();
-
         hasStorage = AndPermission.hasPermissions(getContext(), Permission.Group.STORAGE);
         hasShoot = AndPermission.hasPermissions(getContext(), Permission.CAMERA);
 
@@ -95,7 +97,7 @@ public class PhotographAlbumDialog extends BaseDialog {
     }
 
     public interface OnSelectResultListener {
-        void onResult(String path);
+        void onResult(String... paths);
     }
 
     public void setOnSelectResultListener(OnSelectResultListener onSelectResultListener) {
@@ -103,29 +105,45 @@ public class PhotographAlbumDialog extends BaseDialog {
     }
 
     private void initLauncher() {
-        cropLauncher = compatActivity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() != Activity.RESULT_OK) return;
-            String path = GetFilePathFromUri.getFileAbsolutePath(compatActivity, fileUri);
-            waitDialog.dismiss();
-            dismiss();
-            if (null != onSelectResultListener)
-                onSelectResultListener.onResult(path);
-        });
+        cropLauncher =
+            compatActivity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() != Activity.RESULT_OK) return;
+                String path = GetFilePathFromUri.getFileAbsolutePath(compatActivity, fileUri);
+                waitDialog.dismiss();
+                dismiss();
+                if (null != onSelectResultListener) onSelectResultListener.onResult(path);
+            });
 
-        takePhotoLauncher = compatActivity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() != Activity.RESULT_OK) return;
-            goCrop(fileUri);
-        });
-        albumLauncher = compatActivity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() != Activity.RESULT_OK) return;
-            try {
-                List<Uri> uris = (List<Uri>) result.getData().getExtras().get("extra_result_selection");
-                goCrop(uris.get(0));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        takePhotoLauncher =
+            compatActivity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() != Activity.RESULT_OK) return;
+                if (isToCrop) goCrop(fileUri);
+                else if (null != onSelectResultListener)
+                    onSelectResultListener.onResult(GetFilePathFromUri.getFileAbsolutePath(getContext(), fileUri));
+            });
+        albumLauncher =
+            compatActivity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() != Activity.RESULT_OK) return;
+                try {
+                    List<Uri> uris = (List<Uri>) result.getData().getExtras().get(
+                        "extra_result_selection");
 
-        });
+                    if (isToCrop) {
+                        Uri uri = uris.get(0);
+                        goCrop(uri);
+                    } else if (null != onSelectResultListener) {
+                        String[] paths = new String[uris.size()];
+                        for (int i = 0; i < uris.size(); i++) {
+                            paths[i] = GetFilePathFromUri.getFileAbsolutePath(getContext(),
+                                uris.get(i));
+                        }
+                        onSelectResultListener.onResult(paths);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            });
 
     }
 
@@ -172,28 +190,17 @@ public class PhotographAlbumDialog extends BaseDialog {
      */
     @SuppressLint("WrongConstant")
     private void takePhoto() {
-        if (hasShoot) {
+        Common.permission(getContext(), () -> {
+            hasShoot = true;
             goTakePhoto();
-        } else {
-            AndPermission.with(compatActivity)
-                .runtime()
-                .permission(Permission.Group.CAMERA)
-                .onGranted(permissions -> {
-                    // Storage permission are allowed.
-                    hasShoot = true;
-                    goTakePhoto();
-                })
-                .onDenied(permissions -> {
-                    // Storage permission are not allowed.
-                })
-                .start();
-        }
+        }, hasShoot, Permission.Group.CAMERA);
     }
 
     public File buildTemporaryFile() {
         File file;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            file = new File(Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES), "temporary.jpg");
+            file = new File(Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES),
+                "temporary.jpg");
         } else {
             file = new File(compatActivity.getExternalCacheDir(), "temporary.jpg");
         }
@@ -205,7 +212,8 @@ public class PhotographAlbumDialog extends BaseDialog {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {  //如果是7.0以上，使用FileProvider，否则会报错
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            fileUri = FileProvider.getUriForFile(compatActivity, compatActivity.getPackageName() + ".fileProvider", file);
+            fileUri = FileProvider.getUriForFile(compatActivity,
+                compatActivity.getPackageName() + ".fileProvider", file);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); //设置拍照后图片保存的位置
         }
         intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString()); //设置图片保存的格式
@@ -214,32 +222,22 @@ public class PhotographAlbumDialog extends BaseDialog {
 
     @SuppressLint("WrongConstant")
     private void showMediaPicker() {
-        if (hasStorage)
+        Common.permission(getContext(), () -> {
+            hasStorage = true;
             goMediaPicker();
-        else
-            AndPermission.with(compatActivity)
-                .runtime()
-                .permission(Permission.Group.STORAGE)
-                .onGranted(permissions -> {
-                    // Storage permission are allowed.
-                    hasStorage = true;
-                    goMediaPicker();
-                })
-                .onDenied(permissions -> {
-                    // Storage permission are not allowed.
-                })
-                .start();
+        }, hasStorage, Permission.Group.STORAGE);
     }
 
     private void goMediaPicker() {
-        Matisse.from(compatActivity)
-            .choose(MimeType.ofImage())
-            .countable(true)
-            .maxSelectable(1)
-            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-            .thumbnailScale(0.85f)
-            .imageEngine(new GlideEngine())
-            .forResult(albumLauncher);
+        Matisse.from(compatActivity).choose(MimeType.ofImage()).countable(true).maxSelectable(maxSelectable).restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED).thumbnailScale(0.85f).imageEngine(new GlideEngine()).forResult(albumLauncher);
+    }
+
+    public void setMaxSelectable(int maxSelectable) {
+        this.maxSelectable = maxSelectable;
+    }
+
+    public void setToCrop(boolean toCrop) {
+        isToCrop = toCrop;
     }
 }
 

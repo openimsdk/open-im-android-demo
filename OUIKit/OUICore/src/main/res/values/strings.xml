@@ -265,4 +265,17 @@
     <string name="star_tips2">评论了</string>
     <string name="about_you">提到了你</string>
     <string name="clear_null">清空</string>
+    <string name="push_photo">发布图文</string>
+    <string name="who_see">谁可以看</string>
+    <string name="reminder_who_see">提醒谁看</string>
+    <string name="str_public">公开</string>
+    <string name="public_tips">所有人可见</string>
+    <string name="str_private">私密</string>
+    <string name="str_private_tips">仅自己可见</string>
+    <string name="part_see">部分可见</string>
+    <string name="part_see_tips">选中的人可见</string>
+    <string name="select_group">从群组选择</string>
+    <string name="who_invisible">不给谁看</string>
+    <string name="who_invisible_tips">选中的人不可见</string>
+    <string name="select_user">从通讯录选择</string>
 </resources>

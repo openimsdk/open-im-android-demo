@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
-import io.openim.android.ouimoments.ui.CircleFragment;
+import io.openim.android.ouimoments.ui.fragment.CircleFragment;
 
 public class MainActivity extends AppCompatActivity {
     CircleFragment fragment;
