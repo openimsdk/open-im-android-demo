@@ -15,7 +15,6 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:animateLayoutChanges="true"
         android:orientation="vertical"
         tools:context=".ui.WhoSeeActivity">
 
@@ -84,6 +83,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
                     android:text="@string/str_public"
+                    android:textStyle="bold"
                     android:textColor="#ff333333"
                     android:textSize="16sp" />
 
@@ -127,6 +127,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
                     android:text="@string/str_private"
+                    android:textStyle="bold"
                     android:textColor="#ff333333"
                     android:textSize="16sp" />
 
@@ -171,6 +172,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
                     android:text="@string/part_see"
+                    android:textStyle="bold"
                     android:textColor="#ff333333"
                     android:textSize="16sp" />
 
@@ -201,43 +203,56 @@
             android:paddingBottom="10dp"
             android:visibility="@{PushMoments.param.permission==2?View.VISIBLE:View.GONE}">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/selectGroup"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/select_group"
-                android:textColor="#ff333333"
-                android:textSize="16sp" />
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/select_group"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/seeGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="10dp"
+                    android:textColor="#ff999999"
+                    android:textSize="12sp"
+                    />
+            </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:paddingTop="3dp"
-                android:paddingBottom="10dp"
-                android:text="@string/part_see_tips"
-                android:textColor="#ff999999"
-                android:textSize="12sp"
-                android:visibility="invisible" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/selectUser"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:text="从通讯录选择"
-                android:textColor="#ff333333"
-                android:textSize="16sp" />
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:text="@string/select_user"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:paddingTop="3dp"
-                android:text="@string/part_see_tips"
-                android:textColor="#ff999999"
-                android:textSize="12sp"
-                android:visibility="invisible" />
+                <TextView
+                    android:id="@+id/seeUser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:textColor="#ff999999"
+                    android:textSize="12sp"
+                    />
+            </LinearLayout>
+
         </LinearLayout>
 
         <include layout="@layout/view_dividing_line" />
@@ -271,6 +286,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
                     android:text="@string/who_invisible"
+                    android:textStyle="bold"
                     android:textColor="#ff333333"
                     android:textSize="16sp" />
 
@@ -301,6 +317,11 @@
             android:paddingBottom="10dp"
             android:visibility="@{PushMoments.param.permission==3?View.VISIBLE:View.GONE}">
 
+            <LinearLayout
+                android:id="@+id/selectGroup2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -309,17 +330,23 @@
                 android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/notSeeGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:paddingTop="3dp"
                 android:paddingBottom="10dp"
-                android:text="@string/part_see_tips"
                 android:textColor="#ff999999"
                 android:textSize="12sp"
-                android:visibility="invisible" />
+                />
+            </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/selectUser2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -329,15 +356,16 @@
                 android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/notSeeUser"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:paddingTop="3dp"
-                android:text="@string/part_see_tips"
                 android:textColor="#ff999999"
                 android:textSize="12sp"
-                android:visibility="invisible" />
+                />
+            </LinearLayout>
         </LinearLayout>
 
         <include layout="@layout/view_dividing_line" />

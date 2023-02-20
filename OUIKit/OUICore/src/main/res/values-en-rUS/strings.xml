@@ -266,5 +266,6 @@
     <string name="select_group">从群组选择</string>
     <string name="who_invisible">不给谁看</string>
     <string name="who_invisible_tips">选中的人不可见</string>
+    <string name="selected_group_tips">已选择：%1$d个群</string>
 
 </resources>

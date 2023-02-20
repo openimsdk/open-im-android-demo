@@ -225,6 +225,7 @@
     <string name="blackList">通讯黑名单</string>
     <string name="select_tips">最多选择 %1$d 个人</string>
     <string name="selected_tips">已选择：%1$d人</string>
+    <string name="selected_group_tips">已选择：%1$d个群</string>
     <string name="save_photo_album">图片已保存至相册</string>
     <string name="vc_login">用短信验证码登录</string>
     <string name="vc">验证码</string>
