@@ -34,9 +34,10 @@ public abstract class CircleViewHolder extends RecyclerView.ViewHolder implement
     public TextView urlTipTv;
     /** 动态的内容 */
     public ExpandTextView contentTv;
-    public TextView timeTv;
+    public TextView timeTv,authorityTv;
     public TextView deleteBtn;
-    public ImageView snsBtn;
+    public ImageView snsBtn,authorityIv;
+    public LinearLayout authorityLy;
     /** 点赞列表*/
     public PraiseListView praiseListView;
 
@@ -64,6 +65,9 @@ public abstract class CircleViewHolder extends RecyclerView.ViewHolder implement
         urlTipTv = (TextView) itemView.findViewById(R.id.urlTipTv);
         timeTv = (TextView) itemView.findViewById(R.id.timeTv);
         deleteBtn = (TextView) itemView.findViewById(R.id.deleteBtn);
+        authorityLy = (LinearLayout) itemView.findViewById(R.id.authorityLy);
+        authorityIv = (ImageView) itemView.findViewById(R.id.authorityIv);
+        authorityTv = (TextView) itemView.findViewById(R.id.authorityTv);
         snsBtn = (ImageView) itemView.findViewById(R.id.snsBtn);
         praiseListView = (PraiseListView) itemView.findViewById(R.id.praiseListView);
 

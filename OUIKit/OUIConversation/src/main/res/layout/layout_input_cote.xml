@@ -36,6 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:button="@null"
+                android:background="@android:color/transparent"
                 android:layout_marginRight="-12dp"
                 android:drawableLeft="@drawable/selector_chat_checkbox"
                 />

@@ -39,6 +39,8 @@ public class Routes {
         public final static String SEARCH = "/conversation/SearchActivity";
         //预览图片或视频
         public static final String PREVIEW = "/conversation/PreviewActivity";
+        //拍摄照片或视频
+        public static final String SHOOT = "/conversation/ShootActivity";
     }
 
     //群组

@@ -15,6 +15,7 @@ import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouimoments.bean.EXWorkMomentsInfo;
 import io.openim.android.ouimoments.bean.MomentsContent;
+import io.openim.android.ouimoments.bean.MomentsData;
 import io.openim.android.ouimoments.widgets.dialog.CommentDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
@@ -36,8 +37,8 @@ public class MsgDetailVM extends BaseViewModel {
                 for (WorkMomentsInfo datum : data) {
                     Map map = JSONObject.parseObject(datum.getWorkMomentContent(), Map.class);
                     JsonElement string = JsonParser.parseString((String) map.get("data"));
-                    MomentsContent momentsContent = GsonHel.fromJson(string.toString(),
-                        MomentsContent.class);
+                    MomentsData momentsContent = GsonHel.fromJson(string.toString(),
+                        MomentsData.class);
                     workMomentsInfo.getValue().add(new EXWorkMomentsInfo(momentsContent.data,datum));
                 }
                 workMomentsInfo.setValue(workMomentsInfo.getValue());

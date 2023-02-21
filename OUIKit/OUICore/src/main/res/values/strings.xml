@@ -279,4 +279,8 @@
     <string name="who_invisible">不给谁看</string>
     <string name="who_invisible_tips">选中的人不可见</string>
     <string name="select_user">从通讯录选择</string>
+    <string name="upload_err">上传出错</string>
+    <string name="delete_moments_tips">确定删除此条朋友圈？</string>
+    <string name="part_see_tips2">部分好友可见</string>
+    <string name="push_video">发布视频</string>
 </resources>

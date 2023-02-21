@@ -6,19 +6,35 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.entity.ExUserInfo;
+import io.openim.android.ouicore.net.RXRetrofit.N;
+import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
+import io.openim.android.ouicore.net.bage.GsonHel;
+import io.openim.android.ouicore.services.NiService;
+import io.openim.android.ouicore.services.OneselfService;
+import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.bean.MomentsBean;
 import io.openim.android.ouimoments.bean.MomentsContent;
+import io.openim.android.ouimoments.bean.MomentsData;
 import io.openim.android.ouimoments.ui.SelectDataActivity;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.models.GroupInfo;
 
 public class PushMomentsVM extends BaseViewModel {
+    public static final String TAG = PushMomentsVM.class.getSimpleName();
     public MutableLiveData<List<Object>> selectMedia = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<PushMomentsParam> param = new MutableLiveData<>(new PushMomentsParam());
     //已选择的RuleDataList
@@ -26,24 +42,23 @@ public class PushMomentsVM extends BaseViewModel {
     public List<SelectDataActivity.RuleData> selectedUserRuleDataList;
 
     //是否是发布照片
-    boolean isPhoto = true;
+    public boolean isPhoto=true;
     public int addID = io.openim.android.ouicore.R.mipmap.ic_add3;
 
-    @Override
-    protected void viewCreate() {
-
-    }
 
     public void init() {
+        param.getValue().content = new MomentsData();
+        param.getValue().content.data=new MomentsContent();
+        param.getValue().content.data.metas = new ArrayList<>();
+        param.getValue().content.data.type = isPhoto ? 0 : 1;
         selectMedia.getValue().add(io.openim.android.ouicore.R.mipmap.ic_add3);
         selectMedia.setValue(selectMedia.getValue());
     }
 
     @NonNull
-    public List<SelectDataActivity.RuleData> buildGroupRuleData(List<GroupInfo> groupInfos
-                                                           ) {
+    public List<SelectDataActivity.RuleData> buildGroupRuleData(List<GroupInfo> groupInfos) {
         List<String> selectedIds = new ArrayList<>();
-        if (null!=selectedGroupRuleDataList){
+        if (null != selectedGroupRuleDataList) {
             for (SelectDataActivity.RuleData ruleData : selectedGroupRuleDataList) {
                 selectedIds.add(ruleData.id);
             }
@@ -52,14 +67,14 @@ public class PushMomentsVM extends BaseViewModel {
         for (GroupInfo groupInfo : groupInfos) {
             SelectDataActivity.RuleData ruleData = new SelectDataActivity.RuleData();
             ruleData.id = groupInfo.getGroupID();
-            if (selectedIds.contains(groupInfo.getGroupID()))
-                ruleData.isSelect = true;
+            if (selectedIds.contains(groupInfo.getGroupID())) ruleData.isSelect = true;
             ruleData.name = groupInfo.getGroupName();
             ruleData.icon = groupInfo.getFaceURL();
             ruleDataList.add(ruleData);
         }
         return ruleDataList;
     }
+
     public String getRuleDataNames(List<SelectDataActivity.RuleData> ruleDataList) {
         StringBuilder stringBuilder = new StringBuilder();
         for (SelectDataActivity.RuleData ruleData : ruleDataList) {
@@ -69,6 +84,7 @@ public class PushMomentsVM extends BaseViewModel {
         String res = stringBuilder.toString();
         return res.substring(0, res.length() - 1);
     }
+
     /**
      * 添加资源
      *
@@ -113,8 +129,8 @@ public class PushMomentsVM extends BaseViewModel {
     public void selectAuth(int index) {
         selectedUserRuleDataList = null;
         selectedGroupRuleDataList = null;
-        param.getValue().permissionUserList=null;
-        param.getValue().permissionGroupList=null;
+        param.getValue().permissionUserList = null;
+        param.getValue().permissionGroupList = null;
 
         param.getValue().permission = index;
         param.setValue(param.getValue());
@@ -137,10 +153,11 @@ public class PushMomentsVM extends BaseViewModel {
         else param.getValue().permissionUserList = userOrGroups;
     }
 
-    public List<SelectDataActivity.RuleData> buildUserRuleData(List<ExUserInfo> exUserInfo) {
+    public List<SelectDataActivity.RuleData> buildUserRuleData(List<ExUserInfo> exUserInfo,
+                                                               List<SelectDataActivity.RuleData> selected) {
         List<String> selectedIds = new ArrayList<>();
-        if (null!=selectedUserRuleDataList){
-            for (SelectDataActivity.RuleData ruleData : selectedUserRuleDataList) {
+        if (null != selected) {
+            for (SelectDataActivity.RuleData ruleData : selected) {
                 selectedIds.add(ruleData.id);
             }
         }
@@ -148,17 +165,60 @@ public class PushMomentsVM extends BaseViewModel {
         for (ExUserInfo userInfo : exUserInfo) {
             SelectDataActivity.RuleData ruleData = new SelectDataActivity.RuleData();
             ruleData.id = userInfo.userInfo.getUserID();
-            if (selectedIds.contains( ruleData.id ))
-                ruleData.isSelect = true;
-            ruleData.name =  userInfo.userInfo.getNickname();
-            ruleData.icon =  userInfo.userInfo.getFaceURL();
+            if (selectedIds.contains(ruleData.id)) ruleData.isSelect = true;
+            ruleData.name = userInfo.userInfo.getNickname();
+            ruleData.icon = userInfo.userInfo.getFaceURL();
             ruleDataList.add(ruleData);
         }
         return ruleDataList;
     }
 
+    public List<String> getMediaPaths() {
+        List<String> paths = new ArrayList<>();
+        for (Object o : selectMedia.getValue()) {
+            if (o instanceof String) paths.add((String) o);
+        }
+        return paths;
+    }
+
+    /**
+     *  👻知道我当时是怎么传的参！！！
+     */
+    public void pushMoments() {
+        Map parmMap=new HashMap();
+        Map map=  JSONArray.parseObject(GsonHel.toJson(param.getValue()),Map.class);
+
+        Map map1= new HashMap<>();
+        map1.put("data",param.getValue().content.data);
+
+
+        Map map2= new HashMap<>();
+        map2.put("data",JSONObject.toJSONString(map1));
+
+        parmMap.putAll(map);
+        parmMap.put("content",
+            JSONObject.toJSONString(map2));
+
+        N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office/create_one_work_moment",
+            BaseApp.inst().loginCertificate.imToken, NiService.buildParameter().add("workMoment"
+                , parmMap)
+                .buildJsonBody()).compose(N.IOMain())
+            .map(OneselfService.turn(Object.class))
+            .subscribe(new NetObserver<Object>(TAG) {
+            @Override
+            public void onSuccess(Object o) {
+                getIView().onSuccess(o);
+            }
+
+            @Override
+            protected void onFailure(Throwable e) {
+                getIView().toast(e.getMessage());
+            }
+        });
+    }
+
     public static class PushMomentsParam {
-        public MomentsContent content;
+        public MomentsData content;
         //0/1/2/3, 公开/私密/部分可见/不给谁看
         public int permission;
         public List<UserOrGroup> permissionUserList;

@@ -1,6 +1,8 @@
 package io.openim.android.ouimoments.ui.fragment;
 
 
+import static android.app.Activity.RESULT_OK;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
@@ -21,6 +23,8 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -189,7 +193,8 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
                 try {
                     titleBar.getBackground().setAlpha(alpha);
                     viewBinding.titleBarFl.getBackground().setAlpha(alpha);
-                }catch (Exception ignored){}
+                } catch (Exception ignored) {
+                }
             }
 
             @Override
@@ -260,12 +265,26 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
             });
         }
     }
+
+    private ActivityResultLauncher<Intent> resultLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK) {
+                recyclerView.setRefreshing(true);//执行下拉刷新的动画
+                refreshListener.onRefresh();//执行数据加载操作
+            }
+        });
+
     private void showPopupWindow(View v) {
         //初始化一个PopupWindow，width和height都是WRAP_CONTENT
-        PopupWindow popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        PopupWindow popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT);
         LayoutMomentAddBinding view = LayoutMomentAddBinding.inflate(getLayoutInflater());
         view.pushPhoto.setOnClickListener(v1 -> {
-            startActivity(new Intent(getActivity(), PushMomentsActivity.class));
+            resultLauncher.launch(new Intent(getActivity(), PushMomentsActivity.class));
+        });
+        view.pushVideo.setOnClickListener(v1 -> {
+            resultLauncher.launch(new Intent(getActivity(), PushMomentsActivity.class)
+                .putExtra(Constant.K_RESULT,false));
         });
         //设置PopupWindow的视图内容
         popupWindow.setContentView(view.getRoot());
@@ -277,19 +296,19 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         popupWindow.showAsDropDown(v);
     }
 
-    private int mWindowHeight=0;
+    private int mWindowHeight = 0;
     private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener = () -> {
         Rect r = new Rect();
         //获取当前窗口实际的可见区域
         getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
         int height = r.height();
-        if (height==mWindowHeight)return;
+        if (height == mWindowHeight) return;
         if (mWindowHeight == 0) {
             //一般情况下，这是原始的窗口高度
             mWindowHeight = height;
         } else {
-            RelativeLayout.LayoutParams inputLayoutParams = (RelativeLayout.LayoutParams)
-                edittextbody.getLayoutParams();
+            RelativeLayout.LayoutParams inputLayoutParams =
+                (RelativeLayout.LayoutParams) edittextbody.getLayoutParams();
             if (mWindowHeight == height) {
                 inputLayoutParams.bottomMargin = 0;
             } else {
@@ -300,6 +319,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
             edittextbody.setLayoutParams(inputLayoutParams);
         }
     };
+
     private void setViewTreeObserver() {
         final ViewTreeObserver swipeRefreshLayoutVTO = bodyLayout.getViewTreeObserver();
         swipeRefreshLayoutVTO.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -373,7 +393,8 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         for (int i = 0; i < circleItems.size(); i++) {
             if (circleId.equals(circleItems.get(i).getId())) {
                 circleItems.remove(i);
-                circleAdapter.notifyItemRemoved(i + circleAdapter.HEADVIEW_SIZE);
+                circleAdapter.notifyItemRemoved(
+                    i + circleAdapter.HEADVIEW_SIZE);
                 return;
             }
         }

@@ -1,6 +1,7 @@
 package io.openim.android.ouimoments.bean;
 
 import android.text.TextUtils;
+import android.view.View;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public class CircleItem extends BaseBean{
 	public final static String TYPE_VIDEO = "3";
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -27,11 +28,20 @@ public class CircleItem extends BaseBean{
 	private List<CommentItem> comments;
 	private User user;
 	private String videoUrl;
+	private int  permission;
 	private String videoImgUrl;
 
 	private boolean isExpand;
-	
-	public String getId() {
+
+    public int getPermission() {
+        return permission;
+    }
+
+    public void setPermission(int permission) {
+        this.permission = permission;
+    }
+
+    public String getId() {
 		return id;
 	}
 	public void setId(String id) {
@@ -122,14 +132,14 @@ public class CircleItem extends BaseBean{
 		}
 		return false;
 	}
-	
+
 	public boolean hasComment(){
 		if(comments!=null && comments.size()>0){
 			return true;
 		}
 		return false;
 	}
-	
+
 	public String getCurUserFavortId(String curUserId){
 		String favortid = "";
 		if(!TextUtils.isEmpty(curUserId) && hasFavort()){

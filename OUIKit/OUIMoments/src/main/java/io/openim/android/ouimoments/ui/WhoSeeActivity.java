@@ -52,22 +52,27 @@ public class WhoSeeActivity extends BaseActivity<PushMomentsVM, ActivityWhoSeeBi
             (List<SelectDataActivity.RuleData>) result.getData().getSerializableExtra(Constant.K_RESULT);
 
         int permission = vm.param.getValue().permission;
+        bindData(isGroup, selectedRuleDataList, permission);
+
+        vm.getRuleDataIDs(selectedRuleDataList, isGroup);
+    });
+
+    private void bindData(boolean isGroup, List<SelectDataActivity.RuleData> selectedRuleDataList
+        , int permission) {
         if (isGroup) {
             vm.selectedGroupRuleDataList = selectedRuleDataList;
             if (permission == 2) view.seeGroup.setText(vm.getRuleDataNames(selectedRuleDataList));
-            if (permission == 3) view.notSeeGroup.setText(vm.getRuleDataNames(selectedRuleDataList));
+            if (permission == 3)
+                view.notSeeGroup.setText(vm.getRuleDataNames(selectedRuleDataList));
         } else {
             vm.selectedUserRuleDataList = selectedRuleDataList;
             if (permission == 2) view.seeUser.setText(vm.getRuleDataNames(selectedRuleDataList));
             if (permission == 3) view.notSeeUser.setText(vm.getRuleDataNames(selectedRuleDataList));
         }
-
-        vm.getRuleDataIDs(selectedRuleDataList, isGroup);
-    });
+    }
 
 
-
-    private OnDedrepClickListener selectGroupClick= new OnDedrepClickListener() {
+    private OnDedrepClickListener selectGroupClick = new OnDedrepClickListener() {
         @Override
         public void click(View v) {
             isGroup = true;
@@ -75,7 +80,7 @@ public class WhoSeeActivity extends BaseActivity<PushMomentsVM, ActivityWhoSeeBi
             else jumpSelectGroup(groupVM.groups.getValue());
         }
     };
-    private OnDedrepClickListener selectUserClick=new OnDedrepClickListener() {
+    private OnDedrepClickListener selectUserClick = new OnDedrepClickListener() {
         @Override
         public void click(View v) {
             isGroup = false;
@@ -83,6 +88,7 @@ public class WhoSeeActivity extends BaseActivity<PushMomentsVM, ActivityWhoSeeBi
             else jumpSelectUser(groupVM.exUserInfo.getValue());
         }
     };
+
     private void listener() {
         view.finish.setOnClickListener(v -> {
             setResult(RESULT_OK);
@@ -114,7 +120,7 @@ public class WhoSeeActivity extends BaseActivity<PushMomentsVM, ActivityWhoSeeBi
 
     private void jumpSelectUser(List<ExUserInfo> exUserInfo) {
         if (exUserInfo.isEmpty()) return;
-        List<SelectDataActivity.RuleData> ruleDataList = vm.buildUserRuleData(exUserInfo);
+        List<SelectDataActivity.RuleData> ruleDataList = vm.buildUserRuleData(exUserInfo,vm.selectedUserRuleDataList);
         ruleDataLauncher.launch(new Intent(this, SelectDataActivity.class).putExtra(Constant.K_NAME, getString(io.openim.android.ouicore.R.string.select_user)).putExtra(Constant.K_RESULT, (Serializable) ruleDataList).putExtra(Constant.K_FROM, isGroup).putExtra(Constant.K_SIZE, 20));
     }
 
@@ -134,5 +140,11 @@ public class WhoSeeActivity extends BaseActivity<PushMomentsVM, ActivityWhoSeeBi
     private void initView() {
         waitDialog = new WaitDialog(this);
         view.setPushMoments(vm);
+
+        lastPermission=vm.param.getValue().permission;
+        if (null != vm.selectedGroupRuleDataList)
+            bindData(true, vm.selectedGroupRuleDataList, vm.param.getValue().permission);
+        if (null != vm.selectedUserRuleDataList)
+            bindData(false, vm.selectedUserRuleDataList, vm.param.getValue().permission);
     }
 }

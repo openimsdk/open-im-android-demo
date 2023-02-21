@@ -34,6 +34,7 @@ import io.openim.android.ouimoments.bean.CommentItem;
 import io.openim.android.ouimoments.bean.FavortItem;
 import io.openim.android.ouimoments.bean.MomentsBean;
 import io.openim.android.ouimoments.bean.MomentsContent;
+import io.openim.android.ouimoments.bean.MomentsData;
 import io.openim.android.ouimoments.bean.MomentsMeta;
 import io.openim.android.ouimoments.bean.MomentsUser;
 import io.openim.android.ouimoments.bean.PhotoInfo;
@@ -95,8 +96,8 @@ public class CirclePresenter implements CircleContract.Presenter {
             public void onSuccess(String data) {
                 try {
                     Map map = JSONObject.parseObject(data, Map.class);
-                    int size= (int) map.get("unreadCount");
-                    if (size>0){
+                    int size = (int) map.get("unreadCount");
+                    if (size > 0) {
                         unReadCount = String.valueOf(size);
                         view.updateAdapterIndex(0);
                     }
@@ -121,14 +122,15 @@ public class CirclePresenter implements CircleContract.Presenter {
         NetObserver<MomentsBean> netObserver = new NetObserver<MomentsBean>(TAG) {
             @Override
             public void onSuccess(MomentsBean o) {
-              try {
-                  packInContent(o);
-                  List<CircleItem> circleData = packInCircleData(o);
+                try {
+                    packInContent(o);
+                    List<CircleItem> circleData = packInCircleData(o);
 
-                  if (view != null) {
-                      view.update2loadData(loadType, circleData);
-                  }
-              }catch (Exception ignored){}
+                    if (view != null) {
+                        view.update2loadData(loadType, circleData);
+                    }
+                } catch (Exception ignored) {
+                }
             }
 
             @Override
@@ -167,6 +169,7 @@ public class CirclePresenter implements CircleContract.Presenter {
         item.setType(workMoment.momentsContents.type == 0 ? "2" : "3");
         item.setUser(new User(workMoment.userID, workMoment.userName, workMoment.faceURL));
         item.setId(workMoment.workMomentID);
+        item.setPermission(workMoment.permission);
         item.setContent(workMoment.momentsContents.text);
         item.setCreateTime(TimeUtil.getTime(workMoment.createTime * 1000L,
             TimeUtil.monthTimeFormat));
@@ -237,8 +240,7 @@ public class CirclePresenter implements CircleContract.Presenter {
     private void packInContent(WorkMoments workMoment) {
         Map map = JSONObject.parseObject(workMoment.content, Map.class);
         JsonElement string = JsonParser.parseString((String) map.get("data"));
-        MomentsContent momentsContent = GsonHel.fromJson(string.toString(),
-            MomentsContent.class);
+        MomentsData momentsContent = GsonHel.fromJson(string.toString(), MomentsData.class);
         workMoment.momentsContents = momentsContent.data;
     }
 
@@ -251,12 +253,20 @@ public class CirclePresenter implements CircleContract.Presenter {
      * @Description: 删除动态
      */
     public void deleteCircle(final String circleId) {
-        circleModel.deleteCircle(new IDataRequestListener() {
-
+        N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office/delete_one_work_moment",
+            BaseApp.inst().loginCertificate.imToken, NiService.buildParameter().add("workMomentID"
+                , circleId).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Object.class)).subscribe(new NetObserver<Object>(TAG) {
             @Override
-            public void loadSuccess(Object object) {
+            public void onSuccess(Object o) {
                 if (view != null) {
                     view.update2DeleteCircle(circleId);
+                }
+            }
+
+            @Override
+            protected void onFailure(Throwable e) {
+                if (view != null) {
+                    view.showError(e.getMessage());
                 }
             }
         });
@@ -381,23 +391,24 @@ public class CirclePresenter implements CircleContract.Presenter {
             view.updateEditTextBodyVisible(View.VISIBLE, commentConfig);
         }
     }
+
     public void getMomentsDetail(String momentID) {
         N.API(NiService.class).CommNI(Constant.getImApiUrl() + "/office/get_work_moment_by_id",
             BaseApp.inst().loginCertificate.imToken, NiService.buildParameter().add("workMomentID"
-                , momentID).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(WorkMoments.class))
-            .subscribe(new NetObserver<WorkMoments>(TAG) {
+                , momentID).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(WorkMoments.class)).subscribe(new NetObserver<WorkMoments>(TAG) {
             @Override
             public void onSuccess(WorkMoments o) {
                 try {
-                    WorkMoments workMoment=o.workMoment;
+                    WorkMoments workMoment = o.workMoment;
                     packInContent(workMoment);
                     List<CircleItem> circleItems = new ArrayList<>();
-                    circleItems.add(getPackInCircleData(workMoment)) ;
+                    circleItems.add(getPackInCircleData(workMoment));
 
                     if (view != null) {
                         view.update2loadData(0, circleItems);
                     }
-                }catch (Exception ignored){}
+                } catch (Exception ignored) {
+                }
             }
 
             @Override

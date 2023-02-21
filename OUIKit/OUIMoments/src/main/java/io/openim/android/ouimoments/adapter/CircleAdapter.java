@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.yanzhenjie.permission.AndPermission;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.widget.AvatarImage;
+import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.ui.MsgDetailActivity;
 import io.openim.android.ouimoments.ui.ToUserMomentsActivity;
@@ -170,20 +172,35 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                 holder.contentTv.setText(UrlUtils.formatUrlString(content));
             }
             holder.contentTv.setVisibility(TextUtils.isEmpty(content) ? View.GONE : View.VISIBLE);
-
+            holder.authorityLy.setVisibility(View.GONE);
             if (DatasUtil.curUser.getId().equals(circleItem.getUser().getId())) {
                 holder.deleteBtn.setVisibility(View.VISIBLE);
+                if (circleItem.getPermission() == 1) {
+                    holder.authorityLy.setVisibility(View.VISIBLE);
+                    holder.authorityIv.setImageResource(R.mipmap.ic_m_lock);
+                    holder.authorityTv.setText(io.openim.android.ouicore.R.string.str_private_tips);
+                }
+                if (circleItem.getPermission() == 2
+                    ||circleItem.getPermission() == 3) {
+                    holder.authorityLy.setVisibility(View.VISIBLE);
+                    holder.authorityIv.setImageResource(R.mipmap.ic_m_friends);
+                    holder.authorityTv.setText(io.openim.android.ouicore.R.string.part_see_tips2);
+                }
             } else {
+                holder.authorityLy.setVisibility(View.GONE);
                 holder.deleteBtn.setVisibility(View.GONE);
             }
-            holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            holder.deleteBtn.setOnClickListener(v -> {
+                CommonDialog commonDialog = new CommonDialog(context).atShow();
+                commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.delete_moments_tips);
+                commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
+                commonDialog.getMainView().confirm.setOnClickListener(v1 -> {
                     //删除
                     if (presenter != null) {
                         presenter.deleteCircle(circleId);
+                        commonDialog.dismiss();
                     }
-                }
+                });
             });
             if (hasFavort || hasComment) {
                 if (hasFavort) {//处理点赞列表

@@ -1,12 +1,15 @@
 package io.openim.android.ouiconversation.ui;
 
 
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.cjt2325.cameralibrary.JCameraView;
 import com.cjt2325.cameralibrary.listener.ErrorListener;
 import com.cjt2325.cameralibrary.listener.JCameraListener;
 
@@ -17,10 +20,13 @@ import java.util.UUID;
 import io.openim.android.ouiconversation.databinding.ActivityShootBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Routes;
 
-public class ShootActivity extends BaseActivity<ChatVM, ActivityShootBinding> {
+@Route(path = Routes.Conversation.SHOOT)
+public class ShootActivity extends BaseActivity<BaseViewModel, ActivityShootBinding> {
 
 
     @Override
@@ -28,9 +34,9 @@ public class ShootActivity extends BaseActivity<ChatVM, ActivityShootBinding> {
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityShootBinding.inflate(getLayoutInflater()));
         Common.setFullScreen(this);
-
+        int status=getIntent().getIntExtra(Constant.K_RESULT, JCameraView.BUTTON_STATE_BOTH);
         view.cameraView.setSaveVideoPath(Constant.VIDEO_DIR);
-
+        view.cameraView.setFeatures(status);
         view.cameraView.setErrorLisenter(new ErrorListener() {
             @Override
             public void onError() {

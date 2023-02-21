@@ -30,6 +30,7 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 
 import java.io.File;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.openim.android.ouicore.R;
@@ -200,9 +201,9 @@ public class PhotographAlbumDialog extends BaseDialog {
         File file;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             file = new File(Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES),
-                "temporary.jpg");
+                System.currentTimeMillis()+".jpg");
         } else {
-            file = new File(compatActivity.getExternalCacheDir(), "temporary.jpg");
+            file = new File(compatActivity.getExternalCacheDir(), System.currentTimeMillis()+".jpg");
         }
         return file;
     }
