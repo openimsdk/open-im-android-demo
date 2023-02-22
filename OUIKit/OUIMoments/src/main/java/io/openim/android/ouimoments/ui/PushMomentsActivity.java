@@ -165,10 +165,15 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
             waitDialog.setNotDismiss();
             waitDialog.show();
             final List<String> paths = new ArrayList<>();
-            if (vm.isPhoto) paths.addAll(vm.getMediaPaths());
+            if (vm.isPhoto)
+                paths.addAll(vm.getMediaPaths());
             else {
                 String original = vm.param.getValue().content.data.metas.get(0).original;
                 paths.add(original);
+            }
+            if (paths.isEmpty()){
+                vm.pushMoments();
+                return;
             }
             MThreadTool.executorService.execute(() -> {
                 for (String path : paths) {
