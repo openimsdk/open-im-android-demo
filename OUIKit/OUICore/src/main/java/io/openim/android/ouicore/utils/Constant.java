@@ -15,7 +15,15 @@ public class Constant {
     private static final String IM_API_URL = "https://" + DEFAULT_IP + "/api/";
     //web socket
     private static final String IM_WS_URL = "wss://" + DEFAULT_IP + "/msg_gateway";
+    //admin Manage
+    private static final String ADMIN_MANAGE = "https://" + DEFAULT_IP + "/complete_admin/";
 
+
+    public static String getAdminManage() {
+        String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("ADMIN_MANAGE");
+        if (TextUtils.isEmpty(url)) return ADMIN_MANAGE;
+        return url;
+    }
 
     public static String getImApiUrl() {
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("IM_API_URL");

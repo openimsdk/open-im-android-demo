@@ -14,6 +14,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
+import io.openim.android.ouicontact.ni.NiService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.demo.repository.OpenIMService;
@@ -25,6 +26,8 @@ import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.net.bage.GsonHel;
 
+import io.openim.android.ouicore.services.OneselfService;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
@@ -65,6 +68,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
                             loginCertificate.cache(getContext());
                             BaseApp.inst().loginCertificate = loginCertificate;
                             getIView().jump();
+                            getConfig();
                         }
                     }, loginCertificate.userID, loginCertificate.imToken);
 
@@ -76,6 +80,22 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
             @Override
             protected void onFailure(Throwable e) {
                 getIView().err(e.getMessage());
+            }
+        });
+    }
+
+    private void getConfig() {
+        N.API(NiService.class).CommNI(Constant.getAdminManage() + "admin/init/get_client_config",
+            null,
+            new Parameter().add("operationID", System.currentTimeMillis() + "")
+                .buildJsonBody()).compose(N.IOMain())
+            .map(OneselfService.turn(Object.class)).subscribe(new NetObserver<Object>(getContext()) {
+            @Override
+            public void onSuccess(Object o) {
+            }
+
+            @Override
+            protected void onFailure(Throwable e) {
             }
         });
     }
