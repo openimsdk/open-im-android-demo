@@ -42,6 +42,7 @@ import java.util.Observer;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
@@ -158,6 +159,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         return 0;
     }
 
+
     @SuppressLint("ClickableViewAccessibility")
     public void initView(View mainView) {
         bodyLayout = mainView.findViewById(R.id.bodyLayout);
@@ -184,6 +186,10 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                Rect rect=new Rect();
+                recyclerView.getWindowVisibleDisplayFrame(rect);
+                boolean visible=rect.bottom-rect.top<=0;
+                L.e("visible----"+visible+"==rect.bottom="+rect.bottom+"==rect.top=="+rect.top);
                 int alpha = getScrolledYDistance();
                 if (alpha >= 255) {
                     alpha = 255;
@@ -195,6 +201,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
                 //透明效果是由参数1决定的，透明范围[0,255]
                 // titlebar.setBackgroundColor(Color.argb(alpha, 57, 174, 255));
                 viewBinding.titleBarFl.getBackground().setAlpha(alpha);
+                L.e("recyclerViewId----"+viewBinding.titleBarFl.hashCode());
             }
 
             @Override
@@ -294,30 +301,6 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         popupWindow.showAsDropDown(v);
     }
 
-    private int mWindowHeight = 0;
-    private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener = () -> {
-
-        Rect r = new Rect();
-        //获取当前窗口实际的可见区域
-        viewBinding.getRoot().getWindowVisibleDisplayFrame(r);
-        int height = r.height();
-        if (mWindowHeight == 0) {
-            //一般情况下，这是原始的窗口高度
-            mWindowHeight = height;
-        } else {
-            RelativeLayout.LayoutParams inputLayoutParams =
-                (RelativeLayout.LayoutParams) edittextbody.getLayoutParams();
-            if (mWindowHeight == height) {
-                inputLayoutParams.bottomMargin = 0;
-            } else {
-                //两次窗口高度相减，就是软键盘高度
-                int softKeyboardHeight = mWindowHeight - height-(edittextbody.getHeight());
-                inputLayoutParams.bottomMargin = softKeyboardHeight;
-            }
-            edittextbody.setLayoutParams(inputLayoutParams);
-        }
-    };
-
     private void setViewTreeObserver() {
         final ViewTreeObserver swipeRefreshLayoutVTO = bodyLayout.getViewTreeObserver();
         swipeRefreshLayoutVTO.addOnGlobalLayoutListener(() -> {
@@ -331,8 +314,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
             }
             int keyboardH = screenH - (r.bottom - r.top);
             Log.d(TAG,
-                "screenH＝ " + screenH + " &keyboardH = " + keyboardH + " &r.bottom=" + r
-                .bottom + " &top=" + r.top + " &statusBarH=" + statusBarH);
+                "screenH＝ " + screenH + " &keyboardH = " + keyboardH + " &r.bottom=" + r.bottom + " &top=" + r.top + " &statusBarH=" + statusBarH);
 
             if (keyboardH == currentKeyboardH) {//有变化时才处理，否则会陷入死循环
                 return;
@@ -345,8 +327,8 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
             RelativeLayout.LayoutParams inputLayoutParams =
                 (RelativeLayout.LayoutParams) edittextbody.getLayoutParams();
             //currentKeyboardH-editTextBodyHeight-statusBarH-底部导航栏高度60
-            inputLayoutParams.bottomMargin=currentKeyboardH-editTextBodyHeight
-                -statusBarH-Common.dp2px(60);
+            inputLayoutParams.bottomMargin = currentKeyboardH - editTextBodyHeight - statusBarH;
+            if (!presenter.isSpecifiedUser()) inputLayoutParams.bottomMargin -= Common.dp2px(60);
 
             if (keyboardH < 150) {//说明是隐藏键盘的情况
                 updateEditTextBodyVisible(View.GONE, null);
@@ -354,8 +336,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
             }
             //偏移listview
             if (layoutManager != null && commentConfig != null) {
-                layoutManager.scrollToPositionWithOffset(commentConfig.circlePosition +
-                circleAdapter.HEADVIEW_SIZE, getListviewOffset(commentConfig));
+                layoutManager.scrollToPositionWithOffset(commentConfig.circlePosition + circleAdapter.HEADVIEW_SIZE, getListviewOffset(commentConfig));
             }
         });
     }

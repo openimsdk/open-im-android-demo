@@ -32,7 +32,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentBottom="true"
-            android:layout_marginLeft="12dp"
+            android:layout_marginLeft="9dp"
             android:layout_marginBottom="25dp" />
 
         <TextView
