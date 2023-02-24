@@ -4,6 +4,13 @@
 
     <application android:theme="@style/Theme.Demo">
         <activity
+            android:name=".ui.PartSeeActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".ui.SelectDataActivity"
             android:exported="false">
             <meta-data

@@ -271,5 +271,6 @@
     <string name="delete_moments_tips">确定删除此条朋友圈？</string>
     <string name="part_see_tips2">部分好友可见</string>
     <string name="push_video">发布视频</string>
+    <string name="about_who">提到了：%1$s</string>
 
 </resources>

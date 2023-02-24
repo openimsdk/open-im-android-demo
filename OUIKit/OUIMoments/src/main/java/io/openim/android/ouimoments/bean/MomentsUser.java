@@ -1,6 +1,9 @@
 package io.openim.android.ouimoments.bean;
 
-public class MomentsUser {
+import java.io.Serializable;
+
+public class MomentsUser implements Serializable {
     public String userID;
     public String userName;
+    public String faceURL;
 }

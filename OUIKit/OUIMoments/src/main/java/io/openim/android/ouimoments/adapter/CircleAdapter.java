@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.yanzhenjie.permission.AndPermission;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.ui.MsgDetailActivity;
+import io.openim.android.ouimoments.ui.PartSeeActivity;
 import io.openim.android.ouimoments.ui.ToUserMomentsActivity;
 import io.openim.android.ouimoments.ui.ImagePagerActivity;
 import io.openim.android.ouimoments.adapter.viewholder.CircleViewHolder;
@@ -121,10 +123,15 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                 HeaderViewHolder holder = (HeaderViewHolder) viewHolder;
                 if (presenter.isSpecifiedUser()) {
                     holder.headIv.load(presenter.user.getHeadUrl());
-                    holder.nameTv.setText(presenter.user.getName());
+                    if (presenter.user.getId().equals(BaseApp.inst().loginCertificate.userID))
+                        holder.nameTv.setText(BaseApp.inst().loginCertificate.nickname);
+                    else holder.nameTv.setText(presenter.user.getName());
                 } else {
                     holder.headIv.load(BaseApp.inst().loginCertificate.faceURL);
                     holder.nameTv.setText(BaseApp.inst().loginCertificate.nickname);
+                    holder.headIv.setOnClickListener(v -> {
+                        context.startActivity(new Intent(context, ToUserMomentsActivity.class).putExtra(Constant.K_RESULT, DatasUtil.curUser));
+                    });
                 }
                 if (!presenter.isSpecifiedUser()) {
                     holder.newMsgTips.setVisibility(TextUtils.isEmpty(presenter.unReadCount) ?
@@ -177,19 +184,32 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                 holder.deleteBtn.setVisibility(View.VISIBLE);
                 if (circleItem.getPermission() == 1) {
                     holder.authorityLy.setVisibility(View.VISIBLE);
+                    holder.authorityLy.setOnClickListener(null);
                     holder.authorityIv.setImageResource(R.mipmap.ic_m_lock);
                     holder.authorityTv.setText(io.openim.android.ouicore.R.string.str_private_tips);
                 }
-                if (circleItem.getPermission() == 2
-                    ||circleItem.getPermission() == 3) {
+                if (circleItem.getPermission() == 2 || circleItem.getPermission() == 3) {
                     holder.authorityLy.setVisibility(View.VISIBLE);
                     holder.authorityIv.setImageResource(R.mipmap.ic_m_friends);
                     holder.authorityTv.setText(io.openim.android.ouicore.R.string.part_see_tips2);
+                    holder.authorityLy.setOnClickListener(v -> {
+                        context.startActivity(new Intent(context, PartSeeActivity.class)
+                            .putExtra(Constant.K_NAME, circleItem.getPermission() == 2 ?
+                                this.context.getString(io.openim.android.ouicore.R.string.part_see_tips2)
+                                :
+                                this.context.getString(io.openim.android.ouicore.R.string.who_invisible))
+                            .putExtra(Constant.K_RESULT,
+                                (Serializable) circleItem.getPermissionUsers()));
+                    });
                 }
             } else {
                 holder.authorityLy.setVisibility(View.GONE);
                 holder.deleteBtn.setVisibility(View.GONE);
             }
+            holder.aboutWhoTv.setVisibility(TextUtils.isEmpty(circleItem.getAtUsers()) ?
+                View.GONE : View.VISIBLE);
+            holder.aboutWhoTv.setText(String.format(this.context.getString(io.openim.android.ouicore.R.string.about_who), circleItem.getAtUsers()));
+
             holder.deleteBtn.setOnClickListener(v -> {
                 CommonDialog commonDialog = new CommonDialog(context).atShow();
                 commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.delete_moments_tips);

@@ -26,12 +26,30 @@ public class CircleItem extends BaseBean{
 	private List<PhotoInfo> photos;
 	private List<FavortItem> favorters;
 	private List<CommentItem> comments;
+	private String atUsers;
+	private List<MomentsUser> permissionUsers;
 	private User user;
 	private String videoUrl;
 	private int  permission;
 	private String videoImgUrl;
 
 	private boolean isExpand;
+
+    public List<MomentsUser> getPermissionUsers() {
+        return permissionUsers;
+    }
+
+    public void setPermissionUsers(List<MomentsUser> permissionUsers) {
+        this.permissionUsers = permissionUsers;
+    }
+
+    public String getAtUsers() {
+        return atUsers;
+    }
+
+    public void setAtUsers(String atUsers) {
+        this.atUsers = atUsers;
+    }
 
     public int getPermission() {
         return permission;

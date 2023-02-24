@@ -109,7 +109,7 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
                 if (data.contentBean.metas.isEmpty()){
                     holder.view.content.setVisibility(View.VISIBLE);
                     holder.view.media.setVisibility(View.GONE);
-                    holder.view.content.setText(data.workMomentsInfo.getContent());
+                    holder.view.content.setText(data.contentBean.text);
                 }else {
                     holder.view.media.setVisibility(View.VISIBLE);
                     holder.view.content.setVisibility(View.GONE);

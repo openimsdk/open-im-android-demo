@@ -52,7 +52,7 @@ public class MomentsDetailFragment extends CircleFragment {
     public void initView(View mainView) {
         super.initView(mainView);
         recyclerView.getSwipeToRefresh().setEnabled(false);
-        mainView.findViewById(R.id.titleBarFl).setVisibility(View.GONE);
+//        mainView.findViewById(R.id.titleBarFl).setVisibility(View.GONE);
 
         try {
             presenter.getMomentsDetail(momentID);

@@ -170,6 +170,15 @@ public class CirclePresenter implements CircleContract.Presenter {
         item.setUser(new User(workMoment.userID, workMoment.userName, workMoment.faceURL));
         item.setId(workMoment.workMomentID);
         item.setPermission(workMoment.permission);
+        item.setPermissionUsers(workMoment.permissionUsers);
+        if (null!=workMoment.atUsers&&!workMoment.atUsers.isEmpty()){
+            StringBuilder stringBuilder=new StringBuilder();
+            for (MomentsUser atUser : workMoment.atUsers) {
+                stringBuilder.append(atUser.userName);
+                stringBuilder.append("、");
+            }
+            item.setAtUsers(stringBuilder.substring(0,stringBuilder.length()-1));
+        }
         item.setContent(workMoment.momentsContents.text);
         item.setCreateTime(TimeUtil.getTime(workMoment.createTime * 1000L,
             TimeUtil.monthTimeFormat));

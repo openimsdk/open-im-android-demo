@@ -12,7 +12,7 @@ public class WorkMoments {
     public List<Comment> comments;
     public String faceURL;
     public String userName;
-    public List<String> atUsers;
+    public List<MomentsUser> atUsers;
     public List<MomentsUser> permissionUsers;
     public long createTime;
     public int permission;

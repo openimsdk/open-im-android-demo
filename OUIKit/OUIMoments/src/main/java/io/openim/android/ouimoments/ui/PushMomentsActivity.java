@@ -119,7 +119,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
             for (SelectDataActivity.RuleData ruleData : selectedAtList) {
                 PushMomentsVM.UserOrGroup userOrGroup = new PushMomentsVM.UserOrGroup();
                 userOrGroup.userID = ruleData.id;
-                userOrGroup.groupName = ruleData.name;
+                userOrGroup.userName = ruleData.name;
                 userOrGroups.add(userOrGroup);
             }
             vm.param.getValue().atUserList = userOrGroups;
@@ -165,13 +165,15 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
             waitDialog.setNotDismiss();
             waitDialog.show();
             final List<String> paths = new ArrayList<>();
-            if (vm.isPhoto)
-                paths.addAll(vm.getMediaPaths());
-            else {
-                String original = vm.param.getValue().content.data.metas.get(0).original;
-                paths.add(original);
+            try {
+                if (vm.isPhoto) paths.addAll(vm.getMediaPaths());
+                else {
+                    String original = vm.param.getValue().content.data.metas.get(0).original;
+                    paths.add(original);
+                }
+            } catch (Exception ignored) {
             }
-            if (paths.isEmpty()){
+            if (paths.isEmpty()) {
                 vm.pushMoments();
                 return;
             }
@@ -251,8 +253,13 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
     }
 
     private void setFinishEnable() {
-        boolean isEnable =
-            !vm.getMediaPaths().isEmpty() || !TextUtils.isEmpty(vm.param.getValue().content.data.text);
+        boolean isEnable;
+        if (vm.isPhoto)
+            isEnable =
+                !vm.getMediaPaths().isEmpty() || !TextUtils.isEmpty(vm.param.getValue().content.data.text);
+        else
+            isEnable =
+                !vm.getMediaPaths().isEmpty() && !TextUtils.isEmpty(vm.param.getValue().content.data.text);
         view.finish.setAlpha(isEnable ? 1 : 0.3f);
         view.finish.setOnClickListener(isEnable ? submitClick : null);
     }

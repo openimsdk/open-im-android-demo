@@ -79,7 +79,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         vm.fromLogin = getIntent().getBooleanExtra(LoginActivity.FORM_LOGIN, false);
         bindViewDataBinding(ActivityMainBinding.inflate(getLayoutInflater()));
         super.onCreate(savedInstanceState);
-        sink(null);
+        setLightStatus();
 
         view.setMainVM(vm);
 

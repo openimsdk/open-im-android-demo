@@ -55,12 +55,10 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         super.onCreate(savedInstanceState);
         if (null != callingService)
             OpenIMClient.getInstance().signalingManager.setSignalingListener(callingService);
-        ActionBar actionBar = getSupportActionBar();
-        if (null != actionBar) actionBar.hide();
         if (null != vm) {
             vm.viewCreate();
         }
-
+        setLightStatus();
     }
 
     protected void bindViewDataBinding(A viewDataBinding) {

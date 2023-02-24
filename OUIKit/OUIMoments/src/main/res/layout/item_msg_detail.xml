@@ -53,7 +53,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#ff333333"
-                    android:text="sasasasas"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -88,9 +87,8 @@
             android:id="@+id/content"
             android:layout_width="100dp"
             android:ellipsize="end"
-            android:gravity="center"
             android:maxLines="4"
-            android:layout_height="70dp"/>
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 

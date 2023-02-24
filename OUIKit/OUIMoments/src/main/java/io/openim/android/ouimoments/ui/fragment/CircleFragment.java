@@ -36,10 +36,13 @@ import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
@@ -61,7 +64,7 @@ import io.openim.android.ouimoments.utils.CommonUtils;
 import io.openim.android.ouimoments.widgets.CommentListView;
 import io.openim.android.ouimoments.widgets.TitleBar;
 
-public class CircleFragment extends BaseFragment implements CircleContract.View {
+public class CircleFragment extends BaseFragment implements CircleContract.View, Observer {
 
     protected static final String TAG = CircleFragment.class.getSimpleName();
     public CircleAdapter circleAdapter;
@@ -100,6 +103,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              Bundle savedInstanceState) {
+        Obs.inst().addObserver(this);
         viewBinding = FragmentMomentsHomeBinding.inflate(inflater);
         initTitle(viewBinding.getRoot());
         initView(viewBinding.getRoot());
@@ -190,11 +194,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
                 // titlebar.setBackgroundColor(Color.rgb(57, 174, 255));
                 //透明效果是由参数1决定的，透明范围[0,255]
                 // titlebar.setBackgroundColor(Color.argb(alpha, 57, 174, 255));
-                try {
-                    titleBar.getBackground().setAlpha(alpha);
-                    viewBinding.titleBarFl.getBackground().setAlpha(alpha);
-                } catch (Exception ignored) {
-                }
+                viewBinding.titleBarFl.getBackground().setAlpha(alpha);
             }
 
             @Override
@@ -239,7 +239,6 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
 
     public void initTitle(View mainView) {
         viewBinding.titleBarFl.setPadding(0, SinkHelper.getStatusBarHeight(getContext()), 0, 0);
-        viewBinding.titleBarFl.setBackgroundColor(Color.parseColor("#FF022234"));
         titleBar = mainView.findViewById(R.id.main_title_bar);
         if (presenter.isSpecifiedUser()) {
             titleBar.setLeftImageResource(com.yzq.zxinglibrary.R.drawable.ic_back);
@@ -247,7 +246,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
             titleBar.setLeftClickListener(v -> getActivity().finish());
         } else titleBar.setTitle(getString(io.openim.android.ouicore.R.string.moments));
         titleBar.setTitleColor(getResources().getColor(R.color.white));
-        titleBar.setBackgroundColor(Color.parseColor("#FF022234"));
+        titleBar.setBackgroundColor(Color.TRANSPARENT);
 
 
         if (!presenter.isSpecifiedUser()) {
@@ -268,11 +267,11 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
 
     private ActivityResultLauncher<Intent> resultLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == RESULT_OK) {
-                recyclerView.setRefreshing(true);//执行下拉刷新的动画
-                refreshListener.onRefresh();//执行数据加载操作
-            }
-        });
+        if (result.getResultCode() == RESULT_OK) {
+            recyclerView.setRefreshing(true);//执行下拉刷新的动画
+            refreshListener.onRefresh();//执行数据加载操作
+        }
+    });
 
     private void showPopupWindow(View v) {
         //初始化一个PopupWindow，width和height都是WRAP_CONTENT
@@ -283,8 +282,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
             resultLauncher.launch(new Intent(getActivity(), PushMomentsActivity.class));
         });
         view.pushVideo.setOnClickListener(v1 -> {
-            resultLauncher.launch(new Intent(getActivity(), PushMomentsActivity.class)
-                .putExtra(Constant.K_RESULT,false));
+            resultLauncher.launch(new Intent(getActivity(), PushMomentsActivity.class).putExtra(Constant.K_RESULT, false));
         });
         //设置PopupWindow的视图内容
         popupWindow.setContentView(view.getRoot());
@@ -298,11 +296,11 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
 
     private int mWindowHeight = 0;
     private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener = () -> {
+
         Rect r = new Rect();
         //获取当前窗口实际的可见区域
-        getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
+        viewBinding.getRoot().getWindowVisibleDisplayFrame(r);
         int height = r.height();
-        if (height == mWindowHeight) return;
         if (mWindowHeight == 0) {
             //一般情况下，这是原始的窗口高度
             mWindowHeight = height;
@@ -313,7 +311,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
                 inputLayoutParams.bottomMargin = 0;
             } else {
                 //两次窗口高度相减，就是软键盘高度
-                int softKeyboardHeight = mWindowHeight - height;
+                int softKeyboardHeight = mWindowHeight - height-(edittextbody.getHeight());
                 inputLayoutParams.bottomMargin = softKeyboardHeight;
             }
             edittextbody.setLayoutParams(inputLayoutParams);
@@ -322,38 +320,42 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
 
     private void setViewTreeObserver() {
         final ViewTreeObserver swipeRefreshLayoutVTO = bodyLayout.getViewTreeObserver();
-        swipeRefreshLayoutVTO.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
+        swipeRefreshLayoutVTO.addOnGlobalLayoutListener(() -> {
+            Rect r = new Rect();
+            bodyLayout.getWindowVisibleDisplayFrame(r);
+            int statusBarH = getStatusBarHeight();//状态栏高度
+            int screenH = bodyLayout.getRootView().getHeight();
+            if (r.top != statusBarH) {
+                //在这个demo中r.top代表的是状态栏高度，在沉浸式状态栏时r.top＝0，通过getStatusBarHeight获取状态栏高度
+                r.top = statusBarH;
+            }
+            int keyboardH = screenH - (r.bottom - r.top);
+            Log.d(TAG,
+                "screenH＝ " + screenH + " &keyboardH = " + keyboardH + " &r.bottom=" + r
+                .bottom + " &top=" + r.top + " &statusBarH=" + statusBarH);
 
-                Rect r = new Rect();
-                bodyLayout.getWindowVisibleDisplayFrame(r);
-                int statusBarH = getStatusBarHeight();//状态栏高度
-                int screenH = bodyLayout.getRootView().getHeight();
-                if (r.top != statusBarH) {
-                    //在这个demo中r.top代表的是状态栏高度，在沉浸式状态栏时r.top＝0，通过getStatusBarHeight获取状态栏高度
-                    r.top = statusBarH;
-                }
-                int keyboardH = screenH - (r.bottom - r.top);
-                Log.d(TAG,
-                    "screenH＝ " + screenH + " &keyboardH = " + keyboardH + " &r.bottom=" + r.bottom + " &top=" + r.top + " &statusBarH=" + statusBarH);
+            if (keyboardH == currentKeyboardH) {//有变化时才处理，否则会陷入死循环
+                return;
+            }
 
-                if (keyboardH == currentKeyboardH) {//有变化时才处理，否则会陷入死循环
-                    return;
-                }
+            currentKeyboardH = keyboardH;
+            screenHeight = screenH;//应用屏幕的高度
+            editTextBodyHeight = edittextbody.getHeight();
 
-                currentKeyboardH = keyboardH;
-                screenHeight = screenH;//应用屏幕的高度
-                editTextBodyHeight = edittextbody.getHeight();
+            RelativeLayout.LayoutParams inputLayoutParams =
+                (RelativeLayout.LayoutParams) edittextbody.getLayoutParams();
+            //currentKeyboardH-editTextBodyHeight-statusBarH-底部导航栏高度60
+            inputLayoutParams.bottomMargin=currentKeyboardH-editTextBodyHeight
+                -statusBarH-Common.dp2px(60);
 
-                if (keyboardH < 150) {//说明是隐藏键盘的情况
-                    updateEditTextBodyVisible(View.GONE, null);
-                    return;
-                }
-                //偏移listview
-                if (layoutManager != null && commentConfig != null) {
-                    layoutManager.scrollToPositionWithOffset(commentConfig.circlePosition + circleAdapter.HEADVIEW_SIZE, getListviewOffset(commentConfig));
-                }
+            if (keyboardH < 150) {//说明是隐藏键盘的情况
+                updateEditTextBodyVisible(View.GONE, null);
+                return;
+            }
+            //偏移listview
+            if (layoutManager != null && commentConfig != null) {
+                layoutManager.scrollToPositionWithOffset(commentConfig.circlePosition +
+                circleAdapter.HEADVIEW_SIZE, getListviewOffset(commentConfig));
             }
         });
     }
@@ -393,8 +395,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
         for (int i = 0; i < circleItems.size(); i++) {
             if (circleId.equals(circleItems.get(i).getId())) {
                 circleItems.remove(i);
-                circleAdapter.notifyItemRemoved(
-                    i + circleAdapter.HEADVIEW_SIZE);
+                circleAdapter.notifyItemRemoved(i + circleAdapter.HEADVIEW_SIZE);
                 return;
             }
         }
@@ -566,5 +567,15 @@ public class CircleFragment extends BaseFragment implements CircleContract.View 
     public void onDestroyView() {
         super.onDestroyView();
         presenter.recycle();
+        Obs.inst().deleteObserver(this);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        Obs.Message msg = (Obs.Message) arg;
+        if (msg.tag == Constant.Event.USER_INFO_UPDATE) {
+            recyclerView.setRefreshing(true);
+            refreshListener.onRefresh();
+        }
     }
 }

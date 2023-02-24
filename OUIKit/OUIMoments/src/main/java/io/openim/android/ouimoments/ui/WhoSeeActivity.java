@@ -39,7 +39,6 @@ public class WhoSeeActivity extends BaseActivity<PushMomentsVM, ActivityWhoSeeBi
         bindVMByCache(PushMomentsVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityWhoSeeBinding.inflate(getLayoutInflater()));
-        sink();
         initView();
         listener();
     }
