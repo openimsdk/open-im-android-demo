@@ -1,14 +1,19 @@
 package io.openim.android.ouicore.base;
 
 
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
+import static android.os.Build.VERSION_CODES.M;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -21,10 +26,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import java.lang.reflect.Field;
+
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
 
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.sdk.OpenIMClient;
@@ -36,8 +44,8 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     protected T vm;
     protected A view;
     private String vmCanonicalName;
-    protected CallingService callingService = (CallingService) ARouter.getInstance()
-        .build(Routes.Service.CALLING).navigation();
+    protected CallingService callingService =
+        (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
 
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -47,13 +55,10 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         super.onCreate(savedInstanceState);
         if (null != callingService)
             OpenIMClient.getInstance().signalingManager.setSignalingListener(callingService);
-        ActionBar actionBar = getSupportActionBar();
-        if (null != actionBar)
-            actionBar.hide();
         if (null != vm) {
             vm.viewCreate();
         }
-
+        setLightStatus();
     }
 
     protected void bindViewDataBinding(A viewDataBinding) {
@@ -128,8 +133,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     protected void onResume() {
         super.onResume();
         bind();
-        if (null != vm)
-            vm.viewResume();
+        if (null != vm) vm.viewResume();
     }
 
     @Override
@@ -165,7 +169,8 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
             v.getGlobalVisibleRect(outRect);
             if (!outRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
                 v.clearFocus(); //在根布局添加focusableInTouchMode="true"
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm =
+                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (imm != null) {
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                 }
@@ -177,9 +182,13 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     /**
      * 沉侵式状态栏
      */
-    public void sink() {
+    public void sink(View view) {
         setLightStatus();
-        SinkHelper.get(this).setTranslucentStatus(view.getRoot());
+        SinkHelper.get(this).setTranslucentStatus(view);
+    }
+
+    public void sink() {
+        sink(view.getRoot());
     }
 
     @Override

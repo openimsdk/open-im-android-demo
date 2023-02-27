@@ -39,7 +39,7 @@ public class GroupBulletinActivity extends BaseActivity<GroupVM, ActivityGroupBu
             v.setVisibility(View.GONE);
             view.edit.setVisibility(View.VISIBLE);
 
-            vm.updataGroup(vm.groupId, null, null, vm.groupsInfo.getValue().getNotification(), null, null);
+            vm.UPDATEGroup(vm.groupId, null, null, vm.groupsInfo.getValue().getNotification(), null, null);
         });
     }
 }

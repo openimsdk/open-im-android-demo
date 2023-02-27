@@ -1,9 +1,12 @@
 package io.openim.android.ouicore.utils;
 
 public class Routes {
+
+
     public static class Service {
         public final static String CALLING = "/CallingService/CallingServiceImp";
         public static final String CONVERSATION = "/ConversationService/IBridgeImpl";
+        public static final String MOMENTS = "/MomentsService/IBridgeImpl";
     }
 
     public static class Main {
@@ -34,6 +37,10 @@ public class Routes {
         public static final String CHAT_HISTORY = "/conversation/ChatHistorySearchActivity";
         //全局搜索
         public final static String SEARCH = "/conversation/SearchActivity";
+        //预览图片或视频
+        public static final String PREVIEW = "/conversation/PreviewActivity";
+        //拍摄照片或视频
+        public static final String SHOOT = "/conversation/ShootActivity";
     }
 
     //群组
@@ -58,6 +65,10 @@ public class Routes {
         public final static String FORWARD = "/contact/ForwardToActivity";
         public static final String ALL_FRIEND = "/contact/AllFriendActivity";
         public static final String SEARCH_FRIENDS = "/contact/SearchFriendsActivity";
+    }
+    //朋友圈
+    public static class Moments{
+        public static final String HOME = "/moments/CircleFragment";
     }
 
 }

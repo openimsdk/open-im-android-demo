@@ -70,7 +70,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         infoModifyLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() != RESULT_OK) return;
             String var = result.getData().getStringExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA);
-            if (infoModifyType == 1) vm.updataGroup(vm.groupId, var, null, null, null, null);
+            if (infoModifyType == 1) vm.UPDATEGroup(vm.groupId, var, null, null, null, null);
             if (infoModifyType == 2)
                 vm.setGroupMemberNickname(vm.groupId, vm.loginCertificate.userID, var);
         });
@@ -216,9 +216,9 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
                 @Override
                 public void onSuccess(String s) {
-                    vm.updataGroup(vm.groupId, null, s, null, null, null);
+                    vm.UPDATEGroup(vm.groupId, null, s, null, null, null);
                 }
-            }, path);
+            }, path[0]);
         });
 
         view.recyclerview.setLayoutManager(new GridLayoutManager(this, spanCount));

@@ -20,12 +20,12 @@ android {
 
         if (isModule) {
             applicationId rootProject.ext.applicationId.OUICalling
-            sourceSets {
-                main {
-                    // 组件模式下调试
-                    manifest.srcFile 'src/main/debug/AndroidManifest.xml'
-                }
-            }
+//            sourceSets {
+//                main {
+//                    // 组件模式下调试
+//                    manifest.srcFile 'src/main/debug/AndroidManifest.xml'
+//                }
+//            }
         }
         minSdk rootProject.ext.androidConfig.minSdk
         targetSdk rootProject.ext.androidConfig.targetSdk

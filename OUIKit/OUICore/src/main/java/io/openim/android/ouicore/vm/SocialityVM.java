@@ -112,7 +112,7 @@ public class SocialityVM extends BaseViewModel {
     }
 
 
-    public class PinyinComparator implements Comparator<CommEx> {
+    public static class PinyinComparator implements Comparator<CommEx> {
 
         public int compare(CommEx o1, CommEx o2) {
             //根据ABCDEFG...来排序
@@ -126,7 +126,7 @@ public class SocialityVM extends BaseViewModel {
         }
     }
 
-    public class LettersPinyinComparator implements Comparator<String> {
+    public static  class LettersPinyinComparator implements Comparator<String> {
 
         public int compare(String o1, String o2) {
             //根据ABCDEFG...来排序

@@ -52,7 +52,7 @@ public class PersonalVM extends BaseViewModel {
             BaseApp.inst().loginCertificate.nickname = exUserInfo.getValue().userInfo.getNickname();
             BaseApp.inst().loginCertificate.faceURL = exUserInfo.getValue().userInfo.getFaceURL();
             BaseApp.inst().loginCertificate.globalRecvMsgOpt = exUserInfo.getValue().userInfo.getGlobalRecvMsgOpt();
-            Obs.newMessage(Constant.Event.USER_INFO_UPDATA);
+            Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
         }
     };
 

@@ -55,8 +55,7 @@ public class MediaFileUtil {
         }
     }
 
-    private static HashMap<String, MediaFileType> sFileTypeMap
-        = new HashMap<>();
+    private static HashMap<String, MediaFileType> sFileTypeMap = new HashMap<>();
 
     static void addFileType(String extension, int fileType, String mimeType) {
         sFileTypeMap.put(extension, new MediaFileType(fileType, mimeType));
@@ -105,24 +104,20 @@ public class MediaFileUtil {
     private static final String UNKNOWN_STRING = "<unknown>";
 
     private static boolean isAudioFileType(int fileType) {
-        return ((fileType >= FIRST_AUDIO_FILE_TYPE &&
-            fileType <= LAST_AUDIO_FILE_TYPE));
+        return ((fileType >= FIRST_AUDIO_FILE_TYPE && fileType <= LAST_AUDIO_FILE_TYPE));
     }
 
     private static boolean isVideoFileType(int fileType) {
-        return (fileType >= FIRST_VIDEO_FILE_TYPE &&
-            fileType <= LAST_VIDEO_FILE_TYPE);
+        return (fileType >= FIRST_VIDEO_FILE_TYPE && fileType <= LAST_VIDEO_FILE_TYPE);
     }
 
     private static boolean isImageFileType(int fileType) {
-        return (fileType >= FIRST_IMAGE_FILE_TYPE &&
-            fileType <= LAST_IMAGE_FILE_TYPE);
+        return (fileType >= FIRST_IMAGE_FILE_TYPE && fileType <= LAST_IMAGE_FILE_TYPE);
     }
 
     public static MediaFileType getFileType(String path) {
         int lastDot = path.lastIndexOf(".");
-        if (lastDot < 0)
-            return null;
+        if (lastDot < 0) return null;
         return sFileTypeMap.get(path.substring(lastDot + 1).toUpperCase());
     }
 
@@ -172,21 +167,23 @@ public class MediaFileUtil {
         }
         return duration;
     }
-
-    public static String saveBitmap(Bitmap bitmap, String dir) {
+    public static String saveBitmap(Bitmap bitmap, String dir){
+    return     saveBitmap(bitmap,dir,true);
+    }
+    public static String saveBitmap(Bitmap bitmap, String dir, boolean isRecycle) {
         try {
             File dirFile = new File(dir);
             if (!dirFile.exists()) {              //如果不存在，那就建立这个文件夹
                 dirFile.mkdirs();
             }
-           String random = UUID.randomUUID().toString();
+            String random = UUID.randomUUID().toString();
             File file = new File(dir, random + ".jpg");
             FileOutputStream fos = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.flush();
             fos.close();
-            bitmap.recycle();
-            return  file.getAbsolutePath();
+            if (isRecycle) bitmap.recycle();
+            return file.getAbsolutePath();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

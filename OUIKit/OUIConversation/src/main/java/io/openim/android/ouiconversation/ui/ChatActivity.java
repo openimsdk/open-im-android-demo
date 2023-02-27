@@ -405,8 +405,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 vm.startMsg=null;
                 vm.loadHistoryMessage();
             }
-//            if (message.tag == Constant.Event.UPDATA_GROUP_INFO
-//                || message.tag == Constant.Event.USER_INFO_UPDATA) {
+//            if (message.tag == Constant.Event.UPDATE_GROUP_INFO
+//                || message.tag == Constant.Event.USER_INFO_UPDATE) {
 //                vm.getOneConversation(data -> {
 //                    vm.conversationInfo.setValue(data);
 //                    bindShowName();

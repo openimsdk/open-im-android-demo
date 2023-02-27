@@ -55,7 +55,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
         PhotographAlbumDialog albumDialog = new PhotographAlbumDialog(this);
         view.avatarLy.setOnClickListener(view -> {
             albumDialog.setOnSelectResultListener(path -> {
-                vm.setFaceURL(path);
+                vm.setFaceURL(path[0]);
                 vm.waitDialog.show();
                 OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                     @Override
@@ -74,7 +74,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
                         vm.setFaceURL(s);
                         Common.UIHandler.postDelayed(() -> vm.waitDialog.dismiss(), 1500);
                     }
-                }, path);
+                }, path[0]);
             });
 
             albumDialog.show();

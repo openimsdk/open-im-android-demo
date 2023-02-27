@@ -43,9 +43,9 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
     protected void viewCreate() {
         IMEvent.getInstance().addConversationListener(this);
         IMEvent.getInstance().addAdvanceMsgListener(this);
-        updataConversation();
+        UPDATEConversation();
 
-        UIHandler.postDelayed(this::updataConversation, 5 * 1000);
+        UIHandler.postDelayed(this::UPDATEConversation, 5 * 1000);
         Obs.newMessage(Constant.Event.CONTACT_LIST_VM_INIT);
     }
 
@@ -58,12 +58,12 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
             @Override
             public void onSuccess(String data) {
-                updataConversation();
+                UPDATEConversation();
             }
         }, conversationId);
     }
 
-    private void updataConversation() {
+    private void UPDATEConversation() {
         OpenIMClient.getInstance().conversationManager.getAllConversationList(new OnBase<List<ConversationInfo>>() {
             @Override
             public void onError(int code, String error) {
@@ -81,7 +81,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
                     conversations.getValue().add(new MsgConversation(msg, datum));
                 }
                 conversations.setValue(conversations.getValue());
-                updataFrequentContacts(data);
+                UPDATEFrequentContacts(data);
             }
         });
     }
@@ -105,7 +105,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
      *
      * @param data
      */
-    private void updataFrequentContacts(List<ConversationInfo> data) {
+    private void UPDATEFrequentContacts(List<ConversationInfo> data) {
         List<UserInfo> uList = new ArrayList<>();
         for (ConversationInfo datum : data) {
             if (datum.getConversationType() == Constant.SessionType.SINGLE_CHAT) {
@@ -155,7 +155,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     @Override
     public void onConversationChanged(List<ConversationInfo> list) {
-        updataConversation();
+        UPDATEConversation();
     }
 
 

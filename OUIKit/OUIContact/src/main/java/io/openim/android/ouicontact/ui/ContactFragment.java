@@ -2,14 +2,19 @@ package io.openim.android.ouicontact.ui;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,6 +40,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
+import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.sdk.models.GroupMembersInfo;
@@ -59,12 +65,17 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = FragmentContactMainBinding.inflate(getLayoutInflater());
         header = ViewContactHeaderBinding.inflate(getLayoutInflater());
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) view.title.getLayoutParams();
+        lp.setMargins(0, SinkHelper.getStatusBarHeight(), 0, 0);
+        view.title.setLayoutParams(lp);
 
         initView();
         click();
 
         return view.getRoot();
     }
+
+
 
     public ContactVM getVM() {
         return vm;

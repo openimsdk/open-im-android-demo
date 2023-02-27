@@ -100,6 +100,7 @@
         </activity>
         <activity
             android:name=".ui.main.MainActivity"
+            android:windowSoftInputMode="adjustResize"
             android:launchMode="singleTask" />
 
         <provider

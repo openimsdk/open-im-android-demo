@@ -3,9 +3,11 @@ package io.openim.android.demo.ui.main;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
@@ -42,20 +44,24 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.services.MomentsBridge;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.SystemBarUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
 
     private int mCurrentTabIndex;
-    private BaseFragment lastFragment, conversationListFragment, contactFragment, personalFragment;
+    private BaseFragment lastFragment, conversationListFragment, contactFragment,
+        personalFragment, circleFragment;
     private ActivityResultLauncher<Intent> resultLauncher = Common.getCaptureActivityLauncher(this);
     private boolean hasShoot = false;
+    private MomentsBridge momentsBridge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,13 +77,11 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         PushManager.getInstance().initialize(this);
         bindVM(MainVM.class);
         vm.fromLogin = getIntent().getBooleanExtra(LoginActivity.FORM_LOGIN, false);
-        super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMainBinding.inflate(getLayoutInflater()));
-
-        sink();
+        super.onCreate(savedInstanceState);
+        setLightStatus();
 
         view.setMainVM(vm);
-
 
         vm.visibility.observe(this, v -> {
             View view = findViewById(io.openim.android.ouiconversation.R.id.isOnline);
@@ -95,10 +99,12 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         ContactVM contactVM = ((ContactFragment) contactFragment).getVM();
         if (null == contactVM) return;
         contactVM.friendDotNum.observe(this, integer -> {
-            view.badge.setVisibility((integer > 0 || contactVM.groupDotNum.getValue() > 0) ? View.VISIBLE : View.GONE);
+            view.badge.setVisibility((integer > 0 || contactVM.groupDotNum.getValue() > 0) ?
+                View.VISIBLE : View.GONE);
         });
         contactVM.groupDotNum.observe(this, integer -> {
-            view.badge.setVisibility((integer > 0 || contactVM.friendDotNum.getValue() > 0) ? View.VISIBLE : View.GONE);
+            view.badge.setVisibility((integer > 0 || contactVM.friendDotNum.getValue() > 0) ?
+                View.VISIBLE : View.GONE);
         });
     }
 
@@ -107,12 +113,8 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         view.menuGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.men1) switchFragment(conversationListFragment);
             if (checkedId == R.id.men2) switchFragment(contactFragment);
-
-            SinkHelper.get(this).setTranslucentStatus(view.getRoot());
-            if (checkedId == R.id.men3) {
-                switchFragment(personalFragment);
-                view.getRoot().setPadding(0, 0, 0, 0);
-            }
+            if (checkedId == R.id.men3) switchFragment(circleFragment);
+            if (checkedId == R.id.men4) switchFragment(personalFragment);
         });
     }
 
@@ -135,13 +137,23 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
     @Override
     public void initDate() {
-        contactFragment = (ContactFragment) ARouter.getInstance().build(Routes.Contact.HOME).navigation();
-        conversationListFragment = (ContactListFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
+        contactFragment =
+            (ContactFragment) ARouter.getInstance().build(Routes.Contact.HOME).navigation();
+        conversationListFragment =
+            (ContactListFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
         personalFragment = PersonalFragment.newInstance();
-
-        personalFragment.setPage(3);
+        momentsBridge =
+            (MomentsBridge) ARouter.getInstance().build(Routes.Service.MOMENTS).navigation();
+        personalFragment.setPage(4);
         switchFragment(personalFragment);
 
+        if (null != momentsBridge) {
+            circleFragment = momentsBridge.buildMomentsFragment();
+            circleFragment.setPage(3);
+            switchFragment(circleFragment);
+        } else {
+            view.men3.setVisibility(View.GONE);
+        }
         if (null != contactFragment) {
             contactFragment.setPage(2);
             switchFragment(contactFragment);
@@ -151,12 +163,14 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
             conversationListFragment.setPage(1);
             switchFragment(conversationListFragment);
         }
-//        getSupportFragmentManager().beginTransaction()
-//            .add(R.id.fragment_container, contactListFragment).commit();
-
         Common.UIHandler.postDelayed(this::bindDot, 500);
     }
 
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (null == momentsBridge) return super.onKeyDown(keyCode, event);
+        if (momentsBridge.onKeyDown(keyCode, event)) return true;
+        else return super.onKeyDown(keyCode, event);
+    }
 
     /**
      * 切换Fragment

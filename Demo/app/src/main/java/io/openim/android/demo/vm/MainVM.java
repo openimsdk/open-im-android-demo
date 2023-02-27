@@ -87,7 +87,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
                 BaseApp.inst().loginCertificate.faceURL = data.getFaceURL();
                 BaseApp.inst().loginCertificate.cache(getContext());
                 nickname.setValue(BaseApp.inst().loginCertificate.nickname);
-                Obs.newMessage(Constant.Event.USER_INFO_UPDATA);
+                Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
             }
         });
     }
