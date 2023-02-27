@@ -4,11 +4,15 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.View;
 import android.view.WindowManager;
 
 import java.lang.ref.SoftReference;
+
+import io.openim.android.ouicore.base.BaseApp;
 
 /**
  * 沉侵式状态栏
@@ -37,7 +41,7 @@ public class SinkHelper {
 //            soft.get(). getWindow().addFlags(
 //            WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         if (view != null) {
-            int statusBarHeight = getStatusBarHeight(soft.get().getBaseContext());
+            int statusBarHeight = getStatusBarHeight();
             view.setPadding(0, statusBarHeight, 0, 0);
         }
     }
@@ -47,14 +51,35 @@ public class SinkHelper {
      *
      * @return 返回状态栏高度的像素值。
      */
-    public static int getStatusBarHeight(Context context) {
+    public static int getStatusBarHeight() {
+        Resources resources = BaseApp.inst().getResources();
         int result = 0;
-        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen",
+        int resourceId = resources.getIdentifier("status_bar_height", "dimen",
             "android");
         if (resourceId > 0) {
-            result = context.getResources().getDimensionPixelSize(resourceId);
+            result = resources.getDimensionPixelSize(resourceId);
         }
         return result;
     }
 
+    /**
+     *  获取底部navigationBar高度
+     * @return
+     */
+    public static int getNavigationBarHeight() {
+        Resources resources = BaseApp.inst().getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height","dimen", "android");
+        return resources.getDimensionPixelSize(resourceId);
+    }
+
+    public static  void setSystemBarTintDrawable(Activity activity,Drawable tintDrawable) {
+        SystemBarUtil mTintManager = new SystemBarUtil(activity);
+        if (tintDrawable != null) {
+            mTintManager.setStatusBarTintEnabled(true);
+            mTintManager.setTintDrawable(tintDrawable);
+        } else {
+            mTintManager.setStatusBarTintEnabled(false);
+            mTintManager.setTintDrawable(null);
+        }
+    }
 }

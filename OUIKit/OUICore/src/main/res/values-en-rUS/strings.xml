@@ -272,5 +272,6 @@
     <string name="part_see_tips2">部分好友可见</string>
     <string name="push_video">发布视频</string>
     <string name="about_who">提到了：%1$s</string>
+    <string name="say_more2">说点什么...</string>
 
 </resources>

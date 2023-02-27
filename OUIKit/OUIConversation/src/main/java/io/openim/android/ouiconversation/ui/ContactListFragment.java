@@ -99,7 +99,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = FragmentContactListBinding.inflate(getLayoutInflater());
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) view.title.getLayoutParams();
-        lp.setMargins(0, SinkHelper.getStatusBarHeight(getContext()), 0, 0);
+        lp.setMargins(0, SinkHelper.getStatusBarHeight(), 0, 0);
         view.title.setLayoutParams(lp);
         init();
         return view.getRoot();

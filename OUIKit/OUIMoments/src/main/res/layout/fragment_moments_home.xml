@@ -1,15 +1,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     tools:context="io.openim.android.ouimoments.ui.fragment.CircleFragment">
 
     <RelativeLayout
         android:id="@+id/bodyLayout"
+        android:fitsSystemWindows="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.malinskiy.superrecyclerview.SuperRecyclerView xmlns:app="http://schemas.android.com/apk/res-auto"
+        <com.malinskiy.superrecyclerview.SuperRecyclerView
             android:id="@+id/superRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -24,8 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true" />
 
-        <com.mikhaellopez.circularprogressbar.CircularProgressBar
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+        <com.mikhaellopez.circularprogressbar.CircularProgressBar xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/video_progress"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -38,14 +40,14 @@
 
     </RelativeLayout>
 
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/titleBarFl"
         android:layout_width="match_parent"
-        android:background="#FF022234"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="#FF022234">
 
         <include layout="@layout/layout_main_titlebar" />
-    </FrameLayout>
+    </RelativeLayout>
 
 
 </RelativeLayout>

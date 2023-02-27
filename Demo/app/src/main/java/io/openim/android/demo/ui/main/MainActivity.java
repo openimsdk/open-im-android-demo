@@ -58,7 +58,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
     private int mCurrentTabIndex;
     private BaseFragment lastFragment, conversationListFragment, contactFragment,
-            personalFragment, circleFragment;
+        personalFragment, circleFragment;
     private ActivityResultLauncher<Intent> resultLauncher = Common.getCaptureActivityLauncher(this);
     private boolean hasShoot = false;
     private MomentsBridge momentsBridge;
@@ -67,7 +67,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     protected void onCreate(Bundle savedInstanceState) {
         runOnUiThread(() -> {
             hasShoot = AndPermission.hasPermissions(MainActivity.this, Permission.CAMERA,
-                    Permission.RECORD_AUDIO);
+                Permission.RECORD_AUDIO);
             Common.permission(MainActivity.this, () -> {
                 hasShoot = true;
                 AndPermission.with(this).overlay().start();
@@ -100,11 +100,11 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         if (null == contactVM) return;
         contactVM.friendDotNum.observe(this, integer -> {
             view.badge.setVisibility((integer > 0 || contactVM.groupDotNum.getValue() > 0) ?
-                    View.VISIBLE : View.GONE);
+                View.VISIBLE : View.GONE);
         });
         contactVM.groupDotNum.observe(this, integer -> {
             view.badge.setVisibility((integer > 0 || contactVM.friendDotNum.getValue() > 0) ?
-                    View.VISIBLE : View.GONE);
+                View.VISIBLE : View.GONE);
         });
     }
 
@@ -138,12 +138,12 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     @Override
     public void initDate() {
         contactFragment =
-                (ContactFragment) ARouter.getInstance().build(Routes.Contact.HOME).navigation();
+            (ContactFragment) ARouter.getInstance().build(Routes.Contact.HOME).navigation();
         conversationListFragment =
-                (ContactListFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
+            (ContactListFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
         personalFragment = PersonalFragment.newInstance();
         momentsBridge =
-                (MomentsBridge) ARouter.getInstance().build(Routes.Service.MOMENTS).navigation();
+            (MomentsBridge) ARouter.getInstance().build(Routes.Service.MOMENTS).navigation();
         personalFragment.setPage(4);
         switchFragment(personalFragment);
 

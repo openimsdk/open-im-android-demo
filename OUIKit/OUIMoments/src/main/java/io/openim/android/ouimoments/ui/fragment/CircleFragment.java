@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -106,6 +107,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
                              Bundle savedInstanceState) {
         Obs.inst().addObserver(this);
         viewBinding = FragmentMomentsHomeBinding.inflate(inflater);
+
         initTitle(viewBinding.getRoot());
         initView(viewBinding.getRoot());
         //实现自动下拉刷新功能
@@ -126,7 +128,6 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
             presenter.user = (User) getArguments().getSerializable(Constant.K_RESULT);
         }
     }
-
 
     private void initPermission() {
         Common.UIHandler.post(() -> {
@@ -186,10 +187,10 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                Rect rect=new Rect();
+                Rect rect = new Rect();
                 recyclerView.getWindowVisibleDisplayFrame(rect);
-                boolean visible=rect.bottom-rect.top<=0;
-                L.e("visible----"+visible+"==rect.bottom="+rect.bottom+"==rect.top=="+rect.top);
+                boolean visible = rect.bottom - rect.top <= 0;
+                L.e("visible----" + visible + "==rect.bottom=" + rect.bottom + "==rect.top==" + rect.top);
                 int alpha = getScrolledYDistance();
                 if (alpha >= 255) {
                     alpha = 255;
@@ -201,7 +202,6 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
                 //透明效果是由参数1决定的，透明范围[0,255]
                 // titlebar.setBackgroundColor(Color.argb(alpha, 57, 174, 255));
                 viewBinding.titleBarFl.getBackground().setAlpha(alpha);
-                L.e("recyclerViewId----"+viewBinding.titleBarFl.hashCode());
             }
 
             @Override
@@ -219,20 +219,17 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         edittextbody = (LinearLayout) mainView.findViewById(R.id.editTextBodyLl);
         editText = (EditText) mainView.findViewById(R.id.circleEt);
         sendIv = (ImageView) mainView.findViewById(R.id.sendIv);
-        sendIv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (presenter != null) {
-                    //发布评论
-                    String content = editText.getText().toString().trim();
-                    if (TextUtils.isEmpty(content)) {
-                        toast(getString(io.openim.android.ouicore.R.string.coments_null_tips));
-                        return;
-                    }
-                    presenter.addComment(content, commentConfig);
+        sendIv.setOnClickListener(v -> {
+            if (presenter != null) {
+                //发布评论
+                String content = editText.getText().toString().trim();
+                if (TextUtils.isEmpty(content)) {
+                    toast(getString(io.openim.android.ouicore.R.string.coments_null_tips));
+                    return;
                 }
-                updateEditTextBodyVisible(View.GONE, null);
+                presenter.addComment(content, commentConfig);
             }
+            updateEditTextBodyVisible(View.GONE, null);
         });
         setViewTreeObserver();
     }
@@ -245,7 +242,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
 
 
     public void initTitle(View mainView) {
-        viewBinding.titleBarFl.setPadding(0, SinkHelper.getStatusBarHeight(getContext()), 0, 0);
+        viewBinding.titleBarFl.setPadding(0, SinkHelper.getStatusBarHeight(), 0, 0);
         titleBar = mainView.findViewById(R.id.main_title_bar);
         if (presenter.isSpecifiedUser()) {
             titleBar.setLeftImageResource(com.yzq.zxinglibrary.R.drawable.ic_back);
@@ -274,11 +271,11 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
 
     private ActivityResultLauncher<Intent> resultLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK) {
-            recyclerView.setRefreshing(true);//执行下拉刷新的动画
-            refreshListener.onRefresh();//执行数据加载操作
-        }
-    });
+            if (result.getResultCode() == RESULT_OK) {
+                recyclerView.setRefreshing(true);//执行下拉刷新的动画
+                refreshListener.onRefresh();//执行数据加载操作
+            }
+        });
 
     private void showPopupWindow(View v) {
         //初始化一个PopupWindow，width和height都是WRAP_CONTENT
@@ -306,7 +303,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         swipeRefreshLayoutVTO.addOnGlobalLayoutListener(() -> {
             Rect r = new Rect();
             bodyLayout.getWindowVisibleDisplayFrame(r);
-            int statusBarH = getStatusBarHeight();//状态栏高度
+            int statusBarH = SinkHelper.getStatusBarHeight();//状态栏高度
             int screenH = bodyLayout.getRootView().getHeight();
             if (r.top != statusBarH) {
                 //在这个demo中r.top代表的是状态栏高度，在沉浸式状态栏时r.top＝0，通过getStatusBarHeight获取状态栏高度
@@ -324,16 +321,11 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
             screenHeight = screenH;//应用屏幕的高度
             editTextBodyHeight = edittextbody.getHeight();
 
-            RelativeLayout.LayoutParams inputLayoutParams =
-                (RelativeLayout.LayoutParams) edittextbody.getLayoutParams();
-            //currentKeyboardH-editTextBodyHeight-statusBarH-底部导航栏高度60
-            inputLayoutParams.bottomMargin = currentKeyboardH - editTextBodyHeight - statusBarH;
-            if (!presenter.isSpecifiedUser()) inputLayoutParams.bottomMargin -= Common.dp2px(60);
-
             if (keyboardH < 150) {//说明是隐藏键盘的情况
-                updateEditTextBodyVisible(View.GONE, null);
+                Common.UIHandler.postDelayed(()-> updateEditTextBodyVisible(View.GONE, null),300);
                 return;
             }
+
             //偏移listview
             if (layoutManager != null && commentConfig != null) {
                 layoutManager.scrollToPositionWithOffset(commentConfig.circlePosition + circleAdapter.HEADVIEW_SIZE, getListviewOffset(commentConfig));
@@ -341,24 +333,11 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         });
     }
 
-    /**
-     * 获取状态栏高度
-     *
-     * @return
-     */
-    private int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
-    }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
             if (edittextbody != null && edittextbody.getVisibility() == View.VISIBLE) {
-                updateEditTextBodyVisible(View.GONE, null);
+                Common.UIHandler.postDelayed(()-> updateEditTextBodyVisible(View.GONE, null),300);
                 return true;
             }
         }
