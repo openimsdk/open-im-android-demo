@@ -301,6 +301,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
     private void setViewTreeObserver() {
         final ViewTreeObserver swipeRefreshLayoutVTO = bodyLayout.getViewTreeObserver();
         swipeRefreshLayoutVTO.addOnGlobalLayoutListener(() -> {
+            if (isHidden())return;
             Rect r = new Rect();
             bodyLayout.getWindowVisibleDisplayFrame(r);
             int statusBarH = SinkHelper.getStatusBarHeight();//状态栏高度

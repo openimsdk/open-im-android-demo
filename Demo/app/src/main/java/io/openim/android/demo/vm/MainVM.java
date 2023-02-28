@@ -39,7 +39,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
             callingService.setOnServicePriorLoginCallBack(this::initDate);
 
         BaseApp.inst().loginCertificate = LoginCertificate.getCache(getContext());
-        boolean logged = IMUtil.isLogged("App");
+        boolean logged = IMUtil.isLogged();
         if (fromLogin || logged) {
             initDate();
         } else {

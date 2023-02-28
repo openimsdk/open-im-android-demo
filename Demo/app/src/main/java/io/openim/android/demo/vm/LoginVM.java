@@ -14,7 +14,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-import io.openim.android.ouicontact.ni.NiService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.demo.repository.OpenIMService;
@@ -26,6 +25,7 @@ import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.net.bage.GsonHel;
 
+import io.openim.android.ouicore.services.NiService;
 import io.openim.android.ouicore.services.OneselfService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;

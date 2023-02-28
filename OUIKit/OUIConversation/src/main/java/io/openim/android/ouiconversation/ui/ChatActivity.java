@@ -209,8 +209,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 inputLayoutParams.bottomMargin = 0;
             } else {
                 //两次窗口高度相减，就是软键盘高度
-                int softKeyboardHeight = mWindowHeight - height;
-                inputLayoutParams.bottomMargin = softKeyboardHeight;
+                inputLayoutParams.bottomMargin = mWindowHeight - height;
             }
             view.layoutInputCote.getRoot().setLayoutParams(inputLayoutParams);
         }
