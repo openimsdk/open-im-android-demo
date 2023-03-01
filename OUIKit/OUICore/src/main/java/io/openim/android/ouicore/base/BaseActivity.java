@@ -44,8 +44,6 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     protected T vm;
     protected A view;
     private String vmCanonicalName;
-    protected CallingService callingService =
-        (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
 
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -53,8 +51,6 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState);
-        if (null != callingService)
-            OpenIMClient.getInstance().signalingManager.setSignalingListener(callingService);
         if (null != vm) {
             vm.viewCreate();
         }

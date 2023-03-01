@@ -86,8 +86,11 @@ public class DemoApplication extends BaseApp {
         IM.initSdk();
         listenerIMOffline();
         CallingService callingService = (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-        if (null != callingService)
+        if (null != callingService){
+            IMEvent.getInstance().addSignalingListener(callingService);
             callingService.initKeepAlive(getPackageName());
+        }
+
     }
 
     private void listenerIMOffline() {

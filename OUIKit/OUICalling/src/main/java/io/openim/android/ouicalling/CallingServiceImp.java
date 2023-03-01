@@ -48,17 +48,6 @@ public class CallingServiceImp implements CallingService {
     public CallDialog callDialog;
     private SignalingInfo signalingInfo;
 
-    ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
-    };
-
 
     @Override
     public void startAudioVideoService(Context base) {

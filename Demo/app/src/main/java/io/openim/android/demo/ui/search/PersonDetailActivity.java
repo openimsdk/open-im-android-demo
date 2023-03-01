@@ -24,6 +24,7 @@ import io.openim.android.demo.ui.user.PersonDataActivity;
 import io.openim.android.demo.vm.FriendVM;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.TimeUtil;
@@ -59,6 +60,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     private boolean applyMemberFriend;
     //已经是好友
     private boolean isFriend;
+    private CallingService callingService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     }
 
     private void init() {
+        callingService=(CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
         formChat = getIntent().getBooleanExtra(Constant.K_RESULT, false);
         groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
         vm.searchContent.setValue(getIntent().getStringExtra(Constant.K_ID));

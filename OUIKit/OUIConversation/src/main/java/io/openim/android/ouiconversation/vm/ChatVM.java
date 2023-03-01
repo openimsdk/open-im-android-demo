@@ -70,17 +70,22 @@ import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.listener.OnGroupListener;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
+import io.openim.android.sdk.listener.OnSignalingListener;
 import io.openim.android.sdk.models.AdvancedMessage;
 import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.CustomSignalingInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.KeyValue;
+import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
+import io.openim.android.sdk.models.Participant;
 import io.openim.android.sdk.models.ReadReceiptInfo;
 import io.openim.android.sdk.models.RevokedInfo;
+import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SearchResult;
 import io.openim.android.sdk.models.SearchResultItem;
 import io.openim.android.sdk.models.SignalingInfo;
@@ -88,10 +93,10 @@ import io.openim.android.sdk.models.UserInfo;
 import okhttp3.ResponseBody;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener,
-    OnGroupListener, OnConversationListener, java.util.Observer {
+    OnGroupListener, OnConversationListener, java.util.Observer, OnSignalingListener {
+
     public CallingService callingService =
         (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-
     //阅后即焚Timers
     HashMap<String, Timer> readVanishTimers = new HashMap<>();
     //搜索的本地消息
@@ -112,6 +117,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public MutableLiveData<List<Message>> atMessages = new MutableLiveData<>(new ArrayList<>());
     //表情
     public MutableLiveData<List<String>> emojiMessages = new MutableLiveData<>(new ArrayList<>());
+    //会议流
+    public MutableLiveData<List<Participant>> participants =
+        new MutableLiveData<>(new ArrayList<>());
     public ObservableBoolean typing = new ObservableBoolean(false);
     public MutableLiveData<String> inputMsg = new MutableLiveData<>("");
     MutableLiveData<Boolean> isNoData = new MutableLiveData<>(false);
@@ -148,12 +156,28 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
         IMEvent.getInstance().addAdvanceMsgListener(this);
         IMEvent.getInstance().addConversationListener(this);
+        IMEvent.getInstance().addSignalingListener(this);
         if (isSingleChat) {
             listener();
         } else {
             getGroupPermissions();
             IMEvent.getInstance().addGroupListener(this);
+            signalingGetRoomByGroupID();
         }
+    }
+
+    private void signalingGetRoomByGroupID() {
+        OpenIMClient.getInstance().signalingManager.signalingGetRoomByGroupID(new OnBase<RoomCallingInfo>() {
+            @Override
+            public void onError(int code, String error) {
+            }
+
+            @Override
+            public void onSuccess(RoomCallingInfo data) {
+                if (!data.getParticipant().isEmpty())
+                    participants.setValue(data.getParticipant());
+            }
+        }, groupID);
     }
 
     /**
@@ -407,6 +431,66 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     }
 
+    @Override
+    public void onInvitationCancelled(SignalingInfo s) {
+
+    }
+
+    @Override
+    public void onInvitationTimeout(SignalingInfo s) {
+
+    }
+
+    @Override
+    public void onInviteeAccepted(SignalingInfo s) {
+
+    }
+
+    @Override
+    public void onInviteeAcceptedByOtherDevice(SignalingInfo s) {
+
+    }
+
+    @Override
+    public void onInviteeRejected(SignalingInfo s) {
+
+    }
+
+    @Override
+    public void onInviteeRejectedByOtherDevice(SignalingInfo s) {
+
+    }
+
+    @Override
+    public void onReceiveNewInvitation(SignalingInfo s) {
+
+    }
+
+    @Override
+    public void onHangup(SignalingInfo s) {
+
+    }
+
+    @Override
+    public void onRoomParticipantConnected(RoomCallingInfo s) {
+
+    }
+
+    @Override
+    public void onRoomParticipantDisconnected(RoomCallingInfo s) {
+
+    }
+
+    @Override
+    public void onMeetingStreamChanged(MeetingStreamEvent e) {
+
+    }
+
+    @Override
+    public void onReceiveCustomSignal(CustomSignalingInfo s) {
+
+    }
+
     public interface UserOnlineStatusListener {
         void onResult(OnlineStatus onlineStatus);
     }
@@ -481,6 +565,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         IMEvent.getInstance().removeAdvanceMsgListener(this);
         IMEvent.getInstance().removeGroupListener(this);
         IMEvent.getInstance().removeConversationListener(this);
+        IMEvent.getInstance().removeSignalingListener(this);
         inputMsg.removeObserver(inputObserver);
 
         for (Timer value : readVanishTimers.values()) {

@@ -35,6 +35,7 @@ import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
+import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
@@ -53,6 +54,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private MessageAdapter messageAdapter;
     private BottomInputCote bottomInputCote;
+    private CallingService callingService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         bindViewDataBinding(ActivityChatBinding.inflate(getLayoutInflater()));
         sink();
         view.setChatVM(vm);
+        callingService=(CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
 
         initView();
         listener();

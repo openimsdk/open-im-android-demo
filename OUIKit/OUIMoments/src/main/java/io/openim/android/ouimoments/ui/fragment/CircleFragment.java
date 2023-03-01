@@ -201,7 +201,9 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
                 // titlebar.setBackgroundColor(Color.rgb(57, 174, 255));
                 //透明效果是由参数1决定的，透明范围[0,255]
                 // titlebar.setBackgroundColor(Color.argb(alpha, 57, 174, 255));
-                viewBinding.titleBarFl.getBackground().setAlpha(alpha);
+                try {
+                    viewBinding.titleBarFl.getBackground().setAlpha(alpha);
+                }catch (Exception ignored){}
             }
 
             @Override
