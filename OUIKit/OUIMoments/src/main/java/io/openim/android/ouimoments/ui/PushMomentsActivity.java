@@ -184,7 +184,8 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                         public void onError(int code, String error) {
                             runOnUiThread(() -> {
                                 waitDialog.dismiss();
-                                toast(getString(io.openim.android.ouicore.R.string.upload_err));
+                                toast(getString(io.openim.android.ouicore.R.string.upload_err)
+                                +error);
                             });
                         }
 

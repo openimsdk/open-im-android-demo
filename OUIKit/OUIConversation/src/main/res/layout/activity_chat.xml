@@ -181,7 +181,7 @@
             android:paddingTop="7dp"
             android:paddingRight="16dp"
             android:paddingBottom="7dp"
-            android:visibility="@{null!=ChatVM.notificationMsg? View.VISIBLE:View.GONE}">
+            android:visibility="@{null!=ChatVM.notificationMsg&amp;&amp;null!=ChatVM.callingService? View.VISIBLE:View.GONE}">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -203,6 +203,83 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@mipmap/ic_right" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/card"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="12dp"
+            android:animateLayoutChanges="true"
+            android:background="@drawable/sty_radius_4_fff1f7ff"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:visibility="@{ChatVM.roomCallingInfo.participant.size()
+            >0?View.VISIBLE:View.GONE}">
+
+            <io.openim.android.ouicore.widget.InterceptLinearLayout
+                android:id="@+id/callingUser"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:src="@mipmap/ic_blue_phone" />
+
+                <TextView
+                    android:id="@+id/callingUserNum"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/s_person_audio_calling"
+                    android:textColor="#ff5496eb"
+                    android:textSize="12sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:src="@mipmap/ic_down_arrow2" />
+            </io.openim.android.ouicore.widget.InterceptLinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sty_radius_4_white"
+                android:gravity="center_horizontal"
+                android:visibility="gone"
+                android:layout_marginTop="10dp"
+                android:id="@+id/meetingLy"
+                android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/meetingRv"
+                    android:layout_width="match_parent"
+                    android:padding="12dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp" />
+
+                <include layout="@layout/view_dividing_line" />
+
+                <TextView
+                    android:id="@+id/join"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:text="@string/join"
+                    android:textColor="#ff5496eb"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+
         </LinearLayout>
 
 

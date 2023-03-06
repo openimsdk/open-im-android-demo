@@ -2,20 +2,14 @@ package io.openim.android.ouicalling;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.KeyguardManager;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.view.WindowManager;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import io.openim.android.ouicalling.databinding.DialogGroupCallBinding;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 
 /**
@@ -38,16 +32,16 @@ public class LockPushActivity extends AppCompatActivity {
         } else {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         }
-        CallingService callingService = (CallingService) ARouter.getInstance()
-            .build(Routes.Service.CALLING).navigation();
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
 
-        callingService.showCalling(dialog -> {
+        callingService.buildCallDialog(dialog -> {
             finish();
             overridePendingTransition(0, 0);
             boolean lock = Common.isScreenLocked();
             if (lock)
                 Common.UIHandler.postDelayed(() -> ARouter.getInstance().build(Routes.Main.HOME).navigation(), 300);
-        }, false);
+        }, false).show();
         super.onCreate(savedInstanceState);
     }
 

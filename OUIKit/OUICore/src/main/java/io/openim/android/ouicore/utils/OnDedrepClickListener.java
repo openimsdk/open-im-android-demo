@@ -10,13 +10,19 @@ import android.view.View;
  */
 public abstract class OnDedrepClickListener implements View.OnClickListener {
     private long mLastClickTime;
-    private final long timeInterval = 700;
+    private long timeInterval = 700;
+
+    public OnDedrepClickListener() {
+    }
+
+    public OnDedrepClickListener(long timeInterval) {
+        this.timeInterval = timeInterval;
+    }
 
     @Override
     public void onClick(View v) {
         long nowTime = System.currentTimeMillis();
-        if (nowTime - mLastClickTime < timeInterval)
-            return;
+        if (nowTime - mLastClickTime < timeInterval) return;
         mLastClickTime = nowTime;
         click(v);
     }

@@ -285,4 +285,10 @@
     <string name="push_video">发布视频</string>
     <string name="about_who">提到了：%1$s</string>
     <string name="say_more2">说点什么...</string>
+    <string name="s_person_audio_calling">%1$d人正在语音通话</string>
+    <string name="s_person_video_calling">%1$d人正在视频通话</string>
+    <string name="join">加入</string>
+    <string name="group_calling_tips">当前群正在通话中，确定加入当前通话？</string>
+    <string name="group_calling_tips2">通话人数已满</string>
+    <string name="not_err">未知错误</string>
 </resources>

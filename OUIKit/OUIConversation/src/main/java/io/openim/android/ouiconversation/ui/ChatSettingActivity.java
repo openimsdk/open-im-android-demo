@@ -61,13 +61,13 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             dialog.getMainView().menu1.setOnClickListener(v1 -> {
                 dialog.dismiss();
                 ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
-                    .withString(Constant.K_ID,vm.otherSideID)
+                    .withString(Constant.K_ID,vm.userID)
                     .navigation();
             });
             dialog.getMainView().menu2.setOnClickListener(v1 -> {
                 dialog.dismiss();
                 ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
-                    .withString(Constant.K_ID,vm.otherSideID)
+                    .withString(Constant.K_ID,vm.userID)
                     .withBoolean(Constant.K_RESULT, true)
                     .navigation();
             });
@@ -116,7 +116,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             Postcard postcard = ARouter.getInstance().build(Routes.Main.PERSON_DETAIL);
             LogisticsCenter.completion(postcard);
             personDetailLauncher.launch(new Intent(this, postcard.getDestination())
-                .putExtra(Constant.K_ID, vm.otherSideID).putExtra(Constant.K_RESULT, true));
+                .putExtra(Constant.K_ID, vm.userID).putExtra(Constant.K_RESULT, true));
         });
         view.clearRecord.setOnClickListener(v -> {
             CommonDialog commonDialog = new CommonDialog(this);
@@ -125,7 +125,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             commonDialog.getMainView().cancel.setOnClickListener(view1 -> commonDialog.dismiss());
             commonDialog.getMainView().confirm.setOnClickListener(view1 -> {
                 commonDialog.dismiss();
-                vm.clearCHistory(vm.otherSideID);
+                vm.clearCHistory(vm.userID);
             });
         });
     }
@@ -141,7 +141,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
         });
 
         List<String> uid = new ArrayList<>();
-        uid.add(vm.otherSideID);
+        uid.add(vm.userID);
         OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
             @Override
             public void onError(int code, String error) {

@@ -16,16 +16,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.livekit.android.events.EventListenable;
 import io.livekit.android.events.ParticipantEvent;
 import io.livekit.android.room.participant.LocalParticipant;
 import io.livekit.android.room.participant.Participant;
 import io.livekit.android.room.participant.RemoteParticipant;
 import io.livekit.android.room.track.LocalVideoTrack;
+import io.livekit.android.room.track.Track;
+import io.livekit.android.room.track.TrackPublication;
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicalling.databinding.DialogGroupCallBinding;
 import io.openim.android.ouicalling.databinding.ItemMemberRendererBinding;
+import io.openim.android.ouicalling.entity.ParticipantMeta;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
@@ -33,18 +38,24 @@ import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.models.GroupInfo;
+import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
+import kotlin.Pair;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
+import kotlin.jvm.functions.Function0;
+import kotlin.jvm.internal.FunctionImpl;
 import kotlinx.coroutines.flow.FlowCollector;
 
 public class GroupCallDialog extends CallDialog {
     private DialogGroupCallBinding view;
     private RecyclerViewAdapter<UserInfo, ViewHol.ImageTxtViewHolder> memberAdapter;
     private RecyclerViewAdapter<Participant, RendererViewHole> viewRenderersAdapter;
+    private boolean isJoin = false;
 
 
     public GroupCallDialog(@NonNull Context context, CallingService callingService,
@@ -59,7 +70,8 @@ public class GroupCallDialog extends CallDialog {
             ViewHol.ImageTxtViewHolder>(ViewHol.ImageTxtViewHolder.class) {
 
             @Override
-            public void onBindView(@NonNull ViewHol.ImageTxtViewHolder holder, UserInfo data, int position) {
+            public void onBindView(@NonNull ViewHol.ImageTxtViewHolder holder, UserInfo data,
+                                   int position) {
                 holder.view.img.load(data.getFaceURL());
                 holder.view.txt.setText(data.getNickname());
             }
@@ -71,38 +83,55 @@ public class GroupCallDialog extends CallDialog {
 
             @SuppressLint("UnsafeOptInUsageError")
             @Override
-            public void onBindView(@NonNull RendererViewHole holder, Participant data, int position) {
+            public void onBindView(@NonNull RendererViewHole holder, Participant data,
+                                   int position) {
                 Object speakerVideoViewTag = holder.view.remoteSpeakerVideoView.getTag();
                 if (speakerVideoViewTag instanceof VideoTrack) {
                     ((VideoTrack) speakerVideoViewTag).removeRenderer(holder.view.remoteSpeakerVideoView);
                 }
+
                 try {
                     callingVM.initRemoteVideoRenderer(holder.view.remoteSpeakerVideoView);
+                    ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
+                        ParticipantMeta.class);
+                    String name = participantMeta.groupMemberInfo.getNickname();
+                    if (TextUtils.isEmpty(name)) name = participantMeta.userInfo.getNickname();
+                    holder.view.name.setText(name);
+
+//                    callingVM.callViewModel.subscribe(data.getEvents().getEvents(), (v) -> {
+//                        ParticipantMeta participantMeta2 = GsonHel.fromJson(v.getParticipant()
+//                        .getMetadata(),
+//                            ParticipantMeta.class);
+//                        participantMeta.userInfo.getUserID().equals(participantMeta2)
+//                        holder.view.micOn.setImageResource(v.getParticipant()
+//                        .isMicrophoneEnabled() ?
+//                            R.mipmap.ic_mic_s_on : R.mipmap.ic_mic_s_off);
+//                        return null;
+//                    });
                 } catch (Exception ignore) {
                 }
-
                 if (data instanceof LocalParticipant) {
                     VideoTrack localVideoTrack = callingVM.callViewModel.getVideoTrack(data);
                     localVideoTrack.addRenderer(holder.view.remoteSpeakerVideoView);
                     holder.view.remoteSpeakerVideoView.setTag(localVideoTrack);
                 } else {
-                    callingVM.callViewModel.bindRemoteViewRenderer(holder.view.remoteSpeakerVideoView, data,
-                        new Continuation<Unit>() {
-                            @NonNull
-                            @Override
-                            public CoroutineContext getContext() {
-                                return EmptyCoroutineContext.INSTANCE;
-                            }
+                    callingVM.callViewModel.bindRemoteViewRenderer(holder.view.remoteSpeakerVideoView, data, new Continuation<Unit>() {
+                        @NonNull
+                        @Override
+                        public CoroutineContext getContext() {
+                            return EmptyCoroutineContext.INSTANCE;
+                        }
 
-                            @Override
-                            public void resumeWith(@NonNull Object o) {
+                        @Override
+                        public void resumeWith(@NonNull Object o) {
 
-                            }
-                        });
+                        }
+                    });
                 }
             }
         });
     }
+
 
     @Override
     public void setContentView(@NonNull View v) {
@@ -114,8 +143,7 @@ public class GroupCallDialog extends CallDialog {
     public void bindData(SignalingInfo signalingInfo) {
         super.signalingInfo = signalingInfo;
         callingVM.isGroup = signalingInfo.getInvitation().getInviteeUserIDList().size() > 1;
-        callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation()
-            .getMediaType()));
+        callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
 
         if (callingVM.isCallOut) {
             view.ask.setVisibility(View.GONE);
@@ -130,6 +158,7 @@ public class GroupCallDialog extends CallDialog {
         bindUserInfo(signalingInfo);
         listener(signalingInfo);
     }
+
     public final Observer<String> bindTime = new Observer<String>() {
         @Override
         public void onChanged(String s) {
@@ -137,18 +166,56 @@ public class GroupCallDialog extends CallDialog {
             view.timeTv.setText(s);
         }
     };
+
+    @Override
+    public void dismiss() {
+        callingVM.timeStr.removeObserver(bindTime);
+        super.dismiss();
+    }
+
+    @Override
+    public void playRingtone() {
+        if (isJoin) return;
+        super.playRingtone();
+    }
+
+    public void joinToShow() {
+        isJoin = true;
+        signalingAccept(signalingInfo);
+        show();
+    }
+
+    int num = 0;
+    private final OnDedrepClickListener micIsOnClickListener = new OnDedrepClickListener(1000) {
+        @Override
+        public void click(View v) {
+//            view.micIsOn.setText(view.micIsOn.isChecked() ?
+//                context.getString(io.openim.android.ouicore.R.string.microphone_on) :
+//                context.getString(io.openim.android.ouicore.R.string.microphone_off));
+//            //关闭麦克风
+//            callingVM.callViewModel.setMicEnabled(view.micIsOn.isChecked());
+            L.e("--------" + num++);
+        }
+    };
+
     @Override
     public void listener(SignalingInfo signalingInfo) {
         callingVM.timeStr.observeForever(bindTime);
-        view.micIsOn.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            view.micIsOn.setText(isChecked ? context.getString(io.openim.android.ouicore.R.string.microphone_on)
-                : context.getString(io.openim.android.ouicore.R.string.microphone_off));
-            //关闭麦克风
-            callingVM.callViewModel.setMicEnabled(isChecked);
+        view.micIsOn.setOnClickListener(new OnDedrepClickListener(1000) {
+            @Override
+            public void click(View v) {
+                view.micIsOn.setText(view.micIsOn.isChecked() ?
+                    context.getString(io.openim.android.ouicore.R.string.microphone_on) :
+                    context.getString(io.openim.android.ouicore.R.string.microphone_off));
+                //关闭麦克风
+                callingVM.callViewModel.setMicEnabled(view.micIsOn.isChecked());
+            }
         });
+
         view.speakerIsOn.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            view.speakerIsOn.setText(isChecked ? context.getString(io.openim.android.ouicore.R.string.speaker_on)
-                : context.getString(io.openim.android.ouicore.R.string.speaker_off));
+            view.speakerIsOn.setText(isChecked ?
+                context.getString(io.openim.android.ouicore.R.string.speaker_on) :
+                context.getString(io.openim.android.ouicore.R.string.speaker_off));
             // 打开扬声器
             callingVM.audioManager.setSpeakerphoneOn(isChecked);
         });
@@ -169,23 +236,28 @@ public class GroupCallDialog extends CallDialog {
         view.answer.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                callingVM.signalingAccept(signalingInfo, new OnBase() {
-                    @Override
-                    public void onError(int code, String error) {
-
-                    }
-
-                    @Override
-                    public void onSuccess(Object data) {
-                        changeView();
-                    }
-                });
+                signalingAccept(signalingInfo);
             }
         });
         callingVM.setOnParticipantsChangeListener(participants -> {
             viewRenderersAdapter.setItems(participants);
         });
     }
+
+    private void signalingAccept(SignalingInfo signalingInfo) {
+        callingVM.signalingAccept(signalingInfo, new OnBase() {
+            @Override
+            public void onError(int code, String error) {
+
+            }
+
+            @Override
+            public void onSuccess(Object data) {
+                changeView();
+            }
+        });
+    }
+
 
     @Override
     public void changeView() {
