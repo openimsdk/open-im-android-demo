@@ -23,6 +23,7 @@ ext {
             "OUIContact" : "io.openim.android.ouicontact",
             "OUICalling" : "io.openim.android.ouicalling",
             "OUIMoments" : "io.openim.android.ouimoments",
+            "OUIMeeting" : "io.openim.android.ouimeeting",
     ]
 
 }

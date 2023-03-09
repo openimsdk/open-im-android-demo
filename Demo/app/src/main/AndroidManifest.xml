@@ -16,7 +16,7 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Demo"
+        android:theme="@style/Theme.Main"
         android:usesCleartextTraffic="true">
         <activity
             android:name=".ui.login.ResetPasswordActivity"

@@ -4,7 +4,7 @@
 
     <application
         android:name="io.openim.android.ouicore.base.BaseApp"
-        android:theme="@style/Theme.Demo">
+        android:theme="@style/Theme.Main">
         <activity
             android:name=".ui.ChatActivity"
             android:exported="false" />

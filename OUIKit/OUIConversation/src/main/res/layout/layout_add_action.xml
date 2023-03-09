@@ -132,6 +132,28 @@
                     android:textColor="#ff333333"
                     android:textSize="14sp" />
             </LinearLayout>
+            <LinearLayout
+                android:id="@+id/videoMeeting"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
+                    android:src="@mipmap/ic_c_video_meeting" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/video_meeting"
+                    android:textColor="#ff333333"
+                    android:textSize="14sp" />
+            </LinearLayout>
         </LinearLayout>
 
 

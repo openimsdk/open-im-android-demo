@@ -241,6 +241,11 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
                 .withBoolean(Constant.K_RESULT, true).navigation();
         });
+        view.videoMeeting.setOnClickListener(c -> {
+            popupWindow.dismiss();
+            ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
+                .withBoolean(Constant.K_RESULT, true).navigation();
+        });
         //设置PopupWindow的视图内容
         popupWindow.setContentView(view.getRoot());
         //点击空白区域PopupWindow消失，这里必须先设置setBackgroundDrawable，否则点击无反应

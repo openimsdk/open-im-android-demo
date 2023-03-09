@@ -53,3 +53,4 @@ project(':aar-spotify').projectDir = new File(settingsDir, '../OUIKit/aar-spotif
 include ':OUIMoments'
 project(':OUIMoments').projectDir = new File(settingsDir, '../OUIKit/OUIMoments')
 
+include ':OUIMeeting'

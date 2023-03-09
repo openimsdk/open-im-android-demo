@@ -83,9 +83,9 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     }
 
     private void bind() {
-        if (null == this.vm) return;
-        this.vm.setContext(this);
-        this.vm.setIView(this);
+        if (null == vm) return;
+        vm.setContext(this);
+        vm.setIView(this);
     }
 
     protected void setLightStatus() {

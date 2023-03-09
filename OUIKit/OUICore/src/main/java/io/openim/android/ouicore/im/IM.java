@@ -22,7 +22,7 @@ public class IM {
         ///IM 初始化
         OpenIMClient.getInstance().initSDK(2,
             Constant.getImApiUrl(),
-            Constant.getImWsUrl(), getStorageDir(), 6,
+            Constant.getImWsUrl(), getStorageDir(), 1,
             Constant.getStorageType(),
             null, false, false,
             false,IMEvent.getInstance().connListener);

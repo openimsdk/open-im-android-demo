@@ -1,4 +1,4 @@
-package io.openim.android.ouicalling.entity;
+package io.openim.android.ouicore.entity;
 
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;

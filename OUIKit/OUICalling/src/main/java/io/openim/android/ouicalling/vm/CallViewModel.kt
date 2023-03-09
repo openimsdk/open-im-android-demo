@@ -20,6 +20,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import livekit.LivekitRtc
 import kotlinx.coroutines.flow.collectLatest as collectLatest1
 
 
@@ -242,7 +243,7 @@ class CallViewModel(
         mutableError.value = null
     }
 
-    fun <T> subscribe(flow: Flow<T>, function: (T) -> Any) {
+    fun <T> subscribe(flow: Flow<T>, function: (T) -> Unit) {
         viewModelScope.launch {
             flow.collect {
                 function.invoke(it)
@@ -261,13 +262,13 @@ class CallViewModel(
         room.localParticipant.setTrackSubscriptionPermissions(mutablePermissionAllowed.value)
     }
 
-//    fun simulateMigration() {
-//        room.sendSimulateScenario(
-//            LivekitRtc.SimulateScenario.newBuilder()
-//                .setMigration(true)
-//                .build()
-//        )
-//    }
+    fun simulateMigration() {
+        room.sendSimulateScenario(
+            LivekitRtc.SimulateScenario.newBuilder()
+                .setMigration(true)
+                .build()
+        )
+    }
 
     fun reconnect() {
         mutablePrimarySpeaker.value = null

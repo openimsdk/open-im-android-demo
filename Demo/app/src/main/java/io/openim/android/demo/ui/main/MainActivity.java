@@ -4,18 +4,24 @@ package io.openim.android.demo.ui.main;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.PopupWindow;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
 
 
@@ -55,6 +61,7 @@ import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.SystemBarUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
+import io.openim.android.ouimeeting.MeetingLaunchActivity;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
@@ -95,6 +102,12 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
         click();
         view.men1.setChecked(true);
+
+        demo();
+    }
+
+    private void demo() {
+        startActivity(new Intent(this, MeetingLaunchActivity.class));
     }
 
 

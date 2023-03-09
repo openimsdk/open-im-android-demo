@@ -27,9 +27,9 @@ import io.livekit.android.room.track.TrackPublication;
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicalling.databinding.DialogGroupCallBinding;
 import io.openim.android.ouicalling.databinding.ItemMemberRendererBinding;
-import io.openim.android.ouicalling.entity.ParticipantMeta;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
+import io.openim.android.ouicore.entity.ParticipantMeta;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
@@ -89,7 +89,6 @@ public class GroupCallDialog extends CallDialog {
                 if (speakerVideoViewTag instanceof VideoTrack) {
                     ((VideoTrack) speakerVideoViewTag).removeRenderer(holder.view.remoteSpeakerVideoView);
                 }
-
                 try {
                     callingVM.initRemoteVideoRenderer(holder.view.remoteSpeakerVideoView);
                     ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
@@ -98,16 +97,16 @@ public class GroupCallDialog extends CallDialog {
                     if (TextUtils.isEmpty(name)) name = participantMeta.userInfo.getNickname();
                     holder.view.name.setText(name);
 
-//                    callingVM.callViewModel.subscribe(data.getEvents().getEvents(), (v) -> {
-//                        ParticipantMeta participantMeta2 = GsonHel.fromJson(v.getParticipant()
-//                        .getMetadata(),
-//                            ParticipantMeta.class);
-//                        participantMeta.userInfo.getUserID().equals(participantMeta2)
-//                        holder.view.micOn.setImageResource(v.getParticipant()
-//                        .isMicrophoneEnabled() ?
-//                            R.mipmap.ic_mic_s_on : R.mipmap.ic_mic_s_off);
-//                        return null;
-//                    });
+                    callingVM.callViewModel.subscribe(data.getEvents().getEvents(), (v) -> {
+                        ParticipantMeta participantMeta2 = GsonHel.fromJson(v.getParticipant()
+                        .getMetadata(),
+                            ParticipantMeta.class);
+                        participantMeta.userInfo.getUserID().equals(participantMeta2);
+                        holder.view.micOn.setImageResource(v.getParticipant()
+                        .isMicrophoneEnabled() ?
+                            R.mipmap.ic_mic_s_on : R.mipmap.ic_mic_s_off);
+                        return null;
+                    });
                 } catch (Exception ignore) {
                 }
                 if (data instanceof LocalParticipant) {
@@ -124,7 +123,7 @@ public class GroupCallDialog extends CallDialog {
 
                         @Override
                         public void resumeWith(@NonNull Object o) {
-
+                        L.e("");
                         }
                     });
                 }
@@ -184,19 +183,6 @@ public class GroupCallDialog extends CallDialog {
         signalingAccept(signalingInfo);
         show();
     }
-
-    int num = 0;
-    private final OnDedrepClickListener micIsOnClickListener = new OnDedrepClickListener(1000) {
-        @Override
-        public void click(View v) {
-//            view.micIsOn.setText(view.micIsOn.isChecked() ?
-//                context.getString(io.openim.android.ouicore.R.string.microphone_on) :
-//                context.getString(io.openim.android.ouicore.R.string.microphone_off));
-//            //关闭麦克风
-//            callingVM.callViewModel.setMicEnabled(view.micIsOn.isChecked());
-            L.e("--------" + num++);
-        }
-    };
 
     @Override
     public void listener(SignalingInfo signalingInfo) {
