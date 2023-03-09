@@ -16,12 +16,12 @@ import io.livekit.android.room.participant.Participant
 import io.livekit.android.room.participant.RemoteParticipant
 import io.livekit.android.room.track.*
 import io.livekit.android.util.flow
+import io.openim.android.ouicore.base.BaseApp
 import io.openim.android.ouicore.utils.L
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import livekit.LivekitRtc
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.flow.collectLatest as collectLatest1
 
 
@@ -242,13 +242,27 @@ class CallViewModel(
         mutableError.value = null
     }
 
-    fun <T> subscribe(flow: Flow<T>, function: (T) -> Any) {
-        viewModelScope.launch {
+
+    fun buildScope(): CoroutineScope {
+        return CoroutineScope(Dispatchers.Main);
+    }
+
+    fun scopeCancel(scope: CoroutineScope) {
+        scope.cancel()
+    }
+
+    @JvmOverloads
+    fun <T> subscribe(
+        flow: Flow<T>, function: (T) -> Any,
+        scope: CoroutineScope = viewModelScope,
+    ) {
+        scope.launch {
             flow.collect {
                 function.invoke(it)
             }
         }
     }
+
 
     fun getConnectionFlow(p: Participant): StateFlow<ConnectionQuality> {
         return p::connectionQuality.flow

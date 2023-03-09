@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import io.livekit.android.events.ParticipantEvent;
 import io.livekit.android.renderer.TextureViewRenderer;
 import io.livekit.android.room.participant.ConnectionQuality;
+import io.livekit.android.room.participant.LocalParticipant;
 import io.livekit.android.room.participant.Participant;
 import io.livekit.android.room.participant.RemoteParticipant;
 import io.livekit.android.room.track.VideoTrack;
@@ -34,6 +35,8 @@ import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
+import kotlinx.coroutines.CoroutineScope;
+import kotlinx.coroutines.Dispatchers;
 import kotlinx.coroutines.flow.SharedFlow;
 import kotlinx.coroutines.flow.StateFlow;
 
@@ -41,7 +44,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
 
     private RecyclerViewAdapter<RemoteParticipant, UserStreamViewHolder> adapter;
-    private String centerSID = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,8 +104,9 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                 vm.initVideoView(holder.view.textureView);
                 bindRemoteViewRenderer(holder.view.textureView, data);
                 AtomicBoolean isOpenCamera = new AtomicBoolean(false);
-                //这里更新item 的画面需要一直更新 我们传centerSID，这样相等就会更新
-                userStatusViewBind(holder.view, data.getEvents().getEvents(), false, isOpen -> {
+                //这里新启用协程
+                holder.view.userStatus.setTag(null);
+                userStatusViewBind(holder.view, data.getEvents().getEvents(), isOpen -> {
                     isOpenCamera.set(isOpen);
                     if (isOpen) {
                         holder.view.userStatus.setVisibility(View.GONE);
@@ -116,9 +119,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                 final String finalName = name;
                 holder.view.getRoot().setOnClickListener(v -> {
                     centerCov(isOpenCamera.get());
-                    centerSID = data.getSid();
-                    bindCenterUser(finalName, faceURL,data.getEvents().getEvents());
-
+                    bindCenterUser(finalName, faceURL, data);
                     bindRemoteViewRenderer(view.centerTextureView, data);
                 });
             }
@@ -127,11 +128,35 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     }
 
 
-    private void bindCenterUser(String nickname, String faceUrl,
-                                SharedFlow<ParticipantEvent> flow) {
+    private void bindCenterUser(String nickname, String faceUrl, Participant participant) {
         view.centerUser.name.setText(nickname);
         view.centerUser.avatar.load(faceUrl);
-        userStatusViewBind(view.centerUser, flow,true, this::centerCov);
+        view.centerUser.mic.setImageResource(participant.isMicrophoneEnabled() ?
+            io.openim.android.ouicore.R.mipmap.ic__mic_on :
+            io.openim.android.ouicore.R.mipmap.ic__mic_off);
+
+        switch (participant.getConnectionQuality()) {
+            case EXCELLENT:
+                view.centerUser.net.setImageResource(io.openim.android.ouicore.R.mipmap.ic_net_excellent);
+                break;
+            case GOOD:
+                view.centerUser.net.setImageResource(io.openim.android.ouicore.R.mipmap.ic_net_good);
+                break;
+            default:
+                view.centerUser.net.setImageResource(io.openim.android.ouicore.R.mipmap.ic_net_poor);
+        }
+
+        userStatusViewBind(view.centerUser, participant.getEvents().getEvents(), this::centerCov);
+    }
+
+    @NonNull
+    private CoroutineScope bindCoroutineScope(View view) {
+        if (view.getTag() instanceof CoroutineScope) {
+            vm.callViewModel.scopeCancel((CoroutineScope) view.getTag());
+        }
+        CoroutineScope scope = vm.callViewModel.buildScope();
+        view.setTag(scope);
+        return scope;
     }
 
     /**
@@ -175,36 +200,33 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         holder.name.setText(l.nickname);
         holder.avatar.load(l.faceURL);
 
-        SharedFlow<ParticipantEvent> sharedFlow =
-            vm.callViewModel.getRoom().getLocalParticipant().getEvents().getEvents();
-        centerSID = vm.callViewModel.getRoom().getLocalParticipant().getSid();
-        bindCenterUser(l.nickname, l.faceURL, sharedFlow);
-        bindRemoteViewRenderer(view.centerTextureView,
-            vm.callViewModel.getRoom().getLocalParticipant());
+       LocalParticipant participant = vm.callViewModel.getRoom().getLocalParticipant();
 
-        userStatusViewBind(holder, sharedFlow, true, null);
+        SharedFlow<ParticipantEvent> sharedFlow =
+            participant.getEvents().getEvents();
+        centerCov(participant.isCameraEnabled());
+        bindCenterUser(l.nickname, l.faceURL, participant);
+        bindRemoteViewRenderer(view.centerTextureView,
+            participant);
+
+        userStatusViewBind(holder, sharedFlow, null);
         view.memberRecyclerView.addHeaderView(holder.getRoot());
 
         holder.getRoot().setOnClickListener(v -> {
-            centerSID = vm.callViewModel.getRoom().getLocalParticipant().getSid();
-            centerCov(vm.callViewModel.getRoom().getLocalParticipant().isCameraEnabled());
-            bindCenterUser(l.nickname, l.faceURL, sharedFlow);
+            centerCov(participant.isCameraEnabled());
+            bindCenterUser(l.nickname, l.faceURL, participant);
             bindRemoteViewRenderer(view.centerTextureView,
-                vm.callViewModel.getRoom().getLocalParticipant());
+                participant);
         });
     }
 
 
     private void userStatusViewBind(LayoutUserStatusBinding holder,
                                     SharedFlow<ParticipantEvent> sharedFlow,
-                                    boolean isCare,
                                     CameraOpenListener cameraOpenListener) {
+        CoroutineScope scope = bindCoroutineScope(holder.userStatus);
 
         vm.callViewModel.subscribe(sharedFlow, (v) -> {
-            L.e("--------"+v.getParticipant().getSid());
-            L.e("----2----"+centerSID);
-            if (isCare&&!v.getParticipant().getSid().equals(centerSID)) return null;
-
             holder.mic.setImageResource(v.getParticipant().isMicrophoneEnabled() ?
                 io.openim.android.ouicore.R.mipmap.ic__mic_on :
                 io.openim.android.ouicore.R.mipmap.ic__mic_off);
@@ -226,10 +248,10 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                         holder.net.setImageResource(io.openim.android.ouicore.R.mipmap.ic_net_poor);
                 }
                 return null;
-            });
+            }, scope);
 
             return null;
-        });
+        }, scope);
     }
 
     void init() {
