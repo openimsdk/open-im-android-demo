@@ -37,17 +37,16 @@
                 android:background="#FF0089FF"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
+                android:visibility="visible"
                 android:text="@string/emcee"
                 android:textColor="#ffffffff"
                 android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/name"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:ellipsize="end"
-                android:maxWidth="60dp"
                 android:maxLines="1"
                 android:textColor="#ffffffff"
                 android:textSize="14sp" />

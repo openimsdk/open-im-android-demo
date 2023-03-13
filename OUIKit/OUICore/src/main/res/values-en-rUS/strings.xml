@@ -291,5 +291,6 @@
     <string name="setting">设置</string>
     <string name="v_member">成员</string>
     <string name="meeting_initiator">%1$s发起的视频会议</string>
+    <string name="share_screen">开始投屏中...</string>
 
 </resources>

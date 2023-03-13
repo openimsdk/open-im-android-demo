@@ -16,12 +16,10 @@ import io.livekit.android.room.participant.Participant
 import io.livekit.android.room.participant.RemoteParticipant
 import io.livekit.android.room.track.*
 import io.livekit.android.util.flow
-import io.openim.android.ouicore.base.BaseApp
 import io.openim.android.ouicore.utils.L
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import livekit.LivekitRtc
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.flow.collectLatest as collectLatest1
 
 
@@ -34,8 +32,8 @@ class CallViewModel(
         options = RoomOptions(adaptiveStream = true, dynacast = true),
     )
 
-    val remoteParticipants = room::remoteParticipants.flow.map { remoteParticipants ->
-        remoteParticipants.keys.sortedBy { it }.mapNotNull { remoteParticipants[it] }
+    val allParticipants = room::remoteParticipants.flow.map { remoteParticipants ->
+        listOf<Participant>(room.localParticipant) + remoteParticipants.keys.sortedBy { it }.mapNotNull { remoteParticipants[it] }
     }
 
     private val mutableError = MutableStateFlow<Throwable?>(null)
@@ -45,12 +43,15 @@ class CallViewModel(
     val primarySpeaker: StateFlow<Participant?> = mutablePrimarySpeaker
 
     val activeSpeakers = room::activeSpeakers.flow
+    val roomMetadata = room::metadata.flow
 
     private var localScreencastTrack: LocalScreencastVideoTrack? = null
 
-    val mutableMicEnabled = MutableLiveData(true)
+    private val mutableMicEnabled = MutableLiveData(true)
+    val micEnabled = mutableMicEnabled.hide()
 
-    val mutableCameraEnabled = MutableLiveData(true)
+    private val mutableCameraEnabled = MutableLiveData(true)
+    val cameraEnabled = mutableCameraEnabled.hide()
 
     private val mutableFlipVideoButtonEnabled = MutableLiveData(true)
     val flipButtonVideoEnabled = mutableFlipVideoButtonEnabled.hide()
@@ -69,7 +70,7 @@ class CallViewModel(
     init {
         viewModelScope.launch {
             launch {
-                combine(remoteParticipants, activeSpeakers) { participants, speakers -> participants to speakers }.collect { (participantsList, speakers) ->
+                combine(allParticipants, activeSpeakers) { participants, speakers -> participants to speakers }.collect { (participantsList, speakers) ->
                     handlePrimarySpeaker(
                         participantsList, speakers, room
                     )
@@ -81,7 +82,7 @@ class CallViewModel(
                     when (it) {
                         is RoomEvent.FailedToConnect -> mutableError.value = it.error
                         is RoomEvent.DataReceived -> {
-                            val identity = it.participant.identity ?: ""
+                            val identity = it.participant?.identity ?: ""
                             val message = it.data.toString(Charsets.UTF_8)
                             mutableDataReceived.emit("$identity: $message")
                         }
@@ -211,17 +212,18 @@ class CallViewModel(
     override fun onCleared() {
         super.onCleared()
         room.disconnect()
-
     }
 
     fun setMicEnabled(enabled: Boolean) {
         viewModelScope.launch {
+            mutableMicEnabled.postValue(enabled)
             room.localParticipant.setMicrophoneEnabled(enabled)
         }
     }
 
     fun setCameraEnabled(enabled: Boolean) {
         viewModelScope.launch {
+            mutableCameraEnabled.postValue(enabled)
             room.localParticipant.setCameraEnabled(enabled)
         }
     }

@@ -1,4 +1,4 @@
-//var isModule=true
+var isModule=true
 if (isModule) {
     apply plugin: 'com.android.application'
 } else {
@@ -71,6 +71,7 @@ dependencies {
     implementation project(':aar-spotify')
     implementation 'com.github.webrtc-sdk:android:97.4692.04'
     implementation 'com.google.dagger:dagger:2.38'
+    implementation "io.livekit:livekit-android:1.1.7"
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0'
     implementation "com.squareup.okhttp3:okhttp:4.9.1"
     implementation "androidx.annotation:annotation:1.5.0"

@@ -2,6 +2,7 @@ package io.openim.android.ouicore.widget;
 
 import android.content.Context;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
@@ -12,8 +13,16 @@ import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.databinding.DialogPhotographAlbumBinding;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 
-public class BottomPopDialog  extends BaseDialog {
-    private  DialogPhotographAlbumBinding mainView;
+public class BottomPopDialog extends BaseDialog {
+    private DialogPhotographAlbumBinding mainView;
+    private View customMainView;
+
+    public BottomPopDialog(@NonNull Context context, View mainView) {
+        super(context);
+        this.customMainView = mainView;
+        initView();
+    }
+
     public BottomPopDialog(@NonNull Context context) {
         super(context);
         initView();
@@ -21,7 +30,8 @@ public class BottomPopDialog  extends BaseDialog {
 
     private void initView() {
         mainView = DialogPhotographAlbumBinding.inflate(getLayoutInflater());
-        setContentView(mainView.getRoot());
+        if (null == customMainView) setContentView(mainView.getRoot());
+        else setContentView(customMainView);
 
         WindowManager.LayoutParams params = getWindow().getAttributes();
         params.gravity = Gravity.BOTTOM;
@@ -35,5 +45,10 @@ public class BottomPopDialog  extends BaseDialog {
     public DialogPhotographAlbumBinding getMainView() {
         return mainView;
     }
+
+    public View getCustomMainView() {
+        return customMainView;
+    }
+
 
 }

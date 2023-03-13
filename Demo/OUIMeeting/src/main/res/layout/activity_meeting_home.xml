@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-<data>
-    <variable
-        name="callViewModel"
-        type="io.openim.android.ouimeeting.vm.CallViewModel" />
-</data>
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="callViewModel"
+            type="io.openim.android.ouimeeting.vm.CallViewModel" />
+
+        <variable
+            name="meetingVM"
+            type="io.openim.android.ouimeeting.vm.MeetingVM" />
+    </data>
+
     <LinearLayout xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -53,7 +61,10 @@
                     android:id="@+id/title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="会议名"
+                    android:ellipsize="end"
+                    android:maxWidth="160dp"
+                    android:maxLines="1"
+                    android:text="@{meetingVM.roomMetadata.meetingName}"
                     android:textColor="@color/white"
                     android:textSize="17sp" />
 
@@ -61,7 +72,7 @@
                     android:id="@+id/time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="00:00"
+                    android:text="@{meetingVM.timeStr}"
                     android:textColor="@color/white"
                     android:textSize="10sp" />
             </LinearLayout>
@@ -102,10 +113,11 @@
                 android:layout_height="match_parent" />
 
             <include
+                android:id="@+id/centerUser"
                 layout="@layout/layout_user_status"
                 android:layout_width="115dp"
+                android:visibility="gone"
                 android:layout_height="115dp"
-                android:id="@+id/centerUser"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true" />
 
@@ -132,7 +144,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="10dp"
-                android:rotationX="180"
                 android:src="@mipmap/ic_white_down" />
 
             <com.yanzhenjie.recyclerview.SwipeRecyclerView
@@ -143,6 +154,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
                 android:orientation="horizontal"
                 android:paddingLeft="15dp"
                 android:paddingTop="10dp"
@@ -151,13 +163,16 @@
 
 
                 <CheckBox
+                    android:id="@+id/mic"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:alpha="@{meetingVM.roomMetadata.isMuteAllMicrophone?(0.3f):(1.0f)}"
                     android:button="@null"
+                    android:checked="@{callViewModel.micEnabled}"
                     android:drawableTop="@drawable/selector_m_mic"
                     android:drawablePadding="7dp"
+                    android:enabled="@{!meetingVM.roomMetadata.isMuteAllMicrophone}"
                     android:gravity="center"
-                    android:checked="@={callViewModel.mutableMicEnabled}"
                     android:text="@string/cancel_mute"
                     android:textColor="#ffffffff"
                     android:textSize="10sp" />
@@ -168,14 +183,17 @@
                     android:layout_weight="1" />
 
                 <CheckBox
+                    android:id="@+id/camera"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:alpha="@{meetingVM.roomMetadata.isMuteAllVideo?(0.3f):(1.0f)}"
                     android:button="@null"
+                    android:checked="@{callViewModel.cameraEnabled}"
                     android:drawableTop="@drawable/selector_m_camera"
                     android:drawablePadding="7dp"
+                    android:enabled="@{!meetingVM.roomMetadata.isMuteAllVideo}"
                     android:gravity="center"
                     android:text="@string/start_camera"
-                    android:checked="@={callViewModel.mutableCameraEnabled}"
                     android:textColor="#ffffffff"
                     android:textSize="10sp" />
 
@@ -185,11 +203,14 @@
                     android:layout_weight="1" />
 
                 <CheckBox
+                    android:id="@+id/shareScreen"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:button="@null"
                     android:drawableTop="@drawable/selector_m_shared_screen"
                     android:drawablePadding="7dp"
+                    android:alpha="@{meetingVM.roomMetadata.onlyHostShareScreen?(0.3f):(1.0f)}"
+                    android:enabled="@{!meetingVM.roomMetadata.onlyHostShareScreen}"
                     android:gravity="center"
                     android:text="@string/shared_screen"
                     android:textColor="#ffffffff"
@@ -204,8 +225,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:button="@null"
+                    android:id="@+id/member"
                     android:drawableTop="@mipmap/ic_m_member"
                     android:drawablePadding="7dp"
+                    android:alpha="@{meetingVM.roomMetadata.onlyHostInviteUser?(0.3f):(1.0f)}"
+                    android:enabled="@{!meetingVM.roomMetadata.onlyHostInviteUser}"
                     android:gravity="center"
                     android:text="@string/v_member"
                     android:textColor="#ffffffff"
@@ -214,7 +238,8 @@
                 <View
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:visibility="@{meetingVM.isSelfHostUser?View.VISIBLE:View.GONE}" />
 
                 <CheckBox
                     android:layout_width="wrap_content"
@@ -225,7 +250,8 @@
                     android:gravity="center"
                     android:text="@string/setting"
                     android:textColor="#ffffffff"
-                    android:textSize="10sp" />
+                    android:textSize="10sp"
+                    android:visibility="@{meetingVM.isSelfHostUser?View.VISIBLE:View.GONE}"/>
 
             </LinearLayout>
         </LinearLayout>

@@ -73,6 +73,7 @@ dependencies {
 
     //liveKit
     implementation project(':aar-spotify')
+    implementation "io.livekit:livekit-android:1.1.7"
     implementation 'com.github.webrtc-sdk:android:97.4692.04'
     implementation 'com.google.dagger:dagger:2.38'
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0'
