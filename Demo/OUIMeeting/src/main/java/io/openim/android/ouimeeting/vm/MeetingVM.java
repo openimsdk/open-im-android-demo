@@ -228,10 +228,10 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     public void startShareScreen(Intent data) {
         lastCameraEnabled = callViewModel.getRoom().getLocalParticipant().isCameraEnabled();
-        lastIsMuteAllVideo = roomMetadata.getValue().isMuteAllVideo;
+        lastIsMuteAllVideo =cameraPermission.getValue();
 
         callViewModel.setCameraEnabled(false);
-        roomMetadata.getValue().isMuteAllVideo = true;
+        cameraPermission.setValue(false);
         roomMetadata.setValue(roomMetadata.getValue());
         callViewModel.startScreenCapture(data);
     }
@@ -239,7 +239,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     public void stopShareScreen() {
         callViewModel.stopScreenCapture();
         callViewModel.setCameraEnabled(lastCameraEnabled);
-        roomMetadata.getValue().isMuteAllVideo = lastIsMuteAllVideo;
+        cameraPermission.setValue(lastIsMuteAllVideo);
         roomMetadata.setValue(roomMetadata.getValue());
     }
 
