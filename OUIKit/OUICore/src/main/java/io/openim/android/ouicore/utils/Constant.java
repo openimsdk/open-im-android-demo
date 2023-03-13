@@ -158,6 +158,8 @@ public class Constant {
         public static final int LOCATION = 109;
         //            * 110:自定义消息<br/>
         public static final int CUSTOMIZE = 110;
+        //会议邀请
+        public static final int CUSTOMIZE_MEETING = 905;
         //            * 111:撤回消息回执<br/>
         public static final int REVOKE = 111;
         //2.3.0版本的消息撤回类型，兼容单人撤回，群撤回，新增群主管理员撤回成员信息

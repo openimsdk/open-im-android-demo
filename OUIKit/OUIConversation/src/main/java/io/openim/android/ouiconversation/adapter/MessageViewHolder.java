@@ -3,12 +3,19 @@ package io.openim.android.ouiconversation.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +26,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import io.openim.android.ouiconversation.IBridgeImpl;
 import io.openim.android.ouiconversation.R;
 
 import io.openim.android.ouiconversation.databinding.LayoutLoadingSmallBinding;
@@ -63,9 +72,11 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.entity.CallHistory;
+import io.openim.android.ouicore.entity.MeetingInfo;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
+import io.openim.android.ouicore.services.IMeetingBridge;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.ByteUtil;
@@ -104,9 +115,7 @@ public class MessageViewHolder {
 
         if (viewType == Constant.MsgType.OA_NOTICE) return new NotificationItemHo(parent);
 
-        if (viewType >= Constant.MsgType.NOTICE
-            || viewType == Constant.MsgType.REVOKE
-            || viewType == Constant.MsgType.ADVANCED_REVOKE)
+        if (viewType >= Constant.MsgType.NOTICE || viewType == Constant.MsgType.REVOKE || viewType == Constant.MsgType.ADVANCED_REVOKE)
             return new NoticeView(parent);
 
         if (viewType == Constant.MsgType.MERGE) return new MergeView(parent);
@@ -115,8 +124,9 @@ public class MessageViewHolder {
 
         if (viewType == Constant.MsgType.QUOTE) return new QuoteTXTView(parent);
 
-        if (viewType == Constant.MsgType.LOCAL_CALL_HISTORY)
-            return new CallHistoryView(parent);
+        if (viewType == Constant.MsgType.LOCAL_CALL_HISTORY) return new CallHistoryView(parent);
+
+        if (viewType == Constant.MsgType.CUSTOMIZE_MEETING) return new MeetingInviteView(parent);
 
         return new TXTView(parent);
     }
@@ -238,10 +248,7 @@ public class MessageViewHolder {
                         isLongClick.set(false);
                         return;
                     }
-                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                        .withString(Constant.K_ID, message.getSendID())
-                        .withString(Constant.K_GROUP_ID, message.getGroupID())
-                        .navigation();
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, message.getSendID()).withString(Constant.K_GROUP_ID, message.getGroupID()).navigation();
                 });
             }
             if (null != chatVM.enableMultipleSelect.getValue() && chatVM.enableMultipleSelect.getValue() && message.getContentType() != Constant.MsgType.NOTICE) {
@@ -265,9 +272,7 @@ public class MessageViewHolder {
 
             int viewType = message.getContentType();
             unRead.setVisibility(View.GONE);
-            if (isOwn && message.getStatus() == Constant.Send_State.SEND_SUCCESS && viewType < Constant.MsgType.NOTICE && viewType
-                != Constant.MsgType.REVOKE && viewType != Constant.MsgType.LOCAL_CALL_HISTORY
-                && viewType != Constant.MsgType.ADVANCED_REVOKE) {
+            if (isOwn && message.getStatus() == Constant.Send_State.SEND_SUCCESS && viewType < Constant.MsgType.NOTICE && viewType != Constant.MsgType.REVOKE && viewType != Constant.MsgType.LOCAL_CALL_HISTORY && viewType != Constant.MsgType.ADVANCED_REVOKE) {
                 unRead.setVisibility(View.VISIBLE);
                 if (chatVM.isSingleChat) {
                     String unread =
@@ -391,15 +396,22 @@ public class MessageViewHolder {
                         menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.withdraw));
                     }
                 }
-                menuIcons.add(R.mipmap.ic_forward);
-                menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.forward));
+                if (message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING) {
+                    menuIcons.add(R.mipmap.ic_forward);
+                    menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.forward));
+                }
 
-                if (message.getContentType() != Constant.MsgType.VOICE && message.getContentType() != Constant.MsgType.MERGE) {
+                if (message.getContentType()
+                    != Constant.MsgType.VOICE
+                    && message.getContentType() != Constant.MsgType.MERGE
+                    && message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING) {
                     menuIcons.add(R.mipmap.ic_reply);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.reply));
                 }
-                menuIcons.add(R.mipmap.ic_multiple_choice);
-                menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.multiple_choice));
+                if (message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING) {
+                    menuIcons.add(R.mipmap.ic_multiple_choice);
+                    menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.multiple_choice));
+                }
 
                 LayoutMsgExMenuBinding vb =
                     LayoutMsgExMenuBinding.bind(popupWindow.getContentView());
@@ -518,6 +530,81 @@ public class MessageViewHolder {
 
         }
     }
+
+    //文本消息
+    public static class MeetingInviteView extends MessageViewHolder.MsgViewHolder {
+
+        public MeetingInviteView(ViewGroup itemView) {
+            super(itemView);
+        }
+
+        @Override
+        protected int getLeftInflatedId() {
+            return R.layout.layout_msg_txt_left;
+        }
+
+        @Override
+        protected int getRightInflatedId() {
+            return R.layout.layout_msg_txt_right;
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.P)
+        @Override
+        protected void bindLeft(View itemView, Message message) {
+            LayoutMsgTxtLeftBinding v = LayoutMsgTxtLeftBinding.bind(itemView);
+            v.avatar.load(message.getSenderFaceUrl());
+            v.content.setText(message.getContent());
+
+            v.content.setLineHeight(Common.dp2px(24));
+            SpannableStringBuilder spannableString = getSpannableStringBuilder(message);
+            v.content.setText(spannableString);
+            MsgExpand msgExpand = (MsgExpand) message.getExt();
+            onTap(v.content, msgExpand.meetingInfo);
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.P)
+        @Override
+        protected void bindRight(View itemView, Message message) {
+            LayoutMsgTxtRightBinding v = LayoutMsgTxtRightBinding.bind(itemView);
+            v.avatar2.load(message.getSenderFaceUrl());
+            v.sendState2.setSendState(message.getStatus());
+            v.content2.setLineHeight(Common.dp2px(24));
+            SpannableStringBuilder spannableString = getSpannableStringBuilder(message);
+            v.content2.setText(spannableString);
+            MsgExpand msgExpand = (MsgExpand) message.getExt();
+            onTap(v.content2, msgExpand.meetingInfo);
+        }
+
+        private void onTap(TextView view, MeetingInfo meetingInfo) {
+            view.setOnClickListener(v -> {
+                IMeetingBridge bridge =
+                    (IMeetingBridge) ARouter.getInstance().build(Routes.Service.MEETING).navigation();
+                if (null == bridge) return;
+                bridge.joinMeeting(meetingInfo.id);
+            });
+        }
+
+        @NonNull
+        private SpannableStringBuilder getSpannableStringBuilder(Message message) {
+            MsgExpand msgExpand = (MsgExpand) message.getExt();
+            SpannableStringBuilder spannableString = new SpannableStringBuilder();
+            spannableString.append("--\n");
+            ImageSpan imageSpan = new ImageSpan(BaseApp.inst(), R.mipmap.ic_meeting_tag);
+            spannableString.setSpan(imageSpan, 0, 2, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+            spannableString.append(msgExpand.meetingInfo.inviterNickname + BaseApp.inst().getString(io.openim.android.ouicore.R.string.Invite_you_join) + "\n");
+            spannableString.append("• " + BaseApp.inst().getString(io.openim.android.ouicore.R.string.meeting_theme) + "：" + msgExpand.meetingInfo.subject + "\n");
+            spannableString.append("• " + BaseApp.inst().getString(io.openim.android.ouicore.R.string.start_time) + "：" + msgExpand.meetingInfo.startTime + "\n");
+            spannableString.append("• " + BaseApp.inst().getString(io.openim.android.ouicore.R.string.meeting_duration) + "：" + msgExpand.meetingInfo.durationStr + "\n");
+            spannableString.append("• " + BaseApp.inst().getString(io.openim.android.ouicore.R.string.meeting_num) + "：" + msgExpand.meetingInfo.id + "\n");
+            int start = spannableString.length();
+            spannableString.append(BaseApp.inst().getString(io.openim.android.ouicore.R.string.msg_tap_tips));
+            int end = spannableString.length();
+            spannableString.setSpan(new ForegroundColorSpan(Color.parseColor("#FF5496EB")), start
+                , end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return spannableString;
+        }
+    }
+
 
     //文本消息
     public static class TXTView extends MessageViewHolder.MsgViewHolder {
@@ -681,34 +768,33 @@ public class MessageViewHolder {
         }
 
         private void clickPlay(Message message, LottieAnimationView lottieView) {
-           String sourceUrl=message.getSoundElem().getSourceUrl();
-           if (TextUtils.isEmpty(sourceUrl))return;
+            String sourceUrl = message.getSoundElem().getSourceUrl();
+            if (TextUtils.isEmpty(sourceUrl)) return;
             SPlayer.instance().getMediaPlayer();
             SPlayer.instance().stop();
-            SPlayer.instance().playByUrl(sourceUrl,
-                new PlayerListener() {
-                    @Override
-                    public void LoadSuccess(SMediaPlayer mediaPlayer) {
-                        mediaPlayer.start();
-                    }
+            SPlayer.instance().playByUrl(sourceUrl, new PlayerListener() {
+                @Override
+                public void LoadSuccess(SMediaPlayer mediaPlayer) {
+                    mediaPlayer.start();
+                }
 
-                    @Override
-                    public void Loading(SMediaPlayer mediaPlayer, int i) {
+                @Override
+                public void Loading(SMediaPlayer mediaPlayer, int i) {
 
-                    }
+                }
 
-                    @Override
-                    public void onCompletion(SMediaPlayer mediaPlayer) {
-                        mediaPlayer.stop();
-                        markRead(message, chatVM.conversationInfo.getValue().isPrivateChat());
-                    }
+                @Override
+                public void onCompletion(SMediaPlayer mediaPlayer) {
+                    mediaPlayer.stop();
+                    markRead(message, chatVM.conversationInfo.getValue().isPrivateChat());
+                }
 
-                    @Override
-                    public void onError(Exception e) {
-                        lottieView.cancelAnimation();
-                        lottieView.setProgress(1);
-                    }
-                });
+                @Override
+                public void onError(Exception e) {
+                    lottieView.cancelAnimation();
+                    lottieView.setProgress(1);
+                }
+            });
 
             SPlayer.instance().getMediaPlayer().setOnPlayStateListener(new SMediaPlayer.OnPlayStateListener() {
                 @Override

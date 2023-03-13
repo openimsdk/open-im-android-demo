@@ -33,4 +33,6 @@ public class MsgExpand {
     //呼叫时长
     public  String callDuration;
     // ------
+    //会议邀请信息
+    public  MeetingInfo meetingInfo;
 }

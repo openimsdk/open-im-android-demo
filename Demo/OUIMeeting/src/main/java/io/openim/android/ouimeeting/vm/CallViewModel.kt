@@ -36,6 +36,7 @@ class CallViewModel(
         listOf<Participant>(room.localParticipant) + remoteParticipants.keys.sortedBy { it }.mapNotNull { remoteParticipants[it] }
     }
 
+    private val scopes = mutableListOf<CoroutineScope>()
     private val mutableError = MutableStateFlow<Throwable?>(null)
     val error = mutableError.hide()
 
@@ -212,6 +213,8 @@ class CallViewModel(
     override fun onCleared() {
         super.onCleared()
         room.disconnect()
+        scopes.forEach { it.cancel() }
+        scopes.clear()
     }
 
     fun setMicEnabled(enabled: Boolean) {
@@ -246,11 +249,14 @@ class CallViewModel(
 
 
     fun buildScope(): CoroutineScope {
-        return CoroutineScope(Dispatchers.Main);
+        val scope = CoroutineScope(Dispatchers.Main);
+        scopes.add(scope)
+        return scope;
     }
 
     fun scopeCancel(scope: CoroutineScope) {
         scope.cancel()
+        scopes.remove(scope)
     }
 
     @JvmOverloads

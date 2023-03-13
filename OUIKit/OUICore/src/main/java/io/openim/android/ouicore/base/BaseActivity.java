@@ -120,8 +120,9 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         String key = vm.getClass().getCanonicalName();
         BaseViewModel viewModel = BaseApp.viewModels.get(key);
         if (null != viewModel && viewModel == vm) {
-            BaseApp.viewModels.remove(key);
+            vm.viewDestroy();
             vm.context.clear();
+            BaseApp.viewModels.remove(key);
         }
     }
 

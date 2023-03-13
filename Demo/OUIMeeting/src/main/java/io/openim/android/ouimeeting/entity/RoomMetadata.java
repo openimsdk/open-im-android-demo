@@ -19,9 +19,12 @@ public class RoomMetadata {
     public boolean joinDisableVideo;
     public boolean isMuteAllVideo;
     public boolean isMuteAllMicrophone;
+
     public List<String> canScreenUserIDList;
+    //   暂不使用
     public List<String> disableMicrophoneUserIDList;
     public List<String> disableVideoUserIDList;
+    //    ------
     public List<String> pinedUserIDList;
     public List<String> beWatchedUserIDList;
 }

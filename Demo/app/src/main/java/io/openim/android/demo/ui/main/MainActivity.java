@@ -61,7 +61,6 @@ import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.SystemBarUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
-import io.openim.android.ouimeeting.MeetingLaunchActivity;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
@@ -102,12 +101,6 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
         click();
         view.men1.setChecked(true);
-
-        demo();
-    }
-
-    private void demo() {
-        startActivity(new Intent(this, MeetingLaunchActivity.class));
     }
 
 

@@ -28,11 +28,14 @@ import androidx.core.app.NotificationCompat;
 import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.alibaba.fastjson.JSONArray;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import io.openim.android.ouicore.R;
@@ -47,6 +50,7 @@ import io.openim.android.ouicore.entity.GroupRightsTransferNotification;
 import io.openim.android.ouicore.entity.JoinKickedGroupNotification;
 import io.openim.android.ouicore.entity.LocationInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
+import io.openim.android.ouicore.entity.MeetingInfo;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.MuteMemberNotification;
@@ -151,8 +155,24 @@ public class IMUtil {
     public static Message buildExpandInfo(Message msg) {
         MsgExpand msgExpand = (MsgExpand) msg.getExt();
         if (null == msgExpand) msgExpand = new MsgExpand();
+        msg.setExt(msgExpand);
         try {
             if (msg.getContentType() == Constant.MsgType.CUSTOMIZE) {
+                Map map = JSONArray.parseObject(msg.getCustomElem().getData(), Map.class);
+                int customType = (int) map.get("customType");
+                if (customType == Constant.MsgType.CUSTOMIZE_MEETING) {
+                    msg.setContentType(customType);
+                    MeetingInfo meetingInfo = GsonHel.fromJson(map.get("data").toString(),
+                        MeetingInfo.class);
+                    meetingInfo.startTime = TimeUtil.getTime(meetingInfo.start*1000,
+                        TimeUtil.yearTimeFormat);
+                    BigDecimal bigDecimal =
+                        (BigDecimal.valueOf(meetingInfo.duration).divide(BigDecimal.valueOf(3600)
+                            , 1, BigDecimal.ROUND_HALF_DOWN));
+                    meetingInfo.durationStr =bigDecimal.toString() +BaseApp.inst().getString(R.string.hour);
+                    msgExpand.meetingInfo = meetingInfo;
+                    return msg;
+                }
                 msgExpand.callHistory = GsonHel.fromJson(msg.getCustomElem().getData(),
                     CallHistory.class);
                 if (TextUtils.isEmpty(msgExpand.callHistory.getRoomID())) return msg;
@@ -163,6 +183,7 @@ public class IMUtil {
                 String secondFormat = TimeUtil.secondFormat(second, TimeUtil.secondFormat);
                 msgExpand.callDuration =
                     BaseApp.inst().getString(io.openim.android.ouicore.R.string.call_time) + (second < 60 ? ("00:" + secondFormat) : secondFormat);
+                return msg;
             }
             if (msg.getContentType() == Constant.MsgType.QUOTE) {
                 buildExpandInfo(msg.getQuoteElem().getQuoteMessage());
@@ -466,6 +487,10 @@ public class IMUtil {
                     boolean isAudio = msgExpand.callHistory.getType().equals("audio");
                     lastMsg = "[" + (isAudio ? BaseApp.inst().getString(R.string.voice_calls) :
                         BaseApp.inst().getString(R.string.video_calls)) + "]";
+                    break;
+                case Constant.MsgType.CUSTOMIZE_MEETING:
+                    lastMsg =
+                        "[" + BaseApp.inst().getString(R.string.video_meeting) + "]";
                     break;
             }
         } catch (Exception e) {

@@ -7,6 +7,7 @@ public class Routes {
         public final static String CALLING = "/CallingService/CallingServiceImp";
         public static final String CONVERSATION = "/ConversationService/IBridgeImpl";
         public static final String MOMENTS = "/MomentsService/IBridgeImpl";
+        public static final String MEETING = "/MeetingService/IBridgeImpl";
     }
 
     public static class Main {
@@ -70,5 +71,8 @@ public class Routes {
     public static class Moments{
         public static final String HOME = "/moments/CircleFragment";
     }
-
+    //会议
+    public static class Meeting{
+        public static final String HOME = "/meeting/MeetingLaunchActivity";
+    }
 }
