@@ -99,6 +99,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     public void init() {
         callViewModel = new CallViewModel(BaseApp.inst());
         callViewModel.subscribe(callViewModel.getRoomMetadata(), (v) -> {
+            L.e("-------room subscribe--------"+callViewModel.getRoom().getLocalParticipant().getConnectionQuality());
             fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
             return null;
         });

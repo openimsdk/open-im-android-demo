@@ -1,7 +1,4 @@
 package io.openim.android.ouimeeting;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -9,7 +6,6 @@ import android.view.View;
 
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.ouimeeting.databinding.ActivityJoinMeetingBinding;

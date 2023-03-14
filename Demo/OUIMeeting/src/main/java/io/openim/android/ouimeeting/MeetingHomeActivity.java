@@ -8,41 +8,30 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
-import io.livekit.android.events.ParticipantEvent;
 import io.livekit.android.renderer.TextureViewRenderer;
 import io.livekit.android.room.participant.ConnectionQuality;
-import io.livekit.android.room.participant.LocalParticipant;
 import io.livekit.android.room.participant.Participant;
-import io.livekit.android.room.participant.RemoteParticipant;
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.entity.LoginCertificate;
-import io.openim.android.ouicore.entity.MeetingInfo;
-import io.openim.android.ouicore.entity.MeetingInfoAttach;
 import io.openim.android.ouicore.entity.ParticipantMeta;
-import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
@@ -54,21 +43,12 @@ import io.openim.android.ouimeeting.databinding.ActivityMeetingHomeBinding;
 import io.openim.android.ouimeeting.databinding.LayoutMemberDialogBinding;
 import io.openim.android.ouimeeting.databinding.LayoutUserStatusBinding;
 import io.openim.android.ouimeeting.databinding.MeetingIietmMemberBinding;
-import io.openim.android.ouimeeting.entity.RoomMetadata;
 import io.openim.android.ouimeeting.vm.MeetingVM;
-import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.listener.OnMsgSendCallback;
-import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.OfflinePushInfo;
-import io.openim.android.sdk.models.SignalingInfo;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
 import kotlinx.coroutines.CoroutineScope;
-import kotlinx.coroutines.Dispatchers;
-import kotlinx.coroutines.flow.SharedFlow;
 import kotlinx.coroutines.flow.StateFlow;
 
 public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeetingHomeBinding> implements MeetingVM.Interaction {
@@ -117,8 +97,18 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                 view.memberRecyclerView.setVisibility(View.GONE);
             }
         });
-        view.mic.setOnClickListener(v -> vm.callViewModel.setMicEnabled(view.mic.isChecked()));
-        view.camera.setOnClickListener(v -> vm.callViewModel.setCameraEnabled(view.camera.isChecked()));
+        view.mic.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                vm.callViewModel.setMicEnabled(view.mic.isChecked());
+            }
+        });
+        view.camera.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                vm.callViewModel.setCameraEnabled(view.camera.isChecked());
+            }
+        });
         view.shareScreen.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 requestMediaProjection();
@@ -244,6 +234,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         view.memberRecyclerView.setAdapter(adapter = new RecyclerViewAdapter<Participant,
             UserStreamViewHolder>(UserStreamViewHolder.class) {
 
+
             @Override
             public void onBindView(@NonNull UserStreamViewHolder holder, Participant data,
                                    int position) {
@@ -256,30 +247,21 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
                     String name = getMetaUserName(participantMeta);
                     String faceURL = participantMeta.userInfo.getFaceURL();
-                    holder.view.name.setText(name);
-                    holder.view.avatar.load(faceURL);
-                    final AtomicBoolean isOpenCamera =
-                        new AtomicBoolean(participant.isCameraEnabled());
-                    smallUserStatus(holder, isOpenCamera.get());
-                    bindConnectionQuality(holder.view, participant.getConnectionQuality());
-                    userStatusViewBind(holder.view, participant.getEvents().getEvents(), isOpen -> {
+                    bindUserStatus(holder.view, name, faceURL, participant);
+                    smallWindowSwitch(holder, participant.isCameraEnabled());
+                    AtomicReference<Boolean> isOpenCamera =
+                        new AtomicReference<>(participant.isCameraEnabled());
+                    subscribeUserStatus(holder.view, participant, isOpen -> {
                         isOpenCamera.set(isOpen);
-                        smallUserStatus(holder, isOpen);
+                        smallWindowSwitch(holder, isOpen);
                     });
 
-                    final String finalName = name;
                     holder.view.getRoot().setOnClickListener(v -> {
-                        centerCov(isOpenCamera.get());
-                        bindCenterUser(finalName, faceURL, participant);
-                        bindRemoteViewRenderer(view.centerTextureView, participant);
+                        centerHandle(isOpenCamera.get(), participant, name, faceURL);
                     });
                     if (position == 0) {
-                        centerCov(isOpenCamera.get());
-                        bindCenterUser(finalName, faceURL, participant);
-                        bindRemoteViewRenderer(view.centerTextureView, participant);
+                        centerHandle(isOpenCamera.get(), participant, name, faceURL);
                     }
-                    holder.view.mc.setVisibility(vm.isHostUser(participant) ? View.VISIBLE :
-                        View.GONE);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -287,9 +269,22 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             }
 
             /**
+             * 屏幕中间直播画面数据处理
+             */
+            private void centerHandle(boolean isOpenCamera, Participant participant, String name,
+                                      String faceURL) {
+                centerCov(isOpenCamera);
+                bindRemoteViewRenderer(view.centerTextureView, participant);
+                bindUserStatus(view.centerUser, name, faceURL, participant);
+                subscribeUserStatus(view.centerUser, participant, isOpen -> {
+                    centerCov(isOpen);
+                });
+            }
+
+            /**
              * 下边小窗口状态切换
              */
-            private void smallUserStatus(@NonNull UserStreamViewHolder holder, Boolean isOpen) {
+            private void smallWindowSwitch(@NonNull UserStreamViewHolder holder, Boolean isOpen) {
                 if (isOpen) {
                     holder.view.userStatus.setVisibility(View.GONE);
                     holder.view.textureView.setVisibility(View.VISIBLE);
@@ -307,17 +302,16 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         return name;
     }
 
-
-    private void bindCenterUser(String nickname, String faceUrl, Participant participant) {
-        view.centerUser.name.setText(nickname);
-        view.centerUser.avatar.load(faceUrl);
-        view.centerUser.mc.setVisibility(vm.isHostUser(participant) ? View.VISIBLE : View.GONE);
-        view.centerUser.mic.setImageResource(participant.isMicrophoneEnabled() ?
+    private void bindUserStatus(LayoutUserStatusBinding view, String nickname, String faceUrl,
+                                Participant participant) {
+        if (null != nickname) view.name.setText(nickname);
+        if (null != faceUrl) view.avatar.load(faceUrl);
+        view.mc.setVisibility(vm.isHostUser(participant) ? View.VISIBLE : View.GONE);
+        view.mic.setImageResource(participant.isMicrophoneEnabled() ?
             io.openim.android.ouicore.R.mipmap.ic__mic_on :
             io.openim.android.ouicore.R.mipmap.ic__mic_off);
-        bindConnectionQuality(view.centerUser, participant.getConnectionQuality());
-
-        userStatusViewBind(view.centerUser, participant.getEvents().getEvents(), this::centerCov);
+        L.e("-------bindUserStatus--------"+participant.getConnectionQuality());
+        bindConnectionQuality(view, participant.getConnectionQuality());
     }
 
     @NonNull
@@ -364,22 +358,20 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         });
     }
 
-    private void userStatusViewBind(LayoutUserStatusBinding holder,
-                                    SharedFlow<ParticipantEvent> sharedFlow,
-                                    CameraOpenListener cameraOpenListener) {
+    private void subscribeUserStatus(LayoutUserStatusBinding holder, Participant participant,
+                                     CameraOpenListener cameraOpenListener) {
         final CoroutineScope scope = bindCoroutineScope(holder.userStatus);
 
-        vm.callViewModel.subscribe(sharedFlow, (v) -> {
-            holder.mic.setImageResource(v.getParticipant().isMicrophoneEnabled() ?
-                io.openim.android.ouicore.R.mipmap.ic__mic_on :
-                io.openim.android.ouicore.R.mipmap.ic__mic_off);
-
-            if (null != cameraOpenListener)
+        vm.callViewModel.subscribe(participant.getEvents().getEvents(), (v) -> {
+            L.e("-------subscribe--------");
+            bindUserStatus(holder, null, null, v.getParticipant());
+            if (null != cameraOpenListener) {
                 cameraOpenListener.onOpen(v.getParticipant().isCameraEnabled());
-
+            }
             StateFlow<ConnectionQuality> flow =
                 vm.callViewModel.getConnectionFlow(v.getParticipant());
             vm.callViewModel.subscribe(flow, (quality) -> {
+                L.e("-------quality subscribe--------");
                 bindConnectionQuality(holder, quality);
                 return null;
             }, scope);

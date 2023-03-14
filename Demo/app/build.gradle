@@ -31,21 +31,19 @@ android {
             rootProject.ext.androidConfig.abiFilters
         }
         //getui
-        manifestPlaceholders = [
-            GETUI_APPID: "",
+        manifestPlaceholders = [GETUI_APPID    : "",
 
-            XIAOMI_APP_ID   : "",
-            XIAOMI_APP_KEY  : "",
-            MEIZU_APP_ID    : "",
-            MEIZU_APP_KEY   : "",
-            HUAWEI_APP_ID   : "",
-            OPPO_APP_KEY    : "",
-            OPPO_APP_SECRET : "",
-            VIVO_APP_ID     : "",
-            VIVO_APP_KEY    : "",
-            // 荣耀相关应用参数
-            HONOR_APP_ID   : "",
-        ]
+                                XIAOMI_APP_ID  : "",
+                                XIAOMI_APP_KEY : "",
+                                MEIZU_APP_ID   : "",
+                                MEIZU_APP_KEY  : "",
+                                HUAWEI_APP_ID  : "",
+                                OPPO_APP_KEY   : "",
+                                OPPO_APP_SECRET: "",
+                                VIVO_APP_ID    : "",
+                                VIVO_APP_KEY   : "",
+                                // 荣耀相关应用参数
+                                HONOR_APP_ID   : "",]
     }
     signingConfigs {
         release {
@@ -111,7 +109,7 @@ dependencies {
         implementation project(':OUIConversation')
         implementation project(':OUIGroup')
         implementation project(':OUIContact')
-         implementation project(':OUICalling')
+        implementation project(':OUICalling')
         implementation project(':OUIMoments')
         implementation project(':OUIMeeting')
     }
