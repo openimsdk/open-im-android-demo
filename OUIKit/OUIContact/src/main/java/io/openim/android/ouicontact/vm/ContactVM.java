@@ -1,19 +1,12 @@
 package io.openim.android.ouicontact.vm;
 
-import android.text.TextUtils;
-
-import androidx.databinding.ObservableInt;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.im.IMEvent;
-import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
@@ -58,8 +51,8 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
     }
 
     @Override
-    protected void viewDestroy() {
-        super.viewDestroy();
+    protected void releaseRes() {
+        super.releaseRes();
         IMEvent.getInstance().removeGroupListener(this);
         IMEvent.getInstance().removeFriendListener(this);
     }

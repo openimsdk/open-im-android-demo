@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <variable
+            name="meetingVM"
+            type="io.openim.android.ouimeeting.vm.MeetingVM" />
+    </data>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/sty_radius_25_bottom_white"
+        android:gravity="center_horizontal"
+        android:minHeight="350dp"
+        android:orientation="vertical"
+        tools:ignore="MissingDefaultResource">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:layout_centerHorizontal="true"
+                android:text="@string/meeting_setting"
+                android:textColor="#ff16191c"
+                android:textSize="17sp" />
+            <TextView
+                android:id="@+id/sure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sure"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:padding="16dp"
+                android:textColor="#ff0089ff"
+                android:textSize="17sp"
+                />
+        </RelativeLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/allow_cancel_mute"
+                android:textColor="#ff16191c"
+                android:textSize="17sp" />
+
+            <io.openim.android.ouicore.widget.SlideButton
+                android:id="@+id/allowCancelMute"
+                android:layout_width="45dp"
+                android:checked="true"
+                android:layout_height="25dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/allow_open_camera"
+                android:textColor="#ff16191c"
+                android:textSize="17sp" />
+
+            <io.openim.android.ouicore.widget.SlideButton
+                android:id="@+id/allowOpenCamera"
+                android:layout_width="45dp"
+                android:layout_height="25dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/only_host_share"
+                android:textColor="#ff16191c"
+                android:textSize="17sp" />
+
+            <io.openim.android.ouicore.widget.SlideButton
+                android:id="@+id/onlyHostShare"
+                android:layout_width="45dp"
+                android:layout_height="25dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/only_host_invite"
+                android:textColor="#ff16191c"
+                android:textSize="17sp" />
+
+            <io.openim.android.ouicore.widget.SlideButton
+                android:id="@+id/onlyHostInvite"
+                android:layout_width="45dp"
+                android:layout_height="25dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/join_mute"
+                android:textColor="#ff16191c"
+                android:textSize="17sp" />
+
+            <io.openim.android.ouicore.widget.SlideButton
+                android:id="@+id/joinMute"
+                android:checked="true"
+                android:layout_width="45dp"
+                android:layout_height="25dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</layout>

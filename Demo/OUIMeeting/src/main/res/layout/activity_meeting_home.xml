@@ -78,6 +78,7 @@
             </LinearLayout>
 
             <ImageView
+                android:id="@+id/down"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -86,6 +87,7 @@
                 android:src="@mipmap/ic_white_down" />
 
             <TextView
+                android:id="@+id/end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -116,12 +118,21 @@
                 android:id="@+id/centerUser"
                 layout="@layout/layout_user_status"
                 android:layout_width="115dp"
-                android:visibility="gone"
                 android:layout_height="115dp"
                 android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true" />
+                android:layout_centerVertical="true"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/centerUser2"
+                layout="@layout/layout_user_status"
+                android:layout_width="115dp"
+                android:visibility="gone"
+                android:layout_alignParentRight="true"
+                android:layout_height="115dp" />
 
             <ImageView
+                android:id="@+id/landscape"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -206,10 +217,10 @@
                     android:id="@+id/shareScreen"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:alpha="@{meetingVM.sharePermission?(1.0f):(0.3f)}"
                     android:button="@null"
                     android:drawableTop="@drawable/selector_m_shared_screen"
                     android:drawablePadding="7dp"
-                    android:alpha="@{meetingVM.sharePermission?(1.0f):(0.3f)}"
                     android:enabled="@{meetingVM.sharePermission}"
                     android:gravity="center"
                     android:text="@string/shared_screen"
@@ -222,10 +233,10 @@
                     android:layout_weight="1" />
 
                 <CheckBox
+                    android:id="@+id/member"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:button="@null"
-                    android:id="@+id/member"
                     android:drawableTop="@mipmap/ic_m_member"
                     android:drawablePadding="7dp"
                     android:gravity="center"
@@ -240,6 +251,7 @@
                     android:visibility="@{meetingVM.isSelfHostUser?View.VISIBLE:View.GONE}" />
 
                 <CheckBox
+                    android:id="@+id/setting"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:button="@null"
@@ -249,7 +261,7 @@
                     android:text="@string/setting"
                     android:textColor="#ffffffff"
                     android:textSize="10sp"
-                    android:visibility="@{meetingVM.isSelfHostUser?View.VISIBLE:View.GONE}"/>
+                    android:visibility="@{meetingVM.isSelfHostUser?View.VISIBLE:View.GONE}" />
 
             </LinearLayout>
         </LinearLayout>

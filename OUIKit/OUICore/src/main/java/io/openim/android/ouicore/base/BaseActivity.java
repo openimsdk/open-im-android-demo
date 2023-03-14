@@ -1,60 +1,52 @@
 package io.openim.android.ouicore.base;
 
 
-import static android.os.Build.VERSION_CODES.LOLLIPOP;
-import static android.os.Build.VERSION_CODES.M;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.alibaba.android.arouter.launcher.ARouter;
-
-import java.lang.reflect.Field;
-
-import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.net.RXRetrofit.N;
-import io.openim.android.ouicore.services.CallingService;
 
-import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
-import io.openim.android.sdk.OpenIMClient;
 
 
 public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> extends AppCompatActivity implements IView {
+    //是否释放资源
     private boolean isRelease = true;
+    //已经释放资源
+    private boolean released = false;
 
     protected T vm;
     protected A view;
     private String vmCanonicalName;
 
 
-    @SuppressLint("SourceLockedOrientationActivity")
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        requestedOrientation();
         super.onCreate(savedInstanceState);
         if (null != vm) {
             vm.viewCreate();
         }
         setLightStatus();
+    }
+    @SuppressLint("SourceLockedOrientationActivity")
+    protected void requestedOrientation() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
     protected void bindViewDataBinding(A viewDataBinding) {
@@ -90,8 +82,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     protected void setLightStatus() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
     }
 
@@ -120,7 +111,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         String key = vm.getClass().getCanonicalName();
         BaseViewModel viewModel = BaseApp.viewModels.get(key);
         if (null != viewModel && viewModel == vm) {
-            vm.viewDestroy();
+            vm.releaseRes();
             vm.context.clear();
             BaseApp.viewModels.remove(key);
         }
@@ -135,22 +126,26 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     @Override
     protected void onPause() {
-        super.onPause();
         if (null != vm) {
             vm.viewPause();
-            if (isFinishing() && isRelease) {
-                vm.viewDestroy();
-            }
+            releaseRes();
+        }
+        super.onPause();
+    }
+
+    private void releaseRes() {
+        if (isFinishing()
+            && isRelease && !released) {
+            released = true;
+            vm.releaseRes();
         }
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         N.clearDispose(this);
-        if (null != vm && isRelease) {
-            vm.viewDestroy();
-        }
+        releaseRes();
+        super.onDestroy();
     }
 
 

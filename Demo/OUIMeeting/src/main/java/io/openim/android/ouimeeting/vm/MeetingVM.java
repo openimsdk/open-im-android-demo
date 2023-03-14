@@ -32,6 +32,7 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.ouimeeting.R;
 import io.openim.android.ouimeeting.entity.RoomMetadata;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
@@ -51,7 +52,7 @@ import kotlinx.coroutines.flow.FlowCollector;
 
 public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     //上次摄像头开关、上次麦克风开关、是否有开启权限
-    boolean lastCameraEnabled, lastMicEnabled, lastIsMuteAllVideo;
+    boolean lastCameraEnabled, lastIsMuteAllVideo;
     //通话时间
     private Timer timer;
     private int second = 0;
@@ -68,11 +69,11 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     public List<UserInfo> userInfos = new ArrayList<>();
 
     //下边菜单栏可点击权限
-    public MutableLiveData<Boolean> micPermission = new MutableLiveData<>();
-    public MutableLiveData<Boolean> cameraPermission = new MutableLiveData<>();
-    public MutableLiveData<Boolean> sharePermission = new MutableLiveData<>();
-    public MutableLiveData<Boolean> memberPermission = new MutableLiveData<>();
-    public MutableLiveData<Boolean> isSelfHostUser = new MutableLiveData<>();
+    public MutableLiveData<Boolean> micPermission = new MutableLiveData<>(false);
+    public MutableLiveData<Boolean> cameraPermission = new MutableLiveData<>(false);
+    public MutableLiveData<Boolean> sharePermission = new MutableLiveData<>(false);
+    public MutableLiveData<Boolean> memberPermission = new MutableLiveData<>(false);
+    public MutableLiveData<Boolean> isSelfHostUser = new MutableLiveData<>(false);
 
     public void buildTimer() {
         cancelTimer();
@@ -99,7 +100,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     public void init() {
         callViewModel = new CallViewModel(BaseApp.inst());
         callViewModel.subscribe(callViewModel.getRoomMetadata(), (v) -> {
-            L.e("-------room subscribe--------"+callViewModel.getRoom().getLocalParticipant().getConnectionQuality());
+            L.e("-------room subscribe--------" + callViewModel.getRoom().getLocalParticipant().getConnectionQuality());
             fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
             return null;
         });
@@ -122,9 +123,8 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
         createMeeting(name, startTime, 2 * 60 * 60);
     }
 
-    public void joinMeeting(String roomID) {
-        //3185791707
-        OpenIMClient.getInstance().signalingManager.signalingJoinMeeting(new OnBase<SignalingCertificate>() {
+    private final OnBase<SignalingCertificate> signalingCertificateCallBack =
+        new OnBase<SignalingCertificate>() {
             @Override
             public void onError(int code, String error) {
                 getIView().onError(error);
@@ -132,54 +132,48 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
             @Override
             public void onSuccess(SignalingCertificate data) {
+                if (isDestroy || null == data) return;
                 signalingCertificate = data;
                 getIView().onSuccess(data);
             }
-        }, roomID, null, null);
+        };
+
+    public void joinMeeting(String roomID) {
+        //3185791707
+        OpenIMClient.getInstance().signalingManager.signalingJoinMeeting(signalingCertificateCallBack, roomID, null, null);
     }
 
     public void createMeeting(String meetingName, long startTime, int duration) {
-        OpenIMClient.getInstance().signalingManager.signalingCreateMeeting(new OnBase<SignalingCertificate>() {
-            @Override
-            public void onError(int code, String error) {
-                getIView().toast(error);
-            }
-
-            @Override
-            public void onSuccess(SignalingCertificate data) {
-                signalingCertificate = data;
-                getIView().onSuccess(data);
-            }
-        }, meetingName, BaseApp.inst().loginCertificate.userID, startTime, duration, null, null);
+        OpenIMClient.getInstance().signalingManager.signalingCreateMeeting(signalingCertificateCallBack, meetingName, BaseApp.inst().loginCertificate.userID, startTime, duration, null, null);
     }
 
     public void connectRoom() {
+        if (null == signalingCertificate) return;
         callViewModel.connectToRoom(signalingCertificate.getLiveURL(),
             signalingCertificate.getToken(), new Continuation<Unit>() {
-            @NonNull
-            @Override
-            public CoroutineContext getContext() {
-                return EmptyCoroutineContext.INSTANCE;
-            }
+                @NonNull
+                @Override
+                public CoroutineContext getContext() {
+                    return EmptyCoroutineContext.INSTANCE;
+                }
 
-            @Override
-            public void resumeWith(@NonNull Object o) {
-                Common.UIHandler.post(() -> {
-                    buildTimer();
-                    fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
+                @Override
+                public void resumeWith(@NonNull Object o) {
+                    Common.UIHandler.post(() -> {
+                        buildTimer();
+                        fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
 
 //                        callViewModel.setCameraEnabled(roomMetadata.getValue().joinDisableVideo);
-                    callViewModel.setCameraEnabled(false);
-                    callViewModel.setMicEnabled(roomMetadata.getValue().joinDisableMicrophone);
+                        callViewModel.setCameraEnabled(false);
+                        callViewModel.setMicEnabled(roomMetadata.getValue().joinDisableMicrophone);
 
-                    VideoTrack localVideoTrack =
-                        callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
-                    getIView().connectRoomSuccess(localVideoTrack);
-                });
-            }
-        });
+                        VideoTrack localVideoTrack =
+                            callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
+                        getIView().connectRoomSuccess(localVideoTrack);
+                    });
+                }
+            });
     }
-
 
 
     private void handlePermission() {
@@ -194,6 +188,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
             micPermission.setValue(meta.participantCanUnmuteSelf);
             cameraPermission.setValue(meta.participantCanEnableVideo);
             sharePermission.setValue(!meta.onlyHostShareScreen);
+            memberPermission.setValue(!meta.onlyHostInviteUser);
         }
     }
 
@@ -229,7 +224,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     public void startShareScreen(Intent data) {
         lastCameraEnabled = callViewModel.getRoom().getLocalParticipant().isCameraEnabled();
-        lastIsMuteAllVideo =cameraPermission.getValue();
+        lastIsMuteAllVideo = cameraPermission.getValue();
 
         callViewModel.setCameraEnabled(false);
         cameraPermission.setValue(false);
@@ -343,9 +338,24 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
             @Override
             public void onSuccess(String data) {
-                onSuccessListener.onSuccess(data);
+                if (null != onSuccessListener) onSuccessListener.onSuccess(data);
             }
         }, configure);
+    }
+
+    public void finishMeeting() {
+        OpenIMClient.getInstance().signalingManager.signalingCloseRoom(new OnBase<MeetingInfoList>() {
+            @Override
+            public void onError(int code, String error) {
+                getIView().toast(error);
+            }
+
+            @Override
+            public void onSuccess(MeetingInfoList data) {
+                getIView().toast(BaseApp.inst()
+                    .getString(io.openim.android.ouicore.R.string.meeting_finish));
+            }
+        }, signalingCertificate.getRoomID());
     }
 
 
@@ -354,12 +364,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     }
 
     public void onCleared() {
-        callViewModel.onCleared();
+        if (null != callViewModel) callViewModel.onCleared();
         cancelTimer();
-    }
-
-    @Override
-    protected void viewPause() {
-        super.viewPause();
     }
 }

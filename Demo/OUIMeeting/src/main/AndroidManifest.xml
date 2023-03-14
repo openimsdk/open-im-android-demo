@@ -9,6 +9,9 @@
         <activity
             android:name=".MeetingLaunchActivity"
             android:exported="false" />
+        <activity
+            android:name=".JoinMeetingActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

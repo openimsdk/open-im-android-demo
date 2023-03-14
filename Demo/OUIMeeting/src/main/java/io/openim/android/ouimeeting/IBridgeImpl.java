@@ -4,6 +4,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 
@@ -26,6 +27,7 @@ public class IBridgeImpl implements IMeetingBridge, MeetingVM.Interaction {
     public void init(Context context) {
         this.context = context;
         waitDialog = new WaitDialog(context);
+        waitDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
     }
 
 
@@ -46,6 +48,7 @@ public class IBridgeImpl implements IMeetingBridge, MeetingVM.Interaction {
 
     @Override
     public void onError(String error) {
+        BaseApp.inst().removeCacheVM(MeetingVM.class);
         waitDialog.dismiss();
         Toast.makeText(context,
             context.getString(io.openim.android.ouicore.R.string.meeting_has_ended),
