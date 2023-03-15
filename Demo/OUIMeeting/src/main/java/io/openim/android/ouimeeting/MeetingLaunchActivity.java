@@ -59,6 +59,9 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
     }
 
     private void listener() {
+        view.timing.setOnClickListener(v -> {
+
+        });
         view.timely.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {

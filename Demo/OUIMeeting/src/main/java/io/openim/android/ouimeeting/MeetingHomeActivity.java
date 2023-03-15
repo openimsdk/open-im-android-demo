@@ -8,8 +8,10 @@ import android.graphics.Color;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -79,8 +81,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     private RecyclerViewAdapter<Participant, UserStreamViewHolder> adapter;
     private BottomPopDialog bottomPopDialog, settingPopDialog, meetingInfoPopDialog, exitPopDialog;
     private RecyclerViewAdapter<Participant, MemberItemViewHolder> memberAdapter;
-    //切换横屏
-    private boolean isLandscape;
+    //触发横屏 决定当前绑定的MeetingVM 是否释放
+    private boolean triggerLandscape = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,43 +91,66 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         bindViewDataBinding(ActivityMeetingHomeBinding.inflate(getLayoutInflater()));
         initView();
 
-        if (null != savedInstanceState)
-            isLandscape = savedInstanceState.getBoolean(Constant.K_RESULT, false);
-        if (isLandscape)
-            connectRoomSuccess(vm.callViewModel
-                .getVideoTrack(vm.callViewModel.getRoom().getLocalParticipant()));
-        else init();
+        if (vm.isInit) {
+            if (vm.isLandscape)
+                toast(getString(io.openim.android.ouicore.R.string.double_tap_tips));
+            connectRoomSuccess(vm.callViewModel.getVideoTrack(vm.callViewModel.getRoom().getLocalParticipant()));
+        } else init();
 
         bindVM();
         listener();
+
+        if (vm.isLandscape) Common.UIHandler.post(() -> setMemberExpand(view.expand));
     }
+
 
     @Override
     protected void requestedOrientation() {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
     @Override
     public void onBackPressed() {
-
     }
+
 
     //分享屏幕
     private ActivityResultLauncher<Intent> screenCaptureIntentLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            int resultCode = result.getResultCode();
-            Intent data = result.getData();
-            if (resultCode != Activity.RESULT_OK || data == null) {
-                return;
+        int resultCode = result.getResultCode();
+        Intent data = result.getData();
+        if (resultCode != Activity.RESULT_OK || data == null) {
+            return;
+        }
+        vm.startShareScreen(data);
+        toast(getString(io.openim.android.ouicore.R.string.share_screen));
+    });
+    private final GestureDetector gestureDetector = new GestureDetector(BaseApp.inst(),
+        new GestureDetector.SimpleOnGestureListener() {
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            boolean isEx = getViewBooleanTag(view.topTitle);
+            view.topTitle.setTag(!isEx);
+            if (isEx) {
+                view.topTitle.setVisibility(View.VISIBLE);
+                view.bottomMenu.setVisibility(View.VISIBLE);
+            } else {
+                view.topTitle.setVisibility(View.GONE);
+                view.bottomMenu.setVisibility(View.GONE);
             }
-            vm.startShareScreen(data);
-            toast(getString(io.openim.android.ouicore.R.string.share_screen));
-        });
-
+            return super.onDoubleTap(e);
+        }
+    });
 
     private void listener() {
+        if (vm.isInit && vm.isLandscape) {
+            view.center.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
+        }
         view.landscape.setOnClickListener(v -> {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            triggerLandscape = true;
+            vm.isInit = true;
+            setRequestedOrientation(vm.isLandscape ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT :
+                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            vm.isLandscape = !vm.isLandscape;
         });
 
         View.OnClickListener clickListener = v -> {
@@ -156,30 +181,10 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             });
         });
         view.expand.setOnClickListener(v -> {
-            Object tag = v.getTag();
-            if (null == tag) tag = false;
-            boolean isExpand = (boolean) tag;
-            v.setTag(!isExpand);
-            if (isExpand) {
-                v.setRotationX(0);
-                view.memberRecyclerView.setVisibility(View.VISIBLE);
-            } else {
-                v.setRotationX(180);
-                view.memberRecyclerView.setVisibility(View.GONE);
-            }
+            setMemberExpand(v);
         });
-        view.mic.setOnClickListener(new OnDedrepClickListener() {
-            @Override
-            public void click(View v) {
-                vm.callViewModel.setMicEnabled(view.mic.isChecked());
-            }
-        });
-        view.camera.setOnClickListener(new OnDedrepClickListener() {
-            @Override
-            public void click(View v) {
-                vm.callViewModel.setCameraEnabled(view.camera.isChecked());
-            }
-        });
+        view.mic.setOnClickListener(v -> vm.callViewModel.setMicEnabled(view.mic.isChecked()));
+        view.camera.setOnClickListener(v -> vm.callViewModel.setCameraEnabled(view.camera.isChecked()));
         view.shareScreen.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 requestMediaProjection();
@@ -215,6 +220,35 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             return null;
         }, vm.callViewModel.buildScope());
 
+        view.horn.setOnClickListener(v -> {
+            boolean isHorn = getViewBooleanTag(v);
+            v.setTag(!isHorn);
+            vm.isReceiver.setValue(!isHorn);
+        });
+        vm.isReceiver.observe(this, aBoolean -> {
+            vm.audioManager.setSpeakerphoneOn(!aBoolean);
+            view.horn.setImageResource(aBoolean ?  R.mipmap.ic_m_horn
+                :R.mipmap.ic_m_receiver);
+        });
+
+    }
+
+    private void setMemberExpand(View v) {
+        boolean isExpand = getViewBooleanTag(v);
+        v.setTag(!isExpand);
+        if (isExpand) {
+            v.setRotationX(0);
+            view.memberRecyclerView.setVisibility(View.VISIBLE);
+        } else {
+            v.setRotationX(180);
+            view.memberRecyclerView.setVisibility(View.GONE);
+        }
+    }
+
+    private boolean getViewBooleanTag(View v) {
+        Object tag = v.getTag();
+        if (null == tag) tag = false;
+        return (boolean) tag;
     }
 
     private void exit(Boolean isFinishMeeting) {
@@ -393,7 +427,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         view.memberRecyclerView.setAdapter(adapter = new RecyclerViewAdapter<Participant,
             UserStreamViewHolder>(UserStreamViewHolder.class) {
 
-
             @Override
             public void onBindView(@NonNull UserStreamViewHolder holder, Participant data,
                                    int position) {
@@ -416,9 +449,10 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                     });
 
                     holder.view.getRoot().setOnClickListener(v -> {
+                        vm.selectCenterIndex = position;
                         centerHandle(isOpenCamera.get(), participant, name, faceURL);
                     });
-                    if (position == 0) {
+                    if (position == vm.selectCenterIndex) {
                         centerHandle(isOpenCamera.get(), participant, name, faceURL);
                     }
                 } catch (Exception e) {
@@ -432,6 +466,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
              */
             private void centerHandle(boolean isOpenCamera, Participant participant, String name,
                                       String faceURL) {
+
                 centerCov(isOpenCamera);
                 bindRemoteViewRenderer(view.centerTextureView, participant);
                 bindUserStatus(view.centerUser, name, faceURL, participant);
@@ -572,13 +607,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         vm.initVideoView(view.centerTextureView);
     }
 
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        isLandscape = true;
-        outState.putBoolean(Constant.K_RESULT, true);
-    }
-
 
     @Override
     protected void setLightStatus() {
@@ -588,6 +616,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
     @Override
     public void connectRoomSuccess(VideoTrack localVideoTrack) {
+        view.landscape.setVisibility(View.VISIBLE);
         removeRenderer(view.centerTextureView);
         localVideoTrack.addRenderer(view.centerTextureView);
         view.centerTextureView.setTag(localVideoTrack);
@@ -647,7 +676,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     }
 
     private void release() {
-        if (isFinishing() && !isLandscape) {
+        if (isFinishing() && !triggerLandscape) {
+            vm.audioManager.setSpeakerphoneOn(true);
             vm.onCleared();
             removeCacheVM();
         }

@@ -99,6 +99,7 @@ public class Constant {
     public static final String K_NOTICE = "notice";
     public static final String K_NAME = "name";
     public static final String K_RESULT = "result";
+    public static final String K_RESULT2 = "result2";
     public static final String K_FROM = "from";
     public static final String K_SIZE = "size";
 

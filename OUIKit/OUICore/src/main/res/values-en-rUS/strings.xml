@@ -321,5 +321,6 @@
     <string name="meeting_finish">会议已结束</string>
     <string name="exit_meeting">离开会议</string>
     <string name="finish_meeting">结束会议</string>
+    <string name="double_tap_tips">双击屏幕中间可全屏</string>
 
 </resources>

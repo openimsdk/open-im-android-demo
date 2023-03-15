@@ -18,11 +18,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black"
+        android:animateLayoutChanges="true"
         android:fitsSystemWindows="true"
         android:orientation="vertical"
         tools:context=".MeetingHomeActivity">
 
         <RelativeLayout
+            android:id="@+id/topTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="55dp"
@@ -104,10 +106,13 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/center"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="#FF2E2E2E">
+            android:clickable="true"
+            android:background="#FF2E2E2E"
+            android:focusable="true">
 
             <io.livekit.android.renderer.TextureViewRenderer
                 android:id="@+id/centerTextureView"
@@ -139,6 +144,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginRight="16dp"
                 android:layout_marginBottom="22dp"
+                android:visibility="gone"
                 android:src="@mipmap/ic_m_landscape" />
         </RelativeLayout>
 
@@ -147,6 +153,7 @@
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
             android:background="#FF222222"
+            android:id="@+id/bottomMenu"
             android:orientation="vertical">
 
             <ImageView
@@ -154,7 +161,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:padding="10dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
                 android:src="@mipmap/ic_white_down" />
 
             <com.yanzhenjie.recyclerview.SwipeRecyclerView

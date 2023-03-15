@@ -1,7 +1,9 @@
 package io.openim.android.ouimeeting.vm;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -51,6 +53,12 @@ import kotlinx.coroutines.flow.AbstractFlow;
 import kotlinx.coroutines.flow.FlowCollector;
 
 public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
+    //是否初始化、是否横屏，用于横竖屏切换
+    public boolean isInit, isLandscape;
+    public int selectCenterIndex=0;
+    //获取音频服务
+    public AudioManager audioManager;
+
     //上次摄像头开关、上次麦克风开关、是否有开启权限
     boolean lastCameraEnabled, lastIsMuteAllVideo;
     //通话时间
@@ -59,6 +67,9 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     public MutableLiveData<String> timeStr = new MutableLiveData<>("");
 
     private List<TextureViewRenderer> textureViews;
+
+    //是否听筒模式
+    public MutableLiveData<Boolean> isReceiver = new MutableLiveData<>(false);
 
     public SignalingCertificate signalingCertificate;
     public CallViewModel callViewModel;
@@ -98,6 +109,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     }
 
     public void init() {
+        audioManager = (AudioManager) BaseApp.inst().getSystemService(Context.AUDIO_SERVICE);
         callViewModel = new CallViewModel(BaseApp.inst());
         callViewModel.subscribe(callViewModel.getRoomMetadata(), (v) -> {
             L.e("-------room subscribe--------" + callViewModel.getRoom().getLocalParticipant().getConnectionQuality());
@@ -125,18 +137,18 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     private final OnBase<SignalingCertificate> signalingCertificateCallBack =
         new OnBase<SignalingCertificate>() {
-            @Override
-            public void onError(int code, String error) {
-                getIView().onError(error);
-            }
+        @Override
+        public void onError(int code, String error) {
+            getIView().onError(error);
+        }
 
-            @Override
-            public void onSuccess(SignalingCertificate data) {
-                if (isDestroy || null == data) return;
-                signalingCertificate = data;
-                getIView().onSuccess(data);
-            }
-        };
+        @Override
+        public void onSuccess(SignalingCertificate data) {
+            if (isDestroy || null == data) return;
+            signalingCertificate = data;
+            getIView().onSuccess(data);
+        }
+    };
 
     public void joinMeeting(String roomID) {
         //3185791707
@@ -151,28 +163,28 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
         if (null == signalingCertificate) return;
         callViewModel.connectToRoom(signalingCertificate.getLiveURL(),
             signalingCertificate.getToken(), new Continuation<Unit>() {
-                @NonNull
-                @Override
-                public CoroutineContext getContext() {
-                    return EmptyCoroutineContext.INSTANCE;
-                }
+            @NonNull
+            @Override
+            public CoroutineContext getContext() {
+                return EmptyCoroutineContext.INSTANCE;
+            }
 
-                @Override
-                public void resumeWith(@NonNull Object o) {
-                    Common.UIHandler.post(() -> {
-                        buildTimer();
-                        fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
+            @Override
+            public void resumeWith(@NonNull Object o) {
+                Common.UIHandler.post(() -> {
+                    buildTimer();
+                    fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
 
 //                        callViewModel.setCameraEnabled(roomMetadata.getValue().joinDisableVideo);
-                        callViewModel.setCameraEnabled(false);
-                        callViewModel.setMicEnabled(roomMetadata.getValue().joinDisableMicrophone);
+                    callViewModel.setCameraEnabled(false);
+                    callViewModel.setMicEnabled(roomMetadata.getValue().joinDisableMicrophone);
 
-                        VideoTrack localVideoTrack =
-                            callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
-                        getIView().connectRoomSuccess(localVideoTrack);
-                    });
-                }
-            });
+                    VideoTrack localVideoTrack =
+                        callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
+                    getIView().connectRoomSuccess(localVideoTrack);
+                });
+            }
+        });
     }
 
 
@@ -352,8 +364,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
             @Override
             public void onSuccess(MeetingInfoList data) {
-                getIView().toast(BaseApp.inst()
-                    .getString(io.openim.android.ouicore.R.string.meeting_finish));
+                getIView().toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.meeting_finish));
             }
         }, signalingCertificate.getRoomID());
     }
