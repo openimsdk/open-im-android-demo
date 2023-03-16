@@ -336,4 +336,15 @@
     <string name="exit_meeting">离开会议</string>
     <string name="finish_meeting">结束会议</string>
     <string name="double_tap_tips">双击屏幕中间可全屏</string>
+    <string name="please_input_meeting_theme">请输入会议主题</string>
+    <string name="successful_agreement">预约成功</string>
+    <string name="timing_tips1">请输入主题</string>
+    <string name="timing_tips2">请选择开始时间</string>
+    <string name="timing_tips3">请选择时长</string>
+    <string name="meeting_detail">会议详情</string>
+    <string name="enter_meeting">进入会议</string>
+    <string name="update_meeting_info">修改会议信息</string>
+    <string name="cancel_meeting">取消会议</string>
+    <string name="edit_succ">修改成功</string>
+    <string name="confirm_send_who">确认发送给：</string>
 </resources>

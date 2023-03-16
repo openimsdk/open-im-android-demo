@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -60,7 +61,7 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
 
     private void listener() {
         view.timing.setOnClickListener(v -> {
-            startActivity(new Intent(MeetingLaunchActivity.this,TimingMeetingActivity.class));
+            startActivity(new Intent(MeetingLaunchActivity.this, TimingMeetingActivity.class));
         });
         view.timely.setOnClickListener(new OnDedrepClickListener() {
             @Override
@@ -109,6 +110,7 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
         view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<MeetingInfo,
             MeetingItemViewHolder>(MeetingItemViewHolder.class) {
 
+            @SuppressLint("SetTextI18n")
             @Override
             public void onBindView(@NonNull MeetingItemViewHolder holder, MeetingInfo data,
                                    int position) {
@@ -122,13 +124,24 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
                         io.openim.android.ouicore.R.drawable.sty_radius_3_ffffb300 :
                         io.openim.android.ouicore.R.drawable.sty_radius_3_ff0089ff);
 
+                    //相同的id 获取用户信息返回只有一条数据
+                    String name;
+                    if (vm.userInfos.size() - 1 >= position) {
+                        name = vm.userInfos.get(position).getNickname();
+                    } else name = vm.userInfos.get(vm.userInfos.size() - 1).getNickname();
+
                     holder.view.description.setText(TimeUtil.getTime(data.getCreateTime() * 1000,
-                        TimeUtil.yearMonthDayFormat) + "\t\t\t" + TimeUtil.getTime(data.getStartTime() * 1000, TimeUtil.hourTimeFormat) + "-" + TimeUtil.getTime(data.getEndTime() * 1000, TimeUtil.hourTimeFormat) + "\t\t\t" + String.format(getString(io.openim.android.ouicore.R.string.initiator), vm.userInfos.get(position).getNickname()));
+                        TimeUtil.yearMonthDayFormat) + "\t\t\t" + TimeUtil.getTime(data.getStartTime() * 1000, TimeUtil.hourTimeFormat) + "-"
+                        + TimeUtil.getTime(data.getEndTime() * 1000, TimeUtil.hourTimeFormat) + "\t\t\t"
+                        + String.format(getString(io.openim.android.ouicore.R.string.initiator),name ));
 
 
                     holder.view.join.setOnClickListener(v -> {
-                        createWait();
-                        vm.joinMeeting(data.getMeetingID());
+                        //这里有可能被释放 所以需要重新放入
+                        BaseApp.inst().putVM(vm);
+                        vm.selectMeetingInfo = data;
+                        startActivity(new Intent(MeetingLaunchActivity.this,
+                            MeetingDetailActivity.class));
                     });
                 } catch (Exception ignored) {
 

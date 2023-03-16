@@ -116,30 +116,30 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     //分享屏幕
     private ActivityResultLauncher<Intent> screenCaptureIntentLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        int resultCode = result.getResultCode();
-        Intent data = result.getData();
-        if (resultCode != Activity.RESULT_OK || data == null) {
-            return;
-        }
-        vm.startShareScreen(data);
-        toast(getString(io.openim.android.ouicore.R.string.share_screen));
-    });
+            int resultCode = result.getResultCode();
+            Intent data = result.getData();
+            if (resultCode != Activity.RESULT_OK || data == null) {
+                return;
+            }
+            vm.startShareScreen(data);
+            toast(getString(io.openim.android.ouicore.R.string.share_screen));
+        });
     private final GestureDetector gestureDetector = new GestureDetector(BaseApp.inst(),
         new GestureDetector.SimpleOnGestureListener() {
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            boolean isEx = getViewBooleanTag(view.topTitle);
-            view.topTitle.setTag(!isEx);
-            if (isEx) {
-                view.topTitle.setVisibility(View.VISIBLE);
-                view.bottomMenu.setVisibility(View.VISIBLE);
-            } else {
-                view.topTitle.setVisibility(View.GONE);
-                view.bottomMenu.setVisibility(View.GONE);
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                boolean isEx = getViewBooleanTag(view.topTitle);
+                view.topTitle.setTag(!isEx);
+                if (isEx) {
+                    view.topTitle.setVisibility(View.VISIBLE);
+                    view.bottomMenu.setVisibility(View.VISIBLE);
+                } else {
+                    view.topTitle.setVisibility(View.GONE);
+                    view.bottomMenu.setVisibility(View.GONE);
+                }
+                return super.onDoubleTap(e);
             }
-            return super.onDoubleTap(e);
-        }
-    });
+        });
 
     private void listener() {
         if (vm.isInit && vm.isLandscape) {
@@ -227,8 +227,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         });
         vm.isReceiver.observe(this, aBoolean -> {
             vm.audioManager.setSpeakerphoneOn(!aBoolean);
-            view.horn.setImageResource(aBoolean ?  R.mipmap.ic_m_horn
-                :R.mipmap.ic_m_receiver);
+            view.horn.setImageResource(aBoolean ? R.mipmap.ic_m_horn : R.mipmap.ic_m_receiver);
         });
 
     }
@@ -260,12 +259,12 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         commonDialog.getMainView().confirm.setOnClickListener(v1 -> {
             commonDialog.dismiss();
             if (isFinishMeeting) {
-                setResult(RESULT_OK);
-                vm.finishMeeting();
+                vm.finishMeeting(vm.selectMeetingInfo.getMeetingID());
             }
             finish();
         });
     }
+
 
 
     private View buildMeetingInfoPopDialogView() {

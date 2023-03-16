@@ -43,6 +43,17 @@
         android:textSize="16sp"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/menu5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="18dp"
+        android:paddingBottom="18dp"
+        android:text="@string/album"
+        android:textColor="#ff000000"
+        android:textSize="16sp"
+        android:visibility="gone" />
 
     <include
         layout="@layout/view_dividing_line"

@@ -13,6 +13,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import com.alibaba.fastjson2.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,12 +55,23 @@ import kotlinx.coroutines.flow.AbstractFlow;
 import kotlinx.coroutines.flow.FlowCollector;
 
 public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
+
+    //预约上传的参数
+    public static class TimingParameter {
+        public MutableLiveData<String> meetingTheme = new MutableLiveData<>("");
+        public MutableLiveData<Long> startTime = new MutableLiveData(0L);
+        public MutableLiveData<String> startTimeStr = new MutableLiveData<>("");
+        public MutableLiveData<Integer> duration = new MutableLiveData(0);
+        public MutableLiveData<String> durationStr = new MutableLiveData("");
+    }
+
+    public TimingParameter timingParameter = new TimingParameter();
+
     //是否初始化、是否横屏，用于横竖屏切换
     public boolean isInit, isLandscape;
-    public int selectCenterIndex=0;
+    public int selectCenterIndex = 0;
     //获取音频服务
     public AudioManager audioManager;
-
     //上次摄像头开关、上次麦克风开关、是否有开启权限
     boolean lastCameraEnabled, lastIsMuteAllVideo;
     //通话时间
@@ -74,7 +87,8 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     public SignalingCertificate signalingCertificate;
     public CallViewModel callViewModel;
     public MutableLiveData<RoomMetadata> roomMetadata = new MutableLiveData<>();
-
+    //在列表点击item选择的会议信息实体
+    public MeetingInfo selectMeetingInfo;
     public MutableLiveData<List<MeetingInfo>> meetingInfoList = new MutableLiveData<>();
     //发起人信息
     public List<UserInfo> userInfos = new ArrayList<>();
@@ -156,6 +170,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     }
 
     public void createMeeting(String meetingName, long startTime, int duration) {
+
         OpenIMClient.getInstance().signalingManager.signalingCreateMeeting(signalingCertificateCallBack, meetingName, BaseApp.inst().loginCertificate.userID, startTime, duration, null, null);
     }
 
@@ -312,12 +327,13 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
         meetingInfoAttach.customType = Constant.MsgType.CUSTOMIZE_MEETING;
         io.openim.android.ouicore.entity.MeetingInfo meetingInfo =
             new io.openim.android.ouicore.entity.MeetingInfo();
-        RoomMetadata roomMetadata = this.roomMetadata.getValue();
         meetingInfo.inviterNickname = BaseApp.inst().loginCertificate.nickname;
-        meetingInfo.id = signalingCertificate.getRoomID();
-        meetingInfo.subject = roomMetadata.meetingName;
-        meetingInfo.start = roomMetadata.startTime;
-        meetingInfo.duration = (int) (roomMetadata.endTime - roomMetadata.startTime);
+        meetingInfo.inviterUserID = BaseApp.inst().loginCertificate.userID;
+        meetingInfo.inviterFaceURL = BaseApp.inst().loginCertificate.faceURL;
+        meetingInfo.id = selectMeetingInfo.getMeetingID();
+        meetingInfo.subject = selectMeetingInfo.getMeetingName();
+        meetingInfo.start = selectMeetingInfo.getStartTime();
+        meetingInfo.duration = (int) ( selectMeetingInfo.getEndTime() -  selectMeetingInfo.getStartTime());
         meetingInfoAttach.data = meetingInfo;
         Message msg =
             OpenIMClient.getInstance().messageManager.createCustomMessage(GsonHel.toJson(meetingInfoAttach), null, null);
@@ -350,12 +366,13 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
             @Override
             public void onSuccess(String data) {
-                if (null != onSuccessListener) onSuccessListener.onSuccess(data);
+                if (null != onSuccessListener)
+                    onSuccessListener.onSuccess(data);
             }
         }, configure);
     }
 
-    public void finishMeeting() {
+    public void finishMeeting(String roomID) {
         OpenIMClient.getInstance().signalingManager.signalingCloseRoom(new OnBase<MeetingInfoList>() {
             @Override
             public void onError(int code, String error) {
@@ -364,9 +381,10 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
             @Override
             public void onSuccess(MeetingInfoList data) {
+                getMeetingInfoList();
                 getIView().toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.meeting_finish));
             }
-        }, signalingCertificate.getRoomID());
+        }, roomID);
     }
 
 
