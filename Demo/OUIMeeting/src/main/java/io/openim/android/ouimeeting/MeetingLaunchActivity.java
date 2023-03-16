@@ -60,7 +60,7 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
 
     private void listener() {
         view.timing.setOnClickListener(v -> {
-
+            startActivity(new Intent(MeetingLaunchActivity.this,TimingMeetingActivity.class));
         });
         view.timely.setOnClickListener(new OnDedrepClickListener() {
             @Override
