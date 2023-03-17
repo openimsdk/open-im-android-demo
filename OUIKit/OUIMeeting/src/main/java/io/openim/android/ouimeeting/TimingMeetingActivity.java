@@ -72,9 +72,8 @@ public class TimingMeetingActivity extends BaseActivity<MeetingVM, ActivityTimin
     }
 
     void init() {
+        vm.timingParameter = new MeetingVM.TimingParameter();
         if (isUpdateInfo) {
-            vm.timingParameter = null;
-            vm.timingParameter = new MeetingVM.TimingParameter();
             vm.timingParameter.meetingTheme.setValue(vm.selectMeetingInfo.getMeetingName());
             vm.timingParameter.startTime.setValue(vm.selectMeetingInfo.getStartTime());
             vm.timingParameter.duration.setValue((int) (vm.selectMeetingInfo.getEndTime() - vm.selectMeetingInfo.getStartTime()));
@@ -92,13 +91,15 @@ public class TimingMeetingActivity extends BaseActivity<MeetingVM, ActivityTimin
     }
 
     private void listener() {
-        vm.timingParameter.startTime.observe(this,
-            time -> vm.timingParameter.startTimeStr.setValue(TimeUtil.getTime(time * 1000,
-                TimeUtil.yearTimeFormat)));
-        vm.timingParameter.duration.observe(this,
-            duration -> vm.timingParameter.durationStr.setValue(
-                (BigDecimal.valueOf(duration).divide(BigDecimal.valueOf(3600)))
-                    + getString(io.openim.android.ouicore.R.string.hour)));
+        vm.timingParameter.startTime.observe(this, time -> {
+            if (time == 0) return;
+            vm.timingParameter.startTimeStr.setValue(TimeUtil.getTime(time * 1000,
+                TimeUtil.yearTimeFormat));
+        });
+        vm.timingParameter.duration.observe(this, duration -> {
+            if (duration == 0) return;
+            vm.timingParameter.durationStr.setValue((BigDecimal.valueOf(duration).divide(BigDecimal.valueOf(3600))) + getString(io.openim.android.ouicore.R.string.hour));
+        });
 
         view.durationLy.setOnClickListener(v -> {
             if (null == dialog) dialog = new BottomPopDialog(this);

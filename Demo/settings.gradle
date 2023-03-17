@@ -48,8 +48,6 @@ include ':OUIContact'
 project(':OUIContact').projectDir = new File(settingsDir, '../OUIKit/OUIContact')
 include ':OUICalling'
 project(':OUICalling').projectDir = new File(settingsDir, '../OUIKit/OUICalling')
-include ':aar-spotify'
-project(':aar-spotify').projectDir = new File(settingsDir, '../OUIKit/aar-spotify')
 include ':OUIMoments'
 project(':OUIMoments').projectDir = new File(settingsDir, '../OUIKit/OUIMoments')
 include ':OUIMeeting'

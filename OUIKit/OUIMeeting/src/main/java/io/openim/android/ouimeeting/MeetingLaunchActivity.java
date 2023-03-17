@@ -61,6 +61,8 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
 
     private void listener() {
         view.timing.setOnClickListener(v -> {
+            //这里有可能被释放 所以需要重新放入
+            BaseApp.inst().putVM(vm);
             startActivity(new Intent(MeetingLaunchActivity.this, TimingMeetingActivity.class));
         });
         view.timely.setOnClickListener(new OnDedrepClickListener() {
@@ -73,6 +75,8 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
         view.join.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
+                //这里有可能被释放 所以需要重新放入
+                BaseApp.inst().putVM(vm);
                 startActivity(new Intent(MeetingLaunchActivity.this, JoinMeetingActivity.class));
             }
         });
