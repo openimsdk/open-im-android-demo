@@ -34,7 +34,6 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     private String vmCanonicalName;
 
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         requestedOrientation();
@@ -44,6 +43,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         }
         setLightStatus();
     }
+
     @SuppressLint("SourceLockedOrientationActivity")
     protected void requestedOrientation() {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -134,6 +134,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     }
 
     private void releaseRes() {
+        if (vm == null) return;
         if (isFinishing()
             && isRelease && !released) {
             released = true;
