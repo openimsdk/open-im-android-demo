@@ -159,31 +159,34 @@ public class IMUtil {
         try {
             if (msg.getContentType() == Constant.MsgType.CUSTOMIZE) {
                 Map map = JSONArray.parseObject(msg.getCustomElem().getData(), Map.class);
-                int customType = (int) map.get("customType");
-                if (customType == Constant.MsgType.CUSTOMIZE_MEETING) {
-                    msg.setContentType(customType);
-                    MeetingInfo meetingInfo = GsonHel.fromJson(map.get("data").toString(),
-                        MeetingInfo.class);
-                    meetingInfo.startTime = TimeUtil.getTime(meetingInfo.start*1000,
-                        TimeUtil.yearTimeFormat);
-                    BigDecimal bigDecimal =
-                        (BigDecimal.valueOf(meetingInfo.duration).divide(BigDecimal.valueOf(3600)
-                            , 1, BigDecimal.ROUND_HALF_DOWN));
-                    meetingInfo.durationStr =bigDecimal.toString() +BaseApp.inst().getString(R.string.hour);
-                    msgExpand.meetingInfo = meetingInfo;
-                    return msg;
-                }
-                msgExpand.callHistory = GsonHel.fromJson(msg.getCustomElem().getData(),
-                    CallHistory.class);
-                if (TextUtils.isEmpty(msgExpand.callHistory.getRoomID())) return msg;
-                //当callHistory.getRoomID 不null 表示我们本地插入的呼叫记录
-                msg.setContentType(Constant.MsgType.LOCAL_CALL_HISTORY);
+                if (map.containsKey("customType")) {
+                    int customType = (int) map.get("customType");
+                    if (customType == Constant.MsgType.CUSTOMIZE_MEETING) {
+                        msg.setContentType(customType);
+                        MeetingInfo meetingInfo = GsonHel.fromJson(map.get("data").toString(),
+                            MeetingInfo.class);
+                        meetingInfo.startTime = TimeUtil.getTime(meetingInfo.start * 1000,
+                            TimeUtil.yearTimeFormat);
+                        BigDecimal bigDecimal =
+                            (BigDecimal.valueOf(meetingInfo.duration).divide(BigDecimal.valueOf(3600),
+                                1, BigDecimal.ROUND_HALF_DOWN));
+                        meetingInfo.durationStr =
+                            bigDecimal.toString() + BaseApp.inst().getString(R.string.hour);
+                        msgExpand.meetingInfo = meetingInfo;
+                        return msg;
+                    }
+                } else {
+                    msgExpand.callHistory = GsonHel.fromJson(msg.getCustomElem().getData(),
+                        CallHistory.class);
+                    if (TextUtils.isEmpty(msgExpand.callHistory.getRoomID())) return msg;
+                    //当callHistory.getRoomID 不null 表示我们本地插入的呼叫记录
+                    msg.setContentType(Constant.MsgType.LOCAL_CALL_HISTORY);
 
-                int second = msgExpand.callHistory.getDuration() / 1000;
-                String secondFormat = TimeUtil.secondFormat(second, TimeUtil.secondFormat);
-                msgExpand.callDuration =
-                    BaseApp.inst().getString(io.openim.android.ouicore.R.string.call_time) + (second < 60 ? ("00:" + secondFormat) : secondFormat);
-                return msg;
+                    int second = msgExpand.callHistory.getDuration() / 1000;
+                    String secondFormat = TimeUtil.secondFormat(second, TimeUtil.secondFormat);
+                    msgExpand.callDuration =
+                        BaseApp.inst().getString(io.openim.android.ouicore.R.string.call_time) + (second < 60 ? ("00:" + secondFormat) : secondFormat);
+                }
             }
             if (msg.getContentType() == Constant.MsgType.QUOTE) {
                 buildExpandInfo(msg.getQuoteElem().getQuoteMessage());
@@ -489,8 +492,7 @@ public class IMUtil {
                         BaseApp.inst().getString(R.string.video_calls)) + "]";
                     break;
                 case Constant.MsgType.CUSTOMIZE_MEETING:
-                    lastMsg =
-                        "[" + BaseApp.inst().getString(R.string.video_meeting) + "]";
+                    lastMsg = "[" + BaseApp.inst().getString(R.string.video_meeting) + "]";
                     break;
             }
         } catch (Exception e) {
