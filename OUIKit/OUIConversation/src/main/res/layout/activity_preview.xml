@@ -6,7 +6,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black"
-
         tools:context=".ui.PreviewActivity">
 
         <RelativeLayout
@@ -39,7 +38,7 @@
             android:paddingTop="5dp"
             android:paddingRight="20dp"
             android:paddingBottom="5dp"
-            android:text="下载"
+            android:text="@string/download"
             android:visibility="gone"
             android:textColor="@color/white" />
     </RelativeLayout>

@@ -54,6 +54,7 @@ public class IMEvent {
     private List<OnConversationListener> conversationListeners;
     private List<OnGroupListener> groupListeners;
     private List<OnFriendshipListener> friendshipListeners;
+    private List<OnSignalingListener> signalingListeners;
 
     public void init() {
         connListeners = new ArrayList<>();
@@ -61,13 +62,14 @@ public class IMEvent {
         conversationListeners = new ArrayList<>();
         groupListeners = new ArrayList<>();
         friendshipListeners = new ArrayList<>();
+        signalingListeners = new ArrayList<>();
 
         userListener();
         advanceMsgListener();
         friendshipListener();
         conversationListener();
         groupListeners();
-//        signalingListener();
+        signalingListener();
     }
 
     private void signalingListener() {
@@ -75,69 +77,107 @@ public class IMEvent {
             @Override
             public void onInvitationCancelled(SignalingInfo s) {
                 // 被邀请者收到：邀请者取消音视频通话
+                for (OnSignalingListener signalingListener : signalingListeners) {
+                    signalingListener.onInvitationCancelled(s);
+                }
             }
 
             @Override
             public void onInvitationTimeout(SignalingInfo s) {
                 // 邀请者收到：被邀请者超时未接通
+                for (OnSignalingListener signalingListener : signalingListeners) {
+                    signalingListener.onInvitationTimeout(s);
+                }
             }
 
             @Override
             public void onInviteeAccepted(SignalingInfo s) {
                 // 邀请者收到：被邀请者同意音视频通话
+                for (OnSignalingListener signalingListener : signalingListeners) {
+                    signalingListener.onInviteeAccepted(s);
+                }
             }
 
             @Override
             public void onInviteeAcceptedByOtherDevice(SignalingInfo s) {
-
+                for (OnSignalingListener signalingListener : signalingListeners) {
+                    signalingListener.onInviteeAcceptedByOtherDevice(s);
+                }
             }
 
             @Override
             public void onInviteeRejected(SignalingInfo s) {
                 // 邀请者收到：被邀请者拒绝音视频通话
+                for (OnSignalingListener signalingListener : signalingListeners) {
+                    signalingListener.onInviteeRejected(s);
+                }
             }
 
             @Override
             public void onInviteeRejectedByOtherDevice(SignalingInfo s) {
-
+                for (OnSignalingListener signalingListener : signalingListeners) {
+                    signalingListener.onInviteeRejectedByOtherDevice(s);
+                }
             }
 
             @Override
             public void onReceiveNewInvitation(SignalingInfo s) {
                 // 被邀请者收到：音视频通话邀请
+                for (OnSignalingListener signalingListener : signalingListeners) {
+                    signalingListener.onReceiveNewInvitation(s);
+                }
             }
 
             @Override
             public void onHangup(SignalingInfo s) {
-
+                for (OnSignalingListener signalingListener : signalingListeners) {
+                    signalingListener.onHangup(s);
+                }
             }
 
             @Override
             public void onRoomParticipantConnected(RoomCallingInfo s) {
-
+                for (OnSignalingListener signalingListener : signalingListeners) {
+                    signalingListener.onRoomParticipantConnected(s);
+                }
             }
 
             @Override
             public void onRoomParticipantDisconnected(RoomCallingInfo s) {
-
+                for (OnSignalingListener signalingListener : signalingListeners) {
+                    signalingListener.onRoomParticipantDisconnected(s);
+                }
             }
 
             @Override
             public void onMeetingStreamChanged(MeetingStreamEvent e) {
-
+                for (OnSignalingListener signalingListener : signalingListeners) {
+                    signalingListener.onMeetingStreamChanged(e);
+                }
             }
 
             @Override
             public void onReceiveCustomSignal(CustomSignalingInfo s) {
-
+                for (OnSignalingListener signalingListener : signalingListeners) {
+                    signalingListener.onReceiveCustomSignal(s);
+                }
             }
         });
     }
 
     public static synchronized IMEvent getInstance() {
-        if (null == listener)
-            listener = new IMEvent();
+        if (null == listener) listener = new IMEvent();
         return listener;
+    }
+
+    //信令监听
+    public void addSignalingListener(OnSignalingListener onSignalingListener) {
+        if (!signalingListeners.contains(onSignalingListener)) {
+            signalingListeners.add(onSignalingListener);
+        }
+    }
+    public void removeSignalingListener(OnSignalingListener onSignalingListener) {
+        signalingListeners.remove(onSignalingListener);
     }
 
     //连接事件
@@ -230,8 +270,8 @@ public class IMEvent {
         public void onKickedOffline() {
             // 当前用户被踢下线，此时可以 UI 提示用户“您已经在其他端登录了当前账号，是否重新登录？”
             L.d("当前用户被踢下线");
-            Toast.makeText(BaseApp.inst(), BaseApp.inst().getString(
-                    io.openim.android.ouicore.R.string.kicked_offline_tips),
+            Toast.makeText(BaseApp.inst(),
+                BaseApp.inst().getString(io.openim.android.ouicore.R.string.kicked_offline_tips),
                 Toast.LENGTH_SHORT).show();
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onKickedOffline();
@@ -242,8 +282,8 @@ public class IMEvent {
         public void onUserTokenExpired() {
             // 登录票据已经过期，请使用新签发的 UserSig 进行登录。
             L.d("登录票据已经过期");
-            Toast.makeText(BaseApp.inst(), BaseApp.inst().getString(
-                    io.openim.android.ouicore.R.string.token_expired),
+            Toast.makeText(BaseApp.inst(),
+                BaseApp.inst().getString(io.openim.android.ouicore.R.string.token_expired),
                 Toast.LENGTH_SHORT).show();
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onUserTokenExpired();
@@ -379,14 +419,12 @@ public class IMEvent {
     private void promptSoundOrNotification(ConversationInfo conversationInfo) {
         try {
             if (BaseApp.inst().loginCertificate.globalRecvMsgOpt == 2) return;
-            if (conversationInfo.getRecvMsgOpt() == 0 &&
-                conversationInfo.getUnreadCount() != 0) {
+            if (conversationInfo.getRecvMsgOpt() == 0 && conversationInfo.getUnreadCount() != 0) {
                 if (BaseApp.inst().isBackground())
                     IMUtil.sendNotice(conversationInfo.getLatestMsgSendTime());
-                else
-                    IMUtil.playPrompt();
+                else IMUtil.playPrompt();
             }
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
         }
     }
 
@@ -490,21 +528,21 @@ public class IMEvent {
             @Override
             public void onRecvMessageExtensionsChanged(String msgID, List<KeyValue> list) {
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
-                    onAdvanceMsgListener.onRecvMessageExtensionsChanged(msgID,list);
+                    onAdvanceMsgListener.onRecvMessageExtensionsChanged(msgID, list);
                 }
             }
 
             @Override
             public void onRecvMessageExtensionsDeleted(String msgID, List<String> list) {
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
-                    onAdvanceMsgListener.onRecvMessageExtensionsDeleted(msgID,list);
+                    onAdvanceMsgListener.onRecvMessageExtensionsDeleted(msgID, list);
                 }
             }
 
             @Override
             public void onRecvMessageExtensionsAdded(String msgID, List<KeyValue> list) {
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
-                    onAdvanceMsgListener.onRecvMessageExtensionsAdded(msgID,list);
+                    onAdvanceMsgListener.onRecvMessageExtensionsAdded(msgID, list);
                 }
             }
 

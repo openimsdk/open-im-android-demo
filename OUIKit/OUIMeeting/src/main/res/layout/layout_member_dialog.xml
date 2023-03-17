@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/sty_radius_25_bottom_white"
+    android:gravity="center_horizontal"
+    android:minHeight="350dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:text="@string/v_member"
+        android:textColor="#ff16191c"
+        android:textSize="17sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="350dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:padding="20dp"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/invite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/invite"
+            android:padding="10dp"
+            android:background="@drawable/sty_radius_3_stroke_418ae5"
+            android:layout_marginRight="30dp"
+            android:textColor="#ff0089ff"
+            android:textSize="17sp" />
+        <TextView
+            android:id="@+id/allMute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:background="@drawable/sty_radius_3_stroke_418ae5"
+            android:text="@string/all_mute"
+            android:textColor="#ff0089ff"
+            android:textSize="17sp"
+            />
+    </LinearLayout>
+
+</LinearLayout>

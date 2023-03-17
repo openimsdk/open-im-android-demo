@@ -318,7 +318,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                                 chatVM.startMsg = message = da.getMessageList().get(0);
                                 chatVM.isSingleChat = message.getSessionType() == Constant.SessionType.SINGLE_CHAT;
                                 if (chatVM.isSingleChat)
-                                    chatVM.otherSideID = message.getSendID();
+                                    chatVM.userID = message.getSendID();
                                 else
                                     chatVM.groupID = message.getGroupID();
                                 NotificationMsg notificationMsg = GsonHel.fromJson(message.getNotificationElem().getDetail(),

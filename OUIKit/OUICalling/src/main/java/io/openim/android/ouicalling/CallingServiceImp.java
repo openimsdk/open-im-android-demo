@@ -1,15 +1,9 @@
 package io.openim.android.ouicalling;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.ComponentName;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Build;
-import android.os.IBinder;
-import android.os.SystemClock;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -19,15 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouicalling.service.AudioVideoService;
-import io.openim.android.ouicalling.vm.CallingVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.CallHistory;
-import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.vm.PersonalVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.CustomSignalingInfo;
@@ -36,9 +28,6 @@ import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
 import io.openim.keepalive.Alive;
-import io.realm.Realm;
-import io.realm.RealmAsyncTask;
-import io.realm.RealmResults;
 
 @Route(path = Routes.Service.CALLING)
 public class CallingServiceImp implements CallingService {
@@ -47,17 +36,6 @@ public class CallingServiceImp implements CallingService {
     private Context context;
     public CallDialog callDialog;
     private SignalingInfo signalingInfo;
-
-    ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
-    };
 
 
     @Override
@@ -82,7 +60,7 @@ public class CallingServiceImp implements CallingService {
 
     @Override
     public void initKeepAlive(String precessName) {
-        Alive.init(context,precessName,AudioVideoService.class);
+        Alive.init(context, precessName, AudioVideoService.class);
     }
 
 
@@ -157,10 +135,10 @@ public class CallingServiceImp implements CallingService {
     }
 
     @Override
-    public void showCalling(DialogInterface.OnDismissListener dismissListener,
-                            boolean isCallOut) {
-        if (callDialog != null) return;
-        if (signalingInfo.getInvitation().getInviteeUserIDList().size() > 1)
+    public Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener,
+                                  boolean isCallOut) {
+        if (callDialog != null) return callDialog;
+        if (signalingInfo.getInvitation().getSessionType()== Constant.SessionType.GROUP_CHAT)
             callDialog = new GroupCallDialog(context, this, isCallOut);
         else
             callDialog = new CallDialog(context, this, isCallOut);
@@ -168,19 +146,26 @@ public class CallingServiceImp implements CallingService {
         if (!callDialog.callingVM.isCallOut) {
             callDialog.setOnDismissListener(dismissListener);
             if (!Common.isScreenLocked()) {
-                callDialog.setOnShowListener(dialog ->
-                    ARouter.getInstance().build(Routes.Main.HOME).navigation());
+                callDialog.setOnShowListener(dialog -> ARouter.getInstance().build(Routes.Main.HOME).navigation());
             }
         }
-        callDialog.show();
-
         insetDB();
+        return callDialog;
     }
 
     @Override
     public void call(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
-        showCalling(null, true);
+        buildCallDialog(null, true);
+        callDialog.show();
+    }
+
+    @Override
+    public void join(SignalingInfo signalingInfo) {
+        this.signalingInfo = signalingInfo;
+        GroupCallDialog callDialog = (GroupCallDialog) buildCallDialog(null, false);
+        callDialog.changeView();
+        callDialog.joinToShow();
     }
 
 
@@ -190,15 +175,14 @@ public class CallingServiceImp implements CallingService {
         Common.UIHandler.post(() -> {
             if (null == callDialog) return;
             callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getRoomID(),
-                callHistory -> callHistory.setDuration(
-                    (int) (System.currentTimeMillis() - callHistory.getDate())));
+                callHistory -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
             callDialog.dismiss();
         });
     }
 
     @Override
     public void onRoomParticipantConnected(RoomCallingInfo s) {
-        
+
     }
 
     @Override
@@ -221,10 +205,10 @@ public class CallingServiceImp implements CallingService {
         if (callDialog.callingVM.isGroup) return;
         List<String> ids = new ArrayList<>();
         ids.add(callDialog.callingVM.isCallOut ?
-            signalingInfo.getInvitation().getInviteeUserIDList().get(0)
-            : signalingInfo.getInvitation().getInviterUserID());
+            signalingInfo.getInvitation().getInviteeUserIDList().get(0) :
+            signalingInfo.getInvitation().getInviterUserID());
 
-        boolean isCallOut=!callDialog.callingVM.isCallOut;
+        boolean isCallOut = !callDialog.callingVM.isCallOut;
         OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
             @Override
             public void onError(int code, String error) {
@@ -236,13 +220,11 @@ public class CallingServiceImp implements CallingService {
                 UserInfo userInfo = data.get(0);
 
                 BaseApp.inst().realm.executeTransactionAsync(realm -> {
-                    CallHistory callHistory = new CallHistory(
-                        signalingInfo.getInvitation().getRoomID(),
-                        userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(),
-                        signalingInfo.getInvitation().getMediaType(), false,
-                        0,isCallOut ,
-                        System.currentTimeMillis(), 0
-                    );
+                    CallHistory callHistory =
+                        new CallHistory(signalingInfo.getInvitation().getRoomID(),
+                            userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(),
+                            signalingInfo.getInvitation().getMediaType(), false, 0, isCallOut,
+                            System.currentTimeMillis(), 0);
                     realm.insert(callHistory);
                 });
             }

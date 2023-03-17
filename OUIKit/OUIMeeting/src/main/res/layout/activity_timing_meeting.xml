@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<data>
+    <variable
+        name="timingParameter"
+        type="io.openim.android.ouimeeting.vm.MeetingVM.TimingParameter" />
+</data>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:background="@color/white"
+        android:orientation="vertical"
+        tools:context=".TimingMeetingActivity">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/comm_title_high"
+            app:cardElevation="8dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <include
+                    android:id="@+id/back"
+                    layout="@layout/view_back" />
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/timing_meeting"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/def_bg"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:background="@null"
+                    android:hint="@string/please_input_meeting_theme"
+                    android:text="@={timingParameter.meetingTheme}"
+                    android:textColor="#ff16191c"
+                    android:textSize="17sp" />
+
+                <io.openim.android.ouicore.widget.InterceptLinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:id="@+id/startTimeLy"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/start_time"
+                        android:textColor="#ff16191c"
+                        android:textSize="17sp" />
+
+                    <TextView
+                        android:id="@+id/startTime"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:text="@{timingParameter.startTimeStr}"
+                        android:textColor="#ff16191c"
+                        android:textSize="17sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:src="@mipmap/ic_right" />
+                </io.openim.android.ouicore.widget.InterceptLinearLayout>
+
+
+                <io.openim.android.ouicore.widget.InterceptLinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:id="@+id/durationLy"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/meeting_duration"
+                        android:textColor="#ff16191c"
+                        android:textSize="17sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:id="@+id/duration"
+                        android:gravity="end"
+                        android:text="@{timingParameter.durationStr}"
+                        android:textColor="#ff16191c"
+                        android:textSize="17sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:src="@mipmap/ic_right" />
+                </io.openim.android.ouicore.widget.InterceptLinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sty_radius_3_ff0089ff"
+                android:paddingLeft="80dp"
+                android:paddingTop="10dp"
+                android:paddingRight="80dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="90dp"
+                android:paddingBottom="10dp"
+                android:text="预约会议"
+                android:textColor="#ffffffff"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>
+

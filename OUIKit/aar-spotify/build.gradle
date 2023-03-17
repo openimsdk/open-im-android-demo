@@ -1,4 +1,0 @@
-configurations.maybeCreate("default")
-artifacts.add("default", file('livekit-android-sdk-1.1.0.aar'))
-artifacts.add("default", file('audioswitch-1.1.5.aar'))
-artifacts.add("default", file('openim_keep_alive-1.1.0.aar'))

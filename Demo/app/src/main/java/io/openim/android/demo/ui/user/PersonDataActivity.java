@@ -58,7 +58,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         uid = getIntent().getStringExtra(Constant.K_ID);
         if (TextUtils.isEmpty(uid)) {
             chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
-            uid = chatVM.otherSideID;
+            uid = chatVM.userID;
             vm.getUserInfo(uid);
         } else
             vm.getUserInfo(uid);

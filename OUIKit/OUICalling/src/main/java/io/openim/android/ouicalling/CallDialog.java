@@ -127,7 +127,7 @@ public class CallDialog extends BaseDialog {
 
     public void bindData(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
-        callingVM.isGroup = signalingInfo.getInvitation().getInviteeUserIDList().size() > 1;
+        callingVM.isGroup = signalingInfo.getInvitation().getSessionType()==Constant.SessionType.GROUP_CHAT;
         callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
         if (!callingVM.isVideoCalls) {
             view.timeTv.setVisibility(View.GONE);
@@ -139,7 +139,6 @@ public class CallDialog extends BaseDialog {
         if (callingVM.isCallOut) {
             view.callingMenu.setVisibility(View.VISIBLE);
             view.ask.setVisibility(View.GONE);
-
 
             view.callingTips.setText(context.getString(io.openim.android.ouicore.R.string.waiting_tips) + "...");
             view.callingTips2.setText(context.getString(io.openim.android.ouicore.R.string.waiting_tips) + "...");
@@ -196,13 +195,17 @@ public class CallDialog extends BaseDialog {
 
     public void listener(SignalingInfo signalingInfo) {
         callingVM.timeStr.observeForever(bindTime);
-        view.micIsOn.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            view.micIsOn.setText(isChecked ?
-                context.getString(io.openim.android.ouicore.R.string.microphone_on) :
-                context.getString(io.openim.android.ouicore.R.string.microphone_off));
-            //关闭麦克风
-            callingVM.callViewModel.setMicEnabled(isChecked);
+        view.micIsOn.setOnClickListener(new OnDedrepClickListener(1000) {
+            @Override
+            public void click(View v) {
+                view.micIsOn.setText(view.micIsOn.isChecked() ?
+                    context.getString(io.openim.android.ouicore.R.string.microphone_on) :
+                    context.getString(io.openim.android.ouicore.R.string.microphone_off));
+                //关闭麦克风
+                callingVM.callViewModel.setMicEnabled(view.micIsOn.isChecked());
+            }
         });
+
         view.speakerIsOn.setOnCheckedChangeListener((buttonView, isChecked) -> {
             view.speakerIsOn.setText(isChecked ?
                 context.getString(io.openim.android.ouicore.R.string.speaker_on) :
@@ -270,6 +273,11 @@ public class CallDialog extends BaseDialog {
 
     @Override
     public void show() {
+        playRingtone();
+        super.show();
+    }
+
+    public void playRingtone() {
         try {
             Common.wakeUp(context);
             AssetFileDescriptor assetFileDescriptor = BaseApp.inst().getAssets().openFd(
@@ -298,8 +306,6 @@ public class CallDialog extends BaseDialog {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        super.show();
     }
 
     @Override

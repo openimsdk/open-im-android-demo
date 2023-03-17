@@ -56,7 +56,7 @@ public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBin
         hasStorage = AndPermission.hasPermissions(this, Permission.Group.STORAGE);
         hasShoot = AndPermission.hasPermissions(this, Permission.CAMERA);
         if (vm.isSingleChat)
-            id = vm.otherSideID;
+            id = vm.userID;
         else
             id = vm.groupID;
 

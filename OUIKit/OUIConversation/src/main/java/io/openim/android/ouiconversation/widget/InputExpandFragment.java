@@ -141,7 +141,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                 vm.isVideoCall = keyCode != 1;
                 if (vm.isSingleChat) {
                     List<String> ids = new ArrayList<>();
-                    ids.add(vm.otherSideID);
+                    ids.add(vm.userID);
                     SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall, vm.isSingleChat, ids, null);
                     callingService.call(signalingInfo);
                 } else {

@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.media.AudioManager;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
+import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.SignalingCertificate;
@@ -32,6 +34,7 @@ import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
+import kotlinx.coroutines.flow.FlowCollector;
 
 public class CallingVM {
     //通话时间
@@ -158,18 +161,9 @@ public class CallingVM {
 
                 callViewModel.getParticipants().collect((participants, continuation) -> {
                     if (participants.isEmpty()) return null;
-//                    if (!isGroup && !isCallOut && participants.size() == 1) {
-//                        callingService.onHangup(null);
-//                        return null;
-//                    }
-                    if (null != onParticipantsChangeListener) {
-//                        List<Participant> participantList = new ArrayList<>();
-//                        for (Participant participant : participants) {
-//                            if (participant instanceof RemoteParticipant)
-//                                participantList.add(participant);
-//                        }
-                        Common.UIHandler.post(() -> onParticipantsChangeListener.onChange(participants));
 
+                    if (null != onParticipantsChangeListener) {
+                        Common.UIHandler.post(() -> onParticipantsChangeListener.onChange(participants));
                     } else {
                         for (int i = 0; i < participants.size(); i++) {
                             Participant participant = participants.get(i);
@@ -214,15 +208,14 @@ public class CallingVM {
     public void buildTimer() {
         cancelTimer();
         timer = new Timer();
+
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 second++;
-                int minute = (second / 60);
-                int hour = (minute / 60);
-                if (hour != 0)
-                    timeStr.postValue(repair0(hour) + ":" + repair0(minute) + ":" + repair0(second));
-                else timeStr.postValue(repair0(minute) + ":" + repair0(second));
+                String secondFormat = TimeUtil.secondFormat(second, TimeUtil.secondFormat);
+                if (secondFormat.length() <= 2) secondFormat = "00:" + secondFormat;
+                timeStr.postValue(secondFormat);
             }
         }, 0, 1000);
     }
@@ -299,8 +292,7 @@ public class CallingVM {
             if (null != localVideoTrack) {
                 localVideoTrack.stop();
                 if (null != localSpeakerVideoViews) {
-                    for (TextureViewRenderer localSpeakerVideoView
-                        : localSpeakerVideoViews) {
+                    for (TextureViewRenderer localSpeakerVideoView : localSpeakerVideoViews) {
                         localVideoTrack.removeRenderer(localSpeakerVideoView);
                     }
                 }
@@ -308,8 +300,7 @@ public class CallingVM {
             for (TextureViewRenderer textureViewRenderer : remoteSpeakerVideoViews) {
                 Object videoTask = textureViewRenderer.getTag();
                 if (null != videoTask) {
-                    ((VideoTrack) videoTask)
-                        .removeRenderer(textureViewRenderer);
+                    ((VideoTrack) videoTask).removeRenderer(textureViewRenderer);
                 }
             }
             L.e("unBindView");

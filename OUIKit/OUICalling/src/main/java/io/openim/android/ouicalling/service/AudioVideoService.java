@@ -95,7 +95,6 @@ public class AudioVideoService extends KeepAliveService {
     }
 
     private void addListener() {
-        OpenIMClient.getInstance().signalingManager.setSignalingListener(callingService);
         Open_im_sdk.setListenerForService(new OnListenerForService() {
             @Override
             public void onFriendApplicationAccepted(String s) {

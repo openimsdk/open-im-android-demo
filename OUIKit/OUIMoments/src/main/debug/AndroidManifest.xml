@@ -3,7 +3,7 @@
     package="io.openim.android.ouimoments">
 
     <application
-        android:name=".MyApplication"
+        android:name="io.openim.android.ouicore.base.Debug"
         android:allowBackup="true"
         android:hardwareAccelerated="false"
         android:icon="@mipmap/ic_launcher"
@@ -13,7 +13,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Demo">
+        android:theme="@style/Theme.Main">
         <activity
             android:name=".ui.MsgDetailActivity"
             android:exported="false">

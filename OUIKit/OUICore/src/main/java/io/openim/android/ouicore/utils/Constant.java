@@ -99,8 +99,12 @@ public class Constant {
     public static final String K_NOTICE = "notice";
     public static final String K_NAME = "name";
     public static final String K_RESULT = "result";
+    public static final String K_RESULT2 = "result2";
     public static final String K_FROM = "from";
     public static final String K_SIZE = "size";
+
+    //最大通话人数
+    public static final int MAX_CALL_NUM = 9;
     //好友红点
     public static final String K_FRIEND_NUM = "k_friend_num";
     //群红点
@@ -155,6 +159,8 @@ public class Constant {
         public static final int LOCATION = 109;
         //            * 110:自定义消息<br/>
         public static final int CUSTOMIZE = 110;
+        //会议邀请
+        public static final int CUSTOMIZE_MEETING = 905;
         //            * 111:撤回消息回执<br/>
         public static final int REVOKE = 111;
         //2.3.0版本的消息撤回类型，兼容单人撤回，群撤回，新增群主管理员撤回成员信息

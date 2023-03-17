@@ -57,8 +57,12 @@ public class PreviewActivity extends BaseActivity<BaseViewModel, ActivityPreview
         runOnUiThread(() -> hasWrite = AndPermission.hasPermissions(this,
             Permission.WRITE_EXTERNAL_STORAGE));
         bindViewDataBinding(ActivityPreviewBinding.inflate(getLayoutInflater()));
-        SinkHelper.get(this).setTranslucentStatus(null);
         initView();
+    }
+
+    @Override
+    protected void setLightStatus() {
+
     }
 
     private void initView() {

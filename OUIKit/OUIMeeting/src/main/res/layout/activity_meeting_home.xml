@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="callViewModel"
+            type="io.openim.android.ouimeeting.vm.CallViewModel" />
+
+        <variable
+            name="meetingVM"
+            type="io.openim.android.ouimeeting.vm.MeetingVM" />
+    </data>
+
+    <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:animateLayoutChanges="true"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        tools:context=".MeetingHomeActivity">
+
+        <RelativeLayout
+            android:id="@+id/topTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="55dp"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <ImageView
+                android:id="@+id/zoomOut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:padding="5dp"
+                android:src="@mipmap/ic_zoom_out" />
+
+            <ImageView
+                android:id="@+id/horn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/zoomOut"
+                android:padding="5dp"
+                android:src="@mipmap/ic_m_horn" />
+
+            <LinearLayout
+                android:id="@+id/topCenter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxWidth="160dp"
+                    android:maxLines="1"
+                    android:text="@{meetingVM.roomMetadata.meetingName}"
+                    android:textColor="@color/white"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:id="@+id/time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{meetingVM.timeStr}"
+                    android:textColor="@color/white"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/down"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="8dp"
+                android:layout_toRightOf="@id/topCenter"
+                android:src="@mipmap/ic_white_down" />
+
+            <TextView
+                android:id="@+id/end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/sty_radius_6_red"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
+                android:text="@string/end"
+                android:textColor="#ffffffff"
+                android:textSize="17sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/center"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:background="#FF2E2E2E"
+            android:focusable="true">
+
+            <io.livekit.android.renderer.TextureViewRenderer
+                android:id="@+id/centerTextureView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <include
+                android:id="@+id/centerUser"
+                layout="@layout/layout_user_status"
+                android:layout_width="115dp"
+                android:layout_height="115dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/centerUser2"
+                layout="@layout/layout_user_status"
+                android:layout_width="115dp"
+                android:visibility="gone"
+                android:layout_alignParentRight="true"
+                android:layout_height="115dp" />
+
+            <ImageView
+                android:id="@+id/landscape"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="22dp"
+                android:visibility="gone"
+                android:src="@mipmap/ic_m_landscape" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:background="#FF222222"
+            android:id="@+id/bottomMenu"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/expand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:src="@mipmap/ic_white_down" />
+
+            <com.yanzhenjie.recyclerview.SwipeRecyclerView
+                android:id="@+id/memberRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:paddingLeft="15dp"
+                android:paddingTop="10dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="10dp">
+
+
+                <CheckBox
+                    android:id="@+id/mic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="@{meetingVM.micPermission?(1.0f):(0.3f)}"
+                    android:button="@null"
+                    android:checked="@{callViewModel.micEnabled}"
+                    android:drawableTop="@drawable/selector_m_mic"
+                    android:drawablePadding="7dp"
+                    android:enabled="@{meetingVM.micPermission}"
+                    android:gravity="center"
+                    android:text="@string/cancel_mute"
+                    android:textColor="#ffffffff"
+                    android:textSize="10sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <CheckBox
+                    android:id="@+id/camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="@{meetingVM.cameraPermission?(1.0f):(0.3f)}"
+                    android:button="@null"
+                    android:checked="@{callViewModel.cameraEnabled}"
+                    android:drawableTop="@drawable/selector_m_camera"
+                    android:drawablePadding="7dp"
+                    android:enabled="@{meetingVM.cameraPermission}"
+                    android:gravity="center"
+                    android:text="@string/start_camera"
+                    android:textColor="#ffffffff"
+                    android:textSize="10sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <CheckBox
+                    android:id="@+id/shareScreen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="@{meetingVM.sharePermission?(1.0f):(0.3f)}"
+                    android:button="@null"
+                    android:drawableTop="@drawable/selector_m_shared_screen"
+                    android:drawablePadding="7dp"
+                    android:enabled="@{meetingVM.sharePermission}"
+                    android:gravity="center"
+                    android:text="@string/shared_screen"
+                    android:textColor="#ffffffff"
+                    android:textSize="10sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <CheckBox
+                    android:id="@+id/member"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:drawableTop="@mipmap/ic_m_member"
+                    android:drawablePadding="7dp"
+                    android:gravity="center"
+                    android:text="@string/v_member"
+                    android:textColor="#ffffffff"
+                    android:textSize="10sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:visibility="@{meetingVM.isSelfHostUser?View.VISIBLE:View.GONE}" />
+
+                <CheckBox
+                    android:id="@+id/setting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:drawableTop="@mipmap/ic_m_setting"
+                    android:drawablePadding="7dp"
+                    android:gravity="center"
+                    android:text="@string/setting"
+                    android:textColor="#ffffffff"
+                    android:textSize="10sp"
+                    android:visibility="@{meetingVM.isSelfHostUser?View.VISIBLE:View.GONE}" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+</layout>
+

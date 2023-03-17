@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.openim.android.ouicontact.R;
 import io.openim.android.ouicontact.databinding.FragmentForwardFriendBinding;
 import io.openim.android.ouicontact.ui.ForwardToActivity;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
@@ -114,10 +115,12 @@ public class FriendFragment extends BaseFragment<SocialityVM> {
                     itemViewHo.view.nickName.setText(friendInfo.getNickname());
                     itemViewHo.view.select.setVisibility(View.GONE);
                     itemViewHo.view.getRoot().setOnClickListener(v -> {
-                        CommonDialog commonDialog = new CommonDialog(getContext());
-                        commonDialog.getMainView().tips.setText("确认发送给：" + data.userInfo.getNickname());
+                        CommonDialog commonDialog = new CommonDialog(holder.itemView.getContext());
+                        commonDialog.getMainView().tips.setText(getString(io.openim.android.ouicore.R.string.confirm_send_who)
+                            + data.userInfo.getNickname());
                         commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
                         commonDialog.getMainView().confirm.setOnClickListener(v1 -> {
+                            commonDialog.dismiss();
                             if (null!=confirmListener)
                                 confirmListener.onListener(data.userInfo,data.userInfo.getUserID());
                         });

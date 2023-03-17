@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -22,18 +21,13 @@ import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
-import io.openim.android.ouicore.net.bage.Base;
-import io.openim.android.ouicore.net.bage.GsonHel;
 
 import io.openim.android.ouicore.services.NiService;
 import io.openim.android.ouicore.services.OneselfService;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
-
-import okhttp3.ResponseBody;
 
 public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     public static final int MAX_COUNTDOWN = 60;
@@ -169,8 +163,8 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     }
 
     @Override
-    protected void viewDestroy() {
-        super.viewDestroy();
+    protected void releaseRes() {
+        super.releaseRes();
         if (null != timer) {
             timer.cancel();
             timer = null;

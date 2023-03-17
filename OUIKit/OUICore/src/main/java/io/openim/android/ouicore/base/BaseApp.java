@@ -46,6 +46,7 @@ public class BaseApp extends Application {
         String key = cl.getCanonicalName();
         BaseViewModel viewModel = BaseApp.viewModels.get(key);
         if (null != viewModel) {
+            viewModel.releaseRes();
             BaseApp.viewModels.remove(key);
         }
     }

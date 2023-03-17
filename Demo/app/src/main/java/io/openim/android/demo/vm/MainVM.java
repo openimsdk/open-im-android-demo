@@ -93,7 +93,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     }
 
     @Override
-    protected void viewDestroy() {
+    protected void releaseRes() {
         IMEvent.getInstance().removeConnListener(this);
     }
 

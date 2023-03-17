@@ -83,6 +83,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         fragment.setArguments(args);
         return fragment;
     }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         bindVM(ContactListVM.class);
@@ -90,13 +91,15 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         Obs.inst().addObserver(this);
         Activity activity = getActivity();
         if (null != activity) {
-            activity.runOnUiThread(() -> hasScanPermission = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE));
+            activity.runOnUiThread(() -> hasScanPermission = AndPermission.hasPermissions(this,
+                Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE));
         }
         super.onCreate(savedInstanceState);
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         view = FragmentContactListBinding.inflate(getLayoutInflater());
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) view.title.getLayoutParams();
         lp.setMargins(0, SinkHelper.getStatusBarHeight(), 0, 0);
@@ -121,7 +124,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
             MsgConversation conversationInfo = vm.conversations.getValue().get(position);
             SwipeMenuItem top = new SwipeMenuItem(getContext());
-            top.setText(conversationInfo.conversationInfo.isPinned() ? io.openim.android.ouicore.R.string.cancel_top : R.string.top);
+            top.setText(conversationInfo.conversationInfo.isPinned() ?
+                io.openim.android.ouicore.R.string.cancel_top : R.string.top);
             top.setHeight(MATCH_PARENT);
             top.setWidth(Common.dp2px(73));
             top.setTextSize(16);
@@ -148,9 +152,11 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             int menuPosition = menuBridge.getPosition();
             MsgConversation conversationInfo = vm.conversations.getValue().get(adapterPosition);
             if (menuPosition == 0) {
-                vm.pinConversation(conversationInfo.conversationInfo, !conversationInfo.conversationInfo.isPinned());
+                vm.pinConversation(conversationInfo.conversationInfo,
+                    !conversationInfo.conversationInfo.isPinned());
             } else if (menuPosition == 1 && conversationInfo.conversationInfo.getUnreadCount() > 0) {
-                chatVM.markReadedByConID(conversationInfo.conversationInfo.getConversationID(), null, null);
+                chatVM.markReadedByConID(conversationInfo.conversationInfo.getConversationID(),
+                    null, null);
             } else {
                 vm.conversations.getValue().remove(conversationInfo);
                 adapter.notifyItemRemoved(adapterPosition);
@@ -166,11 +172,15 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             MsgConversation msgConversation = vm.conversations.getValue().get(position);
             if (msgConversation.conversationInfo.getConversationType() == Constant.SessionType.NOTIFICATION) {
                 //系统通知
-                Intent intent = new Intent(getContext(), NotificationActivity.class).putExtra(Constant.K_NAME, msgConversation.conversationInfo.getShowName()).putExtra(Constant.K_ID, msgConversation.conversationInfo.getConversationID());
+                Intent intent =
+                    new Intent(getContext(), NotificationActivity.class).putExtra(Constant.K_NAME
+                        , msgConversation.conversationInfo.getShowName()).putExtra(Constant.K_ID,
+                        msgConversation.conversationInfo.getConversationID());
                 startActivity(intent);
                 return;
             }
-            Intent intent = new Intent(getContext(), ChatActivity.class).putExtra(Constant.K_NAME, msgConversation.conversationInfo.getShowName());
+            Intent intent = new Intent(getContext(), ChatActivity.class).putExtra(Constant.K_NAME
+                , msgConversation.conversationInfo.getShowName());
             if (msgConversation.conversationInfo.getConversationType() == Constant.SessionType.SINGLE_CHAT)
                 intent.putExtra(Constant.K_ID, msgConversation.conversationInfo.getUserID());
 
@@ -182,7 +192,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             startActivity(intent);
 
             //重置强提醒
-            OpenIMClient.getInstance().conversationManager.resetConversationGroupAtType(null, msgConversation.conversationInfo.getConversationID());
+            OpenIMClient.getInstance().conversationManager.resetConversationGroupAtType(null,
+                msgConversation.conversationInfo.getConversationID());
         });
 
         adapter = new CustomAdapter(getContext());
@@ -190,7 +201,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         view.recyclerView.addHeaderView(createHeaderView());
 
 
-//        view.recyclerView.addItemDecoration(new DefaultItemDecoration(getActivity().getColor(android.R.color.transparent), 1, 36));
+//        view.recyclerView.addItemDecoration(new DefaultItemDecoration(getActivity().getColor
+//        (android.R.color.transparent), 1, 36));
         vm.conversations.observe(getActivity(), v -> {
             if (null == v || v.size() == 0) return;
             adapter.setConversationInfos(v);
@@ -203,16 +215,15 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         view.nickname.setText(BaseApp.inst().loginCertificate.nickname);
         view.addFriend.setOnClickListener(this::showPopupWindow);
         view.callRecord.setOnClickListener(view -> {
-            ARouter.getInstance()
-                .build(Routes.Main.CALL_HISTORY)
-                .navigation();
+            ARouter.getInstance().build(Routes.Main.CALL_HISTORY).navigation();
         });
     }
 
 
     private void showPopupWindow(View v) {
         //初始化一个PopupWindow，width和height都是WRAP_CONTENT
-        PopupWindow popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        PopupWindow popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT);
         LayoutAddActionBinding view = LayoutAddActionBinding.inflate(getLayoutInflater());
         view.scan.setOnClickListener(c -> {
             popupWindow.dismiss();
@@ -227,19 +238,21 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         });
         view.addGroup.setOnClickListener(c -> {
             popupWindow.dismiss();
-            ARouter.getInstance().build(Routes.Main.ADD_CONVERS)
-                .withBoolean(Constant.K_RESULT, false)
-                .navigation();
+            ARouter.getInstance().build(Routes.Main.ADD_CONVERS).withBoolean(Constant.K_RESULT,
+                false).navigation();
         });
         view.createGroup.setOnClickListener(c -> {
             popupWindow.dismiss();
-            ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
-                .navigation();
+            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).navigation();
         });
         view.createWordGroup.setOnClickListener(c -> {
             popupWindow.dismiss();
-            ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
-                .withBoolean(Constant.K_RESULT, true).navigation();
+            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withBoolean(Constant.K_RESULT,
+                true).navigation();
+        });
+        view.videoMeeting.setOnClickListener(c -> {
+            popupWindow.dismiss();
+            ARouter.getInstance().build(Routes.Meeting.HOME).navigation();
         });
         //设置PopupWindow的视图内容
         popupWindow.setContentView(view.getRoot());
@@ -259,7 +272,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
     private View createHeaderView() {
         View header = getLayoutInflater().inflate(R.layout.view_search, view.recyclerView, false);
-        header.setOnClickListener(v -> startActivity(new Intent(getActivity(), SearchActivity.class)));
+        header.setOnClickListener(v -> startActivity(new Intent(getActivity(),
+            SearchActivity.class)));
         return header;
     }
 
@@ -306,7 +320,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         public void onBindViewHolder(ViewHol.ContactItemHolder viewHolder, final int position) {
             MsgConversation msgConversation = conversationInfos.get(position);
 
-            viewHolder.viewBinding.avatar.load(msgConversation.conversationInfo.getFaceURL(), msgConversation.conversationInfo.getConversationType() != Constant.SessionType.SINGLE_CHAT);
+            viewHolder.viewBinding.avatar.load(msgConversation.conversationInfo.getFaceURL(),
+                msgConversation.conversationInfo.getConversationType() != Constant.SessionType.SINGLE_CHAT);
             viewHolder.viewBinding.nickName.setText(msgConversation.conversationInfo.getShowName());
 
             if (msgConversation.conversationInfo.getRecvMsgOpt() != 0) {
@@ -328,18 +343,23 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             String lastMsg = IMUtil.getMsgParse(msgConversation.lastMsg);
             //强提醒
             if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification) {
-                String target = "[" + context.getString(io.openim.android.ouicore.R.string.group_bulletin) + "]";
+                String target =
+                    "[" + context.getString(io.openim.android.ouicore.R.string.group_bulletin) +
+                        "]";
                 try {
                     lastMsg = target + msgConversation.notificationMsg.group.notification;
                 } catch (Exception e) {
                     if (!lastMsg.contains(target)) lastMsg = target + "\t" + lastMsg;
                 }
-                Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg, target, BaseApp.inst().getColor(android.R.color.holo_red_dark));
+                Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg,
+                    target, BaseApp.inst().getColor(android.R.color.holo_red_dark));
 
             } else if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.atMe) {
-                String target = "@" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.you);
+                String target =
+                    "@" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.you);
                 if (!lastMsg.contains(target)) lastMsg = target + "\t" + lastMsg;
-                Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg, target, BaseApp.inst().getColor(android.R.color.holo_red_dark));
+                Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg,
+                    target, BaseApp.inst().getColor(android.R.color.holo_red_dark));
             } else viewHolder.viewBinding.lastMsg.setText(lastMsg);
         }
 

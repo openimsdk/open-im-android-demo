@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.sql.Time;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.entity.CallHistory;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
@@ -49,6 +51,7 @@ public class CallHistoryActivity extends BaseActivity<BaseViewModel,
     private RecyclerViewAdapter<CallHistory, CallHistoryItem> recyclerViewAdapter;
     private List<CallHistory> callHistoryList = new ArrayList<>();
     private boolean isMissedCall = false;
+    private CallingService callingService;
 
 
     @Override
@@ -124,6 +127,7 @@ public class CallHistoryActivity extends BaseActivity<BaseViewModel,
     }
 
     void init() {
+        callingService=(CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
         view.content.setLayoutManager(new LinearLayoutManager(this));
         view.content.setAdapter(recyclerViewAdapter = new RecyclerViewAdapter<CallHistory,
             CallHistoryItem>(CallHistoryItem.class) {
