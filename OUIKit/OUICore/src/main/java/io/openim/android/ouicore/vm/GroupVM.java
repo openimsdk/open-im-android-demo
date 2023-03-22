@@ -12,10 +12,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
 
+import io.openim.android.ouicore.im.IMBack;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.Common;
@@ -35,24 +37,30 @@ import io.openim.android.sdk.models.GroupMemberRole;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class GroupVM extends SocialityVM {
+    //禁言状态
+    public MutableLiveData<Integer> muteStatus = new MutableLiveData<>(-1);
     public MutableLiveData<String> groupName = new MutableLiveData<>("");
-
     public MutableLiveData<GroupInfo> groupsInfo = new MutableLiveData<>();
     //当前用户是否是群主
     public MutableLiveData<Boolean> isGroupOwner = new MutableLiveData<>(true);
     //群所有成员
-    public MutableLiveData<List<GroupMembersInfo>> groupMembers = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<GroupMembersInfo>> groupMembers =
+        new MutableLiveData<>(new ArrayList<>());
     //超级群成员分页加载
-    public MutableLiveData<List<ExGroupMemberInfo>> superGroupMembers = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<ExGroupMemberInfo>> superGroupMembers =
+        new MutableLiveData<>(new ArrayList<>());
     //封装过的群成员 用于字母导航
-    public MutableLiveData<List<ExGroupMemberInfo>> exGroupMembers = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<ExGroupMemberInfo>> exGroupMembers =
+        new MutableLiveData<>(new ArrayList<>());
     //群管理
-    public MutableLiveData<List<ExGroupMemberInfo>> exGroupManagement = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<ExGroupMemberInfo>> exGroupManagement =
+        new MutableLiveData<>(new ArrayList<>());
     //群字母导航
     public MutableLiveData<List<String>> groupLetters = new MutableLiveData<>(new ArrayList<>());
     //封装过的好友信息 用于字母导航
     public String groupId;
-    public MutableLiveData<List<FriendInfo>> selectedFriendInfo = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<FriendInfo>> selectedFriendInfo =
+        new MutableLiveData<>(new ArrayList<>());
     public LoginCertificate loginCertificate;
 
     public int page = 0;
@@ -116,8 +124,12 @@ public class GroupVM extends SocialityVM {
                 getIView().onSuccess(data);
                 Common.UIHandler.postDelayed(waitDialog::dismiss, 200);
             }
-        }, groupName.getValue(), null, null, null,
-            isWordGroup ? Constant.GroupType.work : Constant.GroupType.general, null, groupMemberRoles);
+        }, groupName.getValue(), null, null, null, isWordGroup ? Constant.GroupType.work :
+            Constant.GroupType.general, null, groupMemberRoles);
+    }
+
+    public void selectMute(int status) {
+        muteStatus.setValue(status);
     }
 
     /**
@@ -130,7 +142,8 @@ public class GroupVM extends SocialityVM {
      * @param introduction 群简介
      * @param ex           其他信息
      */
-    public void UPDATEGroup(String groupID, String groupName, String faceURL, String notification, String introduction, String ex) {
+    public void UPDATEGroup(String groupID, String groupName, String faceURL, String notification
+        , String introduction, String ex) {
         OpenIMClient.getInstance().groupManager.setGroupInfo(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -191,14 +204,14 @@ public class GroupVM extends SocialityVM {
             }
 
             private void buildOwnSelect() {
-                ExGroupMemberInfo own=new ExGroupMemberInfo();
-                own.groupMembersInfo=new  GroupMembersInfo();
+                ExGroupMemberInfo own = new ExGroupMemberInfo();
+                own.groupMembersInfo = new GroupMembersInfo();
                 own.groupMembersInfo.setUserID(BaseApp.inst().loginCertificate.userID);
-                int index=superGroupMembers.getValue().indexOf(own);
-                if (index>-1){
-                    ExGroupMemberInfo exGroupMemberInfo=superGroupMembers.getValue().get(index);
-                    exGroupMemberInfo.isSelect=true;
-                    exGroupMemberInfo.isEnabled=false;
+                int index = superGroupMembers.getValue().indexOf(own);
+                if (index > -1) {
+                    ExGroupMemberInfo exGroupMemberInfo = superGroupMembers.getValue().get(index);
+                    exGroupMemberInfo.isSelect = true;
+                    exGroupMemberInfo.isEnabled = false;
                 }
             }
         }, groupId, 0, start, pageSize);
@@ -274,7 +287,7 @@ public class GroupVM extends SocialityVM {
                     exGroupMemberInfo.groupMembersInfo = datum;
                     if (datum.getRoleLevel() > 1) {
                         //群管理单独存放
-                        exGroupMemberInfo.sortLetter="";
+                        exGroupMemberInfo.sortLetter = "";
                         exGroupManagement.getValue().add(exGroupMemberInfo);
                         continue;
                     }
@@ -447,7 +460,8 @@ public class GroupVM extends SocialityVM {
 
 
     private void close(CommonDialog commonDialog) {
-        IConversationBridge iConversationBridge = (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();
+        IConversationBridge iConversationBridge =
+            (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();
         iConversationBridge.deleteConversationFromLocalAndSvr(groupId);
         iConversationBridge.closeChatPage();
         commonDialog.dismiss();
@@ -468,7 +482,8 @@ public class GroupVM extends SocialityVM {
         }, groupId, isChecked);
     }
 
-    public void setGroupVerification(int needVerification, IMUtil.OnSuccessListener onSuccessListener) {
+    public void setGroupVerification(int needVerification,
+                                     IMUtil.OnSuccessListener onSuccessListener) {
         OpenIMClient.getInstance().groupManager.setGroupVerification(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -508,5 +523,34 @@ public class GroupVM extends SocialityVM {
                 if (null != onSuccessListener) onSuccessListener.onSuccess(data);
             }
         }, groupId, status);
+    }
+
+    public void changeGroupMemberMute(IMBack<String> imBack, String uid, long seconds) {
+        OpenIMClient.getInstance().groupManager.changeGroupMemberMute(imBack, groupId, uid,
+            seconds);
+    }
+
+   public void setMemberMute(IMBack<String> imBack,String uid, long seconds) {
+        int status = muteStatus.getValue();
+        if (status == -1||(status == 0 && seconds == 0)) {
+            getIView().toast(BaseApp.inst().getString(R.string.mute_tips));
+            return;
+        }
+        if (status==1){
+            seconds=60*10;
+        }
+        if (status==2){
+            seconds=60*60;
+        }
+        if (status==3){
+            seconds=60*60*12;
+        }
+        if (status==4){
+            seconds=60*60*24;
+        }
+        if (status==5){
+            seconds=0;
+        }
+        changeGroupMemberMute(imBack, uid, seconds);
     }
 }

@@ -347,4 +347,18 @@
     <string name="cancel_meeting">取消会议</string>
     <string name="edit_succ">修改成功</string>
     <string name="confirm_send_who">确认发送给：</string>
+    <string name="join_group_method">入群方式</string>
+    <string name="set_manager">设为管理员</string>
+    <string name="set_mute">设置禁言</string>
+    <string name="inviter_join">邀请进群</string>
+    <string name="search_id_join">搜索群ID</string>
+    <string name="group_qr_join">群二维码</string>
+    <string name="_10_minutes">10分钟</string>
+    <string name="_1_hour">1小时</string>
+    <string name="_12_hour">12小时</string>
+    <string name="_1_day">1天</string>
+    <string name="cancel_mute2">取消禁言</string>
+    <string name="customize">自定义</string>
+    <string name="day">天</string>
+    <string name="mute_tips">输入或选择禁言时间</string>
 </resources>

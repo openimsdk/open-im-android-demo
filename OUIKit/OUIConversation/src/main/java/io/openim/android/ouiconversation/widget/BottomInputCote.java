@@ -258,7 +258,9 @@ public class BottomInputCote {
         if (!vm.isSingleChat) {
             vm.groupInfo.observe((LifecycleOwner) context, groupInfo -> {
                 if (null == groupInfo) return;
-                if (groupInfo.getStatus() == Constant.GroupStatus.status3 && !groupInfo.getOwnerUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+                if (groupInfo.getStatus() == Constant.GroupStatus.status3
+                    && !groupInfo.getOwnerUserID().equals(BaseApp.inst()
+                    .loginCertificate.userID)) {
                     view.inputLy.setVisibility(VISIBLE);
                     view.chatSend.setVisibility(VISIBLE);
                     view.touchSay.setVisibility(GONE);

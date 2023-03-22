@@ -300,10 +300,10 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     private void gotoMemberList(boolean transferPermissions) {
-        if (vm.groupMembers.getValue().isEmpty()) return;
-        if (vm.groupMembers.getValue().size() > Constant.SUPER_GROUP_LIMIT)
+//        if (vm.groupMembers.getValue().isEmpty()) return;
+//        if (vm.groupMembers.getValue().size() > Constant.SUPER_GROUP_LIMIT)
             startActivity(new Intent(GroupMaterialActivity.this, SuperGroupMemberActivity.class).putExtra(Constant.K_FROM, transferPermissions));
-        else
-            startActivity(new Intent(GroupMaterialActivity.this, GroupMemberActivity.class).putExtra(Constant.K_FROM, transferPermissions));
+//        else
+//            startActivity(new Intent(GroupMaterialActivity.this, GroupMemberActivity.class).putExtra(Constant.K_FROM, transferPermissions));
     }
 }

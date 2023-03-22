@@ -4,9 +4,15 @@
 
     <application>
         <activity
+            android:name=".ui.SetMuteActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".ui.SelectedMemberActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".ui.MemberPermissionActivity"
             android:exported="false" />

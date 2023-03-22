@@ -127,7 +127,7 @@ public class SearchFriendsActivity extends BaseActivity<SearchVM, ActivitySearch
                 handler.removeCallbacksAndMessages(null);
                 handler.postDelayed(() -> {
                     String input = s.toString();
-                    vm.page = 1;
+                    vm.page = 0;
                     vm.searchContent.setValue(input);
                 }, 500);
             }

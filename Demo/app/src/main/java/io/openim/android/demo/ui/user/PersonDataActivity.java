@@ -33,6 +33,7 @@ import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.SlideButton;
 import io.openim.android.ouicore.widget.WaitDialog;
@@ -59,16 +60,14 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         if (TextUtils.isEmpty(uid)) {
             chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
             uid = chatVM.userID;
-            vm.getUserInfo(uid);
-        } else
-            vm.getUserInfo(uid);
+        }
+        vm.getUserInfo(uid);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (isFinishing())
-            removeCacheVM();
+        if (isFinishing()) removeCacheVM();
     }
 
     private void init() {
@@ -82,6 +81,8 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
     @Override
     public void onSuccess(Object body) {
         super.onSuccess(body);
+        final String cid = "single_" + uid;
+        BaseApp.inst().getVMByCache(ContactListVM.class).deleteConversationFromLocalAndSvr(cid);
         setResult(RESULT_OK);
         finish();
     }
@@ -104,9 +105,8 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             bean.put("userID", userInfo.getUserID());
             bean.put("nickname", userInfo.getNickname());
             bean.put("faceURL", userInfo.getFaceURL());
-            ARouter.getInstance()
-                .build(Routes.Contact.ALL_FRIEND).withString("recommend", GsonHel.toJson(bean))
-                .navigation();
+            ARouter.getInstance().build(Routes.Contact.ALL_FRIEND).withString("recommend",
+                GsonHel.toJson(bean)).navigation();
         });
         view.moreData.setOnClickListener(v -> {
             startActivity(new Intent(this, MoreDataActivity.class));
@@ -116,16 +116,14 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             String remark = "";
             try {
                 remark = vm.exUserInfo.getValue().userInfo.getFriendInfo().getRemark();
-            } catch (Exception e){}
-            resultLauncher.launch(new Intent(this, EditTextActivity.class)
-                .putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.remark))
-                .putExtra(EditTextActivity.INIT_TXT, remark));
+            } catch (Exception e) {
+            }
+            resultLauncher.launch(new Intent(this, EditTextActivity.class).putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.remark)).putExtra(EditTextActivity.INIT_TXT, remark));
         });
         friendVM.blackListUser.observe(this, userInfos -> {
             boolean isCon = false;
             for (UserInfo userInfo : userInfos) {
-                if (userInfo.getUserID()
-                    .equals(uid)) {
+                if (userInfo.getUserID().equals(uid)) {
                     isCon = true;
                     break;
                 }
@@ -134,17 +132,14 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             view.slideButton.post(() -> view.slideButton.setCheckedWithAnimation(finalIsCon));
         });
         view.joinBlackList.setOnClickListener(v -> {
-            if (view.slideButton.isChecked())
-                friendVM.removeBlacklist(uid);
+            if (view.slideButton.isChecked()) friendVM.removeBlacklist(uid);
             else {
                 addBlackList();
             }
         });
         view.slideButton.setOnSlideButtonClickListener(isChecked -> {
-            if (isChecked)
-                addBlackList();
-            else
-                friendVM.removeBlacklist(uid);
+            if (isChecked) addBlackList();
+            else friendVM.removeBlacklist(uid);
         });
     }
 
@@ -152,8 +147,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         CommonDialog commonDialog = new CommonDialog(this);
         commonDialog.setCanceledOnTouchOutside(false);
         commonDialog.setCancelable(false);
-        commonDialog.getMainView().tips.setText("确认对" + vm.exUserInfo.getValue().
-            userInfo.getFriendInfo().getNickname() + "拉黑吗？");
+        commonDialog.getMainView().tips.setText("确认对" + vm.exUserInfo.getValue().userInfo.getFriendInfo().getNickname() + "拉黑吗？");
         commonDialog.getMainView().cancel.setOnClickListener(v -> {
             commonDialog.dismiss();
             friendVM.blackListUser.setValue(friendVM.blackListUser.getValue());
@@ -165,24 +159,25 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         commonDialog.show();
     }
 
-    private ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() != Activity.RESULT_OK) return;
-        String resultStr = result.getData().getStringExtra(Constant.K_RESULT);
+    private ActivityResultLauncher<Intent> resultLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() != Activity.RESULT_OK) return;
+            String resultStr = result.getData().getStringExtra(Constant.K_RESULT);
 
-        waitDialog.show();
-        OpenIMClient.getInstance().friendshipManager.setFriendRemark(new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-                waitDialog.dismiss();
-                toast(error + code);
-            }
+            waitDialog.show();
+            OpenIMClient.getInstance().friendshipManager.setFriendRemark(new OnBase<String>() {
+                @Override
+                public void onError(int code, String error) {
+                    waitDialog.dismiss();
+                    toast(error + code);
+                }
 
-            @Override
-            public void onSuccess(String data) {
-                waitDialog.dismiss();
-                vm.exUserInfo.getValue().userInfo.setRemark(resultStr);
-                Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
-            }
-        }, uid, resultStr);
-    });
+                @Override
+                public void onSuccess(String data) {
+                    waitDialog.dismiss();
+                    vm.exUserInfo.getValue().userInfo.setRemark(resultStr);
+                    Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
+                }
+            }, uid, resultStr);
+        });
 }

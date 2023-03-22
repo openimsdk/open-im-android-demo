@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <declare-styleable name="BadgeButton">
+        <!-- 徽标文本，为空时显示一个小红点 -->
+        <attr name="btnBadgeText" format="string"/>
+        <!-- 徽标高度，宽度自适应 -->
+        <attr name="btnBadgeHeight" format="dimension"/>
+        <!-- 徽标背景色，文本白色 -->
+        <attr name="btnBadgeColor" format="color"/>
+        <!-- 徽标是否可见 -->
+        <attr name="btnBadgeVisible" format="boolean"/>
+    </declare-styleable>
 </resources>

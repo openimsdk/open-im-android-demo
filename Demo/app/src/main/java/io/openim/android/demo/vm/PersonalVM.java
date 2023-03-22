@@ -72,17 +72,18 @@ public class PersonalVM extends BaseViewModel {
                 extendUserInfo.userInfo = data;
                 exUserInfo.setValue(extendUserInfo);
 
-                getExtendUserInfo();
+                getExtendUserInfo(BaseApp.inst().loginCertificate.userID);
             }
         });
 
     }
 
-    private void getExtendUserInfo() {
+    private void getExtendUserInfo(String uid) {
         List<String> ids = new ArrayList<>();
-        ids.add(BaseApp.inst().loginCertificate.userID);
+        ids.add(uid);
         Parameter parameter = new Parameter().add("operationID", System.currentTimeMillis() + "").add("pageNumber", 1).add("showNumber", 1).add("userIDList", ids);
-        N.API(OpenIMService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OpenIMService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
+        N.API(OpenIMService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OpenIMService.turn(HashMap.class))
+            .compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
             @Override
             protected void onFailure(Throwable e) {
                 getIView().toast(e.getMessage());
@@ -119,6 +120,7 @@ public class PersonalVM extends BaseViewModel {
         waitDialog.show();
         List<String> ids = new ArrayList<>();
         ids.add(id);
+
         OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
             @Override
             public void onError(int code, String error) {
@@ -134,7 +136,6 @@ public class PersonalVM extends BaseViewModel {
                 extendUserInfo.userInfo = data.get(0);
                 exUserInfo.setValue(extendUserInfo);
 
-                getExtendUserInfo();
             }
         }, ids);
     }

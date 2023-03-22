@@ -24,18 +24,19 @@ import io.openim.android.demo.ui.user.PersonDataActivity;
 import io.openim.android.demo.vm.FriendVM;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.im.IMBack;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
+import io.openim.android.ouigroup.ui.SetMuteActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendshipInfo;
@@ -62,6 +63,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     private boolean isFriend;
     private CallingService callingService;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         bindVM(SearchVM.class);
@@ -74,8 +76,10 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         click();
     }
 
+
     private void init() {
-        callingService=(CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
         formChat = getIntent().getBooleanExtra(Constant.K_RESULT, false);
         groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
         vm.searchContent.setValue(getIntent().getStringExtra(Constant.K_ID));
@@ -83,7 +87,6 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         Obs.inst().addObserver(this);
         waitDialog = new WaitDialog(this);
         friendVM.waitDialog = waitDialog;
-        waitDialog.setNotDismiss();
         friendVM.setContext(this);
         friendVM.setIView(this);
         waitDialog.show();
@@ -91,10 +94,87 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         vm.searchPerson();
     }
 
+    private ActivityResultLauncher<Intent> jumpCallBack =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK) {
+                getOneselfAndTargetMemberInfo();
+            }
+        });
+
+    /**
+     * 获取自己和选择用户的MemberInfo
+     */
+    private void getOneselfAndTargetMemberInfo() {
+        List<String> ids = new ArrayList<>();
+        ids.add(BaseApp.inst().loginCertificate.userID);
+        ids.add(vm.searchContent.getValue());
+        getGroupMembersInfo(ids, result -> {
+            if (result.isEmpty()) return;
+            GroupMembersInfo oneselfGroupMembersInfo = null;
+            GroupMembersInfo targetGroupMembersInfo = null;
+            for (int i = 0; i < result.size(); i++) {
+                if (result.get(i).getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+                    oneselfGroupMembersInfo = result.get(i);
+                } else targetGroupMembersInfo = result.get(i);
+            }
+            if (oneself()) targetGroupMembersInfo = oneselfGroupMembersInfo;
+            if (null == oneselfGroupMembersInfo || null == targetGroupMembersInfo) return;
+            view.groupNickName.setText(targetGroupMembersInfo.getNickname());
+            view.time.setText(TimeUtil.getTime(targetGroupMembersInfo.getJoinTime() * 1000,
+                TimeUtil.yearMonthDayFormat));
+            view.joinMethodLy.setVisibility(oneself() ? View.GONE : View.VISIBLE);
+
+            String muteTime = "";
+            if (targetGroupMembersInfo.getMuteEndTime() != 0)
+                muteTime = TimeUtil.getTime(targetGroupMembersInfo.getMuteEndTime() * 1000,
+                    TimeUtil.yearTimeSecondFormat);
+            view.muteTime.setText(muteTime);
+            if (oneself()) return;
+
+            view.manager.setVisibility(isOwner(oneselfGroupMembersInfo) ? View.VISIBLE : View.GONE);
+            if (isOwner(targetGroupMembersInfo) || isAdmin(targetGroupMembersInfo)) {
+                view.mute.setVisibility(View.GONE);
+            } else {
+                view.mute.setVisibility(isOwner(oneselfGroupMembersInfo) || isAdmin(oneselfGroupMembersInfo) ? View.VISIBLE : View.GONE);
+            }
+            if (targetGroupMembersInfo.getJoinSource() == 2) {
+                List<String> ids2 = new ArrayList<>();
+                ids2.add(targetGroupMembersInfo.getInviterUserID());
+                getGroupMembersInfo(ids2,
+                    result2 -> view.joinMethod.setText(result2.get(0).getNickname() + getString(io.openim.android.ouicore.R.string.inviter_join)));
+            }
+            if (targetGroupMembersInfo.getJoinSource() == 3) {
+                view.joinMethod.setText(io.openim.android.ouicore.R.string.search_id_join);
+            }
+            if (targetGroupMembersInfo.getJoinSource() == 4) {
+                view.joinMethod.setText(io.openim.android.ouicore.R.string.group_qr_join);
+            }
+
+            view.setManager.setCheckedWithAnimation(isAdmin(targetGroupMembersInfo));
+            final String uid = targetGroupMembersInfo.getUserID();
+            view.setManager.setOnSlideButtonClickListener(isChecked -> {
+                OpenIMClient.getInstance().groupManager.setGroupMemberRoleLevel(new IMBack<String>() {
+                    @Override
+                    public void onSuccess(String data) {
+                        GroupVM groupVM = BaseApp.inst().getVMByCache(GroupVM.class);
+                        groupVM.superGroupMembers.getValue().clear();
+                        groupVM.page = 0;
+                        groupVM.getSuperGroupMemberList();
+                    }
+                }, groupId, uid, isChecked ? Constant.RoleLevel.ADMINISTRATOR :
+                    Constant.RoleLevel.MEMBER);
+            });
+            view.mute.setOnClickListener(v -> {
+                jumpCallBack.launch(new Intent(this, SetMuteActivity.class).putExtra(Constant.K_ID, vm.searchContent.getValue()));
+            });
+
+        });
+    }
+
     private ActivityResultLauncher<Intent> personDataActivityLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK) onSuccess(null);
-    });
+            if (result.getResultCode() == RESULT_OK) onSuccess(null);
+        });
 
     private void click() {
         view.copy.setOnClickListener(v -> {
@@ -147,7 +227,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
 
     boolean oneself() {
         try {
-            return vm.userInfo.getValue().get(0).getUserID().equals(BaseApp.inst().loginCertificate.userID);
+            return BaseApp.inst().loginCertificate.userID.equals(vm.searchContent.getValue());
         } catch (Exception ignored) {
         }
         return false;
@@ -156,9 +236,10 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     private void listener() {
         vm.groupsInfo.observe(this, groupInfos -> {
             if (groupInfos.isEmpty()) return;
+
             GroupInfo groupInfo = groupInfos.get(0);
             // 不允许查看群成员资料
-            if (notLookMemberInfo = groupInfo.getLookMemberInfo() == 1) {
+            if (notLookMemberInfo = (groupInfo.getLookMemberInfo() == 1)) {
                 view.userInfo.setVisibility(View.GONE);
                 view.idLy.setVisibility(View.GONE);
             } else {
@@ -166,10 +247,13 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 if (!oneself() && isFriend) view.userInfo.setVisibility(View.VISIBLE);
             }
             // 不允许添加组成员为好友
-            applyMemberFriend =
-                groupInfo.getApplyMemberFriend() == 1;
-            view.addFriend.setVisibility((applyMemberFriend || isFriend) ? View.GONE : View.VISIBLE);
+            applyMemberFriend = groupInfo.getApplyMemberFriend() == 1;
+
+            view.addFriend.setVisibility((applyMemberFriend || isFriend) ? View.GONE :
+                View.VISIBLE);
             view.idLy.setVisibility(applyMemberFriend ? View.GONE : View.VISIBLE);
+
+            getOneselfAndTargetMemberInfo();
         });
 
         friendVM.blackListUser.observe(this, userInfos -> {
@@ -193,8 +277,12 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             if (!TextUtils.isEmpty(groupId)) {
                 vm.searchGroup(groupId);
                 view.groupInfo.setVisibility(View.VISIBLE);
-                getGroupMembersInfo();
             }
+
+            boolean allowSendMsgNotFriend = BaseApp.inst().loginCertificate.allowSendMsgNotFriend;
+            view.sendMsg.setVisibility(isFriend || allowSendMsgNotFriend ? View.VISIBLE :
+                View.GONE);
+            view.call.setVisibility(isFriend || allowSendMsgNotFriend ? View.VISIBLE : View.GONE);
         });
         vm.userInfo.observe(this, v -> {
             if (null != v && !v.isEmpty()) {
@@ -208,7 +296,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 view.nickName.setText(nickName);
                 view.userId.setText(userInfo.getUserID());
                 view.avatar.load(userInfo.getFaceURL());
-                if (oneself()) view.bottomMenu.setVisibility(View.GONE);
+                view.bottomMenu.setVisibility(oneself() ? View.GONE : View.VISIBLE);
             }
         });
         vm.friendshipInfo.observe(this, v -> {
@@ -219,9 +307,8 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         });
     }
 
-    private void getGroupMembersInfo() {
-        List<String> ids = new ArrayList<>();
-        ids.add(vm.searchContent.getValue());
+    void getGroupMembersInfo(List<String> ids,
+                             IMUtil.OnSuccessListener<List<GroupMembersInfo>> successListener) {
         OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new OnBase<List<GroupMembersInfo>>() {
             @Override
             public void onError(int code, String error) {
@@ -231,13 +318,19 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             @Override
             public void onSuccess(List<GroupMembersInfo> data) {
                 if (data.isEmpty()) return;
-                GroupMembersInfo groupMembersInfo = data.get(0);
-                view.groupNickName.setText(groupMembersInfo.getNickname());
-                view.time.setText(TimeUtil.getTime(groupMembersInfo.getJoinTime() * 1000,
-                    TimeUtil.yearMonthDayFormat));
+                successListener.onSuccess(data);
             }
         }, groupId, ids);
     }
+
+    private boolean isOwner(GroupMembersInfo membersInfo) {
+        return membersInfo.getRoleLevel() == Constant.RoleLevel.GROUP_OWNER;
+    }
+
+    private boolean isAdmin(GroupMembersInfo membersInfo) {
+        return membersInfo.getRoleLevel() == Constant.RoleLevel.ADMINISTRATOR;
+    }
+
 
     @Override
     public void update(Observable o, Object arg) {

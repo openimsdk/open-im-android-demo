@@ -31,13 +31,13 @@ import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivitySuperGroupMemberBinding;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 @Route(path = Routes.Group.SUPER_GROUP_MEMBER)
-public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySuperGroupMemberBinding> {
+public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
+    ActivitySuperGroupMemberBinding> {
     private RecyclerViewAdapter adapter;
     //转让群主权限
     private boolean isTransferPermission;
@@ -58,38 +58,42 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
         listener();
     }
 
-    private ActivityResultLauncher<Intent> searchFriendLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        try {
-            String uid = result.getData().getStringExtra(Constant.K_ID);
-            if (isSelectMember) {
-                String resultJson = result.getData().getStringExtra(Constant.K_RESULT);
-                GroupMembersInfo groupMembersInfo = GsonHel.fromJson(resultJson, GroupMembersInfo.class);
-                ExGroupMemberInfo exGroupMemberInfo = new ExGroupMemberInfo();
-                exGroupMemberInfo.isSelect = true;
-                exGroupMemberInfo.groupMembersInfo = groupMembersInfo;
-                int index = vm.superGroupMembers.getValue().indexOf(exGroupMemberInfo);
-                if (index != -1) {
-                    vm.superGroupMembers.getValue().get(index).isSelect = true;
+    private ActivityResultLauncher<Intent> searchFriendLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            try {
+                String uid = result.getData().getStringExtra(Constant.K_ID);
+                if (isSelectMember) {
+                    String resultJson = result.getData().getStringExtra(Constant.K_RESULT);
+                    GroupMembersInfo groupMembersInfo = GsonHel.fromJson(resultJson,
+                        GroupMembersInfo.class);
+                    ExGroupMemberInfo exGroupMemberInfo = new ExGroupMemberInfo();
+                    exGroupMemberInfo.isSelect = true;
+                    exGroupMemberInfo.groupMembersInfo = groupMembersInfo;
+                    int index = vm.superGroupMembers.getValue().indexOf(exGroupMemberInfo);
+                    if (index != -1) {
+                        vm.superGroupMembers.getValue().get(index).isSelect = true;
+                    } else {
+                        vm.superGroupMembers.getValue().add(exGroupMemberInfo);
+                    }
+                    adapter.notifyItemChanged(index);
+                    updateSelectedNum();
                 } else {
-                    vm.superGroupMembers.getValue().add(exGroupMemberInfo);
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID,
+                        uid).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
                 }
-                adapter.notifyItemChanged(index);
-                UPDATESelectedNum();
-            } else {
-                ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, uid).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
+            } catch (Exception ignored) {
+
             }
-        } catch (Exception ignored) {
+        });
+    private ActivityResultLauncher<Intent> selectMemberLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK) {
+                adapter.notifyDataSetChanged();
+                updateSelectedNum();
+            }
+        });
 
-        }
-    });
-    private ActivityResultLauncher<Intent> selectMemberLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK) {
-            adapter.notifyDataSetChanged();
-            UPDATESelectedNum();
-        }
-    });
-
-    private void UPDATESelectedNum() {
+    private void updateSelectedNum() {
         selectNum = 0;
         for (ExGroupMemberInfo exGroupMemberInfo : vm.superGroupMembers.getValue()) {
             if (exGroupMemberInfo.isSelect) selectNum++;
@@ -115,8 +119,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
                 if (exGroupMemberInfo.isSelect)
                     ids.add(exGroupMemberInfo.groupMembersInfo.getUserID());
             }
-            if (ids.size() == 1
-                && ids.get(0).equals(BaseApp.inst().loginCertificate.userID)) {
+            if (ids.size() == 1 && ids.get(0).equals(BaseApp.inst().loginCertificate.userID)) {
                 toast(getString(io.openim.android.ouicore.R.string.group_call_tips3));
                 return;
             }
@@ -133,8 +136,10 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
         view.recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) view.recyclerview.getLayoutManager();
-                int lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
+                LinearLayoutManager linearLayoutManager =
+                    (LinearLayoutManager) view.recyclerview.getLayoutManager();
+                int lastVisiblePosition =
+                    linearLayoutManager.findLastCompletelyVisibleItemPosition();
                 if (lastVisiblePosition == adapter.getItems().size() - 1 && adapter.getItems().size() >= vm.pageSize) {
                     vm.page++;
                     loadMember();
@@ -142,7 +147,8 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
             }
         });
         view.more.setOnClickListener(v -> {
-            PopupWindow popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            PopupWindow popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
             LayoutMemberActionBinding view = LayoutMemberActionBinding.inflate(getLayoutInflater());
             view.deleteFriend.setVisibility(vm.isOwner() ? View.VISIBLE : View.GONE);
             view.addFriend.setOnClickListener(v1 -> {
@@ -169,8 +175,13 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
 
         vm.superGroupMembers.observe(this, v -> {
             if (v.isEmpty()) return;
-            UPDATESelectedNum();
-            adapter.notifyItemRangeInserted(vm.superGroupMembers.getValue().size() - vm.pageSize, vm.superGroupMembers.getValue().size());
+            updateSelectedNum();
+            if (v.size() > vm.pageSize) {
+                adapter.notifyItemRangeInserted(vm.superGroupMembers.getValue().size()
+                    - vm.pageSize, vm.superGroupMembers.getValue().size());
+            } else {
+                adapter.notifyDataSetChanged();
+            }
         });
     }
 
@@ -187,26 +198,28 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
 
             @NonNull
             @Override
-            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+                                                              int viewType) {
                 return new ViewHol.ItemViewHo(parent);
             }
 
             @Override
-            public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExGroupMemberInfo data, int position) {
+            public void onBindView(@NonNull RecyclerView.ViewHolder holder,
+                                   ExGroupMemberInfo data, int position) {
                 ViewHol.ItemViewHo itemViewHo = (ViewHol.ItemViewHo) holder;
                 itemViewHo.view.select.setVisibility(isSelectMember ? View.VISIBLE : View.GONE);
                 itemViewHo.view.select.setChecked(data.isSelect);
                 itemViewHo.view.avatar.load(data.groupMembersInfo.getFaceURL());
                 itemViewHo.view.nickName.setText(data.groupMembersInfo.getNickname());
-                if (data.groupMembersInfo.getRoleLevel() == 2) {
+                if (data.groupMembersInfo.getRoleLevel() == Constant.RoleLevel.GROUP_OWNER) {
                     itemViewHo.view.identity.setVisibility(View.VISIBLE);
                     itemViewHo.view.identity.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_8_fddfa1);
                     itemViewHo.view.identity.setText(io.openim.android.ouicore.R.string.lord);
                     itemViewHo.view.identity.setTextColor(Color.parseColor("#ffff8c00"));
-                } else if (data.groupMembersInfo.getRoleLevel() == 3) {
+                } else if (data.groupMembersInfo.getRoleLevel() == Constant.RoleLevel.ADMINISTRATOR) {
                     itemViewHo.view.identity.setVisibility(View.VISIBLE);
                     itemViewHo.view.identity.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_8_a2c9f8);
-                    itemViewHo.view.identity.setText(io.openim.android.ouicore.R.string.lord);
+                    itemViewHo.view.identity.setText(io.openim.android.ouicore.R.string.administrator);
                     itemViewHo.view.identity.setTextColor(Color.parseColor("#2691ED"));
                 } else itemViewHo.view.identity.setVisibility(View.GONE);
 
@@ -229,16 +242,19 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
                         view.more2.setVisibility(View.VISIBLE);
                         view.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectNum));
                         view.submit.setEnabled(selectNum > 0);
-                        view.selectLy.setOnClickListener(selectNum > 0 ? (View.OnClickListener) v1 -> {
-                            selectMemberLauncher.launch(new Intent(SuperGroupMemberActivity.this, SelectedMemberActivity.class));
-                        } : null);
+                        view.selectLy.setOnClickListener(selectNum > 0 ?
+                            (View.OnClickListener) v1 -> {
+                                selectMemberLauncher.launch(new Intent(SuperGroupMemberActivity.this,
+                                    SelectedMemberActivity.class));
+                            } : null);
                         return;
                     }
                     if (isTransferPermission) {
                         if (data.groupMembersInfo.getRoleLevel() == 2)
                             toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.repeat_group_manager));
                         else {
-                            CommonDialog commonDialog = new CommonDialog(SuperGroupMemberActivity.this);
+                            CommonDialog commonDialog =
+                                new CommonDialog(SuperGroupMemberActivity.this);
                             commonDialog.getMainView().tips.setText(String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.transfer_permission), data.groupMembersInfo.getNickname()));
                             commonDialog.getMainView().cancel.setOnClickListener(v2 -> {
                                 commonDialog.dismiss();
@@ -263,6 +279,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM, ActivitySupe
         adapter.setItems(vm.superGroupMembers.getValue());
         view.recyclerview.setAdapter(adapter);
 
+        vm.superGroupMembers.getValue().clear();
         loadMember();
     }
 

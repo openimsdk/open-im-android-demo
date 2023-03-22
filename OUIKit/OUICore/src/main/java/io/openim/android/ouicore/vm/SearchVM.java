@@ -100,7 +100,8 @@ public class SearchVM extends BaseViewModel {
                 groupMembersInfo.getValue().addAll(data);
                 groupMembersInfo.setValue(groupMembersInfo.getValue());
             }
-        }, groupId, keys, false, true, page, pageSize);
+        }, groupId, keys, false,
+            true, page, pageSize);
     }
 
     public void addFriend() {

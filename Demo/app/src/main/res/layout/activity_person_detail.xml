@@ -41,9 +41,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/white"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:background="@color/white"
                 android:paddingLeft="20dp"
                 android:paddingTop="10dp"
                 android:paddingRight="20dp"
@@ -68,11 +68,11 @@
 
             <LinearLayout
                 android:id="@+id/idLy"
-                android:background="@color/white"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:gravity="center_vertical"
                 android:layout_marginTop="12dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingLeft="22dp"
                 android:paddingRight="22dp">
@@ -94,10 +94,11 @@
 
                 <ImageView
                     android:id="@+id/copy"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:padding="8dp"
-                    android:src="@mipmap/ic_c_copy" />
+                    android:layout_marginRight="30dp"
+                    android:src="@mipmap/ic__copy" />
 
             </LinearLayout>
 
@@ -105,10 +106,10 @@
                 android:id="@+id/groupInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:background="@color/white"
                 android:orientation="vertical"
                 android:paddingLeft="20dp"
-                android:layout_marginTop="12dp"
                 android:paddingTop="15dp"
                 android:paddingRight="20dp"
                 android:paddingBottom="15dp"
@@ -117,6 +118,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
@@ -140,6 +142,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
@@ -158,6 +161,85 @@
                         android:textColor="#ff333333"
                         android:textSize="18sp" />
                 </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/joinMethodLy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/join_group_method"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/joinMethod"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/manager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:gravity="center_vertical"
+                    android:visibility="gone"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/set_manager"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                    <io.openim.android.ouicore.widget.SlideButton
+                        android:id="@+id/setManager"
+                        android:layout_width="45dp"
+                        android:layout_height="25dp" />
+                </LinearLayout>
+
+                <io.openim.android.ouicore.widget.InterceptLinearLayout
+                    android:id="@+id/mute"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:visibility="gone"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/set_mute"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/muteTime"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@mipmap/ic_right" />
+                </io.openim.android.ouicore.widget.InterceptLinearLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -166,6 +248,7 @@
                 android:layout_height="55dp"
                 android:layout_marginTop="12dp"
                 android:background="@color/white"
+                android:visibility="gone"
                 android:gravity="center_vertical">
 
                 <TextView
@@ -199,6 +282,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
+                android:visibility="gone"
                 android:layout_marginBottom="60dp"
                 android:orientation="horizontal">
 

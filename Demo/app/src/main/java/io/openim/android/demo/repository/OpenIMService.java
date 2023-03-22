@@ -46,6 +46,7 @@ public interface OpenIMService {
     @POST("account/reset_password")
     Observable<ResponseBody> resetPassword(@Body RequestBody requestBody);
 
+
     static <T> Function<ResponseBody, T> turn(Class<T> tClass) {
         return responseBody -> {
             String body = responseBody.string();

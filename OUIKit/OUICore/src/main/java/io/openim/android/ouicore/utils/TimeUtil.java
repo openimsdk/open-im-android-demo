@@ -14,6 +14,7 @@ public class TimeUtil {
     public final static String hourTimeFormat = "HH:mm";
     public final static String monthTimeFormat = "MM/dd HH:mm";
     public final static String yearTimeFormat = "yyyy/MM/dd HH:mm";
+    public final static String yearTimeSecondFormat = "yyyy/MM/dd HH:mm:ss";
     public final static String yearMonthDayFormat = "yyyy/MM/dd";
     public final static String secondFormat = "%02d:%02d:%02d";
     public final static String secondFormatZh = "%02d时%02d分%02d秒";

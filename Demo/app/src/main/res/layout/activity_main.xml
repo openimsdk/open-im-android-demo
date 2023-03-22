@@ -101,7 +101,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="10dp"
-                        android:paddingLeft="45dp"
+                        android:paddingEnd="50dp"
                         android:visibility="gone">
 
                         <include

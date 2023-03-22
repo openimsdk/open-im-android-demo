@@ -317,7 +317,8 @@ public class Common {
      * @param v
      */
     public static void toMap(Message message, View v) {
-        v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord=" + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey));
+        v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class)
+            .putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord=" + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey));
     }
 
     /***

@@ -69,6 +69,7 @@ import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotDisturbInfo;
@@ -76,6 +77,7 @@ import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.SignalingInvitationInfo;
 import io.openim.android.sdk.models.SoundElem;
+import io.openim.android.sdk.models.UserInfo;
 
 public class IMUtil {
     //android PlatformID 2
@@ -628,6 +630,7 @@ public class IMUtil {
         return path;
     }
 
+
     /**
      * 成功监听
      *
@@ -636,6 +639,4 @@ public class IMUtil {
     public interface OnSuccessListener<T> {
         void onSuccess(T data);
     }
-
-
 }

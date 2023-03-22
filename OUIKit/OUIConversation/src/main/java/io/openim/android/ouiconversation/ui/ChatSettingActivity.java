@@ -45,9 +45,12 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
         click();
     }
 
-    private ActivityResultLauncher<Intent> personDetailLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK)
+    private ActivityResultLauncher<Intent> personDetailLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_OK) {
+            setResult(RESULT_OK);
             finish();
+        }
     });
 
     private void click() {
@@ -60,44 +63,38 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
             dialog.getMainView().menu1.setOnClickListener(v1 -> {
                 dialog.dismiss();
-                ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
-                    .withString(Constant.K_ID,vm.userID)
-                    .navigation();
+                ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withString(Constant.K_ID,
+                    vm.userID).navigation();
             });
             dialog.getMainView().menu2.setOnClickListener(v1 -> {
                 dialog.dismiss();
-                ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
-                    .withString(Constant.K_ID,vm.userID)
-                    .withBoolean(Constant.K_RESULT, true)
-                    .navigation();
+                ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withString(Constant.K_ID,
+                    vm.userID).withBoolean(Constant.K_RESULT, true).navigation();
             });
         });
         view.picture.setOnClickListener(v -> {
-            startActivity(new Intent(this,
-                MediaHistoryActivity.class).putExtra(Constant.K_RESULT, true));
+            startActivity(new Intent(this, MediaHistoryActivity.class).putExtra(Constant.K_RESULT
+                , true));
         });
         view.video.setOnClickListener(v -> {
-            startActivity(new Intent(this,
-                MediaHistoryActivity.class));
+            startActivity(new Intent(this, MediaHistoryActivity.class));
         });
         view.file.setOnClickListener(v -> startActivity(new Intent(this,
             FileHistoryActivity.class)));
 
         view.readVanish.setOnSlideButtonClickListener(isChecked -> {
-            OpenIMClient.getInstance().conversationManager
-                .setOneConversationPrivateChat(new OnBase<String>() {
-                                                   @Override
-                                                   public void onError(int code, String error) {
-                                                       toast(error + code);
-                                                       view.readVanish.setCheckedWithAnimation(!isChecked);
-                                                   }
+            OpenIMClient.getInstance().conversationManager.setOneConversationPrivateChat(new OnBase<String>() {
+                @Override
+                public void onError(int code, String error) {
+                    toast(error + code);
+                    view.readVanish.setCheckedWithAnimation(!isChecked);
+                }
 
-                                                   @Override
-                                                   public void onSuccess(String data) {
-                                                       view.readVanish.setCheckedWithAnimation(isChecked);
-                                                   }
-                                               },
-                    vm.conversationInfo.getValue().getConversationID(), isChecked);
+                @Override
+                public void onSuccess(String data) {
+                    view.readVanish.setCheckedWithAnimation(isChecked);
+                }
+            }, vm.conversationInfo.getValue().getConversationID(), isChecked);
         });
         view.topSlideButton.setOnSlideButtonClickListener(is -> {
             contactListVM.pinConversation(vm.conversationInfo.getValue(), is);
@@ -110,13 +107,13 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
         });
 
         view.noDisturb.setOnSlideButtonClickListener(is -> {
-            vm.setConversationRecvMessageOpt(is ? 2 : 0, vm.conversationInfo.getValue().getConversationID());
+            vm.setConversationRecvMessageOpt(is ? 2 : 0,
+                vm.conversationInfo.getValue().getConversationID());
         });
         view.user.setOnClickListener(v -> {
             Postcard postcard = ARouter.getInstance().build(Routes.Main.PERSON_DETAIL);
             LogisticsCenter.completion(postcard);
-            personDetailLauncher.launch(new Intent(this, postcard.getDestination())
-                .putExtra(Constant.K_ID, vm.userID).putExtra(Constant.K_RESULT, true));
+            personDetailLauncher.launch(new Intent(this, postcard.getDestination()).putExtra(Constant.K_ID, vm.userID).putExtra(Constant.K_RESULT, true));
         });
         view.clearRecord.setOnClickListener(v -> {
             CommonDialog commonDialog = new CommonDialog(this);

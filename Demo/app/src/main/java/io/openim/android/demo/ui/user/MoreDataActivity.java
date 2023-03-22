@@ -18,7 +18,6 @@ public class MoreDataActivity extends BaseActivity<PersonalVM, ActivityMoreDataB
         bindVMByCache(PersonalVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMoreDataBinding.inflate(getLayoutInflater()));
-        sink();
         init();
     }
 

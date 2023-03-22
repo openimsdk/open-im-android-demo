@@ -2,6 +2,7 @@ package io.openim.android.ouicore.base;
 
 
 import android.content.Context;
+import android.widget.Toast;
 
 import androidx.lifecycle.ViewModel;
 
@@ -50,6 +51,5 @@ public class BaseViewModel<T extends IView> extends ViewModel {
     protected void viewResume() {
         isDestroy = false;
     }
-
 
 }

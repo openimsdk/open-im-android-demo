@@ -43,8 +43,6 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
         bindVM(PersonalVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityPersonalInfoBinding.inflate(getLayoutInflater()));
-        sink();
-
         vm.getSelfUserInfo();
 
         initView();

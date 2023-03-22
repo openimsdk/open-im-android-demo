@@ -2,6 +2,7 @@ package io.openim.android.ouiconversation.ui;
 
 
 import android.annotation.SuppressLint;
+import android.app.LauncherActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
@@ -12,6 +13,8 @@ import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -83,6 +86,13 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         setTouchClearFocus(false);
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
     }
+
+    private ActivityResultLauncher<Intent> chatSettingActivityLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK) {
+                finish();
+            }
+        });
 
     private void initVM() {
         String userId = getIntent().getStringExtra(Constant.K_ID);
@@ -253,9 +263,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         Obs.inst().addObserver(this);
         view.call.setOnClickListener(v -> {
             if (null == callingService) return;
-            if (null != vm.roomCallingInfo.getValue()
-                && null != vm.roomCallingInfo.getValue().getParticipant()
-                && !vm.roomCallingInfo.getValue().getParticipant().isEmpty()) {
+            if (null != vm.roomCallingInfo.getValue() && null != vm.roomCallingInfo.getValue().getParticipant() && !vm.roomCallingInfo.getValue().getParticipant().isEmpty()) {
                 CommonDialog commonDialog = new CommonDialog(this).atShow();
                 commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.group_calling_tips);
                 commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
@@ -283,8 +291,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 return false;
             });
         });
-        view.join.setOnClickListener(v ->
-            vm.signalingGetTokenByRoomID(vm.getRoomCallingInfoRoomID()));
+        view.join.setOnClickListener(v -> vm.signalingGetTokenByRoomID(vm.getRoomCallingInfoRoomID()));
         view.delete.setOnClickListener(v -> {
             List<Message> selectMsg = getSelectMsg();
             for (Message message : selectMsg) {
@@ -355,7 +362,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             @Override
             public void click(View v) {
                 if (vm.isSingleChat) {
-                    startActivity(new Intent(ChatActivity.this, ChatSettingActivity.class));
+                    chatSettingActivityLauncher.launch(new Intent(ChatActivity.this, ChatSettingActivity.class));
                 } else {
                     ARouter.getInstance().build(Routes.Group.MATERIAL).withString(Constant.K_GROUP_ID, vm.groupID).navigation();
                 }

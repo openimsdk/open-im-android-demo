@@ -6,12 +6,20 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import java.util.Map;
+
+import io.openim.android.demo.repository.OpenIMService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.net.RXRetrofit.N;
+import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
+import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.services.NiService;
+import io.openim.android.ouicore.services.OneselfService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Obs;
@@ -71,6 +79,32 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
         getIView().initDate();
         getSelfUserInfo();
         onConnectSuccess();
+
+        getClientConfig();
+    }
+
+    private void getClientConfig() {
+        N.API(NiService.class).CommNI(Constant.getAdminManage()
+                    + "admin/init/get_client_config",
+                BaseApp.inst().loginCertificate.chatToken,
+                NiService.buildParameter()
+                    .buildJsonBody()).compose(N.IOMain())
+            .map(OneselfService.turn(Map.class)).subscribe(new NetObserver<Map>(getContext()) {
+                @Override
+                public void onSuccess(Map m) {
+                   try {
+                       BaseApp.inst().loginCertificate.allowSendMsgNotFriend
+                           = ((Integer) m.get("allowSendMsgNotFriend")==1);
+
+                       BaseApp.inst().loginCertificate.cache(BaseApp.inst());
+                   }catch (Exception ignored){
+                   }
+                }
+
+                @Override
+                protected void onFailure(Throwable e) {
+                }
+            });
     }
 
     void getSelfUserInfo() {

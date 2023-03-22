@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="GroupVM"
+            type="io.openim.android.ouicore.vm.GroupVM" />
+        <import type="android.view.View"/>
+    </data>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        tools:context=".ui.SetMuteActivity">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardElevation="8dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/comm_title_high"
+                android:gravity="center_vertical">
+
+                <include layout="@layout/view_back" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/set_mute"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/submit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerInParent="true"
+                    android:padding="15dp"
+                    android:text="@string/finish"
+                    android:textColor="#ff333333"
+                    android:textSize="14sp" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/def_bg"
+            android:orientation="vertical"
+            android:paddingTop="12dp">
+
+            <io.openim.android.ouicore.widget.InterceptLinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:onClick="@{()->GroupVM.selectMute(1)}"
+                android:paddingLeft="22dp"
+                android:paddingRight="22dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/_10_minutes"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/tick"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="@{GroupVM.muteStatus==1?View.VISIBLE:View.GONE}"
+                    android:src="@mipmap/ic_tick" />
+            </io.openim.android.ouicore.widget.InterceptLinearLayout>
+
+            <io.openim.android.ouicore.widget.InterceptLinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="22dp"
+                android:onClick="@{()->GroupVM.selectMute(2)}"
+                android:paddingRight="22dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/_1_hour"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/tick2"
+                    android:layout_width="wrap_content"
+                    android:visibility="@{GroupVM.muteStatus==2?View.VISIBLE:View.GONE}"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/ic_tick" />
+            </io.openim.android.ouicore.widget.InterceptLinearLayout>
+
+            <io.openim.android.ouicore.widget.InterceptLinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:onClick="@{()->GroupVM.selectMute(3)}"
+                android:orientation="horizontal"
+                android:paddingLeft="22dp"
+                android:paddingRight="22dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/_12_hour"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/tick3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="@{GroupVM.muteStatus==3?View.VISIBLE:View.GONE}"
+                    android:src="@mipmap/ic_tick" />
+            </io.openim.android.ouicore.widget.InterceptLinearLayout>
+
+            <io.openim.android.ouicore.widget.InterceptLinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="22dp"
+                android:onClick="@{()->GroupVM.selectMute(4)}"
+                android:paddingRight="22dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/_1_day"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/tick4"
+                    android:layout_width="wrap_content"
+                    android:visibility="@{GroupVM.muteStatus==4?View.VISIBLE:View.GONE}"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/ic_tick" />
+            </io.openim.android.ouicore.widget.InterceptLinearLayout>
+
+            <io.openim.android.ouicore.widget.InterceptLinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:onClick="@{()->GroupVM.selectMute(5)}"
+                android:paddingLeft="22dp"
+                android:paddingRight="22dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/cancel_mute2"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/tick5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="@{GroupVM.muteStatus==5?View.VISIBLE:View.GONE}"
+                    android:src="@mipmap/ic_tick" />
+            </io.openim.android.ouicore.widget.InterceptLinearLayout>
+
+            <io.openim.android.ouicore.widget.InterceptLinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="22dp"
+                android:paddingRight="22dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/customize"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/customize_day"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    android:background="@android:color/transparent"
+                    android:gravity="end" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:text="@string/day"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+            </io.openim.android.ouicore.widget.InterceptLinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>

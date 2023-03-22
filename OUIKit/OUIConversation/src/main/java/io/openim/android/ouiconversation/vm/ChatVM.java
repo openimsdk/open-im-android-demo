@@ -495,7 +495,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     public String getRoomCallingInfoRoomID() {
-        String roomID="";
+        String roomID = "";
         try {
             roomID = roomCallingInfo.getValue().getRoomID();
             if (TextUtils.isEmpty(roomID))
@@ -786,7 +786,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         boolean isTyp = msg.getContentType() == Constant.MsgType.TYPING;
         if (isSingleChat) {
             if (msg.getSendID().equals(userID)) {
-                UIHandler.post(() -> typing.set(isTyp));
+                typing.set(isTyp);
                 if (isTyp) {
                     UIHandler.removeCallbacks(typRunnable);
                     UIHandler.postDelayed(typRunnable, 5000);
@@ -922,6 +922,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             getIView().scrollToPosition(0);
         }
         UIHandler.post(() -> {
+            final  Object ext = msg.getExt();
             msg.setExt(null);//必须重置
             OfflinePushInfo offlinePushInfo = new OfflinePushInfo();  // 离线推送的消息备注；不为null
             OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
@@ -929,6 +930,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 public void onError(int code, String error) {
                     if (code != 302) getIView().toast(error + code);
                     UIHandler.postDelayed(() -> {
+                        msg.setExt(ext);
                         msg.setStatus(Constant.Send_State.SEND_FAILED);
                         messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
                     }, 500);

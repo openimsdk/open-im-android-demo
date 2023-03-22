@@ -59,7 +59,7 @@
 
                 <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_centerInParent="true"
                     android:gravity="center"
                     android:orientation="vertical">
@@ -84,7 +84,7 @@
                     <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:visibility="@{ChatVM.typing? View.GONE :View.VISIBLE}">
+                        android:visibility="@{ChatVM.typing? View.GONE:ChatVM.isSingleChat?View.VISIBLE:View.GONE}">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -224,8 +224,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                >
+                android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -250,21 +249,21 @@
             </io.openim.android.ouicore.widget.InterceptLinearLayout>
 
             <LinearLayout
+                android:id="@+id/meetingLy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/sty_radius_4_white"
                 android:gravity="center_horizontal"
-                android:visibility="gone"
-                android:layout_marginTop="10dp"
-                android:id="@+id/meetingLy"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/meetingRv"
                     android:layout_width="match_parent"
-                    android:padding="12dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp" />
+                    android:layout_marginTop="10dp"
+                    android:padding="12dp" />
 
                 <include layout="@layout/view_dividing_line" />
 

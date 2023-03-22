@@ -1,10 +1,5 @@
 package io.openim.android.ouicore.vm;
 
-import static io.openim.android.ouicore.utils.Common.UIHandler;
-
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
@@ -12,7 +7,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.entity.MsgConversation;
@@ -32,8 +26,6 @@ import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.ReadReceiptInfo;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.UserInfo;
-import io.realm.RealmList;
-import io.realm.RealmResults;
 
 public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> implements OnConversationListener, OnAdvanceMsgListener {
     public MutableLiveData<List<MsgConversation>> conversations = new MutableLiveData<>(new ArrayList<>());
@@ -43,9 +35,8 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
     protected void viewCreate() {
         IMEvent.getInstance().addConversationListener(this);
         IMEvent.getInstance().addAdvanceMsgListener(this);
-        UPDATEConversation();
+        updateConversation();
 
-        UIHandler.postDelayed(this::UPDATEConversation, 5 * 1000);
         Obs.newMessage(Constant.Event.CONTACT_LIST_VM_INIT);
     }
 
@@ -58,12 +49,12 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
             @Override
             public void onSuccess(String data) {
-                UPDATEConversation();
+                updateConversation();
             }
         }, conversationId);
     }
 
-    private void UPDATEConversation() {
+    private void updateConversation() {
         OpenIMClient.getInstance().conversationManager.getAllConversationList(new OnBase<List<ConversationInfo>>() {
             @Override
             public void onError(int code, String error) {
@@ -155,7 +146,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     @Override
     public void onConversationChanged(List<ConversationInfo> list) {
-        UPDATEConversation();
+        updateConversation();
     }
 
 

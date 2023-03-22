@@ -6,233 +6,242 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F8F8F8FF"
+        android:background="@color/white"
         android:orientation="vertical"
+        android:fitsSystemWindows="true"
         tools:context=".ui.user.PersonalInfoActivity">
-
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/comm_title_high"
-            app:cardElevation="8dp">
+            android:background="#F8F8F8FF"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
 
-            <RelativeLayout
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/comm_title_high"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                app:cardElevation="8dp">
 
-                <include
-                    android:id="@+id/back"
-                    layout="@layout/view_back" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/comm_title_high"
+                    android:orientation="horizontal">
+
+                    <include
+                        android:id="@+id/back"
+                        layout="@layout/view_back" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="@string/my_info"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:id="@+id/avatarLy"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_marginTop="14dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="@string/my_info"
+                    android:layout_weight="1"
+                    android:text="@string/avatar"
                     android:textColor="#ff333333"
                     android:textSize="18sp" />
 
-            </RelativeLayout>
-        </androidx.cardview.widget.CardView>
+                <io.openim.android.ouicore.widget.AvatarImage
+                    android:id="@+id/avatar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:layout_marginBottom="7dp"
+                    android:src="@mipmap/ic_my_friend" />
 
-        <LinearLayout
-            android:id="@+id/avatarLy"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:layout_marginTop="14dp"
-            android:background="@color/white"
-            android:gravity="center_vertical"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:src="@mipmap/ic_right" />
+            </LinearLayout>
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/avatar"
-                android:textColor="#ff333333"
-                android:textSize="18sp" />
+            <include layout="@layout/view_dividing_line" />
 
-            <io.openim.android.ouicore.widget.AvatarImage
-                android:id="@+id/avatar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="7dp"
-                android:layout_marginBottom="7dp"
-                android:src="@mipmap/ic_my_friend" />
+            <LinearLayout
+                android:id="@+id/nickNameLy"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:src="@mipmap/ic_right" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/nickname"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/nickName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="李来莺"
+                    android:textColor="#ff999999"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:src="@mipmap/ic_right" />
+            </LinearLayout>
+
+            <include layout="@layout/view_dividing_line" />
+
+            <LinearLayout
+                android:id="@+id/genderLy"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/gender"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/gender"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="女"
+                    android:textColor="#ff999999"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:src="@mipmap/ic_right" />
+            </LinearLayout>
+
+            <include layout="@layout/view_dividing_line" />
+
+            <LinearLayout
+                android:id="@+id/birthdayLy"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+
+                <TextView
+
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/birthday"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/birthday"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ff999999"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:src="@mipmap/ic_right" />
+            </LinearLayout>
+
+            <include layout="@layout/view_dividing_line" />
+
+            <LinearLayout
+                android:id="@+id/qrCode"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/qr_code"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/ic_qrcode" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:src="@mipmap/ic_right" />
+            </LinearLayout>
+
+            <include layout="@layout/view_dividing_line" />
+
+            <LinearLayout
+                android:id="@+id/idLy"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="ID"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+                <TextView
+                    android:id="@+id/identity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ff999999"
+                    android:textSize="16sp"
+                    />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:src="@mipmap/ic_right" />
+            </LinearLayout>
+
         </LinearLayout>
 
-        <include layout="@layout/view_dividing_line" />
-
-        <LinearLayout
-            android:id="@+id/nickNameLy"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:background="@color/white"
-            android:gravity="center_vertical"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/nickname"
-                android:textColor="#ff333333"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/nickName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="李来莺"
-                android:textColor="#ff999999"
-                android:textSize="16sp" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:src="@mipmap/ic_right" />
-        </LinearLayout>
-
-        <include layout="@layout/view_dividing_line" />
-
-        <LinearLayout
-            android:id="@+id/genderLy"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:background="@color/white"
-            android:gravity="center_vertical"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/gender"
-                android:textColor="#ff333333"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/gender"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="女"
-                android:textColor="#ff999999"
-                android:textSize="16sp" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:src="@mipmap/ic_right" />
-        </LinearLayout>
-
-        <include layout="@layout/view_dividing_line" />
-
-        <LinearLayout
-            android:id="@+id/birthdayLy"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:background="@color/white"
-            android:gravity="center_vertical"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
-
-            <TextView
-
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/birthday"
-                android:textColor="#ff333333"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/birthday"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#ff999999"
-                android:textSize="16sp" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:src="@mipmap/ic_right" />
-        </LinearLayout>
-
-        <include layout="@layout/view_dividing_line" />
-
-        <LinearLayout
-            android:id="@+id/qrCode"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:background="@color/white"
-            android:gravity="center_vertical"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/qr_code"
-                android:textColor="#ff333333"
-                android:textSize="18sp" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@mipmap/ic_qrcode" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:src="@mipmap/ic_right" />
-        </LinearLayout>
-
-        <include layout="@layout/view_dividing_line" />
-
-        <LinearLayout
-            android:id="@+id/idLy"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:background="@color/white"
-            android:gravity="center_vertical"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="ID"
-                android:textColor="#ff333333"
-                android:textSize="18sp" />
-            <TextView
-                android:id="@+id/identity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#ff999999"
-                android:textSize="16sp"
-                />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:src="@mipmap/ic_right" />
-        </LinearLayout>
 
 
     </LinearLayout>
