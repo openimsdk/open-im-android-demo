@@ -560,6 +560,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     return;
                 }
                 conversationInfo.setValue(data);
+                conversationID=data.getConversationID();
                 loadHistory();
                 getConversationRecvMessageOpt(data.getConversationID());
             }
@@ -569,7 +570,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private void loadHistory() {
         //加载消息记录
-        if (fromChatHistory) loadHistoryMessageReverse();
+        if (fromChatHistory)
+            loadHistoryMessageReverse();
         else loadHistoryMessage();
     }
 
@@ -686,7 +688,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     lastMinSeq = data.getLastMinSeq();
                     handleMessage(data.getMessageList(), false);
                 }
-            }, null, null, conversationInfo.getValue().getConversationID(), lastMinSeq, startMsg,
+            }, null, null, conversationID, lastMinSeq, startMsg,
                 count);
         } else {
             OpenIMClient.getInstance().messageManager.getHistoryMessageList(new OnBase<List<Message>>() {
@@ -1162,7 +1164,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 handleMessage(data, true);
             }
 
-        }, userID, groupID, null, startMsg, count * 50);
+        }, userID, groupID, conversationID, startMsg, count * 50);
 
 
     }
