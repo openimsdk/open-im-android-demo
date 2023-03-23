@@ -4,38 +4,30 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.Build;
-import android.os.IBinder;
 
-import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import io.openim.android.ouicalling.CallingServiceImp;
-import io.openim.android.ouicalling.JumpReceiver;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.CallingService;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.listener._SignalingListener;
 import io.openim.keepalive.KeepAliveService;
 import open_im_sdk.Open_im_sdk;
 import open_im_sdk_callback.OnListenerForService;
 
 public class AudioVideoService extends KeepAliveService {
 
-    private static final String TAG = "AudioVideoService-----";
+    public static final String TAG = "AudioVideoService-----";
     public static final int NOTIFY_ID = 10000;
     private CallingService callingService;
     private Class<?> postcardDestination;
@@ -49,11 +41,7 @@ public class AudioVideoService extends KeepAliveService {
         String CHANNEL_ID = "AudioVideoService";
         String CHANNEL_NAME = getString(io.openim.android.ouicore.R.string.audio_video_service);
         Notification notification =
-            new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle(getString(io.openim.android.ouicore.R.string.audio_video_service_tips1))
-                .setContentText(getString(io.openim.android.ouicore.R.string.audio_video_service_tips2))
-                .setSmallIcon(io.openim.android.ouicore.R.mipmap.ic_logo)
-                .setContentIntent(hangPendingIntent).build();
+            new NotificationCompat.Builder(this, CHANNEL_ID).setContentTitle(getString(io.openim.android.ouicore.R.string.audio_video_service_tips1)).setContentText(getString(io.openim.android.ouicore.R.string.audio_video_service_tips2)).setSmallIcon(io.openim.android.ouicore.R.mipmap.ic_logo).setContentIntent(hangPendingIntent).build();
 
         //Android 8.0 以上需包添加渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -98,7 +86,7 @@ public class AudioVideoService extends KeepAliveService {
         Open_im_sdk.setListenerForService(new OnListenerForService() {
             @Override
             public void onFriendApplicationAccepted(String s) {
-               IMUtil.sendNotice(System.currentTimeMillis());
+                IMUtil.sendNotice(System.currentTimeMillis());
             }
 
             @Override

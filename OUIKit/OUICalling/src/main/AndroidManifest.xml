@@ -5,8 +5,15 @@
     <application>
 
         <receiver
-            android:name=".JumpReceiver"
-            android:exported="true" />
+            android:name=".LauncherReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter android:priority="1000">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".LockPushActivity"
