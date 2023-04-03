@@ -99,34 +99,36 @@ import io.openim.android.sdk.models.SignalingInfo;
 public class MessageViewHolder {
     public static RecyclerView.ViewHolder createViewHolder(@NonNull ViewGroup parent,
                                                            int viewType) {
-        if (viewType == Constant.LOADING) return new LoadingView(parent);
-
-        if (viewType == Constant.MsgType.TXT) return new TXTView(parent);
-
-        if (viewType == Constant.MsgType.PICTURE) return new IMGView(parent);
-
-        if (viewType == Constant.MsgType.VOICE) return new AudioView(parent);
-
-        if (viewType == Constant.MsgType.VIDEO) return new VideoView(parent);
-
-        if (viewType == Constant.MsgType.FILE) return new FileView(parent);
-
-        if (viewType == Constant.MsgType.LOCATION) return new LocationView(parent);
-
-        if (viewType == Constant.MsgType.OA_NOTICE) return new NotificationItemHo(parent);
-
-        if (viewType >= Constant.MsgType.NOTICE || viewType == Constant.MsgType.REVOKE || viewType == Constant.MsgType.ADVANCED_REVOKE)
+        if (viewType == Constant.LOADING)
+            return new LoadingView(parent);
+        if (viewType == Constant.MsgType.TXT)
+            return new TXTView(parent);
+        if (viewType == Constant.MsgType.PICTURE)
+            return new IMGView(parent);
+        if (viewType == Constant.MsgType.VOICE)
+            return new AudioView(parent);
+        if (viewType == Constant.MsgType.VIDEO)
+            return new VideoView(parent);
+        if (viewType == Constant.MsgType.FILE)
+            return new FileView(parent);
+        if (viewType == Constant.MsgType.LOCATION)
+            return new LocationView(parent);
+        if (viewType == Constant.MsgType.OA_NOTICE)
+            return new NotificationItemHo(parent);
+        if (viewType >= Constant.MsgType.NOTICE
+            || viewType == Constant.MsgType.REVOKE
+            || viewType == Constant.MsgType.ADVANCED_REVOKE)
             return new NoticeView(parent);
-
-        if (viewType == Constant.MsgType.MERGE) return new MergeView(parent);
-
-        if (viewType == Constant.MsgType.CARD) return new BusinessCardView(parent);
-
-        if (viewType == Constant.MsgType.QUOTE) return new QuoteTXTView(parent);
-
-        if (viewType == Constant.MsgType.LOCAL_CALL_HISTORY) return new CallHistoryView(parent);
-
-        if (viewType == Constant.MsgType.CUSTOMIZE_MEETING) return new MeetingInviteView(parent);
+        if (viewType == Constant.MsgType.MERGE)
+            return new MergeView(parent);
+        if (viewType == Constant.MsgType.CARD)
+            return new BusinessCardView(parent);
+        if (viewType == Constant.MsgType.QUOTE)
+            return new QuoteTXTView(parent);
+        if (viewType == Constant.MsgType.LOCAL_CALL_HISTORY)
+            return new CallHistoryView(parent);
+        if (viewType == Constant.MsgType.CUSTOMIZE_MEETING)
+            return new MeetingInviteView(parent);
 
         return new TXTView(parent);
     }
@@ -1112,7 +1114,9 @@ public class MessageViewHolder {
             try {
                 if (msgExpand.oaNotification.mixType == 1) {
                     v.picture.setVisibility(View.VISIBLE);
-                    Glide.with(v.getRoot().getContext()).load(msgExpand.oaNotification.pictureElem.getBigPicture().getUrl()).into(v.picture);
+                    Glide.with(v.getRoot().getContext())
+                        .load(msgExpand.oaNotification.pictureElem
+                            .getBigPicture().getUrl()).into(v.picture);
                 } else {
                     v.picture.setVisibility(View.GONE);
                 }
