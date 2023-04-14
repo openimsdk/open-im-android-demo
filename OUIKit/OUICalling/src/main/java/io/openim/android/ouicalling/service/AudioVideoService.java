@@ -41,7 +41,11 @@ public class AudioVideoService extends KeepAliveService {
         String CHANNEL_ID = "AudioVideoService";
         String CHANNEL_NAME = getString(io.openim.android.ouicore.R.string.audio_video_service);
         Notification notification =
-            new NotificationCompat.Builder(this, CHANNEL_ID).setContentTitle(getString(io.openim.android.ouicore.R.string.audio_video_service_tips1)).setContentText(getString(io.openim.android.ouicore.R.string.audio_video_service_tips2)).setSmallIcon(io.openim.android.ouicore.R.mipmap.ic_logo).setContentIntent(hangPendingIntent).build();
+            new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle(getString(io.openim.android.ouicore.R.string.audio_video_service_tips1))
+                .setContentText(getString(io.openim.android.ouicore.R.string.audio_video_service_tips2))
+                .setSmallIcon(io.openim.android.ouicore.R.mipmap.ic_logo)
+                .setContentIntent(hangPendingIntent).build();
 
         //Android 8.0 以上需包添加渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -81,7 +85,6 @@ public class AudioVideoService extends KeepAliveService {
             }
         });
     }
-
     private void addListener() {
         Open_im_sdk.setListenerForService(new OnListenerForService() {
             @Override

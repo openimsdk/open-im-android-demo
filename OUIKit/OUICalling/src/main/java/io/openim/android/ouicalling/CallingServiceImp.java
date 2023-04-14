@@ -1,5 +1,6 @@
 package io.openim.android.ouicalling;
 
+import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -124,6 +125,7 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onReceiveNewInvitation(SignalingInfo signalingInfo) {
         L.e(TAG, "----onReceiveNewInvitation-----");
+        Common.wakeUp(context);
         Common.UIHandler.post(() -> {
             if (callDialog != null) return;
             this.signalingInfo = signalingInfo;

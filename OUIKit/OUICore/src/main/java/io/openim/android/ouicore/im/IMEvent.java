@@ -260,7 +260,7 @@ public class IMEvent {
         @Override
         public void onConnecting() {
             // 正在连接到服务器，适合在 UI 上展示“正在连接”状态。
-            L.d("正在连接到服务器");
+            L.d("正在连接到服务器...");
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnecting();
             }

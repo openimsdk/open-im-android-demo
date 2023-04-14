@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.openim.android.ouicore.entity.LoginCertificate;
+import io.openim.android.ouicore.utils.L;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -64,7 +65,7 @@ public class BaseApp extends Application {
         super.onCreate();
         instance = this;
         realmInit();
-        activityLifecycleCallback();
+//        activityLifecycleCallback();
     }
 
     private void activityLifecycleCallback() {
@@ -76,6 +77,7 @@ public class BaseApp extends Application {
             @Override
             public void onActivityStarted(Activity activity) {
                 mActivityCount++;
+                L.e("---------mActivityCount ++-----------"+mActivityCount);
             }
 
             @Override
@@ -89,6 +91,7 @@ public class BaseApp extends Application {
             @Override
             public void onActivityStopped(Activity activity) {
                 mActivityCount--;
+                L.e("---------mActivityCount-----------"+mActivityCount);
             }
 
             @Override

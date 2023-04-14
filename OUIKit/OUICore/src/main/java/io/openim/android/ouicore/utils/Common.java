@@ -192,7 +192,7 @@ public class Common {
         //点亮屏幕
         wakeLock.acquire(10 * 60 * 1000L /*10 minutes*/);
         //释放
-        new Handler().postDelayed(wakeLock::release, 5000);
+        Common.UIHandler.postDelayed(wakeLock::release, 5000);
     }
 
     /**
