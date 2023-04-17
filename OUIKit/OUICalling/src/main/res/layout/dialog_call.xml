@@ -4,10 +4,10 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:clipToPadding="true"
         android:fitsSystemWindows="true"
-        android:keepScreenOn="true"
-        android:layout_height="match_parent">
+        android:keepScreenOn="true">
 
         <RelativeLayout
             android:id="@+id/home"
@@ -23,20 +23,55 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-            <io.livekit.android.renderer.TextureViewRenderer
-                android:id="@+id/localSpeakerVideoView"
-                android:layout_width="107dp"
-                android:layout_height="197dp"
-                android:layout_alignParentRight="true"
-                android:layout_marginTop="48dp"
-                android:layout_marginRight="15dp" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="28dp"
+                android:layout_marginEnd="15dp"
+                android:gravity="right"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/closeCamera"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:padding="5dp"
+                        android:button="@null"
+                        android:background="@drawable/selector_camera" />
+
+                    <CheckBox
+                        android:id="@+id/switchCamera"
+                        android:layout_width="wrap_content"
+                        android:button="@null"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:background="@mipmap/ic_switch_camera" />
+                </LinearLayout>
+
+
+                <io.livekit.android.renderer.TextureViewRenderer
+                    android:id="@+id/localSpeakerVideoView"
+                    android:layout_width="107dp"
+                    android:layout_height="197dp" />
+
+            </LinearLayout>
+
 
             <ImageView
                 android:id="@+id/zoomOut"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="22dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="35dp"
                 android:src="@mipmap/ic_zoom_out" />
 
             <TextView
@@ -44,7 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="45dp"
+                android:layout_marginTop="40dp"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 

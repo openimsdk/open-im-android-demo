@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -107,27 +108,29 @@ public class CallDialog extends BaseDialog {
         window.setBackgroundDrawableResource(android.R.color.transparent);
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-
-
     }
+
     //收起/展开
     private void shrink(boolean isShrink) {
         view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
         getWindow().setDimAmount(isShrink ? 0f : 1f);
         view.shrink.setVisibility(isShrink ? View.VISIBLE : View.GONE);
         view.sTips.setText(callingVM.isCallOut ? context.getString(io.openim.android.ouicore.
-            R.string.waiting_tips2):
+            R.string.waiting_tips2) :
             context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
         WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.height =isShrink? ViewGroup.LayoutParams.WRAP_CONTENT:ViewGroup.LayoutParams.MATCH_PARENT;
-        params.width = isShrink? ViewGroup.LayoutParams.WRAP_CONTENT:ViewGroup.LayoutParams.MATCH_PARENT;
-        params.gravity= isShrink?(Gravity.TOP|Gravity.END):Gravity.CENTER;
+        params.height = isShrink ? ViewGroup.LayoutParams.WRAP_CONTENT :
+            ViewGroup.LayoutParams.MATCH_PARENT;
+        params.width = isShrink ? ViewGroup.LayoutParams.WRAP_CONTENT :
+            ViewGroup.LayoutParams.MATCH_PARENT;
+        params.gravity = isShrink ? (Gravity.TOP | Gravity.END) : Gravity.CENTER;
         getWindow().setAttributes(params);
     }
 
     public void bindData(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
-        callingVM.isGroup = signalingInfo.getInvitation().getSessionType()==Constant.SessionType.GROUP_CHAT;
+        callingVM.isGroup =
+            signalingInfo.getInvitation().getSessionType() == Constant.SessionType.GROUP_CHAT;
         callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
         if (!callingVM.isVideoCalls) {
             view.timeTv.setVisibility(View.GONE);
@@ -195,6 +198,15 @@ public class CallDialog extends BaseDialog {
 
     public void listener(SignalingInfo signalingInfo) {
         callingVM.timeStr.observeForever(bindTime);
+        view.closeCamera.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            boolean isEnabled=!isChecked;
+            callingVM.callViewModel.setCameraEnabled(isEnabled);
+            view.localSpeakerVideoView.setVisibility(isEnabled?View.VISIBLE:View.GONE);
+        });
+        view.switchCamera
+            .setOnClickListener(v -> {
+                callingVM.callViewModel.flipCamera();
+            });
         view.micIsOn.setOnClickListener(new OnDedrepClickListener(1000) {
             @Override
             public void click(View v) {
@@ -259,8 +271,6 @@ public class CallDialog extends BaseDialog {
             shrink(false);
         });
     }
-
-
 
 
     public void changeView() {
