@@ -130,7 +130,8 @@ public class CallDialog extends BaseDialog {
     public void bindData(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
         callingVM.isGroup =
-            signalingInfo.getInvitation().getSessionType() == Constant.SessionType.GROUP_CHAT;
+            signalingInfo.getInvitation().getSessionType() == Constant.SessionType.GROUP_CHAT
+                || signalingInfo.getInvitation().getSessionType() == Constant.SessionType.SUPER_GROUP;
         callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
         if (!callingVM.isVideoCalls) {
             view.timeTv.setVisibility(View.GONE);
@@ -199,9 +200,9 @@ public class CallDialog extends BaseDialog {
     public void listener(SignalingInfo signalingInfo) {
         callingVM.timeStr.observeForever(bindTime);
         view.closeCamera.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            boolean isEnabled=!isChecked;
+            boolean isEnabled = !isChecked;
             callingVM.callViewModel.setCameraEnabled(isEnabled);
-            view.localSpeakerVideoView.setVisibility(isEnabled?View.VISIBLE:View.GONE);
+            view.localSpeakerVideoView.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
         });
         view.switchCamera
             .setOnClickListener(v -> {

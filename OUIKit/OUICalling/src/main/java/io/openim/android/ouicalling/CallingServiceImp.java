@@ -140,7 +140,8 @@ public class CallingServiceImp implements CallingService {
     public Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener,
                                   boolean isCallOut) {
         if (callDialog != null) return callDialog;
-        if (signalingInfo.getInvitation().getSessionType()== Constant.SessionType.GROUP_CHAT)
+        if (signalingInfo.getInvitation().getSessionType()== Constant.SessionType.GROUP_CHAT
+            ||signalingInfo.getInvitation().getSessionType() == Constant.SessionType.SUPER_GROUP)
             callDialog = new GroupCallDialog(context, this, isCallOut);
         else
             callDialog = new CallDialog(context, this, isCallOut);
