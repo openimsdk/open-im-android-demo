@@ -3,8 +3,11 @@ package io.openim.android.ouicalling;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -49,6 +52,7 @@ import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.internal.FunctionImpl;
+import kotlinx.coroutines.CoroutineScope;
 import kotlinx.coroutines.flow.FlowCollector;
 
 public class GroupCallDialog extends CallDialog {
@@ -56,6 +60,8 @@ public class GroupCallDialog extends CallDialog {
     private RecyclerViewAdapter<UserInfo, ViewHol.ImageTxtViewHolder> memberAdapter;
     private RecyclerViewAdapter<Participant, RendererViewHole> viewRenderersAdapter;
     private boolean isJoin = false;
+    private CoroutineScope scope = callingVM.callViewModel.buildScope();
+    private List<UserInfo> userInfos;
 
 
     public GroupCallDialog(@NonNull Context context, CallingService callingService,
@@ -96,15 +102,16 @@ public class GroupCallDialog extends CallDialog {
                     String name = participantMeta.groupMemberInfo.getNickname();
                     if (TextUtils.isEmpty(name)) name = participantMeta.userInfo.getNickname();
                     holder.view.name.setText(name);
+                    holder.view.avatarRl.setVisibility(callingVM.isVideoCalls ? View.GONE :
+                        View.VISIBLE);
+                    holder.view.avatar.load(participantMeta.userInfo.getFaceURL());
 
                     callingVM.callViewModel.subscribe(data.getEvents().getEvents(), (v) -> {
-                        ParticipantMeta participantMeta2 = GsonHel.fromJson(v.getParticipant()
-                        .getMetadata(),
-                            ParticipantMeta.class);
+                        ParticipantMeta participantMeta2 =
+                            GsonHel.fromJson(v.getParticipant().getMetadata(),
+                                ParticipantMeta.class);
                         participantMeta.userInfo.getUserID().equals(participantMeta2);
-                        holder.view.micOn.setImageResource(v.getParticipant()
-                        .isMicrophoneEnabled() ?
-                            R.mipmap.ic_mic_s_on : R.mipmap.ic_mic_s_off);
+                        holder.view.micOn.setImageResource(v.getParticipant().isMicrophoneEnabled() ? R.mipmap.ic_mic_s_on : R.mipmap.ic_mic_s_off);
                         return null;
                     });
                 } catch (Exception ignore) {
@@ -123,7 +130,7 @@ public class GroupCallDialog extends CallDialog {
 
                         @Override
                         public void resumeWith(@NonNull Object o) {
-                        L.e("");
+                            L.e("");
                         }
                     });
                 }
@@ -168,6 +175,7 @@ public class GroupCallDialog extends CallDialog {
 
     @Override
     public void dismiss() {
+        callingVM.callViewModel.scopeCancel(scope);
         callingVM.timeStr.removeObserver(bindTime);
         super.dismiss();
     }
@@ -184,6 +192,7 @@ public class GroupCallDialog extends CallDialog {
         show();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void listener(SignalingInfo signalingInfo) {
         callingVM.timeStr.observeForever(bindTime);
@@ -228,6 +237,39 @@ public class GroupCallDialog extends CallDialog {
         callingVM.setOnParticipantsChangeListener(participants -> {
             viewRenderersAdapter.setItems(participants);
         });
+        view.zoomOut.setOnClickListener(v -> {
+            shrink(true);
+        });
+        view.shrink.setOnClickListener(v -> {
+            shrink(false);
+        });
+
+        callingVM.callViewModel.subscribe(callingVM.callViewModel.getActiveSpeakersFlow(), (v) -> {
+            if (!v.isEmpty()) {
+                ParticipantMeta participantMeta = GsonHel.fromJson(v.get(0).getMetadata(),
+                    ParticipantMeta.class);
+                String name = participantMeta.groupMemberInfo.getNickname();
+                if (TextUtils.isEmpty(name))
+                    name = participantMeta.userInfo.getNickname();
+                view.sTips.setText(String.format(context.getString(io.openim.android.ouicore.R.string.who_talk), name));
+                view.sAvatar.load(participantMeta.userInfo.getFaceURL());
+            }
+            return null;
+        }, scope);
+    }
+
+    @Override
+    public void shrink(boolean isShrink) {
+        view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
+        getWindow().setDimAmount(isShrink ? 0f : 1f);
+        view.shrink.setVisibility(isShrink ? View.VISIBLE : View.GONE);
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.height = isShrink ? ViewGroup.LayoutParams.WRAP_CONTENT :
+            ViewGroup.LayoutParams.MATCH_PARENT;
+        params.width = isShrink ? ViewGroup.LayoutParams.WRAP_CONTENT :
+            ViewGroup.LayoutParams.MATCH_PARENT;
+        params.gravity = isShrink ? (Gravity.TOP | Gravity.END) : Gravity.CENTER;
+        getWindow().setAttributes(params);
     }
 
     private void signalingAccept(SignalingInfo signalingInfo) {
@@ -268,6 +310,11 @@ public class GroupCallDialog extends CallDialog {
             @Override
             public void onSuccess(List<UserInfo> data) {
                 if (data.isEmpty()) return;
+                userInfos = data;
+                UserInfo userInfo = userInfos.get(0);
+                view.sTips.setText(String.format(context.getString(io.openim.android.ouicore.R.string.who_talk), userInfo.getNickname()));
+                view.sAvatar.load(userInfo.getFaceURL());
+
                 if (callingVM.isCallOut) {
                     memberAdapter.setItems(data);
                 } else {

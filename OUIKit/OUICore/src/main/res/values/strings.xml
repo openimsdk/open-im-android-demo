@@ -361,4 +361,6 @@
     <string name="customize">自定义</string>
     <string name="day">天</string>
     <string name="mute_tips">输入或选择禁言时间</string>
+    <string name="who_talk">%1$s讲话中...</string>
+    <string name="meeting">会议中...</string>
 </resources>

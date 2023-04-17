@@ -111,7 +111,7 @@ public class CallDialog extends BaseDialog {
     }
 
     //收起/展开
-    private void shrink(boolean isShrink) {
+    public void shrink(boolean isShrink) {
         view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
         getWindow().setDimAmount(isShrink ? 0f : 1f);
         view.shrink.setVisibility(isShrink ? View.VISIBLE : View.GONE);

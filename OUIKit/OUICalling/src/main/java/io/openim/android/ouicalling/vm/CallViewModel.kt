@@ -10,16 +10,15 @@ import io.livekit.android.events.RoomEvent
 import io.livekit.android.events.collect
 import io.livekit.android.renderer.TextureViewRenderer
 import io.livekit.android.room.Room
+import io.livekit.android.room.participant.ConnectionQuality
 import io.livekit.android.room.participant.LocalParticipant
 import io.livekit.android.room.participant.Participant
 import io.livekit.android.room.participant.RemoteParticipant
 import io.livekit.android.room.track.*
 import io.livekit.android.util.flow
 import io.openim.android.ouicore.utils.L
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import livekit.LivekitRtc
 import kotlinx.coroutines.flow.collectLatest as collectLatest1
 
@@ -238,19 +237,35 @@ class CallViewModel(
 
         videoTrack.restartTrack(newOptions)
     }
-
+    fun getActiveSpeakersFlow(): StateFlow<List<Participant>> {
+        return room::activeSpeakers.flow
+    }
     fun dismissError() {
         mutableError.value = null
     }
+    private val scopes = mutableListOf<CoroutineScope>()
+    fun buildScope(): CoroutineScope {
+        val scope = CoroutineScope(Dispatchers.Main);
+        scopes.add(scope)
+        return scope;
+    }
 
-    fun <T> subscribe(flow: Flow<T>, function: (T) -> Unit) {
-        viewModelScope.launch {
+    fun scopeCancel(scope: CoroutineScope) {
+        scope.cancel()
+        scopes.remove(scope)
+    }
+
+    @JvmOverloads
+    fun <T> subscribe(
+        flow: Flow<T>, function: (T) -> Any,
+        scope: CoroutineScope = viewModelScope,
+    ) {
+        scope.launch {
             flow.collect {
                 function.invoke(it)
             }
         }
     }
-
     fun sendData(message: String) {
         viewModelScope.launch {
             room.localParticipant.publishData(message.toByteArray(Charsets.UTF_8))
@@ -277,6 +292,8 @@ class CallViewModel(
             connectToRoom(url, token)
         }
     }
+
+
 }
 
 private fun <T> LiveData<T>.hide(): LiveData<T> = this
