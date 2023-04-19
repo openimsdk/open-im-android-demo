@@ -64,7 +64,6 @@ public class GroupCallDialog extends CallDialog {
     private RecyclerViewAdapter<Participant, RendererViewHole> viewRenderersAdapter;
     private boolean isJoin = false;
     private CoroutineScope scope = callingVM.callViewModel.buildScope();
-    private List<UserInfo> userInfos;
 
 
     public GroupCallDialog(@NonNull Context context, CallingService callingService,
@@ -339,8 +338,7 @@ public class GroupCallDialog extends CallDialog {
             @Override
             public void onSuccess(List<UserInfo> data) {
                 if (data.isEmpty()) return;
-                userInfos = data;
-                UserInfo userInfo = userInfos.get(0);
+                UserInfo userInfo = data.get(0);
                 view.sTips.setText(String.format(context.getString(io.openim.android.ouicore.R.string.who_talk), userInfo.getNickname()));
                 view.sAvatar.load(userInfo.getFaceURL());
 
