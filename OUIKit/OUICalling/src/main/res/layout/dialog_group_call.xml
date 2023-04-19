@@ -20,6 +20,7 @@
             android:fitsSystemWindows="true"
             android:keepScreenOn="true"
             tools:context="io.openim.android.ouicalling.CallDialog">
+
             <ImageView
                 android:id="@+id/zoomOut"
                 android:layout_width="wrap_content"
@@ -30,7 +31,6 @@
                 android:src="@mipmap/ic_zoom_out" />
 
             <LinearLayout
-                android:id="@+id/cameraControl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -39,6 +39,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
+                    android:id="@+id/cameraControl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -74,9 +75,9 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/viewRenderers"
-                android:layout_below="@id/zoomOut"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_below="@id/zoomOut" />
 
             <LinearLayout
                 android:id="@+id/headTips"
@@ -127,7 +128,8 @@
                     android:id="@+id/memberRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/headTips" />
+                    android:layout_below="@id/headTips"
+                    android:padding="20dp" />
             </LinearLayout>
 
 
@@ -219,10 +221,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:button="@null"
+                    android:checked="true"
                     android:drawableTop="@drawable/selector_mic"
                     android:drawablePadding="15dp"
                     android:text="@string/microphone_on"
-                    android:checked="true"
                     android:textColor="#ffffffff"
                     android:textSize="16sp" />
 
@@ -256,9 +258,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:button="@null"
+                    android:checked="true"
                     android:drawableTop="@drawable/selector_speaker"
                     android:drawablePadding="15dp"
-                    android:checked="true"
                     android:text="@string/speaker_on"
                     android:textColor="#ffffffff"
                     android:textSize="16sp" />
@@ -280,7 +282,6 @@
             android:keepScreenOn="true"
             android:orientation="vertical"
             android:visibility="gone">
-
 
 
             <LinearLayout

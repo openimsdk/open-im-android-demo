@@ -108,6 +108,8 @@ public class CallDialog extends BaseDialog {
         window.setBackgroundDrawableResource(android.R.color.transparent);
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+
+        view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.GONE : View.VISIBLE);
     }
 
     //收起/展开
@@ -115,8 +117,8 @@ public class CallDialog extends BaseDialog {
         view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
         getWindow().setDimAmount(isShrink ? 0f : 1f);
         view.shrink.setVisibility(isShrink ? View.VISIBLE : View.GONE);
-        view.sTips.setText(callingVM.isCallOut ? context.getString(io.openim.android.ouicore.
-            R.string.waiting_tips2) :
+        view.sTips.setText(callingVM.isCallOut ?
+            context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
             context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
         WindowManager.LayoutParams params = getWindow().getAttributes();
         params.height = isShrink ? ViewGroup.LayoutParams.WRAP_CONTENT :
@@ -130,8 +132,7 @@ public class CallDialog extends BaseDialog {
     public void bindData(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
         callingVM.isGroup =
-            signalingInfo.getInvitation().getSessionType() == Constant.SessionType.GROUP_CHAT
-                || signalingInfo.getInvitation().getSessionType() == Constant.SessionType.SUPER_GROUP;
+            signalingInfo.getInvitation().getSessionType() == Constant.SessionType.GROUP_CHAT || signalingInfo.getInvitation().getSessionType() == Constant.SessionType.SUPER_GROUP;
         callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
         if (!callingVM.isVideoCalls) {
             view.timeTv.setVisibility(View.GONE);
@@ -204,10 +205,9 @@ public class CallDialog extends BaseDialog {
             callingVM.callViewModel.setCameraEnabled(isEnabled);
             view.localSpeakerVideoView.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
         });
-        view.switchCamera
-            .setOnClickListener(v -> {
-                callingVM.callViewModel.flipCamera();
-            });
+        view.switchCamera.setOnClickListener(v -> {
+            callingVM.callViewModel.flipCamera();
+        });
         view.micIsOn.setOnClickListener(new OnDedrepClickListener(1000) {
             @Override
             public void click(View v) {
@@ -312,7 +312,7 @@ public class CallDialog extends BaseDialog {
                     MediaPlayerUtil.INSTANCE.playMedia();
                 }
             });
-            MediaPlayerUtil.INSTANCE.prepareAsync();
+            MediaPlayerUtil.INSTANCE.playMedia();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -375,7 +375,9 @@ public class CallDialog extends BaseDialog {
         view.headTips.setVisibility(View.GONE);
         MediaPlayerUtil.INSTANCE.pause();
         MediaPlayerUtil.INSTANCE.release();
-        view.waiting.setVisibility(View.GONE);
+        view.sTips.setText(io.openim.android.ouicore.R.string.calling);
+        if (callingVM.isVideoCalls)
+            view.waiting.setVisibility(View.GONE);
     }
 
 }

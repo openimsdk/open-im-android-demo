@@ -2,6 +2,7 @@ package io.openim.android.ouicalling;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -73,8 +74,7 @@ public class GroupCallDialog extends CallDialog {
 
     @Override
     public void initRendererView() {
-        view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.VISIBLE : View.GONE);
-        view.memberRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        view.memberRecyclerView.setLayoutManager(new GridLayoutManager(context,5));
         view.memberRecyclerView.setAdapter(memberAdapter = new RecyclerViewAdapter<UserInfo,
             ViewHol.ImageTxtViewHolder>(ViewHol.ImageTxtViewHolder.class) {
 
@@ -82,6 +82,7 @@ public class GroupCallDialog extends CallDialog {
             public void onBindView(@NonNull ViewHol.ImageTxtViewHolder holder, UserInfo data,
                                    int position) {
                 holder.view.img.load(data.getFaceURL());
+                holder.view.txt.setTextColor(Color.WHITE);
                 holder.view.txt.setText(data.getNickname());
             }
         });
@@ -343,15 +344,12 @@ public class GroupCallDialog extends CallDialog {
                 view.sTips.setText(String.format(context.getString(io.openim.android.ouicore.R.string.who_talk), userInfo.getNickname()));
                 view.sAvatar.load(userInfo.getFaceURL());
 
-                if (callingVM.isCallOut) {
-                    memberAdapter.setItems(data);
-                } else {
-                    UserInfo inviterUser = data.get(0);
-                    view.tips1.setText(inviterUser.getNickname() + (callingVM.isVideoCalls ?
-                        context.getString(io.openim.android.ouicore.R.string.invite_video_call) :
-                        context.getString(io.openim.android.ouicore.R.string.invite_audio_call)));
-                    view.tips2.setText(data.size() + "人" + context.getString(io.openim.android.ouicore.R.string.calling));
-                }
+                memberAdapter.setItems(data);
+                UserInfo inviterUser = data.get(0);
+                view.tips1.setText(inviterUser.getNickname() + (callingVM.isVideoCalls ?
+                    context.getString(io.openim.android.ouicore.R.string.invite_video_call) :
+                    context.getString(io.openim.android.ouicore.R.string.invite_audio_call)));
+                view.tips2.setText(data.size() + "人" + context.getString(io.openim.android.ouicore.R.string.calling));
             }
         }, ids);
     }
