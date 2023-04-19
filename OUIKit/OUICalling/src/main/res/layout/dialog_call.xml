@@ -239,6 +239,7 @@
                     android:drawableTop="@drawable/selector_mic"
                     android:drawablePadding="15dp"
                     android:text="@string/microphone_on"
+                    android:checked="true"
                     android:textColor="#ffffffff"
                     android:textSize="16sp" />
 
@@ -275,6 +276,7 @@
                     android:drawableTop="@drawable/selector_speaker"
                     android:drawablePadding="15dp"
                     android:text="@string/speaker_on"
+                    android:checked="true"
                     android:textColor="#ffffffff"
                     android:textSize="16sp" />
 

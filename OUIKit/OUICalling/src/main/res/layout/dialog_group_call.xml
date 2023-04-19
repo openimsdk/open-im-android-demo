@@ -29,6 +29,49 @@
                 android:layout_marginBottom="10dp"
                 android:src="@mipmap/ic_zoom_out" />
 
+            <LinearLayout
+                android:id="@+id/cameraControl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="15dp"
+                android:gravity="right"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/closeCamera"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:background="@drawable/selector_camera"
+                        android:button="@null"
+                        android:padding="5dp" />
+
+                    <CheckBox
+                        android:id="@+id/switchCamera"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@mipmap/ic_switch_camera"
+                        android:button="@null"
+                        android:padding="5dp" />
+                </LinearLayout>
+
+
+                <io.livekit.android.renderer.TextureViewRenderer
+                    android:id="@+id/localSpeakerVideoView"
+                    android:layout_width="107dp"
+                    android:layout_height="197dp" />
+
+            </LinearLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/viewRenderers"
                 android:layout_below="@id/zoomOut"
@@ -179,6 +222,7 @@
                     android:drawableTop="@drawable/selector_mic"
                     android:drawablePadding="15dp"
                     android:text="@string/microphone_on"
+                    android:checked="true"
                     android:textColor="#ffffffff"
                     android:textSize="16sp" />
 
@@ -214,6 +258,7 @@
                     android:button="@null"
                     android:drawableTop="@drawable/selector_speaker"
                     android:drawablePadding="15dp"
+                    android:checked="true"
                     android:text="@string/speaker_on"
                     android:textColor="#ffffffff"
                     android:textSize="16sp" />
@@ -250,7 +295,7 @@
                     android:layout_width="68dp"
                     android:layout_height="68dp"
                     android:layout_marginBottom="10dp"
-                    android:src="@mipmap/ic_my_friend" />
+                    android:src="@mipmap/ic_my_group" />
 
                 <TextView
                     android:id="@+id/sTips"
