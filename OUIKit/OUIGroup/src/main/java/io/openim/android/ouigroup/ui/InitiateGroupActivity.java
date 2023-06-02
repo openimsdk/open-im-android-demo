@@ -27,6 +27,7 @@ import io.openim.android.ouicore.entity.ExUserInfo;
 
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 
 
@@ -290,34 +291,38 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                 }
             }
         });
-        view.submit.setOnClickListener(v -> {
-            try {
-                if (isInviteToGroup) {
-                    vm.inviteUserToGroup(vm.selectedFriendInfo.getValue());
-                    return;
-                }
-                if (isRemoveGroup) {
-                    vm.kickGroupMember(vm.selectedFriendInfo.getValue());
-                    return;
-                }
-                if (isSelectMember) {
-                    ArrayList<String> ids = new ArrayList<>();
-                    for (FriendInfo friendInfo : vm.selectedFriendInfo.getValue()) {
-                        ids.add(friendInfo.getUserID());
+        view.submit.setOnClickListener(new OnDedrepClickListener(850) {
+            @Override
+            public void click(View v) {
+                try {
+                    if (isInviteToGroup) {
+                        vm.inviteUserToGroup(vm.selectedFriendInfo.getValue());
+                        return;
                     }
-                    setResult(RESULT_OK, new Intent().putStringArrayListExtra(Constant.K_RESULT,
-                        ids));
-                    finish();
-                    return;
+                    if (isRemoveGroup) {
+                        vm.kickGroupMember(vm.selectedFriendInfo.getValue());
+                        return;
+                    }
+                    if (isSelectMember) {
+                        ArrayList<String> ids = new ArrayList<>();
+                        for (FriendInfo friendInfo : vm.selectedFriendInfo.getValue()) {
+                            ids.add(friendInfo.getUserID());
+                        }
+                        setResult(RESULT_OK, new Intent().putStringArrayListExtra(Constant.K_RESULT,
+                            ids));
+                        finish();
+                        return;
+                    }
+                    if (isSelectFriend) {
+                        setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
+                            GsonHel.toJson(vm.selectedFriendInfo.getValue())));
+                        finish();
+                        return;
+                    }
+                    createLauncher.launch(getIntent().setClass(InitiateGroupActivity.this,
+                        CreateGroupActivity.class));
+                } catch (Exception ignored) {
                 }
-                if (isSelectFriend) {
-                    setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
-                        GsonHel.toJson(vm.selectedFriendInfo.getValue())));
-                    finish();
-                    return;
-                }
-                createLauncher.launch(getIntent().setClass(this, CreateGroupActivity.class));
-            } catch (Exception ignored) {
             }
         });
     }
