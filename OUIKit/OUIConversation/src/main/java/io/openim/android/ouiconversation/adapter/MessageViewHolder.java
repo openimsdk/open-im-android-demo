@@ -99,36 +99,21 @@ import io.openim.android.sdk.models.SignalingInfo;
 public class MessageViewHolder {
     public static RecyclerView.ViewHolder createViewHolder(@NonNull ViewGroup parent,
                                                            int viewType) {
-        if (viewType == Constant.LOADING)
-            return new LoadingView(parent);
-        if (viewType == Constant.MsgType.TXT)
-            return new TXTView(parent);
-        if (viewType == Constant.MsgType.PICTURE)
-            return new IMGView(parent);
-        if (viewType == Constant.MsgType.VOICE)
-            return new AudioView(parent);
-        if (viewType == Constant.MsgType.VIDEO)
-            return new VideoView(parent);
-        if (viewType == Constant.MsgType.FILE)
-            return new FileView(parent);
-        if (viewType == Constant.MsgType.LOCATION)
-            return new LocationView(parent);
-        if (viewType == Constant.MsgType.OA_NOTICE)
-            return new NotificationItemHo(parent);
-        if (viewType >= Constant.MsgType.NOTICE
-            || viewType == Constant.MsgType.REVOKE
-            || viewType == Constant.MsgType.ADVANCED_REVOKE)
+        if (viewType == Constant.LOADING) return new LoadingView(parent);
+        if (viewType == Constant.MsgType.TXT) return new TXTView(parent);
+        if (viewType == Constant.MsgType.PICTURE) return new IMGView(parent);
+        if (viewType == Constant.MsgType.VOICE) return new AudioView(parent);
+        if (viewType == Constant.MsgType.VIDEO) return new VideoView(parent);
+        if (viewType == Constant.MsgType.FILE) return new FileView(parent);
+        if (viewType == Constant.MsgType.LOCATION) return new LocationView(parent);
+        if (viewType == Constant.MsgType.OA_NOTICE) return new NotificationItemHo(parent);
+        if (viewType >= Constant.MsgType.NOTICE || viewType == Constant.MsgType.REVOKE || viewType == Constant.MsgType.ADVANCED_REVOKE)
             return new NoticeView(parent);
-        if (viewType == Constant.MsgType.MERGE)
-            return new MergeView(parent);
-        if (viewType == Constant.MsgType.CARD)
-            return new BusinessCardView(parent);
-        if (viewType == Constant.MsgType.QUOTE)
-            return new QuoteTXTView(parent);
-        if (viewType == Constant.MsgType.LOCAL_CALL_HISTORY)
-            return new CallHistoryView(parent);
-        if (viewType == Constant.MsgType.CUSTOMIZE_MEETING)
-            return new MeetingInviteView(parent);
+        if (viewType == Constant.MsgType.MERGE) return new MergeView(parent);
+        if (viewType == Constant.MsgType.CARD) return new BusinessCardView(parent);
+        if (viewType == Constant.MsgType.QUOTE) return new QuoteTXTView(parent);
+        if (viewType == Constant.MsgType.LOCAL_CALL_HISTORY) return new CallHistoryView(parent);
+        if (viewType == Constant.MsgType.CUSTOMIZE_MEETING) return new MeetingInviteView(parent);
 
         return new TXTView(parent);
     }
@@ -403,10 +388,7 @@ public class MessageViewHolder {
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.forward));
                 }
 
-                if (message.getContentType()
-                    != Constant.MsgType.VOICE
-                    && message.getContentType() != Constant.MsgType.MERGE
-                    && message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING) {
+                if (message.getContentType() != Constant.MsgType.VOICE && message.getContentType() != Constant.MsgType.MERGE && message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING) {
                     menuIcons.add(R.mipmap.ic_reply);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.reply));
                 }
@@ -773,30 +755,33 @@ public class MessageViewHolder {
             String sourceUrl = message.getSoundElem().getSourceUrl();
             if (TextUtils.isEmpty(sourceUrl)) return;
             SPlayer.instance().getMediaPlayer();
-            SPlayer.instance().stop();
-            SPlayer.instance().playByUrl(sourceUrl, new PlayerListener() {
-                @Override
-                public void LoadSuccess(SMediaPlayer mediaPlayer) {
-                    mediaPlayer.start();
-                }
+            if (SPlayer.instance().isPlaying()) {
+                SPlayer.instance().stop();
+            }else {
+                SPlayer.instance().playByUrl(sourceUrl, new PlayerListener() {
+                    @Override
+                    public void LoadSuccess(SMediaPlayer mediaPlayer) {
+                        mediaPlayer.start();
+                    }
 
-                @Override
-                public void Loading(SMediaPlayer mediaPlayer, int i) {
+                    @Override
+                    public void Loading(SMediaPlayer mediaPlayer, int i) {
 
-                }
+                    }
 
-                @Override
-                public void onCompletion(SMediaPlayer mediaPlayer) {
-                    mediaPlayer.stop();
-                    markRead(message, chatVM.conversationInfo.getValue().isPrivateChat());
-                }
+                    @Override
+                    public void onCompletion(SMediaPlayer mediaPlayer) {
+                        mediaPlayer.stop();
+                        markRead(message, chatVM.conversationInfo.getValue().isPrivateChat());
+                    }
 
-                @Override
-                public void onError(Exception e) {
-                    lottieView.cancelAnimation();
-                    lottieView.setProgress(1);
-                }
-            });
+                    @Override
+                    public void onError(Exception e) {
+                        lottieView.cancelAnimation();
+                        lottieView.setProgress(1);
+                    }
+                });
+            }
 
             SPlayer.instance().getMediaPlayer().setOnPlayStateListener(new SMediaPlayer.OnPlayStateListener() {
                 @Override
@@ -1114,9 +1099,7 @@ public class MessageViewHolder {
             try {
                 if (msgExpand.oaNotification.mixType == 1) {
                     v.picture.setVisibility(View.VISIBLE);
-                    Glide.with(v.getRoot().getContext())
-                        .load(msgExpand.oaNotification.pictureElem
-                            .getBigPicture().getUrl()).into(v.picture);
+                    Glide.with(v.getRoot().getContext()).load(msgExpand.oaNotification.pictureElem.getBigPicture().getUrl()).into(v.picture);
                 } else {
                     v.picture.setVisibility(View.GONE);
                 }

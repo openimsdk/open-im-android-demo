@@ -248,7 +248,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
             @Override
             public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 if (viewType == TITLE)
-                    return new TitleViewHolder(parent);
+                    return new ViewHol.TitleViewHolder(parent);
                 if (viewType == CONTACT_ITEM || viewType == CHAT_ITEM || viewType == GROUP_ITEM)
                     return new ViewHol.ContactItemHolder(parent);
                 if (viewType == FILE_ITEM)
@@ -263,7 +263,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                 switch (getItemViewType(position)) {
                     case TITLE:
                         String title = (String) data;
-                        TitleViewHolder titleViewHolder = (TitleViewHolder) holder;
+                        ViewHol.TitleViewHolder titleViewHolder = (ViewHol.TitleViewHolder) holder;
                         if (title.contains("1")) {
                             titleViewHolder.view.title.setText(title.substring(0, title.indexOf("1")));
                             titleViewHolder.view.more.setVisibility(View.VISIBLE);
@@ -369,12 +369,5 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
         }
     }
 
-    public static class TitleViewHolder extends RecyclerView.ViewHolder {
-        public ItemSearchTitleBinding view;
 
-        public TitleViewHolder(@NonNull View itemView) {
-            super(ItemSearchTitleBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
-            view = ItemSearchTitleBinding.bind(this.itemView);
-        }
-    }
 }

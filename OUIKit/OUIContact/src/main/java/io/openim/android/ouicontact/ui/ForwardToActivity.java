@@ -1,5 +1,7 @@
 package io.openim.android.ouicontact.ui;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -23,6 +25,7 @@ import io.openim.android.ouicontact.R;
 import io.openim.android.ouicontact.databinding.ActivityForwardToBinding;
 import io.openim.android.ouicontact.ui.fragment.FriendFragment;
 import io.openim.android.ouicontact.ui.fragment.GroupFragment;
+import io.openim.android.ouicontact.ui.search.SearchGroupAndFriendsActivity;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
@@ -53,8 +56,16 @@ public class ForwardToActivity extends BaseActivity<SocialityVM, ActivityForward
         initView();
         listener();
     }
+    private ActivityResultLauncher<Intent> launcher= registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),v->{
+        if (v.getResultCode()!=RESULT_OK)return;
+        setResult(RESULT_OK, v.getData());
+        finish();
+    });
 
     private void listener() {
+        view.searchView.setOnClickListener(v -> {
+            launcher.launch(new Intent(this, SearchGroupAndFriendsActivity.class));
+        });
         view.menuGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == view.men1.getId()) {
                 view.menBg1.setVisibility(View.VISIBLE);
@@ -66,6 +77,7 @@ public class ForwardToActivity extends BaseActivity<SocialityVM, ActivityForward
                 switchFragment(groupFragment);
             }
         });
+
     }
 
     private void initView() {

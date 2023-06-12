@@ -1,4 +1,4 @@
-package io.openim.android.ouicontact.ui;
+package io.openim.android.ouicontact.ui.search;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;

@@ -11,7 +11,6 @@
 
     <RelativeLayout
         android:layout_width="49dp"
-
         android:layout_height="49dp">
 
         <io.openim.android.ouicore.widget.AvatarImage

@@ -52,6 +52,7 @@ import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
 import io.openim.android.sdk.models.GroupInfo;
@@ -140,6 +141,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             view.waterMark.onDestroy();
             Obs.inst().deleteObserver(this);
             getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
+
+            SPlayer.instance().stop();
         }
     }
 
