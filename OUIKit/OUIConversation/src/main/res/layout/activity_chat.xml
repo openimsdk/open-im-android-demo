@@ -23,7 +23,7 @@
             android:id="@+id/card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="8dp">
+            app:cardElevation="0dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -68,8 +68,9 @@
                         android:id="@+id/nickName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#ff333333"
-                        android:textSize="18sp"
+                        android:textColor="@color/txt_black"
+                        android:textSize="@dimen/main_body"
+                        android:textStyle="bold"
                         android:visibility="visible" />
 
                     <TextView
@@ -133,6 +134,7 @@
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -157,13 +159,19 @@
                 app:water_mark_textBold="false"
                 app:water_mark_textSize="20sp" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:overScrollMode="never"
-                android:paddingLeft="22dp"
-                android:paddingRight="22dp" />
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:orientation="vertical"
+               android:layout_height="match_parent">
+               <include layout="@layout/view_dividing_line"/>
+               <androidx.recyclerview.widget.RecyclerView
+                   android:id="@+id/recyclerView"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent"
+                   android:overScrollMode="never"
+                   android:paddingLeft="22dp"
+                   android:paddingRight="22dp" />
+           </LinearLayout>
         </FrameLayout>
 
 

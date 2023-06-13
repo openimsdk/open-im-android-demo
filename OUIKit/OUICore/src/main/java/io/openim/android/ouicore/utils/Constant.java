@@ -55,6 +55,8 @@ public class Constant {
     public static final String VIDEO_DIR = IM.getStorageDir() + "/video/";
     //图片存储文件夹
     public static final String PICTURE_DIR = IM.getStorageDir() + "/picture/";
+    //文件夹
+    public static final String File_DIR = IM.getStorageDir() + "/file/";
 
     //二维码
     public static class QR {
@@ -171,6 +173,8 @@ public class Constant {
         public static final int TYPING = 113;
         /// 引用回复
         public static final int QUOTE = 114;
+        //自定义表情
+        public static final int CUSTOM_EMOJI = 115;
         //通知消息一般大于1200
         public static final int NOTICE = 1200;
         //后台发送过来的通知

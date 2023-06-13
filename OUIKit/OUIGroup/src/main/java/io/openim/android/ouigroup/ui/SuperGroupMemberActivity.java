@@ -98,7 +98,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
         for (ExGroupMemberInfo exGroupMemberInfo : vm.superGroupMembers.getValue()) {
             if (exGroupMemberInfo.isSelect) selectNum++;
         }
-        view.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectNum));
+        view.bottomLayout.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectNum));
     }
 
     void init() {
@@ -113,7 +113,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
     }
 
     private void listener() {
-        view.submit.setOnClickListener(v -> {
+        view.bottomLayout.submit.setOnClickListener(v -> {
             ArrayList<String> ids = new ArrayList<>();
             for (ExGroupMemberInfo exGroupMemberInfo : vm.superGroupMembers.getValue()) {
                 if (exGroupMemberInfo.isSelect)
@@ -191,7 +191,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
 
     private void initView() {
         view.more.setVisibility(isTransferPermission ? View.GONE : View.VISIBLE);
-        view.selectMemberGroup.setVisibility(isSelectMember ? View.VISIBLE : View.GONE);
+        view.bottomLayout.getRoot().setVisibility(isSelectMember ? View.VISIBLE : View.GONE);
         view.recyclerview.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecyclerViewAdapter<ExGroupMemberInfo, RecyclerView.ViewHolder>() {
 
@@ -239,10 +239,10 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
                         if (isSelect) selectNum++;
                         else selectNum--;
                         notifyItemChanged(position);
-                        view.more2.setVisibility(View.VISIBLE);
-                        view.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectNum));
-                        view.submit.setEnabled(selectNum > 0);
-                        view.selectLy.setOnClickListener(selectNum > 0 ?
+                        view.bottomLayout.more2.setVisibility(View.VISIBLE);
+                        view.bottomLayout.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectNum));
+                        view.bottomLayout.submit.setEnabled(selectNum > 0);
+                        view.bottomLayout.selectLy.setOnClickListener(selectNum > 0 ?
                             (View.OnClickListener) v1 -> {
                                 selectMemberLauncher.launch(new Intent(SuperGroupMemberActivity.this,
                                     SelectedMemberActivity.class));

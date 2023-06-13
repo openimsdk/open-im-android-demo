@@ -3,6 +3,7 @@ package io.openim.android.ouiconversation.vm;
 
 import static io.openim.android.ouicore.utils.Common.UIHandler;
 
+import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -29,6 +30,9 @@ import javax.annotation.Nullable;
 
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.ISubscribe;
+import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.entity.CustomEmoji;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.entity.OnlineStatus;
@@ -66,6 +70,7 @@ import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
+import io.openim.android.sdk.models.PictureInfo;
 import io.openim.android.sdk.models.ReadReceiptInfo;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.RoomCallingInfo;
@@ -75,6 +80,7 @@ import okhttp3.ResponseBody;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener,
     OnGroupListener, OnConversationListener, java.util.Observer, OnSignalingListener {
+
 
     public CallingService callingService =
         (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
@@ -124,7 +130,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public int count = 20; //条数
     public Message loading, forwardMsg;
     private int lastMinSeq = 0;
-
 
     public void init() {
         loading = new Message();
@@ -506,6 +511,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
 
+
     public interface UserOnlineStatusListener {
         void onResult(OnlineStatus onlineStatus);
     }
@@ -560,7 +566,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     return;
                 }
                 conversationInfo.setValue(data);
-                conversationID=data.getConversationID();
+                conversationID = data.getConversationID();
                 loadHistory();
                 getConversationRecvMessageOpt(data.getConversationID());
             }
@@ -570,14 +576,20 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private void loadHistory() {
         //加载消息记录
-        if (fromChatHistory)
-            loadHistoryMessageReverse();
+        if (fromChatHistory) loadHistoryMessageReverse();
         else loadHistoryMessage();
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        Easy.delete(CustomEmojiVM.class);
     }
 
     @Override
     protected void releaseRes() {
         super.releaseRes();
+        Easy.delete(CustomEmojiVM.class);
         IMEvent.getInstance().removeAdvanceMsgListener(this);
         IMEvent.getInstance().removeGroupListener(this);
         IMEvent.getInstance().removeConversationListener(this);
@@ -617,8 +629,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                         msg.setRead(true);
                         msg.getAttachedInfoElem().setHasReadTime(currentTimeMillis);
 
-                        if (conversationInfo.getValue().isPrivateChat())
-                            messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
+                        messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
                     }
                 }
             }
@@ -688,8 +699,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     lastMinSeq = data.getLastMinSeq();
                     handleMessage(data.getMessageList(), false);
                 }
-            }, null, null, conversationID, lastMinSeq, startMsg,
-                count);
+            }, null, null, conversationID, lastMinSeq, startMsg, count);
         } else {
             OpenIMClient.getInstance().messageManager.getHistoryMessageList(new OnBase<List<Message>>() {
                 @Override
@@ -924,7 +934,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             getIView().scrollToPosition(0);
         }
         UIHandler.post(() -> {
-            final  Object ext = msg.getExt();
+            final MsgExpand ext = (MsgExpand) msg.getExt();
             msg.setExt(null);//必须重置
             OfflinePushInfo offlinePushInfo = new OfflinePushInfo();  // 离线推送的消息备注；不为null
             OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
@@ -934,18 +944,25 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     UIHandler.postDelayed(() -> {
                         msg.setExt(ext);
                         msg.setStatus(Constant.Send_State.SEND_FAILED);
+                        ext.sendProgress=0;
                         messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
                     }, 500);
                 }
 
                 @Override
                 public void onProgress(long progress) {
-                    L.e("");
+                    L.e("------onProgress-------="+progress);
+                  UIHandler.post(() -> {
+                      msg.setExt(ext);
+                      ext.sendProgress=progress;
+                      messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
+                  });
                 }
 
                 @Override
                 public void onSuccess(Message message) {
                     // 返回新的消息体；替换发送传入的，不然撤回消息会有bug
+                    ext.sendProgress=0;
                     int index = messages.getValue().indexOf(msg);
                     messages.getValue().remove(index);
                     messages.getValue().add(index, IMUtil.buildExpandInfo(message));

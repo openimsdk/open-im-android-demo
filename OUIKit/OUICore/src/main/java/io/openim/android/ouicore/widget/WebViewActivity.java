@@ -65,7 +65,6 @@ public class WebViewActivity extends BaseActivity<BaseViewModel, ActivityWebView
             action = "";
 
         initView();
-
     }
 
     public void toBack(View v) {

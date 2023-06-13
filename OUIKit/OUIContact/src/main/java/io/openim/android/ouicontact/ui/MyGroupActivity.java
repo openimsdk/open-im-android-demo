@@ -1,21 +1,33 @@
 package io.openim.android.ouicontact.ui;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import java.util.List;
+
+import io.openim.android.ouicontact.R;
 import io.openim.android.ouicontact.databinding.ActivityMyGroupBinding;
-import io.openim.android.ouicontact.ui.search.SearchGroupActivity;
+import io.openim.android.ouicontact.vm.SearchGroup;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SocialityVM;
+import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.sdk.models.GroupInfo;
 
 public class MyGroupActivity extends BaseActivity<SocialityVM, ActivityMyGroupBinding> {

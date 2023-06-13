@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import io.openim.android.ouicore.net.RXRetrofit.N;
 
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.SinkHelper;
 
 
@@ -38,6 +39,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        ActivityManager.push(this);
         requestedOrientation();
         super.onCreate(savedInstanceState);
         if (null != vm) {
@@ -152,6 +154,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     @Override
     protected void onDestroy() {
+        ActivityManager.remove(this);
         N.clearDispose(this);
         releaseRes();
         super.onDestroy();

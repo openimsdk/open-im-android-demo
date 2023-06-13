@@ -1,95 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical"
-    tools:context=".ui.ContactListFragment">
+<layout>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardElevation="8dp">
+    <data>
 
-        <LinearLayout
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingLeft="20dp"
-            android:paddingTop="15dp"
-            android:paddingRight="20dp"
-            android:paddingBottom="15dp">
+        <import type="io.openim.android.ouiconversation.R" />
 
-            <io.openim.android.ouicore.widget.AvatarImage
-                android:id="@+id/avatar"
-                android:layout_width="@dimen/avatar_size"
-                android:layout_height="@dimen/avatar_size"
-                android:src="@mipmap/ic_my_friend" />
+        <import type="androidx.core.content.ContextCompat" />
 
-            <TextView
-                android:id="@+id/nickname"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="11dp"
-                android:layout_marginRight="11dp"
-                android:textColor="#ff333333"
-                android:textSize="18sp" />
+        <import type="android.view.View" />
 
+        <variable
+            name="cLv"
+            type="io.openim.android.ouicore.vm.ContactListVM" />
 
-            <LinearLayout
-                android:id="@+id/isOnline"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="invisible">
+        <variable
+            name="user"
+            type="io.openim.android.ouicore.vm.UserLogic" />
+    </data>
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingRight="5dp"
-                    android:src="@mipmap/ic_online" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="在线"
-                    android:textColor="#ff333333"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
-
-            <ImageView
-                android:id="@+id/callRecord"
-                android:layout_width="31dp"
-                android:layout_height="31dp"
-                android:layout_marginRight="15dp"
-                android:padding="5dp"
-                android:src="@mipmap/ic_call_white" />
-
-            <ImageView
-                android:id="@+id/addFriend"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:src="@mipmap/ic_add" />
-
-        </LinearLayout>
-
-
-    </androidx.cardview.widget.CardView>
-
-
-    <com.yanzhenjie.recyclerview.SwipeRecyclerView
-        android:id="@+id/recyclerView"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:overScrollMode="never" />
-</LinearLayout>
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        tools:context=".ui.fragment.ContactListFragment">
+
+        <FrameLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="20dp"
+                android:paddingTop="15dp"
+                android:paddingRight="20dp">
+
+                <io.openim.android.ouicore.widget.AvatarImage
+                    android:id="@+id/avatar"
+                    android:layout_width="@dimen/avatar_size2"
+                    android:layout_height="@dimen/avatar_size2"
+                    android:src="@mipmap/ic_my_friend" />
+
+
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:ellipsize="end"
+                    android:maxWidth="120dp"
+                    android:maxLines="1"
+                    android:textColor="@color/txt_black"
+                    android:textSize="@dimen/main_body" />
+
+                <LinearLayout
+                    android:id="@+id/connectStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:background="@{user.connectStatus.ordinal()==2||user.connectStatus.ordinal()==4?@drawable/sty_radius_6_33warning:@drawable/sty_radius_6_330089ff}"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="3dp"
+                    android:visibility="@{user.connectStatus.ordinal()==0?View.GONE:View.VISIBLE}">
+
+                    <ImageView
+                        android:id="@+id/status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="4dp"
+                        android:src="@{user.connectStatus.ordinal()==1||user.connectStatus.ordinal()==3?ContextCompat.getDrawable(context, R.mipmap.ic_loading):ContextCompat.getDrawable(context, R.mipmap.ic_sync_err)}" />
+
+                    <TextView
+                        android:id="@+id/statusTips"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{user.connectStatus.value}"
+                        android:textColor="@{user.connectStatus.ordinal()==1||user.connectStatus.ordinal()==3?@color/theme:@color/txt_warning}"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:id="@+id/callRecord"
+                    android:layout_width="31dp"
+                    android:layout_height="31dp"
+                    android:layout_marginRight="15dp"
+                    android:padding="5dp"
+                    android:src="@mipmap/ic_call_white" />
+
+                <ImageView
+                    android:id="@+id/addFriend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:src="@mipmap/ic_add" />
+
+            </LinearLayout>
+        </FrameLayout>
+
+
+        <com.yanzhenjie.recyclerview.SwipeRecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never" />
+    </LinearLayout>
+
+</layout>

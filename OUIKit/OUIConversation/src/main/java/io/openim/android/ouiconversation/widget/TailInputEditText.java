@@ -12,7 +12,11 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
+
+import com.vanniktech.emoji.EmojiEditText;
 
 import java.util.Iterator;
 import java.util.List;
@@ -21,23 +25,19 @@ import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.sdk.models.Message;
 
-public class TailInputEditText extends AppCompatEditText {
+public class TailInputEditText extends EmojiEditText {
     private ChatVM chatVM;
+
+    public TailInputEditText(@NonNull Context context) {
+        super(context);
+    }
+
+    public TailInputEditText(@NonNull Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+    }
 
     public void setChatVM(ChatVM chatVM) {
         this.chatVM = chatVM;
-    }
-
-    public TailInputEditText(Context context) {
-        this(context, null);
-    }
-
-    public TailInputEditText(Context context, AttributeSet attrs) {
-        this(context, attrs, android.R.attr.editTextStyle);
-    }
-
-    public TailInputEditText(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
     }
 
 

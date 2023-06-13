@@ -35,49 +35,60 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:layout_marginRight="7dp"
-            android:minWidth="@dimen/msg_min_width"
-            android:maxWidth="@dimen/msg_max_width"
             android:layout_toLeftOf="@id/avatar2"
-            android:background="@drawable/sty_radius_unright_30"
-            android:gravity="center_vertical"
-            android:minHeight="40dp"
-            android:orientation="vertical"
-            android:padding="7dp">
-
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/title2"
+                android:id="@+id/nickName2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="3dp"
-                android:textColor="#ff333333"
-                android:textSize="14sp" />
+                android:layout_gravity="right"
+                android:layout_marginEnd="3dp"
+                android:layout_marginBottom="2dp"
+                android:textColor="#ff8e9ab0"
+                android:textSize="12sp"
+                android:visibility="gone" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:background="#ff999999" />
-
-            <TextView
-                android:id="@+id/history21"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="3dp"
-                android:textColor="#ff999999"
-                android:textSize="10sp" />
 
-            <TextView
-                android:id="@+id/history22"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="3dp"
-                android:textColor="#ff999999"
-                android:textSize="10sp" />
+                android:background="@drawable/sty_radius_unright_stroke_30"
+                android:gravity="center_vertical"
+                android:maxWidth="@dimen/msg_max_width"
+                android:minWidth="@dimen/msg_min_width"
+                android:minHeight="@dimen/msg_min_height"
+                android:orientation="vertical"
+                android:padding="7dp">
+
+                <TextView
+                    android:id="@+id/title2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:textColor="#ff0c1c33"
+                    android:textSize="17sp" />
+
+                <include layout="@layout/view_dividing_line" />
+
+                <TextView
+                    android:id="@+id/history21"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:textColor="#ff8e9ab0"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/history22"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:textColor="#ff8e9ab0"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

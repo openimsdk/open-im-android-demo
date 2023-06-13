@@ -17,6 +17,7 @@ import java.util.List;
 
 import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.im.IM;
 import io.openim.android.ouicore.im.IMEvent;
@@ -43,7 +44,7 @@ public class DemoApplication extends BaseApp {
     public void onCreate() {
         L.e("App", "-----onCreate");
         super.onCreate();
-//      if (!isMainProcess()) return;
+        initController();
 
         MultiDex.install(this);
         //ARouter init
@@ -61,7 +62,15 @@ public class DemoApplication extends BaseApp {
         //音频播放
         SPlayer.init(this);
         SPlayer.instance().setCacheDirPath(Constant.AUDIO_DIR);
+
+        EmojiManager.install(new GoogleEmojiProvider());
     }
+
+
+    private void initController() {
+        Easy.installVM(UserLogic.class);
+    }
+
 
     private void initPush() {
         PushManager.getInstance().initialize(this);
@@ -131,35 +140,4 @@ public class DemoApplication extends BaseApp {
             }
         });
     }
-
-
-    private boolean isMainProcess() {
-        ActivityManager am = ((ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE));
-        String mainProcessName = this.getPackageName();
-        int myPid = android.os.Process.myPid();
-
-        List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
-        if (processInfos == null) {
-            L.i(TAG, "isMainProcess get getRunningAppProcesses null");
-            List<ActivityManager.RunningServiceInfo> processList = am.getRunningServices(Integer.MAX_VALUE);
-            if (processList == null) {
-                L.i(TAG, "isMainProcess get getRunningServices null");
-                return false;
-            }
-            for (ActivityManager.RunningServiceInfo rsi : processList) {
-                if (rsi.pid == myPid && mainProcessName.equals(rsi.service.getPackageName())) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        for (ActivityManager.RunningAppProcessInfo info : processInfos) {
-            if (info.pid == myPid && mainProcessName.equals(info.processName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 }

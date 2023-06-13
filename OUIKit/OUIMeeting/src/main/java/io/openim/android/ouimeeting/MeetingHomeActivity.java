@@ -229,7 +229,9 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             vm.audioManager.setSpeakerphoneOn(!aBoolean);
             view.horn.setImageResource(aBoolean ? R.mipmap.ic_m_horn : R.mipmap.ic_m_receiver);
         });
+    view.zoomOut.setOnClickListener(v -> {
 
+    });
     }
 
     private void setMemberExpand(View v) {

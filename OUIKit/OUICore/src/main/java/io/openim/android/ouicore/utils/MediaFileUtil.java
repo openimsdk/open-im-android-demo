@@ -2,6 +2,7 @@ package io.openim.android.ouicore.utils;
 
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
+import android.text.TextUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -146,6 +147,64 @@ public class MediaFileUtil {
         return false;
     }
 
+    /// Checks if string is an powerpoint file.
+    public static  boolean isPPT(String filePath) {
+        final String ext = filePath.toLowerCase();
+
+        return ext.endsWith(".ppt") || ext.endsWith(".pptx");
+    }
+
+    /// Checks if string is an word file.
+    public static  boolean isWord(String filePath) {
+        final String ext = filePath.toLowerCase();
+
+        return ext.endsWith(".doc") || ext.endsWith(".docx");
+    }
+
+    /// Checks if string is an excel file.
+    public static  boolean isExcel(String filePath) {
+        final String ext = filePath.toLowerCase();
+
+        return ext.endsWith(".xls") || ext.endsWith(".xlsx");
+    }
+
+    /// Checks if string is an apk file.
+    public static  boolean isAPK(String filePath) {
+        return filePath.toLowerCase().endsWith(".apk");
+    }
+
+    /// Checks if string is an pdf file.
+    public static  boolean isPDF(String filePath) {
+        return filePath.toLowerCase().endsWith(".pdf");
+    }
+
+    /// Checks if string is an txt file.
+    public static  boolean isTxt(String filePath) {
+        return filePath.toLowerCase().endsWith(".txt");
+    }
+
+    /// Checks if string is an chm file.
+    public static  boolean isChm(String filePath) {
+        return filePath.toLowerCase().endsWith(".chm");
+    }
+
+    /// Checks if string is a vector file.
+    public static  boolean isVector(String filePath) {
+        return filePath.toLowerCase().endsWith(".svg");
+    }
+
+    /// Checks if string is an html file.
+    public static  boolean isHTML(String filePath) {
+        return filePath.toLowerCase().endsWith(".html");
+    }
+    public static  boolean isZIP(String filePath) {
+        String ext=filePath.toLowerCase();
+        return ext.endsWith(".zip")
+            ||ext.endsWith(".rar")
+            ||ext.endsWith(".z")
+            ||ext.endsWith(".arj");
+    }
+
     /**
      * 获取 视频 或 音频 时长
      *
@@ -162,14 +221,20 @@ public class MediaFileUtil {
             String time = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
             duration = Long.parseLong(time);
         } catch (Exception ex) {
-        } finally {
+            ex.printStackTrace();
+        }
+        try {
             mmr.release();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return duration;
     }
-    public static String saveBitmap(Bitmap bitmap, String dir){
-    return     saveBitmap(bitmap,dir,true);
+
+    public static String saveBitmap(Bitmap bitmap, String dir) {
+        return saveBitmap(bitmap, dir, true);
     }
+
     public static String saveBitmap(Bitmap bitmap, String dir, boolean isRecycle) {
         try {
             File dirFile = new File(dir);

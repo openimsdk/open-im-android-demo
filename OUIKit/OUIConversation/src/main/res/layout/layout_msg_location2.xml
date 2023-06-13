@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -13,10 +14,10 @@
             android:id="@+id/readVanishNum2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginRight="8dp"
             android:textColor="#ff5496eb"
             android:textSize="12sp"
-            android:layout_gravity="center_vertical"
             android:visibility="gone" />
 
         <io.openim.android.ouiconversation.widget.SendStateView
@@ -25,48 +26,66 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="8dp" />
-
         <LinearLayout
-            android:id="@+id/content2"
-            android:layout_width="222dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="12dp"
-            android:background="@drawable/sty_radius_6_stroke_e6e6e6"
             android:orientation="vertical">
-
             <TextView
-                android:id="@+id/title2"
+                android:id="@+id/nickName2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginRight="12dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="成都市中小企业服务中心"
-                android:textColor="#ff333333"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/address2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
-                android:layout_marginRight="12dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="四川省成都市武侯区府城大道西段…"
-                android:textColor="#ff999999"
-                android:textSize="12sp" />
-
-            <io.openim.android.ouicore.widget.RoundImageView
-                android:id="@+id/map2"
+                android:textColor="#ff8e9ab0"
+                android:layout_gravity="right"
+                android:layout_marginBottom="2dp"
+                android:layout_marginEnd="3dp"
+                android:textSize="12sp"
+                android:visibility="gone"
+                />
+            <LinearLayout
+                android:id="@+id/content2"
                 android:layout_width="222dp"
-                android:layout_height="80dp"
-                android:layout_marginTop="8dp"
-                android:radius="6dp"
-                android:scaleType="centerCrop" />
+                android:layout_height="wrap_content"
+                android:background="@drawable/sty_radius_6_stroke_e6e6e6"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/title2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginRight="12dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="成都市中小企业服务中心"
+                    android:textColor="#ff333333"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/address2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="四川省成都市武侯区府城大道西段…"
+                    android:textColor="#ff999999"
+                    android:textSize="12sp" />
+
+                <org.raphets.roundimageview.RoundImageView
+                    android:id="@+id/map2"
+                    android:layout_width="222dp"
+                    android:layout_height="80dp"
+                    android:layout_marginTop="8dp"
+                    android:scaleType="centerCrop"
+                    app:type="round"
+                    app:rightBottom_corner_radius="6dp"
+                    app:leftBottom_corner_radius="6dp" />
+            </LinearLayout>
         </LinearLayout>
+
 
 
         <io.openim.android.ouicore.widget.AvatarImage

@@ -23,16 +23,20 @@ public class MsgExpand {
     //用于在消息输入框监听删除键时 判断删除对应@的人
     public int spanHashCode;
     //富文本（at 消息、表情）
-    public transient  SpannableStringBuilder sequence;
+    public transient SpannableStringBuilder sequence;
     //oa 通知
     public OANotification oaNotification;
     //阅后即焚倒计时
     public int readVanishNum;
     //呼叫记录 ------
-    public  CallHistory callHistory;
+    public CallHistory callHistory;
     //呼叫时长
-    public  String callDuration;
+    public String callDuration;
     // ------
     //会议邀请信息
-    public  MeetingInfo meetingInfo;
+    public MeetingInfo meetingInfo;
+    //自定义表情
+    public CustomEmojiEntity customEmoji;
+    //发送消息进度
+    public long sendProgress;
 }

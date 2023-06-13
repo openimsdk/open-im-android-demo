@@ -15,4 +15,16 @@
     <color name="def_bg">#FFF8F8F8</color>
     <color name="img_bg">#abb1b6</color>
 
+    <color name="theme">#0089FF</color>
+    <color name="txt_black">#0C1C33</color>
+    <color name="txt_shallow">#8E9AB0</color>
+    <color name="txt_shallow_33">#668E9AB0</color>
+    <color name="txt_shallow2">#6085B1</color>
+    <color name="txt_grey">#E8EAEF</color>
+    <color name="txt_warning">#FF381F</color>
+    <color name="bubble">#CCE7FE</color>
+    <color name="bubble2">#F4F5F7</color>
+    <color name="theme_bg">#F8F9FA</color>
+    <color name="theme_bg2">#F0F2F6</color>
+
 </resources>

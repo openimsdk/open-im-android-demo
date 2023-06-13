@@ -9,7 +9,7 @@
         android:orientation="horizontal">
 
         <io.openim.android.ouicore.widget.AvatarImage
-            android:id="@+id/avatar"
+            android:id="@+id/noticeAvatar"
             android:layout_width="42dp"
             android:layout_height="42dp"
             android:src="@mipmap/ic_my_friend" />
@@ -21,7 +21,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/nickName"
+                android:id="@+id/noticeNickName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="系统通知"

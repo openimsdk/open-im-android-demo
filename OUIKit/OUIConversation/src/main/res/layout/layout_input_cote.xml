@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:background="#E8F2FF"
+            android:background="@color/theme_bg2"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingLeft="10dp"
@@ -37,10 +37,9 @@
                 android:layout_height="35dp"
                 android:button="@null"
                 android:background="@android:color/transparent"
-                android:layout_marginRight="-12dp"
+                android:layout_marginRight="-8dp"
                 android:drawableLeft="@drawable/selector_chat_checkbox"
                 />
-
 
             <LinearLayout
                 android:id="@+id/inputLy"
@@ -110,11 +109,16 @@
             </LinearLayout>
 
 
-            <Button
+            <TextView
                 android:id="@+id/touchSay"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="43dp"
+                android:layout_height="36dp"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:alpha="0.3"
+                android:textColor="@color/txt_black"
+                android:background="@drawable/sty_radius_4_white"
                 android:text="@string/touch_say"
                 android:visibility="gone" />
 
@@ -122,29 +126,21 @@
                 android:id="@+id/emoji"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="10dp"
                 android:clickable="true"
                 android:paddingLeft="3dp"
                 android:src="@mipmap/emoji" />
 
             <ImageView
-                android:id="@+id/chatMore"
+                android:id="@+id/chatMoreOrSend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="8dp"
                 android:clickable="true"
-                android:layout_marginLeft="3dp"
+                android:layout_marginLeft="8dp"
                 android:paddingLeft="5dp"
                 android:src="@mipmap/ic_chat_add" />
 
-            <Button
-                android:id="@+id/chatSend"
-                android:layout_width="63dp"
-                android:layout_height="43dp"
-                android:enabled="true"
-                android:text="@string/send"
-                android:textSize="14sp"
-                android:visibility="gone" />
         </LinearLayout>
 
         <FrameLayout

@@ -11,15 +11,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.openim.android.ouicore.databinding.ItemFile2Binding;
 import io.openim.android.ouicore.databinding.ItemGroupShowBinding;
 import io.openim.android.ouicore.databinding.ItemImgTxtBinding;
+import io.openim.android.ouicore.databinding.ItemImgTxtRightBinding;
 import io.openim.android.ouicore.databinding.ItemLabelMemberBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonSelectBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonStickyBinding;
-import io.openim.android.ouicore.databinding.ItemSearchTitleBinding;
 import io.openim.android.ouicore.databinding.LayoutContactItemBinding;
 import io.openim.android.ouicore.databinding.LayoutLabelItemBinding;
 import io.openim.android.ouicore.databinding.ViewDividingLineBinding;
 import io.openim.android.ouicore.databinding.ViewImageBinding;
 import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
+import io.openim.android.ouicore.databinding.ViewSelectImageBinding;
 import io.openim.android.ouicore.utils.Common;
 
 public class ViewHol {
@@ -42,14 +43,6 @@ public class ViewHol {
             super(ItemFile2Binding.inflate(LayoutInflater.from(itemView.getContext()),
                 (ViewGroup) itemView, false).getRoot());
             view = ItemFile2Binding.bind(this.itemView);
-        }
-    }
-    public static class TitleViewHolder extends RecyclerView.ViewHolder {
-        public ItemSearchTitleBinding view;
-
-        public TitleViewHolder(@NonNull View itemView) {
-            super(ItemSearchTitleBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
-            view = ItemSearchTitleBinding.bind(this.itemView);
         }
     }
 
@@ -88,6 +81,14 @@ public class ViewHol {
             view = ItemImgTxtBinding.bind(this.itemView);
         }
     }
+    public static class ImageTxtRightViewHolder extends RecyclerView.ViewHolder {
+        public ItemImgTxtRightBinding view;
+
+        public ImageTxtRightViewHolder(@NonNull View itemView) {
+            super(ItemImgTxtRightBinding.inflate(LayoutInflater.from(itemView.getContext()),(ViewGroup) itemView, false).getRoot() );
+            view = ItemImgTxtRightBinding.bind(this.itemView);
+        }
+    }
 
     public static class ContactItemHolder extends RecyclerView.ViewHolder {
         public LayoutContactItemBinding viewBinding;
@@ -116,6 +117,14 @@ public class ViewHol {
         }
     }
 
+    public static class SelectImageViewHolder extends RecyclerView.ViewHolder {
+        public ViewSelectImageBinding view;
+
+        public SelectImageViewHolder(@NonNull View itemView) {
+            super(ViewSelectImageBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
+            view = ViewSelectImageBinding.bind(this.itemView);
+        }
+    }
     public static   class LabelItem extends RecyclerView.ViewHolder{
         public final LayoutLabelItemBinding view;
 

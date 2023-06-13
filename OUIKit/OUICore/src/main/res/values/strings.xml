@@ -361,6 +361,25 @@
     <string name="customize">自定义</string>
     <string name="day">天</string>
     <string name="mute_tips">输入或选择禁言时间</string>
+    <string name="recent_contact">常联系</string>
+    <string name="account">账号</string>
+    <string name="please_input_account">请输入账号</string>
+    <string name="organizational_structure">组织架构</string>
+
     <string name="who_talk">%1$s讲话中...</string>
     <string name="meeting">会议中...</string>
+    <string name="syncing">同步中...</string>
+    <string name="connecting">连接中...</string>
+    <string name="sync_err">同步失败</string>
+    <string name="all_select">全选</string>
+    <string name="chat_record_tips1">松开发送，上划取消</string>
+    <string name="chat_record_tips2">松开手指，取消发送</string>
+    <string name="audio_too_short">语音太短了</string>
+    <string name="chat_record_tips3">松开发送</string>
+    <string name="add">添加</string>
+    <string name="add_success">添加成功</string>
+    <string name="favorite_emoji">收藏表情</string>
+    <string name="manage">管理</string>
+    <string name="emoji_count">共%1$s个表情</string>
+    <string name="file_not_find">文件不存在</string>
 </resources>

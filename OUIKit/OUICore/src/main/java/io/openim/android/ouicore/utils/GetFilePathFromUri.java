@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
@@ -26,36 +27,44 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import io.openim.android.ouicore.R;
 import io.openim.android.sdk.models.Message;
 
 public class GetFilePathFromUri {
+    //获取文件后缀
+    public static String getFileSuffix(String path) {
+        File file = new File(path);
+        String[] split = file.getName().split("\\.");
+        if (split.length > 0)
+            return split[split.length - 1];
+        return "";
+    }
     //打开文件
-    public static  void openFile(Context context, Message message) {
-        Intent it = new Intent(Intent.ACTION_VIEW);
-        it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    public static void openFile(Context context, Message message) {
         String path = message.getFileElem().getFilePath();
-        if (!TextUtils.isEmpty(path) && GetFilePathFromUri.fileIsExists(path)) {
-            try {
-                if (MediaFileUtil.isAudioType(path)) {
-                    it.setDataAndType(Uri.parse(path), "audio/MP3");
-                    context.startActivity(it);
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-        } else {
+        if (TextUtils.isEmpty(path) || !fileIsExists(path)) {
             path = message.getFileElem().getSourceUrl();
+            path = Constant.File_DIR + Common
+                .md5(path)+ "." + getFileSuffix(path);
         }
-        it.setDataAndType(Uri.parse(path), "*/*");
-        context.startActivity(it);
+        openFile(context, path);
+    }
+
+    //打开文件
+    public static void openFile(Context context, String path) {
+        if (!GetFilePathFromUri.fileIsExists(path)){
+            Toast.makeText(context, R.string.file_not_find,
+                Toast.LENGTH_SHORT).show();
+            return;
+        }
+        OpenFileUtil.openFile(context, path);
     }
 
     //判断文件是否存在
     public static boolean fileIsExists(String filePath) {
         try {
             File f = new File(filePath);
-            if (!f.exists())
-                return false;
+            if (!f.exists()) return false;
         } catch (Exception e) {
             return false;
         }
@@ -79,9 +88,7 @@ public class GetFilePathFromUri {
         }
 
         //大于4.4，小于10
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT
-            && android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
-            && DocumentsContract.isDocumentUri(context, imageUri)) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT && android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && DocumentsContract.isDocumentUri(context, imageUri)) {
 
             if (isExternalStorageDocument(imageUri)) {
                 String docId = DocumentsContract.getDocumentId(imageUri);
@@ -92,7 +99,8 @@ public class GetFilePathFromUri {
                 }
             } else if (isDownloadsDocument(imageUri)) {
                 String id = DocumentsContract.getDocumentId(imageUri);
-                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads" +
+                    "/public_downloads"), Long.valueOf(id));
                 return getDataColumn(context, contentUri, null, null);
             } else if (isMediaDocument(imageUri)) {
                 String docId = DocumentsContract.getDocumentId(imageUri);
@@ -176,17 +184,22 @@ public class GetFilePathFromUri {
         return "com.android.providers.downloads.documents".equals(uri.getAuthority());
     }
 
-    private static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
+    private static String getDataColumn(Context context, Uri uri, String selection,
+                                        String[] selectionArgs) {
         Cursor cursor = null;
         String column = MediaStore.Images.Media.DATA;
         String[] projection = {column};
         try {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs
+                , null);
             if (cursor != null && cursor.moveToFirst()) {
                 int index = cursor.getColumnIndexOrThrow(column);
                 return cursor.getString(index);
             }
-        } finally {
+        }catch (Exception E){
+            E.printStackTrace();
+        }
+        finally {
             if (cursor != null) {
                 cursor.close();
             }
@@ -224,10 +237,10 @@ public class GetFilePathFromUri {
             return null;
         }
         String filePath;
-        String[] filePathColumn = {MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DISPLAY_NAME};
+        String[] filePathColumn = {MediaStore.MediaColumns.DATA,
+            MediaStore.MediaColumns.DISPLAY_NAME};
         ContentResolver contentResolver = context.getContentResolver();
-        Cursor cursor = contentResolver.query(uri, filePathColumn, null,
-            null, null);
+        Cursor cursor = contentResolver.query(uri, filePathColumn, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
             try {
@@ -259,10 +272,12 @@ public class GetFilePathFromUri {
             ContentResolver contentResolver = context.getContentResolver();
             Cursor cursor = contentResolver.query(uri, null, null, null, null);
             if (cursor.moveToFirst()) {
-                @SuppressLint("Range") String displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                @SuppressLint("Range") String displayName =
+                    cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 try {
                     InputStream is = contentResolver.openInputStream(uri);
-                    File file1 = new File(context.getExternalCacheDir().getAbsolutePath() + "/" + System.currentTimeMillis());
+                    File file1 =
+                        new File(context.getExternalCacheDir().getAbsolutePath() + "/" + System.currentTimeMillis());
                     if (!file1.exists()) {
                         file1.mkdir();
                     }

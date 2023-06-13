@@ -3,14 +3,11 @@ package io.openim.android.ouiconversation.widget;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -21,13 +18,10 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
@@ -35,7 +29,10 @@ import com.yanzhenjie.permission.runtime.Permission;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.LayoutInputCoteBinding;
+import io.openim.android.ouiconversation.ui.fragment.EmojiFragment;
+import io.openim.android.ouiconversation.ui.fragment.InputExpandFragment;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.EmojiUtil;
@@ -45,10 +42,8 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.AtUserInfo;
-import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.Message;
 
 /**
@@ -63,7 +58,9 @@ public class BottomInputCote {
     InputExpandFragment inputExpandFragment;
     EmojiFragment emojiFragment;
     public LayoutInputCoteBinding view;
-    TouchVoiceDialog touchVoiceDialog;
+    TouchVoiceDialogV3 touchVoiceDialog;
+    //是否可发送内容
+    private boolean isSend;
 
 
     @SuppressLint("WrongConstant")
@@ -71,10 +68,19 @@ public class BottomInputCote {
         this.context = context;
         this.view = view;
         initFragment();
-        Common.UIHandler.postDelayed(() ->
-            hasMicrophone = AndPermission.hasPermissions(context, Permission.Group.MICROPHONE),300);
+        Common.UIHandler.postDelayed(() -> hasMicrophone = AndPermission.hasPermissions(context,
+            Permission.Group.MICROPHONE), 300);
 
-        view.chatSend.setOnClickListener(x -> {
+        view.chatMoreOrSend.setOnClickListener(v -> {
+            if (!isSend) {
+                view.voice.setChecked(false);
+                clearFocus();
+                Common.hideKeyboard(BaseApp.inst(), v);
+                view.fragmentContainer.setVisibility(VISIBLE);
+                switchFragment(inputExpandFragment);
+                return;
+            }
+
             List<Message> atMessages = vm.atMessages.getValue();
             final Message msg;
             if (null != vm.replyMessage.getValue()) {
@@ -128,15 +134,27 @@ public class BottomInputCote {
         });
         view.touchSay.setOnLongClickListener(v -> {
             if (null == touchVoiceDialog) {
-                touchVoiceDialog = new TouchVoiceDialog(context);
-                touchVoiceDialog.setOnSelectResultListener((code, audioPath, duration) -> {
-                    if (code == 0) {
-                        //录音结束
-                        Message message =
-                            OpenIMClient.getInstance().messageManager.createSoundMessageFromFullPath(audioPath.getPath(), duration);
-                        vm.sendMsg(message);
+                touchVoiceDialog = new TouchVoiceDialogV3(context);
+                touchVoiceDialog.setOnSelectResultListener(new TouchVoiceDialogV3.OnSelectResultListener() {
+                    @Override
+                    public void result(int code, Uri audioPath, int duration) {
+                        if (code == 0) {
+                            //录音结束
+                            Message message =
+                                OpenIMClient.getInstance().messageManager.createSoundMessageFromFullPath(audioPath.getPath(), duration);
+                            vm.sendMsg(message);
+                        }
+                    }
+
+                    @Override
+                    public void onViewChange(int code) {
+                        view.touchSay.setText(code == 0 ?
+                            io.openim.android.ouicore.R.string.chat_record_tips3 :
+                            io.openim.android.ouicore.R.string.chat_record_tips2);
                     }
                 });
+                touchVoiceDialog.setOnShowListener(dialog -> showingViewChange());
+                touchVoiceDialog.setOnDismissListener(dialog -> showingViewChange());
             }
             Common.permission(context, () -> {
                 touchVoiceDialog.show();
@@ -152,13 +170,6 @@ public class BottomInputCote {
 //            inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
         });
 
-        view.chatMore.setOnClickListener(v -> {
-            view.voice.setChecked(false);
-            clearFocus();
-            Common.hideKeyboard(BaseApp.inst(), v);
-            view.fragmentContainer.setVisibility(VISIBLE);
-            switchFragment(inputExpandFragment);
-        });
         view.emoji.setOnClickListener(v -> {
             view.voice.setChecked(false);
             clearFocus();
@@ -180,9 +191,30 @@ public class BottomInputCote {
 
             @Override
             public void afterTextChanged(Editable s) {
-                view.chatSend.setVisibility(s.toString().isEmpty() ? GONE : VISIBLE);
+                boolean isSend = !TextUtils.isEmpty(s) && !Common.isBlank(s);
+                setSendButton(isSend);
             }
         });
+    }
+
+    private void showingViewChange() {
+        boolean showing = touchVoiceDialog.isShowing();
+        if (showing) {
+            view.touchSay.setBackground(AppCompatResources.getDrawable(context,
+                io.openim.android.ouicore.R.drawable.sty_radius_4_33shallow));
+            view.touchSay.setTextColor(context.getResources().getColor(io.openim.android.ouicore.R.color.white));
+        } else {
+            view.touchSay.setBackground(AppCompatResources.getDrawable(context,
+                io.openim.android.ouicore.R.drawable.sty_radius_4_white));
+            view.touchSay.setTextColor(context.getResources().getColor(io.openim.android.ouicore.R.color.txt_black));
+            view.touchSay.setText(R.string.touch_say);
+        }
+    }
+
+    private void setSendButton(boolean isSend) {
+        if (BottomInputCote.this.isSend == isSend) return;
+        view.chatMoreOrSend.setImageResource(isSend ? R.mipmap.ic_c_send : R.mipmap.ic_chat_add);
+        BottomInputCote.this.isSend = isSend;
     }
 
 
@@ -204,7 +236,8 @@ public class BottomInputCote {
     }
 
     public void dispatchTouchEvent(MotionEvent event) {
-        if (null != touchVoiceDialog) touchVoiceDialog.dispatchTouchEvent(event);
+        if (null != touchVoiceDialog && touchVoiceDialog.isShowing())
+            touchVoiceDialog.dispatchTouchEvent(event);
     }
 
     public void clearFocus() {
@@ -258,11 +291,9 @@ public class BottomInputCote {
         if (!vm.isSingleChat) {
             vm.groupInfo.observe((LifecycleOwner) context, groupInfo -> {
                 if (null == groupInfo) return;
-                if (groupInfo.getStatus() == Constant.GroupStatus.status3
-                    && !groupInfo.getOwnerUserID().equals(BaseApp.inst()
-                    .loginCertificate.userID)) {
+                if (groupInfo.getStatus() == Constant.GroupStatus.status3 && !groupInfo.getOwnerUserID().equals(BaseApp.inst().loginCertificate.userID)) {
                     view.inputLy.setVisibility(VISIBLE);
-                    view.chatSend.setVisibility(VISIBLE);
+                    setSendButton(true);
                     view.touchSay.setVisibility(GONE);
 
                     view.root.setIntercept(true);
@@ -282,10 +313,6 @@ public class BottomInputCote {
                 view.replyLy.setVisibility(VISIBLE);
                 view.replyContent.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
             }
-        });
-
-        vm.inputMsg.observe((LifecycleOwner) context, s -> {
-            view.chatSend.setEnabled(!TextUtils.isEmpty(s) && !Common.isBlank(s));
         });
     }
 

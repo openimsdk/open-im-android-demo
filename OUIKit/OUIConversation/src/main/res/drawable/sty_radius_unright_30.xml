@@ -4,7 +4,7 @@
     <!-- rectangle表示为矩形 -->
 
     <!-- 填充的颜色 -->
-    <solid android:color="#DCEBFE" />
+    <solid android:color="@color/bubble" />
 
 
     <corners

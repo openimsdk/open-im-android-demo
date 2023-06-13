@@ -151,18 +151,18 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     private final OnBase<SignalingCertificate> signalingCertificateCallBack =
         new OnBase<SignalingCertificate>() {
-        @Override
-        public void onError(int code, String error) {
-            getIView().onError(error);
-        }
+            @Override
+            public void onError(int code, String error) {
+                getIView().onError(error);
+            }
 
-        @Override
-        public void onSuccess(SignalingCertificate data) {
-            if (isDestroy || null == data) return;
-            signalingCertificate = data;
-            getIView().onSuccess(data);
-        }
-    };
+            @Override
+            public void onSuccess(SignalingCertificate data) {
+                if (isDestroy || null == data) return;
+                signalingCertificate = data;
+                getIView().onSuccess(data);
+            }
+        };
 
     public void joinMeeting(String roomID) {
         //3185791707
@@ -170,7 +170,6 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     }
 
     public void createMeeting(String meetingName, long startTime, int duration) {
-
         OpenIMClient.getInstance().signalingManager.signalingCreateMeeting(signalingCertificateCallBack, meetingName, BaseApp.inst().loginCertificate.userID, startTime, duration, null, null);
     }
 
@@ -178,28 +177,28 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
         if (null == signalingCertificate) return;
         callViewModel.connectToRoom(signalingCertificate.getLiveURL(),
             signalingCertificate.getToken(), new Continuation<Unit>() {
-            @NonNull
-            @Override
-            public CoroutineContext getContext() {
-                return EmptyCoroutineContext.INSTANCE;
-            }
+                @NonNull
+                @Override
+                public CoroutineContext getContext() {
+                    return EmptyCoroutineContext.INSTANCE;
+                }
 
-            @Override
-            public void resumeWith(@NonNull Object o) {
-                Common.UIHandler.post(() -> {
-                    buildTimer();
-                    fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
+                @Override
+                public void resumeWith(@NonNull Object o) {
+                    Common.UIHandler.post(() -> {
+                        buildTimer();
+                        fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
 
 //                        callViewModel.setCameraEnabled(roomMetadata.getValue().joinDisableVideo);
-                    callViewModel.setCameraEnabled(false);
-                    callViewModel.setMicEnabled(roomMetadata.getValue().joinDisableMicrophone);
+                        callViewModel.setCameraEnabled(false);
+                        callViewModel.setMicEnabled(roomMetadata.getValue().joinDisableMicrophone);
 
-                    VideoTrack localVideoTrack =
-                        callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
-                    getIView().connectRoomSuccess(localVideoTrack);
-                });
-            }
-        });
+                        VideoTrack localVideoTrack =
+                            callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
+                        getIView().connectRoomSuccess(localVideoTrack);
+                    });
+                }
+            });
     }
 
 
@@ -327,14 +326,27 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
         meetingInfoAttach.customType = Constant.MsgType.CUSTOMIZE_MEETING;
         io.openim.android.ouicore.entity.MeetingInfo meetingInfo =
             new io.openim.android.ouicore.entity.MeetingInfo();
-        meetingInfo.inviterNickname = BaseApp.inst().loginCertificate.nickname;
-        meetingInfo.inviterUserID = BaseApp.inst().loginCertificate.userID;
-        meetingInfo.inviterFaceURL = BaseApp.inst().loginCertificate.faceURL;
-        meetingInfo.id = selectMeetingInfo.getMeetingID();
-        meetingInfo.subject = selectMeetingInfo.getMeetingName();
-        meetingInfo.start = selectMeetingInfo.getStartTime();
-        meetingInfo.duration = (int) ( selectMeetingInfo.getEndTime() -  selectMeetingInfo.getStartTime());
-        meetingInfoAttach.data = meetingInfo;
+        try {
+            meetingInfo.inviterNickname = BaseApp.inst().loginCertificate.nickname;
+            meetingInfo.inviterUserID = BaseApp.inst().loginCertificate.userID;
+            meetingInfo.inviterFaceURL = BaseApp.inst().loginCertificate.faceURL;
+            if (null == selectMeetingInfo) {
+                selectMeetingInfo = new MeetingInfo();
+                RoomMetadata metadata = roomMetadata.getValue();
+                selectMeetingInfo.setMeetingID(metadata.meetingID);
+                selectMeetingInfo.setMeetingName(metadata.meetingName);
+                selectMeetingInfo.setStartTime(metadata.startTime);
+                selectMeetingInfo.setEndTime(metadata.endTime);
+            }
+            meetingInfo.id = selectMeetingInfo.getMeetingID();
+            meetingInfo.subject = selectMeetingInfo.getMeetingName();
+            meetingInfo.start = selectMeetingInfo.getStartTime();
+            meetingInfo.duration =
+                (int) (selectMeetingInfo.getEndTime() - selectMeetingInfo.getStartTime());
+            meetingInfoAttach.data = meetingInfo;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Message msg =
             OpenIMClient.getInstance().messageManager.createCustomMessage(GsonHel.toJson(meetingInfoAttach), null, null);
         OfflinePushInfo offlinePushInfo = new OfflinePushInfo(); // 离线推送的消息备注；不为null

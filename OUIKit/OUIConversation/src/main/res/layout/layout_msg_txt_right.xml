@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -14,8 +15,8 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="8dp"
             android:layout_toLeftOf="@id/sendState2"
-            android:textSize="12sp"
             android:textColor="#ff5496eb"
+            android:textSize="12sp"
             android:visibility="gone" />
 
         <io.openim.android.ouiconversation.widget.SendStateView
@@ -24,22 +25,42 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginRight="8dp"
-            android:layout_toLeftOf="@id/content2" />
+            android:layout_toLeftOf="@id/contentLy" />
 
-        <TextView
-            android:id="@+id/content2"
+        <LinearLayout
+            android:id="@+id/contentLy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
             android:layout_marginRight="7dp"
+            android:gravity="right"
             android:layout_toLeftOf="@id/avatar2"
-            android:background="@drawable/sty_radius_unright_30"
-            android:gravity="center_vertical"
-            android:maxWidth="@dimen/msg_max_width"
-            android:minHeight="40dp"
-            android:padding="7dp"
-            android:textColor="#ff333333"
-            android:textSize="14sp" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/nickName2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ff8e9ab0"
+                android:layout_marginBottom="2dp"
+                android:layout_marginEnd="3dp"
+                android:textSize="12sp"
+                android:visibility="gone"
+                />
+
+            <com.vanniktech.emoji.EmojiTextView
+                android:id="@+id/content2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sty_radius_unright_30"
+                android:gravity="center_vertical"
+                android:maxWidth="@dimen/msg_max_width"
+                android:minHeight="40dp"
+                android:padding="7dp"
+                android:textColor="@color/txt_black"
+                android:textSize="@dimen/main_body"
+                app:emojiSize="23sp" />
+        </LinearLayout>
+
 
         <io.openim.android.ouicore.widget.AvatarImage
             android:id="@+id/avatar2"
@@ -52,7 +73,7 @@
             android:id="@+id/quoteLy2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/content2"
+            android:layout_below="@id/contentLy"
             android:layout_marginTop="5dp"
             android:layout_marginRight="7dp"
             android:layout_toLeftOf="@id/avatar2"

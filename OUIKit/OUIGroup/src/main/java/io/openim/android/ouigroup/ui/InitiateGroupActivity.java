@@ -59,8 +59,11 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
     //默认已选择的id
     private String defSelectId;
 
+    private SelectFriendsVM selectFriendsVM;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         isInviteToGroup = getIntent().getBooleanExtra(Constant.IS_INVITE_TO_GROUP, false);
         isRemoveGroup = getIntent().getBooleanExtra(Constant.IS_REMOVE_GROUP, false);
         isSelectMember = getIntent().getBooleanExtra(Constant.IS_SELECT_MEMBER, false);
@@ -76,6 +79,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityInitiateGroupBinding.inflate(getLayoutInflater()));
 
+        buildSelectFriendsVM();
         initView();
 
         if (isSelectMember) {
@@ -83,6 +87,16 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
             vm.getGroupMemberList();
         } else vm.getAllFriend();
         listener();
+    }
+
+    private void buildSelectFriendsVM() {
+        try {
+            selectFriendsVM = Easy.find(SelectFriendsVM.class);
+            selectMemberNum= selectFriendsVM.userInfoList.getValue().size();
+            selectFriendsVM.bindDataToView(view.bottom);
+            selectFriendsVM.showPopAllSelectFriends(view.bottom, LayoutPopSelectedFriendsBinding.inflate(getLayoutInflater()));
+            selectFriendsVM.submitTap(view.bottom.submit);
+        } catch (Exception ignored) {}
     }
 
     @Override
@@ -98,7 +112,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         if (isRemoveGroup) view.title.setText(io.openim.android.ouicore.R.string.remove_group);
         if (isSelectMember) {
             view.title.setText(io.openim.android.ouicore.R.string.selete_member);
-            view.submit.setText("确定（0/" + maxNum + "）");
+            view.bottom.submit.setText("确定（0/" + maxNum + "）");
         }
         if (!TextUtils.isEmpty(title)) view.title.setText(title);
 
@@ -144,7 +158,6 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
             public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                               int viewType) {
                 if (viewType == ITEM) return new ViewHol.ItemViewHo(parent);
-
                 return new ViewHol.StickyViewHo(parent);
             }
 
@@ -172,12 +185,16 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                         }
                         data.isSelect = !data.isSelect;
                         notifyItemChanged(position);
-                        selectMemberNum = getSelectNum();
-                        view.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectMemberNum));
-                        if (isSelectMember)
-                            view.submit.setText("确定（" + selectMemberNum + "/" + maxNum + "）");
-                        else view.submit.setText("确定（" + selectMemberNum + "/999）");
-                        view.submit.setEnabled(selectMemberNum > 0);
+                        selected();
+
+                        if (null != selectFriendsVM) {
+                            if (data.isSelect)
+                                selectFriendsVM.addUserInfo(data.userInfo.getUserID(),
+                                    data.userInfo.getNickname(),data.userInfo.getFaceURL());
+                            else
+                                selectFriendsVM.removeUserInfo(data.userInfo.getUserID());
+                        }
+
                     });
                 } else {
                     ViewHol.StickyViewHo stickyViewHo = (ViewHol.StickyViewHo) holder;
@@ -186,6 +203,15 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
             }
         };
         view.recyclerView.setAdapter(adapter);
+    }
+
+    private void selected() {
+        selectMemberNum = getSelectNum();
+        view.bottom.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectMemberNum));
+        if (isSelectMember)
+            view.bottom.submit.setText("确定（" + selectMemberNum + "/" + maxNum + "）");
+        else view.bottom.submit.setText("确定（" + selectMemberNum + "/999）");
+        view.bottom.submit.setEnabled(selectMemberNum > 0);
     }
 
     private int getSelectNum() {
@@ -268,9 +294,17 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                     exGroupMemberInfo.groupMembersInfo = new GroupMembersInfo();
                     exGroupMemberInfo.groupMembersInfo.setUserID(exUserInfo.userInfo.getFriendInfo().getUserID());
 
-                    if (vm.exGroupMembers.getValue().contains(exGroupMemberInfo) || vm.exGroupManagement.getValue().contains(exGroupMemberInfo) || exUserInfo.userInfo.getUserID().equals(defSelectId)) {
+                    if (vm.exGroupMembers.getValue().contains(exGroupMemberInfo)
+                        || vm.exGroupManagement.getValue().contains(exGroupMemberInfo)
+                        || exUserInfo.userInfo.getUserID().equals(defSelectId)) {
                         exUserInfo.isEnabled = false;
                         exUserInfo.isSelect = true;
+                    }
+
+                    if (null != selectFriendsVM) {
+                        UserInfo userInfo=new UserInfo();
+                        userInfo.setUserID(exUserInfo.userInfo.getUserID());
+                        exUserInfo.isSelect = selectFriendsVM.contains(userInfo);
                     }
                 }
                 adapter.setItems(exUserInfos);

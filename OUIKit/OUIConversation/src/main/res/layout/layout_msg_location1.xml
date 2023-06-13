@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -26,6 +27,8 @@
                 android:layout_height="wrap_content"
                 android:textColor="#ff666666"
                 android:visibility="gone"
+                android:layout_marginBottom="3dp"
+                android:layout_marginLeft="3dp"
                 android:textSize="12sp" />
 
             <LinearLayout
@@ -61,13 +64,15 @@
                     android:textColor="#ff999999"
                     android:textSize="12sp" />
 
-                <io.openim.android.ouicore.widget.RoundImageView
+                <org.raphets.roundimageview.RoundImageView
                     android:id="@+id/map"
                     android:layout_width="222dp"
                     android:layout_height="80dp"
                     android:layout_marginTop="8dp"
-                    android:radius="6dp"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop"
+                    app:type="round"
+                    app:rightBottom_corner_radius="6dp"
+                    app:leftBottom_corner_radius="6dp" />
             </LinearLayout>
         </LinearLayout>
 

@@ -7,80 +7,98 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/avatar2"
+            android:layout_toStartOf="@id/avatar2"
             android:gravity="center_vertical"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/readVanishNum2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:textSize="12sp"
+                android:layout_gravity="center_vertical"
                 android:textColor="#ff5496eb"
+                android:textSize="12sp"
                 android:visibility="gone" />
 
             <io.openim.android.ouiconversation.widget.SendStateView
                 android:id="@+id/sendState2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_toLeftOf="@id/content2" />
+                android:layout_marginRight="8dp" />
 
             <LinearLayout
-                android:id="@+id/content2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:layout_marginRight="7dp"
-                android:maxWidth="@dimen/msg_max_width"
-                android:background="@drawable/sty_radius_unright_30"
-                android:gravity="center_vertical"
-                android:minHeight="40dp"
-                android:orientation="horizontal"
-                android:padding="7dp">
+                android:gravity="right"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/nickName2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
+                    android:textColor="#ff666666"
+                    android:textSize="12sp"
+                    android:gravity="right"
+                    android:visibility="gone" />
 
                 <LinearLayout
+                    android:id="@+id/content2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:orientation="vertical">
+                    android:background="@drawable/sty_radius_unright_stroke_30"
+                    android:gravity="center_vertical"
+                    android:maxWidth="@dimen/msg_max_width"
+                    android:minHeight="60dp"
+                    android:orientation="horizontal"
+                    android:paddingLeft="12dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="12dp"
+                    android:paddingBottom="10dp">
 
-                    <TextView
-                        android:id="@+id/title2"
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/title2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="2dp"
+                            android:minWidth="120dp"
+                            android:textColor="#FF0c1c33"
+                            android:textSize="17sp" />
+
+                        <TextView
+                            android:id="@+id/size2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#ff8e9ab0"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <io.openim.android.ouicore.widget.FileUploadView
+                        android:id="@+id/fileUploadView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="2dp"
-                        android:minWidth="120dp"
-                        android:textColor="#ff333333"
-                        android:textSize="15sp" />
+                        android:layout_marginStart="10dp" />
 
-                    <TextView
-                        android:id="@+id/size2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#ff666666"
-                        android:textSize="11sp" />
                 </LinearLayout>
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@mipmap/ic_chat_file" />
             </LinearLayout>
         </LinearLayout>
 
-
         <io.openim.android.ouicore.widget.AvatarImage
             android:id="@+id/avatar2"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:layout_alignParentRight="true"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="10dp"
+            android:layout_alignParentEnd="true"
             android:src="@mipmap/ic_my_friend" />
 
     </RelativeLayout>

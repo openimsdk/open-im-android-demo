@@ -4,6 +4,6 @@ import com.alibaba.android.arouter.facade.template.IProvider;
 
 public interface IMeetingBridge extends IProvider {
 
-    public void joinMeeting(String roomID);
+    void joinMeeting(String roomID);
 
 }

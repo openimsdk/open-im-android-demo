@@ -1,8 +1,6 @@
 package io.openim.android.ouicore.utils;
 
 public class Routes {
-
-
     public static class Service {
         public final static String CALLING = "/CallingService/CallingServiceImp";
         public static final String CONVERSATION = "/ConversationService/IBridgeImpl";
@@ -49,7 +47,9 @@ public class Routes {
         //搜索详情
         public final static String DETAIL = "/group/GroupDetailActivity";
         //创建群组
-        public final static String CREATE_GROUP = "/group/CreateGroupActivity";
+        public final static String CREATE_GROUP = "/group/InitiateGroupActivity";
+        public final static String CREATE_GROUP2 = "/group/CreateGroupActivity";
+        public final static String CREATE_GROUP3 = "/group/CreateGroupActivityV3";
         //群资料
         public final static String MATERIAL = "/group/GroupMaterialActivity";
         //通知详情

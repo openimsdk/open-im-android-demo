@@ -72,50 +72,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-            <LinearLayout
-                android:id="@+id/selectMemberGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:background="@color/white"
-                android:gravity="center_vertical"
-                android:minHeight="48dp"
-                android:paddingLeft="17dp"
-                android:paddingRight="17dp">
-
-                <LinearLayout
-                    android:id="@+id/selectLy"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:id="@+id/selectNum"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:textColor="#ff1b72ec"
-                        android:textSize="14sp" />
-
-                    <ImageView
-                        android:id="@+id/more2"
-                        android:layout_width="10dp"
-                        android:layout_height="10dp"
-                        android:layout_marginLeft="8dp"
-                        android:src="@mipmap/ic_top_right"
-                        android:visibility="gone" />
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/submit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:enabled="false"
-                    android:text="确定" />
-            </LinearLayout>
+            <include
+                android:id="@+id/bottomLayout"
+                layout="@layout/layout_selected_friends" />
 
         </RelativeLayout>
 

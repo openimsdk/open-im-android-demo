@@ -23,7 +23,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/sendNickName"
+                    android:id="@+id/nickName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="2dp"
@@ -35,9 +35,11 @@
                     android:id="@+id/content"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/sty_radius_unleft_30"
+                    android:background="@drawable/sty_radius_unleft_stroke_30"
                     android:gravity="center_vertical"
                     android:minHeight="40dp"
+                    android:minWidth="@dimen/msg_min_width"
+                    android:maxWidth="@dimen/msg_max_width"
                     android:orientation="vertical"
                     android:padding="7dp">
 
@@ -46,7 +48,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
                         android:gravity="center_vertical"
-                        android:minWidth="200dp"
+                        android:minWidth="210dp"
                         android:orientation="horizontal"
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp">
@@ -60,7 +62,7 @@
                             android:src="@mipmap/ic_my_friend" />
 
                         <TextView
-                            android:id="@+id/nickName"
+                            android:id="@+id/cardNickName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="8dp"
@@ -68,10 +70,7 @@
                             android:textSize="16sp" />
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:background="@color/react" />
+                    <include layout="@layout/view_dividing_line" />
 
                     <TextView
                         android:layout_width="wrap_content"

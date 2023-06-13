@@ -14,6 +14,7 @@ import java.util.List;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
@@ -21,6 +22,7 @@ import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerListener;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnConnListener;
@@ -176,6 +178,7 @@ public class IMEvent {
             signalingListeners.add(onSignalingListener);
         }
     }
+
     public void removeSignalingListener(OnSignalingListener onSignalingListener) {
         signalingListeners.remove(onSignalingListener);
     }
@@ -238,11 +241,13 @@ public class IMEvent {
 
     //连接事件
     public OnConnListener connListener = new OnConnListener() {
-
+        private UserLogic userLogic=Easy.find(UserLogic.class);
         @Override
         public void onConnectFailed(long code, String error) {
             // 连接服务器失败，可以提示用户当前网络连接不可用
-            L.d("连接服务器失败");
+            L.d("连接服务器失败(" + error + ")");
+            userLogic.connectStatus.setValue(UserLogic.ConnectStatus.CONNECT_ERR);
+
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnectFailed(code, error);
             }
@@ -252,6 +257,8 @@ public class IMEvent {
         public void onConnectSuccess() {
             // 已经成功连接到服务器
             L.d("已经成功连接到服务器");
+            userLogic.connectStatus.setValue(UserLogic.ConnectStatus.DEFAULT);
+
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnectSuccess();
             }
@@ -261,6 +268,8 @@ public class IMEvent {
         public void onConnecting() {
             // 正在连接到服务器，适合在 UI 上展示“正在连接”状态。
             L.d("正在连接到服务器...");
+            userLogic.connectStatus.setValue(UserLogic.ConnectStatus.CONNECTING);
+
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnecting();
             }
@@ -374,6 +383,8 @@ public class IMEvent {
     // 会话新增或改变监听
     private void conversationListener() {
         OpenIMClient.getInstance().conversationManager.setOnConversationListener(new OnConversationListener() {
+            private UserLogic userLogic = Easy.find(UserLogic.class);
+
             @Override
             public void onConversationChanged(List<ConversationInfo> list) {
                 for (ConversationInfo conversationInfo : list) {
@@ -395,17 +406,17 @@ public class IMEvent {
 
             @Override
             public void onSyncServerFailed() {
-
+                userLogic .connectStatus.setValue(UserLogic.ConnectStatus.SYNC_ERR);
             }
 
             @Override
             public void onSyncServerFinish() {
-
+                userLogic.connectStatus.setValue(UserLogic.ConnectStatus.DEFAULT);
             }
 
             @Override
             public void onSyncServerStart() {
-
+                userLogic.connectStatus.setValue(UserLogic.ConnectStatus.SYNCING);
             }
 
             @Override

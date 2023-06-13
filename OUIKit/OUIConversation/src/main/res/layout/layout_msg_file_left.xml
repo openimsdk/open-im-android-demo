@@ -15,49 +15,63 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="7dp"
-                android:layout_marginTop="2dp"
-                android:background="@drawable/sty_radius_unleft_30"
-                android:gravity="center_vertical"
-                android:maxWidth="@dimen/msg_max_width"
-                android:minHeight="40dp"
-                android:orientation="horizontal"
-                android:padding="7dp">
+                android:orientation="vertical">
 
-                <ImageView
+                <TextView
+                    android:id="@+id/nickName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
-                    android:src="@mipmap/ic_chat_file" />
+                    android:layout_marginBottom="3dp"
+                    android:textColor="#ff666666"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:id="@+id/content"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:background="@drawable/sty_radius_unleft_stroke_30"
+                    android:gravity="center_vertical"
+                    android:maxWidth="@dimen/msg_max_width"
+                    android:minHeight="60dp"
+                    android:orientation="horizontal"
+                    android:paddingLeft="12dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="12dp"
+                    android:paddingBottom="10dp">
 
-                    <TextView
-                        android:id="@+id/title"
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="2dp"
+                            android:minWidth="120dp"
+                            android:textColor="#FF0c1c33"
+                            android:textSize="17sp" />
+
+                        <TextView
+                            android:id="@+id/size"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#ff8e9ab0"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <io.openim.android.ouicore.widget.FileDownloadView
+                        android:id="@+id/downloadView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="2dp"
-                        android:minWidth="120dp"
-                        android:textColor="#ff333333"
-                        android:textSize="15sp" />
+                        android:layout_marginLeft="10dp" />
 
-                    <TextView
-                        android:id="@+id/size"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#ff666666"
-                        android:textSize="11sp" />
                 </LinearLayout>
-
-
             </LinearLayout>
 
             <io.openim.android.ouiconversation.widget.SendStateView
@@ -83,8 +97,9 @@
 
         <io.openim.android.ouicore.widget.AvatarImage
             android:id="@+id/avatar"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginRight="10dp"
             android:src="@mipmap/ic_my_friend" />
 
     </RelativeLayout>

@@ -6,7 +6,6 @@
         <variable
             name="MainVM"
             type="io.openim.android.demo.vm.MainVM" />
-
     </data>
 
     <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -27,26 +26,21 @@
                 android:layout_height="match_parent"
                />
 
-            <com.lihang.ShadowLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_marginLeft="-8dp"
-                android:layout_marginRight="-8dp"
-                app:hl_bottomShow="false"
-                app:hl_shadowColor="#2a000000"
-                app:hl_shadowLimit="8dp">
 
                 <RelativeLayout
+                    android:layout_alignParentBottom="true"
                     android:layout_width="match_parent"
+                    android:background="@color/white"
                     android:layout_height="wrap_content">
+                    <include layout="@layout/view_dividing_line"/>
 
                     <RadioGroup
                         android:id="@+id/menuGroup"
                         android:layout_width="match_parent"
-                        android:layout_height="60dp"
+                        android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:paddingTop="5dp">
+                        android:paddingBottom="8dp"
+                        android:paddingTop="8dp">
 
                         <RadioButton
                             android:id="@+id/men1"
@@ -57,7 +51,7 @@
                             android:drawableTop="@drawable/selector_logo"
                             android:gravity="center"
                             android:text="OpenIM"
-                            android:textColor="#ff1b72ec"
+                            android:textColor="@drawable/selector_tab_txt_color"
                             android:textSize="10sp" />
 
                         <RadioButton
@@ -69,7 +63,7 @@
                             android:drawableTop="@drawable/selector_newsletter"
                             android:gravity="center"
                             android:text="@string/address_book"
-                            android:textColor="#ff1b72ec"
+                            android:textColor="@drawable/selector_tab_txt_color"
                             android:textSize="10sp" />
                         <RadioButton
                             android:id="@+id/men3"
@@ -80,7 +74,7 @@
                             android:drawableTop="@drawable/selector_moments"
                             android:gravity="center"
                             android:text="@string/moments"
-                            android:textColor="#ff1b72ec"
+                            android:textColor="@drawable/selector_tab_txt_color"
                             android:textSize="10sp" />
                         <RadioButton
                             android:id="@+id/men4"
@@ -91,7 +85,7 @@
                             android:drawableTop="@drawable/selector_own"
                             android:gravity="center"
                             android:text="@string/my"
-                            android:textColor="#ff1b72ec"
+                            android:textColor="@drawable/selector_tab_txt_color"
                             android:textSize="10sp" />
                     </RadioGroup>
 
@@ -113,7 +107,6 @@
 
                 </RelativeLayout>
 
-            </com.lihang.ShadowLayout>
         </RelativeLayout>
 
 

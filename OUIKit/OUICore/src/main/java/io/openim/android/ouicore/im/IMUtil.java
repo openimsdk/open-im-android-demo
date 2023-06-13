@@ -44,6 +44,7 @@ import io.openim.android.ouicore.entity.AtMsgInfo;
 import io.openim.android.ouicore.entity.AtUsersInfo;
 import io.openim.android.ouicore.entity.BurnAfterReadingNotification;
 import io.openim.android.ouicore.entity.CallHistory;
+import io.openim.android.ouicore.entity.CustomEmojiEntity;
 import io.openim.android.ouicore.entity.EnterGroupNotification;
 import io.openim.android.ouicore.entity.GroupNotification;
 import io.openim.android.ouicore.entity.GroupRightsTransferNotification;
@@ -121,7 +122,7 @@ public class IMUtil {
             if (message.getContentType() >= Constant.MsgType.NOTICE || message.getContentType() == Constant.MsgType.REVOKE || message.getContentType() == Constant.MsgType.ADVANCED_REVOKE)
                 continue;
 
-            if (lastShowTimeStamp == 0 || (message.getSendTime() - lastShowTimeStamp > (1000 * 60 * 5))) {
+            if (lastShowTimeStamp == 0 || (message.getSendTime() - lastShowTimeStamp > (1000 * 60 * 10))) {
                 lastShowTimeStamp = message.getSendTime();
                 msgExpand.isShowTime = true;
             }
@@ -192,6 +193,9 @@ public class IMUtil {
             }
             if (msg.getContentType() == Constant.MsgType.QUOTE) {
                 buildExpandInfo(msg.getQuoteElem().getQuoteMessage());
+            }
+            if (msg.getContentType() == Constant.MsgType.CUSTOM_EMOJI) {
+                msgExpand.customEmoji=GsonHel.fromJson(msg.getFaceElem().getData(), CustomEmojiEntity.class);
             }
             if (msg.getContentType() == Constant.MsgType.OA_NOTICE) {
                 msgExpand.isShowTime = true;

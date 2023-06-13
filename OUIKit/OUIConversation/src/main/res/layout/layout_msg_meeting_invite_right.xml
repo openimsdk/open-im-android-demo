@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/readVanishNum2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@id/sendState2"
+            android:textColor="#ff5496eb"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+        <io.openim.android.ouiconversation.widget.SendStateView
+            android:id="@+id/sendState2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@id/contentLy" />
+
+        <LinearLayout
+            android:id="@+id/contentLy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="7dp"
+            android:layout_toLeftOf="@id/avatar2"
+            android:gravity="right"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/nickName2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="3dp"
+                android:layout_marginBottom="2dp"
+                android:textColor="#ff8e9ab0"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <io.openim.android.ouicore.widget.InterceptLinearLayout
+                android:id="@+id/content2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sty_radius_unright_stroke_30"
+                android:maxWidth="@dimen/msg_max_width"
+                android:minWidth="@dimen/msg_min_width"
+                android:minHeight="@dimen/msg_min_height"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:textColor="@color/txt_black"
+                android:textSize="@dimen/main_body">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="5dp"
+                        android:src="@mipmap/ic_iv_camera" />
+
+                    <TextView
+                        android:id="@+id/meetingName2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="顾萌萌发起的快速会议"
+                        android:textColor="#ff0c1c33"
+                        android:textSize="17sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• "
+                        android:textColor="@color/txt_black"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/startTime2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#ff0c1c33"
+                        android:textSize="17sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• "
+                        android:textColor="@color/txt_black"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/endTime2"
+                        android:layout_width="204dp"
+                        android:layout_height="24dp"
+                        android:textColor="#ff0c1c33"
+                        android:textSize="17sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• "
+                        android:textColor="@color/txt_black"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/meetingID2"
+                        android:layout_width="204dp"
+                        android:layout_height="24dp"
+                        android:textColor="#ff0c1c33"
+                        android:textSize="17sp" />
+                </LinearLayout>
+
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:button="@null"
+                    android:enabled="false"
+                    android:drawableRight="@mipmap/ic_iv_more"
+                    android:text="进入会议"
+                    android:textColor="#ff0089ff"
+                    android:textSize="17sp" />
+            </io.openim.android.ouicore.widget.InterceptLinearLayout>
+
+        </LinearLayout>
+
+
+        <io.openim.android.ouicore.widget.AvatarImage
+            android:id="@+id/avatar2"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_alignParentRight="true"
+            android:src="@mipmap/ic_my_friend" />
+
+    </RelativeLayout>
+</FrameLayout>

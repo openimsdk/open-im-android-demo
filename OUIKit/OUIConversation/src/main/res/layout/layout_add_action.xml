@@ -8,7 +8,7 @@
     tools:ignore="MissingDefaultResource">
 
     <androidx.cardview.widget.CardView
-        android:layout_width="150dp"
+        android:layout_width="145dp"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:minHeight="100dp"
@@ -23,7 +23,7 @@
             <LinearLayout
                 android:id="@+id/scan"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="45dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingLeft="20dp"
@@ -42,11 +42,15 @@
                     android:textColor="#ff333333"
                     android:textSize="14sp" />
             </LinearLayout>
-
+            <include layout="@layout/view_dividing_line"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
             <LinearLayout
                 android:id="@+id/addFriend"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="45dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingLeft="20dp"
@@ -65,11 +69,15 @@
                     android:textColor="#ff333333"
                     android:textSize="14sp" />
             </LinearLayout>
-
+            <include layout="@layout/view_dividing_line"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
             <LinearLayout
                 android:id="@+id/addGroup"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="45dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingLeft="20dp"
@@ -88,10 +96,15 @@
                     android:textColor="#ff333333"
                     android:textSize="14sp" />
             </LinearLayout>
+            <include layout="@layout/view_dividing_line"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
             <LinearLayout
                 android:id="@+id/createGroup"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="45dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingLeft="20dp"
@@ -110,32 +123,15 @@
                     android:textColor="#ff333333"
                     android:textSize="14sp" />
             </LinearLayout>
-            <LinearLayout
-                android:id="@+id/createWordGroup"
+            <include layout="@layout/view_dividing_line"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="15dp"
-                    android:src="@mipmap/ic_create_group" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/create_word_group"
-                    android:textColor="#ff333333"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                android:layout_height="1dp" />
             <LinearLayout
                 android:id="@+id/videoMeeting"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="45dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingLeft="20dp"

@@ -37,6 +37,7 @@
             android:paddingLeft="22dp"
             android:paddingTop="10dp"
             android:paddingRight="22dp"
+            android:visibility="gone"
             android:paddingBottom="10dp">
 
             <io.openim.android.ouicore.widget.SearchView
@@ -86,30 +87,9 @@
                 app:selectbigtTextColor="#000093" />
         </RelativeLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingLeft="17dp"
-            android:paddingTop="10dp"
-            android:paddingRight="17dp"
-            android:paddingBottom="10dp">
-
-            <TextView
-                android:id="@+id/selectNum"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="#ff1b72ec"
-                android:textSize="14sp" />
-
-            <Button
-                android:id="@+id/submit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:enabled="false"
-                android:text="确定（0/999）" />
-        </LinearLayout>
+      <include
+          android:id="@+id/bottom"
+          layout="@layout/layout_selected_friends"/>
 
     </LinearLayout>
 

@@ -40,7 +40,6 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:gravity="center_vertical"
-                android:src="@mipmap/ic_chat_photo"
                 app:corner_radius="7dp"
                 app:type="round" />
 

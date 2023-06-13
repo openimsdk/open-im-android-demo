@@ -132,6 +132,12 @@ public class Common {
         return (int) (dp * scale + 0.5f);
     }
 
+    public static int px2dp(float px) {
+        float scale = BaseApp.inst().getResources().getDisplayMetrics().density;
+        return (int) (px / scale + 0.5f);
+    }
+
+
     //收起键盘
     public static void hideKeyboard(Context context, View v) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -368,6 +374,8 @@ public class Common {
         intent.putExtra(com.yzq.zxinglibrary.common.Constant.INTENT_ZXING_CONFIG, config);
         resultLauncher.launch(intent);
     }
+
+
 
 
 }

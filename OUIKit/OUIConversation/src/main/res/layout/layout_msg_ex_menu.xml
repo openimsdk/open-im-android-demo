@@ -3,6 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
+    android:alpha="0.8"
     android:orientation="vertical">
 
     <ImageView
@@ -17,8 +18,8 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/sty_radius_4_666666"
-        android:padding="8dp">
+        android:background="@drawable/sty_radius_10_black"
+        android:padding="4dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview"

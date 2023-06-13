@@ -35,11 +35,13 @@ import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouiconversation.databinding.ActivityChatBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
+import io.openim.android.ouiconversation.vm.CustomEmojiVM;
 import io.openim.android.ouiconversation.widget.BottomInputCote;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.im.IMUtil;
@@ -96,6 +98,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
 
     private void initVM() {
+        Easy.installVM(CustomEmojiVM.class);
+
         String userId = getIntent().getStringExtra(Constant.K_ID);
         String groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
         boolean fromChatHistory = getIntent().getBooleanExtra(Constant.K_FROM, false);
@@ -135,6 +139,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private void release() {
         if (isFinishing()) {
+            Easy.delete(CustomEmojiVM.class);
             if (!vm.fromChatHistory) removeCacheVM();
 
             N.clearDispose(this);
@@ -142,7 +147,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             Obs.inst().deleteObserver(this);
             getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
 
-            SPlayer.instance().stop();
+            try {
+                SPlayer.instance().stop();
+            }catch (Exception ignored){}
         }
     }
 
