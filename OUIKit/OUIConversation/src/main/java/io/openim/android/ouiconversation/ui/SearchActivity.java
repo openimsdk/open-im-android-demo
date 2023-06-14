@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Locale;
 
 import io.openim.android.ouiconversation.databinding.ActivitySearchBinding;
-import io.openim.android.ouiconversation.databinding.ItemSearchTitleBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;

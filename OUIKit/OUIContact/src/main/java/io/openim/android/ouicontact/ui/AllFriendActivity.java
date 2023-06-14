@@ -133,18 +133,7 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
                             return;
                         }
                         if (formChat) {
-                            CommonDialog commonDialog = new CommonDialog(AllFriendActivity.this);
-                            commonDialog.show();
-                            LayoutCommonDialogBinding mainView = commonDialog.getMainView();
-                            mainView.tips.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.send_card_confirm));
-                            mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
-                            mainView.confirm.setOnClickListener(v1 -> {
-                                commonDialog.dismiss();
-
-                                setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
-                                    GsonHel.toJson(friendInfo)));
-                                finish();
-                            });
+                            sendChatWindow(friendInfo);
                             return;
                         }
                         ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
@@ -157,6 +146,21 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
             }
         };
         view.recyclerView.setAdapter(adapter);
+    }
+
+    private void sendChatWindow(FriendInfo friendInfo) {
+        CommonDialog commonDialog = new CommonDialog(AllFriendActivity.this);
+        commonDialog.show();
+        LayoutCommonDialogBinding mainView = commonDialog.getMainView();
+        mainView.tips.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.send_card_confirm));
+        mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
+        mainView.confirm.setOnClickListener(v1 -> {
+            commonDialog.dismiss();
+
+            setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
+                GsonHel.toJson(friendInfo)));
+            finish();
+        });
     }
 
     private void sendCardMessage(FriendInfo friendInfo) {
@@ -189,9 +193,20 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
         }
     }
 
-    private ActivityResultLauncher<Intent> searchFriendLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+    private ActivityResultLauncher<Intent> searchFriendLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+        result -> {
         try {
+            if (result.getResultCode()!=RESULT_OK)return;
+
             String uid = result.getData().getStringExtra(Constant.K_ID);
+            if (formChat){
+                for (ExUserInfo item : adapter.getItems()) {
+                    if (null!=item.userInfo&&item.userInfo.getUserID().equals(uid)){
+                        sendChatWindow(item.userInfo.getFriendInfo());
+                        return;
+                    }
+                }
+            }
             ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
                 .withString(Constant.K_ID, uid)
                 .navigation();

@@ -48,7 +48,7 @@ import io.openim.android.demo.vm.MainVM;
 import io.openim.android.ouicalling.service.AudioVideoService;
 import io.openim.android.ouicontact.ui.ContactFragment;
 import io.openim.android.ouicontact.vm.ContactVM;
-import io.openim.android.ouiconversation.ui.ContactListFragment;
+import io.openim.android.ouiconversation.ui.fragment.ContactListFragment;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
@@ -91,13 +91,6 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         setLightStatus();
 
         view.setMainVM(vm);
-
-        vm.visibility.observe(this, v -> {
-            View view = findViewById(io.openim.android.ouiconversation.R.id.isOnline);
-            if (null != view) {
-                view.setVisibility(v);
-            }
-        });
 
         click();
         view.men1.setChecked(true);

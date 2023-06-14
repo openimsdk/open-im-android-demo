@@ -22,6 +22,8 @@ import java.util.List;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.databinding.LayoutPopSelectedFriendsBinding;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.ExUserInfo;
 
@@ -31,12 +33,14 @@ import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 
 
+import io.openim.android.ouicore.vm.SelectFriendsVM;
 import io.openim.android.ouigroup.databinding.ActivityInitiateGroupBinding;
 
 import io.openim.android.ouicore.vm.GroupVM;
 
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
+import io.openim.android.sdk.models.UserInfo;
 
 /**
  * 发起群聊/邀请入群/移除群聊/选择群成员
@@ -325,7 +329,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                 }
             }
         });
-        view.submit.setOnClickListener(new OnDedrepClickListener(850) {
+        view.bottom.submit.setOnClickListener(new OnDedrepClickListener(850) {
             @Override
             public void click(View v) {
                 try {

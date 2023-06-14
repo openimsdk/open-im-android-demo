@@ -15,6 +15,7 @@ import io.openim.android.ouicore.databinding.ItemImgTxtRightBinding;
 import io.openim.android.ouicore.databinding.ItemLabelMemberBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonSelectBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonStickyBinding;
+import io.openim.android.ouicore.databinding.ItemSearchTitleBinding;
 import io.openim.android.ouicore.databinding.LayoutContactItemBinding;
 import io.openim.android.ouicore.databinding.LayoutLabelItemBinding;
 import io.openim.android.ouicore.databinding.ViewDividingLineBinding;
@@ -116,7 +117,14 @@ public class ViewHol {
             view = ViewImageBinding.bind(this.itemView);
         }
     }
+    public static class TitleViewHolder extends RecyclerView.ViewHolder {
+        public ItemSearchTitleBinding view;
 
+        public TitleViewHolder(@NonNull View itemView) {
+            super(ItemSearchTitleBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
+            view = ItemSearchTitleBinding.bind(this.itemView);
+        }
+    }
     public static class SelectImageViewHolder extends RecyclerView.ViewHolder {
         public ViewSelectImageBinding view;
 

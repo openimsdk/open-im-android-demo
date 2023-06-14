@@ -63,7 +63,6 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
             @Override
             public void onSuccess(List<ConversationInfo> data) {
-                L.e("AllConversationList---size--" + data.size());
                 conversations.getValue().clear();
                 for (ConversationInfo datum : data) {
                     Message msg = GsonHel.fromJson(datum.getLatestMsg(), Message.class);

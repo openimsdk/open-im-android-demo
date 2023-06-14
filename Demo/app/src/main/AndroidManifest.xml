@@ -18,6 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Main"
         android:usesCleartextTraffic="true">
+
         <activity
             android:name=".ui.login.ResetPasswordActivity"
             android:exported="false">

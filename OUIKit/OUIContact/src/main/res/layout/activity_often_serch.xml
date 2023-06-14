@@ -2,12 +2,13 @@
 <layout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".ui.SearchGroupActivity">
+        android:fitsSystemWindows="true"
+        tools:context=".ui.search.SearchGroupAndFriendsActivity">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,8 +24,7 @@
                 android:layout_marginRight="17dp"
                 android:layout_marginBottom="7dp"
                 android:layout_weight="1"
-                android:hint="@string/search_group"
-                />
+                android:hint="@string/search" />
 
             <TextView
                 android:id="@+id/cancel"
@@ -45,4 +45,3 @@
             android:layout_height="match_parent" />
     </LinearLayout>
 </layout>
-

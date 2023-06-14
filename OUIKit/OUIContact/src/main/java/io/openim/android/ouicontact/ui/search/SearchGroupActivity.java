@@ -1,8 +1,5 @@
-package io.openim.android.ouicontact.ui;
+package io.openim.android.ouicontact.ui.search;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Context;
@@ -11,26 +8,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.View;
 
 import java.util.List;
 
-import io.openim.android.ouicontact.R;
-import io.openim.android.ouicontact.databinding.ActivitySearchGroupBinding;
+import io.openim.android.ouicontact.databinding.ActivityOftenSerchBinding;
+import io.openim.android.ouicontact.ui.MyGroupActivity;
 import io.openim.android.ouicontact.vm.SearchGroup;
-import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.base.BaseViewModel;
-import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
-import io.openim.android.sdk.models.GroupMembersInfo;
 
-public class SearchGroupActivity extends BaseActivity<SearchGroup, ActivitySearchGroupBinding> {
+public class SearchGroupActivity extends BaseActivity<SearchGroup, ActivityOftenSerchBinding> {
 
     private MyGroupActivity.ContentAdapter adapter;
     private Handler handler = new Handler();
@@ -39,7 +28,7 @@ public class SearchGroupActivity extends BaseActivity<SearchGroup, ActivitySearc
     protected void onCreate(Bundle savedInstanceState) {
         bindVMByCache(SearchGroup.class);
         super.onCreate(savedInstanceState);
-        bindViewDataBinding(ActivitySearchGroupBinding.inflate(getLayoutInflater()));
+        bindViewDataBinding(ActivityOftenSerchBinding.inflate(getLayoutInflater()));
         sink();
         initView();
         listener();

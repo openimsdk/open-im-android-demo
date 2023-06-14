@@ -1,4 +1,4 @@
-package io.openim.android.ouicontact.ui;
+package io.openim.android.ouicontact.ui.search;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,10 +23,10 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import java.util.List;
 
 import io.openim.android.ouicontact.R;
+import io.openim.android.ouicontact.databinding.ActivityOftenSerchBinding;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.databinding.ActivityCommSearchBinding;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
@@ -36,7 +36,7 @@ import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 @Route(path = Routes.Contact.SEARCH_FRIENDS)
-public class SearchFriendsActivity extends BaseActivity<SearchVM, ActivityCommSearchBinding> {
+public class SearchFriendsActivity extends BaseActivity<SearchVM, ActivityOftenSerchBinding> {
 
     private final Handler handler = new Handler();
     //为null 搜索好友 否则 搜索群成员
@@ -48,7 +48,7 @@ public class SearchFriendsActivity extends BaseActivity<SearchVM, ActivityCommSe
     protected void onCreate(Bundle savedInstanceState) {
         bindVM(SearchVM.class);
         super.onCreate(savedInstanceState);
-        bindViewDataBinding(ActivityCommSearchBinding.inflate(getLayoutInflater()));
+        bindViewDataBinding(ActivityOftenSerchBinding.inflate(getLayoutInflater()));
         sink();
         init();
         listener();

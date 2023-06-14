@@ -11,6 +11,8 @@ import androidx.multidex.MultiDex;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.igexin.sdk.IUserLoggerInterface;
 import com.igexin.sdk.PushManager;
+import com.vanniktech.emoji.EmojiManager;
+import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,6 +29,7 @@ import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.sdk.listener.OnConnListener;
 import io.realm.Realm;

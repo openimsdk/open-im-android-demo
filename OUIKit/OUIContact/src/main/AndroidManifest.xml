@@ -4,12 +4,11 @@
 
     <application>
         <activity
-            android:name=".ui.SearchGroupActivity"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
+            android:name=".ui.search.SearchGroupActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".ui.search.SearchGroupAndFriendsActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.CreateLabelActivity"
             android:exported="false" />
@@ -17,7 +16,7 @@
             android:name=".ui.LabelActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.SearchFriendsActivity"
+            android:name=".ui.search.SearchFriendsActivity"
             android:exported="false" />
         <activity
             android:name=".ui.MyGroupActivity"

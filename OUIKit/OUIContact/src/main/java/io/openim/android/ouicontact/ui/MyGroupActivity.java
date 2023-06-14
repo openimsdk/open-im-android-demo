@@ -19,6 +19,7 @@ import java.util.List;
 
 import io.openim.android.ouicontact.R;
 import io.openim.android.ouicontact.databinding.ActivityMyGroupBinding;
+import io.openim.android.ouicontact.ui.search.SearchGroupActivity;
 import io.openim.android.ouicontact.vm.SearchGroup;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
