@@ -14,9 +14,8 @@ import java.util.Locale;
 
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
-import io.openim.android.ouicore.entity.CommEx;
+import io.openim.android.ouicore.ex.CommEx;
 import io.openim.android.ouicore.entity.ExUserInfo;
-import io.openim.android.ouicore.entity.SortLetter;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;

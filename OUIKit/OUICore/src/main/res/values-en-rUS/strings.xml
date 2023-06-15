@@ -349,8 +349,8 @@
     <string name="mute_tips">输入或选择禁言时间</string>
     <string name="who_talk">%1$s讲话中...</string>
     <string name="meeting">会议中...</string>
-
-    <string name="recent_contact">常联系</string>
+    <string name="selected_tips2">已选择（%1$d）</string>
+    <string name="recent_contact">最近会话</string>
     <string name="account">账号</string>
     <string name="please_input_account">请输入账号</string>
     <string name="organizational_structure">组织架构</string>

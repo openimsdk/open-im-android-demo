@@ -42,6 +42,10 @@ public class SearchFriendsActivity extends BaseActivity<SearchVM, ActivityOftenS
     //为null 搜索好友 否则 搜索群成员
     private String groupId;
     private boolean isSearchGroupMember;
+    //不为空表示选择
+    private List<String> selectIds;
+
+
     private RecyclerViewAdapter adapter;
 
     @Override
@@ -57,28 +61,35 @@ public class SearchFriendsActivity extends BaseActivity<SearchVM, ActivityOftenS
 
     private void initView() {
         view.recyclerview.setLayoutManager(new LinearLayoutManager(this));
-        view.recyclerview.setAdapter(adapter = new RecyclerViewAdapter<Object, ViewHol.ItemViewHo>(ViewHol.ItemViewHo.class) {
+        view.recyclerview.setAdapter(adapter = new RecyclerViewAdapter<Object,
+            ViewHol.ItemViewHo>(ViewHol.ItemViewHo.class) {
             @Override
             public void onBindView(@NonNull ViewHol.ItemViewHo holder, Object data, int position) {
                 GroupMembersInfo da = null;
                 FriendInfo da2 = null;
-                holder.view.select.setVisibility(View.GONE);
+                holder.view.select.setVisibility(null==selectIds?View.GONE:View.VISIBLE);
+
                 if (isSearchGroupMember) {
                     da = (GroupMembersInfo) data;
                     holder.view.avatar.load(da.getFaceURL());
-                    Common.stringBindForegroundColorSpan(holder.view.nickName, da.getNickname(), vm.searchContent.getValue());
+                    Common.stringBindForegroundColorSpan(holder.view.nickName, da.getNickname(),
+                        vm.searchContent.getValue());
+                    holder.view.select.setChecked(null!=selectIds&&selectIds.contains(da.getUserID()));
                 } else {
                     da2 = (FriendInfo) data;
                     holder.view.avatar.load(da2.getFaceURL());
-                    Common.stringBindForegroundColorSpan(holder.view.nickName, da2.getNickname(), vm.searchContent.getValue());
+                    Common.stringBindForegroundColorSpan(holder.view.nickName, da2.getNickname(),
+                        vm.searchContent.getValue());
+                    holder.view.select.setChecked(null!=selectIds&&selectIds.contains(da2.getUserID()));
                 }
+
 
                 final GroupMembersInfo finalDa = da;
                 final FriendInfo finalDa1 = da2;
                 holder.view.getRoot().setOnClickListener(v -> {
-                    setResult(RESULT_OK, new Intent().putExtra(Constant.K_ID, isSearchGroupMember ? finalDa.getUserID()
-                        : finalDa1.getUserID()).putExtra(Constant.K_RESULT,isSearchGroupMember ? GsonHel.toJson(finalDa)
-                        :GsonHel.toJson(finalDa1)));
+                    setResult(RESULT_OK, new Intent().putExtra(Constant.K_ID, isSearchGroupMember ? finalDa.getUserID() : finalDa1.getUserID())
+                        .putExtra(Constant.K_RESULT, isSearchGroupMember ? GsonHel.toJson(finalDa) : GsonHel.toJson(finalDa1))
+                    );
                     finish();
                 });
             }
@@ -92,6 +103,7 @@ public class SearchFriendsActivity extends BaseActivity<SearchVM, ActivityOftenS
     void init() {
         groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
         isSearchGroupMember = !TextUtils.isEmpty(groupId);
+        selectIds = getIntent().getStringArrayListExtra(Constant.K_RESULT);
     }
 
     private void listener() {
@@ -138,8 +150,10 @@ public class SearchFriendsActivity extends BaseActivity<SearchVM, ActivityOftenS
             view.recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                    LinearLayoutManager linearLayoutManager = (LinearLayoutManager) view.recyclerview.getLayoutManager();
-                    int lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
+                    LinearLayoutManager linearLayoutManager =
+                        (LinearLayoutManager) view.recyclerview.getLayoutManager();
+                    int lastVisiblePosition =
+                        linearLayoutManager.findLastCompletelyVisibleItemPosition();
                     if (lastVisiblePosition >= adapter.getItems().size() - 3) {
                         vm.page++;
                         loadMore();

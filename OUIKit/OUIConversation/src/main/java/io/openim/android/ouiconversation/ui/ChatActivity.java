@@ -456,7 +456,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             //在这里转发
             String id = data.getStringExtra(Constant.K_ID);
             String otherSideNickName = data.getStringExtra(Constant.K_NAME);
-
             String groupId = data.getStringExtra(Constant.K_GROUP_ID);
 
             Message forwardMsg;

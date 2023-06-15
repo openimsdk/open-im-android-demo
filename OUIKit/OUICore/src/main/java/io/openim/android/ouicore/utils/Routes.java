@@ -49,7 +49,7 @@ public class Routes {
         //创建群组
         public final static String CREATE_GROUP = "/group/InitiateGroupActivity";
         public final static String CREATE_GROUP2 = "/group/CreateGroupActivity";
-        public final static String CREATE_GROUP3 = "/group/CreateGroupActivityV3";
+        public final static String SELECT_TARGET = "/group/SelectTargetActivityV3";
         //群资料
         public final static String MATERIAL = "/group/GroupMaterialActivity";
         //通知详情
@@ -66,6 +66,7 @@ public class Routes {
         public final static String FORWARD = "/contact/ForwardToActivity";
         public static final String ALL_FRIEND = "/contact/AllFriendActivity";
         public static final String SEARCH_FRIENDS = "/contact/SearchFriendsActivity";
+        public static final String SEARCH_FRIENDS_GROUP = "/contact/SearchGroupAndFriendsActivity";
     }
     //朋友圈
     public static class Moments{

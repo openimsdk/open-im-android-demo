@@ -74,7 +74,8 @@ public class ForwardToActivity extends BaseActivity<SocialityVM, ActivityForward
 
     private void listener() {
         view.searchView.setOnClickListener(v -> {
-            launcher.launch(new Intent(this, SearchGroupAndFriendsActivity.class));
+            launcher.launch(new Intent(this, SearchGroupAndFriendsActivity.class)
+                .putExtra(Constant.IS_SELECT_FRIEND,true));
         });
         view.menuGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == view.men1.getId()) {

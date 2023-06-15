@@ -27,13 +27,14 @@ import io.openim.android.ouicore.databinding.LayoutPopSelectedFriendsBinding;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.ExUserInfo;
 
+import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 
 
-import io.openim.android.ouicore.vm.SelectFriendsVM;
+import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouigroup.databinding.ActivityInitiateGroupBinding;
 
 import io.openim.android.ouicore.vm.GroupVM;
@@ -63,7 +64,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
     //默认已选择的id
     private String defSelectId;
 
-    private SelectFriendsVM selectFriendsVM;
+    private MultipleChoiceVM multipleChoiceVM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,11 +96,13 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
 
     private void buildSelectFriendsVM() {
         try {
-            selectFriendsVM = Easy.find(SelectFriendsVM.class);
-            selectMemberNum= selectFriendsVM.userInfoList.getValue().size();
-            selectFriendsVM.bindDataToView(view.bottom);
-            selectFriendsVM.showPopAllSelectFriends(view.bottom, LayoutPopSelectedFriendsBinding.inflate(getLayoutInflater()));
-            selectFriendsVM.submitTap(view.bottom.submit);
+            multipleChoiceVM = Easy.find(MultipleChoiceVM.class);
+            selectMemberNum= multipleChoiceVM.metaData.getValue().size();
+            multipleChoiceVM.bindDataToView(view.bottom);
+            multipleChoiceVM.showPopAllSelectFriends(view.bottom, LayoutPopSelectedFriendsBinding.inflate(getLayoutInflater()));
+            multipleChoiceVM.submitTap(view.bottom.submit);
+
+            multipleChoiceVM.metaData.observe(this,v->adapter.notifyDataSetChanged());
         } catch (Exception ignored) {}
     }
 
@@ -191,12 +194,12 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                         notifyItemChanged(position);
                         selected();
 
-                        if (null != selectFriendsVM) {
+                        if (null != multipleChoiceVM) {
                             if (data.isSelect)
-                                selectFriendsVM.addUserInfo(data.userInfo.getUserID(),
+                                multipleChoiceVM.addMetaData(data.userInfo.getUserID(),
                                     data.userInfo.getNickname(),data.userInfo.getFaceURL());
                             else
-                                selectFriendsVM.removeUserInfo(data.userInfo.getUserID());
+                                multipleChoiceVM.removeMetaData(data.userInfo.getUserID());
                         }
 
                     });
@@ -305,10 +308,10 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                         exUserInfo.isSelect = true;
                     }
 
-                    if (null != selectFriendsVM) {
-                        UserInfo userInfo=new UserInfo();
-                        userInfo.setUserID(exUserInfo.userInfo.getUserID());
-                        exUserInfo.isSelect = selectFriendsVM.contains(userInfo);
+                    if (null != multipleChoiceVM) {
+                        MultipleChoice data=new MultipleChoice();
+                        data.key=exUserInfo.userInfo.getUserID();
+                        exUserInfo.isSelect = multipleChoiceVM.contains(data);
                     }
                 }
                 adapter.setItems(exUserInfos);

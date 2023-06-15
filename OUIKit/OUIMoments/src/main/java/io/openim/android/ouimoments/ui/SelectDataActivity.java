@@ -1,15 +1,11 @@
 package io.openim.android.ouimoments.ui;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -24,15 +20,11 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseViewModel;
-import io.openim.android.ouicore.entity.CommEx;
-import io.openim.android.ouicore.entity.ExGroupMemberInfo;
-import io.openim.android.ouicore.entity.ExUserInfo;
+import io.openim.android.ouicore.ex.CommEx;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.vm.SocialityVM;
-import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.databinding.ActivitySelectDataBinding;
-import io.openim.android.sdk.models.FriendInfo;
 
 public class SelectDataActivity extends BaseActivity<BaseViewModel, ActivitySelectDataBinding> {
 

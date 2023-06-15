@@ -1,3 +1,6 @@
+plugins {
+    id 'org.jetbrains.kotlin.android'
+}
 if (isModule) {
     apply plugin: 'com.android.application'
 } else {

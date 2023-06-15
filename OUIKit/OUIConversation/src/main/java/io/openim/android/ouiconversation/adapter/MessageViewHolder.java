@@ -390,10 +390,12 @@ public class MessageViewHolder {
                                         chatVM.deleteMessageFromLocalStorage(message);
                                     }
                                     if (iconRes == R.mipmap.ic_forward) {
-                                        Message forwardMessage =
+                                       Message forwardMessage  =
                                             OpenIMClient.getInstance().messageManager.createForwardMessage(message);
                                         chatVM.forwardMsg = forwardMessage;
-                                        ARouter.getInstance().build(Routes.Contact.FORWARD).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
+
+                                        ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity)
+                                            view.getContext(), Constant.Event.FORWARD);
                                     }
                                     if (iconRes == R.mipmap.ic_multiple_choice) {
                                         chatVM.enableMultipleSelect.setValue(true);

@@ -253,7 +253,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         });
         view.createGroup.setOnClickListener(c -> {
             popupWindow.dismiss();
-            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withBoolean(Constant.K_RESULT,
+            ARouter.getInstance().build(Routes.Group.SELECT_TARGET).withBoolean(Constant.K_RESULT,
                 true).navigation();
         });
         view.videoMeeting.setOnClickListener(c -> {

@@ -1,5 +1,6 @@
 package io.openim.android.ouicore.entity;
 
+import io.openim.android.ouicore.ex.CommEx;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class ExGroupMemberInfo extends CommEx {
