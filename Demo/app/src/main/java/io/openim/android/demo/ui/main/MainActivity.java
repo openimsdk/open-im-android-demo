@@ -60,6 +60,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.SystemBarUtil;
+import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 
 @Route(path = Routes.Main.HOME)
