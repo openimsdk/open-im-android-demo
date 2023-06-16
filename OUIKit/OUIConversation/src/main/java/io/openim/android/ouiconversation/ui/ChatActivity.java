@@ -142,7 +142,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             Obs.inst().deleteObserver(this);
             getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
 
-            SPlayer.instance().stop();
+           try {
+               SPlayer.instance().stop();
+           }catch (Exception ignore){}
         }
     }
 
