@@ -17,6 +17,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConversationListener;
@@ -98,7 +99,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
     private void UPDATEFrequentContacts(List<ConversationInfo> data) {
         List<UserInfo> uList = new ArrayList<>();
         for (ConversationInfo datum : data) {
-            if (datum.getConversationType() == Constant.SessionType.SINGLE_CHAT) {
+            if (datum.getConversationType() == ConversationType.SINGLE_CHAT) {
                 UserInfo u = new UserInfo();
                 u.setUserID(datum.getUserID());
                 u.setNickname(datum.getShowName());
@@ -226,6 +227,16 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     @Override
     public void onRecvMessageExtensionsAdded(String msgID, List<KeyValue> list) {
+
+    }
+
+    @Override
+    public void onMsgDeleted(Message message) {
+
+    }
+
+    @Override
+    public void onRecvOfflineNewMessages(List<Message> list) {
 
     }
 

@@ -42,6 +42,7 @@ import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
@@ -132,9 +133,11 @@ public class CallDialog extends BaseDialog {
     public void bindData(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
         callingVM.isGroup =
-            signalingInfo.getInvitation().getSessionType() == Constant.SessionType.GROUP_CHAT || signalingInfo.getInvitation().getSessionType() == Constant.SessionType.SUPER_GROUP;
+            signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT;
         callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
         if (!callingVM.isVideoCalls) {
+            callingVM.callViewModel.setCameraEnabled(false);
+            view.localSpeakerVideoView.setVisibility(View.GONE);
             view.timeTv.setVisibility(View.GONE);
             view.headTips.setVisibility(View.GONE);
             view.audioCall.setVisibility(View.VISIBLE);

@@ -8,6 +8,7 @@ import io.openim.android.ouicore.im.IM;
 public class Constant {
 //            public static final String DEFAULT_IP = "test-web.rentsoft.cn";//43
     public static final String DEFAULT_IP = "web.rentsoft.cn";//121
+//    public static final String DEFAULT_IP = "121.196.195.35";//121
 
     //登录注册手机验 证服务器地址
     private static final String APP_AUTH_URL = "https://" + DEFAULT_IP + "/chat/";
@@ -82,17 +83,6 @@ public class Constant {
         public static final int SET_GROUP_NOTIFICATION = 10007;
         //插入了消息到本地
         public static final int INSERT_MSG = 10008;
-    }
-
-    //会话类型
-    public static class SessionType {
-        public static final int SINGLE_CHAT = 1;
-
-        public static final int GROUP_CHAT = 2;
-        /// 大群
-        public static final int SUPER_GROUP = 3;
-        /// 通知
-        public static final int NOTIFICATION = 4;
     }
 
     public static final String K_ID = "Id";

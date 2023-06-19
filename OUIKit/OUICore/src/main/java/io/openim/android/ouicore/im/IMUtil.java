@@ -206,10 +206,9 @@ public class IMUtil {
                 msgExpand.locationInfo = GsonHel.fromJson(msg.getLocationElem().getDescription(),
                     LocationInfo.class);
             if (msg.getContentType() == Constant.MsgType.MENTION) {
-                msgExpand.atMsgInfo = GsonHel.fromJson(msg.getContent(), AtMsgInfo.class);
+                msgExpand.atMsgInfo = GsonHel.fromJson(msg.getAtTextElem().getText(), AtMsgInfo.class);
                 handleAt(msgExpand);
             }
-            handleEmoji(msgExpand, msg);
             handleGroupNotification(msg);
         } catch (Exception e) {
             e.printStackTrace();
@@ -379,31 +378,6 @@ public class IMUtil {
         msg.getNotificationElem().setDefaultTips(tips.trim());
     }
 
-    private static void handleEmoji(MsgExpand expand, Message msg) {
-        String content = msg.getContentType() == Constant.MsgType.QUOTE ?
-            msg.getQuoteElem().getText() : msg.getContent();
-        if (TextUtils.isEmpty(content)) return;
-        for (String key : EmojiUtil.emojiFaces.keySet()) {
-            int fromIndex = 0;
-            if (content.contains(key)) {
-                if (null == expand.sequence) {
-                    expand.sequence = new SpannableStringBuilder(content);
-                } else {
-                    //已经处理了@消息
-                    content = expand.sequence.toString();
-                }
-                while ((fromIndex = content.indexOf(key, fromIndex)) > -1) {
-                    int emojiId = Common.getMipmapId(EmojiUtil.emojiFaces.get(key));
-                    Drawable drawable = BaseApp.inst().getResources().getDrawable(emojiId, null);
-                    drawable.setBounds(0, 0, Common.dp2px(22), Common.dp2px(22));
-                    ImageSpan imageSpan = new ImageSpan(drawable);
-                    expand.sequence.setSpan(imageSpan, fromIndex, fromIndex + key.length(),
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    fromIndex += 1;//往后继续查
-                }
-            }
-        }
-    }
 
     private static String atSelf(AtUsersInfo atUsersInfo) {
         return "@" + (atUsersInfo.atUserID.equals(BaseApp.inst().loginCertificate.userID) ?
@@ -449,7 +423,7 @@ public class IMUtil {
                     lastMsg = msg.getNotificationElem().getDefaultTips();
                     break;
                 case Constant.MsgType.TXT:
-                    lastMsg = msg.getContent();
+                    lastMsg = msg.getTextElem().getContent();
                     break;
                 case Constant.MsgType.PICTURE:
                     lastMsg =

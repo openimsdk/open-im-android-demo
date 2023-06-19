@@ -45,22 +45,22 @@ public class GroupVM extends SocialityVM {
     public MutableLiveData<Boolean> isGroupOwner = new MutableLiveData<>(true);
     //群所有成员
     public MutableLiveData<List<GroupMembersInfo>> groupMembers =
-        new MutableLiveData<>(new ArrayList<>());
+            new MutableLiveData<>(new ArrayList<>());
     //超级群成员分页加载
     public MutableLiveData<List<ExGroupMemberInfo>> superGroupMembers =
-        new MutableLiveData<>(new ArrayList<>());
+            new MutableLiveData<>(new ArrayList<>());
     //封装过的群成员 用于字母导航
     public MutableLiveData<List<ExGroupMemberInfo>> exGroupMembers =
-        new MutableLiveData<>(new ArrayList<>());
+            new MutableLiveData<>(new ArrayList<>());
     //群管理
     public MutableLiveData<List<ExGroupMemberInfo>> exGroupManagement =
-        new MutableLiveData<>(new ArrayList<>());
+            new MutableLiveData<>(new ArrayList<>());
     //群字母导航
     public MutableLiveData<List<String>> groupLetters = new MutableLiveData<>(new ArrayList<>());
     //封装过的好友信息 用于字母导航
     public String groupId;
     public MutableLiveData<List<FriendInfo>> selectedFriendInfo =
-        new MutableLiveData<>(new ArrayList<>());
+            new MutableLiveData<>(new ArrayList<>());
     public LoginCertificate loginCertificate;
 
     public int page = 0;
@@ -102,17 +102,18 @@ public class GroupVM extends SocialityVM {
         WaitDialog waitDialog = new WaitDialog(getContext());
         waitDialog.setNotDismiss();
         waitDialog.show();
-        List<GroupMemberRole> groupMemberRoles = new ArrayList<>();
+
         LoginCertificate loginCertificate = LoginCertificate.getCache(getContext());
+        List<String> memberUserIDs = new ArrayList<>();
         for (FriendInfo friendInfo : selectedFriendInfo.getValue()) {
-            GroupMemberRole groupMemberRole = new GroupMemberRole();
-            if (friendInfo.getUserID().equals(loginCertificate.userID)) {
-                groupMemberRole.setRoleLevel(2);
-            } else groupMemberRole.setRoleLevel(1);
-            groupMemberRole.setUserID(friendInfo.getUserID());
-            groupMemberRoles.add(groupMemberRole);
+            if (!friendInfo.getUserID().equals(loginCertificate.userID)) {
+                memberUserIDs.add(friendInfo.getUserID());
+            }
         }
-        OpenIMClient.getInstance().groupManager.createGroup(new OnBase<GroupInfo>() {
+        GroupInfo groupInfo = new GroupInfo();
+        groupInfo.setGroupName(groupName.getValue());
+        OpenIMClient.getInstance().groupManager.createGroup(memberUserIDs, null, groupInfo,
+                loginCertificate.userID, new OnBase<GroupInfo>() {
             @Override
             public void onError(int code, String error) {
                 getIView().onError(error);
@@ -124,8 +125,7 @@ public class GroupVM extends SocialityVM {
                 getIView().onSuccess(data);
                 Common.UIHandler.postDelayed(waitDialog::dismiss, 200);
             }
-        }, groupName.getValue(), null, null, null, isWordGroup ? Constant.GroupType.work :
-            Constant.GroupType.general, null, groupMemberRoles);
+        });
     }
 
     public void selectMute(int status) {
@@ -143,8 +143,16 @@ public class GroupVM extends SocialityVM {
      * @param ex           其他信息
      */
     public void UPDATEGroup(String groupID, String groupName, String faceURL, String notification
-        , String introduction, String ex) {
-        OpenIMClient.getInstance().groupManager.setGroupInfo(new OnBase<String>() {
+            , String introduction, String ex) {
+
+        GroupInfo groupInfo=new GroupInfo();
+        groupInfo.setGroupID(groupID);
+        groupInfo.setGroupName(groupName);
+        groupInfo.setFaceURL(faceURL);
+        groupInfo.setNotification(notification);
+        groupInfo.setIntroduction(introduction);
+        groupInfo.setEx(ex);
+        OpenIMClient.getInstance().groupManager.setGroupInfo(groupInfo,new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
                 getIView().onError(error);
@@ -161,7 +169,7 @@ public class GroupVM extends SocialityVM {
                 getIView().onSuccess(data);
                 getGroupsInfo();
             }
-        }, groupID, groupName, faceURL, notification, introduction, ex);
+        });
     }
 
     /**
@@ -461,7 +469,7 @@ public class GroupVM extends SocialityVM {
 
     private void close(CommonDialog commonDialog) {
         IConversationBridge iConversationBridge =
-            (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();
+                (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();
         iConversationBridge.deleteConversationFromLocalAndSvr(groupId);
         iConversationBridge.closeChatPage();
         commonDialog.dismiss();
@@ -527,29 +535,29 @@ public class GroupVM extends SocialityVM {
 
     public void changeGroupMemberMute(IMBack<String> imBack, String uid, long seconds) {
         OpenIMClient.getInstance().groupManager.changeGroupMemberMute(imBack, groupId, uid,
-            seconds);
+                seconds);
     }
 
-   public void setMemberMute(IMBack<String> imBack,String uid, long seconds) {
+    public void setMemberMute(IMBack<String> imBack, String uid, long seconds) {
         int status = muteStatus.getValue();
-        if (status == -1||(status == 0 && seconds == 0)) {
+        if (status == -1 || (status == 0 && seconds == 0)) {
             getIView().toast(BaseApp.inst().getString(R.string.mute_tips));
             return;
         }
-        if (status==1){
-            seconds=60*10;
+        if (status == 1) {
+            seconds = 60 * 10;
         }
-        if (status==2){
-            seconds=60*60;
+        if (status == 2) {
+            seconds = 60 * 60;
         }
-        if (status==3){
-            seconds=60*60*12;
+        if (status == 3) {
+            seconds = 60 * 60 * 12;
         }
-        if (status==4){
-            seconds=60*60*24;
+        if (status == 4) {
+            seconds = 60 * 60 * 24;
         }
-        if (status==5){
-            seconds=0;
+        if (status == 5) {
+            seconds = 0;
         }
         changeGroupMemberMute(imBack, uid, seconds);
     }

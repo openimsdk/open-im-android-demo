@@ -338,6 +338,11 @@ public class IMEvent {
             }
 
             @Override
+            public void onGroupDismissed(GroupInfo info) {
+
+            }
+
+            @Override
             public void onGroupInfoChanged(GroupInfo info) {
                 // 组资料变更
                 for (OnGroupListener onGroupListener : groupListeners) {
@@ -556,6 +561,16 @@ public class IMEvent {
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
                     onAdvanceMsgListener.onRecvMessageExtensionsAdded(msgID, list);
                 }
+            }
+
+            @Override
+            public void onMsgDeleted(Message message) {
+
+            }
+
+            @Override
+            public void onRecvOfflineNewMessages(List<Message> list) {
+
             }
 
             @Override
