@@ -22,6 +22,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.CustomSignalingInfo;
 import io.openim.android.sdk.models.MeetingStreamEvent;
@@ -140,8 +141,7 @@ public class CallingServiceImp implements CallingService {
     public Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener,
                                   boolean isCallOut) {
         if (callDialog != null) return callDialog;
-        if (signalingInfo.getInvitation().getSessionType()== Constant.SessionType.GROUP_CHAT
-            ||signalingInfo.getInvitation().getSessionType() == Constant.SessionType.SUPER_GROUP)
+        if (signalingInfo.getInvitation().getSessionType()!= ConversationType.SINGLE_CHAT)
             callDialog = new GroupCallDialog(context, this, isCallOut);
         else
             callDialog = new CallDialog(context, this, isCallOut);

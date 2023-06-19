@@ -59,6 +59,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.ConversationType;
 
 @Route(path = Routes.Conversation.CONTACT_LIST)
 public class ContactListFragment extends BaseFragment<ContactListVM> implements ContactListVM.ViewAction, Observer {
@@ -155,8 +156,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                 vm.pinConversation(conversationInfo.conversationInfo,
                     !conversationInfo.conversationInfo.isPinned());
             } else if (menuPosition == 1 && conversationInfo.conversationInfo.getUnreadCount() > 0) {
-                chatVM.markReadedByConID(conversationInfo.conversationInfo.getConversationID(),
-                    null, null);
+                chatVM.markReadedByConID(conversationInfo.conversationInfo.getConversationID(),null);
             } else {
                 vm.conversations.getValue().remove(conversationInfo);
                 adapter.notifyItemRemoved(adapterPosition);
@@ -170,7 +170,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             mLastClickTime = nowTime;
 
             MsgConversation msgConversation = vm.conversations.getValue().get(position);
-            if (msgConversation.conversationInfo.getConversationType() == Constant.SessionType.NOTIFICATION) {
+            if (msgConversation.conversationInfo.getConversationType() == ConversationType.NOTIFICATION) {
                 //系统通知
                 Intent intent =
                     new Intent(getContext(), NotificationActivity.class).putExtra(Constant.K_NAME

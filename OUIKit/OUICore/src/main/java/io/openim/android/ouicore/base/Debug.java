@@ -35,7 +35,7 @@ public class Debug extends BaseApp {
                     token).build());
             }));
 
-        IM.initSdk();
+        IM.initSdk(this);
         OpenIMClient.getInstance().login(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {

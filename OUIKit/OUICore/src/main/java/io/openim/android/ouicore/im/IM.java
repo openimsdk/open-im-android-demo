@@ -1,6 +1,7 @@
 package io.openim.android.ouicore.im;
 
 
+import android.app.Application;
 import android.content.Intent;
 
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -17,14 +18,14 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnConnListener;
 
 public class IM {
-    public static void initSdk() {
+    public static void initSdk(Application app) {
         L.e("App", "---IM--initSdk");
         ///IM 初始化
-        OpenIMClient.getInstance().initSDK(2,
+        OpenIMClient.getInstance().initSDK(app,2,
             Constant.getImApiUrl(),
-            Constant.getImWsUrl(), getStorageDir(), 1,
+            Constant.getImWsUrl(), getStorageDir(), 6,
+            true,
             Constant.getStorageType(),
-            null, false, false,
             false,IMEvent.getInstance().connListener);
 
         IMEvent.getInstance().init();

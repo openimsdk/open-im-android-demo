@@ -122,7 +122,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             commonDialog.getMainView().cancel.setOnClickListener(view1 -> commonDialog.dismiss());
             commonDialog.getMainView().confirm.setOnClickListener(view1 -> {
                 commonDialog.dismiss();
-                vm.clearCHistory(vm.userID);
+                vm.clearCHistory(vm.conversationID);
             });
         });
     }

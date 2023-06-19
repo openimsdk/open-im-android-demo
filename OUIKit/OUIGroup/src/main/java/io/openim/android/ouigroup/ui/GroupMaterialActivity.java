@@ -17,12 +17,14 @@ import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
@@ -39,9 +41,11 @@ import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.GroupVerification;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
+import io.openim.android.sdk.listener.OnPutFileListener;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
+import open_im_sdk_callback.PutFileCallback;
 
 @Route(path = Routes.Group.MATERIAL)
 public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMaterialBinding> {
@@ -51,11 +55,13 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     private ActivityResultLauncher infoModifyLauncher;
     private int infoModifyType;
     private IConversationBridge iConversationBridge;
+    private  String conversationId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         bindVM(GroupVM.class, true);
         vm.groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
+        conversationId = getIntent().getStringExtra(Constant.K_ID);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityGroupMaterialBinding.inflate(getLayoutInflater()));
         view.setGroupVM(vm);
@@ -181,7 +187,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             commonDialog.getMainView().cancel.setOnClickListener(view1 -> commonDialog.dismiss());
             commonDialog.getMainView().confirm.setOnClickListener(view1 -> {
                 commonDialog.dismiss();
-                iConversationBridge.clearCHistory(vm.groupId);
+                iConversationBridge.clearCHistory(conversationId);
             });
         });
     }
@@ -216,9 +222,13 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
                 @Override
                 public void onSuccess(String s) {
-                    vm.UPDATEGroup(vm.groupId, null, s, null, null, null);
+                  try {
+                      Map<String,String> fromJson=GsonHel.fromJson(s, Map.class);
+                      vm.UPDATEGroup(vm.groupId, null, fromJson.get("url"),
+                          null, null, null);
+                  }catch (Exception ignored){}
                 }
-            }, path[0]);
+            }, null, path[0]);
         });
 
         view.recyclerview.setLayoutManager(new GridLayoutManager(this, spanCount));
@@ -302,7 +312,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     private void gotoMemberList(boolean transferPermissions) {
 //        if (vm.groupMembers.getValue().isEmpty()) return;
 //        if (vm.groupMembers.getValue().size() > Constant.SUPER_GROUP_LIMIT)
-            startActivity(new Intent(GroupMaterialActivity.this, SuperGroupMemberActivity.class).putExtra(Constant.K_FROM, transferPermissions));
+            startActivity(new Intent(GroupMaterialActivity.this, SuperGroupMemberActivity.class)
+                .putExtra(Constant.K_FROM, transferPermissions));
 //        else
 //            startActivity(new Intent(GroupMaterialActivity.this, GroupMemberActivity.class).putExtra(Constant.K_FROM, transferPermissions));
     }

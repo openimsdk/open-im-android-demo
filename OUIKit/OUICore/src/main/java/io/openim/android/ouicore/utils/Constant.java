@@ -83,17 +83,6 @@ public class Constant {
         public static final int INSERT_MSG = 10008;
     }
 
-    //会话类型
-    public static class SessionType {
-        public static final int SINGLE_CHAT = 1;
-
-        public static final int GROUP_CHAT = 2;
-        /// 大群
-        public static final int SUPER_GROUP = 3;
-        /// 通知
-        public static final int NOTIFICATION = 4;
-    }
-
     public static final String K_ID = "Id";
     public static final String K_GROUP_ID = "group_id";
     public static final String K_IS_PERSON = "is_person";

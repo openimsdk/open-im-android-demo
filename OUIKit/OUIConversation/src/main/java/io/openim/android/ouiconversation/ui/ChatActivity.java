@@ -369,7 +369,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 if (vm.isSingleChat) {
                     chatSettingActivityLauncher.launch(new Intent(ChatActivity.this, ChatSettingActivity.class));
                 } else {
-                    ARouter.getInstance().build(Routes.Group.MATERIAL).withString(Constant.K_GROUP_ID, vm.groupID).navigation();
+                    ARouter.getInstance().build(Routes.Group.MATERIAL)
+                        .withString(Constant.K_ID,vm.conversationID)
+                        .withString(Constant.K_GROUP_ID, vm.groupID).navigation();
                 }
             }
         });

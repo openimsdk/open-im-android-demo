@@ -22,7 +22,7 @@ public class DebugActivity extends FragmentActivity implements OnBase<String> {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        IM.initSdk();
+        IM.initSdk(getApplication());
 
         LoginCertificate loginCertificate = new LoginCertificate();
         loginCertificate.userID = "a@qq.com";

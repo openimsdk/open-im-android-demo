@@ -43,7 +43,9 @@ import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.SignalingInfo;
@@ -160,7 +162,7 @@ public class GroupCallDialog extends CallDialog {
     public void bindData(SignalingInfo signalingInfo) {
         super.signalingInfo = signalingInfo;
         callingVM.isGroup =
-            signalingInfo.getInvitation().getSessionType() == Constant.SessionType.GROUP_CHAT || signalingInfo.getInvitation().getSessionType() == Constant.SessionType.SUPER_GROUP;
+            signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT;
         callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
 
         if (callingVM.isCallOut) {

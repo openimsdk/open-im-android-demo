@@ -149,6 +149,11 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
     }
 
     @Override
+    public void onGroupDismissed(GroupInfo info) {
+
+    }
+
+    @Override
     public void onGroupInfoChanged(GroupInfo info) {
 
     }
