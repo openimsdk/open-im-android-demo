@@ -106,14 +106,16 @@ public class MessageViewHolder {
                                                            int viewType) {
         if (viewType == Constant.LOADING) return new LoadingView(parent);
         if (viewType == Constant.MsgType.TXT) return new TXTView(parent);
-        if (viewType == Constant.MsgType.PICTURE | viewType == Constant.MsgType.CUSTOM_EMOJI)
+        if (viewType == Constant.MsgType.PICTURE
+            || viewType == Constant.MsgType.CUSTOM_EMOJI)
             return new IMGView(parent);
         if (viewType == Constant.MsgType.VOICE) return new AudioView(parent);
         if (viewType == Constant.MsgType.VIDEO) return new VideoView(parent);
         if (viewType == Constant.MsgType.FILE) return new FileView(parent);
         if (viewType == Constant.MsgType.LOCATION) return new LocationView(parent);
         if (viewType == Constant.MsgType.OA_NOTICE) return new NotificationItemHo(parent);
-        if (viewType >= Constant.MsgType.NOTICE || viewType == Constant.MsgType.REVOKE
+        if (viewType >= Constant.MsgType.NOTICE
+            || viewType == Constant.MsgType.REVOKE
             || viewType == Constant.MsgType.ADVANCED_REVOKE)
             return new NoticeView(parent);
         if (viewType == Constant.MsgType.MERGE) return new MergeView(parent);
