@@ -321,7 +321,6 @@ public class MessageViewHolder {
                     }
                 }
             }
-
         }
 
         //阅后即焚显示与添加timer
@@ -340,7 +339,6 @@ public class MessageViewHolder {
                 readVanishNum.setVisibility(View.VISIBLE);
                 readVanishNum.setText(msgExpand.readVanishNum + "s");
             }
-
         }
 
         /***
