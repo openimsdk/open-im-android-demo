@@ -135,6 +135,8 @@ public class CallDialog extends BaseDialog {
             signalingInfo.getInvitation().getSessionType() == Constant.SessionType.GROUP_CHAT || signalingInfo.getInvitation().getSessionType() == Constant.SessionType.SUPER_GROUP;
         callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
         if (!callingVM.isVideoCalls) {
+            callingVM.callViewModel.setCameraEnabled(false);
+            view.localSpeakerVideoView.setVisibility(View.GONE);
             view.timeTv.setVisibility(View.GONE);
             view.headTips.setVisibility(View.GONE);
             view.audioCall.setVisibility(View.VISIBLE);
