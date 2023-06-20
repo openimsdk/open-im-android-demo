@@ -31,6 +31,7 @@ import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.Message;
 
@@ -64,18 +65,18 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, Acti
                 holder.viewBinding.getRoot().setOnClickListener(v -> {
                     String url;
                     switch (data.getContentType()) {
-                        case Constant.MsgType.MERGE:
+                        case MessageType.MERGER:
                             startActivity(new Intent(ChatHistoryDetailsActivity.this,
                                 ChatHistoryDetailsActivity.class).putExtra(Constant.K_RESULT,
                                 GsonHel.toJson(data.getMergeElem().getMultiMessage())));
                             break;
-                        case Constant.MsgType.PICTURE:
+                        case MessageType.PICTURE:
                             url = data.getPictureElem().getSourcePicture().getUrl();
                             startActivity(
                                 new Intent(v.getContext(),
                                     PreviewActivity.class).putExtra(PreviewActivity.MEDIA_URL, url));
                             break;
-                        case Constant.MsgType.VIDEO:
+                        case MessageType.VIDEO:
                             String snapshotUrl = data.getVideoElem().getSnapshotUrl();
                             url = data.getVideoElem().getVideoUrl();
                             v.getContext().startActivity(
@@ -83,15 +84,15 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, Acti
                                     .putExtra(PreviewActivity.MEDIA_URL, url)
                                     .putExtra(PreviewActivity.FIRST_FRAME, snapshotUrl));
                             break;
-                        case Constant.MsgType.CARD:
+                        case MessageType.CARD:
                             ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
                                 .withString(Constant.K_ID, data.getCardElem().getUserID())
                                 .navigation();
                             break;
-                        case Constant.MsgType.LOCATION:
+                        case MessageType.LOCATION:
                             Common.toMap(data, v);
                             break;
-                        case Constant.MsgType.FILE:
+                        case MessageType.FILE:
                             GetFilePathFromUri.openFile(v.getContext(), data);
                             break;
                     }

@@ -29,6 +29,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.Platform;
 import io.openim.android.sdk.listener.OnBase;
 
 public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
@@ -213,11 +214,15 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     }
 
     public void register() {
-        Parameter parameter = getParameter(verificationCode, 1);
+        Parameter parameter = new Parameter();
+        parameter.add("verifyCode",verificationCode);
+        parameter.add("platform", Platform.ANDROID);
+        parameter.add("autoLogin", true);
 
         Map<String,String> user=new HashMap<>();
         user.put("password",md5(pwd.getValue()));
         user.put("nickname",nickName.getValue());
+        user.put("areaCode", "+86");
         user.put("phoneNumber", account.getValue());
         parameter.add("user",user);
 
@@ -231,7 +236,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
 
             @Override
             public void onSuccess(LoginCertificate o) {
-                setSelfInfo();
+//                setSelfInfo();
                 o.cache(getContext());
                 getIView().jump();
             }

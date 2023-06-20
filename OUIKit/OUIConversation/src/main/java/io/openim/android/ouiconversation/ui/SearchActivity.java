@@ -45,6 +45,7 @@ import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.Message;
@@ -102,13 +103,13 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                 return;
             }
             if (selectTabIndex == FILE_ITEM) {
-                vm.searchLocalMessages(s, Constant.MsgType.FILE);
+                vm.searchLocalMessages(s, MessageType.FILE);
                 return;
             }
             vm.searchFriendV2();
             vm.searchGroupV2();
             vm.searchLocalMessages(s);
-            vm.searchLocalMessages(s, Constant.MsgType.FILE);
+            vm.searchLocalMessages(s, MessageType.FILE);
         });
 
         view.searchView.getEditText().addTextChangedListener(new TextWatcher() {
@@ -153,7 +154,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                     if (selectTabIndex == CHAT_ITEM)
                         vm.searchLocalMessages(vm.searchContent.getValue());
                     if (selectTabIndex == FILE_ITEM)
-                        vm.searchLocalMessages(vm.searchContent.getValue(), Constant.MsgType.FILE);
+                        vm.searchLocalMessages(vm.searchContent.getValue(), MessageType.FILE);
                 }, 200);
 
             }

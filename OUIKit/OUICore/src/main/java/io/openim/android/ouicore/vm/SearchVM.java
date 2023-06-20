@@ -17,6 +17,7 @@ import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.FriendshipInfo;
@@ -206,14 +207,15 @@ public class SearchVM extends BaseViewModel {
         List<Integer> messageTypeLists;
         if (0 == messageTypes.length) {
             messageTypeLists = new ArrayList<>();
-            messageTypeLists.add(Constant.MsgType.TXT);
-            messageTypeLists.add(Constant.MsgType.MENTION);
+            messageTypeLists.add(MessageType.TEXT);
+            messageTypeLists.add(MessageType.AT_TEXT);
         } else {
             messageTypeLists = Arrays.asList(messageTypes);
         }
         MutableLiveData<List<SearchResultItem>> items;
         List<Integer> type;
-        if ((type = Arrays.asList(messageTypes)).size() == 1 && type.get(0) == Constant.MsgType.FILE) {
+        if ((type = Arrays.asList(messageTypes)).size() == 1
+            && type.get(0) == MessageType.FILE) {
             items = fileItems;
         } else {
             items = messageItems;
@@ -251,7 +253,6 @@ public class SearchVM extends BaseViewModel {
         userInfo.getValue().clear();
         friendInfo.getValue().clear();
     }
-
 
     public void addTextChangedListener(EditText editText) {
         editText.addTextChangedListener(new TextWatcher() {

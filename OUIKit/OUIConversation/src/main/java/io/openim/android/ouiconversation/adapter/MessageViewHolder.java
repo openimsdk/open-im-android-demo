@@ -91,6 +91,7 @@ import io.openim.android.ouicore.voice.player.SMediaPlayer;
 import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.CardElem;
 import io.openim.android.sdk.models.MergeElem;
 import io.openim.android.sdk.models.Message;
@@ -99,25 +100,36 @@ import io.openim.android.sdk.models.QuoteElem;
 public class MessageViewHolder {
     public static RecyclerView.ViewHolder createViewHolder(@NonNull ViewGroup parent,
                                                            int viewType) {
-        if (viewType == Constant.LOADING) return new LoadingView(parent);
-        if (viewType == Constant.MsgType.TXT) return new TXTView(parent);
-        if (viewType == Constant.MsgType.PICTURE
-            || viewType == Constant.MsgType.CUSTOM_EMOJI)
+        if (viewType == Constant.LOADING)
+            return new LoadingView(parent);
+        if (viewType == MessageType.TEXT)
+            return new TXTView(parent);
+        if (viewType == MessageType.PICTURE
+            || viewType == MessageType.CUSTOM_FACE)
             return new IMGView(parent);
-        if (viewType == Constant.MsgType.VOICE) return new AudioView(parent);
-        if (viewType == Constant.MsgType.VIDEO) return new VideoView(parent);
-        if (viewType == Constant.MsgType.FILE) return new FileView(parent);
-        if (viewType == Constant.MsgType.LOCATION) return new LocationView(parent);
-        if (viewType == Constant.MsgType.OA_NOTICE) return new NotificationItemHo(parent);
-        if (viewType >= Constant.MsgType.NOTICE
-            || viewType == Constant.MsgType.REVOKE
-            || viewType == Constant.MsgType.ADVANCED_REVOKE)
+        if (viewType == MessageType.VOICE)
+            return new AudioView(parent);
+        if (viewType == MessageType.VIDEO)
+            return new VideoView(parent);
+        if (viewType == MessageType.FILE)
+            return new FileView(parent);
+        if (viewType == MessageType.LOCATION)
+            return new LocationView(parent);
+        if (viewType == MessageType.OA_NTF)
+            return new NotificationItemHo(parent);
+        if (viewType >= MessageType.NTF_BEGIN
+            || viewType == MessageType.REVOKE)
             return new NoticeView(parent);
-        if (viewType == Constant.MsgType.MERGE) return new MergeView(parent);
-        if (viewType == Constant.MsgType.CARD) return new BusinessCardView(parent);
-        if (viewType == Constant.MsgType.QUOTE) return new QuoteTXTView(parent);
-        if (viewType == Constant.MsgType.LOCAL_CALL_HISTORY) return new CallHistoryView(parent);
-        if (viewType == Constant.MsgType.CUSTOMIZE_MEETING) return new MeetingInviteView(parent);
+        if (viewType == MessageType.MERGER)
+            return new MergeView(parent);
+        if (viewType == MessageType.CARD)
+            return new BusinessCardView(parent);
+        if (viewType == MessageType.QUOTE)
+            return new QuoteTXTView(parent);
+        if (viewType == Constant.MsgType.LOCAL_CALL_HISTORY)
+            return new CallHistoryView(parent);
+        if (viewType == Constant.MsgType.CUSTOMIZE_MEETING)
+            return new MeetingInviteView(parent);
 
         return new TXTView(parent);
     }
@@ -266,7 +278,7 @@ public class MessageViewHolder {
 
             if (null != chatVM.enableMultipleSelect.getValue()
                 && chatVM.enableMultipleSelect.getValue()
-                && message.getContentType() != Constant.MsgType.NOTICE) {
+                && message.getContentType() != MessageType.NTF_BEGIN) {
                 checkBox.setVisibility(View.VISIBLE);
                 checkBox.setChecked(msgExpand.isChoice);
                 checkBox.setOnClickListener((buttonView) -> {
@@ -288,10 +300,9 @@ public class MessageViewHolder {
             int viewType = message.getContentType();
             unRead.setVisibility(View.GONE);
             if (isOwn && message.getStatus() == Constant.Send_State.SEND_SUCCESS
-                && viewType < Constant.MsgType.NOTICE
-                && viewType != Constant.MsgType.REVOKE
-                && viewType != Constant.MsgType.LOCAL_CALL_HISTORY
-                && viewType != Constant.MsgType.ADVANCED_REVOKE) {
+                && viewType < MessageType.NTF_BEGIN
+                && viewType != MessageType.REVOKE
+                && viewType != Constant.MsgType.LOCAL_CALL_HISTORY) {
                 unRead.setVisibility(View.VISIBLE);
                 if (chatVM.isSingleChat) {
                     String unread =
@@ -385,7 +396,7 @@ public class MessageViewHolder {
                                         chatVM.deleteMessageFromLocalStorage(message);
                                     }
                                     if (iconRes == R.mipmap.ic_forward) {
-                                       Message forwardMessage  =
+                                        Message forwardMessage =
                                             OpenIMClient.getInstance().messageManager.createForwardMessage(message);
                                         chatVM.forwardMsg = forwardMessage;
 
@@ -402,14 +413,14 @@ public class MessageViewHolder {
                         };
                     view1.recyclerview.setAdapter(adapter);
                 }
-                if (message.getContentType() == Constant.MsgType.TXT) {
+                if (message.getContentType() == MessageType.TEXT) {
                     menuIcons.add(R.mipmap.ic_c_copy);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.copy));
                 }
                 menuIcons.add(R.mipmap.ic_delete);
                 menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.delete));
 
-                if (message.getContentType() == Constant.MsgType.PICTURE) {
+                if (message.getContentType() == MessageType.PICTURE) {
                     menuIcons.add(R.mipmap.ic_add_emoji);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.add));
                 }
@@ -429,7 +440,9 @@ public class MessageViewHolder {
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.forward));
                 }
 
-                if (message.getContentType() != Constant.MsgType.VOICE && message.getContentType() != Constant.MsgType.MERGE && message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING) {
+                if (message.getContentType() != MessageType.VOICE
+                    && message.getContentType() != MessageType.MERGER
+                    && message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING) {
                     menuIcons.add(R.mipmap.ic_reply);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.reply));
                 }
@@ -504,7 +517,7 @@ public class MessageViewHolder {
          */
         public void toPreview(View view, String url, String firstFrameUrl) {
             view.setOnClickListener(v -> {
-                if (message.getContentType() == Constant.MsgType.CUSTOM_EMOJI) {
+                if (message.getContentType() == MessageType.CUSTOM_FACE) {
 
                 } else {
                     view.getContext().startActivity(new Intent(view.getContext(),
@@ -537,11 +550,12 @@ public class MessageViewHolder {
         public void bindData(Message message, int position) {
             TextView textView = itemView.findViewById(R.id.notice);
             textView.setVisibility(View.VISIBLE);
-            if (message.getContentType() >= Constant.MsgType.NOTICE) {
-                String tips = message.getNotificationElem().getDefaultTips();
-                textView.setText(tips);
-            } else
-                textView.setText(String.format(textView.getContext().getString(io.openim.android.ouicore.R.string.revoke_tips), message.getSenderNickname()));
+            if (message.getContentType() >= MessageType.NTF_BEGIN)
+                textView.setText(IMUtil.tipsHandle(message.getContentType()));
+            else
+                textView.setText(String.format(textView.getContext()
+                    .getString(io.openim.android.ouicore.R.string.revoke_tips),
+                    message.getSenderNickname()));
         }
 
         @Override
@@ -601,7 +615,8 @@ public class MessageViewHolder {
         @RequiresApi(api = Build.VERSION_CODES.P)
         @Override
         protected void bindRight(View itemView, Message message) {
-            LayoutMsgMeetingInviteRightBinding v = LayoutMsgMeetingInviteRightBinding.bind(itemView);
+            LayoutMsgMeetingInviteRightBinding v =
+                LayoutMsgMeetingInviteRightBinding.bind(itemView);
             v.sendState2.setSendState(message.getStatus());
             MsgExpand msgExpand = (MsgExpand) message.getExt();
             v.meetingName2.setText(msgExpand.meetingInfo.subject);
@@ -667,7 +682,7 @@ public class MessageViewHolder {
         @Override
         protected void bindLeft(View itemView, Message message) {
             LayoutMsgTxtLeftBinding v = LayoutMsgTxtLeftBinding.bind(itemView);
-            String content=message.getTextElem().getContent();
+            String content = message.getTextElem().getContent();
             v.content.setText(content);
             if (!handleSequence(v.content, message)) v.content.setText(content);
         }
@@ -677,7 +692,7 @@ public class MessageViewHolder {
             LayoutMsgTxtRightBinding v = LayoutMsgTxtRightBinding.bind(itemView);
             v.avatar2.load(message.getSenderFaceUrl(), message.getSenderNickname());
             v.sendState2.setSendState(message.getStatus());
-            String content=message.getTextElem().getContent();
+            String content = message.getTextElem().getContent();
             if (!handleSequence(v.content2, message)) v.content2.setText(content);
         }
 
@@ -711,7 +726,7 @@ public class MessageViewHolder {
 
         private String loadIMG(ImageView img, Message message) {
             String url;
-            if (message.getContentType() == Constant.MsgType.CUSTOM_EMOJI) {
+            if (message.getContentType() == MessageType.CUSTOM_FACE) {
                 MsgExpand msgExpand = (MsgExpand) message.getExt();
                 url = msgExpand.customEmoji.url;
                 Glide.with(img.getContext()).load(url).placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo).centerInside().into(img);
@@ -809,7 +824,7 @@ public class MessageViewHolder {
             SPlayer.instance().getMediaPlayer();
             if (SPlayer.instance().isPlaying()) {
                 SPlayer.instance().stop();
-            }else {
+            } else {
                 SPlayer.instance().playByUrl(sourceUrl, new PlayerListener() {
                     @Override
                     public void LoadSuccess(SMediaPlayer mediaPlayer) {
@@ -1092,7 +1107,7 @@ public class MessageViewHolder {
             LayoutMsgCardLeftBinding view = LayoutMsgCardLeftBinding.bind(itemView);
             view.sendState.setSendState(message.getStatus());
 
-            CardElem cardElem=message.getCardElem();
+            CardElem cardElem = message.getCardElem();
             view.cardNickName.setText(cardElem.getNickname());
             view.otherAvatar.load(cardElem.getFaceURL(), cardElem.getNickname());
             jump(view.content, cardElem.getUserID());
@@ -1108,7 +1123,7 @@ public class MessageViewHolder {
             view.sendState2.setSendState(message.getStatus());
             view.avatar2.load(message.getSenderFaceUrl(), message.getSenderNickname());
 
-            CardElem cardElem=message.getCardElem();
+            CardElem cardElem = message.getCardElem();
             view.cardNickName2.setText(cardElem.getNickname());
             view.otherAvatar2.load(cardElem.getFaceURL(), cardElem.getNickname());
             jump(view.content2, cardElem.getUserID());
@@ -1240,24 +1255,24 @@ public class MessageViewHolder {
 
             message = quoteElem.getQuoteMessage();
             int contentType = message.getContentType();
-            if (contentType == Constant.MsgType.TXT) {
+            if (contentType == MessageType.TEXT) {
                 v.quoteContent1.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
                 v.picture1.setVisibility(View.GONE);
             } else {
                 v.picture1.setVisibility(View.VISIBLE);
-                if (contentType == Constant.MsgType.PICTURE) {
+                if (contentType == MessageType.PICTURE) {
                     v.quoteContent1.setText(message.getSenderNickname() + ":");
                     Common.loadPicture(v.picture1, message.getPictureElem());
                     toPreview(v.quoteLy1, message.getPictureElem().getSourcePicture().getUrl(),
                         null);
                 }
-                if (contentType == Constant.MsgType.VIDEO) {
+                if (contentType == MessageType.VIDEO) {
                     v.quoteContent1.setText(message.getSenderNickname() + ":");
                     Common.loadVideoSnapshot(v.picture1, message.getVideoElem());
                     toPreview(v.quoteLy1, message.getVideoElem().getVideoUrl(),
                         message.getVideoElem().getSnapshotUrl());
                 }
-                if (contentType == Constant.MsgType.LOCATION) {
+                if (contentType == MessageType.LOCATION) {
                     try {
                         MsgExpand msgExpand = (MsgExpand) message.getExt();
                         v.quoteContent1.setText(message.getSenderNickname() + ":" + msgExpand.locationInfo.name + "(" + msgExpand.locationInfo.addr + ")");
@@ -1282,24 +1297,24 @@ public class MessageViewHolder {
 
             message = quoteElem.getQuoteMessage();
             int contentType = message.getContentType();
-            if (contentType == Constant.MsgType.TXT) {
+            if (contentType == MessageType.TEXT) {
                 v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
                 v.picture2.setVisibility(View.GONE);
             } else {
                 v.picture2.setVisibility(View.VISIBLE);
-                if (contentType == Constant.MsgType.PICTURE) {
+                if (contentType == MessageType.PICTURE) {
                     v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
                     Common.loadPicture(v.picture2, message.getPictureElem());
                     toPreview(v.quoteLy2, message.getPictureElem().getSourcePicture().getUrl(),
                         null);
                 }
-                if (contentType == Constant.MsgType.VIDEO) {
+                if (contentType == MessageType.VIDEO) {
                     v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
                     Common.loadVideoSnapshot(v.picture2, message.getVideoElem());
                     toPreview(v.quoteLy2, message.getVideoElem().getVideoUrl(),
                         message.getVideoElem().getSnapshotUrl());
                 }
-                if (contentType == Constant.MsgType.LOCATION) {
+                if (contentType == MessageType.LOCATION) {
                     try {
                         MsgExpand msgExpand = (MsgExpand) message.getExt();
                         v.quoteContent2.setText(message.getSenderNickname() + ":" + msgExpand.locationInfo.name + "(" + msgExpand.locationInfo.addr + ")");

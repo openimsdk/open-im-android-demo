@@ -23,6 +23,7 @@ import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.Message;
 
 public class FileHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHistoryBinding> {
@@ -61,7 +62,7 @@ public class FileHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHisto
     }
 
     private void searchLocalMessages() {
-        vm.searchLocalMessages(null, page, Constant.MsgType.FILE);
+        vm.searchLocalMessages(null, page, MessageType.FILE);
     }
 
     private void initView() {

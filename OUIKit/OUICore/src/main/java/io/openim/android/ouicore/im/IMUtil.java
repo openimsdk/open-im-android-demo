@@ -69,11 +69,13 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotDisturbInfo;
+import io.openim.android.sdk.models.NotificationElem;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.SignalingInvitationInfo;
@@ -119,7 +121,8 @@ public class IMUtil {
             if (null == msgExpand) msgExpand = new MsgExpand();
             //重置
             msgExpand.isShowTime = false;
-            if (message.getContentType() >= Constant.MsgType.NOTICE || message.getContentType() == Constant.MsgType.REVOKE || message.getContentType() == Constant.MsgType.ADVANCED_REVOKE)
+            if (message.getContentType() >= MessageType.NTF_BEGIN
+                || message.getContentType() == MessageType.REVOKE)
                 continue;
 
             if (lastShowTimeStamp == 0 || (message.getSendTime() - lastShowTimeStamp > (1000 * 60 * 10))) {
@@ -160,7 +163,7 @@ public class IMUtil {
         if (null == msgExpand) msgExpand = new MsgExpand();
         msg.setExt(msgExpand);
         try {
-            if (msg.getContentType() == Constant.MsgType.CUSTOMIZE) {
+            if (msg.getContentType() == MessageType.CUSTOM) {
                 Map map = JSONArray.parseObject(msg.getCustomElem().getData(), Map.class);
                 if (map.containsKey("customType")) {
                     int customType = (int) map.get("customType");
@@ -191,21 +194,21 @@ public class IMUtil {
                         BaseApp.inst().getString(io.openim.android.ouicore.R.string.call_time) + (second < 60 ? ("00:" + secondFormat) : secondFormat);
                 }
             }
-            if (msg.getContentType() == Constant.MsgType.QUOTE) {
+            if (msg.getContentType() == MessageType.QUOTE) {
                 buildExpandInfo(msg.getQuoteElem().getQuoteMessage());
             }
-            if (msg.getContentType() == Constant.MsgType.CUSTOM_EMOJI) {
+            if (msg.getContentType() == MessageType.CUSTOM_FACE) {
                 msgExpand.customEmoji=GsonHel.fromJson(msg.getFaceElem().getData(), CustomEmojiEntity.class);
             }
-            if (msg.getContentType() == Constant.MsgType.OA_NOTICE) {
+            if (msg.getContentType() == MessageType.OA_NTF) {
                 msgExpand.isShowTime = true;
                 msgExpand.oaNotification = GsonHel.fromJson(msg.getNotificationElem().getDetail()
                     , OANotification.class);
             }
-            if (msg.getContentType() == Constant.MsgType.LOCATION)
+            if (msg.getContentType() == MessageType.LOCATION)
                 msgExpand.locationInfo = GsonHel.fromJson(msg.getLocationElem().getDescription(),
                     LocationInfo.class);
-            if (msg.getContentType() == Constant.MsgType.MENTION) {
+            if (msg.getContentType() == MessageType.AT_TEXT) {
                 msgExpand.atMsgInfo = GsonHel.fromJson(msg.getAtTextElem().getText(), AtMsgInfo.class);
                 handleAt(msgExpand);
             }
@@ -223,12 +226,13 @@ public class IMUtil {
      */
     @SuppressLint("StringFormatInvalid")
     private static void handleGroupNotification(Message msg) {
-        String detail = msg.getNotificationElem().getDetail();
+        NotificationElem notificationElem =msg.getNotificationElem();
+        if (null==notificationElem)return;
+        String detail = notificationElem.getDetail();
         String tips = "";
         Context ctx = BaseApp.inst();
         switch (msg.getContentType()) {
-            case Constant.MsgType.ADVANCED_REVOKE:
-            case Constant.MsgType.REVOKE: {
+            case MessageType.REVOKE: {
                 //a 撤回了一条消息
                 tips =
                     String.format(ctx.getString(io.openim.android.ouicore.R.string.revoke_tips),
@@ -422,48 +426,48 @@ public class IMUtil {
                 default:
                     lastMsg = msg.getNotificationElem().getDefaultTips();
                     break;
-                case Constant.MsgType.TXT:
+                case MessageType.TEXT:
                     lastMsg = msg.getTextElem().getContent();
                     break;
-                case Constant.MsgType.PICTURE:
+                case MessageType.PICTURE:
                     lastMsg =
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.picture) + "]";
                     break;
-                case Constant.MsgType.VOICE:
+                case MessageType.VOICE:
                     lastMsg =
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.voice) + "]";
                     break;
-                case Constant.MsgType.VIDEO:
+                case MessageType.VIDEO:
                     lastMsg =
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.video) + "]";
                     break;
-                case Constant.MsgType.FILE:
+                case MessageType.FILE:
                     lastMsg =
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.file) + "]";
                     break;
-                case Constant.MsgType.LOCATION:
+                case MessageType.LOCATION:
                     lastMsg =
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.location) + "]";
                     break;
-                case Constant.MsgType.MENTION:
+                case MessageType.AT_TEXT:
                     String atTxt = msgExpand.atMsgInfo.text;
                     for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
                         atTxt = atTxt.replace("@" + atUsersInfo.atUserID, atSelf(atUsersInfo));
                     }
                     lastMsg = atTxt;
                     break;
-                case Constant.MsgType.MERGE:
+                case MessageType.MERGER:
                     lastMsg =
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";
                     break;
-                case Constant.MsgType.CARD:
+                case MessageType.CARD:
                     lastMsg =
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.card) + "]";
                     break;
-                case Constant.MsgType.OA_NOTICE:
+                case MessageType.OA_NTF:
                     lastMsg = ((MsgExpand) msg.getExt()).oaNotification.text;
                     break;
-                case Constant.MsgType.QUOTE:
+                case MessageType.QUOTE:
                     lastMsg = msg.getQuoteElem().getText();
                     break;
                 case Constant.MsgType.LOCAL_CALL_HISTORY:
@@ -471,6 +475,7 @@ public class IMUtil {
                     lastMsg = "[" + (isAudio ? BaseApp.inst().getString(R.string.voice_calls) :
                         BaseApp.inst().getString(R.string.video_calls)) + "]";
                     break;
+                    //TODO
                 case Constant.MsgType.CUSTOMIZE_MEETING:
                     lastMsg = "[" + BaseApp.inst().getString(R.string.video_meeting) + "]";
                     break;
@@ -606,6 +611,14 @@ public class IMUtil {
             e.printStackTrace();
         }
         return path;
+    }
+
+    public static String tipsHandle(int msgType) {
+        switch (msgType){
+            case MessageType.FRIEND_APPLICATION_APPROVED_NTF:
+                return BaseApp.inst().getString(R.string.start_chat_tips);
+        }
+        return "";
     }
 
 

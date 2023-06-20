@@ -132,48 +132,48 @@ public class Constant {
     public static final int LOADING = 201;
 
     public static class MsgType {
-        //本地呼叫记录
+//        //本地呼叫记录
         public static final int LOCAL_CALL_HISTORY = -110;
-        //            * 101:文本消息<br/>
-        public static final int TXT = 101;
-        //            * 102:图片消息<br/>
-        public static final int PICTURE = 102;
-        //            * 103:语音消息<br/>
-        public static final int VOICE = 103;
-        //            * 104:视频消息<br/>
-        public static final int VIDEO = 104;
-        //            * 105:文件消息<br/>'
-        public static final int FILE = 105;
-        //            * 106:@消息<br/>
-        public static final int MENTION = 106;
-        //            * 107:合并消息<br/>
-        public static final int MERGE = 107;
-        //            * 108:名片消息<br/>
-        public static final int CARD = 108;
-        //            * 109:位置消息<br/>
-        public static final int LOCATION = 109;
-        //            * 110:自定义消息<br/>
-        public static final int CUSTOMIZE = 110;
+//        //            * 101:文本消息<br/>
+//        public static final int TXT = 101;
+//        //            * 102:图片消息<br/>
+//        public static final int PICTURE = 102;
+//        //            * 103:语音消息<br/>
+//        public static final int VOICE = 103;
+//        //            * 104:视频消息<br/>
+//        public static final int VIDEO = 104;
+//        //            * 105:文件消息<br/>'
+//        public static final int FILE = 105;
+//        //            * 106:@消息<br/>
+//        public static final int MENTION = 106;
+//        //            * 107:合并消息<br/>
+//        public static final int MERGE = 107;
+//        //            * 108:名片消息<br/>
+//        public static final int CARD = 108;
+//        //            * 109:位置消息<br/>
+//        public static final int LOCATION = 109;
+//        //            * 110:自定义消息<br/>
+//        public static final int CUSTOMIZE = 110;
         //会议邀请
         public static final int CUSTOMIZE_MEETING = 905;
-        //            * 111:撤回消息回执<br/>
-        public static final int REVOKE = 111;
-        //2.3.0版本的消息撤回类型，兼容单人撤回，群撤回，新增群主管理员撤回成员信息
-        public static final int ADVANCED_REVOKE = 118;
-        //            * 112:C2C已读回执<br/>
-        public static final int ALREADY_READ = 112;
-        //            * 113:正在输入状态
-        public static final int TYPING = 113;
-        /// 引用回复
-        public static final int QUOTE = 114;
-        //自定义表情
-        public static final int CUSTOM_EMOJI = 115;
-        //通知消息一般大于1200
-        public static final int NOTICE = 1200;
-        //后台发送过来的通知
-        public static final int OA_NOTICE = 1400;
-        //群公告
-        public static final int BULLETIN = 1502;
+//        //            * 111:撤回消息回执<br/>
+//        public static final int REVOKE = 111;
+//        //2.3.0版本的消息撤回类型，兼容单人撤回，群撤回，新增群主管理员撤回成员信息
+//        public static final int ADVANCED_REVOKE = 118;
+//        //            * 112:C2C已读回执<br/>
+//        public static final int ALREADY_READ = 112;
+//        //            * 113:正在输入状态
+//        public static final int TYPING = 113;
+//        /// 引用回复
+//        public static final int QUOTE = 114;
+//        //自定义表情
+//        public static final int CUSTOM_EMOJI = 115;
+//        //通知消息一般大于1200
+//        public static final int NOTICE = 1200;
+//        //后台发送过来的通知
+//        public static final int OA_NOTICE = 1400;
+//        //群公告
+//        public static final int BULLETIN = 1502;
     }
 
 

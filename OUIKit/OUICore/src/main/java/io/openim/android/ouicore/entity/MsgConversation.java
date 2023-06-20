@@ -3,6 +3,7 @@ package io.openim.android.ouicore.entity;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.Message;
 
@@ -17,7 +18,7 @@ public class MsgConversation {
         this.conversationInfo = conversationInfo;
 
         try {
-            if (lastMsg.getContentType() == Constant.MsgType.BULLETIN) {
+            if (lastMsg.getContentType() == MessageType.GROUP_INFO_SET_NTF) {
                 notificationMsg = GsonHel.fromJson(lastMsg.getNotificationElem().getDetail(),
                     NotificationMsg.class);
             }

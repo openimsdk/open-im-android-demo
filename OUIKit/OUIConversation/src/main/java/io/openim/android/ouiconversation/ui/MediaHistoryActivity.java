@@ -26,6 +26,7 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.Message;
 
 public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHistoryBinding> {
@@ -56,7 +57,8 @@ public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHist
     }
 
     private void searchLocalMessages() {
-        vm.searchLocalMessages(null, page, isPicture ? Constant.MsgType.PICTURE : Constant.MsgType.VIDEO);
+        vm.searchLocalMessages(null, page, isPicture ?
+            MessageType.PICTURE : MessageType.VIDEO);
     }
 
 

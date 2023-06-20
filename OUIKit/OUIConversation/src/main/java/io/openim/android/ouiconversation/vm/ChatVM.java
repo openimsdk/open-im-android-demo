@@ -50,6 +50,7 @@ import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 
 import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConversationListener;
@@ -743,7 +744,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         try {
             while (iterator.hasNext()) {
                 Message meg = iterator.next();
-                if (meg.isRead() || meg.getContentType() >= Constant.MsgType.NOTICE || meg.getContentType() == Constant.MsgType.VOICE || (null == meg.getSendID() || meg.getSendID().equals(BaseApp.inst().loginCertificate.userID)))
+                if (meg.isRead() || meg.getContentType() >=
+                    MessageType.NTF_BEGIN
+                    || meg.getContentType() == MessageType.VOICE
+                    || (null == meg.getSendID() || meg.getSendID().equals(BaseApp.inst().loginCertificate.userID)))
                     iterator.remove();
             }
         } catch (Exception ignored) {
@@ -769,7 +773,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     @Override
     public void onRecvNewMessage(Message msg) {
         if (!isCurrentChat(msg)) return;
-        boolean isTyp = msg.getContentType() == Constant.MsgType.TYPING;
+        boolean isTyp = msg.getContentType() == MessageType.TYPING;
         if (isSingleChat) {
             if (msg.getSendID().equals(userID)) {
                 typing.set(isTyp);
@@ -792,7 +796,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         markReaded();
 
         //标记本条消息已读 语音消息需要点播放才算读
-        if (!viewPause && msg.getContentType() != Constant.MsgType.VOICE) markReaded(msg);
+        if (!viewPause && msg.getContentType() != MessageType.VOICE) markReaded(msg);
 
         statusUPDATE(msg);
     }
@@ -800,7 +804,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     private void statusUPDATE(Message msg) {
         try {
             int contentType = msg.getContentType();
-            if (contentType == Constant.MsgType.BULLETIN) {
+            if (contentType == MessageType.GROUP_INFO_SET_NTF) {
                 NotificationMsg no = GsonHel.fromJson(msg.getNotificationElem().getDetail(),
                     NotificationMsg.class);
                 if (!TextUtils.isEmpty(no.group.notification)) notificationMsg.setValue(no);
@@ -857,7 +861,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 Message message = messageAdapter.getMessages().get(i);
                 if (TextUtils.isEmpty(message.getClientMsgID())) continue;
                 if (message.getClientMsgID().equals(msgId)) {
-                    message.setContentType(Constant.MsgType.REVOKE);
+                    message.setContentType(MessageType.REVOKE);
                     messageAdapter.notifyItemChanged(i);
                     return;
                 }
@@ -872,7 +876,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         try {
             for (Message message : messages.getValue()) {
                 if (message.getClientMsgID().equals(info.getClientMsgID())) {
-                    message.setContentType(Constant.MsgType.ADVANCED_REVOKE);
+                    message.setContentType(MessageType.REVOKE);
                     messageAdapter.notifyItemChanged(messages.getValue().indexOf(message));
                 }
             }
@@ -1000,7 +1004,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
             @Override
             public void onSuccess(String data) {
-                message.setContentType(Constant.MsgType.ADVANCED_REVOKE);
+                message.setContentType(MessageType.REVOKE);
                 if (hasPermission)
                     message.setSenderNickname(BaseApp.inst().loginCertificate.nickname);
                 messageAdapter.notifyItemChanged(messageAdapter.getMessages().indexOf(message));
@@ -1095,8 +1099,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         List<Integer> messageTypeLists;
         if (0 == messageTypes.length) {
             messageTypeLists = new ArrayList<>();
-            messageTypeLists.add(Constant.MsgType.TXT);
-            messageTypeLists.add(Constant.MsgType.MENTION);
+            messageTypeLists.add(MessageType.TEXT);
+            messageTypeLists.add(MessageType.AT_TEXT);
         } else messageTypeLists = Arrays.asList(messageTypes);
 
         String conversationId = conversationInfo.getValue().getConversationID();

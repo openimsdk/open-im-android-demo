@@ -96,6 +96,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
 
     private void initVM() {
+
         String userId = getIntent().getStringExtra(Constant.K_ID);
         String groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
         boolean fromChatHistory = getIntent().getBooleanExtra(Constant.K_FROM, false);
@@ -135,7 +136,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private void release() {
         if (isFinishing()) {
-            if (!vm.fromChatHistory) removeCacheVM();
+            if (!vm.fromChatHistory)
+                removeCacheVM();
 
             N.clearDispose(this);
             view.waterMark.onDestroy();
@@ -225,17 +227,17 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
 
         if (vm.isSingleChat) {
-            vm.getUserOnlineStatus(onlineStatus -> {
-                boolean isOnline = onlineStatus.status.equals("online");
-                view.leftBg.setVisibility(View.VISIBLE);
-                if (isOnline) {
-                    view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_max_10cc64);
-                    view.onlineStatus.setText(String.format(getString(io.openim.android.ouicore.R.string.online), vm.handlePlatformCode(onlineStatus.detailPlatformStatus)));
-                } else {
-                    view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_max_ff999999);
-                    view.onlineStatus.setText(io.openim.android.ouicore.R.string.offline);
-                }
-            });
+//            vm.getUserOnlineStatus(onlineStatus -> {
+//                boolean isOnline = onlineStatus.status.equals("online");
+//                view.leftBg.setVisibility(View.VISIBLE);
+//                if (isOnline) {
+//                    view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_max_10cc64);
+//                    view.onlineStatus.setText(String.format(getString(io.openim.android.ouicore.R.string.online), vm.handlePlatformCode(onlineStatus.detailPlatformStatus)));
+//                } else {
+//                    view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_max_ff999999);
+//                    view.onlineStatus.setText(io.openim.android.ouicore.R.string.offline);
+//                }
+//            });
         }
         view.waterMark.setText(BaseApp.inst().loginCertificate.nickname);
     }
