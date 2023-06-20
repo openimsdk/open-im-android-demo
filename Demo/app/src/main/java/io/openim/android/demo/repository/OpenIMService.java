@@ -28,7 +28,7 @@ public interface OpenIMService {
     @POST("account/login")
     Observable<ResponseBody> login(@Body RequestBody requestBody);
 
-    @POST("account/password")
+    @POST("account/register")
     Observable<ResponseBody> register(@Body RequestBody requestBody);
 
     @POST("user/get_users_full_info")
@@ -37,10 +37,10 @@ public interface OpenIMService {
     @POST("user/update_user_info")
     Observable<ResponseBody> updateUserInfo(@Body RequestBody requestBody);
 
-    @POST("code/send")
+    @POST("account/code/send")
     Observable<ResponseBody> getVerificationCode(@Body RequestBody requestBody);
 
-    @POST("account/verify")
+    @POST("account/code/verify")
     Observable<ResponseBody> checkVerificationCode(@Body RequestBody requestBody);
 
     @POST("account/reset_password")

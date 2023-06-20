@@ -90,15 +90,17 @@ public class DemoApplication extends BaseApp {
                 } catch (Exception ignored) {
                 }
                 return chain.proceed(chain.request().newBuilder().addHeader("token",
-                    token).build());
+                    token).addHeader("operationID",
+                    System.currentTimeMillis() + "").build());
             }));
     }
 
     private void initIM() {
         IM.initSdk(this);
         listenerIMOffline();
-        CallingService callingService = (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-        if (null != callingService){
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null != callingService) {
             callingService.initKeepAlive(getPackageName());
             IMEvent.getInstance().addSignalingListener(callingService);
         }

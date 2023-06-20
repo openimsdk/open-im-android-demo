@@ -87,11 +87,16 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     @NonNull
     private Parameter getParameter(String verificationCode, int usedFor) {
         Parameter parameter = new Parameter().add("password",
-            TextUtils.isEmpty(verificationCode) ? md5(pwd.getValue()) : null).add("platform", 2).add("usedFor", usedFor).add("operationID", System.currentTimeMillis() + "").add("verificationCode", verificationCode);
+            TextUtils.isEmpty(verificationCode) ? md5(pwd.getValue()) : null)
+            .add("platform", 2)
+            .add("usedFor", usedFor)
+            .add("operationID", System.currentTimeMillis() + "")
+            .add("verifyCode", verificationCode);
         if (isPhone.getValue()) {
             parameter.add("phoneNumber", account.getValue());
             parameter.add("areaCode", "+86");
-        } else parameter.add("email", account.getValue());
+        } else
+            parameter.add("email", account.getValue());
         return parameter;
     }
 
@@ -207,7 +212,8 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     }
 
     public void register() {
-        Parameter parameter = getParameter(verificationCode, 1).add("password",
+        Parameter parameter = getParameter(verificationCode, 1)
+            .add("password",
             md5(pwd.getValue())).add("nickname", nickName.getValue());
 
         WaitDialog waitDialog = showWait();
