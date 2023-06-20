@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -212,9 +213,13 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     }
 
     public void register() {
-        Parameter parameter = getParameter(verificationCode, 1)
-            .add("password",
-            md5(pwd.getValue())).add("nickname", nickName.getValue());
+        Parameter parameter = getParameter(verificationCode, 1);
+
+        Map<String,String> user=new HashMap<>();
+        user.put("password",md5(pwd.getValue()));
+        user.put("nickname",nickName.getValue());
+        user.put("phoneNumber", account.getValue());
+        parameter.add("user",user);
 
         WaitDialog waitDialog = showWait();
         N.API(OpenIMService.class).register(parameter.buildJsonBody()).map(OpenIMService.turn(LoginCertificate.class)).compose(N.IOMain()).subscribe(new NetObserver<LoginCertificate>(context.get()) {
