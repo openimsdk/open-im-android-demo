@@ -190,13 +190,14 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             }
             Intent intent = new Intent(getContext(), ChatActivity.class).putExtra(Constant.K_NAME
                 , msgConversation.conversationInfo.getShowName());
-            if (msgConversation.conversationInfo.getConversationType() == Constant.SessionType.SINGLE_CHAT)
+            if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT)
                 intent.putExtra(Constant.K_ID, msgConversation.conversationInfo.getUserID());
 
-            if (msgConversation.conversationInfo.getConversationType() == Constant.SessionType.GROUP_CHAT || msgConversation.conversationInfo.getConversationType() == Constant.SessionType.SUPER_GROUP)
+            if (msgConversation.conversationInfo.getConversationType() == ConversationType.GROUP_CHAT
+                || msgConversation.conversationInfo.getConversationType() == ConversationType.SUPER_GROUP_CHAT)
                 intent.putExtra(Constant.K_GROUP_ID, msgConversation.conversationInfo.getGroupID());
 
-            if (msgConversation.conversationInfo.getGroupAtType() == Constant.SessionType.NOTIFICATION)
+            if (msgConversation.conversationInfo.getGroupAtType() == ConversationType.NOTIFICATION)
                 intent.putExtra(Constant.K_NOTICE, msgConversation.notificationMsg);
             startActivity(intent);
 
@@ -325,7 +326,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         @Override
         public void onBindViewHolder(ViewHol.ContactItemHolder viewHolder, final int position) {
             MsgConversation msgConversation = conversationInfos.get(position);
-            boolean isGroup=msgConversation.conversationInfo.getConversationType() != Constant.SessionType.SINGLE_CHAT;
+            boolean isGroup=msgConversation.conversationInfo.getConversationType()
+                != ConversationType.SINGLE_CHAT;
             viewHolder.viewBinding.avatar.load(msgConversation.conversationInfo.getFaceURL(),
                 isGroup,
                 isGroup?null: msgConversation.conversationInfo.getShowName());

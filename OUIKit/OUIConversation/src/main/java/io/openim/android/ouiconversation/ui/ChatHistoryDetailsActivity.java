@@ -84,10 +84,8 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, Acti
                                     .putExtra(PreviewActivity.FIRST_FRAME, snapshotUrl));
                             break;
                         case Constant.MsgType.CARD:
-                            String friendInfo = data.getContent();
-                            FriendInfo friendInfoBean = GsonHel.fromJson(friendInfo, FriendInfo.class);
                             ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                                .withString(Constant.K_ID, friendInfoBean.getUserID())
+                                .withString(Constant.K_ID, data.getCardElem().getUserID())
                                 .navigation();
                             break;
                         case Constant.MsgType.LOCATION:

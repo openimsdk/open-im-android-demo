@@ -3,7 +3,6 @@ package io.openim.android.ouiconversation.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -41,7 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.openim.android.ouiconversation.IBridgeImpl;
 import io.openim.android.ouiconversation.R;
 
 import io.openim.android.ouiconversation.databinding.LayoutLoadingSmallBinding;
@@ -85,7 +83,6 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.voice.SPlayer;
@@ -93,13 +90,11 @@ import io.openim.android.ouicore.voice.listener.PlayerListener;
 import io.openim.android.ouicore.voice.player.SMediaPlayer;
 import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.models.FriendInfo;
+import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.models.CardElem;
 import io.openim.android.sdk.models.MergeElem;
 import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.PictureElem;
-import io.openim.android.sdk.models.PictureInfo;
 import io.openim.android.sdk.models.QuoteElem;
-import io.realm.Realm;
 
 public class MessageViewHolder {
     public static RecyclerView.ViewHolder createViewHolder(@NonNull ViewGroup parent,
@@ -262,7 +257,7 @@ public class MessageViewHolder {
                 String time = TimeUtil.getTimeString(message.getSendTime());
                 nickName.setVisibility(View.VISIBLE);
                 if (message.getSessionType()
-                    == io.openim.android.ouicore.utils.Constant.SessionType.SINGLE_CHAT) {
+                    == ConversationType.SINGLE_CHAT) {
                     nickName.setText(time);
                 } else {
                     nickName.setText(message.getSenderNickname() + "  " + time);
@@ -377,7 +372,7 @@ public class MessageViewHolder {
                                         chatVM.replyMessage.setValue(message);
                                     }
                                     if (iconRes == R.mipmap.ic_c_copy) {
-                                        Common.copy(message.getContent());
+                                        Common.copy(message.getTextElem().getContent());
                                         chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
                                     }
                                     if (iconRes == R.mipmap.ic_withdraw) {
@@ -672,8 +667,9 @@ public class MessageViewHolder {
         @Override
         protected void bindLeft(View itemView, Message message) {
             LayoutMsgTxtLeftBinding v = LayoutMsgTxtLeftBinding.bind(itemView);
-            v.content.setText(message.getContent());
-            if (!handleSequence(v.content, message)) v.content.setText(message.getContent());
+            String content=message.getTextElem().getContent();
+            v.content.setText(content);
+            if (!handleSequence(v.content, message)) v.content.setText(content);
         }
 
         @Override
@@ -681,7 +677,8 @@ public class MessageViewHolder {
             LayoutMsgTxtRightBinding v = LayoutMsgTxtRightBinding.bind(itemView);
             v.avatar2.load(message.getSenderFaceUrl(), message.getSenderNickname());
             v.sendState2.setSendState(message.getStatus());
-            if (!handleSequence(v.content2, message)) v.content2.setText(message.getContent());
+            String content=message.getTextElem().getContent();
+            if (!handleSequence(v.content2, message)) v.content2.setText(content);
         }
 
     }
@@ -1095,11 +1092,10 @@ public class MessageViewHolder {
             LayoutMsgCardLeftBinding view = LayoutMsgCardLeftBinding.bind(itemView);
             view.sendState.setSendState(message.getStatus());
 
-            String friendInfo = message.getContent();
-            FriendInfo friendInfoBean = GsonHel.fromJson(friendInfo, FriendInfo.class);
-            view.cardNickName.setText(friendInfoBean.getNickname());
-            view.otherAvatar.load(friendInfoBean.getFaceURL(), friendInfoBean.getNickname());
-            jump(view.content, friendInfoBean.getUserID());
+            CardElem cardElem=message.getCardElem();
+            view.cardNickName.setText(cardElem.getNickname());
+            view.otherAvatar.load(cardElem.getFaceURL(), cardElem.getNickname());
+            jump(view.content, cardElem.getUserID());
         }
 
         void jump(View view, String uid) {
@@ -1111,11 +1107,11 @@ public class MessageViewHolder {
             LayoutMsgCardRightBinding view = LayoutMsgCardRightBinding.bind(itemView);
             view.sendState2.setSendState(message.getStatus());
             view.avatar2.load(message.getSenderFaceUrl(), message.getSenderNickname());
-            String friendInfo = message.getContent();
-            FriendInfo friendInfoBean = GsonHel.fromJson(friendInfo, FriendInfo.class);
-            view.cardNickName2.setText(friendInfoBean.getNickname());
-            view.otherAvatar2.load(friendInfoBean.getFaceURL(), friendInfoBean.getNickname());
-            jump(view.content2, friendInfoBean.getUserID());
+
+            CardElem cardElem=message.getCardElem();
+            view.cardNickName2.setText(cardElem.getNickname());
+            view.otherAvatar2.load(cardElem.getFaceURL(), cardElem.getNickname());
+            jump(view.content2, cardElem.getUserID());
         }
     }
 

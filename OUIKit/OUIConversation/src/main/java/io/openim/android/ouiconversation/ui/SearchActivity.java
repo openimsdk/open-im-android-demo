@@ -44,6 +44,7 @@ import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SearchVM;
+import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.Message;
@@ -315,7 +316,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                                 }
                                 Message message;
                                 chatVM.startMsg = message = da.getMessageList().get(0);
-                                chatVM.isSingleChat = message.getSessionType() == Constant.SessionType.SINGLE_CHAT;
+                                chatVM.isSingleChat = message.getSessionType() == ConversationType.SINGLE_CHAT;
                                 if (chatVM.isSingleChat)
                                     chatVM.userID = message.getSendID();
                                 else

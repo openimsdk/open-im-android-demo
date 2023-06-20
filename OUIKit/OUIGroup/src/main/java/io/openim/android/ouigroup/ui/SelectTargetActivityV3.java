@@ -35,6 +35,7 @@ import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityCreateGroupV3Binding;
+import io.openim.android.sdk.enums.ConversationType;
 
 @Route(path = Routes.Group.SELECT_TARGET)
 public class SelectTargetActivityV3 extends BaseActivity<BaseViewModel,
@@ -106,7 +107,7 @@ public class SelectTargetActivityV3 extends BaseActivity<BaseViewModel,
                 public void onBindView(@NonNull ViewHol.ItemViewHo holder, MsgConversation data,
                                        int position) {
                     boolean isGroup =
-                        data.conversationInfo.getConversationType() != Constant.SessionType.SINGLE_CHAT;
+                        data.conversationInfo.getConversationType() != ConversationType.SINGLE_CHAT;
                     String id = isGroup ? data.conversationInfo.getGroupID()
                         : data.conversationInfo.getUserID();
                     String faceURL = data.conversationInfo.getFaceURL();

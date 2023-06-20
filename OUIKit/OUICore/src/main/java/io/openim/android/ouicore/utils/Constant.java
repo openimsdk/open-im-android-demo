@@ -6,20 +6,23 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IM;
 
 public class Constant {
-//            public static final String DEFAULT_IP = "test-web.rentsoft.cn";//43
-    public static final String DEFAULT_IP = "web.rentsoft.cn";//121
-//    public static final String DEFAULT_IP = "121.196.195.35";//121
+    //  public static final String DEFAULT_IP = "test-web.rentsoft.cn";//43
+//  public static final String DEFAULT_IP = "web.rentsoft.cn";//121
+    public static final String DEFAULT_IP = "203.56.175.233";//121
 
     //登录注册手机验 证服务器地址
     private static final String APP_AUTH_URL = "https://" + DEFAULT_IP + "/chat/";
     //IM sdk api地址
-    private static final String IM_API_URL = "https://" + DEFAULT_IP + "/api/";
+    private static final String IM_API_URL = "https://" + DEFAULT_IP + "/api";
     //web socket
     private static final String IM_WS_URL = "wss://" + DEFAULT_IP + "/msg_gateway";
     //admin Manage
-    private static final String ADMIN_MANAGE = "https://" + DEFAULT_IP + "/complete_admin/";
+    private static final String ADMIN_MANAGE = "https://" + DEFAULT_IP + "/complete_admin";
 
-
+    private static final String IM_API = "http://" + DEFAULT_IP + ":10002";
+    private static final String APP_AUTH = "http://" + DEFAULT_IP + ":10008";
+    private static final String IM_WS = "ws://" + DEFAULT_IP + ":10001";
+    private static final Boolean isIP=true;
     public static String getAdminManage() {
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("ADMIN_MANAGE");
         if (TextUtils.isEmpty(url)) return ADMIN_MANAGE;
@@ -28,19 +31,19 @@ public class Constant {
 
     public static String getImApiUrl() {
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("IM_API_URL");
-        if (TextUtils.isEmpty(url)) return IM_API_URL;
+        if (TextUtils.isEmpty(url)) return isIP?IM_API:IM_API_URL;
         return url;
     }
 
     public static String getAppAuthUrl() {
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("APP_AUTH_URL");
-        if (TextUtils.isEmpty(url)) return APP_AUTH_URL;
+        if (TextUtils.isEmpty(url)) return isIP?APP_AUTH:APP_AUTH_URL;
         return url;
     }
 
     public static String getImWsUrl() {
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("IM_WS_URL");
-        if (TextUtils.isEmpty(url)) return IM_WS_URL;
+        if (TextUtils.isEmpty(url)) return isIP?IM_WS:IM_WS_URL;
         return url;
     }
 

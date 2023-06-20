@@ -124,7 +124,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     public int count = 20; //条数
     public Message loading, forwardMsg;
-    private int lastMinSeq = 0;
 
 
     public void init() {
@@ -678,33 +677,17 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     public void loadHistoryMessage() {
-        if (null != groupInfo.getValue() && getIsSuperGroup()) {
-            OpenIMClient.getInstance().messageManager.getAdvancedHistoryMessageList(new OnBase<AdvancedMessage>() {
-                @Override
-                public void onError(int code, String error) {
-                    getIView().toast(error + code);
-                }
+        OpenIMClient.getInstance().messageManager.getAdvancedHistoryMessageList(new OnBase<AdvancedMessage>() {
+            @Override
+            public void onError(int code, String error) {
+                getIView().toast(error + code);
+            }
 
-                @Override
-                public void onSuccess(AdvancedMessage data) {
-                    lastMinSeq = data.getLastMinSeq();
-                    handleMessage(data.getMessageList(), false);
-                }
-            }, null, null, conversationID, lastMinSeq, startMsg, count);
-        } else {
-            OpenIMClient.getInstance().messageManager.getHistoryMessageList(new OnBase<List<Message>>() {
-                @Override
-                public void onError(int code, String error) {
-
-                }
-
-                @Override
-                public void onSuccess(List<Message> data) {
-                    handleMessage(data, false);
-                }
-
-            }, userID, groupID, conversationID, startMsg, count);
-        }
+            @Override
+            public void onSuccess(AdvancedMessage data) {
+                handleMessage(data.getMessageList(), false);
+            }
+        }, conversationID,  startMsg, count);
     }
 
     private void handleMessage(List<Message> data, boolean isReverse) {
@@ -1142,20 +1125,21 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     public void loadHistoryMessageReverse() {
-        OpenIMClient.getInstance().messageManager.getHistoryMessageListReverse(new OnBase<List<Message>>() {
+        OpenIMClient.getInstance().messageManager.getAdvancedHistoryMessageListReverse(new OnBase<AdvancedMessage>() {
             @Override
             public void onError(int code, String error) {}
 
             @Override
-            public void onSuccess(List<Message> data) {
+            public void onSuccess(AdvancedMessage data) {
+                List<Message> messageList=data.getMessageList();
                 if (firstChatHistory) {
-                    data.add(0, startMsg);
+                    messageList.add(0, startMsg);
                     firstChatHistory = false;
                 }
-                handleMessage(data, true);
+                handleMessage(messageList, true);
             }
 
-        }, userID, groupID, conversationID, startMsg, startMsg.getSeq(),count * 50);
+        }, conversationID, startMsg,count * 50);
     }
 
     /**

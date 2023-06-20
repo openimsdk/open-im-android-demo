@@ -72,7 +72,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
                         vm.setFaceURL(s);
                         Common.UIHandler.postDelayed(() -> vm.waitDialog.dismiss(), 1500);
                     }
-                }, path[0]);
+                }, null,path[0]);
             });
 
             albumDialog.show();

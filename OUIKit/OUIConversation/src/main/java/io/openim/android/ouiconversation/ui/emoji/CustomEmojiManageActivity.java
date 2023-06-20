@@ -171,9 +171,7 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
                 }
 
                 @Override
-                public void onProgress(long progress) {
-
-                }
+                public void onProgress(long progress) {}
 
                 @Override
                 public void onSuccess(String s) {
@@ -198,7 +196,7 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
                         });
 
                 }
-            }, path[0]);
+            },null, path[0]);
 
         });
     }

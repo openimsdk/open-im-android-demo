@@ -225,9 +225,7 @@ public class MediaFileUtil {
         }
         try {
             mmr.release();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException ignored) {}
         return duration;
     }
 

@@ -37,7 +37,7 @@ public interface OpenIMService {
     @POST("user/update_user_info")
     Observable<ResponseBody> updateUserInfo(@Body RequestBody requestBody);
 
-    @POST("account/code")
+    @POST("code/send")
     Observable<ResponseBody> getVerificationCode(@Body RequestBody requestBody);
 
     @POST("account/verify")

@@ -211,7 +211,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                                 });
                             }
                         }
-                    }, path);
+                    },null, path);
                 }
             });
 
