@@ -54,3 +54,5 @@ include ':OUIMoments'
 project(':OUIMoments').projectDir = new File(settingsDir, '../OUIKit/OUIMoments')
 include ':OUIMeeting'
 project(':OUIMeeting').projectDir = new File(settingsDir, '../OUIKit/OUIMeeting')
+include ':OUIApplet'
+project(':OUIApplet').projectDir = new File(settingsDir, '../OUIKit/OUIApplet')

@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import io.openim.android.ouicontact.ui.ContactFragment;
+import io.openim.android.ouicontact.ui.fragment.ContactFragment;
 
 public class DebugActivity extends AppCompatActivity {
 

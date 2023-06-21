@@ -384,4 +384,6 @@
     <string name="emoji_count">共%1$s个表情</string>
     <string name="file_not_find">文件不存在</string>
     <string name="start_chat_tips">你们已经成为好友，可以开始聊天了</string>
+    <string name="logout">退出登录</string>
+    <string name="new_group_chat">新的群聊</string>
 </resources>

@@ -1,4 +1,4 @@
-package io.openim.android.ouicontact.ui;
+package io.openim.android.ouicontact.ui.fragment;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -27,6 +27,11 @@ import java.util.Observer;
 
 import io.openim.android.ouicontact.databinding.FragmentContactMainBinding;
 import io.openim.android.ouicontact.databinding.ViewContactHeaderBinding;
+import io.openim.android.ouicontact.ui.AllFriendActivity;
+import io.openim.android.ouicontact.ui.GroupNoticeListActivity;
+import io.openim.android.ouicontact.ui.LabelActivity;
+import io.openim.android.ouicontact.ui.MyGroupActivity;
+import io.openim.android.ouicontact.ui.NewFriendActivity;
 import io.openim.android.ouicontact.vm.ContactVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
@@ -50,8 +55,6 @@ import io.openim.android.sdk.models.UserInfo;
 public class ContactFragment extends BaseFragment<ContactVM> implements Observer {
     private FragmentContactMainBinding view;
     private ViewContactHeaderBinding header;
-    private RecyclerViewAdapter adapter;
-    private ContactListVM contactListVM;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,9 +65,10 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         view = FragmentContactMainBinding.inflate(getLayoutInflater());
-        header = ViewContactHeaderBinding.inflate(getLayoutInflater());
+        header = view.header;
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) view.title.getLayoutParams();
         lp.setMargins(0, SinkHelper.getStatusBarHeight(), 0, 0);
         view.title.setLayoutParams(lp);
@@ -74,7 +78,6 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
 
         return view.getRoot();
     }
-
 
 
     public ContactVM getVM() {
@@ -108,9 +111,9 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
         header.myGroup.setOnClickListener(v -> {
             startActivity(new Intent(getActivity(), MyGroupActivity.class));
         });
-        header.labelLy.setOnClickListener(v -> {
-            startActivity(new Intent(getActivity(),LabelActivity.class));
-        });
+//        header.labelLy.setOnClickListener(v -> {
+//            startActivity(new Intent(getActivity(), LabelActivity.class));
+//        });
     }
 
 
@@ -123,38 +126,6 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
             header.newFriendNoticeBadge.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE);
             header.newFriendNoticeBadge.badge.setText(v + "");
         });
-
-        view.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        adapter = new RecyclerViewAdapter<UserInfo, ViewHol.ItemViewHo>(ViewHol.ItemViewHo.class) {
-
-
-            @Override
-            public void onBindView(@NonNull ViewHol.ItemViewHo holder, UserInfo data, int position) {
-                holder.view.avatar.load(data.getFaceURL());
-                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.view.avatar.getLayoutParams();
-                layoutParams.leftMargin = Common.dp2px(10);
-                holder.view.nickName.setText(data.getNickname());
-                holder.view.getRoot().setOnClickListener(v -> {
-                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, data.getUserID()).navigation();
-                });
-            }
-        };
-        view.recyclerView.setAdapter(adapter);
-        view.recyclerView.addHeaderView(header.getRoot());
-
-
-
-    }
-
-    private void bindData() {
-        contactListVM = BaseApp.inst().getVMByCache(ContactListVM.class);
-        if (null == contactListVM) return;
-        adapter.setItems(contactListVM.frequentContacts.getValue());
-
-        contactListVM.frequentContacts.observe(getActivity(), userInfos -> {
-            if (userInfos.isEmpty()) return;
-            adapter.setItems(userInfos);
-        });
     }
 
     @Override
@@ -166,8 +137,6 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
     @Override
     public void update(Observable o, Object arg) {
         Obs.Message message = (Obs.Message) arg;
-        if (message.tag == Constant.Event.CONTACT_LIST_VM_INIT) {
-            Common.UIHandler.postDelayed(this::bindData, 500);
-        }
+
     }
 }

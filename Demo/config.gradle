@@ -24,6 +24,7 @@ ext {
             "OUICalling" : "io.openim.android.ouicalling",
             "OUIMoments" : "io.openim.android.ouimoments",
             "OUIMeeting" : "io.openim.android.ouimeeting",
+            "OUIApplet" : "io.openim.android.ouiapplet",
     ]
 
 }

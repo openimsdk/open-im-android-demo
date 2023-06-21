@@ -70,7 +70,7 @@ public class Routes {
     }
     //朋友圈
     public static class Moments{
-        public static final String HOME = "/moments/CircleFragment";
+        public static final String HOME = "/moments/MomentsActivity";
     }
     //会议
     public static class Meeting{

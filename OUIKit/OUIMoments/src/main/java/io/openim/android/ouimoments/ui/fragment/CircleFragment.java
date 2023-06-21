@@ -203,7 +203,8 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
                 // titlebar.setBackgroundColor(Color.argb(alpha, 57, 174, 255));
                 try {
                     viewBinding.titleBarFl.getBackground().setAlpha(alpha);
-                }catch (Exception ignored){}
+                } catch (Exception ignored) {
+                }
             }
 
             @Override
@@ -246,14 +247,14 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
     public void initTitle(View mainView) {
         viewBinding.titleBarFl.setPadding(0, SinkHelper.getStatusBarHeight(), 0, 0);
         titleBar = mainView.findViewById(R.id.main_title_bar);
+        titleBar.setLeftImageResource(com.yzq.zxinglibrary.R.drawable.ic_back);
+        titleBar.setLeftClickListener(v -> getActivity().finish());
         if (presenter.isSpecifiedUser()) {
-            titleBar.setLeftImageResource(com.yzq.zxinglibrary.R.drawable.ic_back);
-            titleBar.setTitle(String.format(getString(io.openim.android.ouicore.R.string.to_user_moments), presenter.user.getName()));
-            titleBar.setLeftClickListener(v -> getActivity().finish());
+            titleBar.setTitle(String.format(getString(io.openim.android.ouicore.R.string.to_user_moments),
+                presenter.user.getName()));
         } else titleBar.setTitle(getString(io.openim.android.ouicore.R.string.moments));
         titleBar.setTitleColor(getResources().getColor(R.color.white));
         titleBar.setBackgroundColor(Color.TRANSPARENT);
-
 
         if (!presenter.isSpecifiedUser()) {
             titleBar.addAction(new TitleBar.ImageAction(R.drawable.ic_moments_new_message) {
@@ -303,7 +304,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
     private void setViewTreeObserver() {
         final ViewTreeObserver swipeRefreshLayoutVTO = bodyLayout.getViewTreeObserver();
         swipeRefreshLayoutVTO.addOnGlobalLayoutListener(() -> {
-            if (isHidden())return;
+            if (isHidden()) return;
             Rect r = new Rect();
             bodyLayout.getWindowVisibleDisplayFrame(r);
             int statusBarH = SinkHelper.getStatusBarHeight();//状态栏高度
@@ -325,7 +326,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
             editTextBodyHeight = edittextbody.getHeight();
 
             if (keyboardH < 150) {//说明是隐藏键盘的情况
-                Common.UIHandler.postDelayed(()-> updateEditTextBodyVisible(View.GONE, null),300);
+                Common.UIHandler.postDelayed(() -> updateEditTextBodyVisible(View.GONE, null), 300);
                 return;
             }
 
@@ -340,7 +341,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
             if (edittextbody != null && edittextbody.getVisibility() == View.VISIBLE) {
-                Common.UIHandler.postDelayed(()-> updateEditTextBodyVisible(View.GONE, null),300);
+                Common.UIHandler.postDelayed(() -> updateEditTextBodyVisible(View.GONE, null), 300);
                 return true;
             }
         }

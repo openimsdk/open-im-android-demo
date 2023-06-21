@@ -7,9 +7,12 @@ import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
-import io.openim.android.ouimoments.ui.fragment.CircleFragment;
+import com.alibaba.android.arouter.facade.annotation.Route;
 
-public class MainActivity extends AppCompatActivity {
+import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouimoments.ui.fragment.CircleFragment;
+@Route(path = Routes.Moments.HOME)
+public class MomentsActivity extends AppCompatActivity {
     CircleFragment fragment;
 
     @Override

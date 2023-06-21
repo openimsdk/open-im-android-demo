@@ -58,7 +58,6 @@ buildscript {
         classpath "io.realm:realm-gradle-plugin:10.11.1"
         classpath 'com.huawei.agconnect:agcp:1.6.0.300'
     }
-
 }
 
 plugins {

@@ -1,27 +1,12 @@
 package io.openim.android.demo.ui.main;
 
 
-import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.PopupWindow;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
 
 
@@ -30,38 +15,22 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.igexin.sdk.PushManager;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
-import com.yzq.zxinglibrary.android.CaptureActivity;
-import com.yzq.zxinglibrary.bean.ZxingConfig;
-
-import java.util.Observable;
-import java.util.Observer;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
 import io.openim.android.demo.ui.login.LoginActivity;
-import io.openim.android.demo.ui.search.AddConversActivity;
-import io.openim.android.demo.ui.search.PersonDetailActivity;
 import io.openim.android.demo.ui.user.PersonalFragment;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.demo.vm.MainVM;
-import io.openim.android.ouicalling.service.AudioVideoService;
-import io.openim.android.ouicontact.ui.ContactFragment;
+import io.openim.android.ouicontact.ui.fragment.ContactFragment;
 import io.openim.android.ouicontact.vm.ContactVM;
 import io.openim.android.ouiconversation.ui.fragment.ContactListFragment;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.MomentsBridge;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.utils.SinkHelper;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.SystemBarUtil;
-import io.openim.android.ouicore.widget.AvatarImage;
-import io.openim.android.ouicore.widget.BottomPopDialog;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {

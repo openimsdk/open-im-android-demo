@@ -39,7 +39,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".MomentsActivity"
             android:exported="false" />
         <activity
             android:name=".ui.ImagePagerActivity"
