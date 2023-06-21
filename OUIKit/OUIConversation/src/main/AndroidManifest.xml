@@ -48,6 +48,7 @@
         <activity
             android:name=".ui.ChatActivity"
             android:exported="false" />
+        <activity android:name=".ui.emoji.CustomEmojiManageActivity"/>
     </application>
 
 </manifest>

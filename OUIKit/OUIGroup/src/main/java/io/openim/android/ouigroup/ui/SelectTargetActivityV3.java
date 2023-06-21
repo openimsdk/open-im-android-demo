@@ -85,14 +85,15 @@ public class SelectTargetActivityV3 extends BaseActivity<BaseViewModel,
 
     private void listener() {
         multipleChoiceVM.metaData.observe(this, v -> {
-            adapter.notifyDataSetChanged();
+            if (null != adapter)
+                adapter.notifyDataSetChanged();
         });
     }
 
     private void initView() {
         int visibility = isCreateGroup ? View.GONE : View.VISIBLE;
 
-        view.divider2.getRoot().setVisibility(View.GONE);
+        view.divider2.getRoot().setVisibility(isCreateGroup?View.VISIBLE:View.GONE);
         view.group.setVisibility(visibility);
         view.recentContact.setVisibility(visibility);
 

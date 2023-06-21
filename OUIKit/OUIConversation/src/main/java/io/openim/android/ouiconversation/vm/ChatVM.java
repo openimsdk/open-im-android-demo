@@ -132,8 +132,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         loading.setContentType(Constant.LOADING);
         //获取会话信息
         getConversationInfo();
-        //标记所有消息已读
-        markReaded();
 
         IMEvent.getInstance().addAdvanceMsgListener(this);
         IMEvent.getInstance().addConversationListener(this);
@@ -565,8 +563,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     onSuccessListener.onSuccess(data);
                     return;
                 }
-                conversationInfo.setValue(data);
                 conversationID = data.getConversationID();
+                conversationInfo.setValue(data);
+                 markReaded();
+
                 loadHistory();
                 getConversationRecvMessageOpt(data.getConversationID());
             }
@@ -602,7 +602,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
      */
     public void markReaded(@Nullable Message... msgs) {
         List<String> msgIDs = new ArrayList<>();
-
         if (null != msgs) {
             for (Message msg : msgs) {
                 msgIDs.add(msg.getClientMsgID());
@@ -611,7 +610,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         OnBase<String> callBack = new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
-
+                toast(error+code);
             }
 
             @Override
@@ -629,7 +628,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
         };
         if (null == msgs || msgs.length == 0) {
-            OpenIMClient.getInstance().messageManager.markConversationMessageAsRead(conversationID, callBack);
+            OpenIMClient.getInstance().messageManager
+                .markConversationMessageAsRead(conversationID, callBack);
         } else
             OpenIMClient.getInstance().messageManager.markMessagesAsReadByMsgID(conversationID,
                 msgIDs, callBack);

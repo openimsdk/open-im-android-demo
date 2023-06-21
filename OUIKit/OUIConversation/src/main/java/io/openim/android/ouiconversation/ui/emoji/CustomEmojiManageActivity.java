@@ -53,6 +53,7 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.widget.GridSpaceItemDecoration;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
@@ -168,6 +169,8 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
                 public void onError(int code, String error) {
                     waitDialog.dismiss();
                     toast(error + code);
+                    L.e(error + code);
+
                 }
 
                 @Override

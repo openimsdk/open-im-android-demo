@@ -23,6 +23,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Toast;
@@ -165,7 +167,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                 vm.pinConversation(conversationInfo.conversationInfo,
                     !conversationInfo.conversationInfo.isPinned());
             } else if (menuPosition == 1 && conversationInfo.conversationInfo.getUnreadCount() > 0) {
-                chatVM.markReadedByConID(conversationInfo.conversationInfo.getConversationID(),null);
+                chatVM.markReadedByConID(conversationInfo.conversationInfo.getConversationID(),
+                    null);
             } else {
                 vm.conversations.getValue().remove(conversationInfo);
                 adapter.notifyItemRemoved(adapterPosition);
@@ -210,13 +213,28 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         view.recyclerView.setAdapter(adapter);
         view.recyclerView.addHeaderView(createHeaderView());
 
-
 //        view.recyclerView.addItemDecoration(new DefaultItemDecoration(getActivity().getColor
 //        (android.R.color.transparent), 1, 36));
         vm.conversations.observe(getActivity(), v -> {
             if (null == v || v.size() == 0) return;
             adapter.setConversationInfos(v);
             adapter.notifyDataSetChanged();
+        });
+
+        Easy.find(UserLogic.class).connectStatus.observe(getActivity(), connectStatus -> {
+            Animation animation = view.status.getAnimation();
+            if (connectStatus == UserLogic.ConnectStatus.CONNECTING) {
+                if (null != animation)
+                    animation.start();
+                else {
+                    animation = AnimationUtils.loadAnimation(getActivity(),
+                        R.anim.animation_repeat_spinning);
+                    view.status.startAnimation(animation);
+                }
+            } else {
+                if (null != animation)
+                    animation.cancel();
+            }
         });
 
     }
@@ -326,11 +344,11 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         @Override
         public void onBindViewHolder(ViewHol.ContactItemHolder viewHolder, final int position) {
             MsgConversation msgConversation = conversationInfos.get(position);
-            boolean isGroup=msgConversation.conversationInfo.getConversationType()
+            boolean isGroup = msgConversation.conversationInfo.getConversationType()
                 != ConversationType.SINGLE_CHAT;
             viewHolder.viewBinding.avatar.load(msgConversation.conversationInfo.getFaceURL(),
                 isGroup,
-                isGroup?null: msgConversation.conversationInfo.getShowName());
+                isGroup ? null : msgConversation.conversationInfo.getShowName());
             viewHolder.viewBinding.nickName.setText(msgConversation.conversationInfo.getShowName());
 
             if (msgConversation.conversationInfo.getRecvMsgOpt() != 0) {
@@ -347,8 +365,9 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             }
             viewHolder.viewBinding.time.setText(TimeUtil.getTimeString(msgConversation.conversationInfo.getLatestMsgSendTime()));
 
-//            viewHolder.viewBinding.getRoot().setBackgroundColor(Color.parseColor(msgConversation.conversationInfo.isPinned() ? "#FFF3F3F3" : "#FFFFFF"));
-            viewHolder.viewBinding.setTop.setVisibility(msgConversation.conversationInfo.isPinned()?View.VISIBLE:View.GONE);
+//            viewHolder.viewBinding.getRoot().setBackgroundColor(Color.parseColor
+//            (msgConversation.conversationInfo.isPinned() ? "#FFF3F3F3" : "#FFFFFF"));
+            viewHolder.viewBinding.setTop.setVisibility(msgConversation.conversationInfo.isPinned() ? View.VISIBLE : View.GONE);
 
             String lastMsg = IMUtil.getMsgParse(msgConversation.lastMsg);
             //强提醒
@@ -384,6 +403,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         super.onDestroy();
         BaseApp.viewModels.remove(vm.getClass().getCanonicalName());
         Obs.inst().deleteObserver(this);
+        view.status.getAnimation().cancel();
+
     }
 
     @Override
