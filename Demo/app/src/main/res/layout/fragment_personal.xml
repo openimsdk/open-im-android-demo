@@ -13,6 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:scaleType="centerCrop"
+            android:background="@color/theme"
             android:src="@mipmap/bg_head_my" />
 
         <LinearLayout
