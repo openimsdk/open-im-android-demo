@@ -403,8 +403,10 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         super.onDestroy();
         BaseApp.viewModels.remove(vm.getClass().getCanonicalName());
         Obs.inst().deleteObserver(this);
-        view.status.getAnimation().cancel();
 
+        Animation animation=view.status.getAnimation();
+        if (null!=animation)
+            animation.cancel();
     }
 
     @Override

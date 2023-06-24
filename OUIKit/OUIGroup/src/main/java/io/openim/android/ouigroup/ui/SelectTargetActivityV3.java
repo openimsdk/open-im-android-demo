@@ -98,7 +98,6 @@ public class SelectTargetActivityV3 extends BaseActivity<BaseViewModel,
         view.recentContact.setVisibility(visibility);
 
         if (!isCreateGroup) {
-
             view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
             view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<MsgConversation,
                 ViewHol.ItemViewHo>

@@ -371,4 +371,9 @@
     <string name="start_chat_tips">你们已经成为好友，可以开始聊天了</string>
     <string name="logout">退出登录</string>
     <string name="new_group_chat">新的群聊</string>
+    <string name="find">发现</string>
+    <string name="null_applet">暂无小程序</string>
+    <string name="leave_word">留言</string>
+    <string name="send_who">发送给：</string>
+    <string name="multiple_send">分别发送给：</string>
 </resources>

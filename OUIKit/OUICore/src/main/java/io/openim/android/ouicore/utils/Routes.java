@@ -1,6 +1,10 @@
 package io.openim.android.ouicore.utils;
 
 public class Routes {
+    public static class Applet {
+        public final static String HOME = "/Applet/AppletFragment";
+    }
+
     public static class Service {
         public final static String CALLING = "/CallingService/CallingServiceImp";
         public static final String CONVERSATION = "/ConversationService/IBridgeImpl";
@@ -68,12 +72,14 @@ public class Routes {
         public static final String SEARCH_FRIENDS = "/contact/SearchFriendsActivity";
         public static final String SEARCH_FRIENDS_GROUP = "/contact/SearchGroupAndFriendsActivity";
     }
+
     //朋友圈
-    public static class Moments{
+    public static class Moments {
         public static final String HOME = "/moments/MomentsActivity";
     }
+
     //会议
-    public static class Meeting{
+    public static class Meeting {
         public static final String HOME = "/meeting/MeetingLaunchActivity";
     }
 }

@@ -73,7 +73,7 @@
                             android:button="@null"
                             android:drawableTop="@drawable/selector_moments"
                             android:gravity="center"
-                            android:text="@string/moments"
+                            android:text="@string/find"
                             android:textColor="@drawable/selector_tab_txt_color"
                             android:textSize="10sp" />
                         <RadioButton

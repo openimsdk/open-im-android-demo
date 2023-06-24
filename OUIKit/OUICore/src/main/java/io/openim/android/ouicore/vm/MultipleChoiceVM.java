@@ -24,6 +24,8 @@ import io.openim.android.ouicore.databinding.LayoutSelectedFriendsBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.BottomPopDialog;
+import io.openim.android.ouicore.widget.CommonDialog;
+import io.openim.android.ouicore.widget.ForwardDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.FriendInfo;
 
@@ -130,11 +132,13 @@ public class MultipleChoiceVM extends BaseVM {
                 ARouter.getInstance().build(Routes.Group.CREATE_GROUP2).navigation();
                 return;
             }
-            showConfirmDialog();
+
+            showConfirmDialog(v.getContext());
         });
     }
 
-    private void showConfirmDialog() {
-
+    private void showConfirmDialog(Context context) {
+        ForwardDialog dialog=new ForwardDialog(context);
+        dialog.show();
     }
 }

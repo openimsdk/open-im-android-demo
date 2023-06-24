@@ -44,6 +44,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
+import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
@@ -454,21 +455,14 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != RESULT_OK) return;
-        if (requestCode == Constant.Event.FORWARD && null != data) {
-            //在这里转发
-            String id = data.getStringExtra(Constant.K_ID);
-            String otherSideNickName = data.getStringExtra(Constant.K_NAME);
-
-            String groupId = data.getStringExtra(Constant.K_GROUP_ID);
-
-            Message forwardMsg;
-            if (null == vm.forwardMsg)//表示合并转发
-                forwardMsg = IMUtil.createMergerMessage(vm.isSingleChat, otherSideNickName,
-                    getSelectMsg());
-            else forwardMsg = vm.forwardMsg;
-            vm.aloneSendMsg(forwardMsg, id, groupId);
-            vm.clearSelectMsg();
-        }
+//        if (requestCode == Constant.Event.FORWARD && null != data) {
+//            //在这里转发
+//            String id = data.getStringExtra(Constant.K_ID);
+//            String otherSideNickName = data.getStringExtra(Constant.K_NAME);
+//            String groupId = data.getStringExtra(Constant.K_GROUP_ID);
+//
+//            forward(id, otherSideNickName, groupId);
+//        }
         if (requestCode == Constant.Event.CALLING_REQUEST_CODE && null != data) {
             //发起群通话
             List<String> ids = data.getStringArrayListExtra(Constant.K_RESULT);
@@ -479,6 +473,18 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             if (null == callingService) return;
             callingService.call(signalingInfo);
         }
+    }
+
+    private void forward(String uid, String groupId) {
+        Message forwardMsg;
+        if (null == vm.forwardMsg)//表示合并转发
+            forwardMsg = IMUtil.createMergerMessage(vm.isSingleChat,
+                vm.conversationInfo.getValue().getShowName(),
+                getSelectMsg());
+        else
+            forwardMsg = vm.forwardMsg;
+        vm.aloneSendMsg(forwardMsg, uid, groupId);
+        vm.clearSelectMsg();
     }
 
     @Override
@@ -500,6 +506,14 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 vm.messages.getValue().clear();
                 vm.startMsg = null;
                 vm.loadHistoryMessage();
+            }
+            if (message.tag==Constant.Event.FORWARD){
+               List<MultipleChoice>  choices= (List<MultipleChoice>) message.object;
+                if(null==choices||choices.isEmpty())return;
+                for (MultipleChoice choice : choices) {
+                    forward(choice.key,vm.conversationInfo
+                        .getValue().getShowName());
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

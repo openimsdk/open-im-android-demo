@@ -26,7 +26,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="通讯录"
+                android:text="@string/address_book"
                 android:textColor="#ff1b72ec"
                 android:textSize="22sp" />
 
@@ -35,8 +35,8 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginRight="10dp"
-                android:padding="5dp"
                 android:onClick="toSearch"
+                android:padding="5dp"
                 android:src="@mipmap/ic_search2" />
 
             <ImageView
@@ -48,7 +48,8 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <include android:id="@+id/header"
-        layout="@layout/view_contact_header"/>
+    <include
+        android:id="@+id/header"
+        layout="@layout/view_contact_header" />
 
 </LinearLayout>

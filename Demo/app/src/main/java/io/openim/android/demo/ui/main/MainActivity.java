@@ -22,6 +22,7 @@ import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.demo.ui.user.PersonalFragment;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.demo.vm.MainVM;
+import io.openim.android.ouiapplet.AppletFragment;
 import io.openim.android.ouicontact.ui.fragment.ContactFragment;
 import io.openim.android.ouicontact.vm.ContactVM;
 import io.openim.android.ouiconversation.ui.fragment.ContactListFragment;
@@ -37,10 +38,9 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
     private int mCurrentTabIndex;
     private BaseFragment lastFragment, conversationListFragment, contactFragment,
-        personalFragment, circleFragment;
+        personalFragment,appletFragment;
     private ActivityResultLauncher<Intent> resultLauncher = Common.getCaptureActivityLauncher(this);
     private boolean hasShoot = false;
-    private MomentsBridge momentsBridge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +85,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         view.menuGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.men1) switchFragment(conversationListFragment);
             if (checkedId == R.id.men2) switchFragment(contactFragment);
-            if (checkedId == R.id.men3) switchFragment(circleFragment);
+            if (checkedId == R.id.men3) switchFragment(appletFragment);
             if (checkedId == R.id.men4) switchFragment(personalFragment);
         });
     }
@@ -114,15 +114,16 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         conversationListFragment =
             (ContactListFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
         personalFragment = PersonalFragment.newInstance();
-        momentsBridge =
-            (MomentsBridge) ARouter.getInstance().build(Routes.Service.MOMENTS).navigation();
+
+        appletFragment =
+            (BaseFragment) ARouter.getInstance().build(Routes.Applet.HOME).navigation();
+
         personalFragment.setPage(4);
         switchFragment(personalFragment);
 
-        if (null != momentsBridge) {
-            circleFragment = momentsBridge.buildMomentsFragment();
-            circleFragment.setPage(3);
-            switchFragment(circleFragment);
+        if (null != appletFragment) {
+            appletFragment.setPage(3);
+            switchFragment(appletFragment);
         } else {
             view.men3.setVisibility(View.GONE);
         }
@@ -138,11 +139,6 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         Common.UIHandler.postDelayed(this::bindDot, 500);
     }
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (null == momentsBridge) return super.onKeyDown(keyCode, event);
-        if (momentsBridge.onKeyDown(keyCode, event)) return true;
-        else return super.onKeyDown(keyCode, event);
-    }
 
     /**
      * 切换Fragment

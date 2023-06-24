@@ -198,7 +198,7 @@ public class IMUtil {
                 buildExpandInfo(msg.getQuoteElem().getQuoteMessage());
             }
             if (msg.getContentType() == MessageType.CUSTOM_FACE) {
-                msgExpand.customEmoji=GsonHel.fromJson(msg.getFaceElem().getData(), CustomEmojiEntity.class);
+                msgExpand.customEmoji = GsonHel.fromJson(msg.getFaceElem().getData(), CustomEmojiEntity.class);
             }
             if (msg.getContentType() == MessageType.OA_NTF) {
                 msgExpand.isShowTime = true;
@@ -226,8 +226,8 @@ public class IMUtil {
      */
     @SuppressLint("StringFormatInvalid")
     private static void handleGroupNotification(Message msg) {
-        NotificationElem notificationElem =msg.getNotificationElem();
-        if (null==notificationElem)return;
+        NotificationElem notificationElem = msg.getNotificationElem();
+        if (null == notificationElem) return;
         String detail = notificationElem.getDetail();
         String tips = "";
         Context ctx = BaseApp.inst();
@@ -424,7 +424,9 @@ public class IMUtil {
         try {
             switch (msg.getContentType()) {
                 default:
-                    lastMsg = msg.getNotificationElem().getDefaultTips();
+                    lastMsg = tipsHandle(msg.getContentType());
+                    if (TextUtils.isEmpty(lastMsg))
+                        lastMsg = msg.getNotificationElem().getDefaultTips();
                     break;
                 case MessageType.TEXT:
                     lastMsg = msg.getTextElem().getContent();
@@ -475,7 +477,7 @@ public class IMUtil {
                     lastMsg = "[" + (isAudio ? BaseApp.inst().getString(R.string.voice_calls) :
                         BaseApp.inst().getString(R.string.video_calls)) + "]";
                     break;
-                    //TODO
+                //TODO
                 case Constant.MsgType.CUSTOMIZE_MEETING:
                     lastMsg = "[" + BaseApp.inst().getString(R.string.video_meeting) + "]";
                     break;
@@ -614,7 +616,7 @@ public class IMUtil {
     }
 
     public static String tipsHandle(int msgType) {
-        switch (msgType){
+        switch (msgType) {
             case MessageType.FRIEND_APPLICATION_APPROVED_NTF:
                 return BaseApp.inst().getString(R.string.start_chat_tips);
         }

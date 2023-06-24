@@ -42,7 +42,7 @@ public class CallingServiceImp implements CallingService {
 
     @Override
     public void startAudioVideoService(Context base) {
-        Alive.restart(base);
+//        Alive.restart(base);
     }
 
     @Override
