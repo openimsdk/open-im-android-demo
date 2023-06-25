@@ -72,7 +72,7 @@ public class IMEvent {
         friendshipListener();
         conversationListener();
         groupListeners();
-        signalingListener();
+//        signalingListener();
     }
 
     private void signalingListener() {

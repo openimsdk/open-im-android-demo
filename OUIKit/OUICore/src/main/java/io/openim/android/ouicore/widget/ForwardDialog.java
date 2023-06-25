@@ -1,7 +1,9 @@
 package io.openim.android.ouicore.widget;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
@@ -20,12 +22,15 @@ import io.openim.android.ouicore.databinding.DialogForwardBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
+import io.openim.android.ouicore.vm.ForwardVM;
 import io.openim.android.ouicore.vm.MultipleChoiceVM;
 
 public class ForwardDialog extends BaseDialog {
 
     @NotNull("MultipleChoiceVM can't is null")
     private MultipleChoiceVM choiceVM = Easy.find(MultipleChoiceVM.class);
+    @NotNull("ForwardVM can't is null")
+    private ForwardVM forwardVM = Easy.find(ForwardVM.class);
 
 
     public ForwardDialog(@NonNull Context context) {
@@ -45,15 +50,18 @@ public class ForwardDialog extends BaseDialog {
         getWindow().setAttributes(params);
         getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
+        view.content.setText(forwardVM.tips);
         if (choiceVM.metaData.val().size() == 1) {
             //单个
             MultipleChoice data = choiceVM.metaData.val().get(0);
             view.name.setText(data.name);
             view.avatar.load(data.icon, data.isGroup, data.name);
         } else {
+            view.single.setVisibility(View.GONE);
             view.tips.setText(R.string.multiple_send);
             view.recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
-            view.recyclerView.setAdapter(new RecyclerViewAdapter<MultipleChoice, ViewHol.ImageTxtViewHolder>(ViewHol.ImageTxtViewHolder.class) {
+            RecyclerViewAdapter<MultipleChoice, ViewHol.ImageTxtViewHolder> adapter;
+            view.recyclerView.setAdapter(adapter=new RecyclerViewAdapter<MultipleChoice, ViewHol.ImageTxtViewHolder>(ViewHol.ImageTxtViewHolder.class) {
 
                 @Override
                 public void onBindView(@NonNull ViewHol.ImageTxtViewHolder holder, MultipleChoice data, int position) {
@@ -61,9 +69,14 @@ public class ForwardDialog extends BaseDialog {
                     holder.view.img.load(data.icon, data.isGroup, data.name);
                 }
             });
+            adapter.setItems(choiceVM.metaData.val());
         }
         view.cancel.setOnClickListener(view1 -> dismiss());
         view.sure.setOnClickListener(view1 -> {
+            String leave=view.leave.getText().toString();
+            if (!TextUtils.isEmpty(leave)){
+                forwardVM.createLeaveMsg(leave);
+            }
             Obs.newMessage(Constant.Event.FORWARD,choiceVM.metaData.val());
             dismiss();
         });

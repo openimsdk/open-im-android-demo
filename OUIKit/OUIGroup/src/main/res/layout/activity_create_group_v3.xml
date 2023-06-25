@@ -11,6 +11,7 @@
         tools:context=".ui.group.CreateGroupActivityV3">
 
         <ImageView
+            android:onClick="toBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="15dp"

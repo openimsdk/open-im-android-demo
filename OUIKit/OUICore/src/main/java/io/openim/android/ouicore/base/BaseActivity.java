@@ -136,6 +136,9 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     @Override
     protected void onPause() {
+        if (isFinishing()) {
+            fasterDestroy();
+        }
         if (null != vm) {
             vm.viewPause();
             releaseRes();
@@ -143,10 +146,13 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         super.onPause();
     }
 
+    protected void fasterDestroy() {
+
+    }
+
     private void releaseRes() {
         if (vm == null) return;
-        if (isFinishing()
-            && isRelease && !released) {
+        if (isFinishing() && isRelease && !released) {
             released = true;
             vm.releaseRes();
         }

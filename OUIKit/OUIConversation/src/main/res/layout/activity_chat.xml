@@ -312,23 +312,24 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
+                android:background="@color/theme_bg"
                 android:orientation="horizontal"
-                android:paddingLeft="10dp">
+                android:gravity="center"
+                >
 
                 <CheckBox
                     android:id="@+id/delete"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginRight="55dp"
                     android:button="@null"
                     android:drawableTop="@mipmap/ic_delete_grey"
                     android:drawablePadding="3dp"
                     android:gravity="center"
                     android:padding="7dp"
                     android:text="@string/delete"
-                    android:textColor="#ff898989"
+                    android:textColor="@color/txt_warning"
                     android:textSize="12sp" />
 
                 <CheckBox
@@ -342,7 +343,7 @@
                     android:gravity="center"
                     android:padding="7dp"
                     android:text="@string/merge_forward"
-                    android:textColor="#ff898989"
+                    android:textColor="@color/txt_black"
                     android:textSize="12sp" />
 
             </LinearLayout>

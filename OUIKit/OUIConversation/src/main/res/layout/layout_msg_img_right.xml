@@ -27,31 +27,81 @@
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/contentGroup2" />
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/contentGroup2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/avatar2">
+            android:layout_width="140dp"
+            android:layout_height="230dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@id/avatar2"
+            android:gravity="right"
+            android:orientation="vertical">
 
-            <org.raphets.roundimageview.RoundImageView
-                android:id="@+id/content2"
-                android:layout_width="140dp"
-                android:layout_height="240dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:gravity="center_vertical"
-                app:corner_radius="7dp"
-                app:type="round" />
-
-            <ImageView
-                android:id="@+id/videoPlay2"
+            <TextView
+                android:id="@+id/nickName2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:src="@mipmap/ic_chat_video_play"
+                android:layout_marginBottom="3dp"
+                android:textColor="#ff666666"
+                android:textSize="12sp"
                 android:visibility="gone" />
-        </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <org.raphets.roundimageview.RoundImageView
+                    android:id="@+id/content2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    app:corner_radius="7dp"
+                    app:type="round" />
+
+                <View
+                    android:id="@+id/mask2"
+                    android:layout_width="140dp"
+                    android:layout_height="230dp"
+                    android:alpha="0.6"
+                    android:background="@drawable/sty_radius_6_000000" />
+
+                <RelativeLayout
+                    android:id="@+id/videoPlay2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true">
+
+                    <io.openim.android.ouicore.widget.CirclePgBar
+                        android:id="@+id/circleBar2"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        app:strokeWidth="2dp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:src="@mipmap/ic_file_download_pause"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/duration2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentBottom="true"
+                        android:padding="4dp"
+                        android:textColor="#ffffffff"
+                        android:textSize="10sp" />
+                </RelativeLayout>
+
+
+            </RelativeLayout>
+        </LinearLayout>
+
 
         <io.openim.android.ouicore.widget.AvatarImage
             android:id="@+id/avatar2"

@@ -23,7 +23,6 @@ public class CirclePgBar extends View {
     private int mWidth;
     private int mHeight;
 
-
     public CirclePgBar(Context context) {
         super(context);
         init();
@@ -104,7 +103,7 @@ public class CirclePgBar extends View {
     }
 
     public int getRealSize(int measureSpec) {
-        int result = 1;
+        int result;
         int mode = MeasureSpec.getMode(measureSpec);
         int size = MeasureSpec.getSize(measureSpec);
 

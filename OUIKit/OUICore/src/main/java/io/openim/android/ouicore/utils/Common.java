@@ -305,15 +305,16 @@ public class Common {
      * @return
      */
     public static void loadVideoSnapshot(ImageView iv, VideoElem elem) {
-        String snapshotUrl = elem.getSnapshotUrl();
-        try {
-            if (null == snapshotUrl) {
-                String filePath = elem.getSnapshotPath();
-                if (new File(filePath).exists()) snapshotUrl = filePath;
-            }
-        } catch (Exception ignore) {
+        //本地
+        String path = elem.getSnapshotPath();
+        if (!GetFilePathFromUri.fileIsExists(path)){
+            //远程
+            path = elem.getSnapshotUrl();
         }
-        Glide.with(iv.getContext()).load(snapshotUrl).placeholder(R.mipmap.ic_chat_photo).into(iv);
+        Glide.with(iv.getContext()).load(path)
+            .placeholder(R.mipmap.ic_chat_photo)
+            .error(R.mipmap.ic_chat_photo)
+            .into(iv);
     }
 
     /**

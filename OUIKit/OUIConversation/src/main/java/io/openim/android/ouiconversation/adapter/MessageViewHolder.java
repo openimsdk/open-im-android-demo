@@ -83,8 +83,10 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.ouicore.vm.ForwardVM;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.voice.listener.PlayerListener;
 import io.openim.android.ouicore.voice.player.SMediaPlayer;
@@ -96,6 +98,7 @@ import io.openim.android.sdk.models.CardElem;
 import io.openim.android.sdk.models.MergeElem;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.QuoteElem;
+import io.openim.android.sdk.models.VideoElem;
 
 public class MessageViewHolder {
     public static RecyclerView.ViewHolder createViewHolder(@NonNull ViewGroup parent,
@@ -396,9 +399,7 @@ public class MessageViewHolder {
                                         chatVM.deleteMessageFromLocalStorage(message);
                                     }
                                     if (iconRes == R.mipmap.ic_forward) {
-                                        Message forwardMessage =
-                                            OpenIMClient.getInstance().messageManager.createForwardMessage(message);
-                                        chatVM.forwardMsg = forwardMessage;
+                                        Easy.find(ForwardVM.class).createForwardMessage(message);
 
                                         ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity)
                                             view.getContext(), Constant.Event.FORWARD);
@@ -554,7 +555,7 @@ public class MessageViewHolder {
                 textView.setText(IMUtil.tipsHandle(message.getContentType()));
             else
                 textView.setText(String.format(textView.getContext()
-                    .getString(io.openim.android.ouicore.R.string.revoke_tips),
+                        .getString(io.openim.android.ouicore.R.string.revoke_tips),
                     message.getSenderNickname()));
         }
 
@@ -887,16 +888,27 @@ public class MessageViewHolder {
         @Override
         protected void bindRight(View itemView, Message message) {
             LayoutMsgImgRightBinding view = LayoutMsgImgRightBinding.bind(itemView);
-            view.avatar2.load(message.getSenderFaceUrl(), message.getSenderNickname());
             view.sendState2.setSendState(message.getStatus());
             view.videoPlay2.setVisibility(View.VISIBLE);
 
-            Common.loadVideoSnapshot(view.content2, message.getVideoElem());
+            MsgExpand msgExpand = (MsgExpand) message.getExt();
 
+            int progress = (int) msgExpand.sendProgress;
+            view.circleBar2.setTargetProgress(progress);
+            boolean sendSuccess=message.getStatus() == Constant.Send_State.SEND_SUCCESS;
+            if (sendSuccess)
+                view.circleBar2.reset();
+            view.mask2.setVisibility(sendSuccess?
+                View.GONE : View.VISIBLE);
+
+            VideoElem videoElem =message.getVideoElem();
+            String secondFormat = TimeUtil.getTime((int) videoElem.getDuration(), TimeUtil.minuteTimeFormat);
+            view.duration2.setText(secondFormat);
+            Common.loadVideoSnapshot(view.content2, videoElem);
             preview(message, view.videoPlay2);
         }
 
-        private void preview(Message message, ImageView view) {
+        private void preview(Message message, View view) {
             String snapshotUrl = message.getVideoElem().getSnapshotUrl();
             String videoPath = message.getVideoElem().getVideoPath();
             if (!GetFilePathFromUri.fileIsExists(videoPath))
@@ -1247,11 +1259,11 @@ public class MessageViewHolder {
         @SuppressLint("SetTextI18n")
         @Override
         protected void bindLeft(View itemView, Message message) {
-            super.bindLeft(itemView, message);
             LayoutMsgTxtLeftBinding v = LayoutMsgTxtLeftBinding.bind(itemView);
             v.quoteLy1.setVisibility(View.VISIBLE);
             QuoteElem quoteElem = message.getQuoteElem();
-            if (!handleSequence(v.content, message)) v.content.setText(quoteElem.getText());
+            if (!handleSequence(v.content, message))
+                v.content.setText(quoteElem.getText());
 
             message = quoteElem.getQuoteMessage();
             int contentType = message.getContentType();
@@ -1289,9 +1301,9 @@ public class MessageViewHolder {
         @SuppressLint("SetTextI18n")
         @Override
         protected void bindRight(View itemView, Message message) {
-            super.bindRight(itemView, message);
             LayoutMsgTxtRightBinding v = LayoutMsgTxtRightBinding.bind(itemView);
             v.quoteLy2.setVisibility(View.VISIBLE);
+            v.sendState2.setSendState(message.getStatus());
             QuoteElem quoteElem = message.getQuoteElem();
             if (!handleSequence(v.content2, message)) v.content2.setText(quoteElem.getText());
 

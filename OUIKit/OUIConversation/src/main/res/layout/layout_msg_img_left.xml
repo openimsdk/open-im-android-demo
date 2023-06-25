@@ -67,7 +67,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
-                    android:src="@mipmap/ic_chat_video_play"
+                    android:src="@mipmap/ic_file_download_pause"
                     android:visibility="gone" />
             </RelativeLayout>
         </LinearLayout>

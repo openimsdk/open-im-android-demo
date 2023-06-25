@@ -38,5 +38,5 @@ public class MsgExpand {
     //自定义表情
     public CustomEmojiEntity customEmoji;
     //发送消息进度
-    public long sendProgress;
+    public long sendProgress=0;
 }

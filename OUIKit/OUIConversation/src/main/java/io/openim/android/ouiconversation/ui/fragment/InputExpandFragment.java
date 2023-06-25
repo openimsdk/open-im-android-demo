@@ -245,19 +245,18 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                         Glide.with(this).asBitmap().load(filePath).into(new SimpleTarget<Bitmap>() {
                             @Override
                             public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                                String firstFame = MediaFileUtil.saveBitmap(resource, Constant.PICTURE_DIR);
+                                String firstFame = MediaFileUtil.saveBitmap(resource, Constant.PICTURE_DIR,false);
                                 long duration = MediaFileUtil.getDuration(filePath);
-                                Message msg = OpenIMClient.getInstance().messageManager.createVideoMessageFromFullPath(filePath, MediaFileUtil.getFileType(filePath).mimeType, duration, firstFame);
+                                Message msg = OpenIMClient.getInstance().messageManager.createVideoMessageFromFullPath(filePath,
+                                    MediaFileUtil.getFileType(filePath).mimeType, duration, firstFame);
                                 vm.sendMsg(msg);
                             }
                         });
                         return;
                     }
-                    if (null != filePath) {
-                        Message msg = OpenIMClient.getInstance().messageManager.createFileMessageFromFullPath(filePath,
-                            new File(filePath).getName());
-                        vm.sendMsg(msg);
-                    }
+                    Message msg = OpenIMClient.getInstance().messageManager.createFileMessageFromFullPath(filePath,
+                        new File(filePath).getName());
+                    vm.sendMsg(msg);
                 }
             }
         }
@@ -276,7 +275,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                     Glide.with(this).asBitmap().load(file).into(new SimpleTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                            String firstFame = MediaFileUtil.saveBitmap(resource, Constant.PICTURE_DIR);
+                            String firstFame = MediaFileUtil.saveBitmap(resource, Constant.PICTURE_DIR,false);
                             long duration = MediaFileUtil.getDuration(file);
                             Message msg = OpenIMClient.getInstance().messageManager.createVideoMessageFromFullPath(file, MediaFileUtil.getFileType(file).mimeType, duration, firstFame);
                             vm.sendMsg(msg);

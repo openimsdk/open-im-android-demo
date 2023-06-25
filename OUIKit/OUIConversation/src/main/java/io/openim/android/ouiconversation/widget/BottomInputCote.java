@@ -85,7 +85,8 @@ public class BottomInputCote {
             final Message msg;
             if (null != vm.replyMessage.getValue()) {
                 msg =
-                    OpenIMClient.getInstance().messageManager.createQuoteMessage(vm.inputMsg.getValue(), vm.replyMessage.getValue());
+                    OpenIMClient.getInstance().messageManager
+                        .createQuoteMessage(vm.inputMsg.getValue(), vm.replyMessage.getValue());
             } else if (atMessages.isEmpty())
                 msg =
                     OpenIMClient.getInstance().messageManager.createTextMessage(vm.inputMsg.getValue());

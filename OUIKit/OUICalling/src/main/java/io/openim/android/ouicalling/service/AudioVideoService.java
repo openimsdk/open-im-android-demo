@@ -86,32 +86,32 @@ public class AudioVideoService extends KeepAliveService {
         });
     }
     private void addListener() {
-        Open_im_sdk.setListenerForService(new OnListenerForService() {
-            @Override
-            public void onFriendApplicationAccepted(String s) {
-                IMUtil.sendNotice(System.currentTimeMillis());
-            }
-
-            @Override
-            public void onFriendApplicationAdded(String s) {
-                IMUtil.sendNotice(System.currentTimeMillis());
-            }
-
-            @Override
-            public void onGroupApplicationAccepted(String s) {
-                IMUtil.sendNotice(System.currentTimeMillis());
-            }
-
-            @Override
-            public void onGroupApplicationAdded(String s) {
-                IMUtil.sendNotice(System.currentTimeMillis());
-            }
-
-            @Override
-            public void onRecvNewMessage(String s) {
-
-            }
-        });
+//        Open_im_sdk.setListenerForService(new OnListenerForService() {
+//            @Override
+//            public void onFriendApplicationAccepted(String s) {
+//                IMUtil.sendNotice(System.currentTimeMillis());
+//            }
+//
+//            @Override
+//            public void onFriendApplicationAdded(String s) {
+//                IMUtil.sendNotice(System.currentTimeMillis());
+//            }
+//
+//            @Override
+//            public void onGroupApplicationAccepted(String s) {
+//                IMUtil.sendNotice(System.currentTimeMillis());
+//            }
+//
+//            @Override
+//            public void onGroupApplicationAdded(String s) {
+//                IMUtil.sendNotice(System.currentTimeMillis());
+//            }
+//
+//            @Override
+//            public void onRecvNewMessage(String s) {
+//
+//            }
+//        });
     }
 
     public void loginOpenIM(OnBase<String> stringOnBase) {

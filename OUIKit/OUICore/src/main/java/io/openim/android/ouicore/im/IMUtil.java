@@ -134,19 +134,11 @@ public class IMUtil {
         return list;
     }
 
-    public static Message createMergerMessage(boolean isSingleChat, String otherSideName,
-                                              List<Message> list) {
-        String title = "";
+    public static Message createMergerMessage(String title,List<Message> list) {
         List<String> summaryList = new ArrayList<>();
         for (Message message : list) {
             summaryList.add(message.getSenderNickname() + ":" + getMsgParse(message));
             if (summaryList.size() >= 2) break;
-        }
-        if (isSingleChat) {
-            title =
-                LoginCertificate.getCache(BaseApp.inst()).nickname + BaseApp.inst().getString(R.string.and) + otherSideName + BaseApp.inst().getString(R.string.chat_history);
-        } else {
-            title = BaseApp.inst().getString(R.string.group_chat_history);
         }
 
         return OpenIMClient.getInstance().messageManager.createMergerMessage(list, title,

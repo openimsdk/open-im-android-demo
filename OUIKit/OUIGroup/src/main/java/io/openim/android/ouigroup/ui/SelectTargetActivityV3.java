@@ -164,8 +164,8 @@ public class SelectTargetActivityV3 extends BaseActivity<BaseViewModel,
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void fasterDestroy() {
+        super.fasterDestroy();
         Easy.delete(MultipleChoiceVM.class);
     }
 }

@@ -25,6 +25,7 @@
             android:textSize="17sp"
             android:textStyle="bold" />
 
+
         <LinearLayout
             android:id="@+id/single"
             android:layout_width="wrap_content"
@@ -51,12 +52,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxHeight="200dp" />
+        <TextView
+            android:id="@+id/content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:textColor="#ff8e9ab0"
+            android:textSize="17sp"
+            />
 
         <EditText
             android:id="@+id/leave"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginTop="10dp"
+
             android:background="@drawable/sty_radius_4_f0f0f0"
             android:hint="@string/leave_word"
             android:paddingLeft="16dp"
