@@ -369,7 +369,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 //            (msgConversation.conversationInfo.isPinned() ? "#FFF3F3F3" : "#FFFFFF"));
             viewHolder.viewBinding.setTop.setVisibility(msgConversation.conversationInfo.isPinned() ? View.VISIBLE : View.GONE);
 
-            String lastMsg = IMUtil.getMsgParse(msgConversation.lastMsg);
+            String lastMsg = IMUtil.getMsgParse(msgConversation.lastMsg).toString();
             //强提醒
             if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification) {
                 String target =

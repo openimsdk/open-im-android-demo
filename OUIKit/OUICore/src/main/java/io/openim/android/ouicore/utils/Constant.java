@@ -248,15 +248,6 @@ public class Constant {
         /// 直接进群
         public static final int directly = 2;
     }
-
-    public static class GroupType {
-        /// 普通群
-        public static final int general = 0;
-
-        /// 工作群
-        public static final int work = 2;
-    }
-
     //超级群
     public static final int SUPER_GROUP_LIMIT = 250;
 

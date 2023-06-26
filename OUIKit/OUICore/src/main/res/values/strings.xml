@@ -391,4 +391,5 @@
     <string name="leave_word">留言</string>
     <string name="send_who">发送给：</string>
     <string name="multiple_send">分别发送给：</string>
+    <string name="media_call">音视频通话</string>
 </resources>

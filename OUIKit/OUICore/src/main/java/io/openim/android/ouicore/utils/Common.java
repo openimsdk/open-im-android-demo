@@ -69,7 +69,7 @@ public class Common {
 
 
     public static void stringBindForegroundColorSpan(TextView textView, String data, String target) {
-        stringBindForegroundColorSpan(textView, data, target, Color.parseColor("#009ad6"));
+        stringBindForegroundColorSpan(textView, data, target,R.color.theme);
     }
 
     /**

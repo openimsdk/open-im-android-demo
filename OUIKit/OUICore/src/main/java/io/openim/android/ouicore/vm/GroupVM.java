@@ -29,6 +29,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.GroupType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
@@ -112,12 +113,13 @@ public class GroupVM extends SocialityVM {
         }
         GroupInfo groupInfo = new GroupInfo();
         groupInfo.setGroupName(groupName.getValue());
+        groupInfo.setGroupType(GroupType.WORK);
         OpenIMClient.getInstance().groupManager.createGroup(memberUserIDs, null, groupInfo,
                 loginCertificate.userID, new OnBase<GroupInfo>() {
             @Override
             public void onError(int code, String error) {
+                waitDialog.dismiss();
                 getIView().onError(error);
-
             }
 
             @Override

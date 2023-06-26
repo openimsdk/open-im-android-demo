@@ -23,7 +23,7 @@ public class ForwardVM extends BaseVM {
 
     public void createForwardMessage(Message message) {
         reset();
-        tips = IMUtil.getMsgParse(message);
+        tips = IMUtil.getMsgParse(message).toString();
         forwardMsg = OpenIMClient.getInstance().messageManager.createForwardMessage(message);
     }
 

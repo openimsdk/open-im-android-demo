@@ -76,6 +76,7 @@ public class IMEvent {
     }
 
     private void signalingListener() {
+        //TODO
         OpenIMClient.getInstance().signalingManager.setSignalingListener(new OnSignalingListener() {
             @Override
             public void onInvitationCancelled(SignalingInfo s) {

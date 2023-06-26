@@ -22,14 +22,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/search"
-        android:textColor="#ff333333"
-        android:textSize="14sp" />
+        android:textColor="@color/theme"
+        android:textSize="17sp" />
 
     <TextView
         android:id="@+id/userId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#ff333333"
-
-        android:textSize="14sp" />
+         />
 </LinearLayout>

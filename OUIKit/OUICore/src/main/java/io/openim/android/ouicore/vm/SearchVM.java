@@ -11,9 +11,16 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.entity.UserList;
+import io.openim.android.ouicore.net.RXRetrofit.N;
+import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
+import io.openim.android.ouicore.net.RXRetrofit.Parameter;
+import io.openim.android.ouicore.services.OneselfService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.sdk.OpenIMClient;
@@ -77,6 +84,7 @@ public class SearchVM extends BaseViewModel {
         }, ids);
     }
 
+
     public void checkFriend(List<UserInfo> data) {
         List<String> uIds = new ArrayList<>();
         uIds.add(data.get(0).getUserID());
@@ -92,6 +100,40 @@ public class SearchVM extends BaseViewModel {
             }
         }, uIds);
 
+    }
+
+    //uid、昵称、备注、手机号
+    public void searchUser(String keyword) {
+        Parameter parameter = new Parameter();
+        parameter.add("keyword", keyword);
+//        "pagination": {
+//            "pageNumber": 0,
+//                "showNumber": 10
+//        },
+        Map<String, Integer> pa = new HashMap<>();
+        pa.put("pageNumber", 1);
+        pa.put("showNumber", 100);
+        parameter.add("pagination", pa);
+        parameter.add("keyword", keyword);
+        parameter.add("keyword", keyword);
+
+        N.API(OneselfService.class).searchUser(parameter.buildJsonBody())
+            .map(OneselfService.turn(UserList.class))
+            .compose(N.IOMain())
+            .subscribe(new NetObserver<UserList>("") {
+
+
+                @Override
+                public void onSuccess(UserList o) {
+                    if (o.users.size() > 0)
+                        userInfo.setValue(o.users);
+                }
+
+                @Override
+                protected void onFailure(Throwable e) {
+
+                }
+            });
     }
 
     public void searchGroupMemberByNickname(String groupId, String key) {
@@ -176,7 +218,7 @@ public class SearchVM extends BaseViewModel {
                 }
                 friendInfo.setValue(friendInfo.getValue());
             }
-        }, buildKeyWord(), false, true, true);
+        }, buildKeyWord(), true, true, true);
     }
 
     public void searchGroupV2() {

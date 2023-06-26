@@ -107,7 +107,7 @@ public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChat
                 holder.viewBinding.nickName.setText(data.getSenderNickname());
                 holder.viewBinding.time.setText(TimeUtil.getTimeString(data.getSendTime()));
 
-                String msg = IMUtil.getMsgParse(data);
+                String msg = IMUtil.getMsgParse(data).toString();
                 SpannableStringBuilder spannableString = new SpannableStringBuilder(msg);
                 int index = msg.indexOf(inputKey.getValue());
                 if (index != -1) {

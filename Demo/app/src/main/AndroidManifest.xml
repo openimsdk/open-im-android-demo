@@ -18,7 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Main"
         android:usesCleartextTraffic="true">
-
+        <activity
+            android:name=".ui.user.UserDetailActivityV3"
+            android:exported="false" />
         <activity
             android:name=".ui.login.ResetPasswordActivity"
             android:exported="false">
@@ -101,8 +103,8 @@
         </activity>
         <activity
             android:name=".ui.main.MainActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

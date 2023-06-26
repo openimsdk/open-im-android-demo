@@ -120,8 +120,7 @@ public class MessageViewHolder {
             return new LocationView(parent);
         if (viewType == MessageType.OA_NTF)
             return new NotificationItemHo(parent);
-        if (viewType >= MessageType.NTF_BEGIN
-            || viewType == MessageType.REVOKE)
+        if (viewType >= MessageType.NTF_BEGIN)
             return new NoticeView(parent);
         if (viewType == MessageType.MERGER)
             return new MergeView(parent);
@@ -304,7 +303,6 @@ public class MessageViewHolder {
             unRead.setVisibility(View.GONE);
             if (isOwn && message.getStatus() == Constant.Send_State.SEND_SUCCESS
                 && viewType < MessageType.NTF_BEGIN
-                && viewType != MessageType.REVOKE
                 && viewType != Constant.MsgType.LOCAL_CALL_HISTORY) {
                 unRead.setVisibility(View.VISIBLE);
                 if (chatVM.isSingleChat) {
@@ -313,12 +311,12 @@ public class MessageViewHolder {
                     String readed =
                         String.format(chatVM.getContext().getString(io.openim.android.ouicore.R.string.readed), "");
                     unRead.setText(message.isRead() ? readed : unread);
-                    unRead.setTextColor(Color.parseColor(message.isRead() ? "#ff999999" :
+                    unRead.setTextColor(Color.parseColor(message.isRead() ? "#0089FF" :
                         "#ff5496eb"));
                 } else {
                     int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;
                     if (unreadCount > 0) {
-                        unRead.setTextColor(Color.parseColor("#ff999999"));
+                        unRead.setTextColor(Color.parseColor("#0089FF"));
                         unRead.setText(unreadCount
                             + chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
                         unRead.setOnClickListener(v -> {
@@ -549,14 +547,14 @@ public class MessageViewHolder {
         @SuppressLint({"SetTextI18n", "StringFormatInvalid"})
         @Override
         public void bindData(Message message, int position) {
+            boolean  onlyOne=messageAdapter.messages.size()==1;
             TextView textView = itemView.findViewById(R.id.notice);
             textView.setVisibility(View.VISIBLE);
-            if (message.getContentType() >= MessageType.NTF_BEGIN)
-                textView.setText(IMUtil.tipsHandle(message.getContentType()));
-            else
-                textView.setText(String.format(textView.getContext()
-                        .getString(io.openim.android.ouicore.R.string.revoke_tips),
-                    message.getSenderNickname()));
+            View root = itemView.findViewById(R.id.root);
+            root.setPadding(0,onlyOne?Common.dp2px(10):0,
+                0,0);
+            textView.setText(((MsgExpand)message.getExt()).tips);
+            textView.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
         @Override

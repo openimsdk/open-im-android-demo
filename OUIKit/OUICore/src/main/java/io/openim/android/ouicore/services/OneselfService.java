@@ -44,6 +44,6 @@ public interface OneselfService {
     Observable<ResponseBody> downloadFileWithDynamicUrlSync(@Url String fileUrl);
 
 
-
-
+    @POST("user/search/public")
+    Observable<ResponseBody> searchUser(@Body RequestBody requestBody);
 }

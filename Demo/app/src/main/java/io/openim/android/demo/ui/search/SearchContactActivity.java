@@ -62,7 +62,7 @@ public class SearchContactActivity extends BaseActivity<SearchVM, ActivitySearch
             io.openim.android.ouicore.R.string.search_by_id : R.string.search_group_by_id);
         view.searchView.getEditText().setOnKeyListener((v, keyCode, event) -> {
             vm.searchContent.setValue(view.searchView.getEditText().getText().toString());
-            vm.search();
+            vm.searchUser( vm.searchContent.getValue());
             return false;
         });
 

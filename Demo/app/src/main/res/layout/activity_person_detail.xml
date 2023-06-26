@@ -17,7 +17,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/comm_title_high"
-                app:cardElevation="8dp">
+                app:cardElevation="0dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -28,13 +28,6 @@
                         android:id="@+id/back"
                         layout="@layout/view_back" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:text="@string/detail"
-                        android:textColor="#ff333333"
-                        android:textSize="18sp" />
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
 
@@ -47,60 +40,62 @@
                 android:paddingLeft="20dp"
                 android:paddingTop="10dp"
                 android:paddingRight="20dp"
-                android:paddingBottom="10dp">
+                android:paddingBottom="16dp">
 
                 <io.openim.android.ouicore.widget.AvatarImage
                     android:id="@+id/avatar"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@mipmap/ic_my_friend" />
+                    android:background="@mipmap/ic_my_friend" />
 
-                <TextView
-                    android:id="@+id/nickName"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_weight="1"
-                    android:textColor="#ff333333"
-                    android:textSize="20sp" />
+                    android:orientation="vertical">
 
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/nickName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:layout_weight="1"
+                        android:textColor="#ff0c1c33"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
 
-            <LinearLayout
-                android:id="@+id/idLy"
-                android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:layout_marginTop="12dp"
-                android:background="@color/white"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingLeft="22dp"
-                android:paddingRight="22dp">
+                    <TextView
+                        android:id="@+id/userId"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/txt_shallow"
+                        android:textSize="14sp" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/id"
-                    android:textColor="#ff333333"
-                    android:textSize="18sp" />
+                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/userId"
+                <FrameLayout
+                    android:id="@+id/addFriend"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#ff333333"
-                    android:textSize="18sp" />
+                    android:layout_height="35dp"
+                    android:background="@drawable/sty_radius_6_ff0089ff"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp">
 
-                <ImageView
-                    android:id="@+id/copy"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:padding="8dp"
-                    android:layout_marginRight="30dp"
-                    android:src="@mipmap/ic__copy" />
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:button="@null"
+                        android:drawableLeft="@mipmap/ic_add_friend4"
+                        android:gravity="center_vertical"
+                        android:text="@string/add_friend"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
+                </FrameLayout>
 
             </LinearLayout>
+
 
             <LinearLayout
                 android:id="@+id/groupInfo"
@@ -109,138 +104,163 @@
                 android:layout_marginTop="12dp"
                 android:background="@color/white"
                 android:orientation="vertical"
-                android:paddingLeft="20dp"
-                android:paddingTop="15dp"
-                android:paddingRight="20dp"
-                android:paddingBottom="15dp"
                 android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/group_nickName"
-                        android:textColor="#ff333333"
-                        android:textSize="18sp" />
+                    android:orientation="vertical"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="15dp"
+                    android:paddingRight="20dp"
+                    android:paddingBottom="15dp">
 
-                    <TextView
-                        android:id="@+id/groupNickName"
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:textColor="#ff333333"
-                        android:textSize="18sp" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/group_nickName"
+                            android:textColor="@color/txt_shallow"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/groupNickName"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:textColor="@color/txt_black"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/join_group_time"
+                            android:textColor="@color/txt_shallow"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/time"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:textColor="@color/txt_black"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/joinMethodLy"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/join_group_method"
+                            android:textColor="@color/txt_shallow"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/joinMethod"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:textColor="@color/txt_black"
+                            android:textSize="18sp" />
+                    </LinearLayout>
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp"
+                    android:background="@color/theme_bg" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="15dp"
+                    android:paddingRight="20dp"
+                    android:paddingBottom="15dp">
 
-                    <TextView
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:id="@+id/manager"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/join_group_time"
-                        android:textColor="#ff333333"
-                        android:textSize="18sp" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
 
-                    <TextView
-                        android:id="@+id/time"
-                        android:layout_width="0dp"
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/set_manager"
+                            android:textColor="#ff333333"
+                            android:textSize="18sp" />
+
+                        <io.openim.android.ouicore.widget.SlideButton
+                            android:id="@+id/setManager"
+                            android:layout_width="45dp"
+                            android:layout_height="25dp" />
+                    </LinearLayout>
+
+                    <io.openim.android.ouicore.widget.InterceptLinearLayout
+                        android:id="@+id/mute"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:textColor="#ff333333"
-                        android:textSize="18sp" />
+                        android:layout_marginTop="20dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/set_mute"
+                            android:textColor="#ff333333"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/muteTime"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:textColor="#ff333333"
+                            android:textSize="18sp" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@mipmap/ic_right" />
+                    </io.openim.android.ouicore.widget.InterceptLinearLayout>
+
+
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/joinMethodLy"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/join_group_method"
-                        android:textColor="#ff333333"
-                        android:textSize="18sp" />
-
-                    <TextView
-                        android:id="@+id/joinMethod"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:textColor="#ff333333"
-                        android:textSize="18sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/manager"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:gravity="center_vertical"
-                    android:visibility="gone"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/set_manager"
-                        android:textColor="#ff333333"
-                        android:textSize="18sp" />
-
-                    <io.openim.android.ouicore.widget.SlideButton
-                        android:id="@+id/setManager"
-                        android:layout_width="45dp"
-                        android:layout_height="25dp" />
-                </LinearLayout>
-
-                <io.openim.android.ouicore.widget.InterceptLinearLayout
-                    android:id="@+id/mute"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:visibility="gone"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/set_mute"
-                        android:textColor="#ff333333"
-                        android:textSize="18sp" />
-
-                    <TextView
-                        android:id="@+id/muteTime"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:textColor="#ff333333"
-                        android:textSize="18sp" />
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@mipmap/ic_right" />
-                </io.openim.android.ouicore.widget.InterceptLinearLayout>
             </LinearLayout>
+
 
             <LinearLayout
                 android:id="@+id/userInfo"
@@ -248,8 +268,8 @@
                 android:layout_height="55dp"
                 android:layout_marginTop="12dp"
                 android:background="@color/white"
-                android:visibility="gone"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="0dp"
@@ -280,50 +300,58 @@
                 android:id="@+id/bottomMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
-                android:visibility="gone"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:layout_marginBottom="60dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-                <RadioButton
-                    android:id="@+id/sendMsg"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:button="@null"
-                    android:drawableTop="@mipmap/ic_chat"
-                    android:drawablePadding="5dp"
-                    android:gravity="center_horizontal"
-                    android:text="@string/send_msg"
-                    android:textColor="#ff1d6bed"
-                    android:textSize="14sp" />
-
-                <RadioButton
+                <LinearLayout
                     android:id="@+id/call"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:button="@null"
-                    android:drawableTop="@mipmap/ic_call"
-                    android:drawablePadding="5dp"
-                    android:gravity="center_horizontal"
-                    android:text="@string/openim_call"
-                    android:textColor="#ff1d6bed"
-                    android:textSize="14sp" />
+                    android:layout_width="170dp"
+                    android:layout_height="46dp"
+                    android:gravity="center"
+                    android:background="@drawable/sty_radius_6_white"
+                    >
 
-                <RadioButton
-                    android:id="@+id/addFriend"
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:button="@null"
+                        android:drawableLeft="@mipmap/ic_call"
+                        android:drawablePadding="10dp"
+                        android:text="@string/media_call"
+                        android:textColor="@color/txt_black"
+                        android:textSize="17sp" />
+                </LinearLayout>
+
+
+
+                <View
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:button="@null"
-                    android:drawableTop="@mipmap/ic_add_friend3"
-                    android:drawablePadding="5dp"
-                    android:gravity="center_horizontal"
-                    android:text="@string/add_friend"
-                    android:textColor="#ff1d6bed"
-                    android:textSize="14sp" />
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <LinearLayout
+                    android:layout_width="170dp"
+                    android:layout_height="46dp"
+                    android:id="@+id/sendMsg"
+                    android:background="@drawable/sty_radius_6_ff0089ff"
+                    android:gravity="center"
+                    >
+
+                    <RadioButton
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:button="@null"
+                        android:drawableLeft="@mipmap/ic_chat"
+                        android:drawablePadding="10dp"
+                        android:text="@string/send_msg"
+                        android:textColor="@color/white"
+                        android:textSize="17sp" />
+                </LinearLayout>
+
             </LinearLayout>
 
 

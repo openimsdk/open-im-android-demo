@@ -64,7 +64,7 @@
     <string name="apply_join">申请加入该群</string>
     <string name="withdraw">撤回</string>
     <string name="delete">删除</string>
-    <string name="revoke_tips">撤回了一条消息</string>
+    <string name="revoke_tips">%1$s 撤回了一条消息</string>
     <string name="forward">转发</string>
     <string name="multiple_choice">多选</string>
     <string name="merge_forward">合并转发</string>
@@ -376,4 +376,5 @@
     <string name="leave_word">留言</string>
     <string name="send_who">发送给：</string>
     <string name="multiple_send">分别发送给：</string>
+    <string name="media_call">音视频通话</string>
 </resources>

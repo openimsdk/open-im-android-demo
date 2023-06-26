@@ -3,6 +3,7 @@ package io.openim.android.ouiconversation.vm;
 
 import static io.openim.android.ouicore.utils.Common.UIHandler;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -38,6 +39,7 @@ import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.services.OneselfService;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
@@ -50,6 +52,7 @@ import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 
 import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.enums.GroupType;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
@@ -146,16 +149,17 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     private void signalingGetRoomByGroupID() {
-        OpenIMClient.getInstance().signalingManager.signalingGetRoomByGroupID(new OnBase<RoomCallingInfo>() {
-            @Override
-            public void onError(int code, String error) {
-            }
-
-            @Override
-            public void onSuccess(RoomCallingInfo data) {
-                roomCallingInfo.setValue(data);
-            }
-        }, groupID);
+        //TODO
+//        OpenIMClient.getInstance().signalingManager.signalingGetRoomByGroupID(new OnBase<RoomCallingInfo>() {
+//            @Override
+//            public void onError(int code, String error) {
+//            }
+//
+//            @Override
+//            public void onSuccess(RoomCallingInfo data) {
+//                roomCallingInfo.setValue(data);
+//            }
+//        }, groupID);
     }
 
     public void signalingGetTokenByRoomID(String roomID) {
@@ -187,7 +191,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new OnBase<List<GroupMembersInfo>>() {
             @Override
             public void onError(int code, String error) {
-
+            toast(error+"("+code+")");
             }
 
             @Override
@@ -545,8 +549,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }, groupIds);
     }
 
-    private boolean getIsSuperGroup() {
-        return groupInfo.getValue().getGroupType() == ConversationType.SUPER_GROUP_CHAT;
+    private boolean isWordGroup() {
+        return groupInfo.getValue().getGroupType() == GroupType.WORK;
     }
 
     public void getOneConversation(IMUtil.OnSuccessListener<ConversationInfo> onSuccessListener) {
@@ -570,13 +574,15 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 getConversationRecvMessageOpt(data.getConversationID());
             }
         }, isSingleChat ? userID : groupID, isSingleChat ? ConversationType.SINGLE_CHAT :
-            getIsSuperGroup() ? ConversationType.SUPER_GROUP_CHAT : ConversationType.GROUP_CHAT);
+            isWordGroup() ? ConversationType.SUPER_GROUP_CHAT : ConversationType.GROUP_CHAT);
     }
 
     private void loadHistory() {
         //加载消息记录
-        if (fromChatHistory) loadHistoryMessageReverse();
-        else loadHistoryMessage();
+        if (fromChatHistory)
+            loadHistoryMessageReverse();
+        else
+            loadHistoryMessage();
     }
 
     @Override
@@ -857,7 +863,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 Message message = messageAdapter.getMessages().get(i);
                 if (TextUtils.isEmpty(message.getClientMsgID())) continue;
                 if (message.getClientMsgID().equals(msgId)) {
-                    message.setContentType(MessageType.REVOKE);
+                    message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
                     messageAdapter.notifyItemChanged(i);
                     return;
                 }
@@ -872,7 +878,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         try {
             for (Message message : messages.getValue()) {
                 if (message.getClientMsgID().equals(info.getClientMsgID())) {
-                    message.setContentType(MessageType.REVOKE);
+                    message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
                     messageAdapter.notifyItemChanged(messages.getValue().indexOf(message));
                 }
             }
@@ -1005,11 +1011,25 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
 
             @Override
+            @SuppressLint("StringFormatInvalid")
             public void onSuccess(String data) {
-                message.setContentType(MessageType.REVOKE);
+                message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
                 if (hasPermission)
-                    message.setSenderNickname(BaseApp.inst().loginCertificate.nickname);
-                messageAdapter.notifyItemChanged(messageAdapter.getMessages().indexOf(message));
+                    message.setSenderNickname(BaseApp.inst().
+                        loginCertificate.nickname);
+
+                String name=BaseApp.inst().loginCertificate.nickname;
+                String uid=BaseApp.inst().loginCertificate.userID;
+                //a 撤回了一条消息
+               String txt =
+                    String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips)
+                        ,message.getSenderNickname() );
+
+                ((MsgExpand)message.getExt()).tips =IMUtil.getSingleSequence(name
+                    ,uid, txt);
+
+                messageAdapter.notifyItemChanged(messageAdapter.getMessages()
+                    .indexOf(message));
             }
         }, message);
 

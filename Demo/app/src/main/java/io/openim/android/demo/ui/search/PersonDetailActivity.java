@@ -38,6 +38,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.ouigroup.ui.SetMuteActivity;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendshipInfo;
 import io.openim.android.sdk.models.GroupInfo;
@@ -135,7 +136,8 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             if (isOwner(targetGroupMembersInfo) || isAdmin(targetGroupMembersInfo)) {
                 view.mute.setVisibility(View.GONE);
             } else {
-                view.mute.setVisibility(isOwner(oneselfGroupMembersInfo) || isAdmin(oneselfGroupMembersInfo) ? View.VISIBLE : View.GONE);
+                view.mute.setVisibility(isOwner(oneselfGroupMembersInfo)
+                    || isAdmin(oneselfGroupMembersInfo) ? View.VISIBLE : View.GONE);
             }
             if (targetGroupMembersInfo.getJoinSource() == 2) {
                 List<String> ids2 = new ArrayList<>();
@@ -177,10 +179,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         });
 
     private void click() {
-        view.copy.setOnClickListener(v -> {
-            Common.copy(vm.userInfo.getValue().get(0).getUserID());
-            toast(getString(io.openim.android.ouicore.R.string.copy_succ));
-        });
+
         view.userInfo.setOnClickListener(v -> {
             personDataActivityLauncher.launch(new Intent(this, PersonDataActivity.class).putExtra(Constant.K_ID, vm.userInfo.getValue().get(0).getUserID()));
         });
@@ -241,17 +240,18 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             // 不允许查看群成员资料
             if (notLookMemberInfo = (groupInfo.getLookMemberInfo() == 1)) {
                 view.userInfo.setVisibility(View.GONE);
-                view.idLy.setVisibility(View.GONE);
+                view.userId.setVisibility(View.GONE);
             } else {
-                view.idLy.setVisibility(View.VISIBLE);
-                if (!oneself() && isFriend) view.userInfo.setVisibility(View.VISIBLE);
+                view.userId.setVisibility(View.VISIBLE);
+                if (!oneself() && isFriend) view.userInfo
+                    .setVisibility(View.VISIBLE);
             }
             // 不允许添加组成员为好友
             applyMemberFriend = groupInfo.getApplyMemberFriend() == 1;
 
-            view.addFriend.setVisibility((applyMemberFriend || isFriend) ? View.GONE :
+            view.addFriend.setVisibility((applyMemberFriend || isFriend||oneself()) ? View.GONE :
                 View.VISIBLE);
-            view.idLy.setVisibility(applyMemberFriend ? View.GONE : View.VISIBLE);
+            view.userId.setVisibility(applyMemberFriend ? View.GONE : View.VISIBLE);
 
             getOneselfAndTargetMemberInfo();
         });
@@ -324,11 +324,11 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     }
 
     private boolean isOwner(GroupMembersInfo membersInfo) {
-        return membersInfo.getRoleLevel() == Constant.RoleLevel.GROUP_OWNER;
+        return membersInfo.getRoleLevel() == GroupRole.OWNER;
     }
 
     private boolean isAdmin(GroupMembersInfo membersInfo) {
-        return membersInfo.getRoleLevel() == Constant.RoleLevel.ADMINISTRATOR;
+        return membersInfo.getRoleLevel() == GroupRole.ADMIN;
     }
 
 

@@ -26,6 +26,8 @@ public class MsgExpand {
     public transient SpannableStringBuilder sequence;
     //oa 通知
     public OANotification oaNotification;
+    //普通通知 富文本
+    public CharSequence tips;
     //阅后即焚倒计时
     public int readVanishNum;
     //呼叫记录 ------
