@@ -29,6 +29,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.enums.GroupType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
@@ -63,6 +64,8 @@ public class GroupVM extends SocialityVM {
     public MutableLiveData<List<FriendInfo>> selectedFriendInfo =
             new MutableLiveData<>(new ArrayList<>());
     public LoginCertificate loginCertificate;
+
+    public List<FriendInfo> selectedFriendInfoV3=new ArrayList<>();
 
     public int page = 0;
     public int pageSize = 20;
@@ -295,7 +298,7 @@ public class GroupVM extends SocialityVM {
                 for (GroupMembersInfo datum : data) {
                     ExGroupMemberInfo exGroupMemberInfo = new ExGroupMemberInfo();
                     exGroupMemberInfo.groupMembersInfo = datum;
-                    if (datum.getRoleLevel() > 1) {
+                    if (datum.getRoleLevel() != GroupRole.MEMBER) {
                         //群管理单独存放
                         exGroupMemberInfo.sortLetter = "";
                         exGroupManagement.getValue().add(exGroupMemberInfo);
@@ -342,21 +345,22 @@ public class GroupVM extends SocialityVM {
         for (FriendInfo friendInfo : friendInfos) {
             userIds.add(friendInfo.getUserID());
         }
-        OpenIMClient.getInstance().groupManager.inviteUserToGroup(new OnBase<List<GroupInviteResult>>() {
+        OpenIMClient.getInstance().groupManager
+            .inviteUserToGroup(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
                 getIView().toast(error);
             }
 
             @Override
-            public void onSuccess(List<GroupInviteResult> data) {
+            public void onSuccess(String data) {
                 getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.Invitation_succeeded));
                 getGroupMemberList();
                 getIView().onSuccess(null);
 
                 Obs.newMessage(Constant.Event.UPDATE_GROUP_INFO, groupName);
             }
-        }, groupId, userIds, "");
+        }, groupId, userIds, "com");
     }
 
     /**
@@ -367,14 +371,14 @@ public class GroupVM extends SocialityVM {
         for (FriendInfo friendInfo : friendInfos) {
             userIds.add(friendInfo.getUserID());
         }
-        OpenIMClient.getInstance().groupManager.kickGroupMember(new OnBase<List<GroupInviteResult>>() {
+        OpenIMClient.getInstance().groupManager.kickGroupMember(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
                 getIView().toast(error);
             }
 
             @Override
-            public void onSuccess(List<GroupInviteResult> data) {
+            public void onSuccess(String data) {
                 getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.kicked_out));
                 getGroupMemberList();
                 getIView().onSuccess(null);

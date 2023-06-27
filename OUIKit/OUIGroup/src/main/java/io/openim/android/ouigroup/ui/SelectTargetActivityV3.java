@@ -15,6 +15,8 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,20 +42,17 @@ import io.openim.android.sdk.enums.ConversationType;
 @Route(path = Routes.Group.SELECT_TARGET)
 public class SelectTargetActivityV3 extends BaseActivity<BaseViewModel,
     ActivityCreateGroupV3Binding> {
+
+    @NotNull("multipleChoiceVM cannot be empty")
     MultipleChoiceVM multipleChoiceVM;
     RecyclerViewAdapter<MsgConversation, ViewHol.ItemViewHo> adapter;
 
-    /**
-     * 发起群聊
-     * true 隐藏最近会话、隐藏群，只显示好友
-     */
-    private boolean isCreateGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityCreateGroupV3Binding.inflate(getLayoutInflater()));
-        multipleChoiceVM = Easy.installVM(MultipleChoiceVM.class);
+        multipleChoiceVM = Easy.find(MultipleChoiceVM.class);
         multipleChoiceVM.bindDataToView(view.bottom);
         multipleChoiceVM.showPopAllSelectFriends(view.bottom,
             LayoutPopSelectedFriendsBinding.inflate(getLayoutInflater()));
@@ -78,66 +77,81 @@ public class SelectTargetActivityV3 extends BaseActivity<BaseViewModel,
             }
             Postcard postcard = ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS_GROUP);
             LogisticsCenter.completion(postcard);
-            launcher.launch(new Intent(this, postcard.getDestination()).putExtra(Constant.K_RESULT,
-                (Serializable) ids).putExtra(Constant.IS_SELECT_FRIEND, isCreateGroup));
+            launcher.launch(new Intent(this, postcard.getDestination())
+                .putExtra(Constant.K_RESULT, (Serializable) ids)
+                .putExtra(Constant.IS_SELECT_FRIEND, multipleChoiceVM.isCreateGroup));
         });
     }
 
     private void listener() {
         multipleChoiceVM.metaData.observe(this, v -> {
-            if (null != adapter)
-                adapter.notifyDataSetChanged();
+            if (null != adapter) adapter.notifyDataSetChanged();
         });
+
+
     }
 
     private void initView() {
-        int visibility = isCreateGroup ? View.GONE : View.VISIBLE;
+        view.divider2.getRoot().setVisibility(!multipleChoiceVM.isCreateGroup || !multipleChoiceVM.invite ? View.GONE : View.VISIBLE);
+        //创建群、邀请入群都不显示group
+        view.group.setVisibility(multipleChoiceVM.isCreateGroup || multipleChoiceVM.invite ?
+            View.GONE : View.VISIBLE);
 
-        view.divider2.getRoot().setVisibility(isCreateGroup?View.VISIBLE:View.GONE);
-        view.group.setVisibility(visibility);
-        view.recentContact.setVisibility(visibility);
+        view.recentContact.setVisibility(View.VISIBLE);
+        view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<MsgConversation,
+            ViewHol.ItemViewHo>(ViewHol.ItemViewHo.class) {
 
-        if (!isCreateGroup) {
-            view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<MsgConversation,
-                ViewHol.ItemViewHo>
-                (ViewHol.ItemViewHo.class) {
+            @Override
+            public void onBindView(@NonNull ViewHol.ItemViewHo holder, MsgConversation data,
+                                   int position) {
+                boolean isGroup =
+                    data.conversationInfo.getConversationType() != ConversationType.SINGLE_CHAT;
+                String id = isGroup ? data.conversationInfo.getGroupID() :
+                    data.conversationInfo.getUserID();
+                String faceURL = data.conversationInfo.getFaceURL();
+                String name = data.conversationInfo.getShowName();
+                holder.view.avatar.load(faceURL, isGroup, isGroup ? null : name);
+                holder.view.nickName.setText(name);
 
-                @Override
-                public void onBindView(@NonNull ViewHol.ItemViewHo holder, MsgConversation data,
-                                       int position) {
-                    boolean isGroup =
-                        data.conversationInfo.getConversationType() != ConversationType.SINGLE_CHAT;
-                    String id = isGroup ? data.conversationInfo.getGroupID()
-                        : data.conversationInfo.getUserID();
-                    String faceURL = data.conversationInfo.getFaceURL();
-                    String name = data.conversationInfo.getShowName();
-                    holder.view.avatar.load(faceURL,
-                        isGroup,
-                        isGroup ? null : name);
-                    holder.view.nickName.setText(name);
-
-                    holder.view.select.setVisibility(View.VISIBLE);
-                    holder.view.select.setChecked(multipleChoiceVM.contains(new MultipleChoice(id)));
-                    holder.view.getRoot().setOnClickListener(v -> {
-                        holder.view.select.setChecked(!holder.view.select.isChecked());
-
-                        if (holder.view.select.isChecked()) {
-                            MultipleChoice meta = new MultipleChoice(id);
-                            meta.isGroup = isGroup;
-                            meta.name = name;
-                            meta.icon = faceURL;
-                            multipleChoiceVM.metaData.val().add(meta);
-                            multipleChoiceVM.metaData.update();
-                        } else {
-                            multipleChoiceVM.removeMetaData(id);
+                holder.view.select.setVisibility(View.VISIBLE);
+                if (multipleChoiceVM.contains(new MultipleChoice(id))) {
+                    holder.view.select.setChecked(true);
+                    for (MultipleChoice choice : multipleChoiceVM.metaData.val()) {
+                        if (choice.key.equals(id)) {
+                            holder.view.select.setEnabled(choice.isEnabled);
                         }
-                    });
+                    }
                 }
-            });
-            ContactListVM vmByCache = BaseApp.inst().getVMByCache(ContactListVM.class);
-            adapter.setItems(vmByCache.conversations.getValue());
+
+                holder.view.getRoot().setOnClickListener(v -> {
+                    holder.view.select.setChecked(!holder.view.select.isChecked());
+
+                    if (holder.view.select.isChecked()) {
+                        MultipleChoice meta = new MultipleChoice(id);
+                        meta.isGroup = isGroup;
+                        meta.name = name;
+                        meta.icon = faceURL;
+                        multipleChoiceVM.metaData.val().add(meta);
+                        multipleChoiceVM.metaData.update();
+                    } else {
+                        multipleChoiceVM.removeMetaData(id);
+                    }
+                });
+            }
+        });
+        ContactListVM vmByCache = BaseApp.inst().getVMByCache(ContactListVM.class);
+        List<MsgConversation> conversations = new ArrayList<>();
+        if (multipleChoiceVM.invite || multipleChoiceVM.isCreateGroup) {
+            //只保留单聊
+            for (MsgConversation msgConversation : vmByCache.conversations.getValue()) {
+                if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT)
+                    conversations.add(msgConversation);
+            }
+        } else {
+            conversations.addAll(vmByCache.conversations.getValue());
         }
+        adapter.setItems(conversations);
     }
 
     private ActivityResultLauncher<Intent> launcher =
@@ -159,8 +173,8 @@ public class SelectTargetActivityV3 extends BaseActivity<BaseViewModel,
         });
 
     void init() {
-        multipleChoiceVM.isCreateGroup = isCreateGroup =
-            getIntent().getBooleanExtra(Constant.K_RESULT, false);
+
+
     }
 
     @Override

@@ -11,4 +11,5 @@ public class MultipleChoice extends CommEx {
     public String name;
     public String icon;
     public boolean isGroup;
+    public String groupId;
 }

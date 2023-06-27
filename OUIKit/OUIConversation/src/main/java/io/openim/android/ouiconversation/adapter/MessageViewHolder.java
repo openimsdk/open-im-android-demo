@@ -87,6 +87,7 @@ import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.ForwardVM;
+import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.voice.listener.PlayerListener;
 import io.openim.android.ouicore.voice.player.SMediaPlayer;
@@ -353,8 +354,10 @@ public class MessageViewHolder {
          * @param view
          */
         protected void showMsgExMenu(View view) {
+            view.setOnClickListener(v -> {});
             view.setOnLongClickListener(v -> {
-                if (null != chatVM.enableMultipleSelect.getValue() && chatVM.enableMultipleSelect.getValue())
+                if (null != chatVM.enableMultipleSelect.getValue()
+                    && chatVM.enableMultipleSelect.getValue())
                     return true;
                 List<Integer> menuIcons = new ArrayList<>();
                 List<String> menuTitles = new ArrayList<>();
@@ -394,11 +397,12 @@ public class MessageViewHolder {
                                         Easy.find(CustomEmojiVM.class).insertEmojiDb(message);
                                     }
                                     if (iconRes == R.mipmap.ic_delete) {
-                                        chatVM.deleteMessageFromLocalStorage(message);
+                                        chatVM.deleteMessageFromLocalAndSvr(message);
                                     }
                                     if (iconRes == R.mipmap.ic_forward) {
                                         Easy.find(ForwardVM.class).createForwardMessage(message);
 
+                                        Easy.installVM(MultipleChoiceVM.class);
                                         ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity)
                                             view.getContext(), Constant.Event.FORWARD);
                                     }
@@ -525,7 +529,6 @@ public class MessageViewHolder {
                 }
             });
         }
-
     }
 
 
@@ -717,7 +720,6 @@ public class MessageViewHolder {
         protected void bindLeft(View itemView, Message message) {
             LayoutMsgImgLeftBinding v = LayoutMsgImgLeftBinding.bind(itemView);
 
-
             v.sendState.setSendState(message.getStatus());
             String url = loadIMG(v.content, message);
             toPreview(v.content, url, null);
@@ -740,6 +742,8 @@ public class MessageViewHolder {
         protected void bindRight(View itemView, Message message) {
             LayoutMsgImgRightBinding v = LayoutMsgImgRightBinding.bind(itemView);
             v.avatar2.load(message.getSenderFaceUrl(), message.getSenderNickname());
+            v.videoPlay2.setVisibility(View.GONE);
+            v.mask2.setVisibility(View.GONE);
 
             v.sendState2.setSendState(message.getStatus());
             String url = loadIMG(v.content2, message);
@@ -887,6 +891,7 @@ public class MessageViewHolder {
         protected void bindRight(View itemView, Message message) {
             LayoutMsgImgRightBinding view = LayoutMsgImgRightBinding.bind(itemView);
             view.sendState2.setSendState(message.getStatus());
+            view.mask2.setVisibility(View.VISIBLE);
             view.videoPlay2.setVisibility(View.VISIBLE);
 
             MsgExpand msgExpand = (MsgExpand) message.getExt();
@@ -921,6 +926,7 @@ public class MessageViewHolder {
 
             view.sendState.setSendState(message.getStatus());
             view.videoPlay.setVisibility(View.VISIBLE);
+            view.circleBar.setVisibility(View.VISIBLE);
 
             Common.loadVideoSnapshot(view.content, message.getVideoElem());
             preview(message, view.videoPlay);

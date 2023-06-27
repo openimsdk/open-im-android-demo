@@ -86,6 +86,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:button="@null"
+                        android:clickable="false"
                         android:drawableLeft="@mipmap/ic_add_friend4"
                         android:gravity="center_vertical"
                         android:text="@string/add_friend"
@@ -315,6 +316,7 @@
                     >
 
                     <RadioButton
+                        android:clickable="false"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:button="@null"
@@ -341,7 +343,7 @@
                     >
 
                     <RadioButton
-
+                        android:clickable="false"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:button="@null"

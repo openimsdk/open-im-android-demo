@@ -39,7 +39,10 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
@@ -47,6 +50,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.NiService;
 import io.openim.android.ouicore.services.OneselfService;
 import io.openim.android.ouicore.utils.Common;
@@ -68,6 +72,7 @@ import io.openim.android.ouimoments.mvp.presenter.PushMomentsVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.PutArgs;
 
 public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPushMomentsBinding> {
 
@@ -179,6 +184,8 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
             }
             MThreadTool.executorService.execute(() -> {
                 for (String path : paths) {
+                    PutArgs putArgs=new PutArgs(path);
+                    putArgs.putID=BaseApp.inst().loginCertificate.userID+"_"+System.currentTimeMillis();
                     OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                         @Override
                         public void onError(int code, String error) {
@@ -196,6 +203,8 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
 
                         @Override
                         public void onSuccess(String s) {
+                            Map<String,String> hashMap= GsonHel.fromJson(s, HashMap.class);
+                            s=hashMap.get("url");
                             if (!vm.isPhoto) {
                                 vm.param.getValue().content.data.metas.get(0).original = s;
                             } else {
@@ -211,7 +220,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                                 });
                             }
                         }
-                    },null, path);
+                    },null, putArgs);
                 }
             });
 

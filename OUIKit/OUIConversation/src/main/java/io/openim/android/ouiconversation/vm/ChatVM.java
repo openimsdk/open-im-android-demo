@@ -150,7 +150,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private void signalingGetRoomByGroupID() {
         //TODO
-//        OpenIMClient.getInstance().signalingManager.signalingGetRoomByGroupID(new OnBase<RoomCallingInfo>() {
+//        OpenIMClient.getInstance().signalingManager.signalingGetRoomByGroupID(new
+//        OnBase<RoomCallingInfo>() {
 //            @Override
 //            public void onError(int code, String error) {
 //            }
@@ -191,7 +192,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new OnBase<List<GroupMembersInfo>>() {
             @Override
             public void onError(int code, String error) {
-            toast(error+"("+code+")");
+                toast(error + "(" + code + ")");
             }
 
             @Override
@@ -220,7 +221,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             System.currentTimeMillis() + "");
 
         N.API(OneselfService.class).getUsersOnlineStatus(Constant.getImApiUrl() + "/user" +
-            "/get_users_online_status", BaseApp.inst().loginCertificate.imToken,
+                "/get_users_online_status", BaseApp.inst().loginCertificate.imToken,
             parameter.buildJsonBody()).compose(N.IOMain()).subscribe(new NetObserver<ResponseBody>(getContext()) {
 
             @Override
@@ -405,19 +406,19 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }, 0, 1000);
     }
 
-    private void deleteMessageFromLocalAndSvr(Message message) {
+    public void deleteMessageFromLocalAndSvr(Message message) {
         OpenIMClient.getInstance().messageManager.deleteMessageFromLocalAndSvr(conversationID,
             message.getClientMsgID(), new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-                deleteMessageFromLocalStorage(message);
-            }
+                @Override
+                public void onError(int code, String error) {
+                    deleteMessageFromLocalStorage(message);
+                }
 
-            @Override
-            public void onSuccess(String data) {
-                removeMsList(message);
-            }
-        });
+                @Override
+                public void onSuccess(String data) {
+                    removeMsList(message);
+                }
+            });
     }
 
     int getReadCountdown(Message message) {
@@ -579,10 +580,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private void loadHistory() {
         //加载消息记录
-        if (fromChatHistory)
-            loadHistoryMessageReverse();
-        else
-            loadHistoryMessage();
+        if (fromChatHistory) loadHistoryMessageReverse();
+        else loadHistoryMessage();
     }
 
     @Override
@@ -654,7 +653,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
             @Override
             public void onSuccess(String data) {
-                if (null != onSuccessListener) onSuccessListener.onSuccess(data);
+                if (null != onSuccessListener)
+                    onSuccessListener.onSuccess(data);
             }
         }, conversationID);
     }
@@ -858,19 +858,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onRecvMessageRevoked(String msgId) {
-        try {
-            for (int i = 0; i < messageAdapter.getMessages().size(); i++) {
-                Message message = messageAdapter.getMessages().get(i);
-                if (TextUtils.isEmpty(message.getClientMsgID())) continue;
-                if (message.getClientMsgID().equals(msgId)) {
-                    message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
-                    messageAdapter.notifyItemChanged(i);
-                    return;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Override
@@ -879,6 +867,12 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             for (Message message : messages.getValue()) {
                 if (message.getClientMsgID().equals(info.getClientMsgID())) {
                     message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
+                    //a 撤回了一条消息
+                    String txt =
+                        String.format(getContext().getString(io.openim.android.ouicore.R.string.revoke_tips), info.getRevokerNickname());
+                    ((MsgExpand) message.getExt()).tips =
+                        IMUtil.getSingleSequence(message.getGroupID(),info.getRevokerNickname(),
+                            info.getRevokerID(), txt);
                     messageAdapter.notifyItemChanged(messages.getValue().indexOf(message));
                 }
             }
@@ -941,7 +935,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
                 @Override
                 public void onProgress(long progress) {
-                    L.e("----------sendProgress-----------==="+progress);
+                    L.e("----------sendProgress-----------===" + progress);
                     UIHandler.post(() -> {
                         msg.setExt(ext);
                         ext.sendProgress = progress;
@@ -954,7 +948,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     // 返回新的消息体；替换发送传入的，不然撤回消息会有bug
                     int index = messages.getValue().indexOf(msg);
                     messages.getValue().remove(index);
-                    messages.getValue().add(index,  IMUtil.buildExpandInfo(message));
+                    messages.getValue().add(index, IMUtil.buildExpandInfo(message));
                     IMUtil.calChatTimeInterval(messages.getValue());
                     messageAdapter.notifyItemChanged(index);
                 }
@@ -1015,40 +1009,36 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             public void onSuccess(String data) {
                 message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
                 if (hasPermission)
-                    message.setSenderNickname(BaseApp.inst().
-                        loginCertificate.nickname);
+                    message.setSenderNickname(BaseApp.inst().loginCertificate.nickname);
 
-                String name=BaseApp.inst().loginCertificate.nickname;
-                String uid=BaseApp.inst().loginCertificate.userID;
+                String name = BaseApp.inst().loginCertificate.nickname;
+                String uid = BaseApp.inst().loginCertificate.userID;
                 //a 撤回了一条消息
-               String txt =
-                    String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips)
-                        ,message.getSenderNickname() );
+                String txt =
+                    String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips), message.getSenderNickname());
 
-                ((MsgExpand)message.getExt()).tips =IMUtil.getSingleSequence(name
-                    ,uid, txt);
+                ((MsgExpand) message.getExt()).tips = IMUtil.getSingleSequence(
+                    message.getGroupID(),name, uid, txt);
 
-                messageAdapter.notifyItemChanged(messageAdapter.getMessages()
-                    .indexOf(message));
+                messageAdapter.notifyItemChanged(messageAdapter.getMessages().indexOf(message));
             }
         }, message);
-
 
     }
 
     public void deleteMessageFromLocalStorage(Message message) {
         OpenIMClient.getInstance().messageManager.deleteMessageFromLocalStorage(conversationID,
-            new ArrayList<>(Collections.singleton(message.getClientMsgID())), new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-                getIView().toast(error + "(" + code + ")");
-            }
+            message.getClientMsgID(), new OnBase<String>() {
+                @Override
+                public void onError(int code, String error) {
+                    getIView().toast(error + "(" + code + ")");
+                }
 
-            @Override
-            public void onSuccess(String data) {
-                removeMsList(message);
-            }
-        });
+                @Override
+                public void onSuccess(String data) {
+                    removeMsList(message);
+                }
+            });
     }
 
     private void removeMsList(Message message) {
@@ -1068,20 +1058,20 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
         OpenIMClient.getInstance().messageManager.clearConversationAndDeleteAllMsg(id,
             new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-                waitDialog.dismiss();
-                getIView().toast(error + code);
-            }
+                @Override
+                public void onError(int code, String error) {
+                    waitDialog.dismiss();
+                    getIView().toast(error + code);
+                }
 
-            @Override
-            public void onSuccess(String data) {
-                waitDialog.dismiss();
-                messages.getValue().clear();
-                messageAdapter.notifyDataSetChanged();
-                getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.clear_succ));
-            }
-        });
+                @Override
+                public void onSuccess(String data) {
+                    waitDialog.dismiss();
+                    messages.getValue().clear();
+                    messageAdapter.notifyDataSetChanged();
+                    getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.clear_succ));
+                }
+            });
     }
 
     public void getConversationRecvMessageOpt(String... cid) {

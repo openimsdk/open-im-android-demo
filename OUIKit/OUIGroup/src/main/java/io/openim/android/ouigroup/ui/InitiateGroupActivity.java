@@ -68,7 +68,6 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         isInviteToGroup = getIntent().getBooleanExtra(Constant.IS_INVITE_TO_GROUP, false);
         isRemoveGroup = getIntent().getBooleanExtra(Constant.IS_REMOVE_GROUP, false);
         isSelectMember = getIntent().getBooleanExtra(Constant.IS_SELECT_MEMBER, false);
@@ -78,8 +77,10 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         title = getIntent().getStringExtra(Constant.K_NAME);
         defSelectId = getIntent().getStringExtra(Constant.K_ID);
 
-        if (isInviteToGroup || isRemoveGroup) bindVMByCache(GroupVM.class);
-        else bindVM(GroupVM.class, true);
+        if (isInviteToGroup || isRemoveGroup)
+            bindVMByCache(GroupVM.class);
+        else
+            bindVM(GroupVM.class, true);
 
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityInitiateGroupBinding.inflate(getLayoutInflater()));
@@ -90,7 +91,8 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         if (isSelectMember) {
             vm.groupId = groupId;
             vm.getGroupMemberList();
-        } else vm.getAllFriend();
+        } else
+            vm.getAllFriend();
         listener();
     }
 
@@ -223,6 +225,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
 
     private int getSelectNum() {
         List<FriendInfo> friendInfos = new ArrayList<>();
+        vm.selectedFriendInfoV3.clear();
         int num = 0;
         for (ExUserInfo item : adapter.getItems()) {
             if (item.isSelect) {
@@ -234,6 +237,9 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                     continue;
                 }
                 friendInfos.add(item.userInfo.getFriendInfo());
+
+                if (item.isEnabled)
+                    vm.selectedFriendInfoV3.add(item.userInfo.getFriendInfo());
             }
         }
         vm.selectedFriendInfo.setValue(friendInfos);
@@ -337,7 +343,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
             public void click(View v) {
                 try {
                     if (isInviteToGroup) {
-                        vm.inviteUserToGroup(vm.selectedFriendInfo.getValue());
+                        vm.inviteUserToGroup(vm.selectedFriendInfoV3);
                         return;
                     }
                     if (isRemoveGroup) {

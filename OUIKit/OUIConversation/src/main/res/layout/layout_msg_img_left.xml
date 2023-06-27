@@ -61,6 +61,15 @@
                     app:corner_radius="7dp"
                     app:type="round" />
 
+                <io.openim.android.ouicore.widget.CirclePgBar
+                    android:id="@+id/circleBar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:visibility="gone"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    app:strokeWidth="2dp" />
+
                 <ImageView
                     android:id="@+id/videoPlay"
                     android:layout_width="wrap_content"

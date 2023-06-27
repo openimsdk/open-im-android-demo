@@ -30,7 +30,18 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.FriendInfo;
 
 public class MultipleChoiceVM extends BaseVM {
-    public boolean isCreateGroup = false;
+    /**
+     * 发起群聊
+     * true 隐藏最近会话、隐藏群，只显示好友
+     */
+    public boolean isCreateGroup;
+    /**
+     * 邀请入群
+     * true 显示最近会话、隐藏群，只显示好友
+     */
+    public boolean invite;
+
+
     public static final String NOTIFY_ITEM_REMOVED = "notify_item_removed";
     public State<List<MultipleChoice>> metaData = new State<>(new ArrayList<>());
 

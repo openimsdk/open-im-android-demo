@@ -62,6 +62,7 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
@@ -196,8 +197,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT)
                 intent.putExtra(Constant.K_ID, msgConversation.conversationInfo.getUserID());
 
-            if (msgConversation.conversationInfo.getConversationType() == ConversationType.GROUP_CHAT
-                || msgConversation.conversationInfo.getConversationType() == ConversationType.SUPER_GROUP_CHAT)
+            if (msgConversation.conversationInfo.getConversationType() == ConversationType.GROUP_CHAT || msgConversation.conversationInfo.getConversationType() == ConversationType.SUPER_GROUP_CHAT)
                 intent.putExtra(Constant.K_GROUP_ID, msgConversation.conversationInfo.getGroupID());
 
             if (msgConversation.conversationInfo.getGroupAtType() == ConversationType.NOTIFICATION)
@@ -224,16 +224,14 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         Easy.find(UserLogic.class).connectStatus.observe(getActivity(), connectStatus -> {
             Animation animation = view.status.getAnimation();
             if (connectStatus == UserLogic.ConnectStatus.CONNECTING) {
-                if (null != animation)
-                    animation.start();
+                if (null != animation) animation.start();
                 else {
                     animation = AnimationUtils.loadAnimation(getActivity(),
                         R.anim.animation_repeat_spinning);
                     view.status.startAnimation(animation);
                 }
             } else {
-                if (null != animation)
-                    animation.cancel();
+                if (null != animation) animation.cancel();
             }
         });
 
@@ -272,8 +270,9 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         });
         view.createGroup.setOnClickListener(c -> {
             popupWindow.dismiss();
-            ARouter.getInstance().build(Routes.Group.SELECT_TARGET).withBoolean(Constant.K_RESULT,
-                true).navigation();
+
+            Easy.installVM(MultipleChoiceVM.class).isCreateGroup = true;
+            ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
         });
         view.videoMeeting.setOnClickListener(c -> {
             popupWindow.dismiss();
@@ -344,11 +343,10 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         @Override
         public void onBindViewHolder(ViewHol.ContactItemHolder viewHolder, final int position) {
             MsgConversation msgConversation = conversationInfos.get(position);
-            boolean isGroup = msgConversation.conversationInfo.getConversationType()
-                != ConversationType.SINGLE_CHAT;
+            boolean isGroup =
+                msgConversation.conversationInfo.getConversationType() != ConversationType.SINGLE_CHAT;
             viewHolder.viewBinding.avatar.load(msgConversation.conversationInfo.getFaceURL(),
-                isGroup,
-                isGroup ? null : msgConversation.conversationInfo.getShowName());
+                isGroup, isGroup ? null : msgConversation.conversationInfo.getShowName());
             viewHolder.viewBinding.nickName.setText(msgConversation.conversationInfo.getShowName());
 
             if (msgConversation.conversationInfo.getRecvMsgOpt() != 0) {
@@ -404,9 +402,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         BaseApp.viewModels.remove(vm.getClass().getCanonicalName());
         Obs.inst().deleteObserver(this);
 
-        Animation animation=view.status.getAnimation();
-        if (null!=animation)
-            animation.cancel();
+        Animation animation = view.status.getAnimation();
+        if (null != animation) animation.cancel();
     }
 
     @Override

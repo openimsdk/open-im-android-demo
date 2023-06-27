@@ -57,6 +57,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.vm.ForwardVM;
 import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
@@ -324,6 +325,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             Easy.find(ForwardVM.class).createMergerMessage(vm.isSingleChat,
                 vm.conversationInfo.getValue().getShowName(), getSelectMsg());
 
+            Easy.installVM(MultipleChoiceVM.class);
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) this,
                 Constant.Event.FORWARD);
             Common.UIHandler.postDelayed(() -> vm.enableMultipleSelect.setValue(false), 300);

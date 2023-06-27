@@ -17,6 +17,9 @@ import com.bigkoo.pickerview.listener.OnTimeSelectListener;
 import com.bigkoo.pickerview.view.TimePickerView;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
@@ -24,6 +27,8 @@ import io.openim.android.demo.databinding.ActivityPersonalInfoBinding;
 import io.openim.android.demo.ui.main.EditTextActivity;
 import io.openim.android.demo.vm.PersonalVM;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
@@ -34,6 +39,7 @@ import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.PutArgs;
 import io.openim.android.sdk.models.UserInfo;
 
 public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPersonalInfoBinding> {
@@ -55,6 +61,9 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
             albumDialog.setOnSelectResultListener(path -> {
                 vm.setFaceURL(path[0]);
                 vm.waitDialog.show();
+
+                PutArgs putArgs=new PutArgs(path[0]);
+                putArgs.putID= BaseApp.inst().loginCertificate.userID+"_"+System.currentTimeMillis();
                 OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                     @Override
                     public void onError(int code, String error) {
@@ -69,10 +78,12 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
 
                     @Override
                     public void onSuccess(String s) {
+                        Map<String,String>map= GsonHel.fromJson(s, HashMap.class);
+                        s=map.get("url");
                         vm.setFaceURL(s);
                         Common.UIHandler.postDelayed(() -> vm.waitDialog.dismiss(), 1500);
                     }
-                }, null,path[0]);
+                }, null,putArgs);
             });
 
             albumDialog.show();

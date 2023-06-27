@@ -60,6 +60,7 @@ import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.PutArgs;
 
 public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
     ActivityCustomEmojiManageBinding> {
@@ -164,13 +165,16 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
         albumDialog.show();
         albumDialog.setOnSelectResultListener(path -> {
             waitDialog.show();
+            PutArgs putArgs=new PutArgs(path[0]);
+            putArgs.putID=BaseApp.inst().loginCertificate.userID
+                +"_"+System.currentTimeMillis();
+
             OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                 @Override
                 public void onError(int code, String error) {
                     waitDialog.dismiss();
                     toast(error + code);
                     L.e(error + code);
-
                 }
 
                 @Override
@@ -180,9 +184,20 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
                 public void onSuccess(String s) {
                     CustomEmoji customEmoji = new CustomEmoji();
                     customEmoji.setUserID(BaseApp.inst().loginCertificate.userID);
-                    customEmoji.setSourceUrl(s);
+                    Map<String,String> hashMap=GsonHel.fromJson(s,HashMap.class);
+                    customEmoji.setSourceUrl(hashMap.get("url"));
+
                     Glide.with(CustomEmojiManageActivity.this)
-                        .asBitmap().load(s).into(new CustomTarget<Bitmap>() {
+                        .asBitmap().load(putArgs.filepath).into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                super.onLoadFailed(errorDrawable);
+                                waitDialog.dismiss();
+                            }
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
+                                waitDialog.dismiss();
+                            }
                             @Override
                             public void onResourceReady(@NonNull Bitmap resource,
                                                         @Nullable Transition<? super Bitmap> transition) {
@@ -191,15 +206,10 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
                                 customEmoji.setSourceH(resource.getHeight());
                                 customEmojiVM.insertEmojiDb(new ArrayList<>(Collections.singleton(customEmoji)));
                             }
-
-                            @Override
-                            public void onLoadCleared(@Nullable Drawable placeholder) {
-                                waitDialog.dismiss();
-                            }
                         });
 
                 }
-            },null, path[0]);
+            },null, putArgs);
 
         });
     }

@@ -22,6 +22,7 @@ import java.util.Map;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
@@ -29,6 +30,7 @@ import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
@@ -45,6 +47,7 @@ import io.openim.android.sdk.listener.OnPutFileListener;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
+import io.openim.android.sdk.models.PutArgs;
 import open_im_sdk_callback.PutFileCallback;
 
 @Route(path = Routes.Group.MATERIAL)
@@ -209,6 +212,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         if (vm.isOwner()) view.quitGroup.setText(io.openim.android.ouicore.R.string.dissolve_group);
         albumDialog = new PhotographAlbumDialog(this);
         albumDialog.setOnSelectResultListener(path -> {
+            PutArgs putArgs=new PutArgs(path[0]);
+            putArgs.putID=BaseApp.inst().loginCertificate.userID+"_"+System.currentTimeMillis();
             OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                 @Override
                 public void onError(int code, String error) {
@@ -228,7 +233,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                           null, null, null);
                   }catch (Exception ignored){}
                 }
-            }, null, path[0]);
+            }, null, putArgs);
         });
 
         view.recyclerview.setLayoutManager(new GridLayoutManager(this, spanCount));
@@ -248,6 +253,9 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                             InitiateGroupActivity.class)
                             .putExtra(reId == R.mipmap.ic_group_add ? Constant.IS_INVITE_TO_GROUP
                                 : Constant.IS_REMOVE_GROUP, true));
+
+//                        Easy.installVM(MultipleChoiceVM.class).invite=true;
+//                        ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
                     });
                 } else {
                     layoutParams.topMargin = 0;

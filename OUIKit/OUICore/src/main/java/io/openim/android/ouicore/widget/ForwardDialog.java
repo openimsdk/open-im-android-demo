@@ -11,6 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
+import com.alibaba.android.arouter.launcher.ARouter;
+
 import org.jetbrains.annotations.NotNull;
 
 import io.openim.android.ouicore.R;
@@ -20,16 +24,18 @@ import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.DialogForwardBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ForwardVM;
 import io.openim.android.ouicore.vm.MultipleChoiceVM;
 
 public class ForwardDialog extends BaseDialog {
 
-    @NotNull("MultipleChoiceVM can't is null")
+    @NotNull("choiceVM cannot be empty")
     private MultipleChoiceVM choiceVM = Easy.find(MultipleChoiceVM.class);
-    @NotNull("ForwardVM can't is null")
+    @NotNull("forwardVM cannot be empty")
     private ForwardVM forwardVM = Easy.find(ForwardVM.class);
 
 
@@ -77,9 +83,17 @@ public class ForwardDialog extends BaseDialog {
             if (!TextUtils.isEmpty(leave)){
                 forwardVM.createLeaveMsg(leave);
             }
+
+            finish();
             Obs.newMessage(Constant.Event.FORWARD,choiceVM.metaData.val());
             dismiss();
         });
+    }
+
+    private static void finish() {
+        Postcard postcard =ARouter.getInstance().build(Routes.Group.SELECT_TARGET);
+        LogisticsCenter.completion(postcard);
+        ActivityManager.finishActivity(postcard.getDestination());
     }
 
 }
