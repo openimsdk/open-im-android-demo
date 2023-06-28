@@ -1,6 +1,5 @@
 package io.openim.android.ouicore.im;
 
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -16,7 +15,6 @@ import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,7 +26,6 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.alibaba.fastjson.JSONArray;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -41,7 +38,6 @@ import java.util.UUID;
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.AtMsgInfo;
-import io.openim.android.ouicore.entity.AtUsersInfo;
 import io.openim.android.ouicore.entity.BurnAfterReadingNotification;
 import io.openim.android.ouicore.entity.CallHistory;
 import io.openim.android.ouicore.entity.CustomEmojiEntity;
@@ -68,8 +64,8 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.MessageType;
+import io.openim.android.sdk.models.AtUserInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotificationElem;
@@ -197,8 +193,10 @@ public class IMUtil {
                 msgExpand.locationInfo = GsonHel.fromJson(msg.getLocationElem().getDescription(),
                     LocationInfo.class);
             if (msg.getContentType() == MessageType.AT_TEXT) {
-                msgExpand.atMsgInfo = GsonHel.fromJson(msg.getAtTextElem().getText(),
-                    AtMsgInfo.class);
+                AtMsgInfo atMsgInfo=new AtMsgInfo();
+                atMsgInfo.atUsersInfo=msg.getAtTextElem().atUsersInfo;
+                atMsgInfo.text=msg.getAtTextElem().getText();
+                msgExpand.atMsgInfo =atMsgInfo;
                 handleAt(msgExpand,msg.getGroupID());
             }
             handleNotification(msg);
@@ -510,24 +508,25 @@ public class IMUtil {
     }
 
 
-    private static String atSelf(AtUsersInfo atUsersInfo) {
-        return "@" + (atUsersInfo.atUserID.equals(BaseApp.inst().loginCertificate.userID) ?
-            BaseApp.inst().getString(R.string.you) : atUsersInfo.groupNickname);
+    private static String atSelf(AtUserInfo atUsersInfo) {
+        return "@" + (atUsersInfo.getAtUserID().equals(BaseApp.inst().loginCertificate.userID) ?
+            BaseApp.inst().getString(R.string.you) : atUsersInfo.getGroupNickname());
     }
 
     private static void handleAt(MsgExpand msgExpand,String gid) {
         if (null == msgExpand.atMsgInfo) return;
         String atTxt = msgExpand.atMsgInfo.text;
-        for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
-            atTxt = atTxt.replace("@" + atUsersInfo.atUserID, atSelf(atUsersInfo));
+        for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
+            atTxt = atTxt.replace("@" + atUsersInfo.getAtUserID(), atSelf(atUsersInfo));
         }
         SpannableStringBuilder spannableString = new SpannableStringBuilder(atTxt);
-        for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
+        for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
             String tag = atSelf(atUsersInfo);
-            buildClickAndColorSpannable(spannableString, null, new ClickableSpan() {
+            buildClickAndColorSpannable(spannableString, tag,
+                new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                 toPersonDetail(atUsersInfo.atUserID,gid);
+                 toPersonDetail(atUsersInfo.getAtUserID(),gid);
                 }
             });
         }
@@ -585,8 +584,8 @@ public class IMUtil {
                     break;
                 case MessageType.AT_TEXT:
                     String atTxt = msgExpand.atMsgInfo.text;
-                    for (AtUsersInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
-                        atTxt = atTxt.replace("@" + atUsersInfo.atUserID, atSelf(atUsersInfo));
+                    for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
+                        atTxt = atTxt.replace("@" + atUsersInfo.getAtUserID(), atSelf(atUsersInfo));
                     }
                     lastMsg = atTxt;
                     break;

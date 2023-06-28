@@ -354,7 +354,8 @@ public class MessageViewHolder {
          * @param view
          */
         protected void showMsgExMenu(View view) {
-            view.setOnClickListener(v -> {});
+            view.setOnClickListener(v -> {
+            });
             view.setOnLongClickListener(v -> {
                 if (null != chatVM.enableMultipleSelect.getValue()
                     && chatVM.enableMultipleSelect.getValue())
@@ -495,7 +496,8 @@ public class MessageViewHolder {
             if (null != msgExpand.sequence) {
                 showView.setText(msgExpand.sequence);
                 if (null != msgExpand.atMsgInfo)
-                    showView.setMovementMethod(LinkMovementMethod.getInstance());
+                    showView.setMovementMethod(LinkMovementMethod
+                        .getInstance());
                 return true;
             }
             return false;
@@ -550,13 +552,13 @@ public class MessageViewHolder {
         @SuppressLint({"SetTextI18n", "StringFormatInvalid"})
         @Override
         public void bindData(Message message, int position) {
-            boolean  onlyOne=messageAdapter.messages.size()==1;
+            boolean onlyOne = messageAdapter.messages.size() == 1;
             TextView textView = itemView.findViewById(R.id.notice);
             textView.setVisibility(View.VISIBLE);
             View root = itemView.findViewById(R.id.root);
-            root.setPadding(0,onlyOne?Common.dp2px(10):0,
-                0,0);
-            textView.setText(((MsgExpand)message.getExt()).tips);
+            root.setPadding(0, onlyOne ? Common.dp2px(10) : 0,
+                0, 0);
+            textView.setText(((MsgExpand) message.getExt()).tips);
             textView.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
@@ -684,9 +686,10 @@ public class MessageViewHolder {
         @Override
         protected void bindLeft(View itemView, Message message) {
             LayoutMsgTxtLeftBinding v = LayoutMsgTxtLeftBinding.bind(itemView);
-            String content = message.getTextElem().getContent();
-            v.content.setText(content);
-            if (!handleSequence(v.content, message)) v.content.setText(content);
+            if (!handleSequence(v.content, message)) {
+                String content = message.getTextElem().getContent();
+                v.content.setText(content);
+            }
         }
 
         @Override
@@ -694,8 +697,11 @@ public class MessageViewHolder {
             LayoutMsgTxtRightBinding v = LayoutMsgTxtRightBinding.bind(itemView);
             v.avatar2.load(message.getSenderFaceUrl(), message.getSenderNickname());
             v.sendState2.setSendState(message.getStatus());
-            String content = message.getTextElem().getContent();
-            if (!handleSequence(v.content2, message)) v.content2.setText(content);
+
+            if (!handleSequence(v.content2, message)) {
+                String content = message.getTextElem().getContent();
+                v.content2.setText(content);
+            }
         }
 
     }
@@ -898,14 +904,15 @@ public class MessageViewHolder {
 
             int progress = (int) msgExpand.sendProgress;
             view.circleBar2.setTargetProgress(progress);
-            boolean sendSuccess=message.getStatus() == Constant.Send_State.SEND_SUCCESS;
+            boolean sendSuccess = message.getStatus() == Constant.Send_State.SEND_SUCCESS;
             if (sendSuccess)
                 view.circleBar2.reset();
-            view.mask2.setVisibility(sendSuccess?
+            view.mask2.setVisibility(sendSuccess ?
                 View.GONE : View.VISIBLE);
 
-            VideoElem videoElem =message.getVideoElem();
-            String secondFormat = TimeUtil.getTime((int) videoElem.getDuration(), TimeUtil.minuteTimeFormat);
+            VideoElem videoElem = message.getVideoElem();
+            String secondFormat = TimeUtil.getTime((int) videoElem.getDuration(),
+                TimeUtil.minuteTimeFormat);
             view.duration2.setText(secondFormat);
             Common.loadVideoSnapshot(view.content2, videoElem);
             preview(message, view.videoPlay2);
