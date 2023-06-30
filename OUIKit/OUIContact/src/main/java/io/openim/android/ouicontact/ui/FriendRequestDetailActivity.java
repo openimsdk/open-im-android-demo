@@ -21,7 +21,7 @@ public class FriendRequestDetailActivity extends BaseActivity<ContactVM, Activit
         setLightStatus();
         SinkHelper.get(this).setTranslucentStatus(view.getRoot());
         view.setContactVM(vm);
-
+        view.avatar.load(vm.friendDetail.getValue().getFromFaceURL(),vm.friendDetail.getValue().getFromNickname());
     }
 
     @Override

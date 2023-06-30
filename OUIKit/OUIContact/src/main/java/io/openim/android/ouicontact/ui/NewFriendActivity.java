@@ -49,9 +49,6 @@ public class NewFriendActivity extends BaseActivity<ContactVM, ActivityNewFriend
     }
 
     private void initView() {
-        view.searchView.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Main.SEARCH_CONVER).navigation();
-        });
         view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
 
