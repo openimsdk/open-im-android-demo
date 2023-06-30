@@ -40,6 +40,7 @@ import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.databinding.ItemPsrsonSelectBinding;
 import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
 import io.openim.android.ouicore.databinding.ViewSwipeRecyclerViewBinding;
+import io.openim.android.ouicore.services.MomentsBridge;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
@@ -85,6 +86,12 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
     }
 
     private void click() {
+        MomentsBridge momentsBridge =
+            (MomentsBridge) ARouter.getInstance().build(Routes.Service.MOMENTS).navigation();
+        view.header.moments.setVisibility(null==momentsBridge?View.GONE:View.VISIBLE);
+        view.header.moments.setOnClickListener(v -> {
+            ARouter.getInstance().build(Routes.Moments.HOME).navigation();
+        });
         view.addFriend.setOnClickListener(view1 -> {
             ARouter.getInstance().build(Routes.Main.ADD_CONVERS)
                 .navigation();

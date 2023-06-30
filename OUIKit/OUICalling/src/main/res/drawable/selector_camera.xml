@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@mipmap/ic_open_camera" android:state_focused="true" />
-    <item android:drawable="@mipmap/ic_open_camera" android:state_checked="true" />
-    <item android:drawable="@mipmap/ic_close_camera" />
-</selector>

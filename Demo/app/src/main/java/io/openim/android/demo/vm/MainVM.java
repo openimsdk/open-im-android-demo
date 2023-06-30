@@ -28,6 +28,7 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConnListener;
 import io.openim.android.sdk.models.UserInfo;
+import open_im_sdk.Open_im_sdk;
 
 public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnListener {
 

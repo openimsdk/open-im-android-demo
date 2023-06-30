@@ -26,6 +26,7 @@ import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
+import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConnListener;
 import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.listener.OnFriendshipListener;
@@ -587,11 +588,8 @@ public class IMEvent {
 
     // 用户资料变更监听
     private void userListener() {
-        OpenIMClient.getInstance().userInfoManager.setOnUserListener(new OnUserListener() {
-            @Override
-            public void onSelfInfoUpdated(UserInfo info) {
-                // 当前登录用户资料变更回调
-            }
+        OpenIMClient.getInstance().userInfoManager.setOnUserListener(info -> {
+            // 当前登录用户资料变更回调
         });
     }
 }

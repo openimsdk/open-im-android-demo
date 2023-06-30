@@ -1,6 +1,5 @@
 package io.openim.android.demo;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 
@@ -26,6 +25,7 @@ import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.net.RXRetrofit.HttpConfig;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
@@ -140,8 +140,10 @@ public class DemoApplication extends BaseApp {
                     .build(Routes.Service.CALLING).navigation();
                 if (null != callingService)
                     callingService.stopAudioVideoService(BaseApp.inst());
+
                 BaseApp.inst().startActivity(new Intent(BaseApp.inst(), LoginActivity.class)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        | Intent.FLAG_ACTIVITY_NEW_TASK));
             }
         });
     }

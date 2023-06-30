@@ -52,6 +52,7 @@ import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 
 import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.enums.GroupType;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
@@ -198,7 +199,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             @Override
             public void onSuccess(List<GroupMembersInfo> data) {
                 if (data.isEmpty()) return;
-                hasPermission = data.get(0).getRoleLevel() != Constant.RoleLevel.MEMBER;
+                hasPermission = data.get(0).getRoleLevel()
+                    != GroupRole.MEMBER;
             }
         }, groupID, uid);
     }
@@ -1022,7 +1024,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
                 messageAdapter.notifyItemChanged(messageAdapter.getMessages().indexOf(message));
             }
-        }, message);
+        }, conversationID,message.getClientMsgID());
 
     }
 

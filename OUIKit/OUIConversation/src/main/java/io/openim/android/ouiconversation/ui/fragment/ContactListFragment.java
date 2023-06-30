@@ -4,6 +4,7 @@ package io.openim.android.ouiconversation.ui.fragment;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -50,6 +51,7 @@ import io.openim.android.ouiconversation.ui.NotificationActivity;
 import io.openim.android.ouiconversation.ui.SearchActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.vm.ContactListVM;
@@ -221,19 +223,17 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             adapter.notifyDataSetChanged();
         });
 
-        Easy.find(UserLogic.class).connectStatus.observe(getActivity(), connectStatus -> {
-            Animation animation = view.status.getAnimation();
-            if (connectStatus == UserLogic.ConnectStatus.CONNECTING) {
-                if (null != animation) animation.start();
-                else {
-                    animation = AnimationUtils.loadAnimation(getActivity(),
-                        R.anim.animation_repeat_spinning);
+        Animation animation= AnimationUtils.loadAnimation(getActivity(),
+            R.anim.animation_repeat_spinning);
+        Easy.find(UserLogic.class).connectStatus
+            .observe(getActivity(), connectStatus -> {
+                if (connectStatus == UserLogic.ConnectStatus.CONNECTING
+                    ||connectStatus== UserLogic.ConnectStatus.SYNCING) {
                     view.status.startAnimation(animation);
+                } else {
+                    view.status.clearAnimation();
                 }
-            } else {
-                if (null != animation) animation.cancel();
-            }
-        });
+            });
 
     }
 

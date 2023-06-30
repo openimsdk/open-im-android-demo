@@ -9,10 +9,10 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:background="@color/white"
             android:id="@+id/newFriendNotice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/white"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingLeft="22dp"
@@ -59,15 +59,15 @@
 
 
         <LinearLayout
-            android:background="@color/white"
             android:id="@+id/groupNotice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@color/white"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingLeft="22dp"
             android:paddingTop="10dp"
-            android:layout_marginBottom="10dp"
             android:paddingRight="22dp"
             android:paddingBottom="10dp">
 
@@ -106,16 +106,14 @@
             </LinearLayout>
 
 
-
-
         </LinearLayout>
 
 
         <LinearLayout
-            android:background="@color/white"
             android:id="@+id/myGoodFriend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/white"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingLeft="22dp"
@@ -171,10 +169,10 @@
             android:id="@+id/myGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/white"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingLeft="22dp"
-            android:background="@color/white"
             android:paddingTop="10dp"
             android:paddingRight="22dp"
             android:paddingBottom="10dp">
@@ -218,6 +216,39 @@
 
             </LinearLayout>
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/moments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="22dp"
+            android:paddingTop="10dp"
+            android:paddingRight="22dp"
+            android:paddingBottom="10dp">
+
+            <ImageView
+                android:layout_width="@dimen/avatar_size"
+                android:layout_height="@dimen/avatar_size"
+                android:src="@mipmap/ic_my_group" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_weight="1"
+                android:text="@string/moments"
+                android:textColor="@color/txt_black"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_right" />
         </LinearLayout>
 
     </LinearLayout>

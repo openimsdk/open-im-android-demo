@@ -52,4 +52,5 @@
         android:id="@+id/header"
         layout="@layout/view_contact_header" />
 
+
 </LinearLayout>

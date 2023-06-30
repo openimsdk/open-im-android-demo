@@ -434,7 +434,8 @@ public class MessageViewHolder {
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.withdraw));
                 } else if (message.getSendID().equals(BaseApp.inst().loginCertificate.userID)) {
                     //5分钟内可以撤回
-                    if (System.currentTimeMillis() - message.getSendTime() < (1000 * 60 * 5)) {
+                    if (System.currentTimeMillis() -
+                        message.getSendTime() < (1000 * 60 * 5)) {
                         menuIcons.add(R.mipmap.ic_withdraw);
                         menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.withdraw));
                     }
