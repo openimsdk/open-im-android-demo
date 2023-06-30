@@ -272,11 +272,13 @@ public class GroupVM extends SocialityVM {
             }
         }, groupId, ids);
     }
-
+    public void getGroupMemberList(){
+        getGroupMemberList(0);
+    }
     /**
      * 获取群成员信息
      */
-    public void getGroupMemberList() {
+    public void getGroupMemberList(int count) {
         if (!superGroupMembers.getValue().isEmpty()) return; //表示走了超级大群逻辑
 
         exGroupMembers.getValue().clear();

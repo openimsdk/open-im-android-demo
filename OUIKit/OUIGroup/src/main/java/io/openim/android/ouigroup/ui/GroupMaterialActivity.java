@@ -40,6 +40,7 @@ import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityGroupMaterialBinding;
 
 import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.ouigroup.ui.v3.GroupManageActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.GroupVerification;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
@@ -53,16 +54,17 @@ import open_im_sdk_callback.PutFileCallback;
 @Route(path = Routes.Group.MATERIAL)
 public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMaterialBinding> {
 
-    int spanCount = 7;
+    int spanCount = 5;
     private PhotographAlbumDialog albumDialog;
     private ActivityResultLauncher infoModifyLauncher;
     private int infoModifyType;
     private IConversationBridge iConversationBridge;
-    private  String conversationId;
+    private String conversationId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         bindVM(GroupVM.class, true);
+        Easy.put(vm);
         vm.groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
         conversationId = getIntent().getStringExtra(Constant.K_ID);
         super.onCreate(savedInstanceState);
@@ -76,9 +78,12 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         initView();
         click();
 
-        infoModifyLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        infoModifyLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                result -> {
             if (result.getResultCode() != RESULT_OK) return;
-            String var = result.getData().getStringExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA);
+            String var =
+                result.getData().getStringExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA);
             if (infoModifyType == 1) vm.UPDATEGroup(vm.groupId, var, null, null, null, null);
             if (infoModifyType == 2)
                 vm.setGroupMemberNickname(vm.groupId, vm.loginCertificate.userID, var);
@@ -86,63 +91,37 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     void init() {
-        iConversationBridge = (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();
+        iConversationBridge =
+            (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();
     }
 
     private void click() {
-        view.memberPermissions.setOnClickListener(v -> {
-            startActivity(new Intent(this, MemberPermissionActivity.class));
-        });
-        view.joinValidation.setOnClickListener(v -> {
-            BottomPopDialog dialog = new BottomPopDialog(this);
-            dialog.show();
-            dialog.getMainView().menu3.setOnClickListener(v1 -> dialog.dismiss());
-            dialog.getMainView().menu1.setText(io.openim.android.ouicore.R.string.allowAnyoneJoinGroup);
-            dialog.getMainView().menu2.setText(io.openim.android.ouicore.R.string.inviteNotVerification);
-            dialog.getMainView().menu4.setVisibility(View.VISIBLE);
-            dialog.getMainView().menu4.setText(io.openim.android.ouicore.R.string.needVerification);
-
-            dialog.getMainView().menu1.setOnClickListener(v1 -> {
-                dialog.dismiss();
-                vm.setGroupVerification(Constant.GroupVerification.directly, data -> {
-                    vm.groupsInfo.getValue().setNeedVerification(Constant.GroupVerification.directly);
-                    vm.groupsInfo.setValue(vm.groupsInfo.getValue());
-                });
-            });
-            dialog.getMainView().menu2.setOnClickListener(v1 -> {
-                dialog.dismiss();
-                vm.setGroupVerification(Constant.GroupVerification.applyNeedVerificationInviteDirectly, data -> {
-                    vm.groupsInfo.getValue().setNeedVerification(Constant.GroupVerification.applyNeedVerificationInviteDirectly);
-                    vm.groupsInfo.setValue(vm.groupsInfo.getValue());
-                });
-            });
-            dialog.getMainView().menu4.setOnClickListener(v1 -> {
-                dialog.dismiss();
-                vm.setGroupVerification(Constant.GroupVerification.allNeedVerification, data -> {
-                    vm.groupsInfo.getValue().setNeedVerification(Constant.GroupVerification.allNeedVerification);
-                    vm.groupsInfo.setValue(vm.groupsInfo.getValue());
-                });
-            });
-        });
-        view.totalSilence.setOnSlideButtonClickListener(isChecked -> {
-            vm.changeGroupMute(isChecked, data -> {
-                view.totalSilence.setCheckedWithAnimation(isChecked);
-            });
-        });
         view.topSlideButton.setOnSlideButtonClickListener(is -> {
             if (null == iConversationBridge) return;
             iConversationBridge.pinConversation(iConversationBridge.getConversationInfo(), is);
         });
         view.noDisturb.setOnSlideButtonClickListener(is -> {
             if (null == iConversationBridge) return;
-            iConversationBridge.setConversationRecvMessageOpt(is ? 2 : 0, iConversationBridge.getConversationInfo().getConversationID());
+            iConversationBridge.setConversationRecvMessageOpt(is ? 2 : 0,
+                iConversationBridge.getConversationInfo().getConversationID());
         });
         view.chatHistory.setOnClickListener(v -> {
             ARouter.getInstance().build(Routes.Conversation.CHAT_HISTORY).navigation();
         });
-        view.qrCode.setOnClickListener(v -> startActivity(new Intent(this, ShareQrcodeActivity.class)));
-        view.groupId.setOnClickListener(v -> startActivity(new Intent(this, ShareQrcodeActivity.class).putExtra(ShareQrcodeActivity.IS_QRCODE, false)));
-        view.bulletin.setOnClickListener(v -> startActivity(new Intent(this, GroupBulletinActivity.class).putExtra(Constant.K_RESULT, vm.isOwner())));
+        view.photo.setOnClickListener(v -> {
+            ARouter.getInstance().build(Routes.Conversation.MEDIA_HISTORY)
+                .withBoolean(Constant.K_RESULT, true).navigation();
+        });
+        view.video.setOnClickListener(v -> {
+            ARouter.getInstance().build(Routes.Conversation.MEDIA_HISTORY).navigation();
+        });
+        view.file.setOnClickListener(v -> {
+            ARouter.getInstance().build(Routes.Conversation.FILE_HISTORY).navigation();
+        });
+        view.qrCode.setOnClickListener(v -> startActivity(new Intent(this,
+            ShareQrcodeActivity.class)));
+        view.bulletin.setOnClickListener(v -> startActivity(new Intent(this,
+            GroupBulletinActivity.class).putExtra(Constant.K_RESULT, vm.isOwner())));
 
         view.groupMember.setOnClickListener(v -> {
             gotoMemberList(false);
@@ -150,7 +129,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         view.groupName.setOnClickListener(v -> {
             if (vm.isOwner()) {
                 infoModifyType = 1;
-                SingleInfoModifyActivity.SingleInfoModifyData modifyData = new SingleInfoModifyActivity.SingleInfoModifyData();
+                SingleInfoModifyActivity.SingleInfoModifyData modifyData =
+                    new SingleInfoModifyActivity.SingleInfoModifyData();
                 modifyData.title = "修改群聊名称";
                 modifyData.description = "修改群聊名称后，将在群内通知其他成员。";
                 modifyData.avatarUrl = vm.groupsInfo.getValue().getFaceURL();
@@ -160,7 +140,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
         view.myName.setOnClickListener(v -> {
             infoModifyType = 2;
-            SingleInfoModifyActivity.SingleInfoModifyData modifyData = new SingleInfoModifyActivity.SingleInfoModifyData();
+            SingleInfoModifyActivity.SingleInfoModifyData modifyData =
+                new SingleInfoModifyActivity.SingleInfoModifyData();
             modifyData.title = "我在群里的昵称";
             modifyData.description = "昵称修改后，只会在此群内显示，群内成员都可以看见。";
             ExGroupMemberInfo exGroupMemberInfo = vm.getOwnInGroup(vm.loginCertificate.userID);
@@ -180,9 +161,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                 vm.quitGroup();
             }
         });
-        view.transferPermissions.setOnClickListener(v -> {
-            gotoMemberList(true);
-        });
+
         view.clearRecord.setOnClickListener(v -> {
             CommonDialog commonDialog = new CommonDialog(this);
             commonDialog.show();
@@ -196,11 +175,10 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        if (isFinishing()) removeCacheVM();
+    protected void fasterDestroy() {
+        removeCacheVM();
+        Easy.delete(GroupVM.class);
     }
-
 
     @Override
     public void onSuccess(Object body) {
@@ -212,8 +190,9 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         if (vm.isOwner()) view.quitGroup.setText(io.openim.android.ouicore.R.string.dissolve_group);
         albumDialog = new PhotographAlbumDialog(this);
         albumDialog.setOnSelectResultListener(path -> {
-            PutArgs putArgs=new PutArgs(path[0]);
-            putArgs.putID=BaseApp.inst().loginCertificate.userID+"_"+System.currentTimeMillis();
+            PutArgs putArgs = new PutArgs(path[0]);
+            putArgs.putID =
+                BaseApp.inst().loginCertificate.userID + "_" + System.currentTimeMillis();
             OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                 @Override
                 public void onError(int code, String error) {
@@ -227,65 +206,71 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
                 @Override
                 public void onSuccess(String s) {
-                  try {
-                      Map<String,String> fromJson=GsonHel.fromJson(s, Map.class);
-                      vm.UPDATEGroup(vm.groupId, null, fromJson.get("url"),
-                          null, null, null);
-                  }catch (Exception ignored){}
+                    try {
+                        Map<String, String> fromJson = GsonHel.fromJson(s, Map.class);
+                        vm.UPDATEGroup(vm.groupId, null, fromJson.get("url"), null, null, null);
+                    } catch (Exception ignored) {
+                    }
                 }
             }, null, putArgs);
         });
 
         view.recyclerview.setLayoutManager(new GridLayoutManager(this, spanCount));
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter<GroupMembersInfo, ImageTxtViewHolder>(ImageTxtViewHolder.class) {
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter<GroupMembersInfo,
+            ImageTxtViewHolder>(ImageTxtViewHolder.class) {
 
             @Override
-            public void onBindView(@NonNull ImageTxtViewHolder holder, GroupMembersInfo data, int position) {
-                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.view.img.getLayoutParams();
-                if (TextUtils.isEmpty(data.getUserID())) {
+            public void onBindView(@NonNull ImageTxtViewHolder holder, GroupMembersInfo data,
+                                   int position) {
+                LinearLayout.LayoutParams layoutParams =
+                    (LinearLayout.LayoutParams) holder.view.img.getLayoutParams();
+                holder.view.txt.setTextSize(12);
+                holder.view.txt.setTextColor(getResources().getColor(io.openim.android.ouicore.R.color.txt_shallow));
+                if (TextUtils.isEmpty(data.getGroupID())) {
+                    //加/减按钮
                     layoutParams.width = Common.dp2px(36);
                     layoutParams.height = Common.dp2px(36);
                     layoutParams.topMargin = Common.dp2px(3);
                     int reId;
                     holder.view.img.load(reId = data.getRoleLevel());
+                    holder.view.txt.setText(reId == R.mipmap.ic_group_add ?
+                        io.openim.android.ouicore.R.string.add :
+                        io.openim.android.ouicore.R.string.remove);
                     holder.view.getRoot().setOnClickListener(v -> {
                         startActivity(new Intent(GroupMaterialActivity.this,
-                            InitiateGroupActivity.class)
-                            .putExtra(reId == R.mipmap.ic_group_add ? Constant.IS_INVITE_TO_GROUP
-                                : Constant.IS_REMOVE_GROUP, true));
-
-//                        Easy.installVM(MultipleChoiceVM.class).invite=true;
-//                        ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
+                            InitiateGroupActivity.class).putExtra(reId == R.mipmap.ic_group_add ?
+                            Constant.IS_INVITE_TO_GROUP : Constant.IS_REMOVE_GROUP, true));
                     });
                 } else {
                     layoutParams.topMargin = 0;
-                    layoutParams.width = Common.dp2px(42);
-                    layoutParams.height = Common.dp2px(42);
-                    holder.view.img.load(data.getFaceURL());
+                    layoutParams.width = Common.dp2px(48);
+                    layoutParams.height = Common.dp2px(48);
+                    holder.view.img.load(data.getFaceURL(), data.getNickname());
+                    holder.view.txt.setText(data.getNickname());
                 }
-                holder.view.txt.setVisibility(View.GONE);
-
             }
 
         };
         view.recyclerview.setAdapter(adapter);
         vm.groupsInfo.observe(this, groupInfo -> {
-            view.avatar.load(groupInfo.getFaceURL());
-            vm.getGroupMemberList();
-            view.totalSilence.setCheckedWithAnimation(groupInfo.getStatus() == Constant.GroupStatus.status3);
+            view.avatar.load(groupInfo.getFaceURL(), true);
+            vm.getGroupMemberList(spanCount * 2);
+            view.quitGroup.setText(getString(vm.isOwner() ?
+                io.openim.android.ouicore.R.string.dissolve_group :
+                io.openim.android.ouicore.R.string.quit_group));
 
-            view.describe.setText(getJoinGroupOption(groupInfo.getNeedVerification()));
-            view.groupType.setText(groupInfo.getGroupType() == 2 ? getString(io.openim.android.ouicore.R.string.super_group) : getString(io.openim.android.ouicore.R.string.ordinary_group));
-
-            view.quitGroup.setText(getString(vm.isOwner() ? io.openim.android.ouicore.R.string.dissolve_group : io.openim.android.ouicore.R.string.quit_group));
+            view.all.setText(String.format(getResources().getString(io.openim.android.ouicore.R.string.view_all_member), groupInfo.getMemberCount()));
         });
         vm.groupMembers.observe(this, groupMembersInfos -> {
-            boolean owner;
-            int end = (owner = vm.isOwner()) ? spanCount - 2 : spanCount - 1;
+            if (groupMembersInfos.isEmpty()) return;
+            spanCount = spanCount * 2;
+            boolean owner = vm.isOwner();
+            int end = owner ? spanCount - 2 : spanCount - 1;
             if (groupMembersInfos.size() < end) {
                 end = groupMembersInfos.size();
             }
-            List<GroupMembersInfo> groupMembersInfos1 = new ArrayList<>(groupMembersInfos.subList(0, end));
+            List<GroupMembersInfo> groupMembersInfos1 =
+                new ArrayList<>(groupMembersInfos.subList(0, end));
             GroupMembersInfo add = new GroupMembersInfo();
             add.setRoleLevel(R.mipmap.ic_group_add);
             groupMembersInfos1.add(add);
@@ -305,24 +290,21 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         iConversationBridge.setConversationInfoChangeListener(this, data -> {
             view.topSlideButton.post(() -> view.topSlideButton.setCheckedWithAnimation(data.isPinned()));
         });
+        view.groupManage.setOnClickListener(v -> {
+            startActivity(new Intent(this, GroupManageActivity.class));
+        });
 
     }
 
-    String getJoinGroupOption(int value) {
-        if (value == Constant.GroupVerification.allNeedVerification) {
-            return getString(io.openim.android.ouicore.R.string.needVerification);
-        } else if (value == Constant.GroupVerification.directly) {
-            return getString(io.openim.android.ouicore.R.string.allowAnyoneJoinGroup);
-        }
-        return getString(io.openim.android.ouicore.R.string.inviteNotVerification);
-    }
 
     private void gotoMemberList(boolean transferPermissions) {
 //        if (vm.groupMembers.getValue().isEmpty()) return;
 //        if (vm.groupMembers.getValue().size() > Constant.SUPER_GROUP_LIMIT)
-            startActivity(new Intent(GroupMaterialActivity.this, SuperGroupMemberActivity.class)
-                .putExtra(Constant.K_FROM, transferPermissions));
+        startActivity(new Intent(this, SuperGroupMemberActivity.class).putExtra(Constant.K_FROM,
+            transferPermissions));
 //        else
-//            startActivity(new Intent(GroupMaterialActivity.this, GroupMemberActivity.class).putExtra(Constant.K_FROM, transferPermissions));
+//            startActivity(new Intent(GroupMaterialActivity.this, GroupMemberActivity.class)
+//            .putExtra(Constant.K_FROM, transferPermissions));
     }
+
 }

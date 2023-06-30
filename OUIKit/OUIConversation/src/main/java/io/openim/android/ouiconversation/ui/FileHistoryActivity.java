@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,10 +24,11 @@ import io.openim.android.ouicore.databinding.ItemImgTxtBinding;
 import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.Message;
-
+@Route(path = Routes.Conversation.FILE_HISTORY)
 public class FileHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHistoryBinding> {
 
     private RecyclerViewAdapter adapter;

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
@@ -25,10 +26,11 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.Message;
-
+@Route(path = Routes.Conversation.MEDIA_HISTORY)
 public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHistoryBinding> {
 
     private boolean isPicture;

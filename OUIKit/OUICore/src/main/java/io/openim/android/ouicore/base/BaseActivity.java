@@ -64,13 +64,13 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
             view.setLifecycleOwner(this);
         }
     }
-
+    @Deprecated
     protected void bindVM(Class<T> vm) {
         this.vm = new ViewModelProvider(this).get(vm);
         vmCanonicalName = this.vm.getClass().getCanonicalName();
         bind();
     }
-
+    @Deprecated
     protected void bindVM(Class<T> vm, boolean shareVM) {
         bindVM(vm);
         if (shareVM && !BaseApp.viewModels.containsKey(vmCanonicalName)) {
@@ -107,7 +107,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         this.touchClearFocus = touchClearFocus;
     }
 
-
+    @Deprecated
     public void bindVMByCache(Class<T> vm) {
         String key = vm.getCanonicalName();
         if (BaseApp.viewModels.containsKey(key)) {
@@ -116,7 +116,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
             bind();
         }
     }
-
+    @Deprecated
     public void removeCacheVM() {
         String key = vm.getClass().getCanonicalName();
         BaseViewModel viewModel = BaseApp.viewModels.get(key);

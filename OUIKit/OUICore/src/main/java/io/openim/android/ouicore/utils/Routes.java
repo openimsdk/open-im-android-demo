@@ -44,6 +44,10 @@ public class Routes {
         public static final String PREVIEW = "/conversation/PreviewActivity";
         //拍摄照片或视频
         public static final String SHOOT = "/conversation/ShootActivity";
+        //多媒体聊天记录
+        public static final String MEDIA_HISTORY = "/conversation/MediaHistoryActivity";
+        //文件记录
+        public static final String FILE_HISTORY = "/conversation/FileHistoryActivity";
     }
 
     //群组
