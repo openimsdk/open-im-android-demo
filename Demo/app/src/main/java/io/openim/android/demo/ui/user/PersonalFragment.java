@@ -67,9 +67,6 @@ public class PersonalFragment extends BaseFragment implements Observer {
     }
 
     private void listener() {
-        view.moments.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Moments.HOME).navigation();
-        });
         view.accountSetting.setOnClickListener(v->{
             startActivity(new Intent(getActivity(),AccountSettingActivity.class));
         });

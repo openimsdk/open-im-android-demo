@@ -570,7 +570,7 @@ public class IMEvent {
             }
 
             @Override
-            public void onRecvOfflineNewMessages(List<Message> list) {
+            public void onRecvOfflineNewMessage(List<Message> msg) {
 
             }
 

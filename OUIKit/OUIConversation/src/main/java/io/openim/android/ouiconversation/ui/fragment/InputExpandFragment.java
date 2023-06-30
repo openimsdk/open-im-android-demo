@@ -62,6 +62,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.models.CardElem;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
@@ -168,11 +169,12 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         String friendInfo = result.getData().getStringExtra(Constant.K_RESULT);
 
         FriendInfo friendInfoBean = GsonHel.fromJson(friendInfo, FriendInfo.class);
-        Map<String, String> bean = new HashMap();
-        bean.put("userID", friendInfoBean.getUserID());
-        bean.put("nickname", friendInfoBean.getNickname());
-        bean.put("faceURL", friendInfoBean.getFaceURL());
-        Message message = OpenIMClient.getInstance().messageManager.createCardMessage(GsonHel.toJson(bean));
+
+        CardElem cardElem=new CardElem();
+        cardElem.setUserID(friendInfoBean.getUserID());
+        cardElem.setNickname(friendInfoBean.getNickname());
+        cardElem.setFaceURL(friendInfoBean.getFaceURL());
+        Message message = OpenIMClient.getInstance().messageManager.createCardMessage(cardElem);
         vm.sendMsg(message);
     });
 
