@@ -33,6 +33,7 @@ import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.ouicore.widget.CommonDialog;
@@ -164,7 +165,8 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
     }
 
     private void sendCardMessage(FriendInfo friendInfo) {
-        Message message = OpenIMClient.getInstance().messageManager.createCardMessage(recommend);
+        L.e(recommend);
+        Message message = OpenIMClient.getInstance().messageManager.createCardMessage(null);
         OfflinePushInfo offlinePushInfo = new OfflinePushInfo(); // 离线推送的消息备注；不为null
         OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
             @Override

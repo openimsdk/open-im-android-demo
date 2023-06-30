@@ -905,9 +905,11 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     @Override
-    public void onRecvOfflineNewMessages(List<Message> list) {
+    public void onRecvOfflineNewMessage(List<Message> msg) {
 
     }
+
+
 
 
     public void sendMsg(Message msg) {

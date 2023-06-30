@@ -128,7 +128,6 @@
                 android:src="@mipmap/ic_right" />
         </LinearLayout>
 
-
         <LinearLayout
             android:id="@+id/accountSetting"
             android:layout_width="match_parent"
