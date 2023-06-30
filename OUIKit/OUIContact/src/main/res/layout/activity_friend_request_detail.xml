@@ -57,8 +57,7 @@
                     android:id="@+id/avatar"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:layout_marginRight="15dp"
-                    android:src="@mipmap/ic_my_friend" />
+                    android:layout_marginRight="15dp" />
 
                 <TextView
                     android:id="@+id/nickName"
