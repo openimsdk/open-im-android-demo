@@ -96,33 +96,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     private void click() {
-        view.topSlideButton.setOnSlideButtonClickListener(is -> {
-            if (null == iConversationBridge) return;
-            iConversationBridge.pinConversation(iConversationBridge.getConversationInfo(), is);
-        });
-        view.noDisturb.setOnSlideButtonClickListener(is -> {
-            if (null == iConversationBridge) return;
-            iConversationBridge.setConversationRecvMessageOpt(is ? 2 : 0,
-                iConversationBridge.getConversationInfo().getConversationID());
-        });
-        view.chatHistory.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Conversation.CHAT_HISTORY).navigation();
-        });
-        view.photo.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Conversation.MEDIA_HISTORY)
-                .withBoolean(Constant.K_RESULT, true).navigation();
-        });
-        view.video.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Conversation.MEDIA_HISTORY).navigation();
-        });
-        view.file.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Conversation.FILE_HISTORY).navigation();
-        });
-        view.qrCode.setOnClickListener(v -> startActivity(new Intent(this,
-            ShareQrcodeActivity.class)));
-        view.bulletin.setOnClickListener(v -> startActivity(new Intent(this,
-            GroupBulletinActivity.class).putExtra(Constant.K_RESULT, vm.isOwner())));
-
         view.groupMember.setOnClickListener(v -> {
             gotoMemberList(false);
         });
@@ -138,17 +111,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                 infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
             }
         });
-        view.myName.setOnClickListener(v -> {
-            infoModifyType = 2;
-            SingleInfoModifyActivity.SingleInfoModifyData modifyData =
-                new SingleInfoModifyActivity.SingleInfoModifyData();
-            modifyData.title = "我在群里的昵称";
-            modifyData.description = "昵称修改后，只会在此群内显示，群内成员都可以看见。";
-            ExGroupMemberInfo exGroupMemberInfo = vm.getOwnInGroup(vm.loginCertificate.userID);
-            modifyData.avatarUrl = exGroupMemberInfo.groupMembersInfo.getFaceURL();
-            modifyData.editT = exGroupMemberInfo.groupMembersInfo.getNickname();
-            infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
-        });
+        view.qrCode.setOnClickListener(v -> startActivity(new Intent(this,
+            ShareQrcodeActivity.class)));
         view.avatarEdit.setOnClickListener(v -> {
             if (!vm.isGroupOwner.getValue()) return;
             albumDialog.show();
@@ -160,17 +124,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             } else {
                 vm.quitGroup();
             }
-        });
-
-        view.clearRecord.setOnClickListener(v -> {
-            CommonDialog commonDialog = new CommonDialog(this);
-            commonDialog.show();
-            commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.clear_chat_tips);
-            commonDialog.getMainView().cancel.setOnClickListener(view1 -> commonDialog.dismiss());
-            commonDialog.getMainView().confirm.setOnClickListener(view1 -> {
-                commonDialog.dismiss();
-                iConversationBridge.clearCHistory(conversationId);
-            });
         });
     }
 
@@ -284,15 +237,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             adapter.setItems(groupMembersInfos1);
         });
 
-        iConversationBridge.setNotDisturbStatusListener(this, data -> {
-            view.noDisturb.post(() -> view.noDisturb.setCheckedWithAnimation(data == 2));
-        });
-        iConversationBridge.setConversationInfoChangeListener(this, data -> {
-            view.topSlideButton.post(() -> view.topSlideButton.setCheckedWithAnimation(data.isPinned()));
-        });
-        view.groupManage.setOnClickListener(v -> {
-            startActivity(new Intent(this, GroupManageActivity.class));
-        });
 
     }
 

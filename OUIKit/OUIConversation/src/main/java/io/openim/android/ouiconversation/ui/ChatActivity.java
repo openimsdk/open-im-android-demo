@@ -452,11 +452,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         return selectMsg;
     }
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        bottomInputCote.dispatchTouchEvent(event);
-        return super.dispatchTouchEvent(event);
-    }
 
     @Override
     public void scrollToPosition(int position) {

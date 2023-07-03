@@ -73,14 +73,11 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             });
         });
         view.picture.setOnClickListener(v -> {
-            startActivity(new Intent(this, MediaHistoryActivity.class).putExtra(Constant.K_RESULT
-                , true));
+
         });
         view.video.setOnClickListener(v -> {
-            startActivity(new Intent(this, MediaHistoryActivity.class));
         });
-        view.file.setOnClickListener(v -> startActivity(new Intent(this,
-            FileHistoryActivity.class)));
+        view.file.setOnClickListener(v ->{});
 
         view.readVanish.setOnSlideButtonClickListener(isChecked -> {
             OpenIMClient.getInstance().conversationManager.setOneConversationPrivateChat(new OnBase<String>() {
@@ -100,7 +97,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             contactListVM.pinConversation(vm.conversationInfo.getValue(), is);
         });
         view.searchChat.setOnClickListener(v -> {
-            startActivity(new Intent(this, ChatHistorySearchActivity.class));
+
         });
         view.chatbg.setOnClickListener(view1 -> {
             startActivity(new Intent(this, SetChatBgActivity.class));
