@@ -387,7 +387,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                 if (!lastMsg.contains(target)) lastMsg = target + "\t" + lastMsg;
                 Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg,
                     target, BaseApp.inst().getColor(android.R.color.holo_red_dark));
-            } else viewHolder.viewBinding.lastMsg.setText(lastMsg);
+            } else
+                viewHolder.viewBinding.lastMsg.setText(lastMsg);
         }
 
         @Override

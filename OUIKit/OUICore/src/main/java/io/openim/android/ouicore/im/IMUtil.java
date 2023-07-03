@@ -306,7 +306,7 @@ public class IMUtil {
                 for (GroupMembersInfo groupMembersInfo : invitedUserList.kickedUserList) {
                     stringBuffer.append(groupMembersInfo.getNickname()).append(",");
                     MultipleChoice choice = new MultipleChoice();
-                    choice.name = groupMembersInfo.getNickname();
+                    choice.name = groupMembersInfo.getNickname().trim();
                     choice.key = groupMembersInfo.getUserID();
                     choices.add(choice);
                 }
@@ -315,7 +315,7 @@ public class IMUtil {
                     invitedUserList.opUser.getNickname());
 
                 MultipleChoice choice = new MultipleChoice(invitedUserList.opUser.getUserID());
-                choice.name = invitedUserList.opUser.getNickname();
+                choice.name = invitedUserList.opUser.getNickname().trim();
                 choice.groupId= msg.getGroupID();
                 choices.add(choice);
 

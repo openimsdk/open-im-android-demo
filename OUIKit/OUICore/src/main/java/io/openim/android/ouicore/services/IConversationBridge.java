@@ -13,7 +13,8 @@ public interface IConversationBridge extends IProvider {
 
     void closeChatPage();
 
-    void setConversationRecvMessageOpt(int status, String... cid);
+
+    void setConversationRecvMessageOpt(int status, String cid);
 
     void setNotDisturbStatusListener(LifecycleOwner owner, IMUtil.OnSuccessListener<Integer> onSuccessListener);
 

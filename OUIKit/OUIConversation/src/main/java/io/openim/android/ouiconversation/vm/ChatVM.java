@@ -1091,17 +1091,18 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }, Arrays.asList(cid));
     }
 
-    public void setConversationRecvMessageOpt(int status, String... cid) {
+    public void setConversationRecvMessageOpt(int status, String cid) {
         OpenIMClient.getInstance().conversationManager.setConversationRecvMessageOpt(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
+                toast(error+code);
             }
 
             @Override
             public void onSuccess(String data) {
                 notDisturbStatus.setValue(status);
             }
-        }, Arrays.asList(cid), status);
+        }, cid, status);
     }
 
     public void searchLocalMessages(String key, int page, Integer... messageTypes) {

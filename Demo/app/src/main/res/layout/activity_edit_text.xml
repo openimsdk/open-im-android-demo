@@ -45,6 +45,7 @@
             <EditText
                 android:id="@+id/edit"
                 android:layout_width="0dp"
+                android:singleLine="true"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
 

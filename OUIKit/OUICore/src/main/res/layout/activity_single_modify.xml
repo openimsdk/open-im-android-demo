@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="67dp"
-                android:text="我在群里的昵称"
+                android:text="@string/in_group_name"
                 android:textColor="#ff333333"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -68,6 +68,10 @@
                         android:layout_height="wrap_content"
                         android:background="@color/white"
                         android:id="@+id/editText"
+                        android:imeOptions="actionDone"
+                        android:inputType="text"
+                        android:singleLine="true"
+                        android:maxLines="1"
                         android:paddingLeft="12dp" />
                 </LinearLayout>
             </LinearLayout>

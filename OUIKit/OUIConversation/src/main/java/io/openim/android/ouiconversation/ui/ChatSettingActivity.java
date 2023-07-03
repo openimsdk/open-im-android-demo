@@ -26,6 +26,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.UserInfo;
@@ -107,7 +108,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
         });
 
         view.noDisturb.setOnSlideButtonClickListener(is -> {
-            vm.setConversationRecvMessageOpt(is ? 2 : 0,
+            vm.setConversationRecvMessageOpt(is ? Opt.ReceiveNotNotifyMessage : Opt.NORMAL,
                 vm.conversationInfo.getValue().getConversationID());
         });
         view.user.setOnClickListener(v -> {

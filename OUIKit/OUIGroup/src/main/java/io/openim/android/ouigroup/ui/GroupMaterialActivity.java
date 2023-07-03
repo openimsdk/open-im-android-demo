@@ -43,6 +43,7 @@ import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouigroup.ui.v3.GroupManageActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.GroupVerification;
+import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.listener.OnPutFileListener;
 import io.openim.android.sdk.models.ConversationInfo;
@@ -102,7 +103,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
         view.noDisturb.setOnSlideButtonClickListener(is -> {
             if (null == iConversationBridge) return;
-            iConversationBridge.setConversationRecvMessageOpt(is ? 2 : 0,
+            iConversationBridge.setConversationRecvMessageOpt(is ? Opt.ReceiveNotNotifyMessage : Opt.NORMAL,
                 iConversationBridge.getConversationInfo().getConversationID());
         });
         view.chatHistory.setOnClickListener(v -> {
@@ -285,7 +286,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
 
         iConversationBridge.setNotDisturbStatusListener(this, data -> {
-            view.noDisturb.post(() -> view.noDisturb.setCheckedWithAnimation(data == 2));
+            view.noDisturb.post(() -> view.noDisturb.setCheckedWithAnimation(data == Opt.ReceiveNotNotifyMessage));
         });
         iConversationBridge.setConversationInfoChangeListener(this, data -> {
             view.topSlideButton.post(() -> view.topSlideButton.setCheckedWithAnimation(data.isPinned()));
