@@ -48,5 +48,3 @@ include ':OUIGroup'
 project(':OUIGroup').projectDir = new File(settingsDir, '../OUIKit/OUIGroup')
 include ':OUIContact'
 project(':OUIContact').projectDir = new File(settingsDir, '../OUIKit/OUIContact')
-include ':OUIApplet'
-project(':OUIApplet').projectDir = new File(settingsDir, '../OUIKit/OUIApplet')

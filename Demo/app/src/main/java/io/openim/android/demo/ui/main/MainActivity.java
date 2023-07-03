@@ -22,7 +22,6 @@ import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.demo.ui.user.PersonalFragment;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.demo.vm.MainVM;
-import io.openim.android.ouiapplet.AppletFragment;
 import io.openim.android.ouicontact.ui.fragment.ContactFragment;
 import io.openim.android.ouicontact.vm.ContactVM;
 import io.openim.android.ouiconversation.ui.fragment.ContactListFragment;

@@ -16,7 +16,7 @@ ext {
     ]
 
     applicationId = [
-            "app" : "io.openim.android.c_base_open",
+            "app" : "io.openim.android.demo",
             "OUIConversation" : "io.openim.android.ouiconversation",
             "OUIGroup" : "io.openim.android.ouigroup",
             "OUIContact" : "io.openim.android.ouicontact",

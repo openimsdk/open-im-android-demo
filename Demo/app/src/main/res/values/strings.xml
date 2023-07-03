@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">OpenIM(c_base_open)</string>
+    <string name="app_name">OpenIM</string>
     <string name="open_im">欢迎使用OpenIM</string>
     <string name="login">登录</string>
     <string name="read">我已阅读并同意：</string>
