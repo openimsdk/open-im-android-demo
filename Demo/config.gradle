@@ -10,14 +10,13 @@ ext {
             minSdk     : 21,
             targetSdk  : 33,
             compileSdk : 33,
-            versionCode: 27,
-            versionName: "1.2.7",
+            versionCode: 1,
+            versionName: "1.0.0",
             abiFilters : ['armeabi-v7a', 'arm64-v8a']
     ]
 
     applicationId = [
-            "app" : "io.openim.android.demo",
-//            "app" : "io.openim.app.enterprisechat",
+            "app" : "io.openim.android.c_base_open",
             "OUIConversation" : "io.openim.android.ouiconversation",
             "OUIGroup" : "io.openim.android.ouigroup",
             "OUIContact" : "io.openim.android.ouicontact",
