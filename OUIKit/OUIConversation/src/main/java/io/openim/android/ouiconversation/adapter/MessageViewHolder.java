@@ -354,8 +354,6 @@ public class MessageViewHolder {
          * @param view
          */
         protected void showMsgExMenu(View view) {
-            view.setOnClickListener(v -> {
-            });
             view.setOnLongClickListener(v -> {
                 if (null != chatVM.enableMultipleSelect.getValue()
                     && chatVM.enableMultipleSelect.getValue())
@@ -1137,7 +1135,9 @@ public class MessageViewHolder {
         }
 
         void jump(View view, String uid) {
-            view.setOnClickListener(v -> ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, uid).navigation(view.getContext()));
+            view.setOnClickListener(v ->
+                ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                .withString(Constant.K_ID, uid).navigation(view.getContext()));
         }
 
         @Override

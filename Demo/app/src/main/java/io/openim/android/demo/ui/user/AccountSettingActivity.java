@@ -31,9 +31,9 @@ public class AccountSettingActivity extends BaseActivity<PersonalVM, ActivityAcc
     }
 
     private void listener() {
-        vm.exUserInfo.observe(this, extendUserInfo -> {
+        vm.userInfo.observe(this, extendUserInfo -> {
             if (null == extendUserInfo) return;
-            view.slideButton.setCheckedWithAnimation(extendUserInfo.userInfo.getGlobalRecvMsgOpt() == 2);
+            view.slideButton.setCheckedWithAnimation(extendUserInfo.getGlobalRecvMsgOpt() == 2);
         });
         WaitDialog waitDialog = new WaitDialog(this);
         view.slideButton.setOnSlideButtonClickListener(isChecked -> {

@@ -64,6 +64,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.LoginStatus;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.AtUserInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
@@ -677,7 +678,7 @@ public class IMUtil {
      */
     public static boolean isLogged() {
         long status = OpenIMClient.getInstance().getLoginStatus();
-        return status == 101 || status == 102;
+        return status == LoginStatus.Logging || status == LoginStatus.Logged;
     }
 
     /**

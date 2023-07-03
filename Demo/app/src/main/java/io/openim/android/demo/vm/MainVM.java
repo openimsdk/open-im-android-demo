@@ -84,7 +84,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     }
 
     private void getClientConfig() {
-        N.API(NiService.class).CommNI(Constant.getAdminManage()
+        N.API(NiService.class).CommNI(Constant.getAppAuthUrl()
                     + "admin/init/get_client_config",
                 BaseApp.inst().loginCertificate.chatToken,
                 NiService.buildParameter()

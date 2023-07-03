@@ -31,10 +31,10 @@ public interface OpenIMService {
     @POST("account/register")
     Observable<ResponseBody> register(@Body RequestBody requestBody);
 
-    @POST("user/get_users_full_info")
+    @POST("user/find/full")
     Observable<ResponseBody> getUsersFullInfo(@Body RequestBody requestBody);
 
-    @POST("user/update_user_info")
+    @POST("user/update")
     Observable<ResponseBody> updateUserInfo(@Body RequestBody requestBody);
 
     @POST("account/code/send")

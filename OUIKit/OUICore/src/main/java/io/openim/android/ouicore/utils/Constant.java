@@ -16,19 +16,13 @@ public class Constant {
     private static final String IM_API_URL = "https://" + DEFAULT_IP + "/api";
     //web socket
     private static final String IM_WS_URL = "wss://" + DEFAULT_IP + "/msg_gateway";
-    //admin Manage
-    private static final String ADMIN_MANAGE = "https://" + DEFAULT_IP + "/complete_admin";
 
+    //--------IP----------
     private static final String IM_API = "http://" + DEFAULT_IP + ":10002";
     private static final String APP_AUTH = "http://" + DEFAULT_IP + ":10008";
     private static final String IM_WS = "ws://" + DEFAULT_IP + ":10001";
     private static final Boolean isIP = true;
-
-    public static String getAdminManage() {
-        String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("ADMIN_MANAGE");
-        if (TextUtils.isEmpty(url)) return ADMIN_MANAGE;
-        return url;
-    }
+    //--------------------
 
     public static String getImApiUrl() {
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("IM_API_URL");
@@ -167,74 +161,6 @@ public class Constant {
         public static final int MEMBER = 1;
         public static final int GROUP_OWNER = 2;
         public static final int ADMINISTRATOR = 3;
-    }
-
-    public static class MsgNotification {
-        /// 好友已添加
-        public static final int friendAddedNotification = 1204;
-
-        /// 群已被创建
-        public static final int groupCreatedNotification = 1501;
-
-        /// 群资料改变
-        public static final int groupInfoSetNotification = 1502;
-
-        /// 进群申请
-        public static final int joinGroupApplicationNotification = 1503;
-
-        /// 群成员退出
-        public static final int memberQuitNotification = 1504;
-
-        /// 群申请被接受
-        public static final int groupApplicationAcceptedNotification = 1505;
-
-        /// 群申请被拒绝
-        public static final int groupApplicationRejectedNotification = 1506;
-
-        /// 群拥有者权限转移
-        public static final int groupOwnerTransferredNotification = 1507;
-
-        /// 群成员被踢出群
-        public static final int memberKickedNotification = 1508;
-
-        /// 邀请进群
-        public static final int memberInvitedNotification = 1509;
-
-        /// 群成员进群
-        public static final int memberEnterNotification = 1510;
-
-        /// 解散群
-        public static final int dismissGroupNotification = 1511;
-
-        public static final int groupNotificationEnd = 1599;
-
-        /// 群成员被禁言
-        public static final int groupMemberMutedNotification = 1512;
-
-        /// 群成员被取消禁言
-        public static final int groupMemberCancelMutedNotification = 1513;
-
-        /// 群禁言
-        public static final int groupMutedNotification = 1514;
-
-        /// 取消群禁言
-        public static final int groupCancelMutedNotification = 1515;
-
-        /// 阅后即焚
-        public static final int burnAfterReadingNotification = 1701;
-        /// 群成员信息改变
-        public static final int groupMemberInfoChangedNotification = 1516;
-    }
-
-    public static class CacheKey {
-    }
-
-    public static class GroupStatus {
-        //        0正常，1被封，2解散，3禁言
-        public static final int status0 = 0;
-        public static final int status1 = 1;
-        public static final int status2 = 2;
-        public static final int status3 = 3;
     }
 
     /// 进群验证设置选项
