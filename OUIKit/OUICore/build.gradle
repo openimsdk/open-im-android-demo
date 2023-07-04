@@ -93,4 +93,7 @@ dependencies {
 
     api 'com.liulishuo.okdownload:okdownload:1.0.7'
     api 'com.liulishuo.okdownload:sqlite:1.0.7'
+
+
+    api 'q.rorbin:badgeview:1.1.3'
 }

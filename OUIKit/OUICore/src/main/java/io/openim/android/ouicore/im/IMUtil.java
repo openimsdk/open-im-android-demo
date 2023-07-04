@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,7 +54,6 @@ import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.MuteMemberNotification;
 import io.openim.android.ouicore.entity.OANotification;
 import io.openim.android.ouicore.entity.QuitGroupNotification;
-import io.openim.android.ouicore.ex.CommEx;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
@@ -66,6 +66,7 @@ import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.LoginStatus;
 import io.openim.android.sdk.enums.MessageType;
+import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.AtUserInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
@@ -755,5 +756,15 @@ public class IMUtil {
      */
     public interface OnSuccessListener<T> {
         void onSuccess(T data);
+    }
+    public static class IMCallBack<T>  implements OnBase<T> {
+        @Override
+        public void onError(int code, String error) {
+            Toast.makeText(BaseApp.inst(), error+"("+code+")",
+                Toast.LENGTH_LONG).show();
+        }
+        public   void onSuccess(T data){
+
+        }
     }
 }

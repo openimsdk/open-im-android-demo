@@ -57,12 +57,12 @@ public class IBridgeImpl implements IConversationBridge {
     }
 
     @Override
-    public void setNotDisturbStatusListener(LifecycleOwner owner, IMUtil.OnSuccessListener<Integer> onSuccessListener) {
+    public void setNotDisturbStatusListener(LifecycleOwner owner, IMUtil.OnSuccessListener<Integer> OnSuccessListener) {
         try {
             ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
             if (null != chatVM) {
                 chatVM.notDisturbStatus.observe((LifecycleOwner) chatVM.getContext(), integer -> {
-                    onSuccessListener.onSuccess(integer);
+                    OnSuccessListener.onSuccess(integer);
                 });
             }
         } catch (Exception e) {
@@ -94,11 +94,11 @@ public class IBridgeImpl implements IConversationBridge {
     }
 
     @Override
-    public void setConversationInfoChangeListener(LifecycleOwner owner, IMUtil.OnSuccessListener<ConversationInfo> onSuccessListener) {
+    public void setConversationInfoChangeListener(LifecycleOwner owner, IMUtil.OnSuccessListener<ConversationInfo> OnSuccessListener) {
         ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
         if (null != chatVM) {
             chatVM.conversationInfo.observe(owner, conversationInfo -> {
-                onSuccessListener.onSuccess(conversationInfo);
+                OnSuccessListener.onSuccess(conversationInfo);
             });
         }
     }

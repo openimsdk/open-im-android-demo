@@ -1,23 +1,14 @@
 package io.openim.android.ouimeeting.vm;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.arch.core.internal.SafeIterableMap;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-
-import com.alibaba.fastjson2.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -36,7 +27,6 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.TimeUtil;
-import io.openim.android.ouimeeting.R;
 import io.openim.android.ouimeeting.entity.RoomMetadata;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
@@ -51,8 +41,6 @@ import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
-import kotlinx.coroutines.flow.AbstractFlow;
-import kotlinx.coroutines.flow.FlowCollector;
 
 public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
@@ -369,7 +357,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
 
     public void updateMeetingInfo(Map<String, Object> configure,
-                                  IMUtil.OnSuccessListener<String> onSuccessListener) {
+                                  IMUtil.OnSuccessListener<String> OnSuccessListener) {
         OpenIMClient.getInstance().signalingManager.signalingUpdateMeetingInfo(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -378,8 +366,8 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
             @Override
             public void onSuccess(String data) {
-                if (null != onSuccessListener)
-                    onSuccessListener.onSuccess(data);
+                if (null != OnSuccessListener)
+                    OnSuccessListener.onSuccess(data);
             }
         }, configure);
     }

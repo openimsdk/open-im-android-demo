@@ -65,8 +65,6 @@ public class Constant {
 
 
     public static class Event {
-        //会话列表初始
-        public static final int CONTACT_LIST_VM_INIT = 10001;
         //转发选人
         public static final int FORWARD = 10002;
         //音视频通话
@@ -135,24 +133,6 @@ public class Constant {
 
     }
 
-
-    /// 会话强提示内容
-    public static class GroupAtType {
-        /// 无提示
-        public static final int atNormal = 0;
-
-        /// @了我提示
-        public static final int atMe = 1;
-
-        /// @了所有人提示
-        public static final int atAll = 2;
-
-        /// @了所有人@了我
-        public static final int atAllAtMe = 3;
-
-        /// 群公告提示
-        public static final int groupNotification = 4;
-    }
 
     /**
      * 群身份

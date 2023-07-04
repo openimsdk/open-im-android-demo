@@ -266,6 +266,8 @@ public class MessageViewHolder {
                 });
             } else if (null != avatarImage2) {
                 avatarImage2.load(message.getSenderFaceUrl(), message.getSenderNickname());
+                avatarImage2.setOnClickListener(v -> ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, message.getSendID()).withString(Constant.K_GROUP_ID,
+                    message.getGroupID()).navigation());
             }
 
             if (null != nickName) {

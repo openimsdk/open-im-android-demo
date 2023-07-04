@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.fragment.app.FragmentTransaction;
@@ -32,13 +34,14 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.MomentsBridge;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Routes;
+import q.rorbin.badgeview.QBadgeView;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
 
     private int mCurrentTabIndex;
     private BaseFragment lastFragment, conversationListFragment, contactFragment,
-        personalFragment,appletFragment;
+        personalFragment, appletFragment;
     private ActivityResultLauncher<Intent> resultLauncher = Common.getCaptureActivityLauncher(this);
     private boolean hasShoot = false;
 
@@ -63,7 +66,13 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         view.setMainVM(vm);
 
         click();
+        listener();
         view.men1.setChecked(true);
+    }
+
+    private void listener() {
+        vm.totalUnreadMsgCount.observe(this, v ->
+            Common.buildBadgeView(this, view.men1, v));
     }
 
 
@@ -71,23 +80,34 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         ContactVM contactVM = ((ContactFragment) contactFragment).getVM();
         if (null == contactVM) return;
         contactVM.friendDotNum.observe(this, integer -> {
-            view.badge.setVisibility((integer > 0 || contactVM.groupDotNum.getValue() > 0) ?
+            view.badge.setVisibility((integer > 0 || contactVM.groupDotNum.val() > 0) ?
                 View.VISIBLE : View.GONE);
         });
         contactVM.groupDotNum.observe(this, integer -> {
-            view.badge.setVisibility((integer > 0 || contactVM.friendDotNum.getValue() > 0) ?
+            view.badge.setVisibility((integer > 0 || contactVM.friendDotNum.val() > 0) ?
                 View.VISIBLE : View.GONE);
         });
     }
 
+    private final RadioGroup.OnCheckedChangeListener changeListener = (group, checkedId) -> {
+        if (checkedId == R.id.men1) switchFragment(conversationListFragment);
+        if (checkedId == R.id.men2) switchFragment(contactFragment);
+        if (checkedId == R.id.men3) switchFragment(appletFragment);
+        if (checkedId == R.id.men4) switchFragment(personalFragment);
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View view = group.getChildAt(i);
+            if (view instanceof RadioButton) {
+                ((RadioButton) view)
+                    .setChecked(view.getId() == checkedId);
+            }
+        }
+    };
 
     private void click() {
-        view.menuGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.men1) switchFragment(conversationListFragment);
-            if (checkedId == R.id.men2) switchFragment(contactFragment);
-            if (checkedId == R.id.men3) switchFragment(appletFragment);
-            if (checkedId == R.id.men4) switchFragment(personalFragment);
-        });
+        view.men1.setOnClickListener(v -> changeListener.onCheckedChanged(view.menuGroup, v.getId()));
+        view.men2.setOnClickListener(v -> changeListener.onCheckedChanged(view.menuGroup, v.getId()));
+        view.men3.setOnClickListener(v -> changeListener.onCheckedChanged(view.menuGroup, v.getId()));
+        view.men4.setOnClickListener(v -> changeListener.onCheckedChanged(view.menuGroup, v.getId()));
     }
 
 

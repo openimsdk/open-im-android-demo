@@ -189,7 +189,7 @@
             android:paddingTop="7dp"
             android:paddingRight="16dp"
             android:paddingBottom="7dp"
-            android:visibility="@{null!=ChatVM.notificationMsg&amp;&amp;null!=ChatVM.callingService? View.VISIBLE:View.GONE}">
+            android:visibility="@{null!=ChatVM.notificationMsg? View.VISIBLE:View.GONE}">
 
             <ImageView
                 android:layout_width="wrap_content"

@@ -42,6 +42,7 @@
                         android:paddingBottom="8dp"
                         android:paddingTop="8dp">
 
+
                         <RadioButton
                             android:id="@+id/men1"
                             android:layout_width="0dp"

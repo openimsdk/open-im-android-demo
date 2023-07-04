@@ -66,6 +66,7 @@ import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.enums.GroupAtType;
 
 @Route(path = Routes.Conversation.CONTACT_LIST)
 public class ContactListFragment extends BaseFragment<ContactListVM> implements ContactListVM.ViewAction, Observer {
@@ -369,7 +370,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
             String lastMsg = IMUtil.getMsgParse(msgConversation.lastMsg).toString();
             //强提醒
-            if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification) {
+            if (msgConversation.conversationInfo.getGroupAtType() == GroupAtType.GROUP_NOTIFICATION) {
                 String target =
                     "[" + context.getString(io.openim.android.ouicore.R.string.group_bulletin) +
                         "]";
@@ -381,7 +382,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
                 Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg,
                     target, BaseApp.inst().getColor(android.R.color.holo_red_dark));
 
-            } else if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.atMe) {
+            } else if (msgConversation.conversationInfo.getGroupAtType() == GroupAtType.AT_ME) {
                 String target =
                     "@" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.you);
                 if (!lastMsg.contains(target)) lastMsg = target + "\t" + lastMsg;

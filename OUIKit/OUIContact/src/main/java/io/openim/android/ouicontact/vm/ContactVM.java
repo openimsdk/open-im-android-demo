@@ -6,6 +6,7 @@ import java.util.List;
 
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
@@ -24,9 +25,9 @@ import io.openim.android.sdk.models.UserInfo;
 
 public class ContactVM extends BaseViewModel implements OnGroupListener, OnFriendshipListener {
     //群红点数量
-    public MutableLiveData<Integer> groupDotNum = new MutableLiveData<>(0);
+    public State<Integer> groupDotNum = new State<>(0);
     //好友通知红点
-    public MutableLiveData<Integer> friendDotNum = new MutableLiveData<>(0);
+    public State<Integer> friendDotNum = new State<>(0);
     //申请列表
     public MutableLiveData<List<GroupApplicationInfo>> groupApply = new MutableLiveData<>();
     //好友申请列表

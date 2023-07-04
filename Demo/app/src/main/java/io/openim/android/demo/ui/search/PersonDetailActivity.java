@@ -26,7 +26,6 @@ import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IMBack;
 import io.openim.android.ouicore.services.CallingService;
-import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.GroupVM;
@@ -121,13 +120,13 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             if (oneself()) targetGroupMembersInfo = oneselfGroupMembersInfo;
             if (null == oneselfGroupMembersInfo || null == targetGroupMembersInfo) return;
             view.groupNickName.setText(targetGroupMembersInfo.getNickname());
-            view.time.setText(TimeUtil.getTime(targetGroupMembersInfo.getJoinTime() * 1000,
+            view.time.setText(TimeUtil.getTime(targetGroupMembersInfo.getJoinTime(),
                 TimeUtil.yearMonthDayFormat));
             view.joinMethodLy.setVisibility(oneself() ? View.GONE : View.VISIBLE);
 
             String muteTime = "";
             if (targetGroupMembersInfo.getMuteEndTime() != 0)
-                muteTime = TimeUtil.getTime(targetGroupMembersInfo.getMuteEndTime() * 1000,
+                muteTime = TimeUtil.getTime(targetGroupMembersInfo.getMuteEndTime(),
                     TimeUtil.yearTimeSecondFormat);
             view.muteTime.setText(muteTime);
             if (oneself()) return;

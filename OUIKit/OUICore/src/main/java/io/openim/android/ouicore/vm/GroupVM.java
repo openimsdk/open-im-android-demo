@@ -34,8 +34,6 @@ import io.openim.android.sdk.enums.GroupType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
-import io.openim.android.sdk.models.GroupInviteResult;
-import io.openim.android.sdk.models.GroupMemberRole;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class GroupVM extends SocialityVM {
@@ -459,7 +457,7 @@ public class GroupVM extends SocialityVM {
         }, groupId));
     }
 
-    public void transferGroupOwner(String uid, IMUtil.OnSuccessListener onSuccessListener) {
+    public void transferGroupOwner(String uid, IMUtil.OnSuccessListener OnSuccessListener) {
         OpenIMClient.getInstance().groupManager.transferGroupOwner(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -469,7 +467,7 @@ public class GroupVM extends SocialityVM {
             @Override
             public void onSuccess(String data) {
                 getGroupsInfo();
-                onSuccessListener.onSuccess(data);
+                OnSuccessListener.onSuccess(data);
             }
         }, groupId, uid);
     }
@@ -484,7 +482,7 @@ public class GroupVM extends SocialityVM {
         getIView().close();
     }
 
-    public void changeGroupMute(boolean isChecked, IMUtil.OnSuccessListener onSuccessListener) {
+    public void changeGroupMute(boolean isChecked, IMUtil.OnSuccessListener OnSuccessListener) {
         OpenIMClient.getInstance().groupManager.changeGroupMute(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -493,13 +491,13 @@ public class GroupVM extends SocialityVM {
 
             @Override
             public void onSuccess(String data) {
-                if (null != onSuccessListener) onSuccessListener.onSuccess(data);
+                if (null != OnSuccessListener) OnSuccessListener.onSuccess(data);
             }
         }, groupId, isChecked);
     }
 
     public void setGroupVerification(int needVerification,
-                                     IMUtil.OnSuccessListener onSuccessListener) {
+                                     IMUtil.OnSuccessListener OnSuccessListener) {
         OpenIMClient.getInstance().groupManager.setGroupVerification(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -508,12 +506,12 @@ public class GroupVM extends SocialityVM {
 
             @Override
             public void onSuccess(String data) {
-                if (null != onSuccessListener) onSuccessListener.onSuccess(data);
+                if (null != OnSuccessListener) OnSuccessListener.onSuccess(data);
             }
         }, groupId, needVerification);
     }
 
-    public void setGroupLookMemberInfo(int status, IMUtil.OnSuccessListener onSuccessListener) {
+    public void setGroupLookMemberInfo(int status, IMUtil.OnSuccessListener OnSuccessListener) {
         OpenIMClient.getInstance().groupManager.setGroupLookMemberInfo(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -522,12 +520,12 @@ public class GroupVM extends SocialityVM {
 
             @Override
             public void onSuccess(String data) {
-                if (null != onSuccessListener) onSuccessListener.onSuccess(data);
+                if (null != OnSuccessListener) OnSuccessListener.onSuccess(data);
             }
         }, groupId, status);
     }
 
-    public void setGroupApplyMemberFriend(int status, IMUtil.OnSuccessListener onSuccessListener) {
+    public void setGroupApplyMemberFriend(int status, IMUtil.OnSuccessListener OnSuccessListener) {
         OpenIMClient.getInstance().groupManager.setGroupApplyMemberFriend(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -536,7 +534,7 @@ public class GroupVM extends SocialityVM {
 
             @Override
             public void onSuccess(String data) {
-                if (null != onSuccessListener) onSuccessListener.onSuccess(data);
+                if (null != OnSuccessListener) OnSuccessListener.onSuccess(data);
             }
         }, groupId, status);
     }

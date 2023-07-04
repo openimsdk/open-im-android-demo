@@ -390,7 +390,6 @@ public class IMEvent {
     // 会话新增或改变监听
     private void conversationListener() {
         OpenIMClient.getInstance().conversationManager.setOnConversationListener(new OnConversationListener() {
-            private UserLogic userLogic = Easy.find(UserLogic.class);
 
             @Override
             public void onConversationChanged(List<ConversationInfo> list) {
@@ -413,23 +412,32 @@ public class IMEvent {
 
             @Override
             public void onSyncServerFailed() {
-                userLogic .connectStatus.setValue(UserLogic.ConnectStatus.SYNC_ERR);
+                for (OnConversationListener onConversationListener : conversationListeners) {
+                    onConversationListener.onSyncServerFailed();
+                }
             }
 
             @Override
             public void onSyncServerFinish() {
-                userLogic.connectStatus.setValue(UserLogic.ConnectStatus.DEFAULT);
+                for (OnConversationListener onConversationListener : conversationListeners) {
+                    onConversationListener.onSyncServerFinish();
+                }
+
             }
 
             @Override
             public void onSyncServerStart() {
-                userLogic.connectStatus.setValue(UserLogic.ConnectStatus.SYNCING);
+                for (OnConversationListener onConversationListener : conversationListeners) {
+                    onConversationListener.onSyncServerStart();
+                }
             }
 
             @Override
             public void onTotalUnreadMessageCountChanged(int i) {
                 // 未读消息数发送变化
-
+                for (OnConversationListener onConversationListener : conversationListeners) {
+                    onConversationListener.onTotalUnreadMessageCountChanged(i);
+                }
             }
         });
     }

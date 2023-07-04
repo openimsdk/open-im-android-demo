@@ -225,13 +225,14 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                                    int position) {
                 LinearLayout.LayoutParams layoutParams =
                     (LinearLayout.LayoutParams) holder.view.img.getLayoutParams();
+                layoutParams.topMargin = 0;
+                layoutParams.width = Common.dp2px(48);
+                layoutParams.height = Common.dp2px(48);
+
                 holder.view.txt.setTextSize(12);
                 holder.view.txt.setTextColor(getResources().getColor(io.openim.android.ouicore.R.color.txt_shallow));
                 if (TextUtils.isEmpty(data.getGroupID())) {
                     //加/减按钮
-                    layoutParams.width = Common.dp2px(36);
-                    layoutParams.height = Common.dp2px(36);
-                    layoutParams.topMargin = Common.dp2px(3);
                     int reId;
                     holder.view.img.load(reId = data.getRoleLevel());
                     holder.view.txt.setText(reId == R.mipmap.ic_group_add ?
@@ -243,11 +244,12 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                             Constant.IS_INVITE_TO_GROUP : Constant.IS_REMOVE_GROUP, true));
                     });
                 } else {
-                    layoutParams.topMargin = 0;
-                    layoutParams.width = Common.dp2px(48);
-                    layoutParams.height = Common.dp2px(48);
                     holder.view.img.load(data.getFaceURL(), data.getNickname());
                     holder.view.txt.setText(data.getNickname());
+                    holder.view.getRoot().setOnClickListener(v -> {
+                        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID,
+                            data.getUserID()).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
+                    });
                 }
             }
 
