@@ -364,7 +364,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             meetingRvAdapter.setItems(vm.roomCallingInfo.getValue().getParticipant());
         });
 
-        view.notice.setOnClickListener(v -> ARouter.getInstance().build(Routes.Group.NOTICE_DETAIL).withSerializable(Constant.K_NOTICE, vm.notificationMsg.getValue()).navigation());
+        view.notice.setOnClickListener(v -> ARouter.getInstance().build(Routes.Group.NOTICE_DETAIL)
+            .withSerializable(Constant.K_NOTICE, vm.notificationMsg.getValue()).navigation());
         view.back.setOnClickListener(v -> finish());
 
         view.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {

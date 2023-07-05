@@ -4,7 +4,6 @@ package io.openim.android.ouiconversation.ui.fragment;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -51,7 +50,6 @@ import io.openim.android.ouiconversation.ui.NotificationActivity;
 import io.openim.android.ouiconversation.ui.SearchActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.vm.ContactListVM;
@@ -367,27 +365,18 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 //            (msgConversation.conversationInfo.isPinned() ? "#FFF3F3F3" : "#FFFFFF"));
             viewHolder.viewBinding.setTop.setVisibility(msgConversation.conversationInfo.isPinned() ? View.VISIBLE : View.GONE);
 
-            String lastMsg = IMUtil.getMsgParse(msgConversation.lastMsg).toString();
+            CharSequence lastMsg = IMUtil.getMsgParse(msgConversation.lastMsg);
             //强提醒
-            if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.groupNotification) {
-                String target =
-                    "[" + context.getString(io.openim.android.ouicore.R.string.group_bulletin) +
-                        "]";
-                try {
-                    lastMsg = target + msgConversation.notificationMsg.group.notification;
-                } catch (Exception e) {
-                    if (!lastMsg.contains(target)) lastMsg = target + "\t" + lastMsg;
-                }
-                Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg,
-                    target, BaseApp.inst().getColor(android.R.color.holo_red_dark));
-
-            } else if (msgConversation.conversationInfo.getGroupAtType() == Constant.GroupAtType.atMe) {
+            if (msgConversation.conversationInfo.getGroupAtType() == GroupAtType.AT_ME) {
                 String target =
                     "@" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.you);
-                if (!lastMsg.contains(target)) lastMsg = target + "\t" + lastMsg;
-                Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg,
-                    target, BaseApp.inst().getColor(android.R.color.holo_red_dark));
-            } else viewHolder.viewBinding.lastMsg.setText(lastMsg);
+                if (!lastMsg.toString().contains(target))
+                    lastMsg = target + "\t" + lastMsg;
+
+                IMUtil.buildClickAndColorSpannable((SpannableStringBuilder)
+                    lastMsg, target, android.R.color.holo_red_dark, null);
+            }
+            viewHolder.viewBinding.lastMsg.setText(lastMsg);
         }
 
         @Override

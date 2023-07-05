@@ -62,8 +62,9 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
                 vm.setFaceURL(path[0]);
                 vm.waitDialog.show();
 
-                PutArgs putArgs=new PutArgs(path[0]);
-                putArgs.putID= BaseApp.inst().loginCertificate.userID+"_"+System.currentTimeMillis();
+                PutArgs putArgs = new PutArgs(path[0]);
+                putArgs.putID =
+                    BaseApp.inst().loginCertificate.userID + "_" + System.currentTimeMillis();
                 OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                     @Override
                     public void onError(int code, String error) {
@@ -78,19 +79,21 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
 
                     @Override
                     public void onSuccess(String s) {
-                        Map<String,String>map= GsonHel.fromJson(s, HashMap.class);
-                        s=map.get("url");
+                        Map<String, String> map = GsonHel.fromJson(s, HashMap.class);
+                        s = map.get("url");
                         vm.setFaceURL(s);
                         Common.UIHandler.postDelayed(() -> vm.waitDialog.dismiss(), 1500);
                     }
-                }, null,putArgs);
+                }, null, putArgs);
             });
 
             albumDialog.show();
         });
-        view.nickNameLy.setOnClickListener(v -> resultLauncher.launch(new Intent(this, EditTextActivity.class)
-            .putExtra(EditTextActivity.INIT_TXT, vm.exUserInfo.getValue().userInfo.getNickname())
-            .putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.NickName))));
+        view.nickNameLy.setOnClickListener(v ->
+            nicknameLauncher.launch(new Intent(this, EditTextActivity.class)
+                .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.val().getNickname())
+                .putExtra(EditTextActivity.TITLE,
+                    getString(io.openim.android.ouicore.R.string.NickName))));
         view.genderLy.setOnClickListener(v -> {
             BottomPopDialog dialog = new BottomPopDialog(this);
             dialog.show();
@@ -116,32 +119,40 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
             }).build();
             pvTime.show(v);
         });
-        view.qrCode.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Group.SHARE_QRCODE).navigation();
+        view.email.setOnClickListener(v -> {
+            emailLauncher.launch(new Intent(this, EditTextActivity.class)
+                .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.val().getEmail())
+                .putExtra(EditTextActivity.TITLE,
+                    getString(R.string.mail)));
         });
-        view.identity.setOnClickListener(v -> {
-            Common.copy(vm.exUserInfo.getValue().userInfo.getUserID());
-            toast(getString(io.openim.android.ouicore.R.string.copy_succ));
-        });
-
     }
 
-    private ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() != Activity.RESULT_OK) return;
-        String resultStr = result.getData().getStringExtra(Constant.K_RESULT);
-        vm.setNickname(resultStr);
-    });
+    private final ActivityResultLauncher<Intent> nicknameLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() != Activity.RESULT_OK) return;
+            String resultStr = result.getData().getStringExtra(Constant.K_RESULT);
+            vm.setNickname(resultStr);
+        });
+    private final ActivityResultLauncher<Intent> emailLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() != Activity.RESULT_OK) return;
+            String resultStr = result.getData().getStringExtra(Constant.K_RESULT);
+            vm.setEmail(resultStr);
+        });
 
     private void initView() {
-        vm.exUserInfo.observe(this, extendUserInfo -> {
-            if (null == extendUserInfo) return;
-            view.avatar.load(extendUserInfo.userInfo.getFaceURL());
-            view.nickName.setText(extendUserInfo.userInfo.getNickname());
-            view.gender.setText(extendUserInfo.userInfo.getGender() == 1 ? io.openim.android.ouicore.R.string.male : io.openim.android.ouicore.R.string.girl);
-            if (extendUserInfo.userInfo.getBirth() > 0) {
-                view.birthday.setText(TimeUtil.getTime(extendUserInfo.userInfo.getBirth() * 1000, TimeUtil.yearMonthDayFormat));
+        vm.userInfo.observe(this, v -> {
+            if (null == v) return;
+            view.avatar.load(v.getFaceURL(), v.getNickname());
+            view.nickName.setText(v.getNickname());
+            view.gender.setText(v.getGender() == 1 ? io.openim.android.ouicore.R.string.male :
+                io.openim.android.ouicore.R.string.girl);
+            if (v.getBirth() > 0) {
+                view.birthday.setText(TimeUtil.getTime(v.getBirth() * 1000,
+                    TimeUtil.yearMonthDayFormat));
             }
-            view.identity.setText(extendUserInfo.userInfo.getUserID());
+            view.phoneNumTv.setText(v.getPhoneNumber());
+            view.emailTV.setText(v.getEmail());
         });
     }
 }

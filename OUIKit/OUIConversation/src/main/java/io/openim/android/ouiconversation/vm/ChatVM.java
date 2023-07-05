@@ -39,7 +39,6 @@ import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.services.OneselfService;
-import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
@@ -529,7 +528,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     public void getGroupsInfo(String groupID,
-                              IMUtil.OnSuccessListener<List<GroupInfo>> onSuccessListener) {
+                              IMUtil.OnSuccessListener<List<GroupInfo>> OnSuccessListener) {
         List<String> groupIds = new ArrayList<>();
         groupIds.add(groupID);
         OpenIMClient.getInstance().groupManager.getGroupsInfo(new OnBase<List<GroupInfo>>() {
@@ -541,8 +540,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             @Override
             public void onSuccess(List<GroupInfo> data) {
                 if (data.isEmpty()) return;
-                if (null != onSuccessListener) {
-                    onSuccessListener.onSuccess(data);
+                if (null != OnSuccessListener) {
+                    OnSuccessListener.onSuccess(data);
                     return;
                 }
                 groupInfo.setValue(data.get(0));
@@ -556,7 +555,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         return groupInfo.getValue().getGroupType() == GroupType.WORK;
     }
 
-    public void getOneConversation(IMUtil.OnSuccessListener<ConversationInfo> onSuccessListener) {
+    public void getOneConversation(IMUtil.OnSuccessListener<ConversationInfo> OnSuccessListener) {
         OpenIMClient.getInstance().conversationManager.getOneConversation(new OnBase<ConversationInfo>() {
             @Override
             public void onError(int code, String error) {
@@ -565,8 +564,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
             @Override
             public void onSuccess(ConversationInfo data) {
-                if (null != onSuccessListener) {
-                    onSuccessListener.onSuccess(data);
+                if (null != OnSuccessListener) {
+                    OnSuccessListener.onSuccess(data);
                     return;
                 }
                 conversationID = data.getConversationID();
@@ -646,7 +645,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
      * By conversationID
      */
     public void markReadedByConID(String conversationID,
-                                  IMUtil.OnSuccessListener onSuccessListener) {
+                                  IMUtil.OnSuccessListener OnSuccessListener) {
         OpenIMClient.getInstance().messageManager.markMessageAsReadByConID(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -655,8 +654,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
             @Override
             public void onSuccess(String data) {
-                if (null != onSuccessListener)
-                    onSuccessListener.onSuccess(data);
+                if (null != OnSuccessListener)
+                    OnSuccessListener.onSuccess(data);
             }
         }, conversationID);
     }
@@ -802,16 +801,16 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         //标记本条消息已读 语音消息需要点播放才算读
         if (!viewPause && msg.getContentType() != MessageType.VOICE) markReaded(msg);
 
-        statusUPDATE(msg);
+        statusUpdate(msg);
     }
 
-    private void statusUPDATE(Message msg) {
+    private void statusUpdate(Message msg) {
         try {
             int contentType = msg.getContentType();
-            if (contentType == MessageType.GROUP_INFO_SET_NTF) {
-                NotificationMsg no = GsonHel.fromJson(msg.getNotificationElem().getDetail(),
-                    NotificationMsg.class);
-                if (!TextUtils.isEmpty(no.group.notification)) notificationMsg.setValue(no);
+            if (contentType == MessageType.GROUP_ANNOUNCEMENT_NTF){
+               MsgExpand msgExpand = (MsgExpand) msg.getExt();
+                if (!TextUtils.isEmpty(msgExpand.notificationMsg.group.notification))
+                    notificationMsg.setValue(msgExpand.notificationMsg);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1093,17 +1092,18 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }, Arrays.asList(cid));
     }
 
-    public void setConversationRecvMessageOpt(int status, String... cid) {
+    public void setConversationRecvMessageOpt(int status, String cid) {
         OpenIMClient.getInstance().conversationManager.setConversationRecvMessageOpt(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
+                toast(error+code);
             }
 
             @Override
             public void onSuccess(String data) {
                 notDisturbStatus.setValue(status);
             }
-        }, Arrays.asList(cid), status);
+        }, cid, status);
     }
 
     public void searchLocalMessages(String key, int page, Integer... messageTypes) {

@@ -22,16 +22,16 @@ public class MoreDataActivity extends BaseActivity<PersonalVM, ActivityMoreDataB
     }
 
     void init() {
-        view.avatar.load(vm.exUserInfo.getValue().userInfo.getFaceURL());
-        view.nickName.setText(vm.exUserInfo.getValue().userInfo.getNickname());
-        view.gender.setText(vm.exUserInfo.getValue().userInfo.getGender() == 1 ? io.openim.android.ouicore.R.string.male
+        view.avatar.load(vm.userInfo.val().getFaceURL());
+        view.nickName.setText(vm.userInfo.val().getNickname());
+        view.gender.setText(vm.userInfo.val().getGender() == 1 ? io.openim.android.ouicore.R.string.male
             : io.openim.android.ouicore.R.string.girl);
-        long birth = vm.exUserInfo.getValue().userInfo.getBirth();
+        long birth = vm.userInfo.val().getBirth();
         if (birth != 0) {
             view.birthday.setText(TimeUtil.getTime(birth * 1000,
                 TimeUtil.yearMonthDayFormat));
         }
-        view.phoneTv.setText(vm.exUserInfo.getValue().userInfo.getPhoneNumber());
-        view.mailTv.setText(vm.exUserInfo.getValue().userInfo.getEmail());
+        view.phoneTv.setText(vm.userInfo.val().getPhoneNumber());
+        view.mailTv.setText(vm.userInfo.val().getEmail());
     }
 }

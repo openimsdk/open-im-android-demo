@@ -14,13 +14,12 @@ public class LoginCertificate {
     public String chatToken;
 
     public boolean allowSendMsgNotFriend;
-    /// discoverPageURL
-    /// ordinaryUserAddFriend,
-    /// bossUserID,
-    /// adminURL ,
-    /// needInvitationCodeRegister
-    /// robots
+    public boolean allowAddFriend;
 
+    //允许响铃
+    public boolean allowBeep;
+    //允许振动
+    public boolean allowVibration;
     // 全局免打扰 0：正常；1：不接受消息；2：接受在线消息不接受离线消息；
     public int globalRecvMsgOpt;
 

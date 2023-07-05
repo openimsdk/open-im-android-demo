@@ -16,6 +16,7 @@ import io.openim.android.ouigroup.databinding.ActivityGroupManageBinding;
 import io.openim.android.ouigroup.ui.GroupMaterialActivity;
 import io.openim.android.ouigroup.ui.MemberPermissionActivity;
 import io.openim.android.ouigroup.ui.SuperGroupMemberActivity;
+import io.openim.android.sdk.enums.GroupStatus;
 
 public class GroupManageActivity extends BaseActivity<GroupVM, ActivityGroupManageBinding> {
 
@@ -31,7 +32,7 @@ public class GroupManageActivity extends BaseActivity<GroupVM, ActivityGroupMana
     }
     private void listener() {
         vm.groupsInfo.observe(this, groupInfo -> {
-            view.totalSilence.setCheckedWithAnimation(groupInfo.getStatus() == Constant.GroupStatus.status3);
+            view.totalSilence.setCheckedWithAnimation(groupInfo.getStatus() == GroupStatus.GROUP_MUTED);
             view.describe.setText(getJoinGroupOption(groupInfo.getNeedVerification()));
         });
     }

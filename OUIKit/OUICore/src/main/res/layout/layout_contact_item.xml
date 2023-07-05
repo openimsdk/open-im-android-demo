@@ -78,7 +78,7 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="3dp">
 
-                <TextView
+                <com.vanniktech.emoji.EmojiTextView
                     android:id="@+id/lastMsg"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

@@ -15,7 +15,9 @@ import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.widget.Toast;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
@@ -51,12 +53,13 @@ import io.openim.android.ouicore.entity.MeetingInfo;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.MuteMemberNotification;
+import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.entity.OANotification;
 import io.openim.android.ouicore.entity.QuitGroupNotification;
-import io.openim.android.ouicore.ex.CommEx;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
@@ -64,7 +67,9 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.LoginStatus;
 import io.openim.android.sdk.enums.MessageType;
+import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.AtUserInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
@@ -193,11 +198,11 @@ public class IMUtil {
                 msgExpand.locationInfo = GsonHel.fromJson(msg.getLocationElem().getDescription(),
                     LocationInfo.class);
             if (msg.getContentType() == MessageType.AT_TEXT) {
-                AtMsgInfo atMsgInfo=new AtMsgInfo();
-                atMsgInfo.atUsersInfo=msg.getAtTextElem().atUsersInfo;
-                atMsgInfo.text=msg.getAtTextElem().getText();
-                msgExpand.atMsgInfo =atMsgInfo;
-                handleAt(msgExpand,msg.getGroupID());
+                AtMsgInfo atMsgInfo = new AtMsgInfo();
+                atMsgInfo.atUsersInfo = msg.getAtTextElem().atUsersInfo;
+                atMsgInfo.text = msg.getAtTextElem().getText();
+                msgExpand.atMsgInfo = atMsgInfo;
+                handleAt(msgExpand, msg.getGroupID());
             }
             handleNotification(msg);
         } catch (Exception e) {
@@ -214,6 +219,7 @@ public class IMUtil {
     private static void handleNotification(Message msg) {
         NotificationElem notificationElem = msg.getNotificationElem();
         if (null == notificationElem) return;
+        MsgExpand msgExpand = (MsgExpand) msg.getExt();
         String detail = notificationElem.getDetail();
         CharSequence tips = "";
         Context ctx = BaseApp.inst();
@@ -225,9 +231,8 @@ public class IMUtil {
                 String txt = String.format(ctx.getString(R.string.revoke_tips),
                     revokedInfo.getRevokerNickname());
 
-                tips = getSingleSequence(msg.getGroupID(),revokedInfo.getRevokerNickname(),
-                    revokedInfo.getRevokerID(),
-                    txt);
+                tips = getSingleSequence(msg.getGroupID(), revokedInfo.getRevokerNickname(),
+                    revokedInfo.getRevokerID(), txt);
                 break;
             }
             case MessageType.GROUP_CREATED_NTF: {
@@ -237,8 +242,8 @@ public class IMUtil {
                 String txt = String.format(ctx.getString(R.string.created_group),
                     groupNotification.opUser.getNickname());
 
-                tips = getSingleSequence(msg.getGroupID(),groupNotification.opUser.getNickname(),
-                    groupNotification.opUser.getUserID(), txt);
+                tips = getSingleSequence(msg.getGroupID(), groupNotification.opUser.getNickname()
+                    , groupNotification.opUser.getUserID(), txt);
                 break;
             }
             case MessageType.GROUP_INFO_SET_NTF: {
@@ -248,8 +253,8 @@ public class IMUtil {
                 // a 修改了群资料
                 String txt = String.format(ctx.getString(R.string.change_group_data),
                     groupNotification.opUser.getNickname());
-                tips = getSingleSequence(msg.getGroupID(),groupNotification.opUser.getNickname(),
-                    groupNotification.opUser.getUserID(), txt);
+                tips = getSingleSequence(msg.getGroupID(), groupNotification.opUser.getNickname()
+                    , groupNotification.opUser.getUserID(), txt);
                 break;
             }
             case MessageType.GROUP_NAME_CHANGED_NTF: {
@@ -259,8 +264,8 @@ public class IMUtil {
                 // a 修改了群名字
                 String txt = String.format(ctx.getString(R.string.edit_group_name),
                     groupNotification.opUser.getNickname());
-                tips = getSingleSequence(msg.getGroupID(),groupNotification.opUser.getNickname(),
-                    groupNotification.opUser.getUserID(), txt);
+                tips = getSingleSequence(msg.getGroupID(), groupNotification.opUser.getNickname()
+                    , groupNotification.opUser.getUserID(), txt);
                 break;
             }
             case MessageType.MEMBER_QUIT_NTF: {
@@ -290,7 +295,7 @@ public class IMUtil {
 
                 MultipleChoice choice = new MultipleChoice(invitedUserList.opUser.getUserID());
                 choice.name = invitedUserList.opUser.getNickname();
-                choice.groupId= msg.getGroupID();
+                choice.groupId = msg.getGroupID();
                 choices.add(choice);
 
                 tips = getMultipleSequence(new SpannableStringBuilder(txt), choices);
@@ -305,7 +310,7 @@ public class IMUtil {
                 for (GroupMembersInfo groupMembersInfo : invitedUserList.kickedUserList) {
                     stringBuffer.append(groupMembersInfo.getNickname()).append(",");
                     MultipleChoice choice = new MultipleChoice();
-                    choice.name = groupMembersInfo.getNickname();
+                    choice.name = groupMembersInfo.getNickname().trim();
                     choice.key = groupMembersInfo.getUserID();
                     choices.add(choice);
                 }
@@ -314,8 +319,8 @@ public class IMUtil {
                     invitedUserList.opUser.getNickname());
 
                 MultipleChoice choice = new MultipleChoice(invitedUserList.opUser.getUserID());
-                choice.name = invitedUserList.opUser.getNickname();
-                choice.groupId= msg.getGroupID();
+                choice.name = invitedUserList.opUser.getNickname().trim();
+                choice.groupId = msg.getGroupID();
                 choices.add(choice);
 
                 tips = getMultipleSequence(new SpannableStringBuilder(txt), choices);
@@ -328,7 +333,7 @@ public class IMUtil {
                 String txt = String.format(ctx.getString(R.string.join_group2),
                     entrantUser.entrantUser.getNickname());
 
-                tips = getSingleSequence(msg.getGroupID(),entrantUser.entrantUser.getNickname(),
+                tips = getSingleSequence(msg.getGroupID(), entrantUser.entrantUser.getNickname(),
                     entrantUser.entrantUser.getUserID(), txt);
                 break;
             }
@@ -351,12 +356,11 @@ public class IMUtil {
                 MultipleChoice choice =
                     new MultipleChoice(transferredGroupNotification.newGroupOwner.getUserID());
                 choice.name = transferredGroupNotification.newGroupOwner.getNickname();
-                choice.groupId= msg.getGroupID();
-                tips =
-                    getMultipleSequence(getSingleSequence(msg.getGroupID(),
+                choice.groupId = msg.getGroupID();
+                tips = getMultipleSequence(getSingleSequence(msg.getGroupID(),
                         transferredGroupNotification.opUser.getNickname(),
                         transferredGroupNotification.opUser.getUserID(), txt),
-                        new ArrayList<>(Collections.singleton(choice)));
+                    new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
             case MessageType.GROUP_MEMBER_MUTED_NTF: {
@@ -372,11 +376,11 @@ public class IMUtil {
                 List<MultipleChoice> choices = new ArrayList<>();
                 MultipleChoice choice1 = new MultipleChoice(memberNotification.opUser.getUserID());
                 choice1.name = memberNotification.opUser.getNickname();
-                choice1.groupId= msg.getGroupID();
+                choice1.groupId = msg.getGroupID();
                 MultipleChoice choice2 =
                     new MultipleChoice(memberNotification.mutedUser.getUserID());
                 choice2.name = memberNotification.mutedUser.getNickname();
-                choice2.groupId= msg.getGroupID();
+                choice2.groupId = msg.getGroupID();
                 choices.add(choice1);
                 choices.add(choice2);
 
@@ -395,10 +399,10 @@ public class IMUtil {
                     new MultipleChoice(memberNotification.mutedUser.getUserID());
                 choice.name = memberNotification.mutedUser.getNickname();
                 choice.groupId = msg.getGroupID();
-                tips =
-                    getMultipleSequence(getSingleSequence(msg.getGroupID(),memberNotification.opUser.getNickname()
-                            , memberNotification.opUser.getUserID(), txt),
-                        new ArrayList<>(Collections.singleton(choice)));
+                tips = getMultipleSequence(getSingleSequence(msg.getGroupID(),
+                        memberNotification.opUser.getNickname(),
+                        memberNotification.opUser.getUserID(), txt),
+                    new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
             case MessageType.GROUP_MUTED_NTF: {
@@ -408,7 +412,8 @@ public class IMUtil {
                 String txt = String.format(ctx.getString(R.string.start_muted),
                     memberNotification.opUser.getNickname());
 
-                tips = getSingleSequence(msg.getGroupID(),memberNotification.opUser.getNickname(),
+                tips = getSingleSequence(msg.getGroupID(),
+                    memberNotification.opUser.getNickname(),
                     memberNotification.opUser.getUserID(), txt);
                 break;
             }
@@ -418,7 +423,8 @@ public class IMUtil {
                 // a 关闭了群禁言
                 String txt = String.format(ctx.getString(R.string.close_muted),
                     memberNotification.opUser.getNickname());
-                tips = getSingleSequence(msg.getGroupID(),memberNotification.opUser.getNickname(),
+                tips = getSingleSequence(msg.getGroupID(),
+                    memberNotification.opUser.getNickname(),
                     memberNotification.opUser.getUserID(), txt);
                 break;
             }
@@ -437,10 +443,15 @@ public class IMUtil {
                     GroupNotification.class);
                 String txt = String.format(ctx.getString(R.string.edit_data),
                     groupNotification.opUser.getNickname());
-                tips = getSingleSequence(msg.getGroupID(),groupNotification.opUser.getNickname(),
-                    groupNotification.opUser.getUserID(), txt);
+                tips = getSingleSequence(msg.getGroupID(), groupNotification.opUser.getNickname()
+                    , groupNotification.opUser.getUserID(), txt);
                 break;
             }
+            case MessageType.GROUP_ANNOUNCEMENT_NTF:
+                msgExpand.notificationMsg =
+                    GsonHel.fromJson(msg.getNotificationElem().getDetail(),
+                        NotificationMsg.class);
+                break;
 
             //单聊-------
             case MessageType.FRIEND_APPLICATION_APPROVED_NTF:
@@ -449,12 +460,10 @@ public class IMUtil {
                 break;
 
             //-------
-
             default:
-                L.e("");
                 break;
         }
-        ((MsgExpand) msg.getExt()).tips = tips;
+        msgExpand.tips = tips;
     }
 
     /**
@@ -471,8 +480,7 @@ public class IMUtil {
                 new ClickableSpan() {
                     @Override
                     public void onClick(@NonNull View widget) {
-                        toPersonDetail(choice.key,
-                            choice.groupId);
+                        toPersonDetail(choice.key, choice.groupId);
                     }
                 });
         }
@@ -488,8 +496,7 @@ public class IMUtil {
      * @return
      */
     @NonNull
-    public static CharSequence getSingleSequence(String groupId, String nickName,
-                                                 String uid,
+    public static CharSequence getSingleSequence(String groupId, String nickName, String uid,
                                                  String txt) {
         return buildClickAndColorSpannable(new SpannableStringBuilder(txt), nickName,
             new ClickableSpan() {
@@ -501,10 +508,7 @@ public class IMUtil {
     }
 
     private static void toPersonDetail(String uid, String groupId) {
-        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-            .withString(Constant.K_ID, uid)
-            .withString(Constant.K_GROUP_ID, groupId)
-            .navigation();
+        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, uid).withString(Constant.K_GROUP_ID, groupId).navigation();
     }
 
 
@@ -513,7 +517,7 @@ public class IMUtil {
             BaseApp.inst().getString(R.string.you) : atUsersInfo.getGroupNickname());
     }
 
-    private static void handleAt(MsgExpand msgExpand,String gid) {
+    private static void handleAt(MsgExpand msgExpand, String gid) {
         if (null == msgExpand.atMsgInfo) return;
         String atTxt = msgExpand.atMsgInfo.text;
         for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
@@ -522,20 +526,23 @@ public class IMUtil {
         SpannableStringBuilder spannableString = new SpannableStringBuilder(atTxt);
         for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
             String tag = atSelf(atUsersInfo);
-            buildClickAndColorSpannable(spannableString, tag,
-                new ClickableSpan() {
+            buildClickAndColorSpannable(spannableString, tag, new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                 toPersonDetail(atUsersInfo.getAtUserID(),gid);
+                    toPersonDetail(atUsersInfo.getAtUserID(), gid);
                 }
             });
         }
         msgExpand.sequence = spannableString;
     }
-
-    public static CharSequence buildClickAndColorSpannable(@NotNull SpannableStringBuilder spannableString, String tag, ClickableSpan clickableSpan) {
+    public static CharSequence buildClickAndColorSpannable(@NotNull SpannableStringBuilder spannableString,
+                                                           String tag, ClickableSpan clickableSpan){
+        return  buildClickAndColorSpannable(spannableString,tag,R.color.theme,clickableSpan);
+    }
+    public static CharSequence buildClickAndColorSpannable(@NotNull SpannableStringBuilder spannableString,
+                                                           String tag, @ColorRes int colorId , ClickableSpan clickableSpan) {
         ForegroundColorSpan colorSpan =
-            new ForegroundColorSpan(BaseApp.inst().getResources().getColor(R.color.theme));
+            new ForegroundColorSpan(BaseApp.inst().getResources().getColor(colorId));
         int start = spannableString.toString().indexOf(tag);
         int end = spannableString.toString().indexOf(tag) + tag.length();
         if (null != clickableSpan)
@@ -557,7 +564,8 @@ public class IMUtil {
         try {
             switch (msg.getContentType()) {
                 default:
-                    if (null != msgExpand.tips) lastMsg = msgExpand.tips;
+                    if (null != msgExpand.tips)
+                        lastMsg = msgExpand.tips;
                     break;
                 case MessageType.TEXT:
                     lastMsg = msg.getTextElem().getContent();
@@ -603,12 +611,19 @@ public class IMUtil {
                 case MessageType.QUOTE:
                     lastMsg = msg.getQuoteElem().getText();
                     break;
+                case MessageType.GROUP_ANNOUNCEMENT_NTF:
+                    String target =
+                        "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.group_bulletin) +
+                            "]";
+                        lastMsg = target + msgExpand.notificationMsg.group.notification;
+                    lastMsg=IMUtil.buildClickAndColorSpannable( new SpannableStringBuilder(lastMsg),
+                        target, android.R.color.holo_red_dark,null);
+                    break;
                 case Constant.MsgType.LOCAL_CALL_HISTORY:
                     boolean isAudio = msgExpand.callHistory.getType().equals("audio");
                     lastMsg = "[" + (isAudio ? BaseApp.inst().getString(R.string.voice_calls) :
                         BaseApp.inst().getString(R.string.video_calls)) + "]";
                     break;
-                //TODO
                 case Constant.MsgType.CUSTOMIZE_MEETING:
                     lastMsg = "[" + BaseApp.inst().getString(R.string.video_meeting) + "]";
                     break;
@@ -677,7 +692,7 @@ public class IMUtil {
      */
     public static boolean isLogged() {
         long status = OpenIMClient.getInstance().getLoginStatus();
-        return status == 101 || status == 102;
+        return status == LoginStatus.Logging || status == LoginStatus.Logged;
     }
 
     /**
@@ -754,5 +769,16 @@ public class IMUtil {
      */
     public interface OnSuccessListener<T> {
         void onSuccess(T data);
+    }
+
+    public static class IMCallBack<T> implements OnBase<T> {
+        @Override
+        public void onError(int code, String error) {
+            Toast.makeText(BaseApp.inst(), error + "(" + code + ")", Toast.LENGTH_LONG).show();
+        }
+
+        public void onSuccess(T data) {
+
+        }
     }
 }

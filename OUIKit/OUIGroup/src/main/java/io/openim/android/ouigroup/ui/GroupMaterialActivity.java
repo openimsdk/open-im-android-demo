@@ -43,6 +43,7 @@ import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouigroup.ui.v3.GroupManageActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.GroupVerification;
+import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.listener.OnPutFileListener;
 import io.openim.android.sdk.models.ConversationInfo;
@@ -102,7 +103,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
         view.noDisturb.setOnSlideButtonClickListener(is -> {
             if (null == iConversationBridge) return;
-            iConversationBridge.setConversationRecvMessageOpt(is ? 2 : 0,
+            iConversationBridge.setConversationRecvMessageOpt(is ? Opt.ReceiveNotNotifyMessage : Opt.NORMAL,
                 iConversationBridge.getConversationInfo().getConversationID());
         });
         view.chatHistory.setOnClickListener(v -> {
@@ -224,13 +225,14 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                                    int position) {
                 LinearLayout.LayoutParams layoutParams =
                     (LinearLayout.LayoutParams) holder.view.img.getLayoutParams();
+                layoutParams.topMargin = 0;
+                layoutParams.width = Common.dp2px(48);
+                layoutParams.height = Common.dp2px(48);
+
                 holder.view.txt.setTextSize(12);
                 holder.view.txt.setTextColor(getResources().getColor(io.openim.android.ouicore.R.color.txt_shallow));
                 if (TextUtils.isEmpty(data.getGroupID())) {
                     //加/减按钮
-                    layoutParams.width = Common.dp2px(36);
-                    layoutParams.height = Common.dp2px(36);
-                    layoutParams.topMargin = Common.dp2px(3);
                     int reId;
                     holder.view.img.load(reId = data.getRoleLevel());
                     holder.view.txt.setText(reId == R.mipmap.ic_group_add ?
@@ -242,11 +244,12 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                             Constant.IS_INVITE_TO_GROUP : Constant.IS_REMOVE_GROUP, true));
                     });
                 } else {
-                    layoutParams.topMargin = 0;
-                    layoutParams.width = Common.dp2px(48);
-                    layoutParams.height = Common.dp2px(48);
                     holder.view.img.load(data.getFaceURL(), data.getNickname());
                     holder.view.txt.setText(data.getNickname());
+                    holder.view.getRoot().setOnClickListener(v -> {
+                        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID,
+                            data.getUserID()).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
+                    });
                 }
             }
 
@@ -285,7 +288,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
 
         iConversationBridge.setNotDisturbStatusListener(this, data -> {
-            view.noDisturb.post(() -> view.noDisturb.setCheckedWithAnimation(data == 2));
+            view.noDisturb.post(() -> view.noDisturb.setCheckedWithAnimation(data == Opt.ReceiveNotNotifyMessage));
         });
         iConversationBridge.setConversationInfoChangeListener(this, data -> {
             view.topSlideButton.post(() -> view.topSlideButton.setCheckedWithAnimation(data.isPinned()));
