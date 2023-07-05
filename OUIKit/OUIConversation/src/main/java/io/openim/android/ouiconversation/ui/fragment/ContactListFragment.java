@@ -223,24 +223,17 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             adapter.notifyDataSetChanged();
         });
 
-        Easy.find(UserLogic.class).connectStatus.observe(getActivity(), connectStatus -> {
-            Animation animation = view.status.getAnimation();
-            if (connectStatus == UserLogic.ConnectStatus.CONNECTING) {
-                if (null != animation)
-                    animation.start();
-                else {
-                    animation = AnimationUtils.loadAnimation(getActivity(),
-                        R.anim.animation_repeat_spinning);
+        Animation animation= AnimationUtils.loadAnimation(getActivity(),
+            R.anim.animation_repeat_spinning);
+        Easy.find(UserLogic.class).connectStatus
+            .observe(getActivity(), connectStatus -> {
+                if (connectStatus == UserLogic.ConnectStatus.CONNECTING
+                    ||connectStatus== UserLogic.ConnectStatus.SYNCING) {
                     view.status.startAnimation(animation);
-                }
-            } else {
-                if (null != animation) {
-                    animation.cancel();
+                } else {
                     view.status.clearAnimation();
                 }
-
-            }
-        });
+            });
 
     }
 
