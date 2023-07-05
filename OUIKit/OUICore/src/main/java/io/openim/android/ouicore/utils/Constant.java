@@ -18,8 +18,8 @@ public class Constant {
     private static final String IM_WS_URL = "wss://" + DEFAULT_IP + "/msg_gateway";
 
     //--------IP----------
+    private static final String APP_AUTH = "http://" + DEFAULT_IP + ":10008/";
     private static final String IM_API = "http://" + DEFAULT_IP + ":10002";
-    private static final String APP_AUTH = "http://" + DEFAULT_IP + ":10008";
     private static final String IM_WS = "ws://" + DEFAULT_IP + ":10001";
     private static final Boolean isIP = true;
     //--------------------

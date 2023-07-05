@@ -9,51 +9,41 @@ import com.alibaba.fastjson2.JSONObject;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.entity.UserLabel;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.NiService;
 import io.openim.android.ouicore.services.OneselfService;
-import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.ouimoments.api.MomentsService;
 import io.openim.android.ouimoments.bean.CircleItem;
 import io.openim.android.ouimoments.bean.Comment;
 import io.openim.android.ouimoments.bean.CommentConfig;
 import io.openim.android.ouimoments.bean.CommentItem;
 import io.openim.android.ouimoments.bean.FavortItem;
 import io.openim.android.ouimoments.bean.MomentsBean;
-import io.openim.android.ouimoments.bean.MomentsContent;
 import io.openim.android.ouimoments.bean.MomentsData;
 import io.openim.android.ouimoments.bean.MomentsMeta;
 import io.openim.android.ouimoments.bean.MomentsUser;
 import io.openim.android.ouimoments.bean.PhotoInfo;
 import io.openim.android.ouimoments.bean.User;
 import io.openim.android.ouimoments.bean.WorkMoments;
-import io.openim.android.ouimoments.listener.IDataRequestListener;
 import io.openim.android.ouimoments.mvp.contract.CircleContract;
 import io.openim.android.ouimoments.mvp.modle.CircleModel;
 import io.openim.android.ouimoments.utils.DatasUtil;
-import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnWorkMomentsListener;
 import okhttp3.ResponseBody;
 
 /**
- * @author yiw
- * @ClassName: CirclePresenter
- * @Description: 通知model请求服务器和通知view更新
- * @date 2015-12-28 下午4:06:03
+ * 通知model请求服务器和通知view更新
  */
 public class CirclePresenter implements CircleContract.Presenter {
 
@@ -83,29 +73,31 @@ public class CirclePresenter implements CircleContract.Presenter {
         circleModel = new CircleModel();
         this.view = view;
 
-        OpenIMClient.getInstance().workMomentsManager.setWorkMomentsListener(this::getWorkMomentsUnReadCount);
+            //TODO
+//        OpenIMClient.getInstance().workMomentsManager.setWorkMomentsListener(this::getWorkMomentsUnReadCount);
     }
 
     public void getWorkMomentsUnReadCount() {
-        OpenIMClient.getInstance().workMomentsManager.getWorkMomentsUnReadCount(new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-            }
-
-            @Override
-            public void onSuccess(String data) {
-                try {
-                    Map map = JSONObject.parseObject(data, Map.class);
-                    int size = (int) map.get("unreadCount");
-                    if (size > 0) {
-                        unReadCount = String.valueOf(size);
-                        view.updateAdapterIndex(0);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        //TODO
+//        OpenIMClient.getInstance().workMomentsManager.getWorkMomentsUnReadCount(new OnBase<String>() {
+//            @Override
+//            public void onError(int code, String error) {
+//            }
+//
+//            @Override
+//            public void onSuccess(String data) {
+//                try {
+//                    Map map = JSONObject.parseObject(data, Map.class);
+//                    int size = (int) map.get("unreadCount");
+//                    if (size > 0) {
+//                        unReadCount = String.valueOf(size);
+//                        view.updateAdapterIndex(0);
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
     }
 
     //    String? userID
@@ -114,11 +106,13 @@ public class CirclePresenter implements CircleContract.Presenter {
     }
 
     public void loadData(int loadType, String userID) {
-        if (loadType == TYPE_PULLREFRESH) pageIndex = 1;
-        else pageIndex++;
+        if (loadType == TYPE_PULLREFRESH)
+            pageIndex = 1;
+        else
+            pageIndex++;
 
-        Parameter parameter = NiService.buildParameter().add("pageNumber", pageIndex).add(
-            "showNumber", pageSize).add("userID", userID);
+        Parameter parameter =MomentsService.buildPagination(pageIndex,pageSize)
+            .add("userID", userID);
         NetObserver<MomentsBean> netObserver = new NetObserver<MomentsBean>(TAG) {
             @Override
             public void onSuccess(MomentsBean o) {
@@ -140,12 +134,14 @@ public class CirclePresenter implements CircleContract.Presenter {
             }
         };
         if (TextUtils.isEmpty(userID)) {
+            N.API(MomentsService.class)
+                .getMyMoments(parameter.buildJsonBody())
+                .compose(N.IOMain())
+                .map(OneselfService.turn(MomentsBean.class)).subscribe(netObserver);
+        } else {
             N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office" +
                     "/get_user_friend_work_moments", BaseApp.inst().loginCertificate.imToken,
                 parameter.buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(MomentsBean.class)).subscribe(netObserver);
-        } else {
-            N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office/get_user_work_moments"
-                , BaseApp.inst().loginCertificate.imToken, parameter.buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(MomentsBean.class)).subscribe(netObserver);
         }
     }
 
@@ -432,7 +428,6 @@ public class CirclePresenter implements CircleContract.Presenter {
      */
     public void recycle() {
         N.clearDispose(TAG);
-        OpenIMClient.getInstance().workMomentsManager.setWorkMomentsListener(null);
         this.view = null;
     }
 

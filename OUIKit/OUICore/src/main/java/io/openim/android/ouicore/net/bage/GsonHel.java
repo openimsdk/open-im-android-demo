@@ -34,12 +34,12 @@ public class GsonHel {
 
     public static String toJson(Object object) {
         get();
-        return mGson.toJson(object);
+        return JSONObject.toJSONString(object);
     }
 
     public static <T> T fromJson(String json, Class<T> aClass) {
         get();
-        return mGson.fromJson(json, aClass);
+        return JSONObject.parseObject(json, aClass);
     }
 
     /**

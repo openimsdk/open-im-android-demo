@@ -173,7 +173,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
             try {
                 if (vm.isPhoto) paths.addAll(vm.getMediaPaths());
                 else {
-                    String original = vm.param.getValue().content.data.metas.get(0).original;
+                    String original = vm.param.getValue().content.metas.get(0).original;
                     paths.add(original);
                 }
             } catch (Exception ignored) {
@@ -206,12 +206,12 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                             Map<String,String> hashMap= GsonHel.fromJson(s, HashMap.class);
                             s=hashMap.get("url");
                             if (!vm.isPhoto) {
-                                vm.param.getValue().content.data.metas.get(0).original = s;
+                                vm.param.getValue().content.metas.get(0).original = s;
                             } else {
                                 MomentsMeta momentsMeta = new MomentsMeta();
                                 momentsMeta.original = s;
                                 momentsMeta.thumb = s;
-                                vm.param.getValue().content.data.metas.add(momentsMeta);
+                                vm.param.getValue().content.metas.add(momentsMeta);
                             }
                             successNum++;
                             if (successNum >= paths.size()) {
@@ -255,7 +255,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
 
             @Override
             public void afterTextChanged(Editable s) {
-                vm.param.getValue().content.data.text = s.toString();
+                vm.param.getValue().content.text = s.toString();
                 setFinishEnable();
                 view.restriction.setText(s.length() + "/500");
             }
@@ -266,10 +266,10 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
         boolean isEnable;
         if (vm.isPhoto)
             isEnable =
-                !vm.getMediaPaths().isEmpty() || !TextUtils.isEmpty(vm.param.getValue().content.data.text);
+                !vm.getMediaPaths().isEmpty() || !TextUtils.isEmpty(vm.param.getValue().content.text);
         else
             isEnable =
-                !vm.getMediaPaths().isEmpty() && !TextUtils.isEmpty(vm.param.getValue().content.data.text);
+                !vm.getMediaPaths().isEmpty() && !TextUtils.isEmpty(vm.param.getValue().content.text);
         view.finish.setAlpha(isEnable ? 1 : 0.3f);
         view.finish.setOnClickListener(isEnable ? submitClick : null);
     }
@@ -315,8 +315,8 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
         MomentsMeta momentsMeta = new MomentsMeta();
         momentsMeta.original = path;
         momentsMeta.thumb = firstFame;
-        vm.param.getValue().content.data.metas.clear();
-        vm.param.getValue().content.data.metas.add(momentsMeta);
+        vm.param.getValue().content.metas.clear();
+        vm.param.getValue().content.metas.add(momentsMeta);
     }
 
     private void initView() {
@@ -391,7 +391,10 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                                     photoUrls, position, null);
                             } else {
                                 try {
-                                    ARouter.getInstance().build(Routes.Conversation.PREVIEW).withString("media_url", vm.param.getValue().content.data.metas.get(0).original).withString("first_frame", vm.param.getValue().content.data.metas.get(0).thumb).navigation();
+                                    ARouter.getInstance().build(Routes.Conversation.PREVIEW)
+                                        .withString("media_url", vm.param.getValue().content.metas.get(0).original)
+                                        .withString("first_frame", vm.param.getValue().content.metas.get(0).thumb)
+                                        .navigation();
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }

@@ -25,39 +25,41 @@ public class MsgDetailVM extends BaseViewModel {
    public MutableLiveData<List<EXWorkMomentsInfo>> workMomentsInfo = new MutableLiveData<>(new ArrayList<>());
 
     public void getWorkMomentsNotification() {
-        OpenIMClient.getInstance().workMomentsManager
-            .getWorkMomentsNotification(new OnBase<List<WorkMomentsInfo>>() {
-            @Override
-            public void onError(int code, String error) {
-                getIView().toast(error);
-            }
-
-            @Override
-            public void onSuccess(List<WorkMomentsInfo> data) {
-                for (WorkMomentsInfo datum : data) {
-                    Map map = JSONObject.parseObject(datum.getWorkMomentContent(), Map.class);
-                    JsonElement string = JsonParser.parseString((String) map.get("data"));
-                    MomentsData momentsContent = GsonHel.fromJson(string.toString(),
-                        MomentsData.class);
-                    workMomentsInfo.getValue().add(new EXWorkMomentsInfo(momentsContent.data,datum));
-                }
-                workMomentsInfo.setValue(workMomentsInfo.getValue());
-            }
-        }, 0, 10000);
+        //TODO
+//        OpenIMClient.getInstance().workMomentsManager
+//            .getWorkMomentsNotification(new OnBase<List<WorkMomentsInfo>>() {
+//            @Override
+//            public void onError(int code, String error) {
+//                getIView().toast(error);
+//            }
+//
+//            @Override
+//            public void onSuccess(List<WorkMomentsInfo> data) {
+//                for (WorkMomentsInfo datum : data) {
+//                    Map map = JSONObject.parseObject(datum.getWorkMomentContent(), Map.class);
+//                    JsonElement string = JsonParser.parseString((String) map.get("data"));
+//                    MomentsData momentsContent = GsonHel.fromJson(string.toString(),
+//                        MomentsData.class);
+//                    workMomentsInfo.getValue().add(new EXWorkMomentsInfo(momentsContent.data,datum));
+//                }
+//                workMomentsInfo.setValue(workMomentsInfo.getValue());
+//            }
+//        }, 0, 10000);
     }
 
     public void clearMsg() {
-        OpenIMClient.getInstance().workMomentsManager.clearWorkMomentsNotification(new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-
-            }
-
-            @Override
-            public void onSuccess(String data) {
-                workMomentsInfo.getValue().clear();
-                workMomentsInfo.setValue(workMomentsInfo.getValue());
-            }
-        });
+        //TODO
+//        OpenIMClient.getInstance().workMomentsManager.clearWorkMomentsNotification(new OnBase<String>() {
+//            @Override
+//            public void onError(int code, String error) {
+//
+//            }
+//
+//            @Override
+//            public void onSuccess(String data) {
+//                workMomentsInfo.getValue().clear();
+//                workMomentsInfo.setValue(workMomentsInfo.getValue());
+//            }
+//        });
     }
 }

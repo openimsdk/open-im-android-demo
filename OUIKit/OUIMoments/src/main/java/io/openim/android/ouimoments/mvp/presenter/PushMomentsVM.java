@@ -19,12 +19,14 @@ import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
+import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.NiService;
 import io.openim.android.ouicore.services.OneselfService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouimoments.R;
+import io.openim.android.ouimoments.api.MomentsService;
 import io.openim.android.ouimoments.bean.MomentsBean;
 import io.openim.android.ouimoments.bean.MomentsContent;
 import io.openim.android.ouimoments.bean.MomentsData;
@@ -47,10 +49,10 @@ public class PushMomentsVM extends BaseViewModel {
 
 
     public void init() {
-        param.getValue().content = new MomentsData();
-        param.getValue().content.data=new MomentsContent();
-        param.getValue().content.data.metas = new ArrayList<>();
-        param.getValue().content.data.type = isPhoto ? 0 : 1;
+        param.getValue().content = new MomentsContent();
+        param.getValue().content.metas = new ArrayList<>();
+        param.getValue().content.type = isPhoto ? 0 : 1;
+
         selectMedia.getValue().add(io.openim.android.ouicore.R.mipmap.ic_add3);
         selectMedia.setValue(selectMedia.getValue());
     }
@@ -181,28 +183,11 @@ public class PushMomentsVM extends BaseViewModel {
         return paths;
     }
 
-    /**
-     *  👻知道我当时是怎么传的参！！！
-     */
     public void pushMoments() {
-        Map parmMap=new HashMap();
-        Map map=  JSONArray.parseObject(GsonHel.toJson(param.getValue()),Map.class);
-
-        Map map1= new HashMap<>();
-        map1.put("data",param.getValue().content.data);
-
-
-        Map map2= new HashMap<>();
-        map2.put("data",JSONObject.toJSONString(map1));
-
-        parmMap.putAll(map);
-        parmMap.put("content",
-            JSONObject.toJSONString(map2));
-
-        N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office/create_one_work_moment",
-            BaseApp.inst().loginCertificate.imToken, NiService.buildParameter().add("workMoment"
-                , parmMap)
-                .buildJsonBody()).compose(N.IOMain())
+        N.API(MomentsService.class)
+                .pushMoments(Parameter.buildJsonBody(
+                    JSONArray.toJSONString(param.getValue())))
+                .compose(N.IOMain())
             .map(OneselfService.turn(Object.class))
             .subscribe(new NetObserver<Object>(TAG) {
             @Override
@@ -218,7 +203,7 @@ public class PushMomentsVM extends BaseViewModel {
     }
 
     public static class PushMomentsParam {
-        public MomentsData content;
+        public MomentsContent content;
         //0/1/2/3, 公开/私密/部分可见/不给谁看
         public int permission;
         public List<UserOrGroup> permissionUserList;

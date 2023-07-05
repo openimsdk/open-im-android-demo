@@ -88,7 +88,6 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
     private TitleBar titleBar;
 
     public SwipeRefreshLayout.OnRefreshListener refreshListener;
-    private boolean hasStorage = false;
     private FragmentMomentsHomeBinding viewBinding;
 
 
@@ -122,19 +121,10 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initPermission();
         presenter = new CirclePresenter(this);
         if (getArguments() != null) {
             presenter.user = (User) getArguments().getSerializable(Constant.K_RESULT);
         }
-    }
-
-    private void initPermission() {
-        Common.UIHandler.post(() -> {
-            hasStorage = AndPermission.hasPermissions(getActivity(), Permission.Group.STORAGE);
-            Common.permission(getActivity(), () -> hasStorage = true, hasStorage,
-                Permission.Group.STORAGE);
-        });
     }
 
     @Override

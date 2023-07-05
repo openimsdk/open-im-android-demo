@@ -1,6 +1,8 @@
 package io.openim.android.ouicore.net.RXRetrofit;
 
 
+import com.alibaba.fastjson.JSONArray;
+
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,7 +32,7 @@ public class Parameter {
     }
 
     public String buildJson() {
-        return GsonHel.toJson(jsonMap);
+        return JSONArray.toJSONString(jsonMap);
     }
 
     public RequestBody buildJsonBody() {
