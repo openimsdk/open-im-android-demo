@@ -20,6 +20,7 @@ import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -225,14 +226,19 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         Easy.find(UserLogic.class).connectStatus.observe(getActivity(), connectStatus -> {
             Animation animation = view.status.getAnimation();
             if (connectStatus == UserLogic.ConnectStatus.CONNECTING) {
-                if (null != animation) animation.start();
+                if (null != animation)
+                    animation.start();
                 else {
                     animation = AnimationUtils.loadAnimation(getActivity(),
                         R.anim.animation_repeat_spinning);
                     view.status.startAnimation(animation);
                 }
             } else {
-                if (null != animation) animation.cancel();
+                if (null != animation) {
+                    animation.cancel();
+                    view.status.clearAnimation();
+                }
+
             }
         });
 
@@ -368,28 +374,18 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 //            (msgConversation.conversationInfo.isPinned() ? "#FFF3F3F3" : "#FFFFFF"));
             viewHolder.viewBinding.setTop.setVisibility(msgConversation.conversationInfo.isPinned() ? View.VISIBLE : View.GONE);
 
-            String lastMsg = IMUtil.getMsgParse(msgConversation.lastMsg).toString();
+            CharSequence lastMsg = IMUtil.getMsgParse(msgConversation.lastMsg);
             //强提醒
-            if (msgConversation.conversationInfo.getGroupAtType() == GroupAtType.GROUP_NOTIFICATION) {
-                String target =
-                    "[" + context.getString(io.openim.android.ouicore.R.string.group_bulletin) +
-                        "]";
-                try {
-                    lastMsg = target + msgConversation.notificationMsg.group.notification;
-                } catch (Exception e) {
-                    if (!lastMsg.contains(target)) lastMsg = target + "\t" + lastMsg;
-                }
-                Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg,
-                    target, BaseApp.inst().getColor(android.R.color.holo_red_dark));
-
-            } else if (msgConversation.conversationInfo.getGroupAtType() == GroupAtType.AT_ME) {
+            if (msgConversation.conversationInfo.getGroupAtType() == GroupAtType.AT_ME) {
                 String target =
                     "@" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.you);
-                if (!lastMsg.contains(target)) lastMsg = target + "\t" + lastMsg;
-                Common.stringBindForegroundColorSpan(viewHolder.viewBinding.lastMsg, lastMsg,
-                    target, BaseApp.inst().getColor(android.R.color.holo_red_dark));
-            } else
-                viewHolder.viewBinding.lastMsg.setText(lastMsg);
+                if (!lastMsg.toString().contains(target))
+                    lastMsg = target + "\t" + lastMsg;
+
+                IMUtil.buildClickAndColorSpannable((SpannableStringBuilder)
+                    lastMsg, target, android.R.color.holo_red_dark, null);
+            }
+            viewHolder.viewBinding.lastMsg.setText(lastMsg);
         }
 
         @Override

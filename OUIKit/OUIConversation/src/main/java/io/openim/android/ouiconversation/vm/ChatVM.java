@@ -799,16 +799,16 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         //标记本条消息已读 语音消息需要点播放才算读
         if (!viewPause && msg.getContentType() != MessageType.VOICE) markReaded(msg);
 
-        statusUPDATE(msg);
+        statusUpdate(msg);
     }
 
-    private void statusUPDATE(Message msg) {
+    private void statusUpdate(Message msg) {
         try {
             int contentType = msg.getContentType();
-            if (contentType == MessageType.GROUP_INFO_SET_NTF) {
-                NotificationMsg no = GsonHel.fromJson(msg.getNotificationElem().getDetail(),
-                    NotificationMsg.class);
-                if (!TextUtils.isEmpty(no.group.notification)) notificationMsg.setValue(no);
+            if (contentType == MessageType.GROUP_ANNOUNCEMENT_NTF){
+               MsgExpand msgExpand = (MsgExpand) msg.getExt();
+                if (!TextUtils.isEmpty(msgExpand.notificationMsg.group.notification))
+                    notificationMsg.setValue(msgExpand.notificationMsg);
             }
         } catch (Exception e) {
             e.printStackTrace();

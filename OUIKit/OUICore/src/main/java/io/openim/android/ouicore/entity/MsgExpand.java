@@ -11,7 +11,6 @@ import java.util.List;
 public class MsgExpand {
     public MsgExpand() {
     }
-
     //多选被选中
     public boolean isChoice;
     //此item 应该显示时间
@@ -26,15 +25,19 @@ public class MsgExpand {
     public transient SpannableStringBuilder sequence;
     //oa 通知
     public OANotification oaNotification;
+    //群公告、消息通知
+    public NotificationMsg notificationMsg;
     //普通通知 富文本
     public CharSequence tips;
     //阅后即焚倒计时
     public int readVanishNum;
-    //呼叫记录 ------
+
+    // ---呼叫记录---
     public CallHistory callHistory;
-    //呼叫时长
+    // 呼叫时长
     public String callDuration;
     // ------
+
     //会议邀请信息
     public MeetingInfo meetingInfo;
     //自定义表情
