@@ -73,13 +73,15 @@ public class CirclePresenter implements CircleContract.Presenter {
         circleModel = new CircleModel();
         this.view = view;
 
-            //TODO
-//        OpenIMClient.getInstance().workMomentsManager.setWorkMomentsListener(this::getWorkMomentsUnReadCount);
+        //TODO
+//        OpenIMClient.getInstance().workMomentsManager.setWorkMomentsListener
+//        (this::getWorkMomentsUnReadCount);
     }
 
     public void getWorkMomentsUnReadCount() {
         //TODO
-//        OpenIMClient.getInstance().workMomentsManager.getWorkMomentsUnReadCount(new OnBase<String>() {
+//        OpenIMClient.getInstance().workMomentsManager.getWorkMomentsUnReadCount(new
+//        OnBase<String>() {
 //            @Override
 //            public void onError(int code, String error) {
 //            }
@@ -111,19 +113,19 @@ public class CirclePresenter implements CircleContract.Presenter {
         else
             pageIndex++;
 
-        Parameter parameter =MomentsService.buildPagination(pageIndex,pageSize)
+        Parameter parameter = MomentsService.buildPagination(pageIndex, pageSize)
             .add("userID", userID);
         NetObserver<MomentsBean> netObserver = new NetObserver<MomentsBean>(TAG) {
             @Override
             public void onSuccess(MomentsBean o) {
                 try {
-                    packInContent(o);
                     List<CircleItem> circleData = packInCircleData(o);
 
                     if (view != null) {
                         view.update2loadData(loadType, circleData);
                     }
                 } catch (Exception ignored) {
+
                 }
             }
 
@@ -162,8 +164,8 @@ public class CirclePresenter implements CircleContract.Presenter {
     @NonNull
     private CircleItem getPackInCircleData(WorkMoments workMoment) {
         CircleItem item = new CircleItem();
-        item.setType(workMoment.momentsContents.type == 0 ? "2" : "3");
-        item.setUser(new User(workMoment.userID, workMoment.userName, workMoment.faceURL));
+        item.setType(workMoment.content.type == 0 ? "2" : "3");
+        item.setUser(new User(workMoment.userID, workMoment.nickname, workMoment.faceURL));
         item.setId(workMoment.workMomentID);
         item.setPermission(workMoment.permission);
         item.setPermissionUsers(workMoment.permissionUsers);
@@ -175,41 +177,49 @@ public class CirclePresenter implements CircleContract.Presenter {
             }
             item.setAtUsers(stringBuilder.substring(0, stringBuilder.length() - 1));
         }
-        item.setContent(workMoment.momentsContents.text);
+        item.setContent(workMoment.content.text);
         item.setCreateTime(TimeUtil.getTime(workMoment.createTime * 1000L,
             TimeUtil.monthTimeFormat));
 
+
         List<FavortItem> favortItems = new ArrayList<>();
-        for (MomentsUser likeUser : workMoment.likeUsers) {
-            FavortItem favortItem = new FavortItem();
-            favortItem.setId(likeUser.userID);
-            favortItem.setUser(new User(likeUser.userID, likeUser.userName, ""));
-            favortItems.add(favortItem);
+        if (null != workMoment.likeUsers) {
+            for (MomentsUser likeUser : workMoment.likeUsers) {
+                FavortItem favortItem = new FavortItem();
+                favortItem.setId(likeUser.userID);
+                favortItem.setUser(new User(likeUser.userID, likeUser.userName, ""));
+                favortItems.add(favortItem);
+            }
         }
         item.setFavorters(favortItems);
 
         List<CommentItem> commentItems = new ArrayList<>();
-        for (Comment comment : workMoment.comments) {
-            CommentItem commentItem = new CommentItem();
-            replaceUser(comment, commentItem);
-            commentItem.setId(comment.contentID);
-            commentItem.setContent(comment.content);
-            commentItems.add(commentItem);
+        if (null!=workMoment.comments){
+            for (Comment comment : workMoment.comments) {
+                CommentItem commentItem = new CommentItem();
+                replaceUser(comment, commentItem);
+                commentItem.setId(comment.contentID);
+                commentItem.setContent(comment.content);
+                commentItems.add(commentItem);
+            }
         }
         item.setComments(commentItems);
 
         List<PhotoInfo> photos = new ArrayList<>();
-        for (MomentsMeta meta : workMoment.momentsContents.metas) {
-            if (item.getType().equals(CircleItem.TYPE_VIDEO)) {
-                item.setVideoUrl(meta.original);
-                item.setVideoImgUrl(meta.thumb);
-            } else {
-                PhotoInfo photoInfo = new PhotoInfo();
-                photoInfo.url = meta.original;
-                photos.add(photoInfo);
+        if (null!= workMoment.content.metas){
+            for (MomentsMeta meta : workMoment.content.metas) {
+                if (item.getType().equals(CircleItem.TYPE_VIDEO)) {
+                    item.setVideoUrl(meta.original);
+                    item.setVideoImgUrl(meta.thumb);
+                } else {
+                    PhotoInfo photoInfo = new PhotoInfo();
+                    photoInfo.url = meta.original;
+                    photos.add(photoInfo);
+                }
             }
         }
-        if (!photos.isEmpty()) item.setPhotos(photos);
+        if (!photos.isEmpty())
+            item.setPhotos(photos);
         return item;
     }
 
@@ -226,27 +236,6 @@ public class CirclePresenter implements CircleContract.Presenter {
         if (comment.replyUserID.equals(DatasUtil.curUser.getId()))
             commentItem.setToReplyUser(DatasUtil.curUser);
         else commentItem.setToReplyUser(new User(comment.replyUserID, comment.replyUserName, ""));
-    }
-
-    /**
-     * 解析Content 并赋值给momentsContents
-     */
-    public void packInContent(MomentsBean momentsBean) {
-        try {
-            for (WorkMoments workMoment : momentsBean.workMoments) {
-                packInContent(workMoment);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void packInContent(WorkMoments workMoment) {
-        Map map = JSONObject.parseObject(workMoment.content, Map.class);
-        JsonElement string = JsonParser.parseString((String) map.get("data"));
-        MomentsData momentsContent = GsonHel.fromJson(string.toString(), MomentsData.class);
-        workMoment.momentsContents = momentsContent.data;
     }
 
 
@@ -405,7 +394,6 @@ public class CirclePresenter implements CircleContract.Presenter {
             public void onSuccess(WorkMoments o) {
                 try {
                     WorkMoments workMoment = o.workMoment;
-                    packInContent(workMoment);
                     List<CircleItem> circleItems = new ArrayList<>();
                     circleItems.add(getPackInCircleData(workMoment));
 
