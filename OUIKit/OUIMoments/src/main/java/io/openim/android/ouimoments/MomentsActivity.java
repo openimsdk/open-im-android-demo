@@ -9,10 +9,11 @@ import android.view.KeyEvent;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
+import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouimoments.ui.fragment.CircleFragment;
 @Route(path = Routes.Moments.HOME)
-public class MomentsActivity extends AppCompatActivity {
+public class MomentsActivity extends BaseActivity {
     CircleFragment fragment;
 
     @Override
