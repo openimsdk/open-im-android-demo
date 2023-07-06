@@ -85,7 +85,6 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.ForwardVM;
@@ -94,7 +93,6 @@ import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.voice.listener.PlayerListener;
 import io.openim.android.ouicore.voice.player.SMediaPlayer;
 import io.openim.android.ouicore.widget.AvatarImage;
-import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.CardElem;
@@ -228,7 +226,7 @@ public class MessageViewHolder {
         private void hSendState() {
             if (isOwn) {
                 SendStateView sendStateView = itemView.findViewById(R.id.sendState2);
-                if(null==sendStateView)return;
+                if (null == sendStateView) return;
                 sendStateView.setOnClickListener(v -> chatVM.sendMsg(message));
             }
         }
@@ -238,7 +236,7 @@ public class MessageViewHolder {
          */
         private void hMultipleChoice(MsgExpand msgExpand) {
             CheckBox checkBox = itemView.findViewById(R.id.choose);
-            if (null==checkBox)return;
+            if (null == checkBox) return;
             if (null != chatVM.enableMultipleSelect.getValue() && chatVM.enableMultipleSelect.getValue() && message.getContentType() != MessageType.NTF_BEGIN) {
                 checkBox.setVisibility(View.VISIBLE);
                 checkBox.setChecked(msgExpand.isChoice);
@@ -257,12 +255,10 @@ public class MessageViewHolder {
          */
         private void hUnRead() {
             TextView unRead = itemView.findViewById(R.id.unRead);
-            if (null==unRead)return;
+            if (null == unRead) return;
             int viewType = message.getContentType();
             unRead.setVisibility(View.GONE);
-            if (isOwn && message.getStatus() == Constant.Send_State.SEND_SUCCESS 
-                && viewType < MessageType.NTF_BEGIN 
-                && viewType != Constant.MsgType.LOCAL_CALL_HISTORY) {
+            if (isOwn && message.getStatus() == Constant.Send_State.SEND_SUCCESS && viewType < MessageType.NTF_BEGIN && viewType != Constant.MsgType.LOCAL_CALL_HISTORY) {
                 unRead.setVisibility(View.VISIBLE);
                 if (chatVM.isSingleChat) {
                     String unread =
@@ -270,8 +266,7 @@ public class MessageViewHolder {
                     String readed =
                         String.format(chatVM.getContext().getString(io.openim.android.ouicore.R.string.readed), "");
                     unRead.setText(message.isRead() ? readed : unread);
-                    unRead.setTextColor(Color.parseColor(message.isRead() ? "#0089FF" : 
-                        "#ff5496eb"));
+                    unRead.setTextColor(unRead.getContext().getResources().getColor(message.isRead() ? io.openim.android.ouicore.R.color.txt_shallow : io.openim.android.ouicore.R.color.theme));
                 } else {
                     int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;
                     if (unreadCount > 0) {
@@ -330,14 +325,12 @@ public class MessageViewHolder {
                         isLongClick.set(false);
                         return;
                     }
-                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, message.getSendID())
-                        .withString(Constant.K_GROUP_ID, message.getGroupID()).navigation();
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, message.getSendID()).withString(Constant.K_GROUP_ID, message.getGroupID()).navigation();
                 });
             }
             if (null != avatarImage2) {
                 avatarImage2.load(message.getSenderFaceUrl(), message.getSenderNickname());
-                avatarImage2.setOnClickListener(v -> ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                    .withString(Constant.K_ID, message.getSendID()).withString(Constant.K_GROUP_ID, message.getGroupID()).navigation());
+                avatarImage2.setOnClickListener(v -> ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, message.getSendID()).withString(Constant.K_GROUP_ID, message.getGroupID()).navigation());
             }
         }
 
@@ -835,8 +828,8 @@ public class MessageViewHolder {
             view.content2.setOnClickListener(v -> clickPlay(message, view.lottieView2));
         }
 
-        private void markRead(Message message, boolean isPrivateChat) {
-            if (isPrivateChat && !isOwn) chatVM.markReaded(message);
+        private void markRead(Message message) {
+            if (!isOwn) chatVM.markRead(message);
         }
 
         private void clickPlay(Message message, LottieAnimationView lottieView) {
@@ -860,7 +853,6 @@ public class MessageViewHolder {
                     @Override
                     public void onCompletion(SMediaPlayer mediaPlayer) {
                         mediaPlayer.stop();
-                        markRead(message, chatVM.conversationInfo.getValue().isPrivateChat());
                     }
 
                     @Override
@@ -874,12 +866,11 @@ public class MessageViewHolder {
             SPlayer.instance().getMediaPlayer().setOnPlayStateListener(new SMediaPlayer.OnPlayStateListener() {
                 @Override
                 public void started() {
-                    markRead(message, !chatVM.conversationInfo.getValue().isPrivateChat());
+                    markRead(message);
 
                     playingMessage = message;
                     lottieView.playAnimation();
                 }
-
 
                 @Override
                 public void paused() {

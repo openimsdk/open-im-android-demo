@@ -248,8 +248,6 @@ public class IMEvent {
         public void onConnectFailed(long code, String error) {
             // 连接服务器失败，可以提示用户当前网络连接不可用
             L.d("连接服务器失败(" + error + ")");
-            userLogic.connectStatus.setValue(UserLogic.ConnectStatus.CONNECT_ERR);
-
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnectFailed(code, error);
             }
@@ -259,8 +257,6 @@ public class IMEvent {
         public void onConnectSuccess() {
             // 已经成功连接到服务器
             L.d("已经成功连接到服务器");
-            userLogic.connectStatus.setValue(UserLogic.ConnectStatus.DEFAULT);
-
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnectSuccess();
             }
@@ -270,8 +266,6 @@ public class IMEvent {
         public void onConnecting() {
             // 正在连接到服务器，适合在 UI 上展示“正在连接”状态。
             L.d("正在连接到服务器...");
-            userLogic.connectStatus.setValue(UserLogic.ConnectStatus.CONNECTING);
-
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnecting();
             }
@@ -445,10 +439,12 @@ public class IMEvent {
     private void promptSoundOrNotification(ConversationInfo conversationInfo) {
         try {
             if (BaseApp.inst().loginCertificate.globalRecvMsgOpt == 2) return;
-            if (conversationInfo.getRecvMsgOpt() == 0 && conversationInfo.getUnreadCount() != 0) {
+            if (conversationInfo.getRecvMsgOpt() == 0
+                && conversationInfo.getUnreadCount() != 0) {
                 if (BaseApp.inst().isBackground())
                     IMUtil.sendNotice(conversationInfo.getLatestMsgSendTime());
-                else IMUtil.playPrompt();
+                else
+                    IMUtil.playPrompt();
             }
         } catch (Exception ignored) {
         }

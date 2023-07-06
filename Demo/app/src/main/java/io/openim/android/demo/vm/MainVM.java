@@ -140,17 +140,18 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
 
     @Override
     public void onConnectFailed(long code, String error) {
-
+        userLogic.connectStatus.setValue(UserLogic.ConnectStatus.CONNECT_ERR);
     }
 
     @Override
     public void onConnectSuccess() {
+        userLogic.connectStatus.setValue(UserLogic.ConnectStatus.DEFAULT);
         visibility.setValue(View.VISIBLE);
     }
 
     @Override
     public void onConnecting() {
-
+        userLogic.connectStatus.setValue(UserLogic.ConnectStatus.CONNECTING);
     }
 
     @Override
