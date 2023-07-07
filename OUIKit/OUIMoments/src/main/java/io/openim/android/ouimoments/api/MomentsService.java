@@ -16,6 +16,18 @@ public interface MomentsService {
     @POST("office/work_moment/add")
     Observable<ResponseBody> pushMoments(@Body RequestBody requestBody);
 
+    @POST("/office/work_moment/del")
+    Observable<ResponseBody> deleteMoments(@Body RequestBody requestBody);
+    @POST("office/work_moment/like")
+    Observable<ResponseBody> like(@Body RequestBody requestBody);
+    @POST("office/work_moment/comment/add")
+    Observable<ResponseBody> addComment(@Body RequestBody requestBody);
+
+    @POST("office/work_moment/comment/del")
+    Observable<ResponseBody> deleteComment(@Body RequestBody requestBody);
+
+    @POST("office/work_moment/logs")
+    Observable<ResponseBody> momentsMsg(@Body RequestBody requestBody);
 
    static Parameter buildPagination(int pageNumber,int showNumber){
        HashMap<String,Integer> pagination=new HashMap<>();

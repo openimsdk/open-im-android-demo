@@ -20,7 +20,7 @@ import io.openim.android.ouimoments.utils.DatasUtil;
  * 
 * @ClassName: CommentDialog 
 * @Description: 评论长按对话框，保护复制和删除 
-* @author yiw
+* 
 * @date 2015-12-28 下午3:36:39 
 *
  */

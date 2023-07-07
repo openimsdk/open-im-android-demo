@@ -5,7 +5,7 @@ import java.io.Serializable;
  * 
 * @ClassName: CommentItem 
 * @Description: TODO(这里用一句话描述这个类的作用) 
-* @author yiw
+* 
 * @date 2015-12-28 下午3:44:38 
 *
  */

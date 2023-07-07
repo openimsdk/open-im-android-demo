@@ -1,7 +1,7 @@
 package io.openim.android.ouimoments.spannable;
 
 /**
- * @author yiw
+ * 
  * @Description:
  * @date 16/1/2 19:44
  */

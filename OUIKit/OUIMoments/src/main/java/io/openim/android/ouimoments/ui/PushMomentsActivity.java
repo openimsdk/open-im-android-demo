@@ -48,6 +48,8 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.ExUserInfo;
+import io.openim.android.ouicore.ex.CommEx;
+import io.openim.android.ouicore.ex.Ex;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.bage.GsonHel;
@@ -120,14 +122,11 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                 (List<SelectDataActivity.RuleData>) result.getData().getSerializableExtra(Constant.K_RESULT);
             view.reminderWho.setText(vm.getRuleDataNames(selectedAtList));
 
-            List<PushMomentsVM.UserOrGroup> userOrGroups = new ArrayList<>();
+            List<String> ids = new ArrayList<>();
             for (SelectDataActivity.RuleData ruleData : selectedAtList) {
-                PushMomentsVM.UserOrGroup userOrGroup = new PushMomentsVM.UserOrGroup();
-                userOrGroup.userID = ruleData.id;
-                userOrGroup.userName = ruleData.name;
-                userOrGroups.add(userOrGroup);
+                ids.add(ruleData.id);
             }
-            vm.param.getValue().atUserList = userOrGroups;
+            vm.param.val().atUserIDs = ids;
         });
     private ActivityResultLauncher<Intent> resultLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -171,10 +170,12 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
             waitDialog.show();
             final List<String> paths = new ArrayList<>();
             try {
-                if (vm.isPhoto) paths.addAll(vm.getMediaPaths());
+                if (vm.isPhoto)
+                    paths.addAll(vm.getMediaPaths());
                 else {
-                    String original = vm.param.getValue().content.metas.get(0).original;
-                    paths.add(original);
+                    MomentsMeta meta = vm.param.val().content.metas.get(0);
+                    paths.add(meta.original);
+                    paths.add(meta.thumb);
                 }
             } catch (Exception ignored) {
             }
@@ -184,15 +185,16 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
             }
             MThreadTool.executorService.execute(() -> {
                 for (String path : paths) {
-                    PutArgs putArgs=new PutArgs(path);
-                    putArgs.putID=BaseApp.inst().loginCertificate.userID+"_"+System.currentTimeMillis();
+                    PutArgs putArgs = new PutArgs(path);
+                    putArgs.putID =
+                        BaseApp.inst().loginCertificate.userID
+                            + "_" + System.currentTimeMillis();
                     OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                         @Override
                         public void onError(int code, String error) {
                             runOnUiThread(() -> {
                                 waitDialog.dismiss();
-                                toast(getString(io.openim.android.ouicore.R.string.upload_err)
-                                +error);
+                                toast(getString(io.openim.android.ouicore.R.string.upload_err) + error);
                             });
                         }
 
@@ -202,25 +204,25 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                         }
 
                         @Override
-                        public void onSuccess(String s) {
-                            Map<String,String> hashMap= GsonHel.fromJson(s, HashMap.class);
-                            s=hashMap.get("url");
-                            if (!vm.isPhoto) {
-                                vm.param.getValue().content.metas.get(0).original = s;
-                            } else {
+                        public void onSuccess(String url) {
+                            Map<String, String> hashMap = GsonHel.fromJson(url, HashMap.class);
+                            url = hashMap.get("url");
+                            if (vm.isPhoto) {
                                 MomentsMeta momentsMeta = new MomentsMeta();
-                                momentsMeta.original = s;
-                                momentsMeta.thumb = s;
-                                vm.param.getValue().content.metas.add(momentsMeta);
+                                momentsMeta.original = url;
+                                vm.param.val().content.metas.add(momentsMeta);
+                            } else {
+                                if (MediaFileUtil.isImageType(url))
+                                    vm.param.val().content.metas.get(0).thumb = url;
+                                else
+                                    vm.param.val().content.metas.get(0).original = url;
                             }
                             successNum++;
                             if (successNum >= paths.size()) {
-                                runOnUiThread(() -> {
-                                    vm.pushMoments();
-                                });
+                                runOnUiThread(() -> vm.pushMoments());
                             }
                         }
-                    },null, putArgs);
+                    }, null, putArgs);
                 }
             });
 
@@ -391,10 +393,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                                     photoUrls, position, null);
                             } else {
                                 try {
-                                    ARouter.getInstance().build(Routes.Conversation.PREVIEW)
-                                        .withString("media_url", vm.param.getValue().content.metas.get(0).original)
-                                        .withString("first_frame", vm.param.getValue().content.metas.get(0).thumb)
-                                        .navigation();
+                                    ARouter.getInstance().build(Routes.Conversation.PREVIEW).withString("media_url", vm.param.getValue().content.metas.get(0).original).withString("first_frame", vm.param.getValue().content.metas.get(0).thumb).navigation();
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }

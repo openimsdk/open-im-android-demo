@@ -12,7 +12,6 @@ import io.openim.android.ouimoments.bean.PhotoInfo;
 import io.openim.android.ouimoments.bean.User;
 
 /**
- * @author yiw
  * @ClassName: DatasUtil
  * @Description: TODO(这里用一句话描述这个类的作用)
  * @date 2015-12-28 下午4:16:21
@@ -77,7 +76,6 @@ public class DatasUtil {
     /**
      * 评论id自增长
      */
-    private static int commentId = 0;
     public static User curUser = new User(BaseApp.inst().loginCertificate.userID,
        "你", BaseApp.inst().loginCertificate.faceURL);
 
@@ -287,7 +285,6 @@ public class DatasUtil {
 
     public static CommentItem createComment() {
         CommentItem item = new CommentItem();
-        item.setId(String.valueOf(commentId++));
         item.setContent("哈哈");
         User user = getUser();
         item.setUser(user);
@@ -310,7 +307,6 @@ public class DatasUtil {
      */
     public static CommentItem createPublicComment(String content) {
         CommentItem item = new CommentItem();
-        item.setId(String.valueOf(commentId++));
         item.setContent(content);
         item.setUser(curUser);
         return item;
@@ -321,9 +317,9 @@ public class DatasUtil {
      *
      * @return
      */
-    public static CommentItem createReplyComment(User replyUser, String content) {
+    public static CommentItem createReplyComment(User replyUser,
+                                                 String content) {
         CommentItem item = new CommentItem();
-        item.setId(String.valueOf(commentId++));
         item.setContent(content);
         item.setUser(curUser);
         item.setToReplyUser(replyUser);

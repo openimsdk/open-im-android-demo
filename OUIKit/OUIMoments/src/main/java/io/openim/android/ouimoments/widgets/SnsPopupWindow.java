@@ -12,9 +12,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.bean.ActionItem;
-import io.openim.android.ouimoments.utils.DensityUtil;
 
 /**
  * 朋友圈点赞评论的popupwindow
@@ -55,8 +55,8 @@ public class SnsPopupWindow extends PopupWindow implements OnClickListener{
 		commentBtn.setOnClickListener(this);
 
 		this.setContentView(view);
-		this.setWidth(DensityUtil.dip2px(context, 100));
-		this.setHeight(DensityUtil.dip2px(context, 30));
+		this.setWidth(Common.dp2px(100));
+		this.setHeight(Common.dp2px( 30));
 		this.setFocusable(true);
 		this.setOutsideTouchable(true);
 		this.update();

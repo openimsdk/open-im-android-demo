@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.NiService;
 import io.openim.android.ouicore.services.OneselfService;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouimoments.api.MomentsService;
@@ -172,14 +174,14 @@ public class CirclePresenter implements CircleContract.Presenter {
         if (null != workMoment.atUsers && !workMoment.atUsers.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
             for (MomentsUser atUser : workMoment.atUsers) {
-                stringBuilder.append(atUser.userName);
+                stringBuilder.append(atUser.nickname);
                 stringBuilder.append("、");
             }
             item.setAtUsers(stringBuilder.substring(0, stringBuilder.length() - 1));
         }
         item.setContent(workMoment.content.text);
         item.setCreateTime(TimeUtil.getTime(workMoment.createTime * 1000L,
-            TimeUtil.monthTimeFormat));
+            TimeUtil.yearTimeFormat));
 
 
         List<FavortItem> favortItems = new ArrayList<>();
@@ -187,7 +189,7 @@ public class CirclePresenter implements CircleContract.Presenter {
             for (MomentsUser likeUser : workMoment.likeUsers) {
                 FavortItem favortItem = new FavortItem();
                 favortItem.setId(likeUser.userID);
-                favortItem.setUser(new User(likeUser.userID, likeUser.userName, ""));
+                favortItem.setUser(new User(likeUser.userID, likeUser.nickname, ""));
                 favortItems.add(favortItem);
             }
         }
@@ -198,7 +200,7 @@ public class CirclePresenter implements CircleContract.Presenter {
             for (Comment comment : workMoment.comments) {
                 CommentItem commentItem = new CommentItem();
                 replaceUser(comment, commentItem);
-                commentItem.setId(comment.contentID);
+                commentItem.setId(comment.commentID);
                 commentItem.setContent(comment.content);
                 commentItems.add(commentItem);
             }
@@ -214,6 +216,9 @@ public class CirclePresenter implements CircleContract.Presenter {
                 } else {
                     PhotoInfo photoInfo = new PhotoInfo();
                     photoInfo.url = meta.original;
+                    //单张图片默认宽高
+                    photoInfo.w = Common.dp2px(200);
+                    photoInfo.h = Common.dp2px(280);
                     photos.add(photoInfo);
                 }
             }
@@ -232,7 +237,7 @@ public class CirclePresenter implements CircleContract.Presenter {
     private void replaceUser(Comment comment, CommentItem commentItem) {
         if (comment.userID.equals(DatasUtil.curUser.getId()))
             commentItem.setUser(DatasUtil.curUser);
-        else commentItem.setUser(new User(comment.userID, comment.userName, ""));
+        else commentItem.setUser(new User(comment.userID, comment.nickname, ""));
         if (comment.replyUserID.equals(DatasUtil.curUser.getId()))
             commentItem.setToReplyUser(DatasUtil.curUser);
         else commentItem.setToReplyUser(new User(comment.replyUserID, comment.replyUserName, ""));
@@ -247,9 +252,12 @@ public class CirclePresenter implements CircleContract.Presenter {
      * @Description: 删除动态
      */
     public void deleteCircle(final String circleId) {
-        N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office/delete_one_work_moment",
-            BaseApp.inst().loginCertificate.imToken, NiService.buildParameter().add("workMomentID"
-                , circleId).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Object.class)).subscribe(new NetObserver<Object>(TAG) {
+        N.API(MomentsService.class)
+            .deleteMoments(
+                new Parameter().add("workMomentID"
+                , circleId).buildJsonBody()).compose(N.IOMain())
+            .map(OneselfService.turn(Object.class))
+            .subscribe(new NetObserver<Object>(TAG) {
             @Override
             public void onSuccess(Object o) {
                 if (view != null) {
@@ -278,9 +286,11 @@ public class CirclePresenter implements CircleContract.Presenter {
     }
 
     void favortorDeleteFavort(final int circlePosition, final String mFavorId, Boolean isStar) {
-        N.API(NiService.class).CommNI(Constant.getImApiUrl() + "/office/like_one_work_moment",
-            BaseApp.inst().loginCertificate.imToken, NiService.buildParameter().add("workMomentID"
-                , mFavorId).buildJsonBody()).map(OneselfService.turn(Object.class)).compose(N.IOMain()).subscribe(new NetObserver<Object>(TAG) {
+        N.API(MomentsService.class)
+            .like(new Parameter().add("workMomentID"
+                , mFavorId)
+                .add("like",isStar)
+            .buildJsonBody()).map(OneselfService.turn(Object.class)).compose(N.IOMain()).subscribe(new NetObserver<Object>(TAG) {
             @Override
             public void onSuccess(Object o) {
                 if (isStar) {
@@ -321,27 +331,35 @@ public class CirclePresenter implements CircleContract.Presenter {
      * @return void    返回类型
      * @throws
      * @Title: addComment
+     *
      * @Description: 增加评论
      */
     public void addComment(final String content, final CommentConfig config) {
         if (config == null) {
             return;
         }
-        N.API(NiService.class).CommNI(Constant.getImApiUrl() + "/office/comment_one_work_moment",
-            BaseApp.inst().loginCertificate.imToken, NiService.buildParameter().add("workMomentID"
-                , config.momentID).add("replyUserID", null == config.replyUser ? "" :
-                config.replyUser.getId()).add("content", content).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Object.class)).subscribe(new NetObserver<Object>(TAG) {
+        N.API(MomentsService.class).addComment(
+            new Parameter().add("workMomentID"
+                , config.momentID)
+                .add("replyUserID", null == config.replyUser ? "" : config.replyUser.getId())
+                .add("content", content).buildJsonBody())
+            .compose(N.IOMain()).map(OneselfService.turn(HashMap.class))
+            .subscribe(new NetObserver<HashMap>(TAG) {
             @Override
-            public void onSuccess(Object o) {
-                CommentItem newItem = null;
-                if (config.commentType == CommentConfig.Type.PUBLIC) {
-                    newItem = DatasUtil.createPublicComment(content);
-                } else if (config.commentType == CommentConfig.Type.REPLY) {
-                    newItem = DatasUtil.createReplyComment(config.replyUser, content);
-                }
-                if (view != null) {
-                    view.update2AddComment(config.circlePosition, newItem);
-                }
+            public void onSuccess(HashMap map) {
+              try {
+                  String commentID= (String) map.get("commentID");
+                  CommentItem newItem = null;
+                  if (config.commentType == CommentConfig.Type.PUBLIC) {
+                      newItem = DatasUtil.createPublicComment(content);
+                  } else if (config.commentType == CommentConfig.Type.REPLY) {
+                      newItem = DatasUtil.createReplyComment(config.replyUser, content);
+                  }
+                  if (view != null&&null!=newItem) {
+                      newItem.setId(commentID);
+                      view.update2AddComment(config.circlePosition, newItem);
+                  }
+              }catch (Exception e){e.printStackTrace();}
             }
 
             @Override
@@ -360,9 +378,14 @@ public class CirclePresenter implements CircleContract.Presenter {
      * @Description: 删除评论
      */
     public void deleteComment(String momentID, final int circlePosition, final String commentId) {
-        N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office/delete_comment",
-            BaseApp.inst().loginCertificate.imToken, NiService.buildParameter().add("workMomentID"
-                , momentID).add("contentID", commentId).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Object.class)).subscribe(new NetObserver<Object>(TAG) {
+        N.API(MomentsService.class)
+            .deleteComment(
+           new Parameter().add("workMomentID"
+                , momentID).add("commentID",
+               commentId).buildJsonBody())
+            .compose(N.IOMain())
+            .map(OneselfService.turn(Object.class))
+            .subscribe(new NetObserver<Object>(TAG) {
             @Override
             public void onSuccess(Object o) {
                 if (view != null) {

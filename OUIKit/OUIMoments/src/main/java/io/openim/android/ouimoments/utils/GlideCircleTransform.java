@@ -13,11 +13,7 @@ import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 
 import java.security.MessageDigest;
 
-/**
- * Created by yiw on 2016/6/6.
- */
 public class GlideCircleTransform extends BitmapTransformation {
-
 
 
     @Override

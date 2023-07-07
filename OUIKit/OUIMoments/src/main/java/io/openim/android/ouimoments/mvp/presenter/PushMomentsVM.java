@@ -4,7 +4,6 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -16,6 +15,7 @@ import java.util.Map;
 
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
@@ -30,6 +30,7 @@ import io.openim.android.ouimoments.api.MomentsService;
 import io.openim.android.ouimoments.bean.MomentsBean;
 import io.openim.android.ouimoments.bean.MomentsContent;
 import io.openim.android.ouimoments.bean.MomentsData;
+import io.openim.android.ouimoments.ui.PushMomentsActivity;
 import io.openim.android.ouimoments.ui.SelectDataActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
@@ -37,14 +38,14 @@ import io.openim.android.sdk.models.GroupInfo;
 
 public class PushMomentsVM extends BaseViewModel {
     public static final String TAG = PushMomentsVM.class.getSimpleName();
-    public MutableLiveData<List<Object>> selectMedia = new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<PushMomentsParam> param = new MutableLiveData<>(new PushMomentsParam());
+    public State<List<Object>> selectMedia = new State<>(new ArrayList<>());
+    public State<PushMomentsParam> param = new State<>(new PushMomentsParam());
     //已选择的RuleDataList
     public List<SelectDataActivity.RuleData> selectedGroupRuleDataList;
     public List<SelectDataActivity.RuleData> selectedUserRuleDataList;
 
     //是否是发布照片
-    public boolean isPhoto=true;
+    public boolean isPhoto = true;
     public int addID = io.openim.android.ouicore.R.mipmap.ic_add3;
 
 
@@ -131,28 +132,22 @@ public class PushMomentsVM extends BaseViewModel {
     public void selectAuth(int index) {
         selectedUserRuleDataList = null;
         selectedGroupRuleDataList = null;
-        param.getValue().permissionUserList = null;
-        param.getValue().permissionGroupList = null;
+        param.getValue().permissionUserIDs = null;
+        param.getValue().permissionGroupIDs = null;
 
         param.getValue().permission = index;
         param.setValue(param.getValue());
     }
 
     public void getRuleDataIDs(List<SelectDataActivity.RuleData> ruleDataList, boolean isGroup) {
-        List<UserOrGroup> userOrGroups = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
         for (SelectDataActivity.RuleData ruleData : ruleDataList) {
-            UserOrGroup userOrGroup = new UserOrGroup();
-            if (isGroup) {
-                userOrGroup.groupID = ruleData.id;
-                userOrGroup.groupName = ruleData.name;
-            } else {
-                userOrGroup.userID = ruleData.id;
-                userOrGroup.userName = ruleData.name;
-            }
-            userOrGroups.add(userOrGroup);
+            ids.add(ruleData.id);
         }
-        if (isGroup) param.getValue().permissionGroupList = userOrGroups;
-        else param.getValue().permissionUserList = userOrGroups;
+        if (isGroup)
+            param.val().permissionGroupIDs = ids;
+        else
+            param.val().permissionUserIDs = ids;
     }
 
     public List<SelectDataActivity.RuleData> buildUserRuleData(List<ExUserInfo> exUserInfo,
@@ -185,30 +180,30 @@ public class PushMomentsVM extends BaseViewModel {
 
     public void pushMoments() {
         N.API(MomentsService.class)
-                .pushMoments(Parameter.buildJsonBody(
-                    JSONArray.toJSONString(param.getValue())))
-                .compose(N.IOMain())
+            .pushMoments(Parameter.buildJsonBody(
+                JSONArray.toJSONString(param.getValue())))
+            .compose(N.IOMain())
             .map(OneselfService.turn(Object.class))
             .subscribe(new NetObserver<Object>(TAG) {
-            @Override
-            public void onSuccess(Object o) {
-                getIView().onSuccess(o);
-            }
+                @Override
+                public void onSuccess(Object o) {
+                    getIView().onSuccess(o);
+                }
 
-            @Override
-            protected void onFailure(Throwable e) {
-                getIView().toast(e.getMessage());
-            }
-        });
+                @Override
+                protected void onFailure(Throwable e) {
+                    getIView().toast(e.getMessage());
+                }
+            });
     }
 
     public static class PushMomentsParam {
         public MomentsContent content;
         //0/1/2/3, 公开/私密/部分可见/不给谁看
         public int permission;
-        public List<UserOrGroup> permissionUserList;
-        public List<UserOrGroup> permissionGroupList;
-        public List<UserOrGroup> atUserList;
+        public List<String> permissionUserIDs;
+        public List<String> permissionGroupIDs;
+        public List<String> atUserIDs;
     }
 
     public static class UserOrGroup {

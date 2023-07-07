@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -62,7 +63,6 @@ import io.openim.android.ouimoments.mvp.contract.CircleContract;
 import io.openim.android.ouimoments.mvp.presenter.CirclePresenter;
 import io.openim.android.ouimoments.ui.MsgDetailActivity;
 import io.openim.android.ouimoments.ui.PushMomentsActivity;
-import io.openim.android.ouimoments.utils.CommonUtils;
 import io.openim.android.ouimoments.widgets.CommentListView;
 import io.openim.android.ouimoments.widgets.TitleBar;
 
@@ -125,13 +125,40 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         if (getArguments() != null) {
             presenter.user = (User) getArguments().getSerializable(Constant.K_RESULT);
         }
+        getActivity().getWindow().getDecorView()
+            .getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
     }
 
+    //记录原始窗口高度
+    private int mWindowHeight = 0;
+
+    private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener = () -> {
+        Rect r = new Rect();
+        //获取当前窗口实际的可见区域
+        getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
+        int height = r.height();
+        if (mWindowHeight == 0) {
+            //一般情况下，这是原始的窗口高度
+            mWindowHeight = height;
+        } else {
+            RelativeLayout.LayoutParams inputLayoutParams =
+                (RelativeLayout.LayoutParams)
+                    viewBinding.commentEditView.getRoot().getLayoutParams();
+            if (mWindowHeight == height) {
+                inputLayoutParams.bottomMargin = 0;
+            } else {
+                //两次窗口高度相减，就是软键盘高度
+                inputLayoutParams.bottomMargin = mWindowHeight - height;
+            }
+            viewBinding.commentEditView.getRoot().setLayoutParams(inputLayoutParams);
+        }
+    };
     @Override
     public void onDestroy() {
         if (presenter != null) {
             presenter.recycle();
         }
+        getActivity().getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
         super.onDestroy();
     }
 
@@ -158,7 +185,10 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         SpacesItemDecoration divItemDecoration = new SpacesItemDecoration();
+        divItemDecoration.setColor(getResources()
+            .getColor(io.openim.android.ouicore.R.color.txt_grey));
         divItemDecoration.addNotDrawIndex(1);
+
         recyclerView.addItemDecoration(divItemDecoration);
         recyclerView.getRecyclerView().setItemAnimator(new CustomItemAnimator());
         recyclerView.getMoreProgressView().getLayoutParams().width =
@@ -190,7 +220,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
                 //没有透明效果
                 // titlebar.setBackgroundColor(Color.rgb(57, 174, 255));
                 //透明效果是由参数1决定的，透明范围[0,255]
-                // titlebar.setBackgroundColor(Color.argb(alpha, 57, 174, 255));
+//                 titlebar.setBackgroundColor(Color.argb(alpha, 57, 174, 255));
                 try {
                     viewBinding.titleBarFl.getBackground().setAlpha(alpha);
                 } catch (Exception ignored) {
@@ -209,9 +239,9 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         });
         createAdapter();
 
-        edittextbody = (LinearLayout) mainView.findViewById(R.id.editTextBodyLl);
-        editText = (EditText) mainView.findViewById(R.id.circleEt);
-        sendIv = (ImageView) mainView.findViewById(R.id.sendIv);
+        edittextbody = viewBinding.commentEditView.editTextBodyLl;
+        editText = viewBinding.commentEditView.circleEt;
+        sendIv = viewBinding.commentEditView.sendIv;
         sendIv.setOnClickListener(v -> {
             if (presenter != null) {
                 //发布评论
@@ -236,6 +266,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
 
     public void initTitle(View mainView) {
         viewBinding.titleBarFl.setPadding(0, SinkHelper.getStatusBarHeight(), 0, 0);
+
         titleBar = mainView.findViewById(R.id.main_title_bar);
         titleBar.setLeftImageResource(com.yzq.zxinglibrary.R.drawable.ic_back);
         titleBar.setLeftClickListener(v -> getActivity().finish());
@@ -411,11 +442,10 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         if (View.VISIBLE == visibility) {
             editText.requestFocus();
             //弹出键盘
-            CommonUtils.showSoftInput(editText.getContext(), editText);
-
+           Common.UIHandler.postDelayed(() -> Common.pushKeyboard(getContext()),100);
         } else if (View.GONE == visibility) {
             //隐藏键盘
-            CommonUtils.hideSoftInput(editText.getContext(), editText);
+            Common.hideKeyboard(getContext(),editText);
         }
     }
 

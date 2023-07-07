@@ -1,8 +1,6 @@
 package io.openim.android.ouimoments.bean;
 
-/**
- * Created by yiwei on 16/3/2.
- */
+
 public class CommentConfig {
     public static enum Type{
         PUBLIC("public"), REPLY("reply");

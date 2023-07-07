@@ -14,7 +14,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouimoments.R;
 
 /**
- * @author yiw
+ * 
  * @Description:
  * @date 16/1/2 16:54
  */

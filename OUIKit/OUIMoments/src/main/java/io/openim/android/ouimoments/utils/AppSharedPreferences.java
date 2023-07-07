@@ -9,9 +9,7 @@ import android.text.TextUtils;
  * 
 * @ClassName: AppSharedPreferences 
 * @Description: SharedPreference管理类
-* @author yiw
-* @date 2015-12-30 上午11:05:27 
-*
+* @date 2015-12-30 上午11:05:27
  */
 public class AppSharedPreferences {
 

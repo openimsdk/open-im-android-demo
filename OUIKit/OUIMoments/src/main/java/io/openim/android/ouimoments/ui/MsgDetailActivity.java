@@ -25,7 +25,9 @@ import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.adapter.viewholder.MsgDetailViewHolder;
+import io.openim.android.ouimoments.bean.Comment;
 import io.openim.android.ouimoments.bean.EXWorkMomentsInfo;
+import io.openim.android.ouimoments.bean.WorkMoments;
 import io.openim.android.ouimoments.databinding.ActivityMsgDetailBinding;
 import io.openim.android.ouimoments.mvp.contract.CircleContract;
 import io.openim.android.ouimoments.mvp.presenter.MsgDetailVM;
@@ -35,7 +37,7 @@ import io.openim.android.sdk.models.WorkMomentsInfo;
 
 public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDetailBinding> {
 
-    private RecyclerViewAdapter<EXWorkMomentsInfo, MsgDetailViewHolder> adapter;
+    private RecyclerViewAdapter<WorkMoments, MsgDetailViewHolder> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +50,8 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
     }
 
     private void listener() {
-        vm.workMomentsInfo.observe(this, workMomentsInfos -> {
-            adapter.setItems(workMomentsInfos);
+        vm.workMomentsInfo.observe(this, workMoments -> {
+            adapter.setItems(workMoments);
         });
         view.clear.setOnClickListener(v -> {
             CommonDialog commonDialog =new CommonDialog(this).atShow();
@@ -69,53 +71,55 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
         vm.getWorkMomentsNotification();
 
         view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        view.recyclerView.setAdapter(adapter=new RecyclerViewAdapter<EXWorkMomentsInfo,
+        view.recyclerView.setAdapter(adapter=new RecyclerViewAdapter<WorkMoments,
             MsgDetailViewHolder>(MsgDetailViewHolder.class) {
 
             @Override
-            public void onBindView(@NonNull MsgDetailViewHolder holder, EXWorkMomentsInfo data,
+            public void onBindView(@NonNull MsgDetailViewHolder holder, WorkMoments data,
                                    int position) {
                 holder.view.getRoot().setOnClickListener(v -> {
                     startActivity(new Intent(MsgDetailActivity.this,MomentsDetailActivity.class).putExtra(Constant.K_ID,
-                        data.workMomentsInfo.getWorkMomentID()));
+                        data.workMomentID));
                 });
-                holder.view.avatar.load(data.workMomentsInfo
-                    .getFaceURL());
-                holder.view.nickName.setText(data.workMomentsInfo.getUserName());
+                holder.view.avatar.load(data
+                    .faceURL);
+                holder.view.nickName.setText(data.nickname);
                 holder.view.star.setVisibility(View.GONE);
-                if (data.workMomentsInfo.getNotificationMsgType() == 0) {
-                    if (TextUtils.isEmpty(data.workMomentsInfo.getReplyUserID()))
-                        holder.view.action.setText(io.openim.android.ouicore.R.string.star_tips2 + ":" + data.workMomentsInfo.getContent());
+                if (data.type == MsgDetailVM.WorkMomentLogTypeComment) {
+                    Comment comment = data.comments.get(0);
+                    if (TextUtils.isEmpty(comment.replyUserID))
+                        holder.view.action.setText(getText(io.openim.android.ouicore.R.string.star_tips2)
+                            + ":" +comment.content);
                     else {
                         String targetUser =
-                            DatasUtil.curUser.getId().equals(data.workMomentsInfo.getReplyUserID()) ?
+                            DatasUtil.curUser.getId().equals(comment.replyUserID) ?
                                 DatasUtil.curUser.getName() :
-                                data.workMomentsInfo.getReplyUserName();
+                                comment.replyUserName;
                         Common.stringBindForegroundColorSpan(holder.view.action,
                             getString(io.openim.android.ouicore.R.string.reply)
-                                + targetUser + ":" + data.workMomentsInfo.getContent(),
+                                + targetUser + ":" + comment.content,
                             targetUser);
                     }
                 }
-                holder.view.time.setText(TimeUtil.getTime(data.workMomentsInfo.getCreateTime() * 1000,
+                holder.view.time.setText(TimeUtil.getTime(data.createTime,
                     TimeUtil.monthTimeFormat));
-                if (data.workMomentsInfo.getNotificationMsgType() == 1) {
+                if (data.type == MsgDetailVM.WorkMomentLogTypeLike) {
                     holder.view.star.setVisibility(View.VISIBLE);
                     holder.view.action.setText(io.openim.android.ouicore.R.string.star_tips);
                 }
-                if (data.workMomentsInfo.getNotificationMsgType() == 2) {
+                if (data.type == MsgDetailVM.WorkMomentLogTypeAt) {
                     holder.view.action.setText(io.openim.android.ouicore.R.string.about_you);
                 }
-                if (data.contentBean.metas.isEmpty()){
+                if (data.content.metas.isEmpty()){
                     holder.view.content.setVisibility(View.VISIBLE);
                     holder.view.media.setVisibility(View.GONE);
-                    holder.view.content.setText(data.contentBean.text);
+                    holder.view.content.setText(data.content.text);
                 }else {
                     holder.view.media.setVisibility(View.VISIBLE);
                     holder.view.content.setVisibility(View.GONE);
-                    Glide.with(MsgDetailActivity.this).load(data.contentBean.metas.get(0).thumb)
+                    Glide.with(MsgDetailActivity.this).load(data.content.metas.get(0).thumb)
                         .into(holder.view.img);
-                    holder.view.play.setVisibility(data.contentBean.type != 0 ? View.VISIBLE :
+                    holder.view.play.setVisibility(data.content.type != 0 ? View.VISIBLE :
                         View.GONE);
                 }
             }

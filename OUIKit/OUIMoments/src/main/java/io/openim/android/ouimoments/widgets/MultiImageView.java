@@ -12,9 +12,9 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.List;
 
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.bean.PhotoInfo;
-import io.openim.android.ouimoments.utils.DensityUtil;
 
 /**
  * @author shoyu
@@ -33,7 +33,7 @@ public class MultiImageView extends LinearLayout {
      **/
     private int pxOneMaxWandH;  // 单张图最大允许宽高
     private int pxMoreWandH = 0;// 多张图的宽高
-    private int pxImagePadding = DensityUtil.dip2px(getContext(), 3);// 图片间的间距
+    private int pxImagePadding = Common.dp2px(3);// 图片间的间距
 
     private int MAX_PER_ROW_COUNT = 3;// 每行显示最大数
 
@@ -213,7 +213,9 @@ public class MultiImageView extends LinearLayout {
             imageView.setId(photoInfo.url.hashCode());
             imageView.setOnClickListener(new ImageOnClickListener(position));
             imageView.setBackgroundColor(getResources().getColor(R.color.im_font_color_text_hint));
-            Glide.with(getContext()).load(photoInfo.url).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
+            Glide.with(getContext()).load(photoInfo.url)
+                .centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -14,9 +14,7 @@ import java.util.regex.Pattern;
 
 import io.openim.android.ouimoments.spannable.SpannableClickable;
 
-/**
- * Created by suneee on 2016/6/2.
- */
+
 public class UrlUtils {
 
     public static SpannableStringBuilder formatUrlString(String contentStr){

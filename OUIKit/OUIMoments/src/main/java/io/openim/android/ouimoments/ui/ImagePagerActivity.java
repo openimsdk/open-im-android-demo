@@ -208,7 +208,7 @@ public class ImagePagerActivity extends AppCompatActivity {
 
                 Glide.with(context).load(imgurl).centerInside().diskCacheStrategy(DiskCacheStrategy.ALL)//缓存多个尺寸
                     .thumbnail(0.1f)//先显示缩略图  缩略图为原图的1/10
-                    .error(R.drawable.ic_launcher).into(new DrawableImageViewTarget(imageView) {
+                .into(new DrawableImageViewTarget(imageView) {
                         @Override
                         public void onLoadStarted(Drawable placeholder) {
                             super.onLoadStarted(placeholder);

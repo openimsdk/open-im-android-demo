@@ -67,8 +67,9 @@
                 android:id="@+id/aboutWhoTv"
                 android:visibility="gone"
                 android:layout_width="wrap_content"
+                android:layout_marginTop="5dp"
                 android:layout_height="wrap_content"
-                android:textColor="#ff999999"
+                android:textColor="@color/im_font_color_text_hint"
                 android:textSize="12sp" />
 
             <!-- 地址、时间 、删除 、点赞、 评论 -->
@@ -106,7 +107,7 @@
                         android:id="@+id/authorityTv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#ff999999"
+                        android:textColor="@color/txt_shallow2"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -120,7 +121,7 @@
                     android:paddingLeft="3dp"
                     android:paddingRight="3dp"
                     android:text="删除"
-                    android:textColor="@color/color_8290AF"
+                    android:textColor="@color/txt_shallow2"
                     android:textSize="12sp"
                     android:visibility="gone" />
 

@@ -56,8 +56,14 @@ public class PartSeeActivity extends BaseActivity<BaseViewModel, ActivityPartSee
             public void onBindView(@NonNull ViewHol.ItemViewHo holder, MomentsUser data,
                                    int position) {
                 holder.view.avatar.load(data.faceURL);
-                holder.view.nickName.setText(data.userName);
+                holder.view.nickName.setText(data.nickname);
                 holder.view.select.setVisibility(View.GONE);
+
+                holder.view.getRoot().setOnClickListener(v -> {
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                        .withString(Constant.K_ID, data.userID)
+                        .navigation();
+                });
             }
         };
         view.recyclerView.setAdapter(adapter);

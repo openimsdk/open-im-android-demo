@@ -15,5 +15,6 @@ public class WorkMoments {
     public List<MomentsUser> permissionUsers;
     public long createTime;
     public int permission;
+    public int type;
 }
 
