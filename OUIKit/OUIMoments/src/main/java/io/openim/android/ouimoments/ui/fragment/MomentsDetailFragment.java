@@ -32,7 +32,7 @@ public class MomentsDetailFragment extends CircleFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              Bundle savedInstanceState) {
-        FragmentMomentsHomeBinding viewBinding = FragmentMomentsHomeBinding.inflate(inflater);
+        viewBinding = FragmentMomentsHomeBinding.inflate(inflater);
         initView(viewBinding.getRoot());
         return viewBinding.getRoot();
     }

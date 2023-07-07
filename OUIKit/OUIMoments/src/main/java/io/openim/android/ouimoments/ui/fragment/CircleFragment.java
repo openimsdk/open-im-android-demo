@@ -88,7 +88,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
     private TitleBar titleBar;
 
     public SwipeRefreshLayout.OnRefreshListener refreshListener;
-    private FragmentMomentsHomeBinding viewBinding;
+    protected FragmentMomentsHomeBinding viewBinding;
 
 
     public static CircleFragment newInstance(User user) {

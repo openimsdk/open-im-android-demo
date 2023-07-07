@@ -141,11 +141,14 @@ public class CirclePresenter implements CircleContract.Presenter {
             N.API(MomentsService.class)
                 .getMyMoments(parameter.buildJsonBody())
                 .compose(N.IOMain())
-                .map(OneselfService.turn(MomentsBean.class)).subscribe(netObserver);
+                .map(OneselfService.turn(MomentsBean.class))
+                .subscribe(netObserver);
         } else {
-            N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office" +
-                    "/get_user_friend_work_moments", BaseApp.inst().loginCertificate.imToken,
-                parameter.buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(MomentsBean.class)).subscribe(netObserver);
+            N.API(MomentsService.class)
+                .getMyMomentsById(
+                parameter.buildJsonBody()).compose(N.IOMain())
+                .map(OneselfService.turn(MomentsBean.class))
+                .subscribe(netObserver);
         }
     }
 
@@ -410,9 +413,11 @@ public class CirclePresenter implements CircleContract.Presenter {
     }
 
     public void getMomentsDetail(String momentID) {
-        N.API(NiService.class).CommNI(Constant.getImApiUrl() + "/office/get_work_moment_by_id",
-            BaseApp.inst().loginCertificate.imToken, NiService.buildParameter().add("workMomentID"
-                , momentID).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(WorkMoments.class)).subscribe(new NetObserver<WorkMoments>(TAG) {
+        N.API(MomentsService.class)
+            .getCommentDetail(new Parameter().add("workMomentID"
+                , momentID).buildJsonBody())
+            .compose(N.IOMain()).map(OneselfService.turn(WorkMoments.class))
+            .subscribe(new NetObserver<WorkMoments>(TAG) {
             @Override
             public void onSuccess(WorkMoments o) {
                 try {
