@@ -40,14 +40,20 @@ public class MsgDetailVM extends BaseViewModel {
     public static final int WorkMomentLogTypeAt = 2;
     public static final int WorkMomentLogTypeComment = 3;
 
+    // 1:未读数 2:消息列表 3:全部
+    public static final int clear_unread_num=1;
+    public static final int msg_list=2;
+    public static final int all=3;
+
+
 
     private static final String TAG = "MsgDetailVM";
     public State<List<WorkMoments>> workMomentsInfo = new State<>(new ArrayList<>());
 
 
     public void getWorkMomentsNotification() {
-        //TODO
-        N.API(MomentsService.class).momentsMsg(MomentsService.buildPagination(1, 10000).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(HashMap.class)).subscribe(new NetObserver<HashMap>(TAG) {
+        N.API(MomentsService.class)
+            .momentsMsg(MomentsService.buildPagination(1, 10000).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(HashMap.class)).subscribe(new NetObserver<HashMap>(TAG) {
             @Override
             public void onSuccess(HashMap obj) {
 
@@ -67,43 +73,25 @@ public class MsgDetailVM extends BaseViewModel {
                 toast(e.getMessage());
             }
         });
-
-//        OpenIMClient.getInstance().workMomentsManager
-//            .getWorkMomentsNotification(new OnBase<List<WorkMomentsInfo>>() {
-//            @Override
-//            public void onError(int code, String error) {
-//                getIView().toast(error);
-//            }
-//
-//            @Override
-//            public void onSuccess(List<WorkMomentsInfo> data) {
-//                for (WorkMomentsInfo datum : data) {
-//                    Map map = JSONObject.parseObject(datum.getWorkMomentContent(), Map.class);
-//                    JsonElement string = JsonParser.parseString((String) map.get("data"));
-//                    MomentsData momentsContent = GsonHel.fromJson(string.toString(),
-//                        MomentsData.class);
-//                    workMomentsInfo.getValue().add(new EXWorkMomentsInfo(momentsContent.data,
-//                    datum));
-//                }
-//                workMomentsInfo.setValue(workMomentsInfo.getValue());
-//            }
-//        }, 0, 10000);
     }
 
-    public void clearMsg() {
-        //TODO
-//        OpenIMClient.getInstance().workMomentsManager.clearWorkMomentsNotification(new
-//        OnBase<String>() {
-//            @Override
-//            public void onError(int code, String error) {
-//
-//            }
-//
-//            @Override
-//            public void onSuccess(String data) {
-//                workMomentsInfo.getValue().clear();
-//                workMomentsInfo.setValue(workMomentsInfo.getValue());
-//            }
-//        });
+    public void clearMsg(int type) {
+        N.API(MomentsService.class)
+            .clearMsg(new Parameter().add("type",type)
+                .buildJsonBody())
+                .compose(N.IOMain())
+                    .map(OneselfService.turn(HashMap.class))
+                        .subscribe(new NetObserver<HashMap>(TAG) {
+                            @Override
+                            public void onSuccess(HashMap o) {
+                                workMomentsInfo.getValue().clear();
+                                workMomentsInfo.setValue(workMomentsInfo.getValue());
+                            }
+
+                            @Override
+                            protected void onFailure(Throwable e) {
+                                toast(e.getMessage());
+                            }
+                        });
     }
 }

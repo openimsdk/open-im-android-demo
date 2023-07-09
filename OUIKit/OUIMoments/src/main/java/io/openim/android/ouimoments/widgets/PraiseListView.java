@@ -22,7 +22,6 @@ import io.openim.android.ouimoments.spannable.CircleMovementMethod;
 import io.openim.android.ouimoments.spannable.SpannableClickable;
 
 /**
- * Created by yiwei on 16/7/9.
  */
 public class PraiseListView extends TextView{
 

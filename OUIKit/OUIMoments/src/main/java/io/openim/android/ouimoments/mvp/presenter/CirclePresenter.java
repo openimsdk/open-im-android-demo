@@ -183,9 +183,9 @@ public class CirclePresenter implements CircleContract.Presenter {
             item.setAtUsers(stringBuilder.substring(0, stringBuilder.length() - 1));
         }
         item.setContent(workMoment.content.text);
-        item.setCreateTime(TimeUtil.getTime(workMoment.createTime * 1000L,
+        item.setCreateTimeL(workMoment.createTime);
+        item.setCreateTime(TimeUtil.getTime(workMoment.createTime,
             TimeUtil.yearTimeFormat));
-
 
         List<FavortItem> favortItems = new ArrayList<>();
         if (null != workMoment.likeUsers) {

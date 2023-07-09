@@ -9,7 +9,6 @@ import android.widget.TextView;
 import io.openim.android.ouimoments.R;
 
 /**
- * Created by suneee on 2016/8/16.
  */
 public class URLViewHolder extends CircleViewHolder{
     public LinearLayout urlBody;

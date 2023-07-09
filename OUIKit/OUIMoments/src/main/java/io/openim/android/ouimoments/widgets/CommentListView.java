@@ -16,10 +16,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.alibaba.android.arouter.launcher.ARouter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.bean.CommentItem;
 import io.openim.android.ouimoments.spannable.CircleMovementMethod;
@@ -27,7 +31,6 @@ import io.openim.android.ouimoments.spannable.SpannableClickable;
 import io.openim.android.ouimoments.utils.UrlUtils;
 
 /**
- * Created by yiwei on 16/7/9.
  */
 public class CommentListView extends LinearLayout {
     private int itemColor;
@@ -174,7 +177,10 @@ public class CommentListView extends LinearLayout {
         subjectSpanText.setSpan(new SpannableClickable(itemColor){
                                     @Override
                                     public void onClick(View widget) {
-                                        Toast.makeText(BaseApp.inst(), textStr + " &id = " + id, Toast.LENGTH_SHORT).show();
+//                                        Toast.makeText(BaseApp.inst(), textStr + " &id = " + id, Toast.LENGTH_SHORT).show();
+                                        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                                            .withString(Constant.K_ID, id)
+                                            .navigation();
                                     }
                                 }, 0, subjectSpanText.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

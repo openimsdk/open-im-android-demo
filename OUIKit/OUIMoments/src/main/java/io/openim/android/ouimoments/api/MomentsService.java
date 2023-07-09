@@ -30,8 +30,10 @@ public interface MomentsService {
     Observable<ResponseBody> momentsMsg(@Body RequestBody requestBody);
     @POST("office/work_moment/get")
     Observable<ResponseBody> getCommentDetail(@Body RequestBody requestBody);
-    @POST("/office/work_moment/find/send")
+    @POST("office/work_moment/find/send")
     Observable<ResponseBody> getMyMomentsById(@Body RequestBody requestBody);
+    @POST("office/work_moment/unread/clear")
+    Observable<ResponseBody> clearMsg(@Body RequestBody requestBody);
    static Parameter buildPagination(int pageNumber,int showNumber){
        HashMap<String,Integer> pagination=new HashMap<>();
        pagination.put("pageNumber",pageNumber);

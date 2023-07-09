@@ -7,7 +7,6 @@ import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.widgets.MultiImageView;
 
 /**
- * Created by suneee on 2016/8/16.
  */
 public class ImageViewHolder extends CircleViewHolder {
     /** 图片*/

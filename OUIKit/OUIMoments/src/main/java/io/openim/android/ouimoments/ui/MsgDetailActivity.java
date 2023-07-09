@@ -55,13 +55,13 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
         });
         view.clear.setOnClickListener(v -> {
             CommonDialog commonDialog =new CommonDialog(this).atShow();
-            commonDialog.getMainView().tips.setText("确认清空消息？");
+            commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.clear_msg_sure);
             commonDialog.getMainView().cancel.setOnClickListener(v2 -> {
                 commonDialog.dismiss();
             });
             commonDialog.getMainView().confirm.setOnClickListener(v2 -> {
                 commonDialog.dismiss();
-                vm.clearMsg();
+                vm.clearMsg(MsgDetailVM.msg_list);
             });
 
         });

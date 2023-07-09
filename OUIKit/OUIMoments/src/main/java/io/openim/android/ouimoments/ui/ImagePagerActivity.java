@@ -37,7 +37,6 @@ import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouimoments.R;
 
 /**
- * Created by yiw on 2016/1/6.
  */
 public class ImagePagerActivity extends AppCompatActivity {
     public static final String INTENT_IMGURLS = "imgurls";

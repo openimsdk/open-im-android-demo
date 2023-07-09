@@ -8,7 +8,6 @@ import io.openim.android.ouimoments.bean.CommentItem;
 import io.openim.android.ouimoments.bean.FavortItem;
 
 /**
- * Created by suneee on 2016/7/15.
  */
 public interface CircleContract {
 

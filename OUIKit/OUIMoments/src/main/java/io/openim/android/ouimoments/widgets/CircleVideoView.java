@@ -32,7 +32,6 @@ import io.openim.android.ouimoments.widgets.videolist.visibility.items.ListItem;
 import io.openim.android.ouimoments.widgets.videolist.widget.TextureVideoView;
 
 /**
- * Created by yiwei on 16/5/23.
  */
 public class CircleVideoView extends LinearLayout implements VideoLoadMvpView, ListItem {
 

@@ -5,8 +5,12 @@ import static io.openim.android.ouicore.utils.Common.UIHandler;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.ClickableSpan;
+import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
 import androidx.lifecycle.Observer;
 
@@ -75,10 +79,13 @@ import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SearchResult;
 import io.openim.android.sdk.models.SignalingInfo;
+import io.openim.android.sdk.models.TextElem;
 import okhttp3.ResponseBody;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener,
     OnGroupListener, OnConversationListener, java.util.Observer, OnSignalingListener {
+
+    public static final String REEDIT_MSG = "reeditMsg";
 
     public CallingService callingService =
         (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
@@ -340,7 +347,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public void onConversationChanged(List<ConversationInfo> list) {
         try {
             for (ConversationInfo info : list) {
-                if (info.getConversationID().equals(conversationInfo.getValue().getConversationID()))
+                if (info.getConversationID()
+                    .equals(conversationInfo.getValue().getConversationID()))
                     conversationInfo.setValue(info);
             }
         } catch (Exception ignored) {
@@ -428,7 +436,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             long diff = (end - System.currentTimeMillis()) / 1000;
             return diff < 0 ? 0 : (int) diff;
         }
-
         return 0;
     }
 
@@ -512,6 +519,12 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         return roomID;
     }
 
+    /**
+     * 重新编辑消息
+     */
+    public void reeditMsg(String content) {
+        subject(REEDIT_MSG, content);
+    }
 
     public interface UserOnlineStatusListener {
         void onResult(OnlineStatus onlineStatus);
@@ -623,8 +636,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     for (Message msg : msgs) {
                         msg.setRead(true);
 
-                        if (null!=msg.getAttachedInfoElem()
-                            &&msg.getAttachedInfoElem().isPrivateChat()) {
+                        if (null != msg.getAttachedInfoElem()
+                            && msg.getAttachedInfoElem().isPrivateChat()) {
                             msg.getAttachedInfoElem().setHasReadTime(currentTimeMillis);
                         }
                         messageAdapter.notifyItemChanged(messages.val().indexOf(msg));
@@ -823,8 +836,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                         Message message = messages.val().get(i);
                         if (readInfo.getMsgIDList().contains(message.getClientMsgID())) {
                             message.setRead(true);
-                            if (null!=message.getAttachedInfoElem()
-                            &&message.getAttachedInfoElem().isPrivateChat()) {
+                            if (null != message.getAttachedInfoElem()
+                                && message.getAttachedInfoElem().isPrivateChat()) {
                                 message.getAttachedInfoElem()
                                     .setHasReadTime(readInfo.getReadTime());
                             }
@@ -868,8 +881,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     @Override
     public void onRecvMessageRevokedV2(RevokedInfo info) {
         try {
-            for (Message message : messages.getValue()) {
-                if (message.getClientMsgID().equals(info.getClientMsgID())) {
+            if (info.getRevokerID().equals(BaseApp.inst().loginCertificate.userID))return;
+            for (Message message : messages.val()) {
+                if (message.getClientMsgID()
+                    .equals(info.getClientMsgID())) {
                     message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
                     //a 撤回了一条消息
                     String txt =
@@ -939,7 +954,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
                 @Override
                 public void onProgress(long progress) {
-                    L.e("----------sendProgress-----------===" + progress);
                     UIHandler.post(() -> {
                         msg.setExt(ext);
                         ext.sendProgress = progress;
@@ -1011,6 +1025,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             @Override
             @SuppressLint("StringFormatInvalid")
             public void onSuccess(String data) {
+                final boolean firstType = message.getContentType() == MessageType.TEXT;
                 message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
                 if (hasPermission)
                     message.setSenderNickname(BaseApp.inst().loginCertificate.nickname);
@@ -1021,10 +1036,31 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 String txt =
                     String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips), message.getSenderNickname());
 
-                ((MsgExpand) message.getExt()).tips =
-                    IMUtil.getSingleSequence(message.getGroupID(), name, uid, txt);
-
-                messageAdapter.notifyItemChanged(messageAdapter.getMessages().indexOf(message));
+                MsgExpand msgExpand = ((MsgExpand) message.getExt());
+                if (firstType) {
+                    //只有文本才支持重新编辑
+                    String reedit =
+                        BaseApp.inst().getString(io.openim.android.ouicore.R.string.re_edit);
+                    txt += "\t" + reedit;
+                    msgExpand.tips = IMUtil.buildClickAndColorSpannable(
+                        (SpannableStringBuilder) IMUtil.getSingleSequence(message.getGroupID(),
+                            name,
+                            uid, txt),
+                        reedit, new ClickableSpan() {
+                            @Override
+                            public void onClick(@NonNull View widget) {
+                                TextElem txt = message.getTextElem();
+                                if (null != txt) {
+                                    reeditMsg(txt.getContent());
+                                }
+                            }
+                        });
+                } else {
+                    msgExpand.tips = IMUtil.getSingleSequence(message.getGroupID(), name,
+                        uid, txt);
+                }
+                messageAdapter.notifyItemChanged(messageAdapter.getMessages()
+                    .indexOf(message));
             }
         }, conversationID, message.getClientMsgID());
 

@@ -25,7 +25,7 @@ public class InterceptLinearLayout extends LinearLayout {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    boolean isIntercept = false;
+    boolean isIntercept = true;
 
     public void setIntercept(boolean intercept) {
         isIntercept = intercept;

@@ -9,7 +9,6 @@ import java.util.List;
 import io.openim.android.ouimoments.listener.RecycleViewItemListener;
 
 /**
- * Created by yiwei on 16/4/9.
  */
 public abstract class BaseRecycleViewAdapter<T,VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
     protected RecycleViewItemListener itemListener;

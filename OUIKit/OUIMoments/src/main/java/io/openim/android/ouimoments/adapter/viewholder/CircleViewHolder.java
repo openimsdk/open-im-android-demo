@@ -19,7 +19,6 @@ import io.openim.android.ouimoments.widgets.videolist.model.VideoLoadMvpView;
 import io.openim.android.ouimoments.widgets.videolist.widget.TextureVideoView;
 
 /**
- * Created by yiw on 2016/8/16.
  */
 public abstract class CircleViewHolder extends RecyclerView.ViewHolder implements VideoLoadMvpView {
 

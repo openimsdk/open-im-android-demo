@@ -6,7 +6,6 @@ import android.view.View;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
- * Created by Rjm on 2016/4/10.
  */
 public class DivItemDecoration extends RecyclerView.ItemDecoration {
     private int divHeight;

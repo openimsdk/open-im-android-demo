@@ -20,6 +20,7 @@ public class CircleItem extends BaseBean{
 	private String id;
 	private String content;
 	private String createTime;
+	private long createTimeL;
 	private String type;//1:链接  2:图片 3:视频
 	private String linkImg;
 	private String linkTitle;
@@ -71,7 +72,16 @@ public class CircleItem extends BaseBean{
 	public void setContent(String content) {
 		this.content = content;
 	}
-	public String getCreateTime() {
+
+    public long getCreateTimeL() {
+        return createTimeL;
+    }
+
+    public void setCreateTimeL(long createTimeL) {
+        this.createTimeL = createTimeL;
+    }
+
+    public String getCreateTime() {
 		return createTime;
 	}
 	public void setCreateTime(String createTime) {

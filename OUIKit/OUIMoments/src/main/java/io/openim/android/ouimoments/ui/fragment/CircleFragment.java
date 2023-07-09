@@ -153,6 +153,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
             viewBinding.commentEditView.getRoot().setLayoutParams(inputLayoutParams);
         }
     };
+
     @Override
     public void onDestroy() {
         if (presenter != null) {
@@ -184,12 +185,15 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         recyclerView = mainView.findViewById(R.id.superRecyclerView);
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-        SpacesItemDecoration divItemDecoration = new SpacesItemDecoration();
-        divItemDecoration.setColor(getResources()
-            .getColor(io.openim.android.ouicore.R.color.txt_grey));
-        divItemDecoration.addNotDrawIndex(1);
 
-        recyclerView.addItemDecoration(divItemDecoration);
+        if (!presenter.isSpecifiedUser()) {
+            SpacesItemDecoration divItemDecoration = new SpacesItemDecoration();
+            divItemDecoration.setColor(getResources()
+                .getColor(io.openim.android.ouicore.R.color.txt_grey));
+            divItemDecoration.addNotDrawIndex(1);
+            recyclerView.addItemDecoration(divItemDecoration);
+        }
+
         recyclerView.getRecyclerView().setItemAnimator(new CustomItemAnimator());
         recyclerView.getMoreProgressView().getLayoutParams().width =
             ViewGroup.LayoutParams.MATCH_PARENT;
@@ -442,10 +446,10 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         if (View.VISIBLE == visibility) {
             editText.requestFocus();
             //弹出键盘
-           Common.UIHandler.postDelayed(() -> Common.pushKeyboard(getContext()),100);
+            Common.UIHandler.postDelayed(() -> Common.pushKeyboard(getContext()), 100);
         } else if (View.GONE == visibility) {
             //隐藏键盘
-            Common.hideKeyboard(getContext(),editText);
+            Common.hideKeyboard(getContext(), editText);
         }
     }
 

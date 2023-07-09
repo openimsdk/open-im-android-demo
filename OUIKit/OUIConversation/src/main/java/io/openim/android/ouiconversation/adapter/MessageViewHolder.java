@@ -13,6 +13,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
@@ -99,6 +100,7 @@ import io.openim.android.sdk.models.CardElem;
 import io.openim.android.sdk.models.MergeElem;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.QuoteElem;
+import io.openim.android.sdk.models.TextElem;
 import io.openim.android.sdk.models.VideoElem;
 
 public class MessageViewHolder {
@@ -130,7 +132,7 @@ public class MessageViewHolder {
         protected MessageAdapter messageAdapter;
 
         private PopupWindow popupWindow;
-        private Message message;
+        protected Message message;
         private RecyclerViewAdapter adapter;
         protected ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
 
@@ -570,7 +572,9 @@ public class MessageViewHolder {
             textView.setVisibility(View.VISIBLE);
             View root = itemView.findViewById(R.id.root);
             root.setPadding(0, onlyOne ? Common.dp2px(10) : 0, 0, 0);
-            textView.setText(((MsgExpand) message.getExt()).tips);
+
+            MsgExpand msgExpand=(MsgExpand) message.getExt();
+            textView.setText(msgExpand.tips);
             textView.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
