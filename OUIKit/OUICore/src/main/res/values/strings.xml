@@ -397,5 +397,5 @@
     <string name="group_manage">群管理</string>
     <string name="re_edit">重新编辑</string>
     <string name="clear_msg_sure">确定清空消息？</string>
-    <string name="tal_num_photo">共%1$s张</string>
+    <string name="tal_num_photo">共%1$d张</string>
 </resources>
