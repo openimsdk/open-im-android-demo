@@ -45,7 +45,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#052839">
-
         <include layout="@layout/layout_main_titlebar" />
     </RelativeLayout>
 
