@@ -37,6 +37,7 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.ItemPsrsonSelectBinding;
 import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
 import io.openim.android.ouicore.databinding.ViewSwipeRecyclerViewBinding;
@@ -48,6 +49,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.vm.ContactListVM;
+import io.openim.android.ouicore.vm.NotificationVM;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.UserInfo;
@@ -131,6 +133,10 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
         vm.friendDotNum.observe(getActivity(), v -> {
             header.newFriendNoticeBadge.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE);
             header.newFriendNoticeBadge.badge.setText(v + "");
+        });
+
+        Easy.find(NotificationVM.class).momentsUnread.observe(getActivity(),v->{
+            header.newMomentsMsg.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE);
         });
     }
 

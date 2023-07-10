@@ -20,4 +20,6 @@ public class UserLogic extends BaseVM {
     }
 
     public State<ConnectStatus> connectStatus = new State<>(ConnectStatus.DEFAULT);
+
+
 }

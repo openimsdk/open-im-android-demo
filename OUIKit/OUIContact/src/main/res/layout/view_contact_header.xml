@@ -247,9 +247,15 @@
                 android:textColor="@color/txt_black"
                 android:textSize="16sp" />
 
+            <include
+                android:id="@+id/newMomentsMsg"
+                layout="@layout/view_badge"
+                android:visibility="gone" />
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
                 android:src="@mipmap/ic_right" />
         </LinearLayout>
 

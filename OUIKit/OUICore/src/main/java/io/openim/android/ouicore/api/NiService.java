@@ -1,4 +1,4 @@
-package io.openim.android.ouicore.services;
+package io.openim.android.ouicore.api;
 
 import java.util.Random;
 

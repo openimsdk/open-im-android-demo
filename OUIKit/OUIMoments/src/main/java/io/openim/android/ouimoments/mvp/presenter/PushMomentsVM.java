@@ -1,39 +1,22 @@
 package io.openim.android.ouimoments.mvp.presenter;
 
-import android.os.Build;
-
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
-import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.services.NiService;
-import io.openim.android.ouicore.services.OneselfService;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouimoments.R;
+import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouimoments.api.MomentsService;
-import io.openim.android.ouimoments.bean.MomentsBean;
 import io.openim.android.ouimoments.bean.MomentsContent;
-import io.openim.android.ouimoments.bean.MomentsData;
-import io.openim.android.ouimoments.ui.PushMomentsActivity;
 import io.openim.android.ouimoments.ui.SelectDataActivity;
-import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.models.GroupInfo;
 
 public class PushMomentsVM extends BaseViewModel {

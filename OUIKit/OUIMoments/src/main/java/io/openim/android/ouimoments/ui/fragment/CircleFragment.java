@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
@@ -177,6 +178,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         }
         return 0;
     }
+
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -366,7 +368,8 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
             if (edittextbody != null && edittextbody.getVisibility() == View.VISIBLE) {
-                Common.UIHandler.postDelayed(() -> updateEditTextBodyVisible(View.GONE, null), 300);
+                Common.UIHandler.postDelayed(() -> updateEditTextBodyVisible(View.GONE,
+                    null), 300);
                 return true;
             }
         }

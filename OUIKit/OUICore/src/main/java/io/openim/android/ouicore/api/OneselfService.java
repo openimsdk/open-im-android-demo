@@ -1,4 +1,4 @@
-package io.openim.android.ouicore.services;
+package io.openim.android.ouicore.api;
 
 import com.alibaba.android.arouter.facade.template.IProvider;
 
@@ -46,4 +46,7 @@ public interface OneselfService {
 
     @POST("user/search/public")
     Observable<ResponseBody> searchUser(@Body RequestBody requestBody);
+
+    @POST("office/work_moment/unread/count")
+    Observable<ResponseBody> getMomentsUnreadCount(@Body RequestBody requestBody);
 }

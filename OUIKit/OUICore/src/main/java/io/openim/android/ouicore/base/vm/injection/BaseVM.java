@@ -53,4 +53,8 @@ public class BaseVM extends ViewModel {
         channel.removeObserver(subscribe::onSubject);
     }
 
+    protected  String tag(){
+        return getClass().getSimpleName();
+    }
+
 }

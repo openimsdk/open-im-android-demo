@@ -12,20 +12,16 @@ import retrofit2.http.POST;
 public interface MomentsService {
     @POST("office/work_moment/find/recv")
     Observable<ResponseBody> getMyMoments(@Body RequestBody requestBody);
-
     @POST("office/work_moment/add")
     Observable<ResponseBody> pushMoments(@Body RequestBody requestBody);
-
     @POST("/office/work_moment/del")
     Observable<ResponseBody> deleteMoments(@Body RequestBody requestBody);
     @POST("office/work_moment/like")
     Observable<ResponseBody> like(@Body RequestBody requestBody);
     @POST("office/work_moment/comment/add")
     Observable<ResponseBody> addComment(@Body RequestBody requestBody);
-
     @POST("office/work_moment/comment/del")
     Observable<ResponseBody> deleteComment(@Body RequestBody requestBody);
-
     @POST("office/work_moment/logs")
     Observable<ResponseBody> momentsMsg(@Body RequestBody requestBody);
     @POST("office/work_moment/get")
@@ -34,6 +30,8 @@ public interface MomentsService {
     Observable<ResponseBody> getMyMomentsById(@Body RequestBody requestBody);
     @POST("office/work_moment/unread/clear")
     Observable<ResponseBody> clearMsg(@Body RequestBody requestBody);
+    @POST("office/work_moment/unread/count")
+    Observable<ResponseBody> getUnreadCount(@Body RequestBody requestBody);
    static Parameter buildPagination(int pageNumber,int showNumber){
        HashMap<String,Integer> pagination=new HashMap<>();
        pagination.put("pageNumber",pageNumber);

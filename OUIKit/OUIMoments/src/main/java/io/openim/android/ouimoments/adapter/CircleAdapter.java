@@ -37,6 +37,7 @@ import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.adapter.viewholder.TargetMomentsViewHolder;
+import io.openim.android.ouimoments.mvp.presenter.MsgDetailVM;
 import io.openim.android.ouimoments.ui.MomentsDetailActivity;
 import io.openim.android.ouimoments.ui.MsgDetailActivity;
 import io.openim.android.ouimoments.ui.PartSeeActivity;
@@ -161,6 +162,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                         presenter.unReadCount = null;
                         holder.newMsgTips.setVisibility(View.GONE);
                         //TODO JUMP
+                        new MsgDetailVM().clearMsg(MsgDetailVM.clear_unread_num);
                         context.startActivity(new Intent(context, MsgDetailActivity.class));
                     });
                 }
@@ -405,7 +407,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
         holder.view.getRoot().setOnClickListener(v -> {
             context.startActivity(new Intent(context, MomentsDetailActivity.class)
                 .putExtra(Constant.K_ID,
-                circleItem.getId()));
+                    circleItem.getId()));
         });
 
         int index = circlePosition - 1;
@@ -431,7 +433,15 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
         if (Objects.equals(circleItem.getType(), CircleItem.TYPE_IMG)) {
             holder.view.isVideo.setVisibility(View.GONE);
             int photoNum = circleItem.getPhotos().size();
-            if (photoNum == 1) {
+
+            if (photoNum == 0) {
+                holder.view.media.setVisibility(View.GONE);
+                holder.view.single.setVisibility(View.GONE);
+                holder.view.photoNum.setVisibility(View.GONE);
+                holder.view.content.setBackgroundColor(context.getResources()
+                    .getColor(io.openim.android.ouicore.R.color.theme_bg2));
+
+            } else if (photoNum == 1) {
                 holder.view.single.setVisibility(View.VISIBLE);
                 holder.view.media.setVisibility(View.GONE);
                 holder.view.photoNum.setVisibility(View.GONE);

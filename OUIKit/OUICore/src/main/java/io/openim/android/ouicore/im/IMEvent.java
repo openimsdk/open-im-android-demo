@@ -532,14 +532,6 @@ public class IMEvent {
             }
 
             @Override
-            public void onRecvMessageRevoked(String msgId) {
-                // 消息成功撤回，从界面移除消息
-                for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
-                    onAdvanceMsgListener.onRecvMessageRevoked(msgId);
-                }
-            }
-
-            @Override
             public void onRecvMessageRevokedV2(RevokedInfo info) {
                 // 消息成功撤回，从界面移除消息
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {

@@ -42,7 +42,7 @@ import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.services.CallingService;
-import io.openim.android.ouicore.services.OneselfService;
+import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
@@ -871,11 +871,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onRecvMessageRevoked(String msgId) {
-
     }
 
     @Override

@@ -3,24 +3,26 @@
     android:id="@+id/editTextBodyLl"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
     android:background="#f6f6f6"
+    android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:visibility="gone"
-    >
+    android:visibility="visible">
+
     <EditText
         android:id="@+id/circleEt"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:background="@null"
         android:layout_weight="1"
-        android:paddingLeft="10dp"
+        android:background="@null"
         android:hint="@string/say_more2"
-        />
+        android:paddingLeft="10dp" />
+
     <ImageView
         android:id="@+id/sendIv"
-        android:layout_width="wrap_content"
-        android:layout_height="55dp"
+        android:layout_width="70dp"
+        android:layout_height="50dp"
+        android:clickable="true"
+        android:focusable="true"
         android:padding="8dp"
         android:src="@drawable/selector_send" />
 </LinearLayout>
