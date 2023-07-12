@@ -101,7 +101,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         });
         view.recommend.setOnClickListener(v -> {
             Map<String, String> bean = new HashMap();
-            UserInfo userInfo = vm.exUserInfo.getValue().userInfo;
+            UserInfo userInfo = vm.userInfo.val();
             bean.put("userID", userInfo.getUserID());
             bean.put("nickname", userInfo.getNickname());
             bean.put("faceURL", userInfo.getFaceURL());
@@ -112,10 +112,10 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             startActivity(new Intent(this, MoreDataActivity.class));
         });
         view.remark.setOnClickListener(view -> {
-            if (null == vm.exUserInfo.getValue()) return;
+            if (null == vm.userInfo.getValue()) return;
             String remark = "";
             try {
-                remark = vm.exUserInfo.getValue().userInfo.getFriendInfo().getRemark();
+                remark = vm.userInfo.val().getFriendInfo().getRemark();
             } catch (Exception e) {
             }
             resultLauncher.launch(new Intent(this, EditTextActivity.class).putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.remark)).putExtra(EditTextActivity.INIT_TXT, remark));
@@ -147,7 +147,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         CommonDialog commonDialog = new CommonDialog(this);
         commonDialog.setCanceledOnTouchOutside(false);
         commonDialog.setCancelable(false);
-        commonDialog.getMainView().tips.setText("确认对" + vm.exUserInfo.getValue().userInfo.getFriendInfo().getNickname() + "拉黑吗？");
+        commonDialog.getMainView().tips.setText("确认对" + vm.userInfo.val().getFriendInfo().getNickname() + "拉黑吗？");
         commonDialog.getMainView().cancel.setOnClickListener(v -> {
             commonDialog.dismiss();
             friendVM.blackListUser.setValue(friendVM.blackListUser.getValue());
@@ -175,7 +175,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
                 @Override
                 public void onSuccess(String data) {
                     waitDialog.dismiss();
-                    vm.exUserInfo.getValue().userInfo.setRemark(resultStr);
+                    vm.userInfo.val().setRemark(resultStr);
                     Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
                 }
             }, uid, resultStr);

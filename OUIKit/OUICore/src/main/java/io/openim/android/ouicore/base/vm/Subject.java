@@ -14,6 +14,9 @@ public class Subject {
         this.key = key;
         this.value = value;
     }
+    public boolean equals(String o){
+      return  key.equals(o);
+    }
 
     @Override
     public boolean equals(Object o) {

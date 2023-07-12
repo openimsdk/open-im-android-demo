@@ -46,7 +46,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:background="@android:color/transparent"
-                android:hint="登陆密码用于登陆OpenIM账号"
+                android:hint="@string/login_tips"
                 android:inputType="textPassword"
                 android:text="@={LoginVM.pwd}"
                 android:textColor="#ff333333"

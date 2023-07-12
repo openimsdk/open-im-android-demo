@@ -78,7 +78,6 @@ public class DemoApplication extends BaseApp {
     private void initPush() {
         PushManager.getInstance().initialize(this);
         PushManager.getInstance().setDebugLogger(this, s -> L.i("getui", s));
-
     }
 
     private void initNet() {

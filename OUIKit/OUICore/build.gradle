@@ -43,7 +43,6 @@ android {
 }
 
 dependencies {
-//    api fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     api fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation "androidx.core:core-ktx:1.8.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -80,8 +79,8 @@ dependencies {
     implementation 'com.alibaba:arouter-api:1.5.2'
 
     //openIM sdk
-    api 'io.openim:android-sdk:3.0.0-beta03@aar'
-    api 'io.openim:core-sdk:3.0.0-beta05@aar'
+//    api 'io.openim:android-sdk:3.0.0-beta03@aar'
+//    api 'io.openim:core-sdk:3.0.0-beta07@aar'
     implementation 'com.google.code.gson:gson:2.9.1'
 
     api 'com.contrarywind:Android-PickerView:4.1.9'
@@ -94,4 +93,7 @@ dependencies {
 
     api 'com.liulishuo.okdownload:okdownload:1.0.7'
     api 'com.liulishuo.okdownload:sqlite:1.0.7'
+
+
+    api 'q.rorbin:badgeview:1.1.3'
 }

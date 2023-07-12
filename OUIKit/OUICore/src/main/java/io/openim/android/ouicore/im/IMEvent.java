@@ -249,8 +249,6 @@ public class IMEvent {
         public void onConnectFailed(long code, String error) {
             // 连接服务器失败，可以提示用户当前网络连接不可用
             L.d("连接服务器失败(" + error + ")");
-            userLogic.connectStatus.setValue(UserLogic.ConnectStatus.CONNECT_ERR);
-
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnectFailed(code, error);
             }
@@ -260,8 +258,6 @@ public class IMEvent {
         public void onConnectSuccess() {
             // 已经成功连接到服务器
             L.d("已经成功连接到服务器");
-            userLogic.connectStatus.setValue(UserLogic.ConnectStatus.DEFAULT);
-
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnectSuccess();
             }
@@ -271,8 +267,6 @@ public class IMEvent {
         public void onConnecting() {
             // 正在连接到服务器，适合在 UI 上展示“正在连接”状态。
             L.d("正在连接到服务器...");
-            userLogic.connectStatus.setValue(UserLogic.ConnectStatus.CONNECTING);
-
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnecting();
             }
@@ -391,7 +385,6 @@ public class IMEvent {
     // 会话新增或改变监听
     private void conversationListener() {
         OpenIMClient.getInstance().conversationManager.setOnConversationListener(new OnConversationListener() {
-            private UserLogic userLogic = Easy.find(UserLogic.class);
 
             @Override
             public void onConversationChanged(List<ConversationInfo> list) {
@@ -414,23 +407,32 @@ public class IMEvent {
 
             @Override
             public void onSyncServerFailed() {
-                userLogic .connectStatus.setValue(UserLogic.ConnectStatus.SYNC_ERR);
+                for (OnConversationListener onConversationListener : conversationListeners) {
+                    onConversationListener.onSyncServerFailed();
+                }
             }
 
             @Override
             public void onSyncServerFinish() {
-                userLogic.connectStatus.setValue(UserLogic.ConnectStatus.DEFAULT);
+                for (OnConversationListener onConversationListener : conversationListeners) {
+                    onConversationListener.onSyncServerFinish();
+                }
+
             }
 
             @Override
             public void onSyncServerStart() {
-                userLogic.connectStatus.setValue(UserLogic.ConnectStatus.SYNCING);
+                for (OnConversationListener onConversationListener : conversationListeners) {
+                    onConversationListener.onSyncServerStart();
+                }
             }
 
             @Override
             public void onTotalUnreadMessageCountChanged(int i) {
                 // 未读消息数发送变化
-
+                for (OnConversationListener onConversationListener : conversationListeners) {
+                    onConversationListener.onTotalUnreadMessageCountChanged(i);
+                }
             }
         });
     }
@@ -438,10 +440,12 @@ public class IMEvent {
     private void promptSoundOrNotification(ConversationInfo conversationInfo) {
         try {
             if (BaseApp.inst().loginCertificate.globalRecvMsgOpt == 2) return;
-            if (conversationInfo.getRecvMsgOpt() == 0 && conversationInfo.getUnreadCount() != 0) {
+            if (conversationInfo.getRecvMsgOpt() == 0
+                && conversationInfo.getUnreadCount() != 0) {
                 if (BaseApp.inst().isBackground())
                     IMUtil.sendNotice(conversationInfo.getLatestMsgSendTime());
-                else IMUtil.playPrompt();
+                else
+                    IMUtil.playPrompt();
             }
         } catch (Exception ignored) {
         }
@@ -525,14 +529,6 @@ public class IMEvent {
                 // 消息被阅读回执，将消息标记为已读
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
                     onAdvanceMsgListener.onRecvC2CReadReceipt(list);
-                }
-            }
-
-            @Override
-            public void onRecvMessageRevoked(String msgId) {
-                // 消息成功撤回，从界面移除消息
-                for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
-                    onAdvanceMsgListener.onRecvMessageRevoked(msgId);
                 }
             }
 

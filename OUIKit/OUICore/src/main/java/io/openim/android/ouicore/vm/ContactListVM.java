@@ -37,8 +37,6 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         IMEvent.getInstance().addConversationListener(this);
         IMEvent.getInstance().addAdvanceMsgListener(this);
         updateConversation();
-
-        Obs.newMessage(Constant.Event.CONTACT_LIST_VM_INIT);
     }
 
     public void deleteConversationFromLocalAndSvr(String conversationId) {
@@ -72,11 +70,11 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
                     conversations.getValue().add(new MsgConversation(msg, datum));
                 }
                 conversations.setValue(conversations.getValue());
-                UPDATEFrequentContacts(data);
+                updateFrequentContacts(data);
             }
         });
     }
-    public  void setOneConversationPrivateChat(IMUtil.OnSuccessListener<String> onSuccessListener,
+    public  void setOneConversationPrivateChat(IMUtil.OnSuccessListener<String> OnSuccessListener,
                                                String cid, boolean isChecked){
         OpenIMClient.getInstance().conversationManager.setOneConversationPrivateChat(new OnBase<String>() {
             @Override
@@ -86,7 +84,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
             @Override
             public void onSuccess(String data) {
-                onSuccessListener.onSuccess(data);
+                OnSuccessListener.onSuccess(data);
             }
         },cid,isChecked);
     }
@@ -96,7 +94,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
      *
      * @param data
      */
-    private void UPDATEFrequentContacts(List<ConversationInfo> data) {
+    private void updateFrequentContacts(List<ConversationInfo> data) {
         List<UserInfo> uList = new ArrayList<>();
         for (ConversationInfo datum : data) {
             if (datum.getConversationType() == ConversationType.SINGLE_CHAT) {
@@ -187,7 +185,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     @Override
     public void onTotalUnreadMessageCountChanged(int i) {
-        L.e("");
+
     }
 
     @Override
@@ -202,11 +200,6 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     @Override
     public void onRecvGroupMessageReadReceipt(List<ReadReceiptInfo> list) {
-
-    }
-
-    @Override
-    public void onRecvMessageRevoked(String msgId) {
 
     }
 

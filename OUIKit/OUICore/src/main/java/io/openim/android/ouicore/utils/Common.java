@@ -1,19 +1,13 @@
 package io.openim.android.ouicore.utils;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -29,14 +23,11 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
-import com.yanzhenjie.permission.runtime.PermissionDef;
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.bean.ZxingConfig;
 
@@ -48,18 +39,18 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 import java.util.Locale;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.net.RXRetrofit.N;
-import io.openim.android.ouicore.services.OneselfService;
+import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.PictureElem;
 import io.openim.android.sdk.models.VideoElem;
 import io.reactivex.Observable;
+import q.rorbin.badgeview.QBadgeView;
 
 public class Common {
     /**
@@ -68,8 +59,9 @@ public class Common {
     public final static Handler UIHandler = new Handler(Looper.getMainLooper());
 
 
-    public static void stringBindForegroundColorSpan(TextView textView, String data, String target) {
-        stringBindForegroundColorSpan(textView, data, target,R.color.theme);
+    public static void stringBindForegroundColorSpan(TextView textView, String data,
+                                                     String target) {
+        stringBindForegroundColorSpan(textView, data, target, R.color.theme);
     }
 
     /**
@@ -79,7 +71,8 @@ public class Common {
      * @param data     数据
      * @param target   目标文字
      */
-    public static void stringBindForegroundColorSpan(TextView textView, String data, String target, int bgColor) {
+    public static void stringBindForegroundColorSpan(TextView textView, String data,
+                                                     String target, int bgColor) {
         SpannableStringBuilder spannableString = new SpannableStringBuilder(data);
         String searchContent = target.toLowerCase(Locale.ROOT);
         data = data.toLowerCase(Locale.ROOT);
@@ -89,7 +82,8 @@ public class Common {
             return;
         }
         ForegroundColorSpan colorSpan = new ForegroundColorSpan(bgColor);
-        spannableString.setSpan(colorSpan, start, start + searchContent.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableString.setSpan(colorSpan, start, start + searchContent.length(),
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         textView.setText(spannableString);
     }
 
@@ -140,7 +134,8 @@ public class Common {
 
     //收起键盘
     public static void hideKeyboard(Context context, View v) {
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm =
+            (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
@@ -148,8 +143,15 @@ public class Common {
 
     //弹出键盘
     public static void pushKeyboard(Context context) {
-        InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager =
+            (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+    //软键盘是否弹出
+    public static boolean isShowKeyboard(Context context){
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        //获取状态信息
+        return imm.isActive();//true 打开
     }
 
     /**
@@ -170,7 +172,12 @@ public class Common {
      */
     public static void setFullScreen(Activity activity) {
         View decorView = activity.getWindow().getDecorView();
-        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_FULLSCREEN
+            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
     }
 
@@ -180,7 +187,8 @@ public class Common {
      * @param clip 内容
      */
     public static void copy(String clip) {
-        ClipboardManager cm = (ClipboardManager) BaseApp.inst().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipboardManager cm =
+            (ClipboardManager) BaseApp.inst().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData mClipData = ClipData.newPlainText("text", clip);
         cm.setPrimaryClip(mClipData);
     }
@@ -194,7 +202,9 @@ public class Common {
         //获取电源管理器对象
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         //获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
-        PowerManager.WakeLock wakeLock = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK, "openIM:bright");
+        PowerManager.WakeLock wakeLock =
+            pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK
+                , "openIM:bright");
         //点亮屏幕
         wakeLock.acquire(10 * 60 * 1000L /*10 minutes*/);
         //释放
@@ -207,31 +217,34 @@ public class Common {
      * @return
      */
     public static boolean isScreenLocked() {
-        android.app.KeyguardManager mKeyguardManager = (KeyguardManager) BaseApp.inst().getSystemService(Context.KEYGUARD_SERVICE);
+        android.app.KeyguardManager mKeyguardManager =
+            (KeyguardManager) BaseApp.inst().getSystemService(Context.KEYGUARD_SERVICE);
         return mKeyguardManager.inKeyguardRestrictedInputMode();
     }
 
     public static int getMipmapId(String var) {
         try {
-            return BaseApp.inst().getResources().getIdentifier(var, "mipmap", BaseApp.inst().getPackageName());
+            return BaseApp.inst().getResources().getIdentifier(var, "mipmap",
+                BaseApp.inst().getPackageName());
         } catch (Exception e) {
             return 0;
         }
     }
 
 
-    public static void permission(Context context, OnGrantedListener onGrantedListener, boolean hasPermission, String... permissions) {
+    public static void permission(Context context, OnGrantedListener onGrantedListener,
+                                  boolean hasPermission, String... permissions) {
         if (hasPermission)
             onGrantedListener.onGranted();
         else {
             AndPermission.with(context).runtime()
                 .permission(permissions)
                 .onGranted(permission -> {
-                // Storage permission are allowed.
-                onGrantedListener.onGranted();
-            }).onDenied(permission -> {
-                // Storage permission are not allowed.
-            }).start();
+                    // Storage permission are allowed.
+                    onGrantedListener.onGranted();
+                }).onDenied(permission -> {
+                    // Storage permission are not allowed.
+                }).start();
         }
     }
 
@@ -247,7 +260,8 @@ public class Common {
             InputStream inputStream = null;
             try {
                 if (TextUtils.isEmpty(savePath)) {
-                    outputStream = BaseApp.inst().getContentResolver().openOutputStream(insertUri, "rw");
+                    outputStream = BaseApp.inst().getContentResolver().openOutputStream(insertUri
+                        , "rw");
                 } else {
                     File file = new File(savePath);
                     if (!file.exists()) {
@@ -307,7 +321,7 @@ public class Common {
     public static void loadVideoSnapshot(ImageView iv, VideoElem elem) {
         //本地
         String path = elem.getSnapshotPath();
-        if (!GetFilePathFromUri.fileIsExists(path)){
+        if (!GetFilePathFromUri.fileIsExists(path)) {
             //远程
             path = elem.getSnapshotUrl();
         }
@@ -325,7 +339,8 @@ public class Common {
      */
     public static void toMap(Message message, View v) {
         v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class)
-            .putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord=" + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey));
+            .putExtra(WebViewActivity.LOAD_URL,
+                "https://apis.map.qq.com/uri/v1/geocoder?coord=" + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey));
     }
 
     /***
@@ -347,7 +362,8 @@ public class Common {
     public static ActivityResultLauncher<Intent> getCaptureActivityLauncher(AppCompatActivity compatActivity) {
         return compatActivity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() != Activity.RESULT_OK || null == result.getData()) return;
-            String content = result.getData().getStringExtra(com.yzq.zxinglibrary.common.Constant.CODED_CONTENT);
+            String content =
+                result.getData().getStringExtra(com.yzq.zxinglibrary.common.Constant.CODED_CONTENT);
 
             if (content.contains(Constant.QR.QR_ADD_FRIEND)) {
                 String userId = content.substring(content.lastIndexOf("/") + 1);
@@ -365,8 +381,8 @@ public class Common {
     /**
      * 跳转到扫一扫
      */
-    public static void jumpScan(Context context,ActivityResultLauncher<Intent> resultLauncher) {
-        Intent intent = new Intent(context,CaptureActivity.class);
+    public static void jumpScan(Context context, ActivityResultLauncher<Intent> resultLauncher) {
+        Intent intent = new Intent(context, CaptureActivity.class);
         ZxingConfig config = new ZxingConfig();
         config.setPlayBeep(true);//是否播放扫描声音 默认为true
         config.setShake(true);//是否震动  默认为true
@@ -376,8 +392,51 @@ public class Common {
         resultLauncher.launch(intent);
     }
 
+    /**
+     * 小红点
+     *
+     * @param context
+     * @param target      目标view
+     * @param badgeNumber 数
+     */
+    public static void buildBadgeView(Context context, View target,
+                                      int badgeNumber) {
+        QBadgeView badgeView = (QBadgeView) target.getTag();
+        if (null != badgeView) {
+            badgeView.setBadgeNumber(badgeNumber);
+            return;
+        }
+        target.setTag(new QBadgeView(context).bindTarget(target)
+            .setGravityOffset(10, -2,
+                true)
+            .setBadgeNumber(badgeNumber)
+            .setBadgeTextSize(8, true)
+            .setShowShadow(false));
+    }
 
-
-
+    /**
+     * (x,y)是否在view的区域内
+     * @param view
+     * @param x
+     * @param y
+     * @return
+     */
+    public static boolean isTouchPointInView(View view, float x, float y) {
+        if (view == null) {
+            return false;
+        }
+        int[] location = new int[2];
+        view.getLocationOnScreen(location);
+        int left = location[0];
+        int top = location[1];
+        int right = left + view.getMeasuredWidth();
+        int bottom = top + view.getMeasuredHeight();
+        //view.isClickable() &&
+        if (y >= top && y <= bottom && x >= left
+            && x <= right) {
+            return true;
+        }
+        return false;
+    }
 }
 

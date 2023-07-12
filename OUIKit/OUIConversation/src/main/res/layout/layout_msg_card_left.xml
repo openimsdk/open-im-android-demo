@@ -31,7 +31,7 @@
                     android:textSize="12sp"
                     android:visibility="gone" />
 
-                <LinearLayout
+                <io.openim.android.ouicore.widget.InterceptLinearLayout
                     android:id="@+id/content"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -81,7 +81,7 @@
                         android:textColor="#ff999999"
                         android:textSize="11sp" />
 
-                </LinearLayout>
+                </io.openim.android.ouicore.widget.InterceptLinearLayout>
 
             </LinearLayout>
 

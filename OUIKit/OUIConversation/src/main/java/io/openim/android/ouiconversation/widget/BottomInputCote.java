@@ -42,6 +42,7 @@ import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.GroupStatus;
 import io.openim.android.sdk.models.AtUserInfo;
 import io.openim.android.sdk.models.Message;
 
@@ -64,6 +65,9 @@ public class BottomInputCote {
     public BottomInputCote(Context context, LayoutInputCoteBinding view) {
         this.context = context;
         this.view = view;
+
+        view.root.setIntercept(false);
+
         initFragment();
         Common.UIHandler.postDelayed(() -> hasMicrophone = AndPermission.hasPermissions(context,
             Permission.Group.MICROPHONE), 300);
@@ -156,6 +160,7 @@ public class BottomInputCote {
                 setSendButton(isSend);
             }
         });
+
     }
 
 
@@ -231,7 +236,8 @@ public class BottomInputCote {
         if (!vm.isSingleChat) {
             vm.groupInfo.observe((LifecycleOwner) context, groupInfo -> {
                 if (null == groupInfo) return;
-                if (groupInfo.getStatus() == Constant.GroupStatus.status3 && !groupInfo.getOwnerUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+                if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED
+                    && !groupInfo.getOwnerUserID().equals(BaseApp.inst().loginCertificate.userID)) {
                     view.inputLy.setVisibility(VISIBLE);
                     setSendButton(true);
                     view.touchSay.setVisibility(GONE);

@@ -14,7 +14,9 @@ import java.util.Map;
 import io.openim.android.demo.repository.OpenIMService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.entity.ExtendUserInfo;
+import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
@@ -29,7 +31,7 @@ import io.openim.android.sdk.models.UserInfo;
 
 public class PersonalVM extends BaseViewModel {
     public WaitDialog waitDialog;
-    public MutableLiveData<ExtendUserInfo> exUserInfo = new MutableLiveData<>();
+    public State<UserInfo> userInfo = new State<>();
 
     @Override
     protected void viewCreate() {
@@ -47,67 +49,56 @@ public class PersonalVM extends BaseViewModel {
         @Override
         public void onSuccess(String data) {
             waitDialog.dismiss();
-            exUserInfo.setValue(exUserInfo.getValue());
+            userInfo.update();
 
-            BaseApp.inst().loginCertificate.nickname = exUserInfo.getValue().userInfo.getNickname();
-            BaseApp.inst().loginCertificate.faceURL = exUserInfo.getValue().userInfo.getFaceURL();
-            BaseApp.inst().loginCertificate.globalRecvMsgOpt = exUserInfo.getValue().userInfo.getGlobalRecvMsgOpt();
+            updateConfig(userInfo.val());
             Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
         }
     };
 
+    public void updateConfig(UserInfo userInfo) {
+        LoginCertificate certificate = BaseApp.inst().loginCertificate;
+        if (!userInfo.getUserID().equals(certificate.userID))return;
+
+        certificate.nickname = userInfo.getNickname();
+        certificate.faceURL = userInfo.getFaceURL();
+
+        certificate.globalRecvMsgOpt = userInfo.getGlobalRecvMsgOpt();
+        certificate.allowAddFriend = userInfo.getAllowAddFriend() == 1;
+        certificate.allowBeep = userInfo.getAllowBeep() == 1;
+        certificate.allowVibration = userInfo.getAllowVibration() == 1;
+
+        BaseApp.inst().loginCertificate.cache(BaseApp.inst());
+    }
+
     public void getSelfUserInfo() {
         waitDialog.show();
-        OpenIMClient.getInstance().userInfoManager.getSelfUserInfo(new OnBase<UserInfo>() {
-            @Override
-            public void onError(int code, String error) {
-                waitDialog.dismiss();
-                getIView().toast(error + code);
-            }
-
-            @Override
-            public void onSuccess(UserInfo data) {
-                waitDialog.dismiss();
-                ExtendUserInfo extendUserInfo = new ExtendUserInfo();
-                extendUserInfo.userInfo = data;
-                exUserInfo.setValue(extendUserInfo);
-
-                getExtendUserInfo(BaseApp.inst().loginCertificate.userID);
-            }
-        });
-
+        getExtendUserInfo(BaseApp.inst().loginCertificate.userID);
     }
 
     private void getExtendUserInfo(String uid) {
         List<String> ids = new ArrayList<>();
         ids.add(uid);
-        Parameter parameter = new Parameter().add("operationID", System.currentTimeMillis() + "").add("pageNumber", 1).add("showNumber", 1).add("userIDList", ids);
-        N.API(OpenIMService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OpenIMService.turn(HashMap.class))
-            .compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
+        Parameter parameter = new Parameter().add("userIDs", ids);
+        N.API(OpenIMService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OpenIMService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
             @Override
             protected void onFailure(Throwable e) {
                 getIView().toast(e.getMessage());
-            }
-
-            @Override
-            public void onComplete() {
-
+                waitDialog.dismiss();
             }
 
             @Override
             public void onSuccess(HashMap map) {
+                waitDialog.dismiss();
                 try {
-                    ArrayList arrayList = (ArrayList) map.get("userFullInfoList");
+                    ArrayList arrayList = (ArrayList) map.get("users");
                     if (null == arrayList || arrayList.isEmpty()) return;
-                    String json = GsonHel.getGson().toJson(exUserInfo.getValue().userInfo);
-                    HashMap map1 = JSONObject.parseObject(json, HashMap.class);
-                    HashMap map2 = JSONObject.parseObject(arrayList.get(0).toString(), HashMap.class);
-                    map1.putAll(map2);
 
-                    exUserInfo.getValue().userInfo = GsonHel.getGson().fromJson(GsonHel.toJson(map1), UserInfo.class);
-                    exUserInfo.setValue(exUserInfo.getValue());
-                    BaseApp.inst().loginCertificate.globalRecvMsgOpt = exUserInfo.getValue().userInfo.getGlobalRecvMsgOpt();
-                    BaseApp.inst().loginCertificate.cache(BaseApp.inst());
+                    UserInfo u = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
+                        UserInfo.class);
+                    userInfo.setValue(u);
+
+                    updateConfig(userInfo.val());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -118,38 +109,14 @@ public class PersonalVM extends BaseViewModel {
 
     public void getUserInfo(String id) {
         waitDialog.show();
-        List<String> ids = new ArrayList<>();
-        ids.add(id);
-
-        OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
-            @Override
-            public void onError(int code, String error) {
-                waitDialog.dismiss();
-                getIView().toast(error + code);
-            }
-
-            @Override
-            public void onSuccess(List<UserInfo> data) {
-                waitDialog.dismiss();
-                if (data.isEmpty()) return;
-                ExtendUserInfo extendUserInfo = new ExtendUserInfo();
-                extendUserInfo.userInfo = data.get(0);
-                exUserInfo.setValue(extendUserInfo);
-
-            }
-        }, ids);
+       getExtendUserInfo(id);
     }
 
-    public void setSelfInfo() {
+    public void setSelfInfo(Parameter param) {
         waitDialog.show();
-        String userInfo = GsonHel.toJson(exUserInfo.getValue().userInfo);
-        Map userInfoMap = JSONObject.parseObject(userInfo, Map.class);
-        //扩展
-        userInfoMap.put("platform", IMUtil.PLATFORM_ID);
-        userInfoMap.put("userID", BaseApp.inst().loginCertificate.userID);
-        userInfoMap.put("operationID", System.currentTimeMillis() + "");
-
-        N.API(OpenIMService.class).updateUserInfo(Parameter.buildJsonBody(GsonHel.toJson(userInfoMap))).compose(N.IOMain()).map(OpenIMService.turn(Object.class))
+        N.API(OpenIMService.class)
+            .updateUserInfo(param.buildJsonBody())
+            .compose(N.IOMain()).map(OpenIMService.turn(Object.class))
 
             .subscribe(new NetObserver<Object>(getContext()) {
                 @Override
@@ -165,22 +132,28 @@ public class PersonalVM extends BaseViewModel {
     }
 
     public void setNickname(String nickname) {
-        exUserInfo.getValue().userInfo.setNickname(nickname);
-        setSelfInfo();
+        userInfo.val().setNickname(nickname);
+        setSelfInfo(new Parameter().add("nickname",nickname));
     }
 
     public void setFaceURL(String faceURL) {
-        exUserInfo.getValue().userInfo.setFaceURL(faceURL);
-        setSelfInfo();
+        userInfo.val().setFaceURL(faceURL);
+        setSelfInfo(new Parameter().add("faceURL",faceURL));
     }
 
     public void setGender(int gender) {
-        exUserInfo.getValue().userInfo.setGender(gender);
-        setSelfInfo();
+        userInfo.val().setGender(gender);
+        setSelfInfo(new Parameter().add("gender",gender));
     }
 
     public void setBirthday(long birth) {
-        exUserInfo.getValue().userInfo.setBirth(birth);
-        setSelfInfo();
+        userInfo.val().setBirth(birth);
+        setSelfInfo(new Parameter().add("birth",birth));
     }
+
+    public void setEmail(String email) {
+        userInfo.val().setEmail(email);
+        setSelfInfo(new Parameter().add("email",email));
+    }
+
 }

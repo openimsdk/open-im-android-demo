@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.openim.android.ouicore.services.NiService;
+import io.openim.android.ouicore.api.NiService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.entity.UserLabel;
@@ -13,7 +13,7 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
-import io.openim.android.ouicore.services.OneselfService;
+import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.widget.WaitDialog;
 

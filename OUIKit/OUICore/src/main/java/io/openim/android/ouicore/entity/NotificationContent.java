@@ -9,7 +9,7 @@ public class NotificationContent implements Serializable {
 
     public String ownerUserID;
 
-    public int createTime;
+    public long createTime;
 
     public int memberCount;
 
