@@ -195,6 +195,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.recyclerView.setItemAnimator(new CustomItemAnimator());
         view.recyclerView.setLayoutManager(linearLayoutManager);
         view.recyclerView.addItemDecoration(new DefaultItemDecoration(this.getResources().getColor(android.R.color.transparent), 1, Common.dp2px(16)));
+        view.recyclerView.setItemAnimator(null);
         messageAdapter = new MessageAdapter();
         messageAdapter.bindRecyclerView(view.recyclerView);
 
