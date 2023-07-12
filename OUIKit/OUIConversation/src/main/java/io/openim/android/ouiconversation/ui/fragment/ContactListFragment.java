@@ -35,6 +35,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
+import com.yanzhenjie.recyclerview.OnItemClickListener;
 import com.yanzhenjie.recyclerview.SwipeMenuCreator;
 import com.yanzhenjie.recyclerview.SwipeMenuItem;
 
@@ -52,6 +53,7 @@ import io.openim.android.ouiconversation.ui.SearchActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.utils.Obs;
+import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.adapter.ViewHol;
@@ -73,7 +75,7 @@ import io.openim.android.sdk.enums.GroupAtType;
 public class ContactListFragment extends BaseFragment<ContactListVM> implements ContactListVM.ViewAction, Observer {
 
     private long mLastClickTime;
-    private long timeInterval = 700;
+    private final long timeInterval = 700;
 
     private FragmentContactListBinding view;
     private CustomAdapter adapter;
@@ -120,6 +122,39 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         return view.getRoot();
     }
 
+    private final OnItemClickListener onItemClickListener = (view, position) -> {
+        long nowTime = System.currentTimeMillis();
+        if (nowTime - mLastClickTime < timeInterval) return;
+        mLastClickTime = nowTime;
+
+        MsgConversation msgConversation = vm.conversations.getValue().get(position);
+        if (msgConversation.conversationInfo.getConversationType() == ConversationType.NOTIFICATION) {
+            //系统通知
+            Intent intent =
+                new Intent(getContext(), NotificationActivity.class).putExtra(Constant.K_NAME
+                    , msgConversation.conversationInfo.getShowName()).putExtra(Constant.K_ID,
+                    msgConversation.conversationInfo.getConversationID());
+            startActivity(intent);
+            return;
+        }
+        Intent intent = new Intent(getContext(), ChatActivity.class)
+            .putExtra(Constant.K_NAME
+                , msgConversation.conversationInfo.getShowName());
+        if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT)
+            intent.putExtra(Constant.K_ID, msgConversation.conversationInfo.getUserID());
+
+        if (msgConversation.conversationInfo.getConversationType() == ConversationType.GROUP_CHAT
+            || msgConversation.conversationInfo.getConversationType() == ConversationType.SUPER_GROUP_CHAT)
+            intent.putExtra(Constant.K_GROUP_ID, msgConversation.conversationInfo.getGroupID());
+
+        if (msgConversation.conversationInfo.getGroupAtType() == ConversationType.NOTIFICATION)
+            intent.putExtra(Constant.K_NOTICE, msgConversation.notificationMsg);
+        startActivity(intent);
+
+        //重置强提醒
+        OpenIMClient.getInstance().conversationManager.resetConversationGroupAtType(null,
+            msgConversation.conversationInfo.getConversationID());
+    };
 
     @SuppressLint("NewApi")
     private void init() {
@@ -179,39 +214,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             }
             menuBridge.closeMenu();
         });
-        view.recyclerView.setOnItemClickListener((view, position) -> {
-            long nowTime = System.currentTimeMillis();
-            if (nowTime - mLastClickTime < timeInterval) return;
-            mLastClickTime = nowTime;
 
-            MsgConversation msgConversation = vm.conversations.getValue().get(position);
-            if (msgConversation.conversationInfo.getConversationType() == ConversationType.NOTIFICATION) {
-                //系统通知
-                Intent intent =
-                    new Intent(getContext(), NotificationActivity.class).putExtra(Constant.K_NAME
-                        , msgConversation.conversationInfo.getShowName()).putExtra(Constant.K_ID,
-                        msgConversation.conversationInfo.getConversationID());
-                startActivity(intent);
-                return;
-            }
-            Intent intent = new Intent(getContext(), ChatActivity.class).putExtra(Constant.K_NAME
-                , msgConversation.conversationInfo.getShowName());
-            if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT)
-                intent.putExtra(Constant.K_ID, msgConversation.conversationInfo.getUserID());
-
-            if (msgConversation.conversationInfo.getConversationType() == ConversationType.GROUP_CHAT || msgConversation.conversationInfo.getConversationType() == ConversationType.SUPER_GROUP_CHAT)
-                intent.putExtra(Constant.K_GROUP_ID, msgConversation.conversationInfo.getGroupID());
-
-            if (msgConversation.conversationInfo.getGroupAtType() == ConversationType.NOTIFICATION)
-                intent.putExtra(Constant.K_NOTICE, msgConversation.notificationMsg);
-            startActivity(intent);
-
-            //重置强提醒
-            OpenIMClient.getInstance().conversationManager.resetConversationGroupAtType(null,
-                msgConversation.conversationInfo.getConversationID());
-        });
-
-        adapter = new CustomAdapter(getContext());
+        adapter = new CustomAdapter(onItemClickListener);
         view.recyclerView.setAdapter(adapter);
         view.recyclerView.addHeaderView(createHeaderView());
 
@@ -223,12 +227,12 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             adapter.notifyDataSetChanged();
         });
 
-        Animation animation= AnimationUtils.loadAnimation(getActivity(),
+        Animation animation = AnimationUtils.loadAnimation(getActivity(),
             R.anim.animation_repeat_spinning);
         Easy.find(UserLogic.class).connectStatus
             .observe(getActivity(), connectStatus -> {
                 if (connectStatus == UserLogic.ConnectStatus.CONNECTING
-                    ||connectStatus== UserLogic.ConnectStatus.SYNCING) {
+                    || connectStatus == UserLogic.ConnectStatus.SYNCING) {
                     view.status.startAnimation(animation);
                 } else {
                     view.status.clearAnimation();
@@ -319,20 +323,15 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
     static class CustomAdapter extends RecyclerView.Adapter<ViewHol.ContactItemHolder> {
 
         private List<MsgConversation> conversationInfos;
-        private Context context;
+        private OnItemClickListener itemClickListener;
 
-        public CustomAdapter(Context context) {
-            this.context = context;
+        public CustomAdapter(OnItemClickListener itemClickListener) {
+            this.itemClickListener = itemClickListener;
         }
 
         public void setConversationInfos(List<MsgConversation> conversationInfos) {
             this.conversationInfos = conversationInfos;
         }
-
-        public List<MsgConversation> getConversationInfos() {
-            return conversationInfos;
-        }
-
 
         @Override
         public ViewHol.ContactItemHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -342,6 +341,14 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onBindViewHolder(ViewHol.ContactItemHolder viewHolder, final int position) {
+            viewHolder.viewBinding.getRoot().setOnClickListener(new OnDedrepClickListener() {
+                @Override
+                public void click(View v) {
+                    if (null != itemClickListener)
+                        itemClickListener.onItemClick(v, position);
+                }
+            });
+
             MsgConversation msgConversation = conversationInfos.get(position);
             boolean isGroup =
                 msgConversation.conversationInfo.getConversationType() != ConversationType.SINGLE_CHAT;

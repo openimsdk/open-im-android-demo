@@ -556,7 +556,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     return;
                 }
                 groupInfo.setValue(data.get(0));
-
                 getOneConversation(null);
             }
         }, groupIds);
@@ -581,10 +580,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 }
                 conversationID = data.getConversationID();
                 conversationInfo.setValue(data);
-                markRead();
-
                 loadHistory();
                 getConversationRecvMessageOpt(data.getConversationID());
+
+                markRead();
             }
         }, isSingleChat ? userID : groupID, isSingleChat ? ConversationType.SINGLE_CHAT :
             isWordGroup() ? ConversationType.SUPER_GROUP_CHAT : ConversationType.GROUP_CHAT);
@@ -592,8 +591,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private void loadHistory() {
         //加载消息记录
-        if (fromChatHistory) loadHistoryMessageReverse();
-        else loadHistoryMessage();
+        if (fromChatHistory)
+            loadHistoryMessageReverse();
+        else
+            loadHistoryMessage();
     }
 
     @Override
@@ -614,12 +615,12 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     /**
      * 标记已读
      *
-     * @param msgs 为null 清除里列表小红点
+     * @param msgList 为null 清除里列表小红点
      */
-    public void markRead(@Nullable Message... msgs) {
+    public void markRead(@Nullable Message... msgList) {
         List<String> msgIDs = new ArrayList<>();
-        if (null != msgs) {
-            for (Message msg : msgs) {
+        if (null != msgList) {
+            for (Message msg : msgList) {
                 msgIDs.add(msg.getClientMsgID());
             }
         }
@@ -631,9 +632,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
             @Override
             public void onSuccess(String data) {
-                if (null != msgs) {
+                if (null != msgList) {
                     long currentTimeMillis = System.currentTimeMillis();
-                    for (Message msg : msgs) {
+                    for (Message msg : msgList) {
                         msg.setRead(true);
 
                         if (null != msg.getAttachedInfoElem()
@@ -645,10 +646,12 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 }
             }
         };
-        if (null == msgs || msgs.length == 0) {
-            OpenIMClient.getInstance().messageManager.markConversationMessageAsRead(conversationID, callBack);
+        if (null == msgList || msgList.length == 0) {
+            OpenIMClient.getInstance().messageManager
+                .markConversationMessageAsRead(conversationID, callBack);
         } else
-            OpenIMClient.getInstance().messageManager.markMessagesAsReadByMsgID(conversationID,
+            OpenIMClient.getInstance().messageManager
+                .markMessagesAsReadByMsgID(conversationID,
                 msgIDs, callBack);
 
     }
@@ -696,7 +699,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     public void loadHistoryMessage() {
-        OpenIMClient.getInstance().messageManager.getAdvancedHistoryMessageList(new OnBase<AdvancedMessage>() {
+        OpenIMClient.getInstance().messageManager
+            .getAdvancedHistoryMessageList(new OnBase<AdvancedMessage>() {
             @Override
             public void onError(int code, String error) {
                 getIView().toast(error + code);
@@ -808,7 +812,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         });
 
         //标记本条消息已读 语音消息需要点播放才算读
-        if (!viewPause && msg.getContentType() != MessageType.VOICE)
+        if (!viewPause && msg.getContentType()
+            != MessageType.VOICE)
             markRead(msg);
 
         statusUpdate(msg);
@@ -1177,7 +1182,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     public void loadHistoryMessageReverse() {
-        OpenIMClient.getInstance().messageManager.getAdvancedHistoryMessageListReverse(new OnBase<AdvancedMessage>() {
+        OpenIMClient.getInstance().messageManager
+            .getAdvancedHistoryMessageListReverse(new OnBase<AdvancedMessage>() {
             @Override
             public void onError(int code, String error) {
             }
