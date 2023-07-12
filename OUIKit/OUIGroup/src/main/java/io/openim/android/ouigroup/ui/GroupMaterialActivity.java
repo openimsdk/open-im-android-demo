@@ -50,7 +50,6 @@ import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.PutArgs;
-import open_im_sdk_callback.PutFileCallback;
 
 @Route(path = Routes.Group.MATERIAL)
 public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMaterialBinding> {
@@ -192,8 +191,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         albumDialog = new PhotographAlbumDialog(this);
         albumDialog.setOnSelectResultListener(path -> {
             PutArgs putArgs = new PutArgs(path[0]);
-            putArgs.putID =
-                BaseApp.inst().loginCertificate.userID + "_" + System.currentTimeMillis();
             OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                 @Override
                 public void onError(int code, String error) {

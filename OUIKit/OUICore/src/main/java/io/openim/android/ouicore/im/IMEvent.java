@@ -72,11 +72,10 @@ public class IMEvent {
         friendshipListener();
         conversationListener();
         groupListeners();
-//        signalingListener();
+        signalingListener();
     }
 
     private void signalingListener() {
-        //TODO
         OpenIMClient.getInstance().signalingManager.setSignalingListener(new OnSignalingListener() {
             @Override
             public void onInvitationCancelled(SignalingInfo s) {
@@ -164,6 +163,13 @@ public class IMEvent {
             public void onReceiveCustomSignal(CustomSignalingInfo s) {
                 for (OnSignalingListener signalingListener : signalingListeners) {
                     signalingListener.onReceiveCustomSignal(s);
+                }
+            }
+
+            @Override
+            public void onStreamChange(String s) {
+                for (OnSignalingListener signalingListener : signalingListeners) {
+                    signalingListener.onStreamChange(s);
                 }
             }
         });

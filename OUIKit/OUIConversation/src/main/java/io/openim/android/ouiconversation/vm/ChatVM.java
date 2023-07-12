@@ -508,6 +508,11 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     }
 
+    @Override
+    public void onStreamChange(String s) {
+
+    }
+
     public String getRoomCallingInfoRoomID() {
         String roomID = "";
         try {
@@ -618,6 +623,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
      * @param msgList 为null 清除里列表小红点
      */
     public void markRead(@Nullable Message... msgList) {
+        if (TextUtils.isEmpty(conversationID))return;
         List<String> msgIDs = new ArrayList<>();
         if (null != msgList) {
             for (Message msg : msgList) {
@@ -771,7 +777,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
         } catch (Exception ignored) {
         }
-        if (!megs.isEmpty()) markRead(megs.toArray(new Message[0]));
+        if (!megs.isEmpty())
+            markRead(megs.toArray(new Message[0]));
 
     }
 

@@ -203,6 +203,11 @@ public class CallingServiceImp implements CallingService {
 
     }
 
+    @Override
+    public void onStreamChange(String s) {
+
+    }
+
 
     private void insetDB() {
         if (callDialog.callingVM.isGroup) return;

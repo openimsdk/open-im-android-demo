@@ -84,46 +84,42 @@
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
+
             <LinearLayout
                 android:id="@+id/headTips"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_below="@id/zoomOut"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="35dp"
-                android:orientation="horizontal"
-                android:visibility="visible">
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="50dp"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <io.openim.android.ouicore.widget.AvatarImage
                     android:id="@+id/avatar"
                     android:layout_width="78dp"
                     android:layout_height="78dp"
-                    android:src="@mipmap/ic_my_friend" />
+                    android:layout_marginBottom="10dp"
+                    android:background="@mipmap/ic_my_friend" />
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="25dp"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="10dp"
+                    android:textColor="#ffffffff"
+                    android:textSize="32sp" />
 
-                    <TextView
-                        android:id="@+id/name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="5dp"
-                        android:textColor="#ffffffff"
-                        android:textSize="32sp" />
-
-                    <TextView
-                        android:id="@+id/callingTips"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/Invite_a_video_call"
-                        android:textColor="#ffffffff"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
+                <TextView
+                    android:id="@+id/callingTips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Invite_a_video_call"
+                    android:textColor="#ffffffff"
+                    android:textSize="14sp" />
             </LinearLayout>
+
 
             <LinearLayout
                 android:id="@+id/audioCall"

@@ -170,9 +170,6 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
             MThreadTool.executorService.execute(() -> {
                 for (String path : paths) {
                     PutArgs putArgs = new PutArgs(path);
-                    putArgs.putID =
-                        BaseApp.inst().loginCertificate.userID
-                            + "_" + System.currentTimeMillis();
                     OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                         @Override
                         public void onError(int code, String error) {
