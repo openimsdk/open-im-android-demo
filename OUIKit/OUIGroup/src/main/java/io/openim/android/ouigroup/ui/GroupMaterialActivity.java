@@ -43,7 +43,6 @@ import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouigroup.ui.v3.GroupManageActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.GroupVerification;
-import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.listener.OnPutFileListener;
 import io.openim.android.sdk.models.ConversationInfo;
