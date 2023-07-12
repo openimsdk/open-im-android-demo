@@ -13,6 +13,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
@@ -85,7 +86,6 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.ForwardVM;
@@ -94,13 +94,13 @@ import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.voice.listener.PlayerListener;
 import io.openim.android.ouicore.voice.player.SMediaPlayer;
 import io.openim.android.ouicore.widget.AvatarImage;
-import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.CardElem;
 import io.openim.android.sdk.models.MergeElem;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.QuoteElem;
+import io.openim.android.sdk.models.TextElem;
 import io.openim.android.sdk.models.VideoElem;
 
 public class MessageViewHolder {
@@ -132,7 +132,7 @@ public class MessageViewHolder {
         protected MessageAdapter messageAdapter;
 
         private PopupWindow popupWindow;
-        private Message message;
+        protected Message message;
         private RecyclerViewAdapter adapter;
         protected ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
 
@@ -228,7 +228,7 @@ public class MessageViewHolder {
         private void hSendState() {
             if (isOwn) {
                 SendStateView sendStateView = itemView.findViewById(R.id.sendState2);
-                if(null==sendStateView)return;
+                if (null == sendStateView) return;
                 sendStateView.setOnClickListener(v -> chatVM.sendMsg(message));
             }
         }
@@ -238,7 +238,7 @@ public class MessageViewHolder {
          */
         private void hMultipleChoice(MsgExpand msgExpand) {
             CheckBox checkBox = itemView.findViewById(R.id.choose);
-            if (null==checkBox)return;
+            if (null == checkBox) return;
             if (null != chatVM.enableMultipleSelect.getValue() && chatVM.enableMultipleSelect.getValue() && message.getContentType() != MessageType.NTF_BEGIN) {
                 checkBox.setVisibility(View.VISIBLE);
                 checkBox.setChecked(msgExpand.isChoice);
@@ -257,11 +257,11 @@ public class MessageViewHolder {
          */
         private void hUnRead() {
             TextView unRead = itemView.findViewById(R.id.unRead);
-            if (null==unRead)return;
+            if (null == unRead) return;
+            unRead.setVisibility(View.INVISIBLE);
             int viewType = message.getContentType();
-            unRead.setVisibility(View.GONE);
-            if (isOwn && message.getStatus() == Constant.Send_State.SEND_SUCCESS 
-                && viewType < MessageType.NTF_BEGIN 
+            if (isOwn && message.getStatus() == Constant.Send_State.SEND_SUCCESS
+                && viewType < MessageType.NTF_BEGIN
                 && viewType != Constant.MsgType.LOCAL_CALL_HISTORY) {
                 unRead.setVisibility(View.VISIBLE);
                 if (chatVM.isSingleChat) {
@@ -270,13 +270,13 @@ public class MessageViewHolder {
                     String readed =
                         String.format(chatVM.getContext().getString(io.openim.android.ouicore.R.string.readed), "");
                     unRead.setText(message.isRead() ? readed : unread);
-                    unRead.setTextColor(Color.parseColor(message.isRead() ? "#0089FF" : 
-                        "#ff5496eb"));
+                    unRead.setTextColor(unRead.getContext().getResources().getColor(message.isRead() ? io.openim.android.ouicore.R.color.txt_shallow : io.openim.android.ouicore.R.color.theme));
                 } else {
                     int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;
                     if (unreadCount > 0) {
                         unRead.setTextColor(Color.parseColor("#0089FF"));
-                        unRead.setText(unreadCount + chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
+                        unRead.setText(unreadCount +
+                            chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
                         unRead.setOnClickListener(v -> {
                             v.getContext().startActivity(new Intent(v.getContext(),
                                 MsgReadStatusActivity.class).putExtra(Constant.K_GROUP_ID,
@@ -330,14 +330,12 @@ public class MessageViewHolder {
                         isLongClick.set(false);
                         return;
                     }
-                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, message.getSendID())
-                        .withString(Constant.K_GROUP_ID, message.getGroupID()).navigation();
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, message.getSendID()).withString(Constant.K_GROUP_ID, message.getGroupID()).navigation();
                 });
             }
             if (null != avatarImage2) {
                 avatarImage2.load(message.getSenderFaceUrl(), message.getSenderNickname());
-                avatarImage2.setOnClickListener(v -> ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                    .withString(Constant.K_ID, message.getSendID()).withString(Constant.K_GROUP_ID, message.getGroupID()).navigation());
+                avatarImage2.setOnClickListener(v -> ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, message.getSendID()).withString(Constant.K_GROUP_ID, message.getGroupID()).navigation());
             }
         }
 
@@ -399,46 +397,46 @@ public class MessageViewHolder {
                     adapter =
                         new RecyclerViewAdapter<Object, InputExpandFragment.ExpandHolder>(InputExpandFragment.ExpandHolder.class) {
 
-                        @Override
-                        public void onBindView(@NonNull InputExpandFragment.ExpandHolder holder,
-                                               Object data, int position) {
-                            int iconRes = menuIcons.get(position);
-                            holder.v.menu.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
-                                v.getContext().getDrawable(iconRes), null, null);
-                            holder.v.menu.setText(menuTitles.get(position));
-                            holder.v.menu.setTextColor(Color.WHITE);
-                            holder.v.menu.setOnClickListener(v1 -> {
-                                popupWindow.dismiss();
-                                if (iconRes == R.mipmap.ic_reply) {
-                                    chatVM.replyMessage.setValue(message);
-                                }
-                                if (iconRes == R.mipmap.ic_c_copy) {
-                                    Common.copy(message.getTextElem().getContent());
-                                    chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
-                                }
-                                if (iconRes == R.mipmap.ic_withdraw) {
-                                    chatVM.revokeMessage(message);
-                                }
-                                if (iconRes == R.mipmap.ic_add_emoji) {
-                                    Easy.find(CustomEmojiVM.class).insertEmojiDb(message);
-                                }
-                                if (iconRes == R.mipmap.ic_delete) {
-                                    chatVM.deleteMessageFromLocalAndSvr(message);
-                                }
-                                if (iconRes == R.mipmap.ic_forward) {
-                                    Easy.find(ForwardVM.class).createForwardMessage(message);
+                            @Override
+                            public void onBindView(@NonNull InputExpandFragment.ExpandHolder holder,
+                                                   Object data, int position) {
+                                int iconRes = menuIcons.get(position);
+                                holder.v.menu.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
+                                    v.getContext().getDrawable(iconRes), null, null);
+                                holder.v.menu.setText(menuTitles.get(position));
+                                holder.v.menu.setTextColor(Color.WHITE);
+                                holder.v.menu.setOnClickListener(v1 -> {
+                                    popupWindow.dismiss();
+                                    if (iconRes == R.mipmap.ic_reply) {
+                                        chatVM.replyMessage.setValue(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_c_copy) {
+                                        Common.copy(message.getTextElem().getContent());
+                                        chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
+                                    }
+                                    if (iconRes == R.mipmap.ic_withdraw) {
+                                        chatVM.revokeMessage(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_add_emoji) {
+                                        Easy.find(CustomEmojiVM.class).insertEmojiDb(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_delete) {
+                                        chatVM.deleteMessageFromLocalAndSvr(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_forward) {
+                                        Easy.find(ForwardVM.class).createForwardMessage(message);
 
-                                    Easy.installVM(MultipleChoiceVM.class);
-                                    ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
-                                }
-                                if (iconRes == R.mipmap.ic_multiple_choice) {
-                                    chatVM.enableMultipleSelect.setValue(true);
-                                    ((MsgExpand) message.getExt()).isChoice = true;
-                                    messageAdapter.notifyDataSetChanged();
-                                }
-                            });
-                        }
-                    };
+                                        Easy.installVM(MultipleChoiceVM.class);
+                                        ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
+                                    }
+                                    if (iconRes == R.mipmap.ic_multiple_choice) {
+                                        chatVM.enableMultipleSelect.setValue(true);
+                                        ((MsgExpand) message.getExt()).isChoice = true;
+                                        messageAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                        };
                     view1.recyclerview.setAdapter(adapter);
                 }
                 if (message.getContentType() == MessageType.TEXT) {
@@ -574,11 +572,14 @@ public class MessageViewHolder {
         @Override
         public void bindData(Message message, int position) {
             boolean onlyOne = messageAdapter.messages.size() == 1;
+            itemView.findViewById(R.id.unRead).setVisibility(View.GONE);
             TextView textView = itemView.findViewById(R.id.notice);
             textView.setVisibility(View.VISIBLE);
             View root = itemView.findViewById(R.id.root);
             root.setPadding(0, onlyOne ? Common.dp2px(10) : 0, 0, 0);
-            textView.setText(((MsgExpand) message.getExt()).tips);
+
+            MsgExpand msgExpand = (MsgExpand) message.getExt();
+            textView.setText(msgExpand.tips);
             textView.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
@@ -836,8 +837,8 @@ public class MessageViewHolder {
             view.content2.setOnClickListener(v -> clickPlay(message, view.lottieView2));
         }
 
-        private void markRead(Message message, boolean isPrivateChat) {
-            if (isPrivateChat && !isOwn) chatVM.markReaded(message);
+        private void markRead(Message message) {
+            if (!isOwn) chatVM.markRead(message);
         }
 
         private void clickPlay(Message message, LottieAnimationView lottieView) {
@@ -861,7 +862,6 @@ public class MessageViewHolder {
                     @Override
                     public void onCompletion(SMediaPlayer mediaPlayer) {
                         mediaPlayer.stop();
-                        markRead(message, chatVM.conversationInfo.getValue().isPrivateChat());
                     }
 
                     @Override
@@ -875,12 +875,11 @@ public class MessageViewHolder {
             SPlayer.instance().getMediaPlayer().setOnPlayStateListener(new SMediaPlayer.OnPlayStateListener() {
                 @Override
                 public void started() {
-                    markRead(message, !chatVM.conversationInfo.getValue().isPrivateChat());
+                    markRead(message);
 
                     playingMessage = message;
                     lottieView.playAnimation();
                 }
-
 
                 @Override
                 public void paused() {

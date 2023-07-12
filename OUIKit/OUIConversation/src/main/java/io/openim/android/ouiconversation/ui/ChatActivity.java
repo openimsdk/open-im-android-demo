@@ -42,6 +42,8 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.ISubscribe;
+import io.openim.android.ouicore.base.vm.Subject;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
@@ -193,6 +195,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.recyclerView.setItemAnimator(new CustomItemAnimator());
         view.recyclerView.setLayoutManager(linearLayoutManager);
         view.recyclerView.addItemDecoration(new DefaultItemDecoration(this.getResources().getColor(android.R.color.transparent), 1, Common.dp2px(16)));
+        view.recyclerView.setItemAnimator(null);
         messageAdapter = new MessageAdapter();
         messageAdapter.bindRecyclerView(view.recyclerView);
 
@@ -421,6 +424,14 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                         String.format(getString(io.openim.android.ouicore.R.string.s_person_audio_calling), roomCallingInfo.getParticipant().size());
                 view.callingUserNum.setText(tips);
             } catch (Exception ignored) {
+            }
+        });
+
+        vm.subscribe(this, subject -> {
+            if (subject.equals(ChatVM.REEDIT_MSG)){
+                view.layoutInputCote.chatInput.requestFocus();
+                view.layoutInputCote.chatInput.setText((String) subject.value);
+                Common.pushKeyboard(this);
             }
         });
     }

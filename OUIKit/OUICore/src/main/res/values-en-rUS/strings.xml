@@ -380,4 +380,7 @@
     <string name="edit_group_name">%1$s 修改了群名称</string>
     <string name="view_all_member">查看全部群成员(%1$d)</string>
     <string name="group_manage">群管理</string>
+    <string name="re_edit">重新编辑</string>
+    <string name="clear_msg_sure">确定清空消息？</string>
+    <string name="tal_num_photo">共%1$d张</string>
 </resources>

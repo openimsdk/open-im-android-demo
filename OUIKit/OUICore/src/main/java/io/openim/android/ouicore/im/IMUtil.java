@@ -225,13 +225,12 @@ public class IMUtil {
         Context ctx = BaseApp.inst();
         switch (msg.getContentType()) {
             case MessageType.REVOKE_MESSAGE_NTF: {
-                L.e("-------REVOKE_MESSAGE_NTF--------" + detail);
                 RevokedInfo revokedInfo = GsonHel.fromJson(detail, RevokedInfo.class);
                 //a 撤回了一条消息
                 String txt = String.format(ctx.getString(R.string.revoke_tips),
                     revokedInfo.getRevokerNickname());
-
-                tips = getSingleSequence(msg.getGroupID(), revokedInfo.getRevokerNickname(),
+                tips = getSingleSequence(msg.getGroupID(),
+                    revokedInfo.getRevokerNickname(),
                     revokedInfo.getRevokerID(), txt);
                 break;
             }
@@ -449,8 +448,7 @@ public class IMUtil {
             }
             case MessageType.GROUP_ANNOUNCEMENT_NTF:
                 msgExpand.notificationMsg =
-                    GsonHel.fromJson(msg.getNotificationElem().getDetail(),
-                        NotificationMsg.class);
+                    GsonHel.fromJson(msg.getNotificationElem().getDetail(), NotificationMsg.class);
                 break;
 
             //单聊-------
@@ -535,12 +533,12 @@ public class IMUtil {
         }
         msgExpand.sequence = spannableString;
     }
-    public static CharSequence buildClickAndColorSpannable(@NotNull SpannableStringBuilder spannableString,
-                                                           String tag, ClickableSpan clickableSpan){
-        return  buildClickAndColorSpannable(spannableString,tag,R.color.theme,clickableSpan);
+
+    public static CharSequence buildClickAndColorSpannable(@NotNull SpannableStringBuilder spannableString, String tag, ClickableSpan clickableSpan) {
+        return buildClickAndColorSpannable(spannableString, tag, R.color.theme, clickableSpan);
     }
-    public static CharSequence buildClickAndColorSpannable(@NotNull SpannableStringBuilder spannableString,
-                                                           String tag, @ColorRes int colorId , ClickableSpan clickableSpan) {
+
+    public static CharSequence buildClickAndColorSpannable(@NotNull SpannableStringBuilder spannableString, String tag, @ColorRes int colorId, ClickableSpan clickableSpan) {
         ForegroundColorSpan colorSpan =
             new ForegroundColorSpan(BaseApp.inst().getResources().getColor(colorId));
         int start = spannableString.toString().indexOf(tag);
@@ -564,8 +562,17 @@ public class IMUtil {
         try {
             switch (msg.getContentType()) {
                 default:
-                    if (null != msgExpand.tips)
-                        lastMsg = msgExpand.tips;
+                    break;
+                case MessageType.FRIEND_APPLICATION_APPROVED_NTF:
+                    lastMsg =
+                        new SpannableStringBuilder(BaseApp.inst().getString(R.string.start_chat_tips));
+                    break;
+                case MessageType.REVOKE_MESSAGE_NTF:
+                    //撤回
+                    String detail = msg.getNotificationElem().getDetail();
+                    RevokedInfo revokedInfo = GsonHel.fromJson(detail, RevokedInfo.class);
+                    lastMsg = String.format(BaseApp.inst().getString(R.string.revoke_tips),
+                        revokedInfo.getRevokerNickname());
                     break;
                 case MessageType.TEXT:
                     lastMsg = msg.getTextElem().getContent();
@@ -613,11 +620,11 @@ public class IMUtil {
                     break;
                 case MessageType.GROUP_ANNOUNCEMENT_NTF:
                     String target =
-                        "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.group_bulletin) +
-                            "]";
-                        lastMsg = target + msgExpand.notificationMsg.group.notification;
-                    lastMsg=IMUtil.buildClickAndColorSpannable( new SpannableStringBuilder(lastMsg),
-                        target, android.R.color.holo_red_dark,null);
+                        "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.group_bulletin) + "]";
+                    lastMsg = target + msgExpand.notificationMsg.group.notification;
+                    lastMsg =
+                        IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(lastMsg),
+                            target, android.R.color.holo_red_dark, null);
                     break;
                 case Constant.MsgType.LOCAL_CALL_HISTORY:
                     boolean isAudio = msgExpand.callHistory.getType().equals("audio");

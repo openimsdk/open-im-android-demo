@@ -190,7 +190,9 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                     compatActivity.finish();
                     overridePendingTransition(0, 0);
                 }
-                runOnUiThread(() -> ARouter.getInstance().build(Routes.Conversation.CHAT).withString(Constant.K_ID, vm.searchContent.getValue()).withString(Constant.K_NAME, vm.userInfo.getValue().get(0).getNickname()).navigation());
+                runOnUiThread(() -> ARouter.getInstance().build(Routes.Conversation.CHAT)
+                    .withString(Constant.K_ID, vm.searchContent.getValue())
+                    .withString(Constant.K_NAME, vm.userInfo.getValue().get(0).getNickname()).navigation());
             }
             setResult(RESULT_OK);
             finish();

@@ -54,9 +54,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:layout_marginTop="4dp"
-                android:layout_marginRight="@dimen/avatar_size"
+                android:layout_marginEnd="@dimen/avatar_size"
                 android:textColor="#ff5496eb"
-                android:visibility="gone"
+                android:visibility="invisible"
                 android:textSize="10sp" />
         </LinearLayout>
     </LinearLayout>

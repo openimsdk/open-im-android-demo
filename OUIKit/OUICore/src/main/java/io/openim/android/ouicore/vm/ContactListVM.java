@@ -204,11 +204,6 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
     }
 
     @Override
-    public void onRecvMessageRevoked(String msgId) {
-
-    }
-
-    @Override
     public void onRecvMessageRevokedV2(RevokedInfo info) {
 
     }

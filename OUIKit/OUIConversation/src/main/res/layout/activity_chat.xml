@@ -159,19 +159,21 @@
                 app:water_mark_textBold="false"
                 app:water_mark_textSize="20sp" />
 
-           <LinearLayout
-               android:layout_width="match_parent"
-               android:orientation="vertical"
-               android:layout_height="match_parent">
-               <include layout="@layout/view_dividing_line"/>
-               <androidx.recyclerview.widget.RecyclerView
-                   android:id="@+id/recyclerView"
-                   android:layout_width="match_parent"
-                   android:layout_height="match_parent"
-                   android:overScrollMode="never"
-                   android:paddingLeft="22dp"
-                   android:paddingRight="22dp" />
-           </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <include layout="@layout/view_dividing_line" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:overScrollMode="never"
+                    android:paddingLeft="22dp"
+                    android:paddingRight="22dp" />
+            </LinearLayout>
         </FrameLayout>
 
 
@@ -313,9 +315,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/theme_bg"
-                android:orientation="horizontal"
                 android:gravity="center"
-                >
+                android:orientation="horizontal">
 
                 <CheckBox
                     android:id="@+id/delete"

@@ -43,12 +43,18 @@ public class BaseVM extends ViewModel {
     }
 
     public void subscribe(LifecycleOwner owner, ISubscribe subscribe) {
-        if (null == owner) channel.observeForever(subscribe::onSubject);
-        else channel.observe(owner, subscribe::onSubject);
+        if (null == owner)
+            channel.observeForever(subscribe::onSubject);
+        else
+            channel.observe(owner, subscribe::onSubject);
     }
 
     public void unSubscribe(ISubscribe subscribe) {
         channel.removeObserver(subscribe::onSubject);
+    }
+
+    protected  String tag(){
+        return getClass().getSimpleName();
     }
 
 }

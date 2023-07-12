@@ -9,12 +9,12 @@ import io.openim.android.sdk.models.Message;
 
 //解析最后的消息
 public class MsgConversation {
-    public Message lastMsg;
+    public CharSequence lastMsg;
     public ConversationInfo conversationInfo;
     public NotificationMsg notificationMsg;
 
     public MsgConversation(Message lastMsg, ConversationInfo conversationInfo) {
-        this.lastMsg = IMUtil.buildExpandInfo(lastMsg);
+        this.lastMsg = IMUtil.getMsgParse(lastMsg);
         this.conversationInfo = conversationInfo;
 
         try {

@@ -5,6 +5,11 @@ import android.app.Application;
 import android.os.Bundle;
 import android.util.SparseArray;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.ProcessLifecycleOwner;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +23,7 @@ public class BaseApp extends Application {
 
     private static BaseApp instance;
     public Realm realm;
-    private int mActivityCount;
+    private boolean isAppBackground;
 
     public static BaseApp inst() {
         return instance;
@@ -65,47 +70,25 @@ public class BaseApp extends Application {
         super.onCreate();
         instance = this;
         realmInit();
-//        activityLifecycleCallback();
+        activityLifecycleCallback();
     }
 
     private void activityLifecycleCallback() {
-        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+        ProcessLifecycleOwner.get().getLifecycle().addObserver(new DefaultLifecycleObserver() {
             @Override
-            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+            public void onResume(@NonNull LifecycleOwner owner) {
+                isAppBackground = false;
             }
 
             @Override
-            public void onActivityStarted(Activity activity) {
-                mActivityCount++;
-                L.e("---------mActivityCount ++-----------"+mActivityCount);
-            }
-
-            @Override
-            public void onActivityResumed(Activity activity) {
-            }
-
-            @Override
-            public void onActivityPaused(Activity activity) {
-            }
-
-            @Override
-            public void onActivityStopped(Activity activity) {
-                mActivityCount--;
-                L.e("---------mActivityCount-----------"+mActivityCount);
-            }
-
-            @Override
-            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-            }
-
-            @Override
-            public void onActivityDestroyed(Activity activity) {
+            public void onStop(@NonNull LifecycleOwner owner) {
+                isAppBackground = true;
             }
         });
     }
 
     public boolean isBackground() {
-        return mActivityCount == 0;
+        return isAppBackground;
     }
 
 

@@ -68,6 +68,9 @@ public class BottomInputCote {
     public BottomInputCote(Context context, LayoutInputCoteBinding view) {
         this.context = context;
         this.view = view;
+
+        view.root.setIntercept(false);
+
         initFragment();
         Common.UIHandler.postDelayed(() -> hasMicrophone = AndPermission.hasPermissions(context,
             Permission.Group.MICROPHONE), 300);
@@ -197,6 +200,7 @@ public class BottomInputCote {
                 setSendButton(isSend);
             }
         });
+
     }
 
     private void showingViewChange() {
