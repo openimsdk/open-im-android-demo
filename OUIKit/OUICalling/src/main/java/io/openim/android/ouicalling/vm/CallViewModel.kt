@@ -209,7 +209,8 @@ class CallViewModel(
     override fun onCleared() {
         super.onCleared()
         room.disconnect()
-
+        scopes.forEach { it.cancel() }
+        scopes.clear()
     }
 
     fun setMicEnabled(enabled: Boolean) {
@@ -240,6 +241,7 @@ class CallViewModel(
     fun getActiveSpeakersFlow(): StateFlow<List<Participant>> {
         return room::activeSpeakers.flow
     }
+
     fun dismissError() {
         mutableError.value = null
     }

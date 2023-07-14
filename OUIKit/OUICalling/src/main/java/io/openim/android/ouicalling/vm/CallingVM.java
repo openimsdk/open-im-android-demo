@@ -156,49 +156,36 @@ public class CallingVM {
                         localVideoTrack.addRenderer(localSpeakerVideoView);
                     }
                 }
-
-                callViewModel.getParticipants().collect((participants, continuation) -> {
-                    if (participants.isEmpty()) return null;
-
+                callViewModel.subscribe(callViewModel.getParticipants(), (v) -> {
+                    if (v.isEmpty()) return null;
                     if (null != onParticipantsChangeListener) {
-                        Common.UIHandler.post(() -> onParticipantsChangeListener.onChange(participants));
+                        onParticipantsChangeListener.onChange(v);
                     } else {
-                        for (int i = 0; i < participants.size(); i++) {
-                            Participant participant = participants.get(i);
+                        for (int i = 0; i < v.size(); i++) {
+                            Participant participant = v.get(i);
                             if (participant instanceof RemoteParticipant) {
                                 for (TextureViewRenderer remoteSpeakerVideoView :
-                                    remoteSpeakerVideoViews) {
+                                        remoteSpeakerVideoViews) {
                                     callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoView,
-                                        participant, new Continuation<Unit>() {
-                                            @NonNull
-                                            @Override
-                                            public CoroutineContext getContext() {
-                                                return EmptyCoroutineContext.INSTANCE;
-                                            }
+                                            participant, new Continuation<Unit>() {
+                                                @NonNull
+                                                @Override
+                                                public CoroutineContext getContext() {
+                                                    return EmptyCoroutineContext.INSTANCE;
+                                                }
 
-                                            @Override
-                                            public void resumeWith(@NonNull Object o) {
+                                                @Override
+                                                public void resumeWith(@NonNull Object o) {
 
-                                            }
-                                        });
+                                                }
+                                            });
                                 }
                             }
                         }
                     }
 
                     return null;
-                }, new Continuation<Unit>() {
-                    @NonNull
-                    @Override
-                    public CoroutineContext getContext() {
-                        return EmptyCoroutineContext.INSTANCE;
-                    }
-
-                    @Override
-                    public void resumeWith(@NonNull Object o) {
-
-                    }
-                });
+                },callViewModel.buildScope());
             }
         });
     }
