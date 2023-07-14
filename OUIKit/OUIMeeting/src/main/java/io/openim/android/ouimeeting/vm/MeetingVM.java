@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -310,8 +311,6 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     }
 
     public void inviterUser(String id, String groupId) {
-        MeetingInfoAttach meetingInfoAttach = new MeetingInfoAttach();
-        meetingInfoAttach.customType = Constant.MsgType.CUSTOMIZE_MEETING;
         io.openim.android.ouicore.entity.MeetingInfo meetingInfo =
             new io.openim.android.ouicore.entity.MeetingInfo();
         try {
@@ -331,12 +330,16 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
             meetingInfo.start = selectMeetingInfo.getStartTime();
             meetingInfo.duration =
                 (int) (selectMeetingInfo.getEndTime() - selectMeetingInfo.getStartTime());
-            meetingInfoAttach.data = meetingInfo;
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        HashMap<String,Object> map=new HashMap<>();
+        map.put(Constant.K_CUSTOM_TYPE, Constant.MsgType.CUSTOMIZE_MEETING);
+        map.put(Constant.K_RESULT, meetingInfo);
+
         Message msg =
-            OpenIMClient.getInstance().messageManager.createCustomMessage(GsonHel.toJson(meetingInfoAttach), null, null);
+            OpenIMClient.getInstance().messageManager.createCustomMessage(GsonHel.toJson(map), null, null);
         OfflinePushInfo offlinePushInfo = new OfflinePushInfo(); // 离线推送的消息备注；不为null
         OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
             @Override

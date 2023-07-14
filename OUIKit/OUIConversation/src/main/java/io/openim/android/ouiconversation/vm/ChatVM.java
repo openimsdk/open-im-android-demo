@@ -56,6 +56,7 @@ import io.openim.android.sdk.OpenIMClient;
 
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.GroupType;
+import io.openim.android.sdk.enums.MessageStatus;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
@@ -155,18 +156,12 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     private void signalingGetRoomByGroupID() {
-        //TODO
-//        OpenIMClient.getInstance().signalingManager.signalingGetRoomByGroupID(new
-//        OnBase<RoomCallingInfo>() {
-//            @Override
-//            public void onError(int code, String error) {
-//            }
-//
-//            @Override
-//            public void onSuccess(RoomCallingInfo data) {
-//                roomCallingInfo.setValue(data);
-//            }
-//        }, groupID);
+        OpenIMClient.getInstance().signalingManager.signalingGetRoomByGroupID(new IMUtil.IMCallBack<RoomCallingInfo>(){
+            @Override
+            public void onSuccess(RoomCallingInfo data) {
+                roomCallingInfo.setValue(data);
+            }
+        }, groupID);
     }
 
     public void signalingGetTokenByRoomID(String roomID) {
@@ -179,7 +174,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             @Override
             public void onSuccess(RoomCallingInfo data) {
                 if (null == data.getInvitation()) {
-                    getIView().toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.not_err));
+                    getIView().toast(BaseApp.inst()
+                        .getString(io.openim.android.ouicore.R.string.not_err));
                     return;
                 }
                 SignalingInfo signalingInfo = new SignalingInfo();
@@ -935,7 +931,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
 
     public void sendMsg(Message msg) {
-        msg.setStatus(Constant.Send_State.SENDING);
+        msg.setStatus(MessageStatus.SENDING);
         if (messages.getValue().contains(msg)) {
             messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
         } else {
@@ -953,7 +949,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     if (code != 302) getIView().toast(error + code);
                     UIHandler.postDelayed(() -> {
                         msg.setExt(ext);
-                        msg.setStatus(Constant.Send_State.SEND_FAILED);
+                        msg.setStatus(MessageStatus.FAILED);
                         ext.sendProgress = 0;
                         messageAdapter.notifyItemChanged(messages.getValue().indexOf(msg));
                     }, 500);

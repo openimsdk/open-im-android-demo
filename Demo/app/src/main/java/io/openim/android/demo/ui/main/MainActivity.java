@@ -2,9 +2,11 @@ package io.openim.android.demo.ui.main;
 
 
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
@@ -33,6 +35,7 @@ import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.MomentsBridge;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import q.rorbin.badgeview.QBadgeView;
 
@@ -71,8 +74,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     }
 
     private void listener() {
-        vm.totalUnreadMsgCount.observe(this, v ->
-            Common.buildBadgeView(this, view.men1, v));
+        vm.totalUnreadMsgCount.observe(this, v -> Common.buildBadgeView(this, view.men1, v));
     }
 
 
@@ -88,26 +90,26 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
                 View.VISIBLE : View.GONE);
         });
     }
-
-    private final RadioGroup.OnCheckedChangeListener changeListener = (group, checkedId) -> {
-        if (checkedId == R.id.men1) switchFragment(conversationListFragment);
-        if (checkedId == R.id.men2) switchFragment(contactFragment);
-        if (checkedId == R.id.men3) switchFragment(appletFragment);
-        if (checkedId == R.id.men4) switchFragment(personalFragment);
-        for (int i = 0; i < group.getChildCount(); i++) {
-            View view = group.getChildAt(i);
-            if (view instanceof RadioButton) {
-                ((RadioButton) view)
-                    .setChecked(view.getId() == checkedId);
+    View.OnClickListener clickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            RadioButton[] menus = new RadioButton[]{view.men1, view.men2, view.men3, view.men4};
+            if (v == view.men1) switchFragment(conversationListFragment);
+            if (v == view.men2) switchFragment(contactFragment);
+            if (v == view.men3) switchFragment(appletFragment);
+            if (v == view.men4) switchFragment(personalFragment);
+            for (RadioButton menu : menus) {
+                menu.setChecked(menu == v);
             }
         }
     };
 
+
     private void click() {
-        view.men1.setOnClickListener(v -> changeListener.onCheckedChanged(view.menuGroup, v.getId()));
-        view.men2.setOnClickListener(v -> changeListener.onCheckedChanged(view.menuGroup, v.getId()));
-        view.men3.setOnClickListener(v -> changeListener.onCheckedChanged(view.menuGroup, v.getId()));
-        view.men4.setOnClickListener(v -> changeListener.onCheckedChanged(view.menuGroup, v.getId()));
+        view.men1.setOnClickListener(clickListener);
+        view.men2.setOnClickListener(clickListener);
+        view.men3.setOnClickListener(clickListener);
+        view.men4.setOnClickListener(clickListener);
     }
 
 

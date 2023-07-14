@@ -12,31 +12,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.CompoundButton;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.lifecycle.Observer;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import io.livekit.android.renderer.TextureViewRenderer;
 import io.openim.android.ouicalling.databinding.DialogCallBinding;
 import io.openim.android.ouicalling.vm.CallingVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseDialog;
-import io.openim.android.ouicore.entity.CallHistory;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerListener;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.Obs;
@@ -118,9 +112,16 @@ public class CallDialog extends BaseDialog {
         view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
         getWindow().setDimAmount(isShrink ? 0f : 1f);
         view.shrink.setVisibility(isShrink ? View.VISIBLE : View.GONE);
-        view.sTips.setText(callingVM.isCallOut ?
-            context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
-            context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
+
+        view.waiting.setVisibility(callingVM.isVideoCalls
+            ? View.GONE : View.VISIBLE);
+        if (callingVM.isStartCall &&!callingVM.isVideoCalls){
+            view.sTips.setText(io.openim.android.ouicore.R.string.calling);
+        }else {
+            view.sTips.setText(callingVM.isCallOut ?
+                context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
+                context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
+        }
         WindowManager.LayoutParams params = getWindow().getAttributes();
         params.height = isShrink ? ViewGroup.LayoutParams.WRAP_CONTENT :
             ViewGroup.LayoutParams.MATCH_PARENT;
@@ -128,6 +129,8 @@ public class CallDialog extends BaseDialog {
             ViewGroup.LayoutParams.MATCH_PARENT;
         params.gravity = isShrink ? (Gravity.TOP | Gravity.END) : Gravity.CENTER;
         getWindow().setAttributes(params);
+
+
     }
 
     public void bindData(SignalingInfo signalingInfo) {
@@ -233,8 +236,8 @@ public class CallDialog extends BaseDialog {
         view.hangUp.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                callingVM.renewalDB(signalingInfo.getInvitation().getRoomID(),
-                    callHistory -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
+                callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(),
+                    (realm, callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
 
                 callingVM.signalingHungUp(signalingInfo);
             }
@@ -258,12 +261,7 @@ public class CallDialog extends BaseDialog {
                     public void onSuccess(Object data) {
                         changeView();
 
-                        BaseApp.inst().realm.executeTransactionAsync(realm -> {
-                            CallHistory callHistory = realm.where(CallHistory.class).equalTo(
-                                "roomID", signalingInfo.getInvitation().getRoomID()).findFirst();
-                            if (null == callHistory) return;
-                            callHistory.setSuccess(true);
-                        });
+                        callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(),(realm, v)-> v.setSuccess(true));
                     }
                 });
             }
@@ -281,7 +279,6 @@ public class CallDialog extends BaseDialog {
         view.headTips.setVisibility(View.GONE);
         view.ask.setVisibility(View.GONE);
         view.callingMenu.setVisibility(View.VISIBLE);
-        view.waiting.setVisibility(View.GONE);
     }
 
 
@@ -294,11 +291,13 @@ public class CallDialog extends BaseDialog {
     public void playRingtone() {
         try {
             Common.wakeUp(context);
+//           Ringtone铃声
             AssetFileDescriptor assetFileDescriptor = BaseApp.inst().getAssets().openFd(
                 "incoming_call_ring.mp3");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), assetFileDescriptor);
             }
+            MediaPlayerUtil.INSTANCE.prepare();
             MediaPlayerUtil.INSTANCE.setMediaListener(new MediaPlayerListener() {
                 @Override
                 public void finish() {
@@ -317,7 +316,7 @@ public class CallDialog extends BaseDialog {
             });
             MediaPlayerUtil.INSTANCE.playMedia();
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -341,34 +340,33 @@ public class CallDialog extends BaseDialog {
 
     private void insertChatHistory() {
         boolean isGroup = callingVM.isGroup;
-        if (!isShowing() || isGroup || (null != signalingInfo && TextUtils.isEmpty(signalingInfo.getInvitation().getRoomID())))
+        if (!isShowing()
+            || isGroup
+            || (null != signalingInfo
+            && TextUtils.isEmpty(signalingInfo.getInvitation().getCustomData())))
             return;
-        String roomID = signalingInfo.getInvitation().getRoomID();
+        String id = signalingInfo.getInvitation().getCustomData();
         String senderID = isGroup ? BaseApp.inst().loginCertificate.userID :
             signalingInfo.getInvitation().getInviterUserID();
         String receiver = signalingInfo.getInvitation().getInviteeUserIDList().get(0);
 
-        BaseApp.inst().realm.executeTransactionAsync(realm -> {
-            CallHistory callHistory =
-                realm.where(CallHistory.class).equalTo("roomID", roomID).findFirst();
-            if (null == callHistory) return;
+        callingVM.renewalDB(id, (realm, callHistory) -> {
             callHistory = realm.copyFromRealm(callHistory);
-            String data = GsonHel.toJson(callHistory);
+
+            HashMap<String, Object> map = new HashMap<>();
+            map.put(Constant.K_CUSTOM_TYPE, Constant.MsgType.LOCAL_CALL_HISTORY);
+            map.put(Constant.K_RESULT, callHistory);
+
+            String data = GsonHel.toJson(map);
             Message message = OpenIMClient.getInstance().messageManager.createCustomMessage(data,
                 "", "");
-            OnBase<String> callBack = new OnBase<String>() {
-                @Override
-                public void onError(int code, String error) {
-                    L.e("");
-                }
 
+            OpenIMClient.getInstance().messageManager.insertSingleMessageToLocalStorage(new IMUtil.IMCallBack<String>() {
                 @Override
                 public void onSuccess(String data) {
                     Obs.newMessage(Constant.Event.INSERT_MSG);
                 }
-            };
-            OpenIMClient.getInstance().messageManager.insertSingleMessageToLocalStorage(callBack,
-                message, receiver, senderID);
+            }, message, receiver, senderID);
         });
     }
 
@@ -378,9 +376,6 @@ public class CallDialog extends BaseDialog {
         view.headTips.setVisibility(View.GONE);
         MediaPlayerUtil.INSTANCE.pause();
         MediaPlayerUtil.INSTANCE.release();
-        view.sTips.setText(io.openim.android.ouicore.R.string.calling);
-        if (callingVM.isVideoCalls)
-            view.waiting.setVisibility(View.GONE);
     }
 
 }

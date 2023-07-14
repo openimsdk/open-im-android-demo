@@ -285,10 +285,9 @@
         <RelativeLayout
             android:id="@+id/shrink"
             android:layout_width="107dp"
-            android:layout_height="197dp"
+            android:layout_height="180dp"
             android:layout_marginTop="48dp"
             android:layout_marginRight="13dp"
-            android:alpha="0.8"
             android:background="@drawable/sty_radius_6_000000"
             android:clipToPadding="true"
             android:fitsSystemWindows="true"
@@ -320,7 +319,6 @@
                     android:id="@+id/sTips"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="等待接通"
                     android:textColor="#ffffffff"
                     android:textSize="12sp" />
             </LinearLayout>

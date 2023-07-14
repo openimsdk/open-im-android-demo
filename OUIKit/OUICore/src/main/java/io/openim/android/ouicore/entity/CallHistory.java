@@ -5,7 +5,7 @@ import io.realm.annotations.PrimaryKey;
 
 public class CallHistory extends RealmObject {
     @PrimaryKey
-    private String roomID;
+    private String id;
     private String userID;
     private String nickname;
     private String faceURL;
@@ -21,8 +21,8 @@ public class CallHistory extends RealmObject {
     public CallHistory() {
     }
 
-    public CallHistory(String roomID, String userID, String nickname, String faceURL, String type, boolean success, int failedState, boolean incomingCall, long date, int duration) {
-        this.roomID = roomID;
+    public CallHistory(String id, String userID, String nickname, String faceURL, String type, boolean success, int failedState, boolean incomingCall, long date, int duration) {
+        this.id = id;
         this.userID = userID;
         this.nickname = nickname;
         this.faceURL = faceURL;
@@ -46,12 +46,12 @@ public class CallHistory extends RealmObject {
         this.failedState = failedState;
     }
 
-    public String getRoomID() {
-        return roomID;
+    public String getId() {
+        return id;
     }
 
-    public void setRoomID(String roomID) {
-        this.roomID = roomID;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getUserID() {

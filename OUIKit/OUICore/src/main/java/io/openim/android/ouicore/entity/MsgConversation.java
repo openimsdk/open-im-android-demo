@@ -1,5 +1,9 @@
 package io.openim.android.ouicore.entity;
 
+import androidx.annotation.Nullable;
+
+import java.util.Objects;
+
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
@@ -14,6 +18,7 @@ public class MsgConversation {
     public NotificationMsg notificationMsg;
 
     public MsgConversation(Message lastMsg, ConversationInfo conversationInfo) {
+        IMUtil.buildExpandInfo(lastMsg);
         this.lastMsg = IMUtil.getMsgParse(lastMsg);
         this.conversationInfo = conversationInfo;
 
@@ -26,5 +31,18 @@ public class MsgConversation {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MsgConversation)) return false;
+        MsgConversation that = (MsgConversation) o;
+        return conversationInfo.equals(that.conversationInfo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(conversationInfo.getConversationID());
     }
 }

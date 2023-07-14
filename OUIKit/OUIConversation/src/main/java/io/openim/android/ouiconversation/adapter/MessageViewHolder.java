@@ -95,6 +95,7 @@ import io.openim.android.ouicore.voice.listener.PlayerListener;
 import io.openim.android.ouicore.voice.player.SMediaPlayer;
 import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.enums.MessageStatus;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.CardElem;
 import io.openim.android.sdk.models.MergeElem;
@@ -210,6 +211,7 @@ public class MessageViewHolder {
          */
         private void unite() {
             MsgExpand msgExpand = (MsgExpand) message.getExt();
+            hFirstItem();
 
             hAvatar();
             hName();
@@ -220,6 +222,11 @@ public class MessageViewHolder {
 
             hMultipleChoice(msgExpand);
             hSendState();
+        }
+        protected void hFirstItem() {
+            boolean onlyOne = messageAdapter.messages.size() == 1;
+            View root = itemView.findViewById(R.id.root);
+            root.setPadding(0, onlyOne ? Common.dp2px(10) : 0, 0, 0);
         }
 
         /**
@@ -239,7 +246,9 @@ public class MessageViewHolder {
         private void hMultipleChoice(MsgExpand msgExpand) {
             CheckBox checkBox = itemView.findViewById(R.id.choose);
             if (null == checkBox) return;
-            if (null != chatVM.enableMultipleSelect.getValue() && chatVM.enableMultipleSelect.getValue() && message.getContentType() != MessageType.NTF_BEGIN) {
+            if (null != chatVM.enableMultipleSelect.getValue()
+                && chatVM.enableMultipleSelect.getValue()
+                && message.getContentType() != MessageType.NTF_BEGIN) {
                 checkBox.setVisibility(View.VISIBLE);
                 checkBox.setChecked(msgExpand.isChoice);
                 checkBox.setOnClickListener((buttonView) -> {
@@ -260,7 +269,7 @@ public class MessageViewHolder {
             if (null == unRead) return;
             unRead.setVisibility(View.INVISIBLE);
             int viewType = message.getContentType();
-            if (isOwn && message.getStatus() == Constant.Send_State.SEND_SUCCESS
+            if (isOwn && message.getStatus() == MessageStatus.SUCCEEDED
                 && viewType < MessageType.NTF_BEGIN
                 && viewType != Constant.MsgType.LOCAL_CALL_HISTORY) {
                 unRead.setVisibility(View.VISIBLE);
@@ -346,7 +355,8 @@ public class MessageViewHolder {
                 String time = TimeUtil.getTimeString(message.getSendTime());
                 notice.setVisibility(View.VISIBLE);
                 notice.setText(time);
-            } else notice.setVisibility(View.GONE);
+            } else
+                notice.setVisibility(View.GONE);
         }
 
         private void hContentView() {
@@ -570,17 +580,16 @@ public class MessageViewHolder {
         @SuppressLint({"SetTextI18n", "StringFormatInvalid"})
         @Override
         public void bindData(Message message, int position) {
-            boolean onlyOne = messageAdapter.messages.size() == 1;
+            hFirstItem();
             itemView.findViewById(R.id.unRead).setVisibility(View.GONE);
             TextView textView = itemView.findViewById(R.id.notice);
             textView.setVisibility(View.VISIBLE);
-            View root = itemView.findViewById(R.id.root);
-            root.setPadding(0, onlyOne ? Common.dp2px(10) : 0, 0, 0);
 
             MsgExpand msgExpand = (MsgExpand) message.getExt();
             textView.setText(msgExpand.tips);
             textView.setMovementMethod(LinkMovementMethod.getInstance());
         }
+
 
         @Override
         protected int getLeftInflatedId() {
@@ -915,7 +924,7 @@ public class MessageViewHolder {
 
             int progress = (int) msgExpand.sendProgress;
             view.circleBar2.setTargetProgress(progress);
-            boolean sendSuccess = message.getStatus() == Constant.Send_State.SEND_SUCCESS;
+            boolean sendSuccess = message.getStatus() == MessageStatus.SUCCEEDED;
             if (sendSuccess) view.circleBar2.reset();
             view.mask2.setVisibility(sendSuccess ? View.GONE : View.VISIBLE);
 
@@ -1000,7 +1009,7 @@ public class MessageViewHolder {
             view.fileUploadView.setRes(path);
             MsgExpand msgExpand = (MsgExpand) message.getExt();
             view.fileUploadView.setProgress((int) msgExpand.sendProgress);
-            view.fileUploadView.setForegroundVisibility(message.getStatus() == Constant.Send_State.SEND_SUCCESS);
+            view.fileUploadView.setForegroundVisibility(message.getStatus() == MessageStatus.SUCCEEDED);
         }
     }
 

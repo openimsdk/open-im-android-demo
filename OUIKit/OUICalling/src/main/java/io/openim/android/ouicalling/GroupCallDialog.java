@@ -127,8 +127,10 @@ public class GroupCallDialog extends CallDialog {
                         holder.view.remoteSpeakerVideoView.setVisibility(View.VISIBLE);
                         holder.view.avatarRl.setVisibility(View.GONE);
                         VideoTrack localVideoTrack = callingVM.callViewModel.getVideoTrack(data);
-                        localVideoTrack.addRenderer(holder.view.remoteSpeakerVideoView);
-                        holder.view.remoteSpeakerVideoView.setTag(localVideoTrack);
+                        if (localVideoTrack != null) {
+                            localVideoTrack.addRenderer(holder.view.remoteSpeakerVideoView);
+                            holder.view.remoteSpeakerVideoView.setTag(localVideoTrack);
+                        }
                     } else {
                         holder.view.avatarRl.setVisibility(View.VISIBLE);
                         holder.view.remoteSpeakerVideoView.setVisibility(View.GONE);
@@ -300,6 +302,12 @@ public class GroupCallDialog extends CallDialog {
             ViewGroup.LayoutParams.MATCH_PARENT;
         params.gravity = isShrink ? (Gravity.TOP | Gravity.END) : Gravity.CENTER;
         getWindow().setAttributes(params);
+
+        if (!callingVM.isStartCall){
+            view.sTips.setText(callingVM.isCallOut ?
+                context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
+                context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
+        }
     }
 
     private void signalingAccept(SignalingInfo signalingInfo) {
@@ -323,6 +331,7 @@ public class GroupCallDialog extends CallDialog {
         view.ask.setVisibility(View.GONE);
         view.callingMenu.setVisibility(View.VISIBLE);
         view.timeTv.setVisibility(View.VISIBLE);
+
     }
 
     @Override
@@ -343,6 +352,7 @@ public class GroupCallDialog extends CallDialog {
                 UserInfo userInfo = data.get(0);
                 view.sTips.setText(String.format(context.getString(io.openim.android.ouicore.R.string.who_talk), userInfo.getNickname()));
                 view.sAvatar.load(userInfo.getFaceURL());
+                view.avatar.load(userInfo.getFaceURL());
 
                 memberAdapter.setItems(data);
                 UserInfo inviterUser = data.get(0);

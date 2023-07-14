@@ -1,10 +1,11 @@
 package io.openim.android.ouicalling;
 
-import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -12,13 +13,13 @@ import com.yanzhenjie.permission.AndPermission;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import io.openim.android.ouicalling.service.AudioVideoService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.CallHistory;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
@@ -39,6 +40,12 @@ public class CallingServiceImp implements CallingService {
     public CallDialog callDialog;
     private SignalingInfo signalingInfo;
 
+    public void setSignalingInfo(SignalingInfo signalingInfo) {
+        if (TextUtils.isEmpty(signalingInfo.getInvitation().getCustomData())) {
+            signalingInfo.getInvitation().setCustomData(String.valueOf(UUID.randomUUID()));
+        }
+        this.signalingInfo = signalingInfo;
+    }
 
     @Override
     public void startAudioVideoService(Context base) {
@@ -74,12 +81,10 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onInvitationCancelled(SignalingInfo s) {
         L.e(TAG, "----onInvitationCancelled-----");
-        Common.UIHandler.post(() -> {
-            if (null == callDialog) return;
-            callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getRoomID(),
-                callHistory -> callHistory.setFailedState(1));
-            callDialog.dismiss();
-        });
+        if (null == callDialog) return;
+        callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(),
+            (realm, callHistory) -> callHistory.setFailedState(1));
+        callDialog.dismiss();
     }
 
     @Override
@@ -90,12 +95,10 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onInviteeAccepted(SignalingInfo s) {
         L.e(TAG, "----onInviteeAccepted-----");
-        Common.UIHandler.post(() -> {
-            if (null == callDialog) return;
-            callDialog.otherSideAccepted();
-            callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getRoomID(),
-                callHistory -> callHistory.setSuccess(true));
-        });
+        if (null == callDialog) return;
+        callDialog.otherSideAccepted();
+        callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(),
+            (realm, callHistory) -> callHistory.setSuccess(true));
     }
 
     @Override
@@ -106,15 +109,12 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onInviteeRejected(SignalingInfo signalingInfo) {
         L.e(TAG, "----onInviteeRejected-----");
-        Common.UIHandler.post(() -> {
-            if (null == callDialog) return;
-            callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getRoomID(),
-                callHistory -> {
-                    callHistory.setSuccess(false);
-                    callHistory.setFailedState(2);
-                });
-            callDialog.dismiss();
+        if (null == callDialog) return;
+        callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(), (realm, callHistory) -> {
+            callHistory.setSuccess(false);
+            callHistory.setFailedState(2);
         });
+        callDialog.dismiss();
 
     }
 
@@ -126,22 +126,19 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onReceiveNewInvitation(SignalingInfo signalingInfo) {
         L.e(TAG, "----onReceiveNewInvitation-----");
+        if (callDialog != null) return;
         Common.wakeUp(context);
-        Common.UIHandler.post(() -> {
-            if (callDialog != null) return;
-            this.signalingInfo = signalingInfo;
-            AndPermission.with(context).overlay().onGranted(data -> {
-                context.startActivity(new Intent(context, LockPushActivity.class)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            }).start();
-        });
+        setSignalingInfo(signalingInfo);
+
+        AndPermission.with(context).overlay().onGranted(data -> context.startActivity(new Intent(context, LockPushActivity.class)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))).start();
     }
 
     @Override
     public Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener,
                                   boolean isCallOut) {
         if (callDialog != null) return callDialog;
-        if (signalingInfo.getInvitation().getSessionType()!= ConversationType.SINGLE_CHAT)
+        if (signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT)
             callDialog = new GroupCallDialog(context, this, isCallOut);
         else
             callDialog = new CallDialog(context, this, isCallOut);
@@ -158,29 +155,38 @@ public class CallingServiceImp implements CallingService {
 
     @Override
     public void call(SignalingInfo signalingInfo) {
-        this.signalingInfo = signalingInfo;
+        if (isCalling()) return;
+        setSignalingInfo(signalingInfo);
         buildCallDialog(null, true);
         callDialog.show();
     }
 
     @Override
     public void join(SignalingInfo signalingInfo) {
-        this.signalingInfo = signalingInfo;
+        if (isCalling()) return;
+        setSignalingInfo(signalingInfo);
         GroupCallDialog callDialog = (GroupCallDialog) buildCallDialog(null, false);
         callDialog.changeView();
         callDialog.joinToShow();
+    }
+
+    private boolean isCalling() {
+        if (null != callDialog) {
+            Toast.makeText(context, io.openim.android.ouicore.R.string.now_calling,
+                Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return false;
     }
 
 
     @Override
     public void onHangup(SignalingInfo signalingInfo) {
         L.e(TAG, "----onHangup-----");
-        Common.UIHandler.post(() -> {
-            if (null == callDialog) return;
-            callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getRoomID(),
-                callHistory -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
-            callDialog.dismiss();
-        });
+        if (null == callDialog) return;
+        callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(),
+            (realm, callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
+        callDialog.dismiss();
     }
 
     @Override
@@ -229,7 +235,7 @@ public class CallingServiceImp implements CallingService {
 
                 BaseApp.inst().realm.executeTransactionAsync(realm -> {
                     CallHistory callHistory =
-                        new CallHistory(signalingInfo.getInvitation().getRoomID(),
+                        new CallHistory(signalingInfo.getInvitation().getCustomData(),
                             userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(),
                             signalingInfo.getInvitation().getMediaType(), false, 0, isCallOut,
                             System.currentTimeMillis(), 0);

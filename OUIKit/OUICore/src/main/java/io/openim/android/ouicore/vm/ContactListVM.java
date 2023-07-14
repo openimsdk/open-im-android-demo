@@ -9,6 +9,8 @@ import java.util.List;
 
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
+import io.openim.android.ouicore.base.vm.State;
+import io.openim.android.ouicore.base.vm.Subject;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
@@ -29,8 +31,11 @@ import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> implements OnConversationListener, OnAdvanceMsgListener {
-    public MutableLiveData<List<MsgConversation>> conversations = new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<List<UserInfo>> frequentContacts = new MutableLiveData<>(new ArrayList<>());
+    public static final String NOTIFY_ITEM_CHANGED = "notify_item_changed";
+
+    public State<List<MsgConversation>> conversations = new State<>(new ArrayList<>());
+    public State<List<UserInfo>> frequentContacts = new State<>(new ArrayList<>());
+
 
     @Override
     protected void viewCreate() {
@@ -62,20 +67,20 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
             @Override
             public void onSuccess(List<ConversationInfo> data) {
-                conversations.getValue().clear();
+                conversations.val().clear();
                 for (ConversationInfo datum : data) {
                     Message msg = GsonHel.fromJson(datum.getLatestMsg(), Message.class);
                     if (null == msg)
                         continue;
-                    conversations.getValue().add(new MsgConversation(msg, datum));
+                    conversations.val().add(new MsgConversation(msg, datum));
                 }
                 conversations.setValue(conversations.getValue());
-                updateFrequentContacts(data);
             }
         });
     }
-    public  void setOneConversationPrivateChat(IMUtil.OnSuccessListener<String> OnSuccessListener,
-                                               String cid, boolean isChecked){
+
+    public void setOneConversationPrivateChat(IMUtil.OnSuccessListener<String> OnSuccessListener,
+                                              String cid, boolean isChecked) {
         OpenIMClient.getInstance().conversationManager.setOneConversationPrivateChat(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -86,7 +91,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
             public void onSuccess(String data) {
                 OnSuccessListener.onSuccess(data);
             }
-        },cid,isChecked);
+        }, cid, isChecked);
     }
 
     /**
@@ -144,23 +149,37 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     @Override
     public void onConversationChanged(List<ConversationInfo> list) {
-        updateConversation();
+        for (ConversationInfo info : list) {
+            Message message=GsonHel.fromJson(info.getLatestMsg(),
+                Message.class);
+            if (null==message) continue;
+            MsgConversation msgConversation =
+                new MsgConversation(message, info);
+            int index = conversations.val()
+                .indexOf(msgConversation);
+            if (index != -1) {
+                conversations.val().set(index, msgConversation);
+                subject(NOTIFY_ITEM_CHANGED, index);
+            }
+        }
     }
 
 
     private void sortConversation(List<ConversationInfo> list) {
         List<MsgConversation> msgConversations = new ArrayList<>();
+        Iterator<MsgConversation> iterator = conversations.val().iterator();
         for (ConversationInfo info : list) {
-            msgConversations.add(new MsgConversation(GsonHel.fromJson(info.getLatestMsg(), Message.class), info));
-            Iterator<MsgConversation> iterator = conversations.getValue().iterator();
+            msgConversations.add(new MsgConversation(GsonHel.fromJson(info.getLatestMsg(),
+                Message.class), info));
             while (iterator.hasNext()) {
-                if (iterator.next().conversationInfo.getConversationID().equals(info.getConversationID()))
+                if (iterator.next().conversationInfo.getConversationID()
+                    .equals(info.getConversationID()))
                     iterator.remove();
             }
         }
-        conversations.getValue().addAll(msgConversations);
-        Collections.sort(conversations.getValue(), IMUtil.simpleComparator());
-        conversations.setValue(conversations.getValue());
+        conversations.val().addAll(msgConversations);
+        Collections.sort(conversations.val(), IMUtil.simpleComparator());
+        conversations.setValue(conversations.val());
     }
 
     @Override

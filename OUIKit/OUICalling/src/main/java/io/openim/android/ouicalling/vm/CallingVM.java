@@ -5,10 +5,8 @@ import android.content.DialogInterface;
 import android.media.AudioManager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
@@ -30,11 +28,11 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.SignalingCertificate;
 import io.openim.android.sdk.models.SignalingInfo;
+import io.realm.Realm;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
-import kotlinx.coroutines.flow.FlowCollector;
 
 public class CallingVM {
     //通话时间
@@ -255,7 +253,7 @@ public class CallingVM {
 
                 @Override
                 public void onSuccess(SignalingCertificate data) {
-                    renewalDB(signalingInfo.getInvitation().getRoomID(), v -> v.setFailedState(1));
+                    renewalDB(signalingInfo.getInvitation().getCustomData(), (realm, v) -> v.setFailedState(1));
                     dismissUI();
                 }
             }, signalingInfo);
@@ -315,16 +313,17 @@ public class CallingVM {
     }
 
 
-    public void renewalDB(String roomID, OnRenewalDBListener onRenewalDBListener) {
+    public void renewalDB(String id, OnRenewalDBListener onRenewalDBListener) {
         BaseApp.inst().realm.executeTransactionAsync(realm -> {
             CallHistory callHistory =
-                realm.where(CallHistory.class).equalTo("roomID", roomID).findFirst();
+                realm.where(CallHistory.class).equalTo("id",
+                    id).findFirst();
             if (null == callHistory) return;
-            onRenewalDBListener.onRenewal(callHistory);
+            onRenewalDBListener.onRenewal(realm,callHistory);
         });
     }
 
     public interface OnRenewalDBListener {
-        void onRenewal(CallHistory callHistory);
+        void onRenewal(Realm realm, CallHistory callHistory);
     }
 }

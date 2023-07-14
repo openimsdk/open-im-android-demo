@@ -34,7 +34,7 @@
                     android:layout_height="wrap_content">
                     <include layout="@layout/view_dividing_line"/>
 
-                    <RadioGroup
+                    <LinearLayout
                         android:id="@+id/menuGroup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -88,7 +88,7 @@
                             android:text="@string/my"
                             android:textColor="@drawable/selector_tab_txt_color"
                             android:textSize="10sp" />
-                    </RadioGroup>
+                    </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/badge"

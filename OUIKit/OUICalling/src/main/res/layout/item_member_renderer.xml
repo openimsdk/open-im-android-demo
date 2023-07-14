@@ -32,8 +32,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:alpha="0.2"
-        android:background="@color/black"
         android:gravity="right|center"
         android:orientation="horizontal"
         android:paddingTop="6dp"
@@ -47,12 +45,15 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
             android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:textSize="@dimen/description_txt" />
 
         <ImageView
             android:id="@+id/micOn"
+            android:background="@drawable/sty_radius_4_33shallow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:alpha="1"
             android:src="@mipmap/ic_mic_s_on" />
     </LinearLayout>
 </RelativeLayout>

@@ -4,9 +4,9 @@
     <!-- rectangle表示为矩形 -->
 
     <!-- 填充的颜色 -->
-    <solid android:color="@android:color/holo_red_dark" />
+    <solid android:color="#FF381F" />
 
 
-    <corners  android:radius="100dp" />
+    <corners  android:radius="24dp" />
 
 </shape>

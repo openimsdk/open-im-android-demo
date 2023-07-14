@@ -13,6 +13,7 @@ import com.wang.avi.AVLoadingIndicatorView;
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.LayoutSendStateBinding;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.sdk.enums.MessageStatus;
 
 public class SendStateView extends FrameLayout {
     public SendStateView(Context context) {
@@ -38,10 +39,10 @@ public class SendStateView extends FrameLayout {
     }
 
     public void setSendState(int state) {
-        if (state == Constant.Send_State.SENDING) {
+        if (state == MessageStatus.SENDING) {
             loading.setVisibility(View.VISIBLE);
             failedSend.setVisibility(View.GONE);
-        } else if (state == Constant.Send_State.SEND_FAILED) {
+        } else if (state == MessageStatus.FAILED) {
             failedSend.setVisibility(View.VISIBLE);
             loading.setVisibility(View.GONE);
         } else {
