@@ -1,6 +1,8 @@
 package io.openim.android.demo.ui.main;
 
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -31,6 +33,7 @@ import io.openim.android.ouicontact.ui.fragment.ContactFragment;
 import io.openim.android.ouicontact.vm.ContactVM;
 import io.openim.android.ouiconversation.ui.fragment.ContactListFragment;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.MomentsBridge;
@@ -50,14 +53,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        runOnUiThread(() -> {
-            hasShoot = AndPermission.hasPermissions(MainActivity.this, Permission.CAMERA,
-                Permission.RECORD_AUDIO);
-            Common.permission(MainActivity.this, () -> {
-                hasShoot = true;
-                AndPermission.with(this).overlay().start();
-            }, hasShoot, Permission.CAMERA, Permission.RECORD_AUDIO);
-        });
+        init();
 
         PushManager.getInstance().initialize(this);
         bindVM(MainVM.class);
@@ -71,6 +67,17 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         click();
         listener();
         view.men1.setChecked(true);
+    }
+
+    private void init() {
+        runOnUiThread(() -> {
+            hasShoot = AndPermission.hasPermissions(MainActivity.this, Permission.CAMERA,
+                Permission.RECORD_AUDIO);
+            Common.permission(MainActivity.this, () -> {
+                hasShoot = true;
+                AndPermission.with(this).overlay().start();
+            }, hasShoot, Permission.CAMERA, Permission.RECORD_AUDIO);
+        });
     }
 
     private void listener() {

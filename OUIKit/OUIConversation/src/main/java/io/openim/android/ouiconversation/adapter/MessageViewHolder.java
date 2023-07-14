@@ -86,6 +86,7 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.ForwardVM;
@@ -223,6 +224,7 @@ public class MessageViewHolder {
             hMultipleChoice(msgExpand);
             hSendState();
         }
+
         protected void hFirstItem() {
             boolean onlyOne = messageAdapter.messages.size() == 1;
             View root = itemView.findViewById(R.id.root);
@@ -236,7 +238,12 @@ public class MessageViewHolder {
             if (isOwn) {
                 SendStateView sendStateView = itemView.findViewById(R.id.sendState2);
                 if (null == sendStateView) return;
-                sendStateView.setOnClickListener(v -> chatVM.sendMsg(message));
+                sendStateView.setOnClickListener(new OnDedrepClickListener() {
+                    @Override
+                    public void click(View v) {
+                        chatVM.sendMsg(message);
+                    }
+                });
             }
         }
 
@@ -246,9 +253,7 @@ public class MessageViewHolder {
         private void hMultipleChoice(MsgExpand msgExpand) {
             CheckBox checkBox = itemView.findViewById(R.id.choose);
             if (null == checkBox) return;
-            if (null != chatVM.enableMultipleSelect.getValue()
-                && chatVM.enableMultipleSelect.getValue()
-                && message.getContentType() != MessageType.NTF_BEGIN) {
+            if (null != chatVM.enableMultipleSelect.getValue() && chatVM.enableMultipleSelect.getValue() && message.getContentType() != MessageType.NTF_BEGIN) {
                 checkBox.setVisibility(View.VISIBLE);
                 checkBox.setChecked(msgExpand.isChoice);
                 checkBox.setOnClickListener((buttonView) -> {
@@ -269,9 +274,7 @@ public class MessageViewHolder {
             if (null == unRead) return;
             unRead.setVisibility(View.INVISIBLE);
             int viewType = message.getContentType();
-            if (isOwn && message.getStatus() == MessageStatus.SUCCEEDED
-                && viewType < MessageType.NTF_BEGIN
-                && viewType != Constant.MsgType.LOCAL_CALL_HISTORY) {
+            if (isOwn && message.getStatus() == MessageStatus.SUCCEEDED && viewType < MessageType.NTF_BEGIN && viewType != Constant.MsgType.LOCAL_CALL_HISTORY) {
                 unRead.setVisibility(View.VISIBLE);
                 if (chatVM.isSingleChat) {
                     String unread =
@@ -284,8 +287,7 @@ public class MessageViewHolder {
                     int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;
                     if (unreadCount > 0) {
                         unRead.setTextColor(Color.parseColor("#0089FF"));
-                        unRead.setText(unreadCount +
-                            chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
+                        unRead.setText(unreadCount + chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
                         unRead.setOnClickListener(v -> {
                             v.getContext().startActivity(new Intent(v.getContext(),
                                 MsgReadStatusActivity.class).putExtra(Constant.K_GROUP_ID,
@@ -300,9 +302,11 @@ public class MessageViewHolder {
         /**
          * 处理名字
          */
+        @SuppressLint("SetTextI18n")
         private void hName() {
             TextView nickName = itemView.findViewById(R.id.nickName);
-            if (null == nickName) nickName = itemView.findViewById(R.id.nickName2);
+            if (null == nickName)
+                nickName = itemView.findViewById(R.id.nickName2);
             if (null != nickName) {
                 String time = TimeUtil.getTimeString(message.getSendTime());
                 nickName.setVisibility(View.VISIBLE);
@@ -355,8 +359,7 @@ public class MessageViewHolder {
                 String time = TimeUtil.getTimeString(message.getSendTime());
                 notice.setVisibility(View.VISIBLE);
                 notice.setText(time);
-            } else
-                notice.setVisibility(View.GONE);
+            } else notice.setVisibility(View.GONE);
         }
 
         private void hContentView() {
@@ -391,7 +394,8 @@ public class MessageViewHolder {
          */
         protected void showMsgExMenu(View view) {
             view.setOnLongClickListener(v -> {
-                if (null != chatVM.enableMultipleSelect.getValue() && chatVM.enableMultipleSelect.getValue())
+                if (null != chatVM.enableMultipleSelect.val()
+                    && chatVM.enableMultipleSelect.val())
                     return true;
                 List<Integer> menuIcons = new ArrayList<>();
                 List<String> menuTitles = new ArrayList<>();
@@ -488,7 +492,7 @@ public class MessageViewHolder {
                 LayoutMsgExMenuBinding vb =
                     LayoutMsgExMenuBinding.bind(popupWindow.getContentView());
                 vb.recyclerview.setLayoutManager(new GridLayoutManager(view.getContext(),
-                    menuIcons.size() < 4 ? menuIcons.size() : 4));
+                    Math.min(menuIcons.size(), 4)));
                 adapter.setItems(menuIcons);
 
                 int yDelay = Common.dp2px(5);

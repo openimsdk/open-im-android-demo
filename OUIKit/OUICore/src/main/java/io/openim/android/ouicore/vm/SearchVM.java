@@ -123,8 +123,10 @@ public class SearchVM extends BaseViewModel {
 
                 @Override
                 public void onSuccess(UserList o) {
-                    if (o.users.size() > 0)
-                        userInfo.setValue(o.users);
+                 try {
+                     if (o.users.size() > 0)
+                         userInfo.setValue(o.users);
+                 }catch (Exception e){e.printStackTrace();}
                 }
 
                 @Override

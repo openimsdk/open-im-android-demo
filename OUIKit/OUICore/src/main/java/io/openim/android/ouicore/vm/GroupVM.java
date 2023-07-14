@@ -14,6 +14,7 @@ import java.util.List;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
 
@@ -125,6 +126,7 @@ public class GroupVM extends SocialityVM {
 
             @Override
             public void onSuccess(GroupInfo data) {
+                Easy.delete(MultipleChoiceVM.class);
                 getIView().onSuccess(data);
                 Common.UIHandler.postDelayed(waitDialog::dismiss, 200);
             }

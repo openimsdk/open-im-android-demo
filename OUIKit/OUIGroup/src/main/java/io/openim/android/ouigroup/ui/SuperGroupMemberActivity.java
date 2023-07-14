@@ -33,6 +33,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouigroup.databinding.ActivitySuperGroupMemberBinding;
 import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 @Route(path = Routes.Group.SUPER_GROUP_MEMBER)
@@ -211,12 +212,12 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
                 itemViewHo.view.select.setChecked(data.isSelect);
                 itemViewHo.view.avatar.load(data.groupMembersInfo.getFaceURL());
                 itemViewHo.view.nickName.setText(data.groupMembersInfo.getNickname());
-                if (data.groupMembersInfo.getRoleLevel() == Constant.RoleLevel.GROUP_OWNER) {
+                if (data.groupMembersInfo.getRoleLevel() == GroupRole.OWNER) {
                     itemViewHo.view.identity.setVisibility(View.VISIBLE);
                     itemViewHo.view.identity.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_8_fddfa1);
                     itemViewHo.view.identity.setText(io.openim.android.ouicore.R.string.lord);
                     itemViewHo.view.identity.setTextColor(Color.parseColor("#ffff8c00"));
-                } else if (data.groupMembersInfo.getRoleLevel() == Constant.RoleLevel.ADMINISTRATOR) {
+                } else if (data.groupMembersInfo.getRoleLevel() == GroupRole.ADMIN) {
                     itemViewHo.view.identity.setVisibility(View.VISIBLE);
                     itemViewHo.view.identity.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_8_a2c9f8);
                     itemViewHo.view.identity.setText(io.openim.android.ouicore.R.string.administrator);

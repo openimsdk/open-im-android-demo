@@ -120,7 +120,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             vm.groupID = groupId;
         }
         vm.fromChatHistory = fromChatHistory;
-        if (null != notificationMsg) vm.notificationMsg.setValue(notificationMsg);
+        if (null != notificationMsg)
+            vm.notificationMsg.setValue(notificationMsg);
 
         if (fromChatHistory) {
             ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
@@ -449,7 +450,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             if (vm.isSingleChat)
                 view.nickName.setText(vm.conversationInfo.getValue().getShowName());
             else
-                view.nickName.setText(vm.conversationInfo.getValue().getShowName() + "(" + vm.groupInfo.getValue().getMemberCount() + ")");
+                view.nickName.setText(vm.conversationInfo.getValue()
+                    .getShowName() + "(" + vm.groupInfo.getValue().getMemberCount() + ")");
         } catch (Exception ignored) {
         }
     }

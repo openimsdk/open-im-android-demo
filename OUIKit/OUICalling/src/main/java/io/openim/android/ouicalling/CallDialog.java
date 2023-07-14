@@ -360,7 +360,7 @@ public class CallDialog extends BaseDialog {
             String data = GsonHel.toJson(map);
             Message message = OpenIMClient.getInstance().messageManager.createCustomMessage(data,
                 "", "");
-
+            message.setRead(true);
             OpenIMClient.getInstance().messageManager.insertSingleMessageToLocalStorage(new IMUtil.IMCallBack<String>() {
                 @Override
                 public void onSuccess(String data) {

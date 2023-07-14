@@ -570,6 +570,8 @@ public class IMUtil {
         try {
             switch (msg.getContentType()) {
                 default:
+                    if (!TextUtils.isEmpty(msgExpand.tips))
+                        lastMsg=msgExpand.tips.toString();
                     break;
 
                 case MessageType.TEXT:
@@ -718,7 +720,7 @@ public class IMUtil {
         from.finish();
     }
 
-    public static void sendNotice(long id) {
+    public static void sendNotice(int id) {
         NotificationManager manager =
             (NotificationManager) BaseApp.inst().getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -728,10 +730,17 @@ public class IMUtil {
         PendingIntent hangPendingIntent = PendingIntent.getActivity(BaseApp.inst(), 1002,
             hangIntent, PendingIntent.FLAG_MUTABLE);
 
-        String CHANNEL_ID = "msg_notification";
+        String CHANNEL_ID = Constant.NOTICE_TAG;
         String CHANNEL_NAME = BaseApp.inst().getString(R.string.msg_notification);
         Notification notification =
-            new NotificationCompat.Builder(BaseApp.inst(), CHANNEL_ID).setContentTitle(BaseApp.inst().getString(R.string.app_name)).setContentText(BaseApp.inst().getString(R.string.a_message_is_received)).setSmallIcon(R.mipmap.ic_logo).setContentIntent(hangPendingIntent).setAutoCancel(true).setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE).setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring)).build();
+            new NotificationCompat.Builder(BaseApp.inst(), CHANNEL_ID)
+                .setContentTitle(BaseApp.inst().getString(R.string.app_name)).setContentText(BaseApp.inst().getString(R.string.a_message_is_received))
+                .setSmallIcon(R.mipmap.ic_logo)
+                .setContentIntent(hangPendingIntent)
+                .setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
+                .setSound(Uri.parse("android.resource://"
+                    + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring)).build();
 
         //Android 8.0 以上需包添加渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -742,7 +751,7 @@ public class IMUtil {
             notificationChannel.setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring), audioAttributes);
             manager.createNotificationChannel(notificationChannel);
         }
-        manager.notify((int) id, notification);
+        manager.notify(id, notification);
     }
 
     //播放提示音

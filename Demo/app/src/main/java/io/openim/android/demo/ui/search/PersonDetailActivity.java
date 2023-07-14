@@ -162,8 +162,8 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                         groupVM.page = 0;
                         groupVM.getSuperGroupMemberList();
                     }
-                }, groupId, uid, isChecked ? Constant.RoleLevel.ADMINISTRATOR :
-                    Constant.RoleLevel.MEMBER);
+                }, groupId, uid, isChecked ? GroupRole.ADMIN :
+                    GroupRole.MEMBER);
             });
             view.mute.setOnClickListener(v -> {
                 jumpCallBack.launch(new Intent(this, SetMuteActivity.class).putExtra(Constant.K_ID, vm.searchContent.getValue()));
