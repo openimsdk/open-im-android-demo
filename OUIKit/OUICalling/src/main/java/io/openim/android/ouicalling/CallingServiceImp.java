@@ -183,7 +183,7 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onHangup(SignalingInfo signalingInfo) {
         L.e(TAG, "----onHangup-----");
-        if (null == callDialog) return;
+        if (null == callDialog||callDialog.callingVM.isGroup) return;
         callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(),
             (realm, callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
         callDialog.dismiss();
