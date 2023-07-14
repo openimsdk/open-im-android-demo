@@ -166,8 +166,6 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
         albumDialog.setOnSelectResultListener(path -> {
             waitDialog.show();
             PutArgs putArgs=new PutArgs(path[0]);
-            putArgs.putID=BaseApp.inst().loginCertificate.userID
-                +"_"+System.currentTimeMillis();
 
             OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                 @Override

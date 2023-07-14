@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
@@ -17,6 +18,8 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -130,8 +133,6 @@ public class Common {
         float scale = BaseApp.inst().getResources().getDisplayMetrics().density;
         return (int) (px / scale + 0.5f);
     }
-
-
     //收起键盘
     public static void hideKeyboard(Context context, View v) {
         InputMethodManager imm =

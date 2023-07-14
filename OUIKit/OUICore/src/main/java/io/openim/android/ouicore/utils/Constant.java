@@ -9,6 +9,8 @@ public class Constant {
     //  public static final String DEFAULT_IP = "test-web.rentsoft.cn";//43
 //  public static final String DEFAULT_IP = "web.rentsoft.cn";//121
     public static final String DEFAULT_IP = "203.56.175.233";//121
+//    public static final String DEFAULT_IP = "125.124.195.201";//121
+
 
     //登录注册手机验 证服务器地址
     private static final String APP_AUTH_URL = "https://" + DEFAULT_IP + "/chat/";
@@ -107,25 +109,16 @@ public class Constant {
     public static final String IS_SELECT_MEMBER = "isSelectMember";
     //选择好友
     public static final String IS_SELECT_FRIEND = "isSelectFriend";
+    //自定义消息类型
+    public static final String K_CUSTOM_TYPE = "customType";
 
-    /**
-     * 发送状态
-     */
-    public static class Send_State {
-        //发送中...
-        public static final int SENDING = 1;
-        //发送成功
-        public static final int SEND_SUCCESS = 2;
-        //发送失败
-        public static final int SEND_FAILED = 3;
-    }
 
 
     //加载中
     public static final int LOADING = 201;
 
     public static class MsgType {
-        //        //本地呼叫记录
+        //本地呼叫记录
         public static final int LOCAL_CALL_HISTORY = -110;
 
         //会议邀请
