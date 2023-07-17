@@ -22,6 +22,8 @@ public class SupplementInfoActivity extends BaseActivity<LoginVM, ActivitySupple
         bindViewDataBinding(ActivitySupplementInfoBinding.inflate(getLayoutInflater()));
         sink();
         view.setLoginVM(vm);
+
+        vm.pwd.setValue("");
     }
 
     // 禁止返回
