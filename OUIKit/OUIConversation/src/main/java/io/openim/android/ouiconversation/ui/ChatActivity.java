@@ -120,7 +120,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             vm.groupID = groupId;
         }
         vm.fromChatHistory = fromChatHistory;
-        if (null != notificationMsg) vm.notificationMsg.setValue(notificationMsg);
+        if (null != notificationMsg)
+            vm.notificationMsg.setValue(notificationMsg);
 
         if (fromChatHistory) {
             ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
@@ -198,7 +199,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.recyclerView.setItemAnimator(null);
         messageAdapter = new MessageAdapter();
         messageAdapter.bindRecyclerView(view.recyclerView);
-
 
         vm.setMessageAdapter(messageAdapter);
         view.recyclerView.setAdapter(messageAdapter);
@@ -287,7 +287,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         Obs.inst().addObserver(this);
         view.call.setOnClickListener(v -> {
             if (null == callingService) return;
-            if (null != vm.roomCallingInfo.getValue() && null != vm.roomCallingInfo.getValue().getParticipant() && !vm.roomCallingInfo.getValue().getParticipant().isEmpty()) {
+            if (null != vm.roomCallingInfo.getValue()
+                && null != vm.roomCallingInfo.getValue().getParticipant()
+                && !vm.roomCallingInfo.getValue().getParticipant().isEmpty()) {
                 CommonDialog commonDialog = new CommonDialog(this).atShow();
                 commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.group_calling_tips);
                 commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
@@ -448,7 +450,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             if (vm.isSingleChat)
                 view.nickName.setText(vm.conversationInfo.getValue().getShowName());
             else
-                view.nickName.setText(vm.conversationInfo.getValue().getShowName() + "(" + vm.groupInfo.getValue().getMemberCount() + ")");
+                view.nickName.setText(vm.conversationInfo.getValue()
+                    .getShowName() + "(" + vm.groupInfo.getValue().getMemberCount() + ")");
         } catch (Exception ignored) {
         }
     }

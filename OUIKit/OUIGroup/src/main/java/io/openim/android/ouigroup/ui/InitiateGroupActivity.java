@@ -286,6 +286,11 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                     ExUserInfo exUserInfo = new ExUserInfo();
                     exUserInfo.sortLetter = exGroupMemberInfo.sortLetter;
                     exUserInfo.exGroupMemberInfo = exGroupMemberInfo;
+                    UserInfo userInfo=new UserInfo();
+                    userInfo.setUserID(exGroupMemberInfo.groupMembersInfo.getUserID());
+                    userInfo.setNickname(exGroupMemberInfo.groupMembersInfo.getNickname());
+                    userInfo.setFaceURL(exGroupMemberInfo.groupMembersInfo.getFaceURL());
+                    exUserInfo.userInfo=userInfo;
                     exUserInfos.add(exUserInfo);
                 }
                 adapter.setItems(exUserInfos);

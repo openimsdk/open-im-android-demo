@@ -41,7 +41,13 @@ public class ServerConfigActivity extends BaseActivity<BaseViewModel, ActivitySe
             if (!serverConfigVM.IM_API_URL.getValue().equals(Constant.getImApiUrl()))
                 SharedPreferencesUtil.get(BaseApp.inst()).setCache("IM_API_URL", serverConfigVM.IM_API_URL.getValue());
             if (!serverConfigVM.APP_AUTH_URL.getValue().equals(Constant.getAppAuthUrl()))
-                SharedPreferencesUtil.get(BaseApp.inst()).setCache("APP_AUTH_URL", serverConfigVM.APP_AUTH_URL.getValue());
+            {
+                String appAuthUrl=serverConfigVM.APP_AUTH_URL.getValue();
+                if (!appAuthUrl.endsWith("/")){
+                    appAuthUrl+="/";
+                }
+                SharedPreferencesUtil.get(BaseApp.inst()).setCache("APP_AUTH_URL", appAuthUrl);
+            }
             if (!serverConfigVM.IM_WS_URL.getValue().equals(Constant.getImWsUrl()))
                 SharedPreferencesUtil.get(BaseApp.inst()).setCache("IM_WS_URL", serverConfigVM.IM_WS_URL.getValue());
             if (!serverConfigVM.STORAGE_TYPE.getValue().equals(Constant.getStorageType()))
@@ -66,11 +72,11 @@ public class ServerConfigActivity extends BaseActivity<BaseViewModel, ActivitySe
         serverConfigVM.HEAD.observe(this, s -> {
             if (isIP)
                 setAddress("http://" + s + ":10002",
-                    "http://" + s + ":10008",
+                    "http://" + s + ":10008/",
                     "ws://" + s + ":10001");
             else {
                 setAddress(
-                    "https://" + s + "/api/",
+                    "https://" + s + "/api",
                     "https://" + s + "/chat/",
                     "wss://" + s + "/msg_gateway");
             }

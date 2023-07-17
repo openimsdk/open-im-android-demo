@@ -6,9 +6,14 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IM;
 
 public class Constant {
-    //  public static final String DEFAULT_IP = "test-web.rentsoft.cn";//43
+//  public static final String DEFAULT_IP = "test-web.rentsoft.cn";//43
 //  public static final String DEFAULT_IP = "web.rentsoft.cn";//121
-    public static final String DEFAULT_IP = "203.56.175.233";//121
+
+//    public static final String DEFAULT_IP = "203.56.175.233";//121
+//    public static final String DEFAULT_IP = "43.154.157.177";//43
+    public static final String DEFAULT_IP = "59.36.173.89";//43
+
+
 
     //登录注册手机验 证服务器地址
     private static final String APP_AUTH_URL = "https://" + DEFAULT_IP + "/chat/";
@@ -90,6 +95,8 @@ public class Constant {
     public static final String K_RESULT2 = "result2";
     public static final String K_FROM = "from";
     public static final String K_SIZE = "size";
+    public static final String NOTICE_TAG = "msg_notification";
+
 
     //最大通话人数
     public static final int MAX_CALL_NUM = 9;
@@ -107,25 +114,16 @@ public class Constant {
     public static final String IS_SELECT_MEMBER = "isSelectMember";
     //选择好友
     public static final String IS_SELECT_FRIEND = "isSelectFriend";
+    //自定义消息类型
+    public static final String K_CUSTOM_TYPE = "customType";
 
-    /**
-     * 发送状态
-     */
-    public static class Send_State {
-        //发送中...
-        public static final int SENDING = 1;
-        //发送成功
-        public static final int SEND_SUCCESS = 2;
-        //发送失败
-        public static final int SEND_FAILED = 3;
-    }
 
 
     //加载中
     public static final int LOADING = 201;
 
     public static class MsgType {
-        //        //本地呼叫记录
+        //本地呼叫记录
         public static final int LOCAL_CALL_HISTORY = -110;
 
         //会议邀请
@@ -134,14 +132,6 @@ public class Constant {
     }
 
 
-    /**
-     * 群身份
-     */
-    public static class RoleLevel {
-        public static final int MEMBER = 1;
-        public static final int GROUP_OWNER = 2;
-        public static final int ADMINISTRATOR = 3;
-    }
 
     /// 进群验证设置选项
     public static class GroupVerification {

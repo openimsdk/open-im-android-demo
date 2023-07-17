@@ -51,6 +51,8 @@ import io.openim.android.ouiconversation.ui.ChatActivity;
 import io.openim.android.ouiconversation.ui.NotificationActivity;
 import io.openim.android.ouiconversation.ui.SearchActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
+import io.openim.android.ouicore.base.vm.ISubscribe;
+import io.openim.android.ouicore.base.vm.Subject;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
@@ -210,7 +212,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             } else {
                 vm.conversations.getValue().remove(conversationInfo);
                 adapter.notifyItemRemoved(adapterPosition);
-                vm.deleteConversationFromLocalAndSvr(conversationInfo.conversationInfo.getConversationID());
+                vm.deleteConversationAndDeleteAllMsg(conversationInfo.conversationInfo.getConversationID());
             }
             menuBridge.closeMenu();
         });
@@ -218,13 +220,17 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         adapter = new CustomAdapter(onItemClickListener);
         view.recyclerView.setAdapter(adapter);
         view.recyclerView.addHeaderView(createHeaderView());
+        view.recyclerView.setItemAnimator(null);
 
-//        view.recyclerView.addItemDecoration(new DefaultItemDecoration(getActivity().getColor
-//        (android.R.color.transparent), 1, 36));
         vm.conversations.observe(getActivity(), v -> {
             if (null == v || v.size() == 0) return;
             adapter.setConversationInfos(v);
             adapter.notifyDataSetChanged();
+        });
+        vm.subscribe(getActivity(), subject -> {
+            if (subject.equals(ContactListVM.NOTIFY_ITEM_CHANGED)){
+                adapter.notifyItemChanged((Integer) subject.value);
+            }
         });
 
         Animation animation = AnimationUtils.loadAnimation(getActivity(),
@@ -338,14 +344,14 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             return new ViewHol.ContactItemHolder(viewGroup);
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
-        public void onBindViewHolder(ViewHol.ContactItemHolder viewHolder, final int position) {
+        public void onBindViewHolder(ViewHol.ContactItemHolder viewHolder,  int position) {
+            final  int index=position;
             viewHolder.viewBinding.getRoot().setOnClickListener(new OnDedrepClickListener() {
                 @Override
                 public void click(View v) {
                     if (null != itemClickListener)
-                        itemClickListener.onItemClick(v, position);
+                        itemClickListener.onItemClick(v, index);
                 }
             });
 
@@ -357,8 +363,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             viewHolder.viewBinding.nickName.setText(msgConversation.conversationInfo.getShowName());
 
             if (msgConversation.conversationInfo.getRecvMsgOpt() != 0) {
-                if (msgConversation.conversationInfo.getUnreadCount() > 0)
-                    viewHolder.viewBinding.noDisturbTips.setVisibility(View.VISIBLE);
+                    viewHolder.viewBinding.noDisturbTips
+                        .setVisibility(msgConversation.conversationInfo.getUnreadCount() > 0?View.VISIBLE:View.GONE);
                 viewHolder.viewBinding.noDisturbIc.setVisibility(View.VISIBLE);
                 viewHolder.viewBinding.badge.badge.setVisibility(View.GONE);
             } else {

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.vanniktech.ui.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,6 @@ import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.PutArgs;
-import open_im_sdk_callback.PutFileCallback;
 
 @Route(path = Routes.Group.MATERIAL)
 public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMaterialBinding> {
@@ -144,8 +144,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         albumDialog = new PhotographAlbumDialog(this);
         albumDialog.setOnSelectResultListener(path -> {
             PutArgs putArgs = new PutArgs(path[0]);
-            putArgs.putID =
-                BaseApp.inst().loginCertificate.userID + "_" + System.currentTimeMillis();
             OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                 @Override
                 public void onError(int code, String error) {
@@ -183,10 +181,12 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
                 holder.view.txt.setTextSize(12);
                 holder.view.txt.setTextColor(getResources().getColor(io.openim.android.ouicore.R.color.txt_shallow));
+                holder.view.img.setVisibility(TextUtils.isEmpty(data.getGroupID())?View.GONE:View.VISIBLE);
+                holder.view.img2.setVisibility(TextUtils.isEmpty(data.getGroupID())?View.VISIBLE:View.GONE);
                 if (TextUtils.isEmpty(data.getGroupID())) {
                     //加/减按钮
                     int reId;
-                    holder.view.img.load(reId = data.getRoleLevel());
+                    holder.view.img2.setImageResource(reId = data.getRoleLevel());
                     holder.view.txt.setText(reId == R.mipmap.ic_group_add ?
                         io.openim.android.ouicore.R.string.add :
                         io.openim.android.ouicore.R.string.remove);
@@ -216,8 +216,10 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
             view.all.setText(String.format(getResources().getString(io.openim.android.ouicore.R.string.view_all_member), groupInfo.getMemberCount()));
         });
+
         vm.groupMembers.observe(this, groupMembersInfos -> {
             if (groupMembersInfos.isEmpty()) return;
+            view.all.setText(String.format(getResources().getString(io.openim.android.ouicore.R.string.view_all_member), groupMembersInfos.size()));
             spanCount = spanCount * 2;
             boolean owner = vm.isOwner();
             int end = owner ? spanCount - 2 : spanCount - 1;

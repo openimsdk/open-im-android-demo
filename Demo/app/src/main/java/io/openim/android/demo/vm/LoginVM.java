@@ -44,7 +44,11 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
 
     public void login(String verificationCode, int usedFor) {
         Parameter parameter = getParameter(verificationCode, usedFor);
-        N.API(OpenIMService.class).login(parameter.buildJsonBody()).compose(N.IOMain()).map(OpenIMService.turn(LoginCertificate.class)).subscribe(new NetObserver<LoginCertificate>(getContext()) {
+        N.API(OpenIMService.class)
+            .login(parameter.buildJsonBody())
+            .compose(N.IOMain())
+            .map(OpenIMService.turn(LoginCertificate.class))
+            .subscribe(new NetObserver<LoginCertificate>(getContext()) {
 
             @Override
             public void onSuccess(LoginCertificate loginCertificate) {

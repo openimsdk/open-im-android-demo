@@ -98,7 +98,7 @@
     <string name="selete_member">选择成员</string>
     <string name="invite_audio_call">邀请你语音通话</string>
     <string name="invite_video_call">邀请你视频通话</string>
-    <string name="calling">正在通话中</string>
+    <string name="calling">正在通话中...</string>
     <string name="audio_video_service">音视频服务</string>
     <string name="audio_video_service_tips1">OpenIM音视频服务</string>
     <string name="audio_video_service_tips2">关闭应用自启动将无法接收音视频请求</string>
@@ -398,4 +398,6 @@
     <string name="re_edit">重新编辑</string>
     <string name="clear_msg_sure">确定清空消息？</string>
     <string name="tal_num_photo">共%1$d张</string>
+    <string name="audio_calling">语音通话中...</string>
+    <string name="now_calling">当前正在通话中...</string>
 </resources>

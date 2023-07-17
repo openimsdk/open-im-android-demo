@@ -34,7 +34,7 @@ public class IBridgeImpl implements IConversationBridge {
                     conversationID = msgConversation.conversationInfo.getConversationID();
             }
             if (!conversationID.isEmpty())
-                contactListVM.deleteConversationFromLocalAndSvr(conversationID);
+                contactListVM.deleteConversationAndDeleteAllMsg(conversationID);
         }
 
     }
