@@ -131,19 +131,6 @@ public class Constant {
 
     }
 
-
-
-    /// 进群验证设置选项
-    public static class GroupVerification {
-        /// 申请需要同意 邀请直接进
-        public static final int applyNeedVerificationInviteDirectly = 0;
-
-        /// 所有人进群需要验证，除了群主管理员邀
-        public static final int allNeedVerification = 1;
-
-        /// 直接进群
-        public static final int directly = 2;
-    }
     //超级群
     public static final int SUPER_GROUP_LIMIT = 250;
 

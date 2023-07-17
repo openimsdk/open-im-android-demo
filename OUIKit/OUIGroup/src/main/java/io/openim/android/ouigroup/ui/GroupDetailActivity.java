@@ -22,6 +22,7 @@ import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouigroup.databinding.ActivityGroupDetailBinding;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.GroupVerification;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
@@ -48,7 +49,8 @@ public class GroupDetailActivity extends BaseActivity<GroupVM, ActivityGroupDeta
 
     private void listener() {
         vm.groupsInfo.observe(this, groupInfo -> {
-            if (groupInfo.getNeedVerification() == Constant.GroupVerification.directly) {
+            view.avatar.load(groupInfo.getFaceURL(),true);
+            if (groupInfo.getNeedVerification() == GroupVerification.DIRECTLY) {
                 startChat();
             } else {
                 List<String> ids = new ArrayList<>();
@@ -82,7 +84,7 @@ public class GroupDetailActivity extends BaseActivity<GroupVM, ActivityGroupDeta
     private void startChat() {
         view.joinGroup.setText(io.openim.android.ouicore.R.string.start_chat);
         view.joinGroup.setOnClickListener(v -> {
-            if (vm.groupsInfo.getValue().getNeedVerification() == Constant.GroupVerification.directly) {
+            if (vm.groupsInfo.getValue().getNeedVerification() == GroupVerification.DIRECTLY) {
                 CommonDialog dialog = new CommonDialog(this);
                 OpenIMClient.getInstance().groupManager.joinGroup(new OnBase<String>() {
                     @Override
