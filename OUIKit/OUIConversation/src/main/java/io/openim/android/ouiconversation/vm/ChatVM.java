@@ -959,7 +959,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
             @Override
             public void onError(int code, String error) {
-                if (code != 302) getIView().toast(error + code);
                 UIHandler.postDelayed(() -> {
                     msg.setExt(ext);
                     msg.setStatus(MessageStatus.FAILED);
