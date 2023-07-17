@@ -38,7 +38,7 @@ public class RXRetrofitException extends Exception {
     private static String getErrTips(int code, String errMsg) {
         switch (code) {
             case 10001:
-                return "请求参数错误";
+                return "用户名或密码错误";
             case 10002:
                 return "数据库错误";
             case 10003:
