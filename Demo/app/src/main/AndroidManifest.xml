@@ -108,7 +108,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="io.openim.android.demo.fileProvider"
+            android:authorities="${applicationId}.fileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
