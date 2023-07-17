@@ -54,10 +54,13 @@
                     android:textStyle="bold" />
 
                 <LinearLayout
+                    android:id="@+id/userIdLy"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:clickable="true"
+                    android:orientation="horizontal"
+                    android:focusable="true">
                     <TextView
                         android:id="@+id/userId"
                         android:layout_width="wrap_content"
