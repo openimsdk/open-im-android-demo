@@ -156,7 +156,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         } else {
             getGroupPermissions();
             IMEvent.getInstance().addGroupListener(this);
-            signalingGetRoomByGroupID();
         }
     }
 
