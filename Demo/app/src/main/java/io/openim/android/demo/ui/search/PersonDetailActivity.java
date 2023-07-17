@@ -128,16 +128,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             if (targetGroupMembersInfo.getMuteEndTime() != 0)
                 muteTime = TimeUtil.getTime(targetGroupMembersInfo.getMuteEndTime(),
                     TimeUtil.yearTimeSecondFormat);
-            view.muteTime.setText(muteTime);
-            if (oneself()) return;
 
-            view.manager.setVisibility(isOwner(oneselfGroupMembersInfo) ? View.VISIBLE : View.GONE);
-            if (isOwner(targetGroupMembersInfo) || isAdmin(targetGroupMembersInfo)) {
-                view.mute.setVisibility(View.GONE);
-            } else {
-                view.mute.setVisibility(isOwner(oneselfGroupMembersInfo)
-                    || isAdmin(oneselfGroupMembersInfo) ? View.VISIBLE : View.GONE);
-            }
             if (targetGroupMembersInfo.getJoinSource() == 2) {
                 List<String> ids2 = new ArrayList<>();
                 ids2.add(targetGroupMembersInfo.getInviterUserID());
@@ -150,25 +141,6 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             if (targetGroupMembersInfo.getJoinSource() == 4) {
                 view.joinMethod.setText(io.openim.android.ouicore.R.string.group_qr_join);
             }
-
-            view.setManager.setCheckedWithAnimation(isAdmin(targetGroupMembersInfo));
-            final String uid = targetGroupMembersInfo.getUserID();
-            view.setManager.setOnSlideButtonClickListener(isChecked -> {
-                OpenIMClient.getInstance().groupManager.setGroupMemberRoleLevel(new IMBack<String>() {
-                    @Override
-                    public void onSuccess(String data) {
-                        GroupVM groupVM = BaseApp.inst().getVMByCache(GroupVM.class);
-                        groupVM.superGroupMembers.getValue().clear();
-                        groupVM.page = 0;
-                        groupVM.getSuperGroupMemberList();
-                    }
-                }, groupId, uid, isChecked ? GroupRole.ADMIN :
-                    GroupRole.MEMBER);
-            });
-            view.mute.setOnClickListener(v -> {
-                jumpCallBack.launch(new Intent(this, SetMuteActivity.class).putExtra(Constant.K_ID, vm.searchContent.getValue()));
-            });
-
         });
     }
 
