@@ -18,6 +18,7 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentTransaction;
@@ -42,6 +43,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.GroupStatus;
 import io.openim.android.sdk.models.AtUserInfo;
@@ -75,60 +77,64 @@ public class BottomInputCote {
         Common.UIHandler.postDelayed(() -> hasMicrophone = AndPermission.hasPermissions(context,
             Permission.Group.MICROPHONE), 300);
 
-        view.chatMoreOrSend.setOnClickListener(v -> {
-            if (!isSend) {
-                view.voice.setChecked(false);
-                clearFocus();
-                Common.hideKeyboard(BaseApp.inst(), v);
-                view.fragmentContainer.setVisibility(VISIBLE);
-                switchFragment(inputExpandFragment);
-                return;
-            }
-
-            List<Message> atMessages = vm.atMessages.getValue();
-            final Message msg;
-            if (null != vm.replyMessage.getValue()) {
-                msg =
-                    OpenIMClient.getInstance().messageManager
-                        .createQuoteMessage(vm.inputMsg.getValue(), vm.replyMessage.getValue());
-            } else if (atMessages.isEmpty())
-                msg =
-                    OpenIMClient.getInstance().messageManager.createTextMessage(vm.inputMsg.getValue());
-            else {
-                List<String> atUserIDList = new ArrayList<>();
-                List<AtUserInfo> atUserInfoList = new ArrayList<>();
-
-                Editable msgEdit = view.chatInput.getText();
-                final ForegroundColorSpan spans[] = view.chatInput.getText().getSpans(0,
-                    view.chatInput.getText().length(), ForegroundColorSpan.class);
-                for (Message atMessage : atMessages) {
-                    atUserIDList.add(atMessage.getSendID());
-                    AtUserInfo atUserInfo = new AtUserInfo();
-                    atUserInfo.setAtUserID(atMessage.getSendID());
-                    atUserInfo.setGroupNickname(atMessage.getSenderNickname());
-                    atUserInfoList.add(atUserInfo);
-
-                    try {
-                        for (ForegroundColorSpan span : spans) {
-                            if (span == null) continue;
-                            MsgExpand msgExpand = (MsgExpand) atMessage.getExt();
-                            if (msgExpand.spanHashCode == span.hashCode()) {
-                                final int spanStart = view.chatInput.getText().getSpanStart(span);
-                                final int spanEnd = view.chatInput.getText().getSpanEnd(span);
-                                msgEdit.replace(spanStart, spanEnd,
-                                    " @" + atMessage.getSendID() + " ");
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+        view.chatMoreOrSend.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                if (!isSend) {
+                    view.voice.setChecked(false);
+                    clearFocus();
+                    Common.hideKeyboard(BaseApp.inst(), v);
+                    view.fragmentContainer.setVisibility(VISIBLE);
+                    switchFragment(inputExpandFragment);
+                    return;
                 }
-                msg =
-                    OpenIMClient.getInstance().messageManager.createTextAtMessage(msgEdit.toString(), atUserIDList, atUserInfoList, null);
-            }
-            if (null != msg) {
-                vm.sendMsg(msg);
-                reset();
+
+                List<Message> atMessages = vm.atMessages.getValue();
+                final Message msg;
+                if (null != vm.replyMessage.getValue()) {
+                    msg =
+                        OpenIMClient.getInstance().messageManager
+                            .createQuoteMessage(vm.inputMsg.getValue(), vm.replyMessage.getValue());
+                } else if (atMessages.isEmpty())
+                    msg =
+                        OpenIMClient.getInstance().messageManager.createTextMessage(vm.inputMsg.getValue());
+                else {
+                    List<String> atUserIDList = new ArrayList<>();
+                    List<AtUserInfo> atUserInfoList = new ArrayList<>();
+
+                    Editable msgEdit = view.chatInput.getText();
+                    final ForegroundColorSpan spans[] = view.chatInput.getText().getSpans(0,
+                        view.chatInput.getText().length(), ForegroundColorSpan.class);
+                    for (Message atMessage : atMessages) {
+                        atUserIDList.add(atMessage.getSendID());
+                        AtUserInfo atUserInfo = new AtUserInfo();
+                        atUserInfo.setAtUserID(atMessage.getSendID());
+                        atUserInfo.setGroupNickname(atMessage.getSenderNickname());
+                        atUserInfoList.add(atUserInfo);
+
+                        try {
+                            for (ForegroundColorSpan span : spans) {
+                                if (span == null) continue;
+                                MsgExpand msgExpand = (MsgExpand) atMessage.getExt();
+                                if (msgExpand.spanHashCode == span.hashCode()) {
+                                    final int spanStart =
+                                        view.chatInput.getText().getSpanStart(span);
+                                    final int spanEnd = view.chatInput.getText().getSpanEnd(span);
+                                    msgEdit.replace(spanStart, spanEnd,
+                                        " @" + atMessage.getSendID() + " ");
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    msg =
+                        OpenIMClient.getInstance().messageManager.createTextAtMessage(msgEdit.toString(), atUserIDList, atUserInfoList, null);
+                }
+                if (null != msg) {
+                    vm.sendMsg(msg);
+                    reset();
+                }
             }
         });
         view.voice.setOnCheckedChangeListener((v, isChecked) -> {

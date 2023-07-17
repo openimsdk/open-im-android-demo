@@ -212,7 +212,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             } else {
                 vm.conversations.getValue().remove(conversationInfo);
                 adapter.notifyItemRemoved(adapterPosition);
-                vm.deleteConversationFromLocalAndSvr(conversationInfo.conversationInfo.getConversationID());
+                vm.deleteConversationAndDeleteAllMsg(conversationInfo.conversationInfo.getConversationID());
             }
             menuBridge.closeMenu();
         });
@@ -363,8 +363,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             viewHolder.viewBinding.nickName.setText(msgConversation.conversationInfo.getShowName());
 
             if (msgConversation.conversationInfo.getRecvMsgOpt() != 0) {
-                if (msgConversation.conversationInfo.getUnreadCount() > 0)
-                    viewHolder.viewBinding.noDisturbTips.setVisibility(View.VISIBLE);
+                    viewHolder.viewBinding.noDisturbTips
+                        .setVisibility(msgConversation.conversationInfo.getUnreadCount() > 0?View.VISIBLE:View.GONE);
                 viewHolder.viewBinding.noDisturbIc.setVisibility(View.VISIBLE);
                 viewHolder.viewBinding.badge.badge.setVisibility(View.GONE);
             } else {

@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.api.NiService;
 import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.NotificationVM;
@@ -79,7 +81,8 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     private void initDate() {
         if (isInitDate) return;
         isInitDate = true;
-        if (null != callingService) callingService.startAudioVideoService(getContext());
+        if (null != callingService)
+            callingService.startAudioVideoService(getContext());
 
         initGlobalVM();
         getIView().initDate();
@@ -94,14 +97,15 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     }
 
     private void getClientConfig() {
-        N.API(NiService.class).CommNI(Constant.getAppAuthUrl() + "admin/init/get_client_config",
+        N.API(NiService.class).CommNI(Constant.getAppAuthUrl() + "client_config/get",
             BaseApp.inst().loginCertificate.chatToken,
             NiService.buildParameter().buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Map.class)).subscribe(new NetObserver<Map>(getContext()) {
             @Override
             public void onSuccess(Map m) {
                 try {
-                    BaseApp.inst().loginCertificate.allowSendMsgNotFriend = ((Integer) m.get(
-                        "allowSendMsgNotFriend") == 1);
+                   HashMap<String,Object> map = (HashMap) m.get("config");
+                    int allowSendMsgNotFriend= Integer.valueOf((String) map.get("allowSendMsgNotFriend"));
+                    BaseApp.inst().loginCertificate.allowSendMsgNotFriend = allowSendMsgNotFriend == 1;
 
                     BaseApp.inst().loginCertificate.cache(BaseApp.inst());
                 } catch (Exception ignored) {
@@ -110,6 +114,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
 
             @Override
             protected void onFailure(Throwable e) {
+               toast(e.getMessage());
             }
         });
     }
@@ -124,7 +129,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
             @Override
             public void onSuccess(UserInfo data) {
                 // 返回当前登录用户的资料
-                BaseApp.inst().loginCertificate.nickname = data.getNickname();
+                BaseApp.inst().loginCertificate.nickname = (null==data.getNickname())?"":data.getNickname();
                 BaseApp.inst().loginCertificate.faceURL = data.getFaceURL();
                 BaseApp.inst().loginCertificate.cache(getContext());
                 nickname.setValue(BaseApp.inst().loginCertificate.nickname);

@@ -2,9 +2,10 @@ package io.openim.android.ouicore.ex;
 
 import androidx.annotation.Nullable;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Ex {
+public class Ex implements Serializable {
     public String key; //Id
 
     public Ex(String key) {

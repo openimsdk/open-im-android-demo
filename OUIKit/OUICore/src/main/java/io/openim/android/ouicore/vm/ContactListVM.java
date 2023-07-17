@@ -44,8 +44,9 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         updateConversation();
     }
 
-    public void deleteConversationFromLocalAndSvr(String conversationId) {
-        OpenIMClient.getInstance().conversationManager.deleteConversationFromLocalAndSvr(new OnBase<String>() {
+    public void deleteConversationAndDeleteAllMsg(String conversationId) {
+        OpenIMClient.getInstance().conversationManager
+            .deleteConversationAndDeleteAllMsg(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
 
@@ -69,9 +70,10 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
             public void onSuccess(List<ConversationInfo> data) {
                 conversations.val().clear();
                 for (ConversationInfo datum : data) {
-                    Message msg = GsonHel.fromJson(datum.getLatestMsg(), Message.class);
-                    if (null == msg)
-                        continue;
+                    Message msg = null;
+                    if (null!=datum.getLatestMsg()){
+                        msg = GsonHel.fromJson(datum.getLatestMsg(), Message.class);
+                    }
                     conversations.val().add(new MsgConversation(msg, datum));
                 }
                 conversations.setValue(conversations.getValue());
@@ -152,7 +154,6 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         for (ConversationInfo info : list) {
             Message message=GsonHel.fromJson(info.getLatestMsg(),
                 Message.class);
-            if (null==message) continue;
             MsgConversation msgConversation =
                 new MsgConversation(message, info);
             int index = conversations.val()

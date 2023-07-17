@@ -15,6 +15,7 @@ import java.util.List;
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
@@ -446,10 +447,11 @@ public class IMEvent {
     private void promptSoundOrNotification(ConversationInfo conversationInfo) {
         try {
             if (BaseApp.inst().loginCertificate.globalRecvMsgOpt == 2) return;
+            Message msg= GsonHel.fromJson(conversationInfo.getLatestMsg(),Message.class);
             if (conversationInfo.getRecvMsgOpt() == 0
                 && conversationInfo.getUnreadCount() != 0) {
                 if (BaseApp.inst().isBackground())
-                    IMUtil.sendNotice(conversationInfo.getLatestMsgSendTime());
+                    IMUtil.sendNotice(msg.getClientMsgID().hashCode());
                 else
                     IMUtil.playPrompt();
             }

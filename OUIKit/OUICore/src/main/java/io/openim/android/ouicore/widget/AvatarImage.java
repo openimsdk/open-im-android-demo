@@ -39,6 +39,11 @@ public class AvatarImage extends FrameLayout {
         init(context);
     }
 
+    public RoundImageView getRoundImageView() {
+        return roundImageView;
+    }
+
+
     void init(Context context) {
         roundImageView = new RoundImageView(context);
         roundImageView.setType(RoundImageView.TYPE_ROUND);

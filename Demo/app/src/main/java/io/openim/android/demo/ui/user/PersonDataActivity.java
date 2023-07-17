@@ -29,11 +29,14 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
+import io.openim.android.ouicore.ex.MultipleChoice;
+import io.openim.android.ouicore.ex.User;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ContactListVM;
+import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.SlideButton;
 import io.openim.android.ouicore.widget.WaitDialog;
@@ -82,7 +85,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
     public void onSuccess(Object body) {
         super.onSuccess(body);
         final String cid = "single_" + uid;
-        BaseApp.inst().getVMByCache(ContactListVM.class).deleteConversationFromLocalAndSvr(cid);
+        BaseApp.inst().getVMByCache(ContactListVM.class).deleteConversationAndDeleteAllMsg(cid);
         setResult(RESULT_OK);
         finish();
     }
@@ -100,13 +103,13 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             });
         });
         view.recommend.setOnClickListener(v -> {
-            Map<String, String> bean = new HashMap();
             UserInfo userInfo = vm.userInfo.val();
-            bean.put("userID", userInfo.getUserID());
-            bean.put("nickname", userInfo.getNickname());
-            bean.put("faceURL", userInfo.getFaceURL());
-            ARouter.getInstance().build(Routes.Contact.ALL_FRIEND).withString("recommend",
-                GsonHel.toJson(bean)).navigation();
+            User user=new User(userInfo.getUserID());
+            user.setName(userInfo.getNickname());
+            user.setFaceUrl(userInfo.getFaceURL());
+            ARouter.getInstance().build(Routes.Contact.ALL_FRIEND)
+                .withSerializable("recommend",
+                    user).navigation();
         });
         view.moreData.setOnClickListener(v -> {
             startActivity(new Intent(this, MoreDataActivity.class));
@@ -147,7 +150,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         CommonDialog commonDialog = new CommonDialog(this);
         commonDialog.setCanceledOnTouchOutside(false);
         commonDialog.setCancelable(false);
-        commonDialog.getMainView().tips.setText("确认对" + vm.userInfo.val().getFriendInfo().getNickname() + "拉黑吗？");
+        commonDialog.getMainView().tips.setText("确认对" + vm.userInfo.val().getNickname() + "拉黑吗？");
         commonDialog.getMainView().cancel.setOnClickListener(v -> {
             commonDialog.dismiss();
             friendVM.blackListUser.setValue(friendVM.blackListUser.getValue());

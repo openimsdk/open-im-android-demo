@@ -40,7 +40,7 @@ import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
 
-public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBinding> {
+public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBinding>implements ChatVM.ViewAction {
 
     private Uri fileUri;
     boolean hasStorage, hasShoot;
@@ -175,4 +175,13 @@ public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBin
             .forResult(albumLauncher);
     }
 
+    @Override
+    public void scrollToPosition(int position) {
+
+    }
+
+    @Override
+    public void closePage() {
+
+    }
 }

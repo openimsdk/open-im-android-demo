@@ -31,14 +31,17 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.entity.ExUserInfo;
+import io.openim.android.ouicore.ex.User;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SocialityVM;
+import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
+import io.openim.android.sdk.models.CardElem;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.OfflinePushInfo;
@@ -50,7 +53,7 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
     //从聊天跳转过来
     private boolean formChat;
     //从推荐好友跳转过来 带的userinfo
-    private String recommend;
+    private User recommend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +62,7 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
         bindViewDataBinding(ActivityAllFriendBinding.inflate(getLayoutInflater()));
         sink();
         formChat = getIntent().getBooleanExtra("formChat", false);
-        recommend = getIntent().getStringExtra("recommend");
+        recommend = (User) getIntent().getSerializableExtra("recommend");
         vm.getAllFriend();
 
         listener();
@@ -120,7 +123,7 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
                     itemViewHo.view.nickName.setText(friendInfo.getNickname());
                     itemViewHo.view.select.setVisibility(View.GONE);
                     itemViewHo.view.getRoot().setOnClickListener(v -> {
-                        if (!TextUtils.isEmpty(recommend)) {
+                        if (null!=recommend) {
                             CommonDialog commonDialog = new CommonDialog(AllFriendActivity.this);
                             commonDialog.show();
                             LayoutCommonDialogBinding mainView = commonDialog.getMainView();
@@ -165,8 +168,11 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
     }
 
     private void sendCardMessage(FriendInfo friendInfo) {
-        L.e(recommend);
-        Message message = OpenIMClient.getInstance().messageManager.createCardMessage(null);
+        CardElem cardElem=new CardElem();
+        cardElem.setUserID(recommend.key);
+        cardElem.setNickname(recommend.getName());
+        cardElem.setFaceURL(recommend.getFaceUrl());
+        Message message = OpenIMClient.getInstance().messageManager.createCardMessage(cardElem);
         OfflinePushInfo offlinePushInfo = new OfflinePushInfo(); // 离线推送的消息备注；不为null
         OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
             @Override
