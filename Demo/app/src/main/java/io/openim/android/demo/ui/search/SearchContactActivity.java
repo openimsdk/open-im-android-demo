@@ -61,8 +61,12 @@ public class SearchContactActivity extends BaseActivity<SearchVM, ActivitySearch
         view.searchView.getEditText().setHint(vm.isPerson ?
             io.openim.android.ouicore.R.string.search_by_id : R.string.search_group_by_id);
         view.searchView.getEditText().setOnKeyListener((v, keyCode, event) -> {
-            vm.searchContent.setValue(view.searchView.getEditText().getText().toString());
+            String id;
+            vm.searchContent.setValue(id=view.searchView.getEditText().getText().toString());
+            if ( vm.isPerson)
             vm.searchUser( vm.searchContent.getValue());
+            else
+            vm.searchGroup(id);
             return false;
         });
 
@@ -135,7 +139,8 @@ public class SearchContactActivity extends BaseActivity<SearchVM, ActivitySearch
                 if (isPerson)
                     context.startActivity(new Intent(context, PersonDetailActivity.class).putExtra(Constant.K_ID, title));
                 else
-                    ARouter.getInstance().build(Routes.Group.DETAIL).withString(io.openim.android.ouicore.utils.Constant.K_GROUP_ID, title).navigation();
+                    ARouter.getInstance().build(Routes.Group.DETAIL).withString(io.openim.android.ouicore.utils.Constant.K_GROUP_ID,
+                        title).navigation();
             });
         }
 

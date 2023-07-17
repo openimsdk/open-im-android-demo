@@ -41,8 +41,9 @@
 
                 <io.openim.android.ouicore.widget.AvatarImage
                     android:layout_width="48dp"
+                    android:id="@+id/avatar"
                     android:layout_height="48dp"
-                    android:src="@mipmap/ic_my_group" />
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -71,6 +72,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:orientation="horizontal">
 
                 <TextView
