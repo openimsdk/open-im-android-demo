@@ -13,7 +13,7 @@
         android:layout_margin="8dp"
         android:minHeight="100dp"
         app:cardCornerRadius="6dp"
-        app:cardElevation="8dp">
+        app:cardElevation="0dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:orientation="vertical"
