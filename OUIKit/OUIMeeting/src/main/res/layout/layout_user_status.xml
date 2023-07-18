@@ -1,78 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<io.openim.android.ouicore.widget.InterceptLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="115dp"
-    android:layout_height="115dp"
-    android:layout_marginRight="10dp"
-    android:background="#FF2E2E2E"
-    android:orientation="vertical"
-    android:padding="8dp"
-    tools:ignore="MissingDefaultResource">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/mc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="2dp"
+        android:src="@mipmap/ic_mc" />
 
     <LinearLayout
-        android:id="@+id/userStatus"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:background="@drawable/sty_radius_10_aa666666"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="5dp"
+        android:paddingTop="2dp"
+        android:paddingRight="5dp"
+        android:paddingBottom="2dp">
 
-        <io.openim.android.ouicore.widget.AvatarImage
-            android:id="@+id/avatar"
-            android:layout_width="65dp"
-            android:layout_height="65dp"
-            android:src="@mipmap/ic_my_friend" />
+        <ImageView
+            android:id="@+id/mic"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:src="@mipmap/ic__mic_on" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxWidth="@dimen/comm_title_high"
+            android:maxLines="1"
+            android:textColor="#ffffffff"
+            android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/mc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="3dp"
-                android:background="#FF0089FF"
-                android:paddingLeft="3dp"
-                android:paddingRight="3dp"
-                android:visibility="visible"
-                android:text="@string/emcee"
-                android:textColor="#ffffffff"
-                android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/name"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:gravity="right"
-                android:textColor="#ffffffff"
-                android:textSize="14sp" />
+        <ImageView
+            android:id="@+id/net"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:src="@mipmap/ic_net_excellent" />
 
-            <ImageView
-                android:id="@+id/mic"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_marginLeft="3dp"
-                android:layout_marginRight="3dp"
-                android:src="@mipmap/ic__mic_on" />
-
-            <ImageView
-                android:id="@+id/net"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:src="@mipmap/ic_net_excellent" />
-
-        </LinearLayout>
     </LinearLayout>
 
-    <io.livekit.android.renderer.TextureViewRenderer
-        android:id="@+id/textureView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+</LinearLayout>
 
-</io.openim.android.ouicore.widget.InterceptLinearLayout>

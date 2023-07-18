@@ -233,7 +233,8 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     public boolean isHostUser(Participant participant) {
         if (null == roomMetadata.getValue()) return false;
-        return null != participant.getIdentity() && participant.getIdentity().equals(roomMetadata.getValue().hostUserID);
+        return null != participant.getIdentity()
+            && participant.getIdentity().equals(roomMetadata.getValue().hostUserID);
     }
 
 
