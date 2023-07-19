@@ -3,41 +3,62 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
+    android:orientation="horizontal"
     android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:orientation="horizontal">
+    android:paddingRight="16dp">
 
     <io.openim.android.ouicore.widget.AvatarImage
-        android:layout_width="50dp"
-        android:layout_height="50dp"
         android:id="@+id/avatar"
-        android:src="@mipmap/ic_my_friend" />
+        android:layout_width="50dp"
+        android:layout_height="50dp" />
 
     <TextView
-        android:layout_width="0dp"
-        android:layout_weight="1"
         android:id="@+id/name"
+        android:layout_width="0dp"
         android:layout_height="63dp"
         android:layout_marginLeft="20dp"
-        android:text="陛书天"
+        android:layout_weight="1"
         android:gravity="left|center"
         android:textColor="#ff16191c"
         android:textSize="17sp" />
 
     <CheckBox
-        android:button="@null"
         android:id="@+id/mic"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:drawableRight="@drawable/selector_m_mic2"
-        android:layout_height="wrap_content"/>
+        android:button="@null"
+        android:drawableRight="@drawable/selector_m_mic2" />
 
     <CheckBox
-        android:button="@null"
         android:id="@+id/camera"
-        android:layout_marginLeft="5dp"
-        android:background="@android:color/transparent"
         android:layout_width="wrap_content"
-        android:drawableRight="@drawable/selector_m_camera2"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:background="@android:color/transparent"
+        android:button="@null"
+        android:drawableRight="@drawable/selector_m_camera2" />
+
+    <RelativeLayout
+        android:layout_width="40dp"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/more"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="10dp"
+            android:src="@mipmap/ic_more" />
+
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/angleMark"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_angle_mark" />
+    </RelativeLayout>
+
 </LinearLayout>

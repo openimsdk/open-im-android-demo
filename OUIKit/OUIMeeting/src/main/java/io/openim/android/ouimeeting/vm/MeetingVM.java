@@ -3,6 +3,7 @@ package io.openim.android.ouimeeting.vm;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,7 +23,9 @@ import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
+import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.entity.MeetingInfoAttach;
+import io.openim.android.ouicore.entity.ParticipantMeta;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
@@ -44,6 +48,7 @@ import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
 
 public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
+
 
     //预约上传的参数
     public static class TimingParameter {
@@ -75,12 +80,14 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     public SignalingCertificate signalingCertificate;
     public CallViewModel callViewModel;
-    public MutableLiveData<RoomMetadata> roomMetadata = new MutableLiveData<>();
+    public State<RoomMetadata> roomMetadata = new State<>();
     //在列表点击item选择的会议信息实体
     public MeetingInfo selectMeetingInfo;
     public MutableLiveData<List<MeetingInfo>> meetingInfoList = new MutableLiveData<>();
     //发起人信息
     public List<UserInfo> userInfos = new ArrayList<>();
+    //都看他
+    public State<String> allWatchedUserId = new State<>("");
 
     //下边菜单栏可点击权限
     public MutableLiveData<Boolean> micPermission = new MutableLiveData<>(false);
@@ -119,6 +126,16 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
             fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
             return null;
         });
+    }
+
+    public String getMetaUserName(ParticipantMeta participantMeta) {
+        try {
+            String name = participantMeta.groupMemberInfo.getNickname();
+            if (TextUtils.isEmpty(name)) name = participantMeta.userInfo.getNickname();
+            return name;
+        } catch (Exception ignore) {
+        }
+        return "";
     }
 
     public void initVideoView(TextureViewRenderer... viewRenderers) {
@@ -212,8 +229,20 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
             L.e("-------roomMetadata-------" + json);
             roomMetadata.setValue(GsonHel.fromJson(json, RoomMetadata.class));
             handlePermission();
+            allSeeHe();
         } catch (Exception ignored) {
         }
+    }
+
+    private void allSeeHe() {
+        RoomMetadata meta = roomMetadata.val();
+        if (null==meta)return;
+        if (null!=meta.beWatchedUserIDList && meta.beWatchedUserIDList.isEmpty()){
+            String id = meta.beWatchedUserIDList.get(0);
+            if (!Objects.equals(allWatchedUserId.val(), id))
+                allWatchedUserId.setValue(id);
+        }
+
     }
 
 
@@ -233,8 +262,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     public boolean isHostUser(Participant participant) {
         if (null == roomMetadata.getValue()) return false;
-        return null != participant.getIdentity()
-            && participant.getIdentity().equals(roomMetadata.getValue().hostUserID);
+        return null != participant.getIdentity() && participant.getIdentity().equals(roomMetadata.getValue().hostUserID);
     }
 
 
@@ -335,12 +363,13 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
             e.printStackTrace();
         }
 
-        HashMap<String,Object> map=new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
         map.put(Constant.K_CUSTOM_TYPE, Constant.MsgType.CUSTOMIZE_MEETING);
         map.put(Constant.K_RESULT, meetingInfo);
 
         Message msg =
-            OpenIMClient.getInstance().messageManager.createCustomMessage(GsonHel.toJson(map), null, null);
+            OpenIMClient.getInstance().messageManager.createCustomMessage(GsonHel.toJson(map),
+                null, null);
         OfflinePushInfo offlinePushInfo = new OfflinePushInfo(); // 离线推送的消息备注；不为null
         OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
             @Override
@@ -370,8 +399,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
             @Override
             public void onSuccess(String data) {
-                if (null != OnSuccessListener)
-                    OnSuccessListener.onSuccess(data);
+                if (null != OnSuccessListener) OnSuccessListener.onSuccess(data);
             }
         }, configure);
     }

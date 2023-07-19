@@ -43,7 +43,7 @@ class CallViewModel(
     private val mutablePrimarySpeaker = MutableStateFlow<Participant?>(null)
     val primarySpeaker: StateFlow<Participant?> = mutablePrimarySpeaker
 
-    val activeSpeakers = room::activeSpeakers.flow
+    private val activeSpeakers = room::activeSpeakers.flow
     val roomMetadata = room::metadata.flow
 
     private var localScreencastTrack: LocalScreencastVideoTrack? = null
@@ -167,10 +167,10 @@ class CallViewModel(
                 flowOf(null)
             }
         }.collectLatest1 { videoTrack ->
-            val videoTrack = videoTrack as? VideoTrack;
+            val videoTrack = videoTrack as? VideoTrack
             if (null != videoTrack) {
-                viewRenderer.tag = videoTrack;
-                videoTrack.addRenderer(viewRenderer);
+                viewRenderer.tag = videoTrack
+                videoTrack.addRenderer(viewRenderer)
             }
         }
     }
@@ -242,6 +242,9 @@ class CallViewModel(
 
         videoTrack.restartTrack(newOptions)
     }
+    fun getActiveSpeakersFlow(): StateFlow<List<Participant>> {
+        return room::activeSpeakers.flow
+    }
 
     fun dismissError() {
         mutableError.value = null
@@ -264,6 +267,7 @@ class CallViewModel(
         flow: Flow<T>, function: (T) -> Any,
         scope: CoroutineScope = viewModelScope,
     ) {
+        scopes.add(scope)
         scope.launch {
             flow.collect {
                 function.invoke(it)

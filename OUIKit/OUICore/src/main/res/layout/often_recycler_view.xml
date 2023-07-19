@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
     <LinearLayout
         android:id="@+id/parent"
         android:layout_width="match_parent"
@@ -8,14 +8,15 @@
         android:fitsSystemWindows="true"
         android:orientation="vertical">
 
-        <include  android:id="@+id/top"
+        <include
+            android:id="@+id/top"
             layout="@layout/view_often_title" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="0dp" />
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
     </LinearLayout>
 

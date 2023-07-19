@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -15,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -22,13 +24,12 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 
 import java.math.BigDecimal;
@@ -37,7 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.livekit.android.renderer.TextureViewRenderer;
 import io.livekit.android.room.participant.ConnectionQuality;
@@ -46,8 +47,9 @@ import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.databinding.OftenRecyclerViewBinding;
+import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
 import io.openim.android.ouicore.entity.ParticipantMeta;
-import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
@@ -57,13 +59,14 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouicore.widget.WaitDialog;
+import io.openim.android.ouicore.widget.GridSpaceItemDecoration;
 import io.openim.android.ouimeeting.databinding.ActivityMeetingHomeBinding;
 import io.openim.android.ouimeeting.databinding.LayoutMeetingInfoDialogBinding;
 import io.openim.android.ouimeeting.databinding.LayoutMemberDialogBinding;
 import io.openim.android.ouimeeting.databinding.LayoutSettingDialogBinding;
 import io.openim.android.ouimeeting.databinding.LayoutUserStatusBinding;
 import io.openim.android.ouimeeting.databinding.MeetingIietmMemberBinding;
+import io.openim.android.ouimeeting.databinding.MenuUserSettingBinding;
 import io.openim.android.ouimeeting.databinding.ViewSingleTextureBinding;
 import io.openim.android.ouimeeting.entity.RoomMetadata;
 import io.openim.android.ouimeeting.vm.MeetingVM;
@@ -76,7 +79,6 @@ import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
 import kotlinx.coroutines.CoroutineScope;
 import kotlinx.coroutines.flow.StateFlow;
-import open_im_sdk_callback.Base;
 
 public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeetingHomeBinding> implements MeetingVM.Interaction {
 
@@ -101,7 +103,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         if (vm.isInit) {
             if (vm.isLandscape)
                 toast(getString(io.openim.android.ouicore.R.string.double_tap_tips));
-            connectRoomSuccess(vm.callViewModel.getVideoTrack(vm.callViewModel.getRoom().getLocalParticipant()));
+            connectRoomSuccess(vm.callViewModel.
+                getVideoTrack(vm.callViewModel.getRoom().getLocalParticipant()));
         } else init();
 
         bindVM();
@@ -121,18 +124,23 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     //分享屏幕
     private ActivityResultLauncher<Intent> screenCaptureIntentLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        int resultCode = result.getResultCode();
-        Intent data = result.getData();
-        if (resultCode != Activity.RESULT_OK || data == null) {
-            return;
-        }
-        vm.startShareScreen(data);
-        toast(getString(io.openim.android.ouicore.R.string.share_screen));
-    });
+            int resultCode = result.getResultCode();
+            Intent data = result.getData();
+            if (resultCode != Activity.RESULT_OK || data == null) {
+                return;
+            }
+            vm.startShareScreen(data);
+            toast(getString(io.openim.android.ouicore.R.string.share_screen));
+        });
 
     private void listener() {
-
-
+        vm.allWatchedUserId.observe(this,v->{
+            for (Participant participant : memberParticipants) {
+                if (v.equals(participant.getIdentity())){
+                    showPageFirst(participant);
+                }
+            }
+        });
         view.landscape.setOnClickListener(v -> {
             triggerLandscape = true;
             vm.isInit = true;
@@ -269,33 +277,56 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         return v.getRoot();
     }
 
+    //设置弹窗
     private View buildSettingPopView() {
         LayoutSettingDialogBinding v = LayoutSettingDialogBinding.inflate(getLayoutInflater());
-        vm.roomMetadata.observe(this, roomMetadata -> {
-            v.allowCancelMute.setCheckedWithAnimation(roomMetadata.participantCanUnmuteSelf);
-            v.allowOpenCamera.setCheckedWithAnimation(roomMetadata.participantCanEnableVideo);
-            v.onlyHostShare.setCheckedWithAnimation(roomMetadata.onlyHostShareScreen);
-            v.onlyHostInvite.setCheckedWithAnimation(roomMetadata.onlyHostInviteUser);
-            v.joinMute.setCheckedWithAnimation(roomMetadata.joinDisableMicrophone);
-        });
         RoomMetadata roomMetadata = vm.roomMetadata.getValue();
-        v.allowCancelMute.setOnSlideButtonClickListener(isChecked -> roomMetadata.participantCanUnmuteSelf = isChecked);
-        v.allowOpenCamera.setOnSlideButtonClickListener(isChecked -> roomMetadata.participantCanEnableVideo = isChecked);
-        v.onlyHostShare.setOnSlideButtonClickListener(isChecked -> roomMetadata.onlyHostShareScreen = isChecked);
-        v.onlyHostInvite.setOnSlideButtonClickListener(isChecked -> roomMetadata.onlyHostInviteUser = isChecked);
-        v.joinMute.setOnSlideButtonClickListener(isChecked -> roomMetadata.joinDisableMicrophone
-            = isChecked);
+
+        AtomicBoolean participantCanUnmuteSelf =
+            new AtomicBoolean(roomMetadata.participantCanUnmuteSelf);
+        AtomicBoolean participantCanEnableVideo =
+            new AtomicBoolean(roomMetadata.participantCanEnableVideo);
+        AtomicBoolean onlyHostInviteUser = new AtomicBoolean(roomMetadata.onlyHostInviteUser);
+        AtomicBoolean onlyHostShareScreen = new AtomicBoolean(roomMetadata.onlyHostShareScreen);
+        AtomicBoolean joinDisableMicrophone = new AtomicBoolean(roomMetadata.joinDisableMicrophone);
+
+        v.allowCancelMute.setCheckedWithAnimation(participantCanUnmuteSelf.get());
+        v.allowOpenCamera.setCheckedWithAnimation(participantCanEnableVideo.get());
+        v.onlyHostShare.setCheckedWithAnimation(onlyHostShareScreen.get());
+        v.onlyHostInvite.setCheckedWithAnimation(onlyHostInviteUser.get());
+        v.joinMute.setCheckedWithAnimation(joinDisableMicrophone.get());
+
+        v.allowCancelMute.setOnSlideButtonClickListener(isChecked -> participantCanUnmuteSelf.set(isChecked));
+        v.allowOpenCamera.setOnSlideButtonClickListener(isChecked -> participantCanEnableVideo.set(isChecked));
+        v.onlyHostShare.setOnSlideButtonClickListener(isChecked -> onlyHostShareScreen.set(isChecked));
+        v.onlyHostInvite.setOnSlideButtonClickListener(isChecked -> onlyHostInviteUser.set(isChecked));
+        v.joinMute.setOnSlideButtonClickListener(isChecked -> joinDisableMicrophone.set(isChecked));
         v.sure.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                Map map = JSONObject.parseObject(GsonHel.toJson(vm.roomMetadata.getValue()),
-                    Map.class);
+                Map<String, Object> map = new HashMap<>();
                 map.put("roomID", vm.signalingCertificate.getRoomID());
-                vm.updateMeetingInfo(map, data -> settingPopDialog.dismiss());
+                map.put("participantCanUnmuteSelf", participantCanUnmuteSelf.get());
+                map.put("participantCanEnableVideo", participantCanEnableVideo.get());
+                map.put("onlyHostInviteUser", onlyHostInviteUser.get());
+                map.put("onlyHostShareScreen", onlyHostShareScreen.get());
+                map.put("joinDisableMicrophone", joinDisableMicrophone.get());
+
+                vm.updateMeetingInfo(map, data -> {
+                    roomMetadata.participantCanUnmuteSelf = participantCanUnmuteSelf.get();
+                    roomMetadata.participantCanEnableVideo = participantCanEnableVideo.get();
+                    roomMetadata.onlyHostInviteUser = onlyHostInviteUser.get();
+                    roomMetadata.onlyHostShareScreen = onlyHostShareScreen.get();
+                    roomMetadata.joinDisableMicrophone = joinDisableMicrophone.get();
+
+                    vm.roomMetadata.setValue(roomMetadata);
+                    settingPopDialog.dismiss();
+                });
             }
         });
         return v.getRoot();
     }
+
 
     //成员弹窗
     private View buildPopView() {
@@ -311,7 +342,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                     ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
                         ParticipantMeta.class);
                     holder.view.avatar.load(participantMeta.userInfo.getFaceURL());
-                    holder.view.name.setText(getMetaUserName(participantMeta));
+                    holder.view.name.setText(vm.getMetaUserName(participantMeta));
 
                     if (vm.isSelfHostUser.getValue()) {
                         holder.view.mic.setVisibility(View.VISIBLE);
@@ -330,13 +361,75 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                                 vm.muteCamera(data.getIdentity(), !holder.view.camera.isChecked());
                             }
                         });
+                        holder.view.more.setOnClickListener(v -> {
+                            showPopupWindow(v, data, participantMeta);
+                        });
                     } else {
                         holder.view.mic.setVisibility(View.GONE);
                         holder.view.camera.setVisibility(View.GONE);
+                        holder.view.more.setVisibility(View.GONE);
                     }
-
+                    holder.view.angleMark.setVisibility(participantMeta.setTop ? View.VISIBLE :
+                        View.GONE);
                 } catch (Exception ignored) {
                 }
+            }
+
+            private void showPopupWindow(View v, Participant data, ParticipantMeta meta) {
+                PopupWindow popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+                MenuUserSettingBinding view = MenuUserSettingBinding.inflate(getLayoutInflater());
+                view.setTop.setText(getText(meta.setTop ?
+                    io.openim.android.ouicore.R.string.cancel_top
+                    : io.openim.android.ouicore.R.string.set_top));
+                view.setTop.setOnClickListener(v1 -> {
+                    Map<String, Object> map = new HashMap<>();
+                    List<String> ids = new ArrayList<>();
+                    ids.add(data.getIdentity());
+                    map.put("roomID", vm.signalingCertificate.getRoomID());
+                    if (meta.setTop)
+                        map.put("reducePinedUserIDList", ids);
+                    else
+                        map.put("addPinedUserIDList", ids);
+                    vm.updateMeetingInfo(map, data1 -> {
+                        ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
+                            ParticipantMeta.class);
+                        meta.setTop = participantMeta.setTop = !meta.setTop;
+                        data.setMetadata$livekit_android_sdk_release(GsonHel.toJson(participantMeta));
+                        memberAdapter.getItems().remove(data);
+                        if (meta.setTop) {
+                            memberAdapter.getItems().add(0, data);
+                        } else {
+                            memberAdapter.getItems().add(data);
+                        }
+                        memberAdapter.notifyDataSetChanged();
+                        popupWindow.dismiss();
+                    });
+                });
+                view.allSee.setOnClickListener(v1 -> {
+                    Map<String, Object> map = new HashMap<>();
+                    List<String> ids = new ArrayList<>();
+                    ids.add(data.getIdentity());
+                    map.put("roomID", vm.signalingCertificate.getRoomID());
+                    map.put("addBeWatchedUserIDList", ids);
+                    map.put("reduceBeWatchedUserIDList",
+                        vm.roomMetadata.getValue().beWatchedUserIDList);
+
+                    vm.updateMeetingInfo(map, data1 -> {
+                        vm.roomMetadata.getValue().beWatchedUserIDList
+                            .add(0, data.getIdentity());
+                        vm.roomMetadata.setValue(vm.roomMetadata.getValue());
+                        popupWindow.dismiss();
+                    });
+                });
+
+                //设置PopupWindow的视图内容
+                popupWindow.setContentView(view.getRoot());
+                //点击空白区域PopupWindow消失，这里必须先设置setBackgroundDrawable，否则点击无反应
+                popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
+                popupWindow.setOutsideTouchable(true);
+                //PopupWindow在targetView下方弹出
+                popupWindow.showAsDropDown(v, 0, Common.dp2px(-20));
             }
         });
 
@@ -348,9 +441,9 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         boolean isMuteAllMicrophone = vm.roomMetadata.getValue().isMuteAllMicrophone;
 
         v.allMute.setVisibility(vm.isSelfHostUser.getValue() ? View.VISIBLE : View.GONE);
-        v.allMute.setText(isMuteAllMicrophone ?
-            io.openim.android.ouicore.R.string.cancle_all_mute :
-            io.openim.android.ouicore.R.string.all_mute);
+        v.allMute.setText(isMuteAllMicrophone ? io.openim.android.ouicore.
+            R.string.cancle_all_mute : io.openim.android.ouicore.
+            R.string.all_mute);
         v.allMute.setTag(isMuteAllMicrophone);
         v.allMute.setOnClickListener(new OnDedrepClickListener() {
             @Override
@@ -362,10 +455,11 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                 map.put("isMuteAllMicrophone", isAll);
 
                 vm.updateMeetingInfo(map, data -> {
-                    ((TextView) v1).setText(isAll ?
-                        io.openim.android.ouicore.R.string.cancle_all_mute :
-                        io.openim.android.ouicore.R.string.all_mute);
+                    ((TextView) v1).setText(isAll ? io.openim.android.ouicore.
+                        R.string.cancle_all_mute : io.openim.android.ouicore.
+                        R.string.all_mute);
                     v1.setTag(isAll);
+                    vm.roomMetadata.getValue().isMuteAllMicrophone = isAll;
 
                     bottomPopDialog.dismiss();
                 });
@@ -452,46 +546,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 //        });
     }
 
-    private String getMetaUserName(ParticipantMeta participantMeta) {
-        String name = participantMeta.groupMemberInfo.getNickname();
-        if (TextUtils.isEmpty(name)) name = participantMeta.userInfo.getNickname();
-        return name;
-    }
-
-
-    @NonNull
-    private CoroutineScope bindCoroutineScope(View view) {
-        if (view.getTag() instanceof CoroutineScope) {
-            vm.callViewModel.scopeCancel((CoroutineScope) view.getTag());
-        }
-        CoroutineScope scope = vm.callViewModel.buildScope();
-        view.setTag(scope);
-        return scope;
-    }
-
-
-//    private void subscribeUserStatus(LayoutUserStatusBinding holder, Participant participant,
-//                                     CameraOpenListener cameraOpenListener) {
-//        final CoroutineScope scope = bindCoroutineScope(holder.userStatus);
-//
-//        vm.callViewModel.subscribe(participant.getEvents().getEvents(), (v) -> {
-//            L.e("-------subscribe--------" + (holder == view.centerUser));
-//            bindUserStatus(holder, null, null, v.getParticipant());
-//            if (null != cameraOpenListener) {
-//                cameraOpenListener.onOpen(v.getParticipant().isCameraEnabled());
-//            }
-//            StateFlow<ConnectionQuality> flow =
-//                vm.callViewModel.getConnectionFlow(v.getParticipant());
-//            vm.callViewModel.subscribe(flow, (quality) -> {
-//                L.e("-------quality subscribe--------" + (holder == view.centerUser));
-//                bindConnectionQuality(holder, quality);
-//                return null;
-//            }, scope);
-//
-//            return null;
-//        }, scope);
-//    }
-
 
     void init() {
         vm.init();
@@ -518,14 +572,11 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 //        localVideoTrack.addRenderer(view.centerTextureView);
 //        view.centerTextureView.setTag(localVideoTrack);
 
-
         vm.callViewModel.subscribe(vm.callViewModel.getAllParticipants(), (v) -> {
             if (v.isEmpty()) return null;
             memberParticipants = vm.handleParticipants(v);
             List<List<Participant>> data = new ArrayList<>();
-            if (null != activeSpeaker) {
-                data.add(new ArrayList<>(Collections.singleton(activeSpeaker)));
-            }
+
             int pageNum = memberParticipants.size() / pageShow;
             if (pageNum == 0) {
                 data.add(new ArrayList<>(memberParticipants));
@@ -540,12 +591,22 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         });
 
 
-        vm.callViewModel.subscribe(vm.callViewModel.getActiveSpeakers(), (v) -> {
-            if (v.isEmpty()) return null;
-            activeSpeaker = v.get(0);
-            adapter.notifyDataSetChanged();
+        vm.callViewModel.subscribe(vm.callViewModel.getActiveSpeakersFlow(), (v) -> {
+            if (v.isEmpty()||!TextUtils.isEmpty(vm.allWatchedUserId.val())) return null;
+            showPageFirst(v.get(0));
             return null;
         });
+    }
+
+    /**
+     *  在说话用户/都看他
+     * @param first
+     */
+    private void showPageFirst(Participant first) {
+        adapter.getList().remove(activeSpeaker);
+        activeSpeaker = first;
+        adapter.getList().add(0, activeSpeaker);
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -561,19 +622,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         }
     }
 
-
-    public static class UserStreamViewHolder extends RecyclerView.ViewHolder {
-        public final LayoutUserStatusBinding view;
-
-        public UserStreamViewHolder(@NonNull View itemView) {
-            super(LayoutUserStatusBinding.inflate(LayoutInflater.from(itemView.getContext()),
-                (ViewGroup) itemView, false).getRoot());
-            view = LayoutUserStatusBinding.bind(this.itemView);
-//            ViewGroup.LayoutParams params = view.avatar.getLayoutParams();
-//            params.width = Common.dp2px(55);
-//            params.height = Common.dp2px(55);
-        }
-    }
 
     public static class MemberItemViewHolder extends RecyclerView.ViewHolder {
         public final MeetingIietmMemberBinding view;
@@ -595,6 +643,11 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         release();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
     private void release() {
         if (isFinishing() && !triggerLandscape) {
             vm.audioManager.setSpeakerphoneOn(true);
@@ -603,28 +656,23 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        release();
-    }
-
     private static class PageAdapter extends PagerAdapter {
-        private LayoutInflater inflater;
-        private List<List<Participant>> list = new ArrayList<>();
-        private MeetingVM vm;
+        private final LayoutInflater inflater;
+        private List<Object> list = new ArrayList<>();
+        private final MeetingVM vm;
 
         public PageAdapter(LayoutInflater inflater, MeetingVM vm) {
             this.inflater = inflater;
             this.vm = vm;
         }
 
-        public List<List<Participant>> getList() {
+        public List<Object> getList() {
             return list;
         }
 
-        public void setList(List<List<Participant>> list) {
+        public void setList(List list) {
             this.list = list;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -632,20 +680,87 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             return list.size();
         }
 
+        @Override
+        public int getItemPosition(Object object) {
+            //  notifyDataSetChanged() 页面不刷新问题的方法
+            return POSITION_NONE;
+        }
+
         @NonNull
         @Override
         public Object instantiateItem(@NonNull ViewGroup container, int position) {
-            List<Participant> participants = list.get(position);
-            if (position == 0) {
+            Object ob = list.get(position);
+            View view_ = null;
+            if (ob instanceof Participant) {
                 ViewSingleTextureBinding view = ViewSingleTextureBinding.inflate(inflater);
-                if (participants.isEmpty()) return view.getRoot();
-                Participant participant = participants.get(0);
-                bindRemoteViewRenderer(view.textureView, participant);
-                bindUserStatus(view.userStatus, participant);
-            } else {
+                Participant participant = (Participant) ob;
 
+                vm.initVideoView(view.textureView);
+                bindRemoteViewRenderer(view.textureView, participant);
+                subscribeUserStatus(view.userStatus, participant, isOpen -> {
+                    handleCenter(view, participant, isOpen);
+                });
+
+                view_ = view.getRoot();
             }
-            return super.instantiateItem(container, position);
+            if (ob instanceof List) {
+                List<Participant> participants = (List<Participant>) ob;
+                ViewRecyclerViewBinding view = ViewRecyclerViewBinding.inflate(inflater);
+                view.recyclerView.setLayoutManager(new GridLayoutManager(container.getContext(),
+                    2));
+                RecyclerViewAdapter<Participant, UserStreamViewHolder> adapter;
+                GridSpaceItemDecoration divItemDecoration =
+                    new GridSpaceItemDecoration(Common.dp2px(1));
+                view.recyclerView.addItemDecoration(divItemDecoration);
+                view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<Participant,
+                    UserStreamViewHolder>(UserStreamViewHolder.class) {
+
+                    @Override
+                    public void onBindView(@NonNull UserStreamViewHolder holder, Participant data
+                        , int position) {
+                        holder.setItemHeight(view.recyclerView.getHeight() / 2);
+
+                        vm.initVideoView(holder.view.textureView);
+                        bindRemoteViewRenderer(holder.view.textureView, data);
+                        subscribeUserStatus(holder.view.userStatus, data, isOpen -> {
+                            handleCenter(holder.view, data, isOpen);
+                        });
+                    }
+                });
+                adapter.setItems(participants);
+                view_ = view.getRoot();
+            }
+            if (null != view_) {
+                container.addView(view_);
+                return view_;
+            }
+            return container;
+        }
+
+        private void handleCenter(@NonNull ViewSingleTextureBinding view, Participant data, Boolean isOpen) {
+            view.textureView.setVisibility(isOpen ? View.VISIBLE :
+                View.GONE);
+            view.avatar.setVisibility(isOpen ? View.GONE : View.VISIBLE);
+            ParticipantMeta meta = GsonHel.fromJson(data.getMetadata(),
+                ParticipantMeta.class);
+            if (null != meta)
+                view.avatar.load(meta.userInfo.getFaceURL(),
+                    vm.getMetaUserName(meta));
+        }
+
+        public static class UserStreamViewHolder extends RecyclerView.ViewHolder {
+            public final ViewSingleTextureBinding view;
+
+            public UserStreamViewHolder(@NonNull View itemView) {
+                super(ViewSingleTextureBinding.inflate(LayoutInflater.from(itemView.getContext())
+                    , (ViewGroup) itemView, false).getRoot());
+                view = ViewSingleTextureBinding.bind(this.itemView);
+            }
+
+            public void setItemHeight(int height) {
+                ViewGroup.LayoutParams params = view.getRoot().getLayoutParams();
+                params.height = height;
+            }
         }
 
         private void removeRenderer(TextureViewRenderer textureView) {
@@ -656,7 +771,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         }
 
         private void bindRemoteViewRenderer(TextureViewRenderer textureView, Participant data) {
-            removeRenderer(textureView);
+//            removeRenderer(textureView);
             vm.callViewModel.bindRemoteViewRenderer(textureView, data, new Continuation<Unit>() {
                 @NonNull
                 @Override
@@ -678,8 +793,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                 io.openim.android.ouicore.R.mipmap.ic__mic_off);
             ParticipantMeta meta = GsonHel.fromJson(participant.getMetadata(),
                 ParticipantMeta.class);
-            view.name.setText(meta.userInfo.getNickname());
-            L.e("-------bindUserStatus--------" + participant.getConnectionQuality());
+            view.name.setText(vm.getMetaUserName(meta));
             bindConnectionQuality(view, participant.getConnectionQuality());
         }
 
@@ -697,16 +811,48 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             }
         }
 
+        @NonNull
+        private CoroutineScope bindCoroutineScope(View view) {
+            if (view.getTag() instanceof CoroutineScope) {
+                vm.callViewModel.scopeCancel((CoroutineScope) view.getTag());
+            }
+            CoroutineScope scope = vm.callViewModel.buildScope();
+            view.setTag(scope);
+            return scope;
+        }
+
+        private void subscribeUserStatus(LayoutUserStatusBinding holder, Participant participant,
+                                         CameraOpenListener cameraOpenListener) {
+            bindUserStatus(holder, participant);
+            if (null != cameraOpenListener) {
+                cameraOpenListener.onOpen(participant.isCameraEnabled());
+            }
+
+            final CoroutineScope scope = bindCoroutineScope(holder.getRoot());
+            vm.callViewModel.subscribe(participant.getEvents().getEvents(), (v) -> {
+                bindUserStatus(holder, v.getParticipant());
+                if (null != cameraOpenListener) {
+                    cameraOpenListener.onOpen(v.getParticipant().isCameraEnabled());
+                }
+                StateFlow<ConnectionQuality> flow =
+                    vm.callViewModel.getConnectionFlow(v.getParticipant());
+                vm.callViewModel.subscribe(flow, (quality) -> {
+                    bindConnectionQuality(holder, quality);
+                    return null;
+                }, scope);
+
+                return null;
+            }, scope);
+        }
+
         @Override
         public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-            return view.equals(object);
+            return view == object;
         }
 
         @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
+        public void destroyItem(ViewGroup container, int position, @NonNull Object object) {
             container.removeView((View) object);
         }
-
-
     }
 }

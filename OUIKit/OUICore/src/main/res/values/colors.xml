@@ -14,6 +14,7 @@
     <color name="black_overlay">#66000000</color>
     <color name="def_bg">#FFF8F8F8</color>
     <color name="img_bg">#abb1b6</color>
+    <color name="gray">#666666</color>
 
     <color name="theme">#0089FF</color>
     <color name="txt_black">#0C1C33</color>
