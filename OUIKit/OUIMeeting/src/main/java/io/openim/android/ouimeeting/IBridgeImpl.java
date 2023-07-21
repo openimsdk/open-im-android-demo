@@ -2,6 +2,7 @@ package io.openim.android.ouimeeting;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.WindowManager;
@@ -60,6 +61,10 @@ public class IBridgeImpl implements IMeetingBridge, MeetingVM.Interaction {
         waitDialog.dismiss();
         context.startActivity(new Intent(context, MeetingHomeActivity.class)
             .addFlags(FLAG_ACTIVITY_NEW_TASK));
+        if (context instanceof Activity){
+            ((Activity)context).overridePendingTransition(0, 0);
+        }
+
     }
 
     @Override

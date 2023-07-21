@@ -129,8 +129,6 @@ public class CallDialog extends BaseDialog {
             ViewGroup.LayoutParams.MATCH_PARENT;
         params.gravity = isShrink ? (Gravity.TOP | Gravity.END) : Gravity.CENTER;
         getWindow().setAttributes(params);
-
-
     }
 
     public void bindData(SignalingInfo signalingInfo) {

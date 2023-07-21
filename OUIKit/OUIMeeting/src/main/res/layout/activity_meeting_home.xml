@@ -25,6 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:animateLayoutChanges="true"
+            android:id="@+id/home"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -248,44 +249,6 @@
 
         </LinearLayout>
 
-        <RelativeLayout
-            android:id="@+id/shrink"
-            android:layout_width="107dp"
-            android:layout_height="197dp"
-            android:layout_marginTop="48dp"
-            android:layout_marginRight="13dp"
-            android:alpha="0.8"
-            android:background="@drawable/sty_radius_6_000000"
-            android:clipToPadding="true"
-            android:gravity="center"
-            android:keepScreenOn="true"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-
-            <LinearLayout
-                android:id="@+id/waiting"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <io.openim.android.ouicore.widget.AvatarImage
-                    android:id="@+id/sAvatar"
-                    android:layout_width="68dp"
-                    android:layout_height="68dp"
-                    android:layout_marginBottom="10dp"
-                    android:src="@mipmap/ic_my_group" />
-
-                <TextView
-                    android:id="@+id/sTips"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/meeting"
-                    android:textColor="#ffffffff"
-                    android:textSize="12sp" />
-            </LinearLayout>
-        </RelativeLayout>
     </RelativeLayout>
 
 </layout>

@@ -15,12 +15,12 @@
             </intent-filter>
         </receiver>
 
-        <activity
-            android:name=".LockPushActivity"
-            android:exported="false"
-            android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
-            android:theme="@style/ThemeWithoutAnim" />
+<!--        <activity-->
+<!--            android:name=".LockPushActivity"-->
+<!--            android:exported="false"-->
+<!--            android:launchMode="singleInstance"-->
+<!--            android:screenOrientation="portrait"-->
+<!--            android:theme="@style/ThemeWithoutAnim" />-->
 
         <service
             android:name=".service.AudioVideoService"

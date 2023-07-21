@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -32,6 +33,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.alibaba.fastjson2.JSONObject;
+import com.hjq.window.EasyWindow;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -70,6 +72,7 @@ import io.openim.android.ouimeeting.databinding.LayoutSettingDialogBinding;
 import io.openim.android.ouimeeting.databinding.LayoutUserStatusBinding;
 import io.openim.android.ouimeeting.databinding.MeetingIietmMemberBinding;
 import io.openim.android.ouimeeting.databinding.MenuUserSettingBinding;
+import io.openim.android.ouimeeting.databinding.ViewMeetingFloatBinding;
 import io.openim.android.ouimeeting.databinding.ViewSingleTextureBinding;
 import io.openim.android.ouimeeting.entity.RoomMetadata;
 import io.openim.android.ouimeeting.vm.MeetingVM;
@@ -86,7 +89,6 @@ import kotlinx.coroutines.flow.StateFlow;
 
 public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeetingHomeBinding> implements MeetingVM.Interaction {
 
-
     private PageAdapter adapter;
     private BottomPopDialog bottomPopDialog, settingPopDialog, meetingInfoPopDialog, exitPopDialog;
     private RecyclerViewAdapter<Participant, MemberItemViewHolder> memberAdapter;
@@ -97,6 +99,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     //每页显示多少Participant
     private final int pageShow = 4;
     private List<View> guideViews = new ArrayList<>();
+    private EasyWindow<?> easyWindow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -229,8 +232,27 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             view.horn.setImageResource(aBoolean ? R.mipmap.ic_m_horn : R.mipmap.ic_m_receiver);
         });
         view.zoomOut.setOnClickListener(v -> {
-
+            moveTaskToBack(true);
+            // 传入 Activity 对象表示设置成局部的，不需要有悬浮窗权限
+// 传入 Application 对象表示设置成全局的，但需要有悬浮窗权限
+            ViewMeetingFloatBinding floatView =
+                ViewMeetingFloatBinding.inflate(getLayoutInflater());
+            if (null == easyWindow) {
+                easyWindow = new EasyWindow<>(getApplication())
+                    .setContentView(floatView.getRoot())
+                    .setWidth(Common.dp2px(107))
+                    .setHeight(Common.dp2px(160))
+                    .setGravity(Gravity.RIGHT | Gravity.TOP)
+                    // 设置成可拖拽的
+                    .setDraggable()
+                    .setOnClickListener(floatView.getRoot().getId(), (window, view) -> {
+                        startActivity(new Intent(getApplication(), MeetingHomeActivity.class));
+                        window.cancel();
+                    });
+            }
+            easyWindow.show();
         });
+
     }
 
 
@@ -281,7 +303,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                     + "：" + roomMetadata.roomID
                     + "\n" + getString(io.openim.android.ouicore.R.string.emcee) + "：" + data.get(0).getNickname()
                     + "\n" + getString(io.openim.android.ouicore.R.string.start_time) + "：" + TimeUtil.getTime(roomMetadata.createTime * 1000, TimeUtil.yearMonthDayFormat)
-                    + "\t\t" + TimeUtil.getTime(roomMetadata.startTime * 1000, TimeUtil.hourTimeFormat) + "\n"
+                    + "\t\t" + TimeUtil.getTime(roomMetadata.startTime * 1000,
+                    TimeUtil.hourTimeFormat) + "\n"
                     + getString(io.openim.android.ouicore.R.string.meeting_duration) + "：" + durationStr);
             }
         }, ids);
@@ -688,6 +711,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
     @Override
     protected void onPause() {
+        overridePendingTransition(0, 0);
         super.onPause();
         release();
     }
@@ -695,6 +719,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        release();
     }
 
     private void release() {
@@ -814,8 +839,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 //            }
 
             public void setItemHeight(int height) {
-                View childAt=view.getChildAt(0);
-                if (null!=childAt){
+                View childAt = view.getChildAt(0);
+                if (null != childAt) {
                     ViewGroup.LayoutParams params = childAt.getLayoutParams();
                     params.height = height;
                 }
