@@ -3,7 +3,7 @@ package io.openim.android.ouimeeting.entity;
 import java.util.List;
 
 public class RoomMetadata {
-    public String meetingID;
+    public String roomID;
     public String meetingName;
     public String ex;
     public String hostUserID;

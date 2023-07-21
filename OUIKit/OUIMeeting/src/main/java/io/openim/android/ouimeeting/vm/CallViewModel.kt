@@ -20,6 +20,7 @@ import io.openim.android.ouicore.utils.L
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import livekit.LivekitRtc
+import java.lang.NullPointerException
 import kotlinx.coroutines.flow.collectLatest as collectLatest1
 
 
@@ -87,6 +88,7 @@ class CallViewModel(
                             val message = it.data.toString(Charsets.UTF_8)
                             mutableDataReceived.emit("$identity: $message")
                         }
+
                         else -> {}
                     }
                 }
@@ -152,7 +154,7 @@ class CallViewModel(
         mutablePrimarySpeaker.value = speaker
     }
 
-    suspend fun bindRemoteViewRenderer(viewRenderer: TextureViewRenderer, participant: Participant) {
+    suspend fun bindRemoteViewRenderer(viewRenderer: TextureViewRenderer, participant: Participant) :Unit{
         // observe videoTracks changes.
         val videoTrackPubFlow = participant::videoTracks.flow.map { participant to it }.flatMapLatest { (participant, videoTracks) ->
             // Prioritize any screenshare streams.
@@ -212,9 +214,11 @@ class CallViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        room.disconnect()
-        scopes.forEach { it.cancel() }
-        scopes.clear()
+       try {
+           scopes.forEach { it.cancel() }
+           scopes.clear()
+           room.disconnect()
+       }catch (_:Exception){}
     }
 
     fun setMicEnabled(enabled: Boolean) {
@@ -242,6 +246,7 @@ class CallViewModel(
 
         videoTrack.restartTrack(newOptions)
     }
+
     fun getActiveSpeakersFlow(): StateFlow<List<Participant>> {
         return room::activeSpeakers.flow
     }

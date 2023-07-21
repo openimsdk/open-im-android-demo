@@ -120,7 +120,7 @@ public class ImagePagerActivity extends AppCompatActivity {
             guideViewList.clear();
             for (int i = 0; i < imgUrls.size(); i++) {
                 View view = new View(this);
-                view.setBackgroundResource(R.drawable.selector_guide_bg);
+                view.setBackgroundResource(io.openim.android.ouicore.R.drawable.selector_guide_bg);
                 view.setSelected(i == startPos ? true : false);
                 LinearLayout.LayoutParams layoutParams =
                     new LinearLayout.LayoutParams(getResources().getDimensionPixelSize(R.dimen.gudieview_width), getResources().getDimensionPixelSize(R.dimen.gudieview_heigh));

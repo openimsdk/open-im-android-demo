@@ -191,18 +191,15 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
                 @Override
                 public void resumeWith(@NonNull Object o) {
-                    Common.UIHandler.post(() -> {
-                        buildTimer();
-                        fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
+                    buildTimer();
+                    fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
+                    VideoTrack localVideoTrack =
+                        callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
+                    getIView().connectRoomSuccess(localVideoTrack);
 
+                    callViewModel.setCameraEnabled(false);
 //                        callViewModel.setCameraEnabled(roomMetadata.getValue().joinDisableVideo);
-                        callViewModel.setCameraEnabled(false);
-                        callViewModel.setMicEnabled(roomMetadata.getValue().joinDisableMicrophone);
-
-                        VideoTrack localVideoTrack =
-                            callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
-                        getIView().connectRoomSuccess(localVideoTrack);
-                    });
+                    callViewModel.setMicEnabled(roomMetadata.getValue().joinDisableMicrophone);
                 }
             });
     }
@@ -236,8 +233,8 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     private void allSeeHe() {
         RoomMetadata meta = roomMetadata.val();
-        if (null==meta)return;
-        if (null!=meta.beWatchedUserIDList && meta.beWatchedUserIDList.isEmpty()){
+        if (null == meta) return;
+        if (null != meta.beWatchedUserIDList && meta.beWatchedUserIDList.isEmpty()) {
             String id = meta.beWatchedUserIDList.get(0);
             if (!Objects.equals(allWatchedUserId.val(), id))
                 allWatchedUserId.setValue(id);
@@ -349,7 +346,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
             if (null == selectMeetingInfo) {
                 selectMeetingInfo = new MeetingInfo();
                 RoomMetadata metadata = roomMetadata.getValue();
-                selectMeetingInfo.setMeetingID(metadata.meetingID);
+                selectMeetingInfo.setMeetingID(metadata.roomID);
                 selectMeetingInfo.setMeetingName(metadata.meetingName);
                 selectMeetingInfo.setStartTime(metadata.startTime);
                 selectMeetingInfo.setEndTime(metadata.endTime);
@@ -405,14 +402,14 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     }
 
     public void finishMeeting(String roomID) {
-        OpenIMClient.getInstance().signalingManager.signalingCloseRoom(new OnBase<MeetingInfoList>() {
+        OpenIMClient.getInstance().signalingManager.signalingCloseRoom(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
                 getIView().toast(error);
             }
 
             @Override
-            public void onSuccess(MeetingInfoList data) {
+            public void onSuccess(String data) {
                 getMeetingInfoList();
                 getIView().toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.meeting_finish));
             }
