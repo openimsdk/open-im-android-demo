@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.openim.android.ouimeeting">
 
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
     <application>
         <activity
             android:name=".MeetingDetailActivity"

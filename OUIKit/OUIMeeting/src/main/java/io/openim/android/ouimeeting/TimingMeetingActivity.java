@@ -19,6 +19,7 @@ import java.util.Map;
 
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
@@ -62,7 +63,7 @@ public class TimingMeetingActivity extends BaseActivity<MeetingVM, ActivityTimin
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        bindVMByCache(MeetingVM.class);
+        vm=Easy.find(MeetingVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityTimingMeetingBinding.inflate(getLayoutInflater()));
         isUpdateInfo = getIntent().getBooleanExtra(Constant.K_RESULT, false);

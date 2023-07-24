@@ -16,6 +16,7 @@ import java.util.List;
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
@@ -35,7 +36,7 @@ public class MeetingDetailActivity extends BaseActivity<MeetingVM, ActivityMeeti
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        bindVMByCache(MeetingVM.class);
+        vm=Easy.find(MeetingVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMeetingDetailBinding.inflate(getLayoutInflater()));
         initView();

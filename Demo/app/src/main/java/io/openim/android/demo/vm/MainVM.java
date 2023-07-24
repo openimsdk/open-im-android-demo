@@ -38,7 +38,6 @@ import io.openim.android.sdk.models.UserInfo;
 public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnListener,
     OnConversationListener {
 
-    private static final String TAG = "App";
     public MutableLiveData<String> nickname = new MutableLiveData<>("");
     public MutableLiveData<Integer> visibility = new MutableLiveData<>(View.INVISIBLE);
     public boolean fromLogin, isInitDate;

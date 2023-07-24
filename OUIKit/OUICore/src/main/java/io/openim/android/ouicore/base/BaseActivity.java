@@ -2,6 +2,7 @@ package io.openim.android.ouicore.base;
 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Rect;
@@ -20,9 +21,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
+import com.alibaba.android.arouter.launcher.ARouter;
+
+import java.util.List;
+
 import io.openim.android.ouicore.net.RXRetrofit.N;
 
 import io.openim.android.ouicore.utils.ActivityManager;
+import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
 
 
@@ -64,12 +74,14 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
             view.setLifecycleOwner(this);
         }
     }
+
     @Deprecated
     protected void bindVM(Class<T> vm) {
         this.vm = new ViewModelProvider(this).get(vm);
         vmCanonicalName = this.vm.getClass().getCanonicalName();
         bind();
     }
+
     @Deprecated
     protected void bindVM(Class<T> vm, boolean shareVM) {
         bindVM(vm);
@@ -117,6 +129,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
             bind();
         }
     }
+
     @Deprecated
     public void removeCacheVM() {
         String key = vm.getClass().getCanonicalName();
@@ -132,8 +145,10 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     protected void onResume() {
         super.onResume();
         bind();
-        if (null != vm) vm.viewResume();
+        if (null != vm)
+            vm.viewResume();
     }
+
 
     @Override
     protected void onPause() {

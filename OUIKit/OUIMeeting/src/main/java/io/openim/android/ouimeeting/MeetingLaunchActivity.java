@@ -3,7 +3,6 @@ package io.openim.android.ouimeeting;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,34 +14,24 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.alibaba.android.arouter.launcher.ARouter;
-
-import java.util.List;
+import com.hjq.window.EasyWindow;
 
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.entity.LoginCertificate;
-import io.openim.android.ouicore.net.RXRetrofit.HttpConfig;
-import io.openim.android.ouicore.net.RXRetrofit.N;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.WaitDialog;
-import io.openim.android.ouimeeting.databinding.ActivityMeetingHomeBinding;
 import io.openim.android.ouimeeting.databinding.ActivityMeetingLaunchBinding;
 import io.openim.android.ouimeeting.databinding.MeetingHomeIietmMemberBinding;
-import io.openim.android.ouimeeting.databinding.MeetingIietmMemberBinding;
 import io.openim.android.ouimeeting.vm.MeetingVM;
-import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.MeetingInfo;
-import io.openim.android.sdk.models.MeetingInfoList;
-import io.openim.android.sdk.models.SignalingCertificate;
 
-@Route(path = Routes.Meeting.HOME)
+@Route(path = Routes.Meeting.LAUNCH)
 public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeetingLaunchBinding> implements MeetingVM.Interaction {
 
     private RecyclerViewAdapter<MeetingInfo, MeetingItemViewHolder> adapter;
@@ -50,7 +39,7 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        bindVM(MeetingVM.class, true);
+        vm = Easy.installVM(MeetingVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMeetingLaunchBinding.inflate(getLayoutInflater()));
 
@@ -96,9 +85,10 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
     public void onSuccess(Object body) {
         waitDialog.dismiss();
         vm.getMeetingInfoList();
+        vm.second = 0;
         //这里有可能被释放 所以需要重新放入
         BaseApp.inst().putVM(vm);
-        meetingHomeActivityCallBack.launch(new Intent(MeetingLaunchActivity.this,
+        meetingHomeActivityCallBack.launch(new Intent(getApplication(),
             MeetingHomeActivity.class));
     }
 
@@ -136,8 +126,10 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
 
                     holder.view.description.setText(TimeUtil.getTime(data.getCreateTime() * 1000,
                         TimeUtil.yearMonthDayFormat) + "\t\t\t" + TimeUtil.getTime(data.getStartTime() * 1000, TimeUtil.hourTimeFormat) + "-"
-                        + TimeUtil.getTime(data.getEndTime() * 1000, TimeUtil.hourTimeFormat) + "\t\t\t"
-                        + String.format(getString(io.openim.android.ouicore.R.string.initiator),name ));
+                        + TimeUtil.getTime(data.getEndTime() * 1000, TimeUtil.hourTimeFormat) +
+                        "\t\t\t"
+                        + String.format(getString(io.openim.android.ouicore.R.string.initiator),
+                        name));
 
 
                     holder.view.join.setOnClickListener(v -> {
@@ -170,9 +162,9 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        removeCacheVM();
+    protected void fasterDestroy() {
+        if (null == ActivityManager.isExist(MeetingHomeActivity.class))
+            Easy.delete(MeetingVM.class);
     }
 
     public static class MeetingItemViewHolder extends RecyclerView.ViewHolder {

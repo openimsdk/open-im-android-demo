@@ -70,7 +70,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     boolean lastCameraEnabled, lastIsMuteAllVideo;
     //通话时间
     private Timer timer;
-    private int second = 0;
+    public int second = 0;
     public MutableLiveData<String> timeStr = new MutableLiveData<>("");
 
     private List<TextureViewRenderer> textureViews;
@@ -422,7 +422,8 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     }
 
     public void onCleared() {
-        if (null != callViewModel) callViewModel.onCleared();
+        if (null != callViewModel)
+            callViewModel.onCleared();
         cancelTimer();
     }
 }

@@ -3,22 +3,18 @@ package io.openim.android.ouimeeting;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -31,17 +27,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.alibaba.fastjson2.JSONObject;
 import com.hjq.window.EasyWindow;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.livekit.android.renderer.TextureViewRenderer;
@@ -51,16 +49,16 @@ import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.databinding.OftenRecyclerViewBinding;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
-import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.entity.ParticipantMeta;
 import io.openim.android.ouicore.net.bage.GsonHel;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
@@ -87,6 +85,7 @@ import kotlin.coroutines.EmptyCoroutineContext;
 import kotlinx.coroutines.CoroutineScope;
 import kotlinx.coroutines.flow.StateFlow;
 
+@Route(path = Routes.Meeting.HOME)
 public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeetingHomeBinding> implements MeetingVM.Interaction {
 
     private PageAdapter adapter;
@@ -103,7 +102,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        bindVMByCache(MeetingVM.class);
+        vm= Easy.find(MeetingVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMeetingHomeBinding.inflate(getLayoutInflater()));
         initView();
@@ -111,8 +110,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         if (vm.isInit) {
             if (vm.isLandscape)
                 toast(getString(io.openim.android.ouicore.R.string.double_tap_tips));
-            connectRoomSuccess(vm.callViewModel.
-                getVideoTrack(vm.callViewModel.getRoom().getLocalParticipant()));
+            connectRoomSuccess(vm.callViewModel.getVideoTrack(vm.callViewModel.getRoom().getLocalParticipant()));
         } else init();
 
         bindVM();
@@ -132,14 +130,14 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     //分享屏幕
     private ActivityResultLauncher<Intent> screenCaptureIntentLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            int resultCode = result.getResultCode();
-            Intent data = result.getData();
-            if (resultCode != Activity.RESULT_OK || data == null) {
-                return;
-            }
-            vm.startShareScreen(data);
-            toast(getString(io.openim.android.ouicore.R.string.share_screen));
-        });
+        int resultCode = result.getResultCode();
+        Intent data = result.getData();
+        if (resultCode != Activity.RESULT_OK || data == null) {
+            return;
+        }
+        vm.startShareScreen(data);
+        toast(getString(io.openim.android.ouicore.R.string.share_screen));
+    });
 
     private void listener() {
         vm.allWatchedUserId.observe(this, v -> {
@@ -232,27 +230,54 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             view.horn.setImageResource(aBoolean ? R.mipmap.ic_m_horn : R.mipmap.ic_m_receiver);
         });
         view.zoomOut.setOnClickListener(v -> {
-            moveTaskToBack(true);
-            // 传入 Activity 对象表示设置成局部的，不需要有悬浮窗权限
-// 传入 Application 对象表示设置成全局的，但需要有悬浮窗权限
-            ViewMeetingFloatBinding floatView =
-                ViewMeetingFloatBinding.inflate(getLayoutInflater());
-            if (null == easyWindow) {
-                easyWindow = new EasyWindow<>(getApplication())
-                    .setContentView(floatView.getRoot())
-                    .setWidth(Common.dp2px(107))
+
+            android.app.ActivityManager manager =
+                (android.app.ActivityManager) BaseApp.inst().getSystemService(ACTIVITY_SERVICE);
+            Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
+            LogisticsCenter.completion(postcard);
+            Activity activity = ActivityManager.isExist(postcard.getDestination());
+            if (null != activity) {
+                manager.moveTaskToFront(activity.getTaskId(),
+                    android.app.ActivityManager.MOVE_TASK_NO_USER_ACTION);
+                showFloatView();
+            }
+        });
+    }
+
+    private void showFloatView() {
+        // 传入 Activity 对象表示设置成局部的，不需要有悬浮窗权限
+        // 传入 Application 对象表示设置成全局的，但需要有悬浮窗权限
+        ViewMeetingFloatBinding floatView = ViewMeetingFloatBinding.inflate(getLayoutInflater());
+        if (null == easyWindow) {
+            easyWindow =
+                new EasyWindow<>(getApplication())
+                    .setContentView(floatView.getRoot()).setWidth(Common.dp2px(107))
                     .setHeight(Common.dp2px(160))
                     .setGravity(Gravity.RIGHT | Gravity.TOP)
-                    // 设置成可拖拽的
-                    .setDraggable()
-                    .setOnClickListener(floatView.getRoot().getId(), (window, view) -> {
-                        startActivity(new Intent(getApplication(), MeetingHomeActivity.class));
-                        window.cancel();
-                    });
-            }
-            easyWindow.show();
-        });
+                // 设置成可拖拽的
+                .setDraggable().setOnClickListener(floatView.getRoot().getId(), (window, view) -> {
 
+                    Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
+                    LogisticsCenter.completion(postcard);
+                    Activity activity = ActivityManager.isExist(postcard.getDestination());
+                    if (null != activity) {
+                        android.app.ActivityManager manager =
+                            (android.app.ActivityManager) BaseApp.inst().getSystemService(ACTIVITY_SERVICE);
+                        manager.moveTaskToFront(activity.getTaskId(),
+                            android.app.ActivityManager.MOVE_TASK_NO_USER_ACTION);
+                        easyWindow.cancel();
+                    }
+
+                });
+        }
+        if (!easyWindow.isShowing()) easyWindow.show();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (null != easyWindow)
+            easyWindow.cancel();
     }
 
 
@@ -299,13 +324,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                     (BigDecimal.valueOf(roomMetadata.endTime - roomMetadata.startTime).divide(BigDecimal.valueOf(3600), 1, BigDecimal.ROUND_HALF_DOWN));
                 String durationStr =
                     bigDecimal.toString() + BaseApp.inst().getString(io.openim.android.ouicore.R.string.hour);
-                v.description.setText(getString(io.openim.android.ouicore.R.string.meeting_num)
-                    + "：" + roomMetadata.roomID
-                    + "\n" + getString(io.openim.android.ouicore.R.string.emcee) + "：" + data.get(0).getNickname()
-                    + "\n" + getString(io.openim.android.ouicore.R.string.start_time) + "：" + TimeUtil.getTime(roomMetadata.createTime * 1000, TimeUtil.yearMonthDayFormat)
-                    + "\t\t" + TimeUtil.getTime(roomMetadata.startTime * 1000,
-                    TimeUtil.hourTimeFormat) + "\n"
-                    + getString(io.openim.android.ouicore.R.string.meeting_duration) + "：" + durationStr);
+                v.description.setText(getString(io.openim.android.ouicore.R.string.meeting_num) + "：" + roomMetadata.roomID + "\n" + getString(io.openim.android.ouicore.R.string.emcee) + "：" + data.get(0).getNickname() + "\n" + getString(io.openim.android.ouicore.R.string.start_time) + "：" + TimeUtil.getTime(roomMetadata.createTime * 1000, TimeUtil.yearMonthDayFormat) + "\t\t" + TimeUtil.getTime(roomMetadata.startTime * 1000, TimeUtil.hourTimeFormat) + "\n" + getString(io.openim.android.ouicore.R.string.meeting_duration) + "：" + durationStr);
             }
         }, ids);
         return v.getRoot();
@@ -672,9 +691,9 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
      * @param first
      */
     private void showPageFirst(Participant first) {
-        if (null != activeSpeaker
-            && Objects.equals(first.getIdentity(),
-            activeSpeaker.getIdentity())) return;
+        if (null != activeSpeaker && Objects.equals(first.getIdentity(),
+            activeSpeaker.getIdentity()))
+            return;
         adapter.getList().remove(activeSpeaker);
         activeSpeaker = first;
         adapter.getList().add(0, activeSpeaker);
@@ -713,6 +732,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     protected void onPause() {
         overridePendingTransition(0, 0);
         super.onPause();
+        if (!isFinishing())
+            showFloatView();
         release();
     }
 
@@ -727,6 +748,11 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             vm.audioManager.setSpeakerphoneOn(true);
             vm.onCleared();
             removeCacheVM();
+            if (null != easyWindow) {
+                easyWindow.cancel();
+                easyWindow.recycle();
+                easyWindow = null;
+            }
         }
     }
 

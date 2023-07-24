@@ -6,6 +6,7 @@ import android.view.View;
 
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.ouimeeting.databinding.ActivityJoinMeetingBinding;
@@ -17,7 +18,7 @@ public class JoinMeetingActivity extends BaseActivity<MeetingVM, ActivityJoinMee
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        bindVMByCache(MeetingVM.class);
+        vm= Easy.find(MeetingVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityJoinMeetingBinding.inflate(getLayoutInflater()));
         listener();
