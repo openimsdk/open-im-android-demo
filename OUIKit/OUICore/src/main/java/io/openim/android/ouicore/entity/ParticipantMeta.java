@@ -8,4 +8,5 @@ public class ParticipantMeta {
     public GroupInfo groupInfo;
     public GroupMembersInfo groupMemberInfo;
     public UserInfo userInfo;
+    public boolean setTop=false;
 }

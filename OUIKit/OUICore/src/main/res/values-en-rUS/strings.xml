@@ -385,4 +385,7 @@
     <string name="tal_num_photo">共%1$d张</string>
     <string name="audio_calling">语音通话中...</string>
     <string name="now_calling">当前正在通话中...</string>
+    <string name="set_top" >置顶该成员</string>
+    <string name="all_see_the" >全部看他</string>
+
 </resources>

@@ -48,7 +48,8 @@ public class ActivityManager {
      */
     public static void finishAllExceptActivity(Class<?>... cls) {
         List<Activity> excepts = new ArrayList<>();
-        t:for (Activity activity : activityStack) {
+        t:
+        for (Activity activity : activityStack) {
             if (activity != null) {
                 for (Class<?> cl : cls) {
                     if (activity.getClass().equals(cl)) {
@@ -61,5 +62,24 @@ public class ActivityManager {
         }
         activityStack.clear();
         if (!excepts.isEmpty()) activityStack.addAll(excepts);
+    }
+
+    /**
+     * 获取 activityStack 中Activity是否存在且没有Finishing
+     *
+     * @param cls
+     * @return 存在返回Activity 实例，否则返回null
+     */
+    public static Activity isExist(Class<?> cls) {
+        for (Activity activity : activityStack) {
+            if (activity.getClass().equals(cls)
+                && !activity.isFinishing()) {
+                return activity;
+            }
+        }
+        return null;
+    }
+    public static Stack<Activity> getActivityStack() {
+        return activityStack;
     }
 }

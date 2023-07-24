@@ -18,9 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Main"
         android:usesCleartextTraffic="true">
-        <activity
-            android:name=".ui.user.UserDetailActivityV3"
-            android:exported="false" />
+    <activity android:name=".ui.main.TopActivity" android:launchMode="singleInstance"  android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" android:exported="false"/>
         <activity
             android:name=".ui.login.ResetPasswordActivity"
             android:exported="false">

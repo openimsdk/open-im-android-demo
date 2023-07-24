@@ -10,7 +10,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="@dimen/comm_title_high"
-            app:cardElevation="8dp">
+            app:cardElevation="0dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
