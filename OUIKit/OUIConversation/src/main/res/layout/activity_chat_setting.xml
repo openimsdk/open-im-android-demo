@@ -261,14 +261,21 @@
                 android:layout_width="38dp"
                 android:layout_height="23dp" />
         </LinearLayout>
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/sty_radius_6_white"
+        android:gravity="center_vertical"
+        android:paddingLeft="22dp"
+        android:paddingRight="22dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@color/white"
             android:gravity="center_vertical"
-            android:paddingLeft="22dp"
-            android:paddingRight="22dp">
+            >
 
             <TextView
                 android:layout_width="0dp"
@@ -284,11 +291,46 @@
                 android:layout_height="23dp" />
         </LinearLayout>
 
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/readVanishTime"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/time_set"
+                android:textColor="#ff333333"
+                android:textSize="16sp" />
+            <TextView
+                android:id="@+id/readVanishNum"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:textColor="#ff333333"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_right" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+
         <LinearLayout
             android:id="@+id/chatbg"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="12dp"
             android:background="@color/white"
             android:gravity="center_vertical"
             android:paddingLeft="22dp"

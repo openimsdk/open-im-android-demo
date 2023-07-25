@@ -403,4 +403,8 @@
 
     <string name="set_top" >置顶该成员</string>
     <string name="all_see_the" >全部看他</string>
+    <string name="time_set">时间设置</string>
+    <string name="read_vanish_tips">在此之后发送的消息，好友已读后会在 选择的时间之后自动删除</string>
+    <string name="seconds">秒</string>
+    <string name="minute">分钟</string>
 </resources>

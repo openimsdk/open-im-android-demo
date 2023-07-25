@@ -49,6 +49,7 @@ import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.NotificationElem;
 import io.openim.android.sdk.models.SearchResultItem;
 
 @Route(path = Routes.Conversation.SEARCH)
@@ -319,13 +320,15 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                                 chatVM.startMsg = message = da.getMessageList().get(0);
                                 chatVM.isSingleChat = message.getSessionType() == ConversationType.SINGLE_CHAT;
                                 if (chatVM.isSingleChat)
-                                    chatVM.userID = message.getSendID();
+                                    chatVM.userID = message.getRecvID();
                                 else
                                     chatVM.groupID = message.getGroupID();
-                                NotificationMsg notificationMsg = GsonHel.fromJson(message.getNotificationElem().getDetail(),
-                                    NotificationMsg.class);
-                                chatVM.notificationMsg.setValue(notificationMsg);
-
+                                NotificationElem notificationElem = message.getNotificationElem();
+                                if (null!=notificationElem){
+                                    NotificationMsg notificationMsg = GsonHel.fromJson(notificationElem.getDetail(),
+                                        NotificationMsg.class);
+                                    chatVM.notificationMsg.setValue(notificationMsg);
+                                }
                                 startActivity(new Intent(SearchActivity.this,
                                     ChatActivity.class).putExtra(Constant.K_FROM, true));
                             });
