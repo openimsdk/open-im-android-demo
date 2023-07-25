@@ -10,8 +10,8 @@ ext {
             minSdk     : 21,
             targetSdk  : 33,
             compileSdk : 33,
-            versionCode: 35,
-            versionName: "3.0.7",
+            versionCode: 36,
+            versionName: "3.0.8",
             abiFilters : ['armeabi-v7a', 'arm64-v8a']
     ]
 

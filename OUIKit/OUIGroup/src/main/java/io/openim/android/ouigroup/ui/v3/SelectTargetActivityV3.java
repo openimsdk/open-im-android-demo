@@ -1,4 +1,4 @@
-package io.openim.android.ouigroup.ui;
+package io.openim.android.ouigroup.ui.v3;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,6 +37,7 @@ import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityCreateGroupV3Binding;
+import io.openim.android.ouigroup.ui.AllGroupActivity;
 import io.openim.android.sdk.enums.ConversationType;
 
 @Route(path = Routes.Group.SELECT_TARGET)
@@ -115,12 +116,11 @@ public class SelectTargetActivityV3 extends BaseActivity<BaseViewModel,
                 holder.view.nickName.setText(name);
 
                 holder.view.select.setVisibility(View.VISIBLE);
-                if (multipleChoiceVM.contains(new MultipleChoice(id))) {
-                    holder.view.select.setChecked(true);
-                    for (MultipleChoice choice : multipleChoiceVM.metaData.val()) {
-                        if (choice.key.equals(id)) {
-                            holder.view.select.setEnabled(choice.isEnabled);
-                        }
+
+                holder.view.select.setChecked(multipleChoiceVM.contains(new MultipleChoice(id)));
+                for (MultipleChoice choice : multipleChoiceVM.metaData.val()) {
+                    if (choice.key.equals(id)) {
+                        holder.view.select.setEnabled(choice.isEnabled);
                     }
                 }
 

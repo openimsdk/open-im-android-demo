@@ -571,7 +571,7 @@ public class IMUtil {
             switch (msg.getContentType()) {
                 default:
                     if (!TextUtils.isEmpty(msgExpand.tips))
-                        lastMsg=msgExpand.tips.toString();
+                        lastMsg = msgExpand.tips.toString();
                     break;
 
                 case MessageType.TEXT:
@@ -602,8 +602,16 @@ public class IMUtil {
                     for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
                         atTxt = atTxt.replace("@" + atUsersInfo.getAtUserID(), atSelf(atUsersInfo));
                     }
-                    lastMsg = atTxt;
+                    String tar =
+                        "@" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.you);
+                    if (atTxt.contains(tar)) {
+                        lastMsg =
+                            IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(atTxt),
+                                tar, android.R.color.holo_red_dark, null);
+                    } else
+                        lastMsg = atTxt;
                     break;
+
                 case MessageType.MERGER:
                     lastMsg =
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";

@@ -430,7 +430,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
 
         vm.subscribe(this, subject -> {
-            if (subject.equals(ChatVM.REEDIT_MSG)){
+            if (subject.equals(ChatVM.REEDIT_MSG)) {
                 view.layoutInputCote.chatInput.requestFocus();
                 view.layoutInputCote.chatInput.setText((String) subject.value);
                 Common.pushKeyboard(this);
@@ -503,8 +503,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     private void forward(List<MultipleChoice> choices) {
         ForwardVM forwardVM = Easy.find(ForwardVM.class);
         for (MultipleChoice choice : choices) {
-            if (null != forwardVM.leaveMsg) aloneSendMsg(forwardVM.leaveMsg, choice);
             aloneSendMsg(forwardVM.forwardMsg, choice);
+            if (null != forwardVM.leaveMsg)
+                aloneSendMsg(forwardVM.leaveMsg, choice);
         }
         vm.clearSelectMsg();
     }
