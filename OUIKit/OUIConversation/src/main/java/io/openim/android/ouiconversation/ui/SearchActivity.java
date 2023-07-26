@@ -248,7 +248,8 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
 
             @NonNull
             @Override
-            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+                                                              int viewType) {
                 if (viewType == TITLE)
                     return new ViewHol.TitleViewHolder(parent);
                 if (viewType == CONTACT_ITEM || viewType == CHAT_ITEM || viewType == GROUP_ITEM)
@@ -261,13 +262,15 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
 
             @SuppressLint("SetTextI18n")
             @Override
-            public void onBindView(@NonNull RecyclerView.ViewHolder holder, Object data, int position) {
+            public void onBindView(@NonNull RecyclerView.ViewHolder holder, Object data,
+                                   int position) {
                 switch (getItemViewType(position)) {
                     case TITLE:
                         String title = (String) data;
                         ViewHol.TitleViewHolder titleViewHolder = (ViewHol.TitleViewHolder) holder;
                         if (title.contains("1")) {
-                            titleViewHolder.view.title.setText(title.substring(0, title.indexOf("1")));
+                            titleViewHolder.view.title.setText(title.substring(0, title.indexOf(
+                                "1")));
                             titleViewHolder.view.more.setVisibility(View.VISIBLE);
                             titleViewHolder.view.more.setOnClickListener(v -> {
                                 int index = getItemViewType(position + 1);
@@ -283,7 +286,8 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                     case CONTACT_ITEM:
                     case CHAT_ITEM:
                     case GROUP_ITEM:
-                        ViewHol.ContactItemHolder contactItemHolder = (ViewHol.ContactItemHolder) holder;
+                        ViewHol.ContactItemHolder contactItemHolder =
+                            (ViewHol.ContactItemHolder) holder;
                         contactItemHolder.viewBinding.bottom.setVisibility(View.VISIBLE);
                         contactItemHolder.viewBinding.expand.setVisibility(View.VISIBLE);
                         if (data instanceof FriendInfo) {
@@ -318,15 +322,21 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                                 }
                                 Message message;
                                 chatVM.startMsg = message = da.getMessageList().get(0);
-                                chatVM.isSingleChat = message.getSessionType() == ConversationType.SINGLE_CHAT;
-                                if (chatVM.isSingleChat)
+                                chatVM.isSingleChat =
+                                    message.getSessionType() == ConversationType.SINGLE_CHAT;
+                                if (chatVM.isSingleChat) {
                                     chatVM.userID = message.getRecvID();
-                                else
+                                    if (message.getRecvID()
+                                        .equals(BaseApp.inst().loginCertificate.userID))
+                                        //表示是对方发送的消息
+                                        chatVM.userID = message.getSendID();
+                                } else
                                     chatVM.groupID = message.getGroupID();
                                 NotificationElem notificationElem = message.getNotificationElem();
-                                if (null!=notificationElem){
-                                    NotificationMsg notificationMsg = GsonHel.fromJson(notificationElem.getDetail(),
-                                        NotificationMsg.class);
+                                if (null != notificationElem) {
+                                    NotificationMsg notificationMsg =
+                                        GsonHel.fromJson(notificationElem.getDetail(),
+                                            NotificationMsg.class);
                                     chatVM.notificationMsg.setValue(notificationMsg);
                                 }
                                 startActivity(new Intent(SearchActivity.this,
@@ -344,7 +354,8 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                             contactItemHolder.viewBinding.getRoot().setOnClickListener(v -> {
                                 BaseApp.inst().removeCacheVM(ChatVM.class);
                                 startActivity(new Intent(SearchActivity.this,
-                                    ChatActivity.class).putExtra(Constant.K_GROUP_ID, groupInfo.getGroupID()));
+                                    ChatActivity.class).putExtra(Constant.K_GROUP_ID,
+                                    groupInfo.getGroupID()));
                             });
                         }
                         break;
@@ -352,7 +363,8 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                         ViewHol.FileItemViewHo fileItemViewHo = (ViewHol.FileItemViewHo) holder;
                         fileItemViewHo.view.divider.getRoot().setVisibility(View.GONE);
                         Message da = (Message) data;
-                        Common.stringBindForegroundColorSpan(fileItemViewHo.view.title, da.getFileElem().getFileName(), vm.searchContent.getValue());
+                        Common.stringBindForegroundColorSpan(fileItemViewHo.view.title,
+                            da.getFileElem().getFileName(), vm.searchContent.getValue());
                         fileItemViewHo.view.size.setText(getString(io.openim.android.ouicore.R.string.sender) + ":" + da.getSenderNickname());
                         fileItemViewHo.view.getRoot().setOnClickListener(v ->
                             GetFilePathFromUri.openFile(SearchActivity.this, da));
