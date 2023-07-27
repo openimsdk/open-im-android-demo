@@ -503,7 +503,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 runOnUiThread(() -> aloneSendMsg(forwardVM.forwardMsg, choice));
                 if (null != forwardVM.leaveMsg) {
                     try {
-                        Thread.sleep(150);
+                        Thread.sleep(200);
                     } catch (InterruptedException ignored) {
                     }
                     runOnUiThread(() -> aloneSendMsg(forwardVM.leaveMsg, choice));
