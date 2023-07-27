@@ -497,20 +497,27 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     private void forward(List<MultipleChoice> choices) {
-        MThreadTool.executorService.execute(() -> {
-            ForwardVM forwardVM = Easy.find(ForwardVM.class);
-            for (MultipleChoice choice : choices) {
-                runOnUiThread(() -> aloneSendMsg(forwardVM.forwardMsg, choice));
-                if (null != forwardVM.leaveMsg) {
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException ignored) {
-                    }
-                    runOnUiThread(() -> aloneSendMsg(forwardVM.leaveMsg, choice));
-                }
-            }
-            vm.clearSelectMsg();
-        });
+//        MThreadTool.executorService.execute(() -> {
+//            ForwardVM forwardVM = Easy.find(ForwardVM.class);
+//            for (MultipleChoice choice : choices) {
+//                runOnUiThread(() -> aloneSendMsg(forwardVM.forwardMsg, choice));
+//                if (null != forwardVM.leaveMsg) {
+//                    try {
+//                        Thread.sleep(200);
+//                    } catch (InterruptedException ignored) {
+//                    }
+//                    runOnUiThread(() -> aloneSendMsg(forwardVM.leaveMsg, choice));
+//                }
+//            }
+//            vm.clearSelectMsg();
+//        });
+        ForwardVM forwardVM = Easy.find(ForwardVM.class);
+        for (MultipleChoice choice : choices) {
+            aloneSendMsg(forwardVM.forwardMsg, choice);
+            if (null != forwardVM.leaveMsg)
+                aloneSendMsg(forwardVM.leaveMsg, choice);
+        }
+        vm.clearSelectMsg();
     }
 
     private void aloneSendMsg(Message msg, MultipleChoice choice) {
