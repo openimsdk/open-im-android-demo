@@ -35,6 +35,7 @@ import com.hjq.window.EasyWindow;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -197,6 +198,13 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             bottomPopDialog = new BottomPopDialog(this, buildPopView());
 
             List<Participant> participants = new ArrayList<>(memberParticipants);
+            Collections.sort(participants, (o1, o2) -> {
+                ParticipantMeta participantMeta = GsonHel.fromJson(o1.getMetadata(),
+                    ParticipantMeta.class);
+                if (participantMeta.setTop)
+                    return -1;
+                return 0;
+            });
             memberAdapter.setItems(participants);
             bottomPopDialog.show();
         });

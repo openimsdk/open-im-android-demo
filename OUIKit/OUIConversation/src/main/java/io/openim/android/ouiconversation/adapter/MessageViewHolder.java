@@ -304,9 +304,11 @@ public class MessageViewHolder {
          */
         @SuppressLint("SetTextI18n")
         private void hName() {
-            TextView nickName = itemView.findViewById(R.id.nickName);
-            if (null == nickName)
+            TextView nickName;
+            if (isOwn)
                 nickName = itemView.findViewById(R.id.nickName2);
+            else
+                nickName = itemView.findViewById(R.id.nickName);
             if (null != nickName) {
                 String time = TimeUtil.getTimeString(message.getSendTime());
                 nickName.setVisibility(View.VISIBLE);
@@ -363,8 +365,11 @@ public class MessageViewHolder {
         }
 
         private void hContentView() {
-            View contentView = itemView.findViewById(R.id.content);
-            if (null == contentView) contentView = itemView.findViewById(R.id.content2);
+            View contentView;
+            if (isOwn)
+                contentView = itemView.findViewById(R.id.content2);
+            else
+                contentView  = itemView.findViewById(R.id.content);
             if (null == contentView) return;
 
             showMsgExMenu(contentView);
