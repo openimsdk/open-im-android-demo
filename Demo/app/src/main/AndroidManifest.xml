@@ -19,9 +19,6 @@
         android:theme="@style/Theme.Main"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ui.user.UserDetailActivityV3"
-            android:exported="false" />
-        <activity
             android:name=".ui.login.ResetPasswordActivity"
             android:exported="false">
             <meta-data

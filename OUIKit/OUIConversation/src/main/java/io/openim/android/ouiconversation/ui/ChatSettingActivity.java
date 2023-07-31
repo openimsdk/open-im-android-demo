@@ -3,6 +3,7 @@ package io.openim.android.ouiconversation.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -11,14 +12,25 @@ import androidx.lifecycle.Observer;
 import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.bigkoo.pickerview.adapter.ArrayWheelAdapter;
+import com.bigkoo.pickerview.builder.OptionsPickerBuilder;
+import com.bigkoo.pickerview.builder.TimePickerBuilder;
+import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
+import com.bigkoo.pickerview.listener.OnTimeSelectListener;
+import com.bigkoo.pickerview.view.OptionsPickerView;
+import com.bigkoo.pickerview.view.TimePickerView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.ActivityChatSettingBinding;
+import io.openim.android.ouiconversation.databinding.LayoutBurnAfterReadingBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
@@ -123,6 +135,48 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
                 vm.clearCHistory(vm.conversationID);
             });
         });
+
+        view.readVanishTime.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                LayoutBurnAfterReadingBinding view =
+                    LayoutBurnAfterReadingBinding.inflate(getLayoutInflater());
+                CommonDialog commonDialog = new CommonDialog(ChatSettingActivity.this);
+                commonDialog.setCustomCentral(view.getRoot());
+                List<Object> strings = new ArrayList<>();
+                strings.add("30"+getString(io.openim.android.ouicore.R.string.seconds));
+                strings.add("5"+getString(io.openim.android.ouicore.R.string.minute));
+                strings.add("1"+getString(io.openim.android.ouicore.R.string.hour));
+                view.roller.setAdapter(new ArrayWheelAdapter(strings));
+                int duration=vm.conversationInfo.val().getBurnDuration();
+                int currentItem=0;
+                if (duration==300)
+                    currentItem=1;
+                if (duration>=3600)
+                    currentItem=2;
+                view.roller.setCurrentItem(currentItem);
+                view.roller.setCyclic(false);
+                commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
+                commonDialog.getMainView().confirm.setOnClickListener(v1 -> {
+                    commonDialog.dismiss();
+                    int burnDuration = 30;
+                    int position = view.roller.getCurrentItem();
+                    if (position == 1) burnDuration = 5 * 60;
+                    if (position == 2) burnDuration = 60 * 60;
+
+                   final int finalBurnDuration = burnDuration;
+                    OpenIMClient.getInstance().conversationManager.setConversationBurnDuration(new IMUtil.IMCallBack<String>() {
+                        @Override
+                        public void onSuccess(String data) {
+                            toast(getString(io.openim.android.ouicore.R.string.set_succ));
+                            vm.conversationInfo.val().setBurnDuration(finalBurnDuration);
+                            vm.conversationInfo.update();
+                        }
+                    }, vm.conversationID, burnDuration);
+                });
+                commonDialog.show();
+            }
+        });
     }
 
     private void initView() {
@@ -133,6 +187,15 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
         });
         vm.conversationInfo.observe(this, conversationInfo -> {
             view.topSlideButton.post(() -> view.topSlideButton.setCheckedWithAnimation(conversationInfo.isPinned()));
+            view.readVanishTime.setVisibility(conversationInfo.isPrivateChat() ? View.VISIBLE :
+                View.GONE);
+             int burnDuration=conversationInfo.getBurnDuration();
+            String burnDurationStr="30"+getString(io.openim.android.ouicore.R.string.seconds);
+            if (burnDuration==300)
+                burnDurationStr="5"+getString(io.openim.android.ouicore.R.string.minute);
+            if (burnDuration>=3600)
+                burnDurationStr="1"+getString(io.openim.android.ouicore.R.string.hour);
+            view.readVanishNum.setText(burnDurationStr);
         });
 
         List<String> uid = new ArrayList<>();
@@ -150,6 +213,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
                 view.userName.setText(data.get(0).getNickname());
             }
         }, uid);
+
     }
 
     @Override

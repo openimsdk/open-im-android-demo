@@ -10,6 +10,7 @@ public class Constant {
 //  public static final String DEFAULT_IP = "web.rentsoft.cn";//121
 
     public static final String DEFAULT_IP = "203.56.175.233";//121
+
 //    public static final String DEFAULT_IP = "43.154.157.177";//43
 //    public static final String DEFAULT_IP = "59.36.173.89";//43
 
@@ -96,7 +97,8 @@ public class Constant {
     public static final String K_FROM = "from";
     public static final String K_SIZE = "size";
     public static final String NOTICE_TAG = "msg_notification";
-
+    //是否拉起通话页
+    public static final String K_PUSH_CALL_PAGE ="push_call_page" ;
 
     //最大通话人数
     public static final int MAX_CALL_NUM = 9;
@@ -131,19 +133,6 @@ public class Constant {
 
     }
 
-
-
-    /// 进群验证设置选项
-    public static class GroupVerification {
-        /// 申请需要同意 邀请直接进
-        public static final int applyNeedVerificationInviteDirectly = 0;
-
-        /// 所有人进群需要验证，除了群主管理员邀
-        public static final int allNeedVerification = 1;
-
-        /// 直接进群
-        public static final int directly = 2;
-    }
     //超级群
     public static final int SUPER_GROUP_LIMIT = 250;
 

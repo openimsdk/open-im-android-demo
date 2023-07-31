@@ -6,17 +6,14 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,8 +48,6 @@ import io.openim.android.ouiconversation.ui.ChatActivity;
 import io.openim.android.ouiconversation.ui.NotificationActivity;
 import io.openim.android.ouiconversation.ui.SearchActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
-import io.openim.android.ouicore.base.vm.ISubscribe;
-import io.openim.android.ouicore.base.vm.Subject;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
@@ -286,7 +281,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         });
         view.videoMeeting.setOnClickListener(c -> {
             popupWindow.dismiss();
-            ARouter.getInstance().build(Routes.Meeting.HOME).navigation();
+            ARouter.getInstance().build(Routes.Meeting.LAUNCH).navigation();
         });
         //设置PopupWindow的视图内容
         popupWindow.setContentView(view.getRoot());
@@ -381,16 +376,6 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             viewHolder.viewBinding.setTop.setVisibility(msgConversation.conversationInfo.isPinned() ? View.VISIBLE : View.GONE);
 
             CharSequence lastMsg = msgConversation.lastMsg;
-            //强提醒
-            if (msgConversation.conversationInfo.getGroupAtType() == GroupAtType.AT_ME) {
-                String target =
-                    "@" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.you);
-                if (!lastMsg.toString().contains(target))
-                    lastMsg = target + "\t" + lastMsg;
-
-                IMUtil.buildClickAndColorSpannable((SpannableStringBuilder)
-                    lastMsg, target, android.R.color.holo_red_dark, null);
-            }
             viewHolder.viewBinding.lastMsg.setText(lastMsg);
         }
 

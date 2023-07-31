@@ -79,7 +79,7 @@ public class PersonalFragment extends BaseFragment implements Observer {
                 startActivity(new Intent(getActivity(), PersonalInfoActivity.class));
             }
         });
-        view.userId.setOnClickListener(v -> {
+        view.userIdLy.setOnClickListener(v -> {
             Common.copy(BaseApp.inst().loginCertificate.userID);
             toast(getString(io.openim.android.ouicore.R.string.copy_succ));
         });

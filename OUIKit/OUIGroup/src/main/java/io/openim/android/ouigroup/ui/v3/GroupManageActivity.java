@@ -17,6 +17,7 @@ import io.openim.android.ouigroup.ui.GroupMaterialActivity;
 import io.openim.android.ouigroup.ui.MemberPermissionActivity;
 import io.openim.android.ouigroup.ui.SuperGroupMemberActivity;
 import io.openim.android.sdk.enums.GroupStatus;
+import io.openim.android.sdk.enums.GroupVerification;
 
 public class GroupManageActivity extends BaseActivity<GroupVM, ActivityGroupManageBinding> {
 
@@ -37,9 +38,9 @@ public class GroupManageActivity extends BaseActivity<GroupVM, ActivityGroupMana
         });
     }
     String getJoinGroupOption(int value) {
-        if (value == Constant.GroupVerification.allNeedVerification) {
+        if (value == GroupVerification.ALL_NEED_VERIFICATION) {
             return getString(io.openim.android.ouicore.R.string.needVerification);
-        } else if (value == Constant.GroupVerification.directly) {
+        } else if (value == GroupVerification.DIRECTLY) {
             return getString(io.openim.android.ouicore.R.string.allowAnyoneJoinGroup);
         }
         return getString(io.openim.android.ouicore.R.string.inviteNotVerification);
@@ -59,22 +60,22 @@ public class GroupManageActivity extends BaseActivity<GroupVM, ActivityGroupMana
 
             dialog.getMainView().menu1.setOnClickListener(v1 -> {
                 dialog.dismiss();
-                vm.setGroupVerification(Constant.GroupVerification.directly, data -> {
-                    vm.groupsInfo.getValue().setNeedVerification(Constant.GroupVerification.directly);
+                vm.setGroupVerification(GroupVerification.DIRECTLY, data -> {
+                    vm.groupsInfo.getValue().setNeedVerification(GroupVerification.DIRECTLY);
                     vm.groupsInfo.setValue(vm.groupsInfo.getValue());
                 });
             });
             dialog.getMainView().menu2.setOnClickListener(v1 -> {
                 dialog.dismiss();
-                vm.setGroupVerification(Constant.GroupVerification.applyNeedVerificationInviteDirectly, data -> {
-                    vm.groupsInfo.getValue().setNeedVerification(Constant.GroupVerification.applyNeedVerificationInviteDirectly);
+                vm.setGroupVerification(GroupVerification.APPLY_NEED_VERIFICATION_INVITE_DIRECTLY, data -> {
+                    vm.groupsInfo.getValue().setNeedVerification(GroupVerification.APPLY_NEED_VERIFICATION_INVITE_DIRECTLY);
                     vm.groupsInfo.setValue(vm.groupsInfo.getValue());
                 });
             });
             dialog.getMainView().menu4.setOnClickListener(v1 -> {
                 dialog.dismiss();
-                vm.setGroupVerification(Constant.GroupVerification.allNeedVerification, data -> {
-                    vm.groupsInfo.getValue().setNeedVerification(Constant.GroupVerification.allNeedVerification);
+                vm.setGroupVerification(GroupVerification.ALL_NEED_VERIFICATION, data -> {
+                    vm.groupsInfo.getValue().setNeedVerification(GroupVerification.ALL_NEED_VERIFICATION);
                     vm.groupsInfo.setValue(vm.groupsInfo.getValue());
                 });
             });

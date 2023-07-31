@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.KeyEvent;
 
 import io.openim.android.demo.R;
@@ -41,6 +43,8 @@ public class ResetPasswordActivity extends BaseActivity<LoginVM, ActivityResetPa
 
             }
         });
+        view.eyes.setOnCheckedChangeListener((buttonView, isChecked) ->
+            view.edt2.setTransformationMethod(isChecked ? HideReturnsTransformationMethod.getInstance() : PasswordTransformationMethod.getInstance()));
     }
 
     private void submitEnabled() {

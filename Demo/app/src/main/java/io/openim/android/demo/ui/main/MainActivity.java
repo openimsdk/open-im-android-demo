@@ -18,6 +18,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.hjq.window.EasyWindow;
 import com.igexin.sdk.PushManager;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
@@ -32,14 +33,11 @@ import io.openim.android.ouicontact.ui.fragment.ContactFragment;
 import io.openim.android.ouicontact.vm.ContactVM;
 import io.openim.android.ouiconversation.ui.fragment.ContactListFragment;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.im.IMUtil;
-import io.openim.android.ouicore.services.MomentsBridge;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
-import q.rorbin.badgeview.QBadgeView;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {

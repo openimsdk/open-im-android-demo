@@ -17,6 +17,7 @@ import java.util.Map;
 
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.entity.UserList;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
@@ -54,7 +55,7 @@ public class SearchVM extends BaseViewModel {
     //true 搜索人 false 搜索群
     public boolean isPerson = false;
     public int page;
-    public int pageSize;
+    public int pageSize=50;
     private final Handler handler = new Handler();
 
     public void searchPerson() {
@@ -188,12 +189,7 @@ public class SearchVM extends BaseViewModel {
     public void searchGroup(String gid) {
         List<String> groupIds = new ArrayList<>(); // 群ID集合
         groupIds.add(gid);
-        OpenIMClient.getInstance().groupManager.getGroupsInfo(new OnBase<List<GroupInfo>>() {
-            @Override
-            public void onError(int code, String error) {
-
-            }
-
+        OpenIMClient.getInstance().groupManager.getGroupsInfo(new IMUtil.IMCallBack<List<GroupInfo>>(){
             @Override
             public void onSuccess(List<GroupInfo> data) {
                 groupsInfo.setValue(data);
@@ -222,11 +218,7 @@ public class SearchVM extends BaseViewModel {
     }
 
     public void searchGroupV2() {
-        OpenIMClient.getInstance().groupManager.searchGroups(new OnBase<List<GroupInfo>>() {
-            @Override
-            public void onError(int code, String error) {
-            }
-
+        OpenIMClient.getInstance().groupManager.searchGroups(new IMUtil.IMCallBack<List<GroupInfo>>(){
             @Override
             public void onSuccess(List<GroupInfo> data) {
                 if (page == 1) {
@@ -237,7 +229,7 @@ public class SearchVM extends BaseViewModel {
                 }
                 groupsInfo.setValue(groupsInfo.getValue());
             }
-        }, buildKeyWord(), false, true);
+        }, buildKeyWord(), true, true);
     }
 
     public void searchLocalMessages(String key, Integer... messageTypes) {

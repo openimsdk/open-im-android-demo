@@ -33,7 +33,7 @@ public interface OpenIMService {
     @POST("account/code/verify")
     Observable<ResponseBody> checkVerificationCode(@Body RequestBody requestBody);
 
-    @POST("account/reset_password")
+    @POST("account/password/reset")
     Observable<ResponseBody> resetPassword(@Body RequestBody requestBody);
 
 

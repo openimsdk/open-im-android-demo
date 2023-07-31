@@ -116,6 +116,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
                 }
             }).build();
             pvTime.show(v);
+
         });
         view.email.setOnClickListener(v -> {
             emailLauncher.launch(new Intent(this, EditTextActivity.class)

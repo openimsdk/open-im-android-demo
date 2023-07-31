@@ -162,8 +162,16 @@ public class BottomInputCote {
 
             @Override
             public void afterTextChanged(Editable s) {
-                boolean isSend = !TextUtils.isEmpty(s) && !Common.isBlank(s);
+                String content=s.toString();
+                boolean isSend = !TextUtils.isEmpty(content) && !Common.isBlank(content);
                 setSendButton(isSend);
+
+                if (content.length()>0){
+                    String last=content.substring(content.length()-1);
+                    if (last.equals("@")){
+
+                    }
+                }
             }
         });
 

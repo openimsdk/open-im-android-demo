@@ -151,18 +151,19 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     @Override
     public void onConversationChanged(List<ConversationInfo> list) {
-        for (ConversationInfo info : list) {
-            Message message=GsonHel.fromJson(info.getLatestMsg(),
-                Message.class);
-            MsgConversation msgConversation =
-                new MsgConversation(message, info);
-            int index = conversations.val()
-                .indexOf(msgConversation);
-            if (index != -1) {
-                conversations.val().set(index, msgConversation);
-                subject(NOTIFY_ITEM_CHANGED, index);
-            }
-        }
+        updateConversation();
+//        for (ConversationInfo info : list) {
+//            Message message=GsonHel.fromJson(info.getLatestMsg(),
+//                Message.class);
+//            MsgConversation msgConversation =
+//                new MsgConversation(message, info);
+//            int index = conversations.val()
+//                .indexOf(msgConversation);
+//            if (index != -1) {
+//                conversations.val().set(index, msgConversation);
+//                subject(NOTIFY_ITEM_CHANGED, index);
+//            }
+//        }
     }
 
 

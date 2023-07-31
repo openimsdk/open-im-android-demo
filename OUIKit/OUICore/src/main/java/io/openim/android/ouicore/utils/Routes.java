@@ -84,6 +84,8 @@ public class Routes {
 
     //会议
     public static class Meeting {
-        public static final String HOME = "/meeting/MeetingLaunchActivity";
+        public static final String LAUNCH = "/meeting/MeetingLaunchActivity";
+        public static final String HOME = "/meeting/MeetingHomeActivity";
+
     }
 }

@@ -113,6 +113,7 @@ public class PersonalVM extends BaseViewModel {
     }
 
     public void setSelfInfo(Parameter param) {
+        param.add("userID",BaseApp.inst().loginCertificate.userID);
         waitDialog.show();
         N.API(OpenIMService.class)
             .updateUserInfo(param.buildJsonBody())
