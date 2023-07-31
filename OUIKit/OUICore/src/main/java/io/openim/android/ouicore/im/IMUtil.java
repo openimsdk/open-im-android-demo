@@ -660,6 +660,10 @@ public class IMUtil {
      */
     public static SignalingInfo buildSignalingInfo(boolean isVideoCalls, boolean isSingleChat,
                                                    List<String> inviteeUserIDs, String groupID) {
+        boolean isGroupChat = !TextUtils.isEmpty(groupID);
+        if (!isGroupChat)
+            groupID = UUID.randomUUID().toString(); //单聊Id自动生成
+
         SignalingInfo signalingInfo = new SignalingInfo();
         String inId = BaseApp.inst().loginCertificate.userID;
         signalingInfo.setOpUserID(inId);
@@ -675,7 +679,8 @@ public class IMUtil {
         signalingInvitationInfo.setPlatformID(IMUtil.PLATFORM_ID);
         signalingInvitationInfo.setSessionType(isSingleChat ? ConversationType.SINGLE_CHAT
             : ConversationType.SUPER_GROUP_CHAT);
-        signalingInvitationInfo.setGroupID(groupID);
+        if (isGroupChat)
+            signalingInvitationInfo.setGroupID(groupID);
 
         signalingInfo.setInvitation(signalingInvitationInfo);
         signalingInfo.setOfflinePushInfo(new OfflinePushInfo());

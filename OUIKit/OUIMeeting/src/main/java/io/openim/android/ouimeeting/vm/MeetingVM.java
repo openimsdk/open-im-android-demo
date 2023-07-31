@@ -127,7 +127,19 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
             return null;
         });
     }
-
+    public void buildMetaData(List<Participant> v) {
+        try {
+            for (int i = 0; i < v.size(); i++) {
+                Participant data = v.get(i);
+                ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
+                    ParticipantMeta.class);
+                participantMeta.setTop = roomMetadata.getValue()
+                    .pinedUserIDList.contains(data.getIdentity());
+                data.setMetadata$livekit_android_sdk_release(GsonHel.toJson(participantMeta));
+            }
+        } catch (Exception ignored) {
+        }
+    }
     public String getMetaUserName(ParticipantMeta participantMeta) {
         try {
             String name = participantMeta.groupMemberInfo.getNickname();

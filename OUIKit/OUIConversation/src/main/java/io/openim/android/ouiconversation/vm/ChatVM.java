@@ -593,7 +593,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private void loadHistory() {
         //加载消息记录
-        if (fromChatHistory) loadHistoryMessageReverse();
+        if (fromChatHistory)
+            loadHistoryMessageReverse();
         else loadHistoryMessage();
     }
 

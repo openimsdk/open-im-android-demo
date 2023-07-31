@@ -256,9 +256,7 @@ public class MessageViewHolder {
             if (null != chatVM.enableMultipleSelect.getValue() && chatVM.enableMultipleSelect.getValue() && message.getContentType() != MessageType.NTF_BEGIN) {
                 checkBox.setVisibility(View.VISIBLE);
                 checkBox.setChecked(msgExpand.isChoice);
-                checkBox.setOnClickListener((buttonView) -> {
-                    msgExpand.isChoice = checkBox.isChecked();
-                });
+                checkBox.setOnClickListener((buttonView) -> msgExpand.isChoice = checkBox.isChecked());
             } else {
                 checkBox.setVisibility(View.GONE);
             }

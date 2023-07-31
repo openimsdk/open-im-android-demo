@@ -250,6 +250,16 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                 showFloatView();
             }
         });
+
+        vm.roomMetadata.observe(this, meta -> {
+            try {
+                if (null == meta || null == memberAdapter || memberAdapter.getItems().isEmpty())
+                    return;
+                vm.buildMetaData(memberParticipants);
+                memberAdapter.setItems(memberParticipants);
+            } catch (Exception ignored) {
+            }
+        });
     }
 
     private void showFloatView() {
@@ -475,7 +485,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                         vm.roomMetadata.getValue().beWatchedUserIDList);
 
                     vm.updateMeetingInfo(map, data1 -> {
-                        vm.roomMetadata.getValue().beWatchedUserIDList.add(0, data.getIdentity());
+                        vm.roomMetadata.getValue().beWatchedUserIDList=ids;
                         vm.roomMetadata.setValue(vm.roomMetadata.getValue());
                         popupWindow.dismiss();
                     });
@@ -668,6 +678,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         vm.callViewModel.subscribe(vm.callViewModel.getAllParticipants(), (v) -> {
             if (v.isEmpty()) return null;
             memberParticipants = vm.handleParticipants(v);
+            vm.buildMetaData(memberParticipants);
             List<List<Participant>> data = new ArrayList<>();
 
             int pageNum = memberParticipants.size() / pageShow;
