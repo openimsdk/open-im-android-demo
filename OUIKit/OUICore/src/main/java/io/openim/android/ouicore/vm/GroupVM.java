@@ -337,7 +337,7 @@ public class GroupVM extends SocialityVM {
                 });
                 exGroupMembers.setValue(exGroupMembers.getValue());
             }
-        }, groupId, 0, 0, 0);
+        }, groupId, 0, 0, pageSize);
     }
 
     /**
