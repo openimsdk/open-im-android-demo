@@ -8,10 +8,9 @@ import android.content.DialogInterface;
 
 import com.alibaba.android.arouter.facade.template.IProvider;
 
-import io.openim.android.sdk.listener.OnSignalingListener;
 import io.openim.android.sdk.models.SignalingInfo;
 
-public interface CallingService extends IProvider, OnSignalingListener {
+public interface CallingService extends IProvider {
 
     Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener,
                            boolean isCallOut);

@@ -67,7 +67,6 @@ import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.listener.OnGroupListener;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
-import io.openim.android.sdk.listener.OnSignalingListener;
 import io.openim.android.sdk.models.AdvancedMessage;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.CustomSignalingInfo;
@@ -88,7 +87,7 @@ import io.openim.android.sdk.models.TextElem;
 import okhttp3.ResponseBody;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener,
-    OnGroupListener, OnConversationListener, java.util.Observer, OnSignalingListener {
+    OnGroupListener, OnConversationListener, java.util.Observer {
 
     public static final String REEDIT_MSG = "reeditMsg";
 
@@ -148,7 +147,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
         IMEvent.getInstance().addAdvanceMsgListener(this);
         IMEvent.getInstance().addConversationListener(this);
-        IMEvent.getInstance().addSignalingListener(this);
         if (isSingleChat) {
             listener();
         } else {
@@ -156,36 +154,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             IMEvent.getInstance().addGroupListener(this);
         }
     }
-
-    private void signalingGetRoomByGroupID() {
-        OpenIMClient.getInstance().signalingManager.signalingGetRoomByGroupID(new IMUtil.IMCallBack<RoomCallingInfo>() {
-            @Override
-            public void onSuccess(RoomCallingInfo data) {
-                roomCallingInfo.setValue(data);
-            }
-        }, groupID);
-    }
-
-    public void signalingGetTokenByRoomID(String roomID) {
-        OpenIMClient.getInstance().signalingManager.signalingGetRoomByGroupID(new OnBase<RoomCallingInfo>() {
-            @Override
-            public void onError(int code, String error) {
-
-            }
-
-            @Override
-            public void onSuccess(RoomCallingInfo data) {
-                if (null == data.getInvitation()) {
-                    getIView().toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.not_err));
-                    return;
-                }
-                SignalingInfo signalingInfo = new SignalingInfo();
-                signalingInfo.setInvitation(data.getInvitation());
-                callingService.join(signalingInfo);
-            }
-        }, roomID);
-    }
-
     /**
      * 获取自己在这个群的权限
      */
@@ -440,74 +408,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     }
 
-    @Override
-    public void onInvitationCancelled(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInvitationTimeout(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeAccepted(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeAcceptedByOtherDevice(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeRejected(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeRejectedByOtherDevice(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onReceiveNewInvitation(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onHangup(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onRoomParticipantConnected(RoomCallingInfo s) {
-        if (groupID.equals(s.getGroupID())) {
-            roomCallingInfo.setValue(s);
-        }
-    }
-
-    @Override
-    public void onRoomParticipantDisconnected(RoomCallingInfo s) {
-        if (groupID.equals(s.getGroupID())) {
-            roomCallingInfo.setValue(s);
-        }
-    }
-
-    @Override
-    public void onMeetingStreamChanged(MeetingStreamEvent e) {
-
-    }
-
-    @Override
-    public void onReceiveCustomSignal(CustomSignalingInfo s) {
-
-    }
-
-    @Override
-    public void onStreamChange(String s) {
-
-    }
 
     public String getRoomCallingInfoRoomID() {
         String roomID = "";
@@ -603,7 +503,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         IMEvent.getInstance().removeAdvanceMsgListener(this);
         IMEvent.getInstance().removeGroupListener(this);
         IMEvent.getInstance().removeConversationListener(this);
-        IMEvent.getInstance().removeSignalingListener(this);
         inputMsg.removeObserver(inputObserver);
 
         for (Timer value : readVanishTimers.values()) {

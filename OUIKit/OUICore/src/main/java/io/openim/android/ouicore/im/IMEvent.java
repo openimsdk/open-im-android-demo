@@ -32,7 +32,6 @@ import io.openim.android.sdk.listener.OnConnListener;
 import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.listener.OnFriendshipListener;
 import io.openim.android.sdk.listener.OnGroupListener;
-import io.openim.android.sdk.listener.OnSignalingListener;
 import io.openim.android.sdk.listener.OnUserListener;
 import io.openim.android.sdk.models.BlacklistInfo;
 import io.openim.android.sdk.models.ConversationInfo;
@@ -59,7 +58,6 @@ public class IMEvent {
     private List<OnConversationListener> conversationListeners;
     private List<OnGroupListener> groupListeners;
     private List<OnFriendshipListener> friendshipListeners;
-    private List<OnSignalingListener> signalingListeners;
 
     public void init() {
         connListeners = new ArrayList<>();
@@ -67,132 +65,18 @@ public class IMEvent {
         conversationListeners = new ArrayList<>();
         groupListeners = new ArrayList<>();
         friendshipListeners = new ArrayList<>();
-        signalingListeners = new ArrayList<>();
 
         userListener();
         advanceMsgListener();
         friendshipListener();
         conversationListener();
         groupListeners();
-        signalingListener();
-    }
-
-    private void signalingListener() {
-        OpenIMClient.getInstance().signalingManager.setSignalingListener(new OnSignalingListener() {
-            @Override
-            public void onInvitationCancelled(SignalingInfo s) {
-                // 被邀请者收到：邀请者取消音视频通话
-                for (OnSignalingListener signalingListener : signalingListeners) {
-                    signalingListener.onInvitationCancelled(s);
-                }
-            }
-
-            @Override
-            public void onInvitationTimeout(SignalingInfo s) {
-                // 邀请者收到：被邀请者超时未接通
-                for (OnSignalingListener signalingListener : signalingListeners) {
-                    signalingListener.onInvitationTimeout(s);
-                }
-            }
-
-            @Override
-            public void onInviteeAccepted(SignalingInfo s) {
-                // 邀请者收到：被邀请者同意音视频通话
-                for (OnSignalingListener signalingListener : signalingListeners) {
-                    signalingListener.onInviteeAccepted(s);
-                }
-            }
-
-            @Override
-            public void onInviteeAcceptedByOtherDevice(SignalingInfo s) {
-                for (OnSignalingListener signalingListener : signalingListeners) {
-                    signalingListener.onInviteeAcceptedByOtherDevice(s);
-                }
-            }
-
-            @Override
-            public void onInviteeRejected(SignalingInfo s) {
-                // 邀请者收到：被邀请者拒绝音视频通话
-                for (OnSignalingListener signalingListener : signalingListeners) {
-                    signalingListener.onInviteeRejected(s);
-                }
-            }
-
-            @Override
-            public void onInviteeRejectedByOtherDevice(SignalingInfo s) {
-                for (OnSignalingListener signalingListener : signalingListeners) {
-                    signalingListener.onInviteeRejectedByOtherDevice(s);
-                }
-            }
-
-            @Override
-            public void onReceiveNewInvitation(SignalingInfo s) {
-                // 被邀请者收到：音视频通话邀请
-                for (OnSignalingListener signalingListener : signalingListeners) {
-                    signalingListener.onReceiveNewInvitation(s);
-                }
-            }
-
-            @Override
-            public void onHangup(SignalingInfo s) {
-                for (OnSignalingListener signalingListener : signalingListeners) {
-                    signalingListener.onHangup(s);
-                }
-            }
-
-            @Override
-            public void onRoomParticipantConnected(RoomCallingInfo s) {
-                for (OnSignalingListener signalingListener : signalingListeners) {
-                    signalingListener.onRoomParticipantConnected(s);
-                }
-            }
-
-            @Override
-            public void onRoomParticipantDisconnected(RoomCallingInfo s) {
-                for (OnSignalingListener signalingListener : signalingListeners) {
-                    signalingListener.onRoomParticipantDisconnected(s);
-                }
-            }
-
-            @Override
-            public void onMeetingStreamChanged(MeetingStreamEvent e) {
-                for (OnSignalingListener signalingListener : signalingListeners) {
-                    signalingListener.onMeetingStreamChanged(e);
-                }
-            }
-
-            @Override
-            public void onReceiveCustomSignal(CustomSignalingInfo s) {
-                for (OnSignalingListener signalingListener : signalingListeners) {
-                    signalingListener.onReceiveCustomSignal(s);
-                }
-            }
-
-            @Override
-            public void onStreamChange(String s) {
-                for (OnSignalingListener signalingListener : signalingListeners) {
-                    signalingListener.onStreamChange(s);
-                }
-            }
-        });
     }
 
     public static synchronized IMEvent getInstance() {
         if (null == listener) listener = new IMEvent();
         return listener;
     }
-
-    //信令监听
-    public void addSignalingListener(OnSignalingListener onSignalingListener) {
-        if (!signalingListeners.contains(onSignalingListener)) {
-            signalingListeners.add(onSignalingListener);
-        }
-    }
-
-    public void removeSignalingListener(OnSignalingListener onSignalingListener) {
-        signalingListeners.remove(onSignalingListener);
-    }
-
     //连接事件
     public void addConnListener(OnConnListener onConnListener) {
         if (!connListeners.contains(onConnListener)) {
