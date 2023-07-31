@@ -1,9 +1,11 @@
 package io.openim.android.ouicore.entity;
 
+import java.io.Serializable;
+
 import io.openim.android.ouicore.ex.CommEx;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
-public class ExGroupMemberInfo extends CommEx {
+public class ExGroupMemberInfo extends CommEx implements Serializable {
     public GroupMembersInfo groupMembersInfo;
 
     /**

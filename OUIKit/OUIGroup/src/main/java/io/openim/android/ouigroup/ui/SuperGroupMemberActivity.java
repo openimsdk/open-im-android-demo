@@ -19,7 +19,9 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
@@ -27,6 +29,7 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
+import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
@@ -42,6 +45,8 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
     private RecyclerViewAdapter adapter;
     //转让群主权限
     private boolean isTransferPermission;
+    //选择成员进行群通话
+    private boolean groupCall;
     //选择群成员
     private boolean isSelectMember;
     private int maxNum;
@@ -63,7 +68,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             try {
                 String uid = result.getData().getStringExtra(Constant.K_ID);
-                if (isSelectMember) {
+                if (groupCall || isSelectMember) {
                     String resultJson = result.getData().getStringExtra(Constant.K_RESULT);
                     GroupMembersInfo groupMembersInfo = GsonHel.fromJson(resultJson,
                         GroupMembersInfo.class);
@@ -109,6 +114,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
             vm.pageSize = 20;
         }
         isTransferPermission = getIntent().getBooleanExtra(Constant.K_FROM, false);
+        groupCall = getIntent().getBooleanExtra(Constant.IS_GROUP_CALL, false);
         isSelectMember = getIntent().getBooleanExtra(Constant.IS_SELECT_MEMBER, false);
         maxNum = getIntent().getIntExtra(Constant.K_SIZE, 9);
     }
@@ -116,17 +122,28 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
     private void listener() {
         view.bottomLayout.submit.setOnClickListener(v -> {
             ArrayList<String> ids = new ArrayList<>();
+            List<MultipleChoice> members = new ArrayList<>();
             for (ExGroupMemberInfo exGroupMemberInfo : vm.superGroupMembers.getValue()) {
-                if (exGroupMemberInfo.isSelect)
+                if (exGroupMemberInfo.isSelect) {
                     ids.add(exGroupMemberInfo.groupMembersInfo.getUserID());
+                    MultipleChoice multipleChoice=new MultipleChoice(exGroupMemberInfo.groupMembersInfo.getUserID());
+                    multipleChoice.name=exGroupMemberInfo.groupMembersInfo.getNickname();
+                    members.add(multipleChoice);
+                }
             }
-            if (ids.size() == 1 && ids.get(0).equals(BaseApp.inst().loginCertificate.userID)) {
-                toast(getString(io.openim.android.ouicore.R.string.group_call_tips3));
-                return;
-            }
-            setResult(RESULT_OK, new Intent().putStringArrayListExtra(Constant.K_RESULT, ids));
-            finish();
+            if (groupCall) {
+                if (ids.size() == 1 && ids.get(0).
+                    equals(BaseApp.inst().loginCertificate.userID)) {
+                    toast(getString(io.openim.android.ouicore.R.string.group_call_tips3));
+                    return;
+                }
+                setResult(RESULT_OK, new Intent().putStringArrayListExtra(Constant.K_RESULT, ids));
 
+            }
+            if (isSelectMember) {
+                setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT, (Serializable) members));
+            }
+            finish();
             BaseApp.inst().removeCacheVM(GroupVM.class);
         });
         view.searchView.setOnClickListener(v -> {
@@ -176,6 +193,9 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
 
         vm.superGroupMembers.observe(this, v -> {
             if (v.isEmpty()) return;
+            if (groupCall){
+                vm.buildOwnSelect();
+            }
             updateSelectedNum();
             if (v.size() > vm.pageSize) {
                 adapter.notifyItemRangeInserted(vm.superGroupMembers.getValue().size()
@@ -192,7 +212,8 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
 
     private void initView() {
         view.more.setVisibility(isTransferPermission ? View.GONE : View.VISIBLE);
-        view.bottomLayout.getRoot().setVisibility(isSelectMember ? View.VISIBLE : View.GONE);
+        view.bottomLayout.getRoot().setVisibility(groupCall || isSelectMember ? View.VISIBLE :
+            View.GONE);
         view.recyclerview.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecyclerViewAdapter<ExGroupMemberInfo, RecyclerView.ViewHolder>() {
 
@@ -208,7 +229,8 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
             public void onBindView(@NonNull RecyclerView.ViewHolder holder,
                                    ExGroupMemberInfo data, int position) {
                 ViewHol.ItemViewHo itemViewHo = (ViewHol.ItemViewHo) holder;
-                itemViewHo.view.select.setVisibility(isSelectMember ? View.VISIBLE : View.GONE);
+                itemViewHo.view.select.setVisibility(groupCall || isSelectMember ? View.VISIBLE :
+                    View.GONE);
                 itemViewHo.view.select.setChecked(data.isSelect);
                 itemViewHo.view.avatar.load(data.groupMembersInfo.getFaceURL());
                 itemViewHo.view.nickName.setText(data.groupMembersInfo.getNickname());
@@ -226,8 +248,8 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
 
 
                 itemViewHo.view.getRoot().setOnClickListener(v -> {
-                    if (isSelectMember) {
-                        if (!data.isEnabled) {
+                    if (groupCall||isSelectMember) {
+                        if (groupCall&&!data.isEnabled) {
                             toast(getString(io.openim.android.ouicore.R.string.group_call_tips));
                             return;
                         }
@@ -244,7 +266,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
                         view.bottomLayout.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectNum));
                         view.bottomLayout.submit.setEnabled(selectNum > 0);
                         view.bottomLayout.selectLy.setOnClickListener(selectNum > 0 ?
-                            (View.OnClickListener) v1 -> {
+                            v1 -> {
                                 selectMemberLauncher.launch(new Intent(SuperGroupMemberActivity.this,
                                     SelectedMemberActivity.class));
                             } : null);
@@ -270,7 +292,9 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
                             commonDialog.show();
                         }
                     } else {
-                        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, data.groupMembersInfo.getUserID()).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
+                        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID,
+                            data.groupMembersInfo.getUserID()).withString(Constant.K_GROUP_ID,
+                            vm.groupId).navigation();
                     }
                 });
 

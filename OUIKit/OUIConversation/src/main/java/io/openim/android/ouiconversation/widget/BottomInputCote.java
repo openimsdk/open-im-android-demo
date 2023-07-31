@@ -57,6 +57,7 @@ public class BottomInputCote {
     private boolean hasMicrophone = false;
     private ChatVM vm;
     private Context context;
+    private OnAtUserListener onAtUserListener;
 
     InputExpandFragment inputExpandFragment;
     EmojiFragment emojiFragment;
@@ -197,24 +198,26 @@ public class BottomInputCote {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                if (s.length() > 0 && null != onAtUserListener) {
+                    if (s.toString().equals("@")) {
+                        onAtUserListener.onAtUser();
+                    }
+                }
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                String content=s.toString();
+                String content = s.toString();
                 boolean isSend = !TextUtils.isEmpty(content) && !Common.isBlank(content);
                 setSendButton(isSend);
 
-                if (content.length()>0){
-                    String last=content.substring(content.length()-1);
-                    if (last.equals("@")){
 
-                    }
-                }
             }
         });
+    }
 
+    public void setOnAtUserListener(OnAtUserListener onAtUserListener) {
+        this.onAtUserListener = onAtUserListener;
     }
 
     private void showingViewChange() {
@@ -365,4 +368,9 @@ public class BottomInputCote {
             e.printStackTrace();
         }
     }
+
+    public interface OnAtUserListener {
+        void onAtUser();
+    }
+
 }
