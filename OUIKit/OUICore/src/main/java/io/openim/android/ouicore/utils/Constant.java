@@ -85,6 +85,8 @@ public class Constant {
         public static final int SET_GROUP_NOTIFICATION = 10007;
         //插入了消息到本地
         public static final int INSERT_MSG = 10008;
+        //@用户
+        public static final int AT_USER = 10009;
     }
 
     public static final String K_ID = "Id";
@@ -97,8 +99,6 @@ public class Constant {
     public static final String K_FROM = "from";
     public static final String K_SIZE = "size";
     public static final String NOTICE_TAG = "msg_notification";
-    //是否拉起通话页
-    public static final String K_PUSH_CALL_PAGE ="push_call_page" ;
 
     //最大通话人数
     public static final int MAX_CALL_NUM = 9;
@@ -114,6 +114,8 @@ public class Constant {
     public static final String IS_REMOVE_GROUP = "isRemoveGroup";
     //选择群成员
     public static final String IS_SELECT_MEMBER = "isSelectMember";
+    //群通话
+    public static final String IS_GROUP_CALL = "isGroupCall";
     //选择好友
     public static final String IS_SELECT_FRIEND = "isSelectFriend";
     //自定义消息类型

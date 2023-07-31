@@ -1,6 +1,8 @@
 package io.openim.android.ouicore.ex;
 
-public class MultipleChoice extends CommEx {
+import java.io.Serializable;
+
+public class MultipleChoice extends CommEx implements Serializable {
     public MultipleChoice() {
     }
 
