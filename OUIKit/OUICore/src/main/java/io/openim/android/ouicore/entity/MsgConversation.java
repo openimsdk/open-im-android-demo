@@ -18,13 +18,13 @@ public class MsgConversation {
     public NotificationMsg notificationMsg;
 
     public MsgConversation(Message lastMsg, ConversationInfo conversationInfo) {
-        if (null != lastMsg) {
-            IMUtil.buildExpandInfo(lastMsg);
-            this.lastMsg = IMUtil.getMsgParse(lastMsg);
-        } else
-            this.lastMsg = "";
-        this.conversationInfo = conversationInfo;
         try {
+            if (null != lastMsg) {
+                IMUtil.buildExpandInfo(lastMsg);
+                this.lastMsg = IMUtil.getMsgParse(lastMsg);
+            } else
+                this.lastMsg = "";
+            this.conversationInfo = conversationInfo;
             if (lastMsg.getContentType() == MessageType.GROUP_INFO_SET_NTF) {
                 notificationMsg = GsonHel.fromJson(lastMsg.getNotificationElem().getDetail(),
                     NotificationMsg.class);

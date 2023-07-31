@@ -55,7 +55,7 @@ public class SearchVM extends BaseViewModel {
     //true 搜索人 false 搜索群
     public boolean isPerson = false;
     public int page;
-    public int pageSize;
+    public int pageSize=50;
     private final Handler handler = new Handler();
 
     public void searchPerson() {

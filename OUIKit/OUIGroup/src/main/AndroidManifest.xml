@@ -10,7 +10,7 @@
             android:name=".ui.AllGroupActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.SelectTargetActivityV3"
+            android:name=".ui.v3.SelectTargetActivityV3"
             android:exported="false" />
         <activity
             android:name=".ui.SetMuteActivity"

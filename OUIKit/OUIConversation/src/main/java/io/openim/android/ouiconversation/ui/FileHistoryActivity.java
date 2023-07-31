@@ -28,6 +28,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.Message;
+
 @Route(path = Routes.Conversation.FILE_HISTORY)
 public class FileHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHistoryBinding> {
 
@@ -53,8 +54,10 @@ public class FileHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHisto
         view.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) view.recyclerView.getLayoutManager();
-                int lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
+                LinearLayoutManager linearLayoutManager =
+                    (LinearLayoutManager) view.recyclerView.getLayoutManager();
+                int lastVisiblePosition =
+                    linearLayoutManager.findLastCompletelyVisibleItemPosition();
                 if (lastVisiblePosition == vm.searchMessageItems.getValue().size() - 1
                     && vm.searchMessageItems.getValue().size() >= vm.count) {
                     page++;
@@ -65,6 +68,8 @@ public class FileHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHisto
     }
 
     private void searchLocalMessages() {
+        vm.searchMessageItems.
+            val().clear();
         vm.searchLocalMessages(null, page, MessageType.FILE);
     }
 
@@ -73,17 +78,22 @@ public class FileHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHisto
             io.openim.android.ouicore.R.string.file);
         view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<Message, FileItemHolder>(FileItemHolder.class) {
+        view.recyclerView.setAdapter(adapter =
+            new RecyclerViewAdapter<Message, FileItemHolder>(FileItemHolder.class) {
             @Override
             public void onBindView(@NonNull FileItemHolder holder,
                                    Message data, int position) {
 
-                holder.v.avatar.load(data.getSenderFaceUrl());
-                holder.v.nickName.setText(data.getSenderNickname());
-                holder.v.time.setText(TimeUtil.getTime(data.getSendTime() , TimeUtil.yearTimeFormat));
-                holder.v.title.setText(data.getFileElem().getFileName());
-                holder.v.size.setText(ByteUtil.bytes2kb(data.getFileElem().getFileSize()));
-                holder.v.item.setOnClickListener(v -> GetFilePathFromUri.openFile(v.getContext(), data));
+                try {
+                    holder.v.avatar.load(data.getSenderFaceUrl());
+                    holder.v.nickName.setText(data.getSenderNickname());
+                    holder.v.time.setText(TimeUtil.getTime(data.getSendTime(),
+                        TimeUtil.yearTimeFormat));
+                    holder.v.title.setText(data.getFileElem().getFileName());
+                    holder.v.size.setText(ByteUtil.bytes2kb(data.getFileElem().getFileSize()));
+                    holder.v.item.setOnClickListener(v -> GetFilePathFromUri.openFile(v.getContext(), data));
+                } catch (Exception ignore) {
+                }
             }
         });
         adapter.setItems(vm.searchMessageItems.getValue());

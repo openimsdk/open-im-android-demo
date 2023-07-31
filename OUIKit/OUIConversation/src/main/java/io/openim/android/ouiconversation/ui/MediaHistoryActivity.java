@@ -30,6 +30,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.Message;
+
 @Route(path = Routes.Conversation.MEDIA_HISTORY)
 public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHistoryBinding> {
 
@@ -59,6 +60,8 @@ public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHist
     }
 
     private void searchLocalMessages() {
+        vm.searchMessageItems.
+            val().clear();
         vm.searchLocalMessages(null, page, isPicture ?
             MessageType.PICTURE : MessageType.VIDEO);
     }
@@ -73,8 +76,10 @@ public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHist
         view.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) view.recyclerView.getLayoutManager();
-                int lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
+                LinearLayoutManager linearLayoutManager =
+                    (LinearLayoutManager) view.recyclerView.getLayoutManager();
+                int lastVisiblePosition =
+                    linearLayoutManager.findLastCompletelyVisibleItemPosition();
                 if (lastVisiblePosition == adapter.getItems().size() - 1) {
                     page++;
                     searchLocalMessages();
@@ -98,7 +103,8 @@ public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHist
         public List<Message> messageList = new ArrayList<>();
     }
 
-    private class ExRecyclerViewAdapter extends RecyclerViewAdapter<ExMessage, RecyclerView.ViewHolder> {
+    private class ExRecyclerViewAdapter extends RecyclerViewAdapter<ExMessage,
+        RecyclerView.ViewHolder> {
         private int TITLE = 1;
         private int CONTENT = 2;
 
@@ -162,32 +168,41 @@ public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHist
         }
 
         @Override
-        public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExMessage data, int position) {
+        public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExMessage data,
+                               int position) {
             if (getItemViewType(position) == CONTENT) {
                 ViewHol.RecyclerViewHolder recyclerViewHolder = (ViewHol.RecyclerViewHolder) holder;
                 RecyclerView recyclerView = recyclerViewHolder.viewBinding.getRoot();
                 recyclerView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
                 recyclerView.setLayoutManager(new GridLayoutManager(MediaHistoryActivity.this, 4));
                 RecyclerViewAdapter adapter;
-                recyclerView.setAdapter(adapter = new RecyclerViewAdapter<Message, ViewHol.ImageViewHolder>(ViewHol.ImageViewHolder.class) {
+                recyclerView.setAdapter(adapter = new RecyclerViewAdapter<Message,
+                    ViewHol.ImageViewHolder>(ViewHol.ImageViewHolder.class) {
                         @Override
-                        public void onBindView(@NonNull ViewHol.ImageViewHolder holder, Message data, int position) {
-                            String url = isPicture ? data.getPictureElem().getSourcePicture().getUrl() : data.getVideoElem().getVideoUrl();
+                        public void onBindView(@NonNull ViewHol.ImageViewHolder holder,
+                                               Message data, int position) {
+                            String url = isPicture ?
+                                data.getPictureElem().getSourcePicture().getUrl() :
+                                data.getVideoElem().getVideoUrl();
 
                             holder.view.getRoot().getLayoutParams().height = Common.dp2px(100);
                             Glide.with(MediaHistoryActivity.this)
                                 .load(url)
                                 .centerCrop()
+                                .placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo)
+                                .error(io.openim.android.ouicore.R.mipmap.ic_chat_photo)
                                 .into(holder.view.getRoot());
                             holder.view.getRoot().setOnClickListener(v -> {
                                 if (isPicture) {
                                     startActivity(
-                                        new Intent(MediaHistoryActivity.this, PreviewActivity.class).putExtra(PreviewActivity.MEDIA_URL, url));
+                                        new Intent(MediaHistoryActivity.this,
+                                            PreviewActivity.class).putExtra(PreviewActivity.MEDIA_URL, url));
                                 } else {
                                     startActivity(
                                         new Intent(MediaHistoryActivity.this, PreviewActivity.class)
                                             .putExtra(PreviewActivity.MEDIA_URL, url)
-                                            .putExtra(PreviewActivity.FIRST_FRAME, data.getVideoElem().getSnapshotUrl()));
+                                            .putExtra(PreviewActivity.FIRST_FRAME,
+                                                data.getVideoElem().getSnapshotUrl()));
                                 }
                             });
                         }

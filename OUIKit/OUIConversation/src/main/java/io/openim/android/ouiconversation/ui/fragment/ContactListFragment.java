@@ -376,16 +376,6 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             viewHolder.viewBinding.setTop.setVisibility(msgConversation.conversationInfo.isPinned() ? View.VISIBLE : View.GONE);
 
             CharSequence lastMsg = msgConversation.lastMsg;
-            //强提醒
-            if (msgConversation.conversationInfo.getGroupAtType() == GroupAtType.AT_ME) {
-                String target =
-                    "@" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.you);
-                if (!lastMsg.toString().contains(target))
-                    lastMsg = target + "\t" + lastMsg;
-
-                IMUtil.buildClickAndColorSpannable((SpannableStringBuilder)
-                    lastMsg, target, android.R.color.holo_red_dark, null);
-            }
             viewHolder.viewBinding.lastMsg.setText(lastMsg);
         }
 

@@ -129,17 +129,20 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
         view.groupName.setOnClickListener(v -> {
             if (vm.isOwner()) {
-                infoModifyType = 1;
-                SingleInfoModifyActivity.SingleInfoModifyData modifyData =
-                    new SingleInfoModifyActivity.SingleInfoModifyData();
-                modifyData.title = "修改群聊名称";
-                modifyData.description = "修改群聊名称后，将在群内通知其他成员。";
-                modifyData.avatarUrl = vm.groupsInfo.getValue().getFaceURL();
-                modifyData.editT = vm.groupsInfo.getValue().getGroupName();
-                infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
+               try {
+                   infoModifyType = 1;
+                   SingleInfoModifyActivity.SingleInfoModifyData modifyData =
+                       new SingleInfoModifyActivity.SingleInfoModifyData();
+                   modifyData.title = "修改群聊名称";
+                   modifyData.description = "修改群聊名称后，将在群内通知其他成员。";
+                   modifyData.avatarUrl = vm.groupsInfo.getValue().getFaceURL();
+                   modifyData.editT = vm.groupsInfo.getValue().getGroupName();
+                   infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
+               }catch (Exception ignored){}
             }
         });
         view.myName.setOnClickListener(v -> {
+            try {
             infoModifyType = 2;
             SingleInfoModifyActivity.SingleInfoModifyData modifyData =
                 new SingleInfoModifyActivity.SingleInfoModifyData();
@@ -149,6 +152,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             modifyData.avatarUrl = exGroupMemberInfo.groupMembersInfo.getFaceURL();
             modifyData.editT = exGroupMemberInfo.groupMembersInfo.getNickname();
             infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
+            }catch (Exception ignored){}
         });
         view.avatarEdit.setOnClickListener(v -> {
             if (!vm.isGroupOwner.getValue()) return;

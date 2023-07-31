@@ -53,6 +53,7 @@ import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
@@ -120,8 +121,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             vm.groupID = groupId;
         }
         vm.fromChatHistory = fromChatHistory;
-        if (null != notificationMsg)
-            vm.notificationMsg.setValue(notificationMsg);
+        if (null != notificationMsg) vm.notificationMsg.setValue(notificationMsg);
 
         if (fromChatHistory) {
             ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
@@ -155,8 +155,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             N.clearDispose(this);
             view.waterMark.onDestroy();
             Obs.inst().deleteObserver(this);
-            getWindow().getDecorView().getViewTreeObserver()
-                .removeOnGlobalLayoutListener(mGlobalLayoutListener);
+            getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
             try {
                 SPlayer.instance().stop();
             } catch (Exception ignore) {
@@ -240,7 +239,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         if (!chatBg.isEmpty()) Glide.with(this).load(chatBg).into(view.chatBg);
 
 
-        if (vm.isSingleChat) {
+//        if (vm.isSingleChat) {
 //            vm.getUserOnlineStatus(onlineStatus -> {
 //                boolean isOnline = onlineStatus.status.equals("online");
 //                view.leftBg.setVisibility(View.VISIBLE);
@@ -255,7 +254,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 //                    view.onlineStatus.setText(io.openim.android.ouicore.R.string.offline);
 //                }
 //            });
-        }
+//        }
         view.waterMark.setText(BaseApp.inst().loginCertificate.nickname);
     }
 
@@ -287,9 +286,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         Obs.inst().addObserver(this);
         view.call.setOnClickListener(v -> {
             if (null == callingService) return;
-            if (null != vm.roomCallingInfo.getValue()
-                && null != vm.roomCallingInfo.getValue().getParticipant()
-                && !vm.roomCallingInfo.getValue().getParticipant().isEmpty()) {
+            if (null != vm.roomCallingInfo.getValue() && null != vm.roomCallingInfo.getValue().getParticipant() && !vm.roomCallingInfo.getValue().getParticipant().isEmpty()) {
                 CommonDialog commonDialog = new CommonDialog(this).atShow();
                 commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.group_calling_tips);
                 commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
@@ -369,8 +366,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             meetingRvAdapter.setItems(vm.roomCallingInfo.getValue().getParticipant());
         });
 
-        view.notice.setOnClickListener(v -> ARouter.getInstance().build(Routes.Group.NOTICE_DETAIL)
-            .withSerializable(Constant.K_NOTICE, vm.notificationMsg.getValue()).navigation());
+        view.notice.setOnClickListener(v -> ARouter.getInstance().build(Routes.Group.NOTICE_DETAIL).withSerializable(Constant.K_NOTICE, vm.notificationMsg.getValue()).navigation());
         view.back.setOnClickListener(v -> finish());
 
         view.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -382,7 +378,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                     linearLayoutManager.findFirstCompletelyVisibleItemPosition();
                 int lastVisiblePosition =
                     linearLayoutManager.findLastCompletelyVisibleItemPosition();
-                if (lastVisiblePosition == vm.messages.getValue().size() - 1 && vm.messages.getValue().size() >= vm.count) {
+                if (lastVisiblePosition == vm.messages.getValue().size() - 1
+                    && !vm.isNoData.val()) {
                     vm.loadHistoryMessage();
                 }
 //                if (vm.fromChatHistory && firstVisiblePosition < 2) {
@@ -430,7 +427,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
 
         vm.subscribe(this, subject -> {
-            if (subject.equals(ChatVM.REEDIT_MSG)){
+            if (subject.equals(ChatVM.REEDIT_MSG)) {
                 view.layoutInputCote.chatInput.requestFocus();
                 view.layoutInputCote.chatInput.setText((String) subject.value);
                 Common.pushKeyboard(this);
@@ -442,7 +439,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         GroupVM groupVM = new GroupVM();
         groupVM.groupId = vm.groupID;
         BaseApp.inst().putVM(groupVM);
-        ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER).withBoolean(Constant.IS_SELECT_MEMBER, true).withInt(Constant.K_SIZE, 9).navigation(this, Constant.Event.CALLING_REQUEST_CODE);
+        ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
+            .withBoolean(Constant.IS_SELECT_MEMBER, true)
+            .withInt(Constant.K_SIZE, 9)
+            .navigation(this, Constant.Event.CALLING_REQUEST_CODE);
     }
 
     private void bindShowName() {
@@ -450,8 +450,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             if (vm.isSingleChat)
                 view.nickName.setText(vm.conversationInfo.getValue().getShowName());
             else
-                view.nickName.setText(vm.conversationInfo.getValue()
-                    .getShowName() + "(" + vm.groupInfo.getValue().getMemberCount() + ")");
+                view.nickName.setText(vm.conversationInfo.getValue().getShowName() + "(" + vm.groupInfo.getValue().getMemberCount() + ")");
         } catch (Exception ignored) {
         }
     }
@@ -501,10 +500,25 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     private void forward(List<MultipleChoice> choices) {
+//        MThreadTool.executorService.execute(() -> {
+//            ForwardVM forwardVM = Easy.find(ForwardVM.class);
+//            for (MultipleChoice choice : choices) {
+//                runOnUiThread(() -> aloneSendMsg(forwardVM.forwardMsg, choice));
+//                if (null != forwardVM.leaveMsg) {
+//                    try {
+//                        Thread.sleep(200);
+//                    } catch (InterruptedException ignored) {
+//                    }
+//                    runOnUiThread(() -> aloneSendMsg(forwardVM.leaveMsg, choice));
+//                }
+//            }
+//            vm.clearSelectMsg();
+//        });
         ForwardVM forwardVM = Easy.find(ForwardVM.class);
         for (MultipleChoice choice : choices) {
-            if (null != forwardVM.leaveMsg) aloneSendMsg(forwardVM.leaveMsg, choice);
             aloneSendMsg(forwardVM.forwardMsg, choice);
+            if (null != forwardVM.leaveMsg)
+                aloneSendMsg(forwardVM.leaveMsg, choice);
         }
         vm.clearSelectMsg();
     }
