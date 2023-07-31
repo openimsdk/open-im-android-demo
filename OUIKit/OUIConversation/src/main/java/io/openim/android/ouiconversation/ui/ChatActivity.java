@@ -7,6 +7,7 @@ import android.app.LauncherActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,6 +19,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,6 +47,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.ISubscribe;
 import io.openim.android.ouicore.base.vm.Subject;
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.ex.MultipleChoice;
@@ -64,6 +67,7 @@ import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
+import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.Participant;
@@ -256,6 +260,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 //            });
 //        }
         view.waterMark.setText(BaseApp.inst().loginCertificate.nickname);
+
+
+
     }
 
     //记录原始窗口高度
@@ -284,6 +291,17 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private void listener() {
         Obs.inst().addObserver(this);
+
+        bottomInputCote.setOnAtUserListener(() -> {
+            GroupVM groupVM = new GroupVM();
+            groupVM.groupId = vm.groupID;
+            BaseApp.inst().putVM(groupVM);
+            ARouter.getInstance()
+                .build(Routes.Group.SUPER_GROUP_MEMBER)
+                .withInt(Constant.K_SIZE, 9)
+                .withBoolean(Constant.IS_SELECT_MEMBER, true)
+                .navigation(this, Constant.Event.AT_USER);
+        });
         view.call.setOnClickListener(v -> {
             if (null == callingService) return;
             if (null != vm.roomCallingInfo.getValue() && null != vm.roomCallingInfo.getValue().getParticipant() && !vm.roomCallingInfo.getValue().getParticipant().isEmpty()) {
@@ -308,7 +326,15 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                         vm.isSingleChat, ids, null);
                     callingService.call(signalingInfo);
                 } else {
-                    toSelectMember();
+
+                    GroupVM groupVM = new GroupVM();
+                    groupVM.groupId = vm.groupID;
+                    BaseApp.inst().putVM(groupVM);
+                    ARouter.getInstance()
+                        .build(Routes.Group.SUPER_GROUP_MEMBER)
+                        .withInt(Constant.K_SIZE, 9)
+                        .withBoolean(Constant.IS_GROUP_CALL, true)
+                        .navigation(this, Constant.Event.CALLING_REQUEST_CODE);
                 }
                 return false;
             });
@@ -433,15 +459,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
     }
 
-    public void toSelectMember() {
-        GroupVM groupVM = new GroupVM();
-        groupVM.groupId = vm.groupID;
-        BaseApp.inst().putVM(groupVM);
-        ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
-            .withBoolean(Constant.IS_SELECT_MEMBER, true)
-            .withInt(Constant.K_SIZE, 9)
-            .navigation(this, Constant.Event.CALLING_REQUEST_CODE);
-    }
+
 
     private void bindShowName() {
         try {
@@ -478,9 +496,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != RESULT_OK) return;
+        if (resultCode != RESULT_OK||null==data) return;
 
-        if (requestCode == Constant.Event.CALLING_REQUEST_CODE && null != data) {
+        if (requestCode == Constant.Event.CALLING_REQUEST_CODE ) {
             //发起群通话
             List<String> ids = data.getStringArrayListExtra(Constant.K_RESULT);
             //邀请列表中移除自己
@@ -489,6 +507,23 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 vm.groupID);
             if (null == callingService) return;
             callingService.call(signalingInfo);
+        }
+        if (requestCode == Constant.Event.AT_USER){
+            List<MultipleChoice> extra = (List<MultipleChoice>)
+                data.getSerializableExtra(Constant.K_RESULT);
+            List<Message> atMessages = vm.atMessages.getValue();
+            t:for (MultipleChoice multipleChoice : extra) {
+                for (Message atMessage : atMessages) {
+                    if (multipleChoice.key.equals(atMessage.getSendID())){
+                        continue t;
+                    }
+                }
+                Message message=new Message();
+                message.setSendID(multipleChoice.key);
+                message.setSenderNickname(multipleChoice.name);
+                atMessages.add(message);
+                vm.atMessages.setValue(atMessages);
+            }
         }
     }
 
