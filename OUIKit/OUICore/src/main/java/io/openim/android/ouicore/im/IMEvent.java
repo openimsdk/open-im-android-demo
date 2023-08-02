@@ -53,6 +53,7 @@ import io.openim.android.sdk.models.UserInfo;
 
 ///im事件 统一处理
 public class IMEvent {
+    private static final String TAG = "IMEvent";
     private static IMEvent listener = null;
     private List<OnConnListener> connListeners;
     private List<OnAdvanceMsgListener> advanceMsgListeners;
@@ -255,7 +256,7 @@ public class IMEvent {
         @Override
         public void onConnectFailed(long code, String error) {
             // 连接服务器失败，可以提示用户当前网络连接不可用
-            L.d("连接服务器失败(" + error + ")");
+            L.d(TAG,"连接服务器失败(" + error + ")");
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnectFailed(code, error);
             }
@@ -264,7 +265,7 @@ public class IMEvent {
         @Override
         public void onConnectSuccess() {
             // 已经成功连接到服务器
-            L.d("已经成功连接到服务器");
+            L.d(TAG,"已经成功连接到服务器");
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnectSuccess();
             }
@@ -273,7 +274,7 @@ public class IMEvent {
         @Override
         public void onConnecting() {
             // 正在连接到服务器，适合在 UI 上展示“正在连接”状态。
-            L.d("正在连接到服务器...");
+            L.d(TAG,"正在连接到服务器...");
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnecting();
             }
@@ -282,7 +283,7 @@ public class IMEvent {
         @Override
         public void onKickedOffline() {
             // 当前用户被踢下线，此时可以 UI 提示用户“您已经在其他端登录了当前账号，是否重新登录？”
-            L.d("当前用户被踢下线");
+            L.d(TAG,"当前用户被踢下线");
             Toast.makeText(BaseApp.inst(),
                 BaseApp.inst().getString(io.openim.android.ouicore.R.string.kicked_offline_tips),
                 Toast.LENGTH_SHORT).show();
@@ -294,7 +295,7 @@ public class IMEvent {
         @Override
         public void onUserTokenExpired() {
             // 登录票据已经过期，请使用新签发的 UserSig 进行登录。
-            L.d("登录票据已经过期");
+            L.d(TAG,"登录票据已经过期");
             Toast.makeText(BaseApp.inst(),
                 BaseApp.inst().getString(io.openim.android.ouicore.R.string.token_expired),
                 Toast.LENGTH_SHORT).show();

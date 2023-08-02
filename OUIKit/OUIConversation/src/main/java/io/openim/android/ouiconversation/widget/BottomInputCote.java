@@ -94,11 +94,10 @@ public class BottomInputCote {
                 final Message msg;
                 if (null != vm.replyMessage.getValue()) {
                     msg =
-                        OpenIMClient.getInstance().messageManager
-                            .createQuoteMessage(vm.inputMsg.getValue(), vm.replyMessage.getValue());
+                        OpenIMClient.getInstance().messageManager.createQuoteMessage(vm.inputMsg.val(), vm.replyMessage.getValue());
                 } else if (atMessages.isEmpty())
                     msg =
-                        OpenIMClient.getInstance().messageManager.createTextMessage(vm.inputMsg.getValue());
+                        OpenIMClient.getInstance().messageManager.createTextMessage(vm.inputMsg.val());
                 else {
                     List<String> atUserIDList = new ArrayList<>();
                     List<AtUserInfo> atUserInfoList = new ArrayList<>();
@@ -198,10 +197,14 @@ public class BottomInputCote {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() > 0 && null != onAtUserListener) {
-                    if (s.toString().equals("@")) {
-                        onAtUserListener.onAtUser();
+                try {
+                    String content = s.toString().substring(s.length() - 1);
+                    if (!TextUtils.isEmpty(content) && null != onAtUserListener) {
+                        if (content.equals("@")) {
+                            onAtUserListener.onAtUser();
+                        }
                     }
+                } catch (Exception ignore) {
                 }
             }
 
@@ -287,8 +290,11 @@ public class BottomInputCote {
             spannableString.setSpan(colorSpan, 0, spannableString.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             Message lastMsg = messages.get(messages.size() - 1);
+            if (null == lastMsg.getExt()) {
+                lastMsg.setExt(new MsgExpand());
+            }
             MsgExpand msgExpand = (MsgExpand) lastMsg.getExt();
-            if (null != msgExpand) msgExpand.spanHashCode = colorSpan.hashCode();
+            msgExpand.spanHashCode = colorSpan.hashCode();
             view.chatInput.append(spannableString);
         });
         vm.emojiMessages.observe((LifecycleOwner) context, messages -> {
@@ -314,8 +320,7 @@ public class BottomInputCote {
         if (!vm.isSingleChat) {
             vm.groupInfo.observe((LifecycleOwner) context, groupInfo -> {
                 if (null == groupInfo) return;
-                if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED
-                    && !groupInfo.getOwnerUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+                if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED && !groupInfo.getOwnerUserID().equals(BaseApp.inst().loginCertificate.userID)) {
                     view.inputLy.setVisibility(VISIBLE);
                     setSendButton(true);
                     view.touchSay.setVisibility(GONE);
