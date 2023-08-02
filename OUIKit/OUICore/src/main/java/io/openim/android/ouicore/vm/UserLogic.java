@@ -8,7 +8,8 @@ import io.openim.android.ouicore.utils.L;
 
 public class UserLogic extends BaseVM {
     public enum ConnectStatus {
-        DEFAULT(""), CONNECTING(BaseApp.inst().getString(R.string.connecting)),
+        DEFAULT(""),
+        CONNECTING(BaseApp.inst().getString(R.string.connecting)),
         CONNECT_ERR(BaseApp.inst().getString(R.string.conn_failed)),
         SYNCING(BaseApp.inst().getString(R.string.syncing)),
         SYNC_ERR(BaseApp.inst().getString(R.string.sync_err));

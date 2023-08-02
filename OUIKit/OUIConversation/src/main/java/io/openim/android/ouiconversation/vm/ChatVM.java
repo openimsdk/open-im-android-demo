@@ -123,7 +123,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     public boolean viewPause = false;
     private MessageAdapter messageAdapter;
-    private Observer<String> inputObserver;
+    private Observer<CharSequence> inputObserver;
     public Message startMsg = null; // 消息体，取界面上显示的消息体对象/搜索时的起始坐标
     //userID 与 GROUP_ID 互斥
     public String userID = ""; // 接受消息的用户ID
@@ -160,6 +160,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private void signalingGetRoomByGroupID() {
         OpenIMClient.getInstance().signalingManager.signalingGetRoomByGroupID(new IMUtil.IMCallBack<RoomCallingInfo>() {
+            @Override
+            public void onError(int code, String error) {
+            }
+
             @Override
             public void onSuccess(RoomCallingInfo data) {
                 roomCallingInfo.setValue(data);
