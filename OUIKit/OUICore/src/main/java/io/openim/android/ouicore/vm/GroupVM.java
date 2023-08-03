@@ -14,6 +14,7 @@ import java.util.List;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
@@ -48,8 +49,8 @@ public class GroupVM extends SocialityVM {
     public MutableLiveData<List<GroupMembersInfo>> groupMembers =
             new MutableLiveData<>(new ArrayList<>());
     //超级群成员分页加载
-    public MutableLiveData<List<ExGroupMemberInfo>> superGroupMembers =
-            new MutableLiveData<>(new ArrayList<>());
+    public State<List<ExGroupMemberInfo>> superGroupMembers =
+            new State<>(new ArrayList<>());
     //封装过的群成员 用于字母导航
     public MutableLiveData<List<ExGroupMemberInfo>> exGroupMembers =
             new MutableLiveData<>(new ArrayList<>());
@@ -211,8 +212,8 @@ public class GroupVM extends SocialityVM {
             @Override
             public void onSuccess(List<GroupMembersInfo> data) {
                 if (data.isEmpty()) return;
-                superGroupMembers.getValue().addAll(getExGroupMemberInfos(data));
-                superGroupMembers.setValue(superGroupMembers.getValue());
+                superGroupMembers.val().addAll(getExGroupMemberInfos(data));
+                superGroupMembers.update();
             }
 
 

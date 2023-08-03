@@ -197,12 +197,13 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
                 vm.buildOwnSelect();
             }
             updateSelectedNum();
-            if (v.size() > vm.pageSize) {
-                adapter.notifyItemRangeInserted(vm.superGroupMembers.getValue().size()
-                    - vm.pageSize, vm.superGroupMembers.getValue().size());
-            } else {
+//            if (v.size() > vm.pageSize) {
+//               int lastIndex=vm.superGroupMembers.val().size();
+//                adapter.notifyItemRangeInserted(lastIndex
+//                    - vm.pageSize, lastIndex);
+//            } else {
                 adapter.notifyDataSetChanged();
-            }
+//            }
         });
     }
 
@@ -304,6 +305,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
         adapter.setItems(vm.superGroupMembers.getValue());
         view.recyclerview.setAdapter(adapter);
 
+        vm.page=0;
         vm.superGroupMembers.getValue().clear();
         loadMember();
     }
