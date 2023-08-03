@@ -127,10 +127,12 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
             @Override
             public void onSuccess(UserInfo data) {
                 // 返回当前登录用户的资料
-                BaseApp.inst().loginCertificate.nickname = (null==data.getNickname())?"":data.getNickname();
-                BaseApp.inst().loginCertificate.faceURL = data.getFaceURL();
-                BaseApp.inst().loginCertificate.cache(getContext());
-                nickname.setValue(BaseApp.inst().loginCertificate.nickname);
+                LoginCertificate loginCertificate= BaseApp.inst().loginCertificate;
+                loginCertificate.nickname = (null==data.getNickname())?"":data.getNickname();
+                loginCertificate.faceURL = data.getFaceURL();
+                loginCertificate.cache(getContext());
+                loginCertificate.globalRecvMsgOpt=data.getGlobalRecvMsgOpt();
+                nickname.setValue(loginCertificate.nickname);
                 Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
             }
         });
