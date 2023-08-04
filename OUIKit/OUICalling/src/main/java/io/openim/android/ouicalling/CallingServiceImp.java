@@ -110,7 +110,8 @@ public class CallingServiceImp implements CallingService {
     public void onInviteeRejected(SignalingInfo signalingInfo) {
         L.e(TAG, "----onInviteeRejected-----");
         if (null == callDialog) return;
-        callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(), (realm, callHistory) -> {
+        callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(), (realm,
+                                                                                       callHistory) -> {
             callHistory.setSuccess(false);
             callHistory.setFailedState(2);
         });
@@ -137,19 +138,22 @@ public class CallingServiceImp implements CallingService {
     @Override
     public Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener,
                                   boolean isCallOut) {
-        if (callDialog != null) return callDialog;
-        if (signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT)
-            callDialog = new GroupCallDialog(context, this, isCallOut);
-        else
-            callDialog = new CallDialog(context, this, isCallOut);
-        callDialog.bindData(signalingInfo);
-        if (!callDialog.callingVM.isCallOut) {
-            callDialog.setOnDismissListener(dismissListener);
-            if (!Common.isScreenLocked()) {
-                callDialog.setOnShowListener(dialog -> ARouter.getInstance().build(Routes.Main.HOME).navigation());
+        try {
+            if (callDialog != null) return callDialog;
+            if (signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT)
+                callDialog = new GroupCallDialog(context, this, isCallOut);
+            else
+                callDialog = new CallDialog(context, this, isCallOut);
+            callDialog.bindData(signalingInfo);
+            if (!callDialog.callingVM.isCallOut) {
+                callDialog.setOnDismissListener(dismissListener);
+                if (!Common.isScreenLocked()) {
+                    callDialog.setOnShowListener(dialog -> ARouter.getInstance().build(Routes.Main.HOME).navigation());
+                }
             }
+            insetDB();
+        } catch (Exception ignore) {
         }
-        insetDB();
         return callDialog;
     }
 
@@ -183,7 +187,7 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onHangup(SignalingInfo signalingInfo) {
         L.e(TAG, "----onHangup-----");
-        if (null == callDialog||callDialog.callingVM.isGroup) return;
+        if (null == callDialog || callDialog.callingVM.isGroup) return;
         callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(),
             (realm, callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
         callDialog.dismiss();

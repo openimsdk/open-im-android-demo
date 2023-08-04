@@ -257,7 +257,7 @@ class CallViewModel(
 
 
     fun buildScope(): CoroutineScope {
-        val scope = CoroutineScope(Dispatchers.Main);
+        val scope = CoroutineScope(SupervisorJob()+ Dispatchers.Main);
         scopes.add(scope)
         return scope;
     }
