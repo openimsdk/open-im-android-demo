@@ -119,6 +119,8 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
 
     void getSelfUserInfo() {
         OpenIMClient.getInstance().userInfoManager.getSelfUserInfo(new OnBase<UserInfo>() {
+
+
             @Override
             public void onError(int code, String error) {
                 getIView().toast(error + code);
