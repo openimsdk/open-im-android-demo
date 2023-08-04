@@ -104,7 +104,7 @@ public class CallDialog extends BaseDialog {
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
 
-        view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.GONE : View.VISIBLE);
+        view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.VISIBLE : View.GONE);
     }
 
     //收起/展开
