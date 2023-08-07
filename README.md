@@ -21,7 +21,7 @@ Demo is a set of UI components implemented based on the Open-IM SDK, which inclu
 Android Studio 3.6.1 or above
 Gradle-5.1.1 or above
 Android Gradle Plugin Version-3.4.0 or above
-android x库
+android x library
 ```
 #### Development Configuration
 ```
