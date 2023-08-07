@@ -92,7 +92,7 @@ OpenIMClient.getInstance().initSDK(
 );
 ```
 5.Login
-
+  
 >1.Log in to your business server to obtain the userID and token.
 >2.Use the userID and token obtained in step 1 to log in to the IM (Instant Messaging) server.
 ```
