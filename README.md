@@ -93,8 +93,8 @@ OpenIMClient.getInstance().initSDK(
 ```
 5.Login
   
->1.Log in to your business server to obtain the userID and token.
->2.Use the userID and token obtained in step 1 to log in to the IM (Instant Messaging) server.
+1.Log in to your business server to obtain the userID and token.  
+2.Use the userID and token obtained in step 1 to log in to the IM (Instant Messaging) server.
 ```
 public void login() {
         Parameter parameter = getParameter(null);
@@ -141,8 +141,8 @@ public void login() {
 ```
 
 #### Common Questions
-1.Reminder: If you encounter the "resource loading is not complete" error when calling SDK-related APIs, make sure to call other APIs after the login callback is executed. 
-2.After disabling or adding a module, if the app shows an error toast when calling the functionalities of that module, you can resolve the issue by uninstalling and reinstalling the app.
-3.Reminder: Avoid using duplicate names for resources across different modules.
+1.Reminder: If you encounter the "resource loading is not complete" error when calling SDK-related APIs, make sure to call other APIs after the login callback is executed.   
+2.After disabling or adding a module, if the app shows an error toast when calling the functionalities of that module, you can resolve the issue by uninstalling and reinstalling the app.  
+3.Reminder: Avoid using duplicate names for resources across different modules.  
 4.Some ViewModels need to be globally shared. Developers should pay attention to whether ViewModels are cached in viewModels and release them in a timely manner when they are no longer in use to avoid memory leaks.
 
