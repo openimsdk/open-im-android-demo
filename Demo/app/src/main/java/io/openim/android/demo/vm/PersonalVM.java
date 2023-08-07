@@ -58,7 +58,7 @@ public class PersonalVM extends BaseViewModel {
 
     public void updateConfig(UserInfo userInfo) {
         LoginCertificate certificate = BaseApp.inst().loginCertificate;
-        if (!userInfo.getUserID().equals(certificate.userID))return;
+        if (!userInfo.getUserID().equals(certificate.userID)) return;
 
         certificate.nickname = userInfo.getNickname();
         certificate.faceURL = userInfo.getFaceURL();
@@ -109,15 +109,13 @@ public class PersonalVM extends BaseViewModel {
 
     public void getUserInfo(String id) {
         waitDialog.show();
-       getExtendUserInfo(id);
+        getExtendUserInfo(id);
     }
 
     public void setSelfInfo(Parameter param) {
-        param.add("userID",BaseApp.inst().loginCertificate.userID);
+        param.add("userID", BaseApp.inst().loginCertificate.userID);
         waitDialog.show();
-        N.API(OpenIMService.class)
-            .updateUserInfo(param.buildJsonBody())
-            .compose(N.IOMain()).map(OpenIMService.turn(Object.class))
+        N.API(OpenIMService.class).updateUserInfo(param.buildJsonBody()).compose(N.IOMain()).map(OpenIMService.turn(Object.class))
 
             .subscribe(new NetObserver<Object>(getContext()) {
                 @Override
@@ -134,27 +132,33 @@ public class PersonalVM extends BaseViewModel {
 
     public void setNickname(String nickname) {
         userInfo.val().setNickname(nickname);
-        setSelfInfo(new Parameter().add("nickname",nickname));
+        setSelfInfo(new Parameter().add("nickname", nickname));
     }
 
     public void setFaceURL(String faceURL) {
         userInfo.val().setFaceURL(faceURL);
-        setSelfInfo(new Parameter().add("faceURL",faceURL));
+        setSelfInfo(new Parameter().add("faceURL", faceURL));
     }
 
     public void setGender(int gender) {
         userInfo.val().setGender(gender);
-        setSelfInfo(new Parameter().add("gender",gender));
+        setSelfInfo(new Parameter().add("gender", gender));
     }
 
     public void setBirthday(long birth) {
         userInfo.val().setBirth(birth);
-        setSelfInfo(new Parameter().add("birth",birth));
+        setSelfInfo(new Parameter().add("birth", birth));
+    }
+
+    public void setGlobalRecvMessageOpt(boolean isOpen) {
+        int globalRecvMsgOpt = isOpen ? 2 : 0;
+        userInfo.val().setGlobalRecvMsgOpt(globalRecvMsgOpt);
+        setSelfInfo(new Parameter().add("globalRecvMsgOpt", globalRecvMsgOpt));
     }
 
     public void setEmail(String email) {
         userInfo.val().setEmail(email);
-        setSelfInfo(new Parameter().add("email",email));
+        setSelfInfo(new Parameter().add("email", email));
     }
 
 }

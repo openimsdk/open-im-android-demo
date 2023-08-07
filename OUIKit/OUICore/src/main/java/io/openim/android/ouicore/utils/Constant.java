@@ -9,11 +9,9 @@ public class Constant {
 //  public static final String DEFAULT_IP = "test-web.rentsoft.cn";//43
 //  public static final String DEFAULT_IP = "web.rentsoft.cn";//121
 
-    public static final String DEFAULT_IP = "14.29.213.197";//121
-
-//    public static final String DEFAULT_IP = "43.154.157.177";//43
-//    public static final String DEFAULT_IP = "59.36.173.89";//43
-
+ //    public static final String DEFAULT_IP = "14.29.213.197";
+    public static final String DEFAULT_IP = "203.56.175.233";
+//    public static final String DEFAULT_IP = "43.154.157.177";
 
 
     //登录注册手机验 证服务器地址
@@ -120,7 +118,6 @@ public class Constant {
     public static final String IS_SELECT_FRIEND = "isSelectFriend";
     //自定义消息类型
     public static final String K_CUSTOM_TYPE = "customType";
-
 
 
     //加载中

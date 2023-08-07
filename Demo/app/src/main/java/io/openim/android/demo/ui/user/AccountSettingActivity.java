@@ -35,23 +35,7 @@ public class AccountSettingActivity extends BaseActivity<PersonalVM, ActivityAcc
             if (null == extendUserInfo) return;
             view.slideButton.setCheckedWithAnimation(extendUserInfo.getGlobalRecvMsgOpt() == 2);
         });
-        WaitDialog waitDialog = new WaitDialog(this);
-        view.slideButton.setOnSlideButtonClickListener(isChecked -> {
-            waitDialog.show();
-            OpenIMClient.getInstance().conversationManager.setGlobalRecvMessageOpt(new OnBase<String>() {
-                @Override
-                public void onError(int code, String error) {
-                    waitDialog.dismiss();
-                    toast(error + code);
-                }
-
-                @Override
-                public void onSuccess(String data) {
-                    waitDialog.dismiss();
-                    view.slideButton.setCheckedWithAnimation(isChecked);
-                }
-            }, isChecked ? 2 : 0);
-        });
+        view.slideButton.setOnSlideButtonClickListener(isChecked -> vm.setGlobalRecvMessageOpt(isChecked));
         view.clearRecord.setOnClickListener(v -> {
             CommonDialog commonDialog = new CommonDialog(this);
             commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.clear_chat_all_record);
@@ -64,8 +48,6 @@ public class AccountSettingActivity extends BaseActivity<PersonalVM, ActivityAcc
             commonDialog.show();
         });
         view.blackList
-            .setOnClickListener(view1 -> {
-                startActivity(new Intent(this, BlackListActivity.class));
-            });
+            .setOnClickListener(view1 -> startActivity(new Intent(this, BlackListActivity.class)));
     }
 }

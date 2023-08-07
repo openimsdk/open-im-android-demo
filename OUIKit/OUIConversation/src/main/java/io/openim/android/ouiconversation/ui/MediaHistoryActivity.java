@@ -23,6 +23,7 @@ import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
@@ -177,7 +178,7 @@ public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHist
                 recyclerView.setLayoutManager(new GridLayoutManager(MediaHistoryActivity.this, 4));
                 RecyclerViewAdapter adapter;
                 recyclerView.setAdapter(adapter = new RecyclerViewAdapter<Message,
-                    ViewHol.ImageViewHolder>(ViewHol.ImageViewHolder.class) {
+                        ViewHol.ImageViewHolder>(ViewHol.ImageViewHolder.class) {
                         @Override
                         public void onBindView(@NonNull ViewHol.ImageViewHolder holder,
                                                Message data, int position) {
@@ -186,12 +187,14 @@ public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHist
                                 data.getVideoElem().getVideoUrl();
 
                             holder.view.getRoot().getLayoutParams().height = Common.dp2px(100);
-                            Glide.with(MediaHistoryActivity.this)
-                                .load(url)
-                                .centerCrop()
-                                .placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo)
-                                .error(io.openim.android.ouicore.R.mipmap.ic_chat_photo)
-                                .into(holder.view.getRoot());
+
+                            if (isPicture)
+                                IMUtil.loadPicture(data.getPictureElem())
+                                    .centerCrop().into(holder.view.getRoot());
+                            else
+                                IMUtil.loadVideoSnapshot(data.getVideoElem())
+                                    .centerCrop().into(holder.view.getRoot());
+
                             holder.view.getRoot().setOnClickListener(v -> {
                                 if (isPicture) {
                                     startActivity(

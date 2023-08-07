@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.ColorRes;
@@ -27,9 +28,13 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.request.BaseRequestOptions;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,6 +67,7 @@ import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.Routes;
@@ -77,15 +83,59 @@ import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotificationElem;
 import io.openim.android.sdk.models.OfflinePushInfo;
+import io.openim.android.sdk.models.PictureElem;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.SignalingInvitationInfo;
 import io.openim.android.sdk.models.SoundElem;
+import io.openim.android.sdk.models.VideoElem;
 
 public class IMUtil {
     //android PlatformID 2
     public static final int PLATFORM_ID = 2;
     private static final String TAG = "IMUtil";
+
+
+    /**
+     * 加载图片
+     * 判断本地是否存在 本地存在直接加载 不存在加载网络
+     *
+     * @return
+     */
+    public static RequestBuilder<?> loadPicture(PictureElem elem) {
+        String url = "";
+        try {
+            url = elem.getSnapshotPicture().getUrl();
+            String filePath = elem.getSourcePath();
+            if (new File(filePath).exists()) url = filePath;
+        } catch (Exception ignore) {}
+        if (TextUtils.isEmpty(url)) {
+            url = elem.getSourcePicture().getUrl();
+        }
+        return Glide.with(BaseApp.inst()).load(url)
+            .placeholder(R.mipmap.ic_chat_photo).
+            error(R.mipmap.ic_chat_photo);
+    }
+
+    /**
+     * 加载视频缩略图
+     * 判断本地是否存在 本地存在直接加载 不存在加载网络
+     *
+     * @return
+     */
+    public static RequestBuilder<?> loadVideoSnapshot(VideoElem elem) {
+        //本地
+        String path = elem.getSnapshotPath();
+        if (!GetFilePathFromUri.fileIsExists(path)) {
+            //远程
+            path = elem.getSnapshotUrl();
+        }
+        return Glide.with(BaseApp.inst())
+            .load(path)
+            .placeholder(R.mipmap.ic_chat_photo)
+            .error(R.mipmap.ic_chat_photo);
+    }
+
 
     /**
      * 会话排序比较器
