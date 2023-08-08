@@ -28,7 +28,6 @@
             android:layout_toRightOf="@id/contentGroup" />
 
         <LinearLayout
-            android:id="@+id/contentGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
@@ -46,6 +45,7 @@
                 android:visibility="gone" />
 
             <RelativeLayout
+                android:id="@+id/contentGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="true"
@@ -65,13 +65,13 @@
                     android:id="@+id/circleBar"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:visibility="gone"
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
+                    android:visibility="gone"
                     app:strokeWidth="2dp" />
 
                 <ImageView
-                    android:id="@+id/videoPlay"
+                    android:id="@+id/playBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"

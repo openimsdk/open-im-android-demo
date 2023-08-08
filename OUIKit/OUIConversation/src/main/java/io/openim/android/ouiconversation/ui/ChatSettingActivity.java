@@ -240,7 +240,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
         if (days <= 6) {
             return days + getString(io.openim.android.ouicore.R.string.day);
-        } else if (weeks <= 6) {
+        } else if (weeks <= 6 &&(days % 7==0)) {
             return weeks + getString(io.openim.android.ouicore.R.string.week);
         } else {
             return months + getString(io.openim.android.ouicore.R.string.month);

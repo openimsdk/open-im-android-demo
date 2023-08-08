@@ -269,6 +269,7 @@
             android:background="@drawable/sty_radius_6_white"
             android:gravity="center_vertical"
             android:orientation="vertical"
+            android:animateLayoutChanges="true"
             android:paddingLeft="22dp"
             android:paddingRight="22dp">
 
@@ -333,6 +334,7 @@
             android:gravity="center_vertical"
             android:orientation="vertical"
             android:paddingLeft="22dp"
+            android:animateLayoutChanges="true"
             android:paddingRight="22dp">
 
             <LinearLayout

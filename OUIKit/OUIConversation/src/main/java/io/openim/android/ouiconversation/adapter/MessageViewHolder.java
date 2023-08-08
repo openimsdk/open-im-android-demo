@@ -928,7 +928,7 @@ public class MessageViewHolder {
             if (isOwn)
                 contentView = itemView.findViewById(R.id.videoPlay2);
             else
-                contentView  = itemView.findViewById(R.id.videoPlay);
+                contentView  = itemView.findViewById(R.id.contentGroup);
             if (null == contentView) return;
 
             showMsgExMenu(contentView);
@@ -974,13 +974,13 @@ public class MessageViewHolder {
             LayoutMsgImgLeftBinding view = LayoutMsgImgLeftBinding.bind(itemView);
 
             view.sendState.setSendState(message.getStatus());
-            view.videoPlay.setVisibility(View.VISIBLE);
+            view.playBtn.setVisibility(View.VISIBLE);
             view.circleBar.setVisibility(View.VISIBLE);
 
             IMUtil.loadVideoSnapshot( message.getVideoElem())
                 .centerInside()
                 .into(view.content);
-            preview(message, view.videoPlay);
+            preview(message, view.contentGroup);
         }
     }
 
