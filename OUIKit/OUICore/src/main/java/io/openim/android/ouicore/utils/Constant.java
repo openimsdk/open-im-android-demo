@@ -9,7 +9,7 @@ public class Constant {
 //  public static final String DEFAULT_IP = "test-web.rentsoft.cn";//43
 //  public static final String DEFAULT_IP = "web.rentsoft.cn";//121
 
- //    public static final String DEFAULT_IP = "14.29.213.197";
+//     public static final String DEFAULT_IP = "14.29.213.197";
     public static final String DEFAULT_IP = "203.56.175.233";
 //    public static final String DEFAULT_IP = "43.154.157.177";
 
@@ -97,6 +97,8 @@ public class Constant {
     public static final String K_FROM = "from";
     public static final String K_SIZE = "size";
     public static final String NOTICE_TAG = "msg_notification";
+    //语言
+    public static final String K_LANGUAGE_SP = "language_sp";
 
     //最大通话人数
     public static final int MAX_CALL_NUM = 9;

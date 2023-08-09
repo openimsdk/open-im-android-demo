@@ -31,6 +31,9 @@ public class AccountSettingActivity extends BaseActivity<PersonalVM, ActivityAcc
     }
 
     private void listener() {
+        view.languageSetting.setOnClickListener(v -> {
+            startActivity(new Intent(this,LanguageSettingActivity.class));
+        });
         vm.userInfo.observe(this, extendUserInfo -> {
             if (null == extendUserInfo) return;
             view.slideButton.setCheckedWithAnimation(extendUserInfo.getGlobalRecvMsgOpt() == 2);

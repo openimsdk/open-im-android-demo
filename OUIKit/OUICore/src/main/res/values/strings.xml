@@ -413,4 +413,9 @@
     <string name="month">月</string>
     <string name="period_deletion_tips1">定期删除消息记录</string>
     <string name="period_deletion_tips2">在此之后发送的消息会在选择的时间之后自动删除</string>
+    <string name="language_setting">语言设置</string>
+    <string name="with_system">跟随系统</string>
+    <string name="chinese">简体中文</string>
+    <string name="english">英语</string>
+    <string name="switch_language_tips">确定切换为</string>
 </resources>

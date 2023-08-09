@@ -10,8 +10,8 @@ ext {
             minSdk     : 21,
             targetSdk  : 33,
             compileSdk : 33,
-            versionCode: 42,
-            versionName: "3.1.0+9",
+            versionCode: 44,
+            versionName: "toc_enterpise_v3.1-e-1.0.0+1",
             abiFilters : ['armeabi-v7a', 'arm64-v8a']
     ]
 

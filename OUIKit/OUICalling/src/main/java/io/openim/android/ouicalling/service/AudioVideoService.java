@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
@@ -18,6 +19,7 @@ import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
@@ -122,5 +124,10 @@ public class AudioVideoService extends KeepAliveService {
             OpenIMClient.getInstance().login(stringOnBase, BaseApp.inst().loginCertificate.userID
                 , BaseApp.inst().loginCertificate.imToken);
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LanguageUtil.getNewLocalContext(newBase));
     }
 }

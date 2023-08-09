@@ -98,23 +98,24 @@ public class IMUtil {
 
     /**
      * 加载图片
-     * 判断本地是否存在 本地存在直接加载 不存在加载网络
+     *  本地存在直接加载-》缩略图-》加载原图
      *
      * @return
      */
     public static RequestBuilder<?> loadPicture(PictureElem elem) {
         String url = "";
-        try {
-            url = elem.getSnapshotPicture().getUrl();
-            String filePath = elem.getSourcePath();
-            if (new File(filePath).exists()) url = filePath;
-        } catch (Exception ignore) {}
+        String filePath = elem.getSourcePath();
+        if (GetFilePathFromUri.fileIsExists(filePath))
+            url = filePath;
+        if (TextUtils.isEmpty(url) && null!=elem.getSnapshotPicture())
+           url= elem.getSnapshotPicture().getUrl();
         if (TextUtils.isEmpty(url)) {
             url = elem.getSourcePicture().getUrl();
         }
-        return Glide.with(BaseApp.inst()).load(url)
-            .placeholder(R.mipmap.ic_chat_photo).
-            error(R.mipmap.ic_chat_photo);
+        return Glide.with(BaseApp.inst())
+            .load(url)
+            .placeholder(R.mipmap.ic_chat_photo)
+            .error(R.mipmap.ic_chat_photo);
     }
 
     /**

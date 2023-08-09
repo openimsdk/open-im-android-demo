@@ -3,6 +3,7 @@ package io.openim.android.demo;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 
 import androidx.annotation.NonNull;
 import androidx.multidex.MultiDex;
@@ -28,6 +29,7 @@ import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.voice.SPlayer;
@@ -143,5 +145,16 @@ public class DemoApplication extends BaseApp {
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
             }
         });
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LanguageUtil.attachBaseContext(base));
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        LanguageUtil.attachBaseContext(this);
     }
 }
