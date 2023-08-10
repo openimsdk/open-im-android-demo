@@ -78,8 +78,8 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
             view.loginContent.edt1.setText("");
             view.loginContent.edt2.setText("");
             submitEnabled();
-            view.loginContent.edt1.setHint(v ? getString(R.string.input_phone) : getString(R.string.input_mail));
-            view.registerTv.setText(v ? getString(R.string.phone_register) : getString(R.string.mail_register));
+            view.loginContent.edt1.setHint(v ? getString(io.openim.android.ouicore.R.string.input_phone) : getString(io.openim.android.ouicore.R.string.input_mail));
+            view.registerTv.setText(v ? getString(io.openim.android.ouicore.R.string.phone_register) : getString(io.openim.android.ouicore.R.string.mail_register));
         });
         vm.account.observe(this, v -> submitEnabled());
         vm.pwd.observe(this, v -> submitEnabled());
@@ -131,13 +131,13 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
             view.loginContent.vcLogin.setText(io.openim.android.ouicore.R.string.password_login);
             view.loginContent.getVC.setVisibility(View.VISIBLE);
             view.loginContent.eyes.setVisibility(View.GONE);
-            view.loginContent.edt2.setHint(R.string.input_verification_code);
+            view.loginContent.edt2.setHint(io.openim.android.ouicore.R.string.input_verification_code);
         } else {
-            view.loginContent.vcTitle.setText(R.string.password);
+            view.loginContent.vcTitle.setText(io.openim.android.ouicore.R.string.password);
             view.loginContent.vcLogin.setText(io.openim.android.ouicore.R.string.vc_login);
             view.loginContent.getVC.setVisibility(View.GONE);
             view.loginContent.eyes.setVisibility(View.VISIBLE);
-            view.loginContent.edt2.setHint(R.string.input_password);
+            view.loginContent.edt2.setHint(io.openim.android.ouicore.R.string.input_password);
         }
     }
 

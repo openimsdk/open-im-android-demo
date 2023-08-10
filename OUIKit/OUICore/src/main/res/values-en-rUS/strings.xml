@@ -79,18 +79,23 @@
     <string name="qr_code">QR Code</string>
     <string name="quit_tips">Are you sure you want to log out?</string>
     <string name="Invite_a_video_call">Invites you to a video call...</string>
+    <string name="hang_up">hang up</string>
     <string name="answer">Answer</string>
+    <string name="microphone_on">Microphone On</string>
     <string name="speaker_on">Speaker On</string>
+    <string name="microphone_off">Microphone Off</string>
     <string name="speaker_off">Speaker Off</string>
     <string name="voice_calls">Voice Call</string>
     <string name="video_calls">Video Call</string>
     <string name="waiting_tips">Waiting for the other party to accept the invitation</string>
     <string name="Invite_a_audio_call">Invites you to a voice call</string>
     <string name="selete_member">Select Members</string>
+    <string name="invite_audio_call">Invite you for a voice call</string>
     <string name="invite_video_call">Invites you to a video call</string>
     <string name="calling">Calling</string>
     <string name="audio_video_service">Audio-Video Service</string>
     <string name="audio_video_service_tips1">Background audio-video service is enabled</string>
+    <string name="audio_video_service_tips2">Disabling app auto-start will result in being unable to receive audio and video requests</string>
     <string name="start_chat">Start Chat</string>
     <string name="dissolve_group">Dissolve Group Chat</string>
     <string name="dissolve_tips">After dissolving the group, you will lose contact with the group members</string>
@@ -217,6 +222,7 @@
     <string name="blackList">Communication Blacklist</string>
     <string name="select_tips">Select up to %1$d people</string>
     <string name="selected_tips">Selected: %1$d people</string>
+    <string name="save_photo_album">The image has been saved to the photo album</string>
     <string name="vc_login">Log in with SMS verification code</string>
     <string name="vc">Verification Code</string>
     <string name="password_login">Password Login</string>
@@ -247,6 +253,7 @@
     <string name="word_circle">Inviting you for a call</string>
     <string name="star">Like</string>
     <string name="comment">Comment</string>
+    <string name="new_msg_tips">%1$s new messages</string>
     <string name="coments_null_tips">Comment cannot be empty...</string>
     <string name="moments">Moments</string>
     <string name="to_user_moments">%1$s\'s Moments</string>
@@ -268,6 +275,7 @@
     <string name="who_invisible">Invisible to</string>
     <string name="who_invisible_tips">Invisible to selected people</string>
     <string name="selected_group_tips">Selected: %1$d groups</string>
+    <string name="select_user">Select from contacts</string>
     <string name="upload_err">Upload Error</string>
     <string name="delete_moments_tips">Confirm to delete this moment?</string>
     <string name="part_see_tips2">Visible to some friends</string>
@@ -283,6 +291,7 @@
     <string name="video_meeting">Video Meeting</string>
     <string name="join_meeting">Join Meeting</string>
     <string name="timely_meeting">Quick Meeting</string>
+    <string name="timing_meeting">Schedule a meeting</string>
     <string name="end">End</string>
     <string name="download">Download</string>
     <string name="emcee">Host</string>
@@ -296,6 +305,7 @@
     <string name="initiator">Initiator: %1$s</string>
     <string name="have_begun">Has Begun</string>
     <string name="not_started">Not Started</string>
+    <string name="meeting_num">Meeting ID</string>
     <string name="please_input_meeting_num">Please enter meeting number</string>
     <string name="mute">Mute</string>
     <string name="close_camera">Turn off Camera</string>
@@ -402,6 +412,68 @@
     <string name="with_system">Follow System</string>
     <string name="chinese">Simplified Chinese</string>
     <string name="english">English</string>
-    <string name="switch_language_tips">确定切换为</string>
+    <string name="switch_language_tips">Confirm switch to</string>
+
+    <string name="read">I have read and agreed to:</string>
+    <string name="protocol">"Terms of Service", "Privacy Policy"</string>
+    <string name="input_phone">Please enter your phone number</string>
+    <string name="password">Password</string>
+    <string name="phone_num">Phone Number</string>
+    <string name="mail">Email</string>
+    <string name="input_password">Please enter your password</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="phone_register">Phone Number Registration</string>
+    <string name="input_mail">Please enter your email</string>
+    <string name="mail_register">Email Registration</string>
+    <string name="new_user">New User Registration</string>
+    <string name="register">Register</string>
+    <string name="not_find_user">Could not find the user</string>
+    <string name="id">ID Number</string>
+    <string name="send_msg">Send Message</string>
+    <string name="openim_call">OpenIM Call</string>
+    <string name="add_friend">Add Friend</string>
+    <string name="disassociate">Unfriend</string>
+    <string name="detail">Details</string>
+    <string name="friend_verify">Friend Verification</string>
+    <string name="group_verify">Group Chat Verification</string>
+    <string name="verification_code_send_mail">Verification code has been sent to your email</string>
+    <string name="verification_code_send_phone">Verification code has been sent to your phone</string>
+    <string name="input_verification_code">Please enter the verification code</string>
+    <string name="resend_verification_code">Resend Verification Code</string>
+    <string name="after">After</string>
+
+    <string name="name">Your Name</string>
+    <string name="input_name">Please provide your real name</string>
+    <string name="welcome">Welcome to OpenIM</string>
+    <string name="join_im">Join OpenIM</string>
+    <string name="add_group">Add Group Chat</string>
+    <string name="search_group_by_id">Search and add by Group ID</string>
+    <string name="not_find_group">Group chat not found</string>
+    <string name="send_friend_apply">Send friend request</string>
+    <string name="send_join_group_apply">Send group join request</string>
+    <string name="address_book">Address Book</string>
+    <string name="nickname">Nickname</string>
+    <string name="invite_add_friends">Invite the other party to scan and add as friend</string>
+    <string name="login">Login</string>
+
+    <string name="pass">Approve group join request</string>
+    <string name="Fail">Decline group join request</string>
+
+
+    <string name="top">Pin</string>
+    <string name="typing">Typing…</string>
+    <string name="unsupported_type">Unsupported message type</string>
+    <string name="touch_say">Hold to Talk</string>
+    <string name="let_go">Release to Cancel</string>
+    <string name="speech_to_txt">Speech to Text</string>
+    <string name="let_send">Release to Send</string>
+    <string name="msg_read_status">Message Read Status</string>
+
+
+    <string name="group_id">Group ID</string>
+    <string name="member">Group Members</string>
+    <string name="complete_creation">Complete Creation</string>
+    <string name="group_set">Group Chat Settings</string>
+    <string name="not_disturb_tips">Will not receive offline push messages after enabling</string>
 
 </resources>

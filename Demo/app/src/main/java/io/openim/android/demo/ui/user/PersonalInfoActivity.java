@@ -109,12 +109,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
             });
         });
         view.birthdayLy.setOnClickListener(v -> {
-            TimePickerView pvTime = new TimePickerBuilder(this, new OnTimeSelectListener() {
-                @Override
-                public void onTimeSelect(Date date, View v) {
-                    vm.setBirthday(date.getTime() / 1000);
-                }
-            }).build();
+            TimePickerView pvTime = new TimePickerBuilder(this, (date, v12) -> vm.setBirthday(date.getTime() / 1000)).build();
             pvTime.show(v);
 
         });
@@ -122,7 +117,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
             emailLauncher.launch(new Intent(this, EditTextActivity.class)
                 .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.val().getEmail())
                 .putExtra(EditTextActivity.TITLE,
-                    getString(R.string.mail)));
+                    getString(io.openim.android.ouicore.R.string.mail)));
         });
     }
 

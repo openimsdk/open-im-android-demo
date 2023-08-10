@@ -75,7 +75,7 @@
                 android:paddingLeft="22dp"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
-                android:text="开启后不接收离线推送消息"
+                android:text="@string/not_disturb_tips"
                 android:textColor="#ff999999"
                 android:textSize="12sp" />
 

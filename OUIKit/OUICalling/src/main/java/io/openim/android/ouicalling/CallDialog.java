@@ -115,9 +115,9 @@ public class CallDialog extends BaseDialog {
 
         view.waiting.setVisibility(callingVM.isVideoCalls
             ? View.GONE : View.VISIBLE);
-        if (callingVM.isStartCall &&!callingVM.isVideoCalls){
+        if (callingVM.isStartCall && !callingVM.isVideoCalls) {
             view.sTips.setText(io.openim.android.ouicore.R.string.calling);
-        }else {
+        } else {
             view.sTips.setText(callingVM.isCallOut ?
                 context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
                 context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
@@ -238,6 +238,7 @@ public class CallDialog extends BaseDialog {
                     (realm, callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
 
                 callingVM.signalingHungUp(signalingInfo);
+                Common.UIHandler.postDelayed(() -> dismiss(), 18 * 1000);
             }
         });
         view.reject.setOnClickListener(new OnDedrepClickListener() {
@@ -259,7 +260,8 @@ public class CallDialog extends BaseDialog {
                     public void onSuccess(Object data) {
                         changeView();
 
-                        callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(),(realm, v)-> v.setSuccess(true));
+                        callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(), (realm
+                            , v) -> v.setSuccess(true));
                     }
                 });
             }

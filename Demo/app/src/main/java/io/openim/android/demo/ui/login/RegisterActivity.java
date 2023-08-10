@@ -53,11 +53,11 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
     }
 
     private void initView() {
-        view.tips.setText(vm.isPhone.getValue() ? getString(R.string.phone_register) : getString(R.string.mail_register));
-        view.edt1.setHint(vm.isPhone.getValue() ? getString(R.string.input_phone) : getString(R.string.input_mail));
+        view.tips.setText(vm.isPhone.getValue() ? getString(io.openim.android.ouicore.R.string.phone_register) : getString(io.openim.android.ouicore.R.string.mail_register));
+        view.edt1.setHint(vm.isPhone.getValue() ? getString(io.openim.android.ouicore.R.string.input_phone) : getString(io.openim.android.ouicore.R.string.input_mail));
         if (vm.isFindPassword){
-            view.tips.setText(R.string.phone_num);
-            view.title.setText(R.string.forgot_password);
+            view.tips.setText(io.openim.android.ouicore.R.string.phone_num);
+            view.title.setText(io.openim.android.ouicore.R.string.forgot_password);
             view.protocolLy.setVisibility(View.GONE);
             view.submit.setText(io.openim.android.ouicore.R.string.get_vc);
             view.protocol.setChecked(true);
@@ -85,7 +85,7 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
 
     @Override
     public void succ(Object o) {
-        Toast.makeText(this, R.string.send_succ, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, io.openim.android.ouicore.R.string.send_succ, Toast.LENGTH_SHORT).show();
         startActivity(new Intent(this, VerificationCodeActivity.class));
     }
 

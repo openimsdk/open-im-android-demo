@@ -17,6 +17,7 @@ import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityLanguageSettingBinding;
 import io.openim.android.demo.ui.main.MainActivity;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
@@ -68,6 +69,7 @@ public class LanguageSettingActivity extends BaseActivity<BaseViewModel,
             commonDialog.getMainView().confirm.setOnClickListener(v1 -> {
                 String lang = null == checkLocale ? "" : checkLocale.getLanguage();
                 LanguageUtil.switchLanguage(lang, this, MainActivity.class);
+                LanguageUtil.updateApplicationLocale(BaseApp.inst(),lang);
             });
             commonDialog.show();
 

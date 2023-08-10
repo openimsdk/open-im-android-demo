@@ -42,7 +42,6 @@ import okhttp3.Response;
 
 public class DemoApplication extends BaseApp {
     private static final String TAG = BaseApp.class.getSimpleName();
-    public Realm realm;
 
 
     @Override
@@ -145,16 +144,5 @@ public class DemoApplication extends BaseApp {
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
             }
         });
-    }
-
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(LanguageUtil.attachBaseContext(base));
-    }
-
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        LanguageUtil.attachBaseContext(this);
     }
 }

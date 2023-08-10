@@ -88,7 +88,7 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
         super.onSuccess(body);
 
         BaseApp.inst().removeCacheVM(GroupVM.class);
-        Toast.makeText(this, getString(R.string.create_succ), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(io.openim.android.ouicore.R.string.create_succ), Toast.LENGTH_SHORT).show();
         GroupInfo groupInfo = (GroupInfo) body;
 
         Postcard postcard1=ARouter.getInstance().build(Routes.Conversation.CHAT);

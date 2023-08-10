@@ -59,7 +59,7 @@ public class SearchContactActivity extends BaseActivity<SearchVM, ActivitySearch
         view.searchView.getEditText().setFocusableInTouchMode(true);
         view.searchView.getEditText().requestFocus();
         view.searchView.getEditText().setHint(vm.isPerson ?
-            io.openim.android.ouicore.R.string.search_by_id : R.string.search_group_by_id);
+            io.openim.android.ouicore.R.string.search_by_id : io.openim.android.ouicore.R.string.search_group_by_id);
         view.searchView.getEditText().setOnKeyListener((v, keyCode, event) -> {
             String id;
             vm.searchContent.setValue(id=view.searchView.getEditText().getText().toString());

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="group_id">群ID号</string>
-    <string name="member">群成员</string>
-    <string name="complete_creation">完成创建</string>
-
-    <string name="group_set">群聊设置</string>
-</resources>

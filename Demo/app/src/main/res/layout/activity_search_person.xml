@@ -64,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:gravity="center"
-                android:text="@{SearchVM.isPerson? R.string.not_find_user:R.string.not_find_group}"
+                android:text="@{SearchVM.isPerson? io.openim.android.ouicore.R.string.not_find_user:io.openim.android.ouicore.R.string.not_find_group}"
                 android:textColor="#ff666666"
                 android:textSize="14sp"
                 android:visibility="gone" />
