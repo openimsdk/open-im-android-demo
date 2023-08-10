@@ -403,7 +403,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="设置聊天背景"
+                android:text="@string/setting_chat_bg"
                 android:textColor="#ff333333"
                 android:textSize="16sp" />
 

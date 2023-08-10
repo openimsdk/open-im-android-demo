@@ -480,5 +480,6 @@
     <string name="complete_creation">完成创建</string>
     <string name="group_set">群聊设置</string>
     <string name="not_disturb_tips">开启后不接收离线推送消息</string>
+    <string name="setting_chat_bg">设置聊天背景</string>
 
 </resources>

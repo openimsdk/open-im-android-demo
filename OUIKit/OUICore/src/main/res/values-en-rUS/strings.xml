@@ -475,5 +475,6 @@
     <string name="complete_creation">Complete Creation</string>
     <string name="group_set">Group Chat Settings</string>
     <string name="not_disturb_tips">Will not receive offline push messages after enabling</string>
+    <string name="setting_chat_bg">Set the chat background</string>
 
 </resources>
