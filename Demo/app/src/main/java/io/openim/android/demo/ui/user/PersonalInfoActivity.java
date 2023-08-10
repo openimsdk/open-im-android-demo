@@ -109,7 +109,8 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
             });
         });
         view.birthdayLy.setOnClickListener(v -> {
-            TimePickerView pvTime = new TimePickerBuilder(this, (date, v12) -> vm.setBirthday(date.getTime() / 1000)).build();
+            TimePickerView pvTime = new TimePickerBuilder(this,
+                (date, v12) -> vm.setBirthday(date.getTime() / 1000)).build();
             pvTime.show(v);
 
         });
