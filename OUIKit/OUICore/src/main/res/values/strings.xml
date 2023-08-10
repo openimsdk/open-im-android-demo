@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-
-
     <string name="app_name">OpenIM</string>
     <string name="group_bulletin">群公告</string>
     <string name="search_by_id">通过用户ID号搜索添加</string>

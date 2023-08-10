@@ -98,7 +98,7 @@ public class IMUtil {
 
     /**
      * 加载图片
-     *  本地存在直接加载-》缩略图-》加载原图
+     * 本地存在直接加载-》缩略图-》加载原图
      *
      * @return
      */
@@ -107,8 +107,8 @@ public class IMUtil {
         String filePath = elem.getSourcePath();
         if (GetFilePathFromUri.fileIsExists(filePath))
             url = filePath;
-        if (TextUtils.isEmpty(url) && null!=elem.getSnapshotPicture())
-           url= elem.getSnapshotPicture().getUrl();
+        if (TextUtils.isEmpty(url) && null != elem.getSnapshotPicture())
+            url = elem.getSnapshotPicture().getUrl();
         if (TextUtils.isEmpty(url)) {
             url = elem.getSourcePicture().getUrl();
         }
