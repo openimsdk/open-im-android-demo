@@ -95,6 +95,8 @@ dependencies {
     implementation 'com.github.Wynsbin:VerificationCodeInputView:1.0.2'
 
     implementation 'com.github.czy1121:badgebutton:1.1.0'
+    implementation 'com.hbb20:ccp:2.6.1'
+
     // getui
     implementation 'com.getui:gtsdk:3.2.13.0'  //个推SDK
     implementation 'com.getui:gtc:3.1.12.0'  //个推核心组件

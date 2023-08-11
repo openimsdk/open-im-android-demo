@@ -22,6 +22,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="tiramisu">
         <activity
+            android:name=".ui.user.ChangePasswordActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.user.LanguageSettingActivity"
             android:exported="false" />
         <activity

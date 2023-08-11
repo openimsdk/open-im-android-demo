@@ -84,7 +84,6 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
                     }
                 }, null, putArgs);
             });
-
             albumDialog.show();
         });
         view.nickNameLy.setOnClickListener(v ->

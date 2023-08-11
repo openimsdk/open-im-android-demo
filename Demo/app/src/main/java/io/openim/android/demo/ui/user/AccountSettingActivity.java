@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityAccountSettingBinding;
@@ -12,6 +13,7 @@ import io.openim.android.demo.vm.PersonalVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.entity.ExtendUserInfo;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.SlideButton;
 import io.openim.android.ouicore.widget.WaitDialog;
@@ -31,6 +33,9 @@ public class AccountSettingActivity extends BaseActivity<PersonalVM, ActivityAcc
     }
 
     private void listener() {
+        view.changePassword.setOnClickListener(v -> {
+            startActivity(new Intent(this,ChangePasswordActivity.class));
+        });
         view.languageSetting.setOnClickListener(v -> {
             startActivity(new Intent(this,LanguageSettingActivity.class));
         });

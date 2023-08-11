@@ -26,7 +26,7 @@ public interface OneselfService {
             String body = responseBody.string();
             Base<T> base = GsonHel.dataObject(body, tClass);
             if (base.errCode == 0) return null == base.data ? tClass.newInstance() : base.data;
-            throw new RXRetrofitException(base.errCode, base.errMsg);
+            throw new RXRetrofitException(base.errCode, base.errDlt);
         };
     }
 

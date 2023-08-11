@@ -481,5 +481,12 @@
     <string name="group_set">群聊设置</string>
     <string name="not_disturb_tips">开启后不接收离线推送消息</string>
     <string name="setting_chat_bg">设置聊天背景</string>
-
+    <string name="change_password">修改密码</string>
+    <string name="old_password">原密码：</string>
+    <string name="new_password">新密码：</string>
+    <string name="sure_password">确认密码：</string>
+    <string name="please_input_complete">请填写完整</string>
+    <string name="password_valid_tips2">新密码与确认密码不匹配</string>
+    <string name="do_not_account">还没有账号？</string>
+    <string name="next">下一步</string>
 </resources>

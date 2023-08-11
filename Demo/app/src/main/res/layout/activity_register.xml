@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
             name="LoginVM"
@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:background="@drawable/splash_shape_gradient"
         tools:context=".ui.login.RegisterActivity">
 
         <LinearLayout
@@ -37,7 +38,7 @@
                 android:layout_marginTop="50dp"
                 android:layout_marginBottom="44dp"
                 android:text="@string/new_user"
-                android:textColor="#ff333333"
+                android:textColor="@color/theme"
                 android:textSize="26sp"
                 android:textStyle="bold" />
 
@@ -46,27 +47,46 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/phone_num"
+                android:layout_marginBottom="10dp"
                 android:textColor="#ff000000"
                 android:textSize="14sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="23dp"
+                android:background="@drawable/sty_radius_6_tr_stroke_e6e6e6"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="5dp">
+
+
+                <com.hbb20.CountryCodePicker
+                    android:id="@+id/countryCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ff0c1c33"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    app:ccp_autoDetectCountry="true"
+                    app:ccp_defaultNameCode="CN"
+                    app:ccp_showFlag="false"
+                    app:ccp_showFullName="false"
+                    app:ccp_showNameCode="false" />
+
+
+                <include layout="@layout/view_dividing_line_verticle" />
 
                 <EditText
-                    android:paddingTop="6dp"
                     android:id="@+id/edt1"
                     android:layout_width="0dp"
                     android:layout_height="45dp"
+                    android:layout_marginLeft="15dp"
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:hint="@string/input_phone"
-                    android:textColor="#ff333333"
                     android:text="@={LoginVM.account}"
+                    android:textColor="#ff333333"
                     android:textSize="18sp" />
 
                 <ImageView
@@ -77,10 +97,6 @@
                     android:src="@mipmap/ic_close" />
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EAEAEA" />
         </LinearLayout>
 
 
@@ -92,7 +108,7 @@
             android:layout_marginRight="32dp"
             android:layout_marginBottom="20dp"
             android:enabled="false"
-            android:text="@string/register"
+            android:text="@string/next"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -102,6 +118,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="80dp"
             android:gravity="center"
+            android:visibility="invisible"
             android:orientation="horizontal">
 
             <CheckBox

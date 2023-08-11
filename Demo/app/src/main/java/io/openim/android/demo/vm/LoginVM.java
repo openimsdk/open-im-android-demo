@@ -16,6 +16,7 @@ import java.util.TimerTask;
 
 import io.openim.android.demo.R;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.demo.repository.OpenIMService;
 import io.openim.android.ouicore.base.BaseViewModel;
@@ -24,6 +25,7 @@ import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.RegexValid;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
@@ -39,6 +41,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     public MutableLiveData<Boolean> isPhone = new MutableLiveData<>(true);
     public MutableLiveData<Integer> countdown = new MutableLiveData<>(MAX_COUNTDOWN);
     public MutableLiveData<String> nickName = new MutableLiveData<>("");
+    public State<String> areaCode = new State<>("+86");
 
     public String verificationCode;
     //是否是找回密码
@@ -46,36 +49,40 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
 
     public void login(String verificationCode, int usedFor) {
         Parameter parameter = getParameter(verificationCode, usedFor);
-        N.API(OpenIMService.class).login(parameter.buildJsonBody()).compose(N.IOMain()).map(OpenIMService.turn(LoginCertificate.class)).subscribe(new NetObserver<LoginCertificate>(getContext()) {
+        N.API(OpenIMService.class)
+            .login(parameter.buildJsonBody())
+            .compose(N.IOMain())
+            .map(OpenIMService.turn(LoginCertificate.class))
+            .subscribe(new NetObserver<LoginCertificate>(getContext()) {
 
-            @Override
-            public void onSuccess(LoginCertificate loginCertificate) {
-                try {
-                    OpenIMClient.getInstance().login(new OnBase<String>() {
-                        @Override
-                        public void onError(int code, String error) {
-                            getIView().err(error);
-                        }
+                @Override
+                public void onSuccess(LoginCertificate loginCertificate) {
+                    try {
+                        OpenIMClient.getInstance().login(new OnBase<String>() {
+                            @Override
+                            public void onError(int code, String error) {
+                                getIView().err(error);
+                            }
 
-                        @Override
-                        public void onSuccess(String data) {
-                            //缓存登录信息
-                            loginCertificate.cache(getContext());
-                            BaseApp.inst().loginCertificate = loginCertificate;
-                            getIView().jump();
-                        }
-                    }, loginCertificate.userID, loginCertificate.imToken);
+                            @Override
+                            public void onSuccess(String data) {
+                                //缓存登录信息
+                                loginCertificate.cache(getContext());
+                                BaseApp.inst().loginCertificate = loginCertificate;
+                                getIView().jump();
+                            }
+                        }, loginCertificate.userID, loginCertificate.imToken);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
 
-            @Override
-            protected void onFailure(Throwable e) {
-                getIView().err(e.getMessage());
-            }
-        });
+                @Override
+                protected void onFailure(Throwable e) {
+                    getIView().err(e.getMessage());
+                }
+            });
     }
 
 
@@ -87,11 +94,15 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     @NonNull
     private Parameter getParameter(String verificationCode, int usedFor) {
         Parameter parameter = new Parameter().add("password",
-            TextUtils.isEmpty(verificationCode) ? md5(pwd.getValue()) : null).add("platform", 2).add("usedFor", usedFor).add("operationID", System.currentTimeMillis() + "").add("verifyCode", verificationCode);
+            TextUtils.isEmpty(verificationCode) ? md5(pwd.getValue()) : null)
+            .add("platform", 2).add("usedFor", usedFor)
+            .add("operationID", System.currentTimeMillis() + "")
+            .add("verifyCode", verificationCode);
         if (isPhone.getValue()) {
             parameter.add("phoneNumber", account.getValue());
-            parameter.add("areaCode", "+86");
-        } else parameter.add("email", account.getValue());
+            parameter.add("areaCode", areaCode.val());
+        } else
+            parameter.add("email", account.getValue());
         return parameter;
     }
 
@@ -206,6 +217,36 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
         });
     }
 
+    public void changePassword(String currentPassword, String newPassword) {
+        Parameter parameter = new Parameter();
+        parameter.add("userID", BaseApp.inst().loginCertificate.userID)
+            .add("currentPassword", Common.md5(currentPassword))
+            .add("newPassword", Common.md5(newPassword));
+
+        WaitDialog waitDialog = showWait();
+        N.API(OpenIMService.class)
+            .changePassword(parameter.buildJsonBody())
+            .map(OpenIMService.turn(String.class))
+            .compose(N.IOMain())
+            .subscribe(new NetObserver<String>(context.get()) {
+
+                @Override
+                public void onComplete() {
+                    waitDialog.dismiss();
+                }
+
+                @Override
+                public void onSuccess(String o) {
+                  getIView().succ(o);
+                }
+
+                @Override
+                protected void onFailure(Throwable e) {
+                    getIView().err(e.getMessage());
+                }
+            });
+    }
+
     public void register() {
         String pwdValue = pwd.getValue();
         if (!RegexValid.isValidPassword(pwdValue)) {
@@ -221,7 +262,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
         Map<String, String> user = new HashMap<>();
         user.put("password", md5(pwdValue));
         user.put("nickname", nickName.getValue());
-        user.put("areaCode", "+86");
+        user.put("areaCode", areaCode.val());
         user.put("phoneNumber", account.getValue());
         parameter.add("user", user);
 
@@ -245,19 +286,6 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
                 getIView().toast(e.getMessage());
             }
         });
-    }
-
-    ///设置个人信息
-    public void setSelfInfo() {
-        OpenIMClient.getInstance().userInfoManager.setSelfInfo(new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-            }
-
-            @Override
-            public void onSuccess(String data) {
-            }
-        }, nickName.getValue(), null, 0, 0, null, 0, null, null);
     }
 
 

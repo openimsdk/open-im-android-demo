@@ -477,4 +477,13 @@
     <string name="not_disturb_tips">Will not receive offline push messages after enabling</string>
     <string name="setting_chat_bg">Set the chat background</string>
 
+    <string name="change_password">Change Password</string>
+    <string name="old_password">Old Password:</string>
+    <string name="new_password">New Password:</string>
+    <string name="sure_password">Confirm Password:</string>
+    <string name="please_input_complete">Please fill in all fields</string>
+    <string name="password_valid_tips2">Confirm password does not match the new password</string>
+    <string name="do_not_account">Don\'t have an account yet?</string>
+    <string name="next">下一步</string>
+
 </resources>

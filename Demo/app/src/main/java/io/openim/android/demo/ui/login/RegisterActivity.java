@@ -12,7 +12,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
 
+import com.hbb20.CountryCodePicker;
+
 import java.io.IOException;
+import java.util.Locale;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityRegisterBinding;
@@ -20,6 +23,7 @@ import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
 import okhttp3.ResponseBody;
 
@@ -47,12 +51,18 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
         view.clear.setOnClickListener(v -> view.edt1.setText(""));
 
         view.submit.setOnClickListener(v -> {
-//            startActivity(new Intent(this,ResetPasswordActivity.class));
+            vm.areaCode.setValue("+"+view.countryCode.getSelectedCountryCode());
             vm.getVerificationCode(vm.isFindPassword?2:1);
         });
     }
 
     private void initView() {
+        Locale locale = LanguageUtil.getCurrentLocale(this);
+        CountryCodePicker.Language language;
+        if (locale == Locale.CHINA) language = CountryCodePicker.Language.CHINESE_SIMPLIFIED;
+        else language = CountryCodePicker.Language.forCountryNameCode(locale.getLanguage());
+        view.countryCode.changeDefaultLanguage(language);
+
         view.tips.setText(vm.isPhone.getValue() ? getString(io.openim.android.ouicore.R.string.phone_register) : getString(io.openim.android.ouicore.R.string.mail_register));
         view.edt1.setHint(vm.isPhone.getValue() ? getString(io.openim.android.ouicore.R.string.input_phone) : getString(io.openim.android.ouicore.R.string.input_mail));
         if (vm.isFindPassword){
