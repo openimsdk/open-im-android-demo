@@ -92,7 +92,7 @@
             <TextView
                 android:layout_width="56dp"
                 android:layout_height="20dp"
-                android:text="手机号码"
+                android:text="@string/phone_num"
                 android:textColor="#ff171a1d"
                 android:layout_marginBottom="6dp"
                 android:textSize="14sp"
@@ -157,8 +157,8 @@ android:visibility="gone"
 
 
             <TextView
-                android:layout_width="72dp"
-                android:layout_height="17dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="@string/do_not_account"
                 android:textColor="#ff8e9ab0"
                 android:textSize="12sp"
