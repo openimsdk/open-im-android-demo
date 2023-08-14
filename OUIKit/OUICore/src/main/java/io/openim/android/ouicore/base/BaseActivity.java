@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import io.openim.android.ouicore.net.RXRetrofit.N;
 
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
@@ -57,6 +59,23 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         }
         setLightStatus();
     }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        //多语言适配
+        super.attachBaseContext(LanguageUtil.getNewLocalContext(newBase));
+    }
+    @Override
+    public void applyOverrideConfiguration(Configuration overrideConfiguration) {
+        // 兼容androidX在部分手机切换语言失败问题
+        if (overrideConfiguration != null) {
+            int uiMode = overrideConfiguration.uiMode;
+            overrideConfiguration.setTo(getBaseContext().getResources().getConfiguration());
+            overrideConfiguration.uiMode = uiMode;
+        }
+        super.applyOverrideConfiguration(overrideConfiguration);
+    }
+
 
     @SuppressLint("SourceLockedOrientationActivity")
     protected void requestedOrientation() {
@@ -190,7 +209,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if (!touchClearFocus) return super.dispatchTouchEvent(ev);
         View v = getCurrentFocus();
-        if (v != null && v instanceof EditText) {
+        if (v instanceof EditText) {
             Rect outRect = new Rect();
             v.getGlobalVisibleRect(outRect);
             if (!outRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
@@ -236,6 +255,5 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     public void close() {
         finish();
     }
-
 
 }

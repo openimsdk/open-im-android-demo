@@ -132,12 +132,18 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             if (oneself()) return;
 
             view.manager.setVisibility(isOwner(oneselfGroupMembersInfo) ? View.VISIBLE : View.GONE);
-            if (isOwner(targetGroupMembersInfo) || isAdmin(targetGroupMembersInfo)) {
-                view.mute.setVisibility(View.GONE);
-            } else {
-                view.mute.setVisibility(isOwner(oneselfGroupMembersInfo)
-                    || isAdmin(oneselfGroupMembersInfo) ? View.VISIBLE : View.GONE);
+            if (isOwner(oneselfGroupMembersInfo)){
+                //自己是群主-显示
+                view.mute.setVisibility(View.VISIBLE);
+            }else {
+                //自己是管理员且对方不是群主不是管理员-显示
+                if (isAdmin(oneselfGroupMembersInfo)
+                    && !isOwner(targetGroupMembersInfo)&& !isAdmin(targetGroupMembersInfo))
+                    view.mute.setVisibility(View.VISIBLE);
+                else
+                    view.mute.setVisibility(View.GONE);
             }
+
             if (targetGroupMembersInfo.getJoinSource() == 2) {
                 List<String> ids2 = new ArrayList<>();
                 ids2.add(targetGroupMembersInfo.getInviterUserID());

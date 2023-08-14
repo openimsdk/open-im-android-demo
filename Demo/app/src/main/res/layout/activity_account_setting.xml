@@ -75,10 +75,67 @@
                 android:paddingLeft="22dp"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
-                android:text="开启后不接收离线推送消息"
+                android:text="@string/not_disturb_tips"
                 android:textColor="#ff999999"
                 android:textSize="12sp" />
 
+            <LinearLayout
+                android:id="@+id/languageSetting"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:paddingLeft="22dp"
+                android:paddingRight="22dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/language_setting"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ff999999"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/ic_right" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/changePassword"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:paddingLeft="22dp"
+                android:paddingRight="22dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/change_password"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ff999999"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/ic_right" />
+            </LinearLayout>
             <LinearLayout
                 android:id="@+id/clearRecord"
                 android:layout_width="match_parent"

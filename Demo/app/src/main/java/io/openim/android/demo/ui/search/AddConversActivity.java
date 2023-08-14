@@ -44,7 +44,7 @@ public class AddConversActivity extends BaseActivity<SearchVM, ActivityAddFriend
     }
 
     private void initView() {
-        view.input.getEditText().setHint(vm.isPerson ? io.openim.android.ouicore.R.string.search_by_id : R.string.search_group_by_id);
+        view.input.getEditText().setHint(vm.isPerson ? io.openim.android.ouicore.R.string.search_by_id : io.openim.android.ouicore.R.string.search_group_by_id);
         view.back.back.setOnClickListener(v -> finish());
         view.input.setOnClickListener(v -> {
             startActivity(new Intent(this, SearchContactActivity.class));

@@ -8,6 +8,7 @@ public class Base<T> {
     public int errCode;
 
     public String errMsg;
+    public String errDlt;
 
     public T data;
 }

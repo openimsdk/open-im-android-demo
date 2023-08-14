@@ -37,6 +37,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
+import io.openim.android.ouicore.widget.SlideButton;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnBase;
@@ -60,30 +61,80 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
     private ActivityResultLauncher<Intent> personDetailLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK) {
-            setResult(RESULT_OK);
-            finish();
-        }
-    });
+            if (result.getResultCode() == RESULT_OK) {
+                setResult(RESULT_OK);
+                finish();
+            }
+        });
 
     private void click() {
-        view.addChat.setOnClickListener(v -> {
-            BottomPopDialog dialog = new BottomPopDialog(this);
-            dialog.show();
-            dialog.getMainView().menu3.setOnClickListener(v1 -> dialog.dismiss());
-            dialog.getMainView().menu1.setText(io.openim.android.ouicore.R.string.general_group);
-            dialog.getMainView().menu2.setText(io.openim.android.ouicore.R.string.work_group);
+        view.periodicDeletionTime.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                LayoutBurnAfterReadingBinding view =
+                    LayoutBurnAfterReadingBinding.inflate(getLayoutInflater());
+                CommonDialog commonDialog = new CommonDialog(ChatSettingActivity.this);
+                commonDialog.setCustomCentral(view.getRoot());
+                view.title.setText(io.openim.android.ouicore.R.string.period_deletion_tips1);
+                view.description.setText(io.openim.android.ouicore.R.string.period_deletion_tips2);
+                List<String> numList = new ArrayList<>();
+                List<String> units = new ArrayList<>();
+                for (int i = 0; i < 6; i++) {
+                    numList.add(String.valueOf(i + 1));
+                }
+                units.add(getString(io.openim.android.ouicore.R.string.day));
+                units.add(getString(io.openim.android.ouicore.R.string.week));
+                units.add(getString(io.openim.android.ouicore.R.string.month));
 
-            dialog.getMainView().menu1.setOnClickListener(v1 -> {
-                dialog.dismiss();
-                ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withString(Constant.K_ID,
-                    vm.userID).navigation();
+                view.roller.setAdapter(new ArrayWheelAdapter(numList));
+                view.roller.setCyclic(false);
+                view.roller.setCurrentItem(0);
+
+                view.roller2.setVisibility(View.VISIBLE);
+                view.roller2.setAdapter(new ArrayWheelAdapter(units));
+                view.roller2.setCyclic(false);
+                view.roller2.setCurrentItem(0);
+
+                commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
+                commonDialog.getMainView().confirm.setOnClickListener(v1 -> {
+                    commonDialog.dismiss();
+                    int position = view.roller.getCurrentItem();
+                    int unit = view.roller2.getCurrentItem();
+                    int num = Integer.parseInt(numList.get(position));
+                    long seconds;
+                    if (unit == 0) {
+                        seconds = num * (60 * 60 * 24);
+                    } else if (unit == 1) {
+                        seconds = num * (60 * 60 * 24 * 7);
+                    } else {
+                        seconds = num * (60 * 60 * 24 * 30);
+                    }
+                    OpenIMClient.getInstance().conversationManager.setConversationMsgDestructTime(new IMUtil.IMCallBack<String>(){
+                        @Override
+                        public void onSuccess(String data) {
+                            vm.conversationInfo.val().setMsgDestructTime(seconds);
+                            vm.conversationInfo.update();
+                        }
+                    },vm.conversationID,seconds);
+                });
+                commonDialog.show();
+            }
+        });
+        view.periodicDeletion
+            .setOnSlideButtonClickListener(isChecked -> {
+                OpenIMClient.getInstance().conversationManager
+                    .setConversationIsMsgDestruct(new IMUtil.IMCallBack<String>() {
+                        @Override
+                        public void onSuccess(String data) {
+                            vm.conversationInfo.val().setMsgDestruct(isChecked);
+                            vm.conversationInfo.update();
+                        }
+                    }, vm.conversationID, isChecked);
             });
-            dialog.getMainView().menu2.setOnClickListener(v1 -> {
-                dialog.dismiss();
-                ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withString(Constant.K_ID,
-                    vm.userID).withBoolean(Constant.K_RESULT, true).navigation();
-            });
+
+        view.addChat.setOnClickListener(v -> {
+            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withString(Constant.K_ID,
+                vm.userID).withBoolean(Constant.K_RESULT, true).navigation();
         });
         view.picture.setOnClickListener(v -> {
             startActivity(new Intent(this, MediaHistoryActivity.class).putExtra(Constant.K_RESULT
@@ -147,16 +198,16 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
                 CommonDialog commonDialog = new CommonDialog(ChatSettingActivity.this);
                 commonDialog.setCustomCentral(view.getRoot());
                 List<Object> strings = new ArrayList<>();
-                strings.add("30"+getString(io.openim.android.ouicore.R.string.seconds));
-                strings.add("5"+getString(io.openim.android.ouicore.R.string.minute));
-                strings.add("1"+getString(io.openim.android.ouicore.R.string.hour));
+                strings.add("30" + getString(io.openim.android.ouicore.R.string.seconds));
+                strings.add("5" + getString(io.openim.android.ouicore.R.string.minute));
+                strings.add("1" + getString(io.openim.android.ouicore.R.string.hour));
                 view.roller.setAdapter(new ArrayWheelAdapter(strings));
-                int duration=vm.conversationInfo.val().getBurnDuration();
-                int currentItem=0;
-                if (duration==300)
-                    currentItem=1;
-                if (duration>=3600)
-                    currentItem=2;
+                int duration = vm.conversationInfo.val().getBurnDuration();
+                int currentItem = 0;
+                if (duration == 300)
+                    currentItem = 1;
+                if (duration >= 3600)
+                    currentItem = 2;
                 view.roller.setCurrentItem(currentItem);
                 view.roller.setCyclic(false);
                 commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
@@ -167,7 +218,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
                     if (position == 1) burnDuration = 5 * 60;
                     if (position == 2) burnDuration = 60 * 60;
 
-                   final int finalBurnDuration = burnDuration;
+                    final int finalBurnDuration = burnDuration;
                     OpenIMClient.getInstance().conversationManager.setConversationBurnDuration(new IMUtil.IMCallBack<String>() {
                         @Override
                         public void onSuccess(String data) {
@@ -182,22 +233,37 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
         });
     }
 
-    private void initView() {
-        view.readVanish.setCheckedWithAnimation(vm.conversationInfo.getValue().isPrivateChat());
+    public String convertToDaysWeeksMonths(long seconds) {
+        long days = seconds / (60 * 60 * 24);
+        long weeks = days / 7;
+        long months = weeks / 4;
 
+        if (days <= 6) {
+            return days + getString(io.openim.android.ouicore.R.string.day);
+        } else if (weeks <= 6 &&(days % 7==0)) {
+            return weeks + getString(io.openim.android.ouicore.R.string.week);
+        } else {
+            return months + getString(io.openim.android.ouicore.R.string.month);
+        }
+    }
+
+    private void initView() {
+        view.readVanish.setCheckedWithAnimation(vm.conversationInfo.val().isPrivateChat());
         vm.notDisturbStatus.observe(this, integer -> {
             view.noDisturb.post(() -> view.noDisturb.setCheckedWithAnimation(integer == 2));
         });
         vm.conversationInfo.observe(this, conversationInfo -> {
+            showPeriodicDeletionTime();
+
             view.topSlideButton.post(() -> view.topSlideButton.setCheckedWithAnimation(conversationInfo.isPinned()));
             view.readVanishTime.setVisibility(conversationInfo.isPrivateChat() ? View.VISIBLE :
                 View.GONE);
-             int burnDuration=conversationInfo.getBurnDuration();
-            String burnDurationStr="30"+getString(io.openim.android.ouicore.R.string.seconds);
-            if (burnDuration==300)
-                burnDurationStr="5"+getString(io.openim.android.ouicore.R.string.minute);
-            if (burnDuration>=3600)
-                burnDurationStr="1"+getString(io.openim.android.ouicore.R.string.hour);
+            int burnDuration = conversationInfo.getBurnDuration();
+            String burnDurationStr = "30" + getString(io.openim.android.ouicore.R.string.seconds);
+            if (burnDuration == 300)
+                burnDurationStr = "5" + getString(io.openim.android.ouicore.R.string.minute);
+            if (burnDuration >= 3600)
+                burnDurationStr = "1" + getString(io.openim.android.ouicore.R.string.hour);
             view.readVanishNum.setText(burnDurationStr);
         });
 
@@ -217,6 +283,16 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             }
         }, uid);
 
+    }
+
+    private void showPeriodicDeletionTime() {
+        view.periodicDeletion.setCheckedWithAnimation(vm.conversationInfo.val().isMsgDestruct());
+        view.periodicDeletionTime.setVisibility(vm.conversationInfo.val().isMsgDestruct() ?
+            View.VISIBLE : View.GONE);
+        long destructTime = vm.conversationInfo.val().getMsgDestructTime();
+        if (0 != destructTime) {
+            view.periodicDeletionStr.setText(convertToDaysWeeksMonths(destructTime));
+        }
     }
 
     @Override

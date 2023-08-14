@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-
-
     <string name="app_name">OpenIM</string>
     <string name="group_bulletin">群公告</string>
     <string name="search_by_id">通过用户ID号搜索添加</string>
@@ -407,4 +405,88 @@
     <string name="read_vanish_tips">在此之后发送的消息，好友已读后会在 选择的时间之后自动删除</string>
     <string name="seconds">秒</string>
     <string name="minute">分钟</string>
+    <string name="password_valid_tips">密码请输入6-18位包含数字与字母</string>
+    <string name="periodic_deletion">定期删除消息记录</string>
+    <string name="week">周</string>
+    <string name="month">月</string>
+    <string name="period_deletion_tips1">定期删除消息记录</string>
+    <string name="period_deletion_tips2">在此之后发送的消息会在选择的时间之后自动删除</string>
+    <string name="language_setting">语言设置</string>
+    <string name="with_system">跟随系统</string>
+    <string name="chinese">简体中文</string>
+    <string name="english">英语</string>
+    <string name="switch_language_tips">确定切换为</string>
+
+
+
+    <string name="read">我已阅读并同意：</string>
+    <string name="protocol">《服务协议》，《隐私权政策》</string>
+    <string name="input_phone">请输入手机号码</string>
+    <string name="password">密码</string>
+    <string name="phone_num">手机号码</string>
+    <string name="mail">邮箱</string>
+    <string name="input_password">请输入密码</string>
+    <string name="forgot_password">忘记密码</string>
+    <string name="phone_register">手机号注册</string>
+    <string name="input_mail">请输入邮箱</string>
+    <string name="mail_register">邮箱注册</string>
+    <string name="new_user">新用户注册</string>
+    <string name="register">注册</string>
+    <string name="not_find_user">无法找到该用户</string>
+    <string name="id">ID号</string>
+    <string name="send_msg">发消息</string>
+    <string name="openim_call">OpenIM电话</string>
+    <string name="add_friend">添加好友</string>
+    <string name="disassociate">解除好友关系</string>
+    <string name="detail">详情</string>
+    <string name="friend_verify">好友验证</string>
+    <string name="group_verify">群聊验证</string>
+    <string name="verification_code_send_mail">验证码已发送至邮箱</string>
+    <string name="verification_code_send_phone">验证码已发送至手机</string>
+    <string name="input_verification_code">请输入验证码</string>
+    <string name="resend_verification_code">重发验证码</string>
+    <string name="after">后</string>
+
+    <string name="name">你的姓名</string>
+    <string name="input_name">请填写真实姓名</string>
+    <string name="welcome">欢迎使用OpenIM</string>
+    <string name="join_im">进入OpenIM</string>
+    <string name="add_group">添加群聊</string>
+    <string name="search_group_by_id">通过群ID号搜索添加</string>
+    <string name="not_find_group">未找到该群聊</string>
+    <string name="send_friend_apply">发送添加好友申请</string>
+    <string name="send_join_group_apply">发送入群申请</string>
+    <string name="address_book">通讯录</string>
+    <string name="nickname">昵称</string>
+    <string name="invite_add_friends">邀请对方扫码，添加好友</string>
+    <string name="login">登录</string>
+
+    <string name="pass">通过入群申请</string>
+    <string name="Fail">拒绝入群申请</string>
+
+
+    <string name="top">置顶</string>
+    <string name="typing">正在输入…</string>
+    <string name="unsupported_type">暂不支持的消息类型</string>
+    <string name="touch_say">按住说话</string>
+    <string name="let_go">松开取消</string>
+    <string name="speech_to_txt">转文字</string>
+    <string name="let_send">松手发送</string>
+    <string name="msg_read_status">消息阅读状态</string>
+
+
+    <string name="group_id">群ID号</string>
+    <string name="member">群成员</string>
+    <string name="complete_creation">完成创建</string>
+    <string name="group_set">群聊设置</string>
+    <string name="not_disturb_tips">开启后不接收离线推送消息</string>
+    <string name="setting_chat_bg">设置聊天背景</string>
+    <string name="change_password">修改密码</string>
+    <string name="old_password">原密码：</string>
+    <string name="new_password">新密码：</string>
+    <string name="sure_password">确认密码：</string>
+    <string name="please_input_complete">请填写完整</string>
+    <string name="password_valid_tips2">新密码与确认密码不匹配</string>
+    <string name="do_not_account">还没有账号？</string>
+    <string name="next">下一步</string>
 </resources>

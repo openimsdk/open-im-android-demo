@@ -85,7 +85,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             if (result.getResultCode() != RESULT_OK) return;
             String var =
                 result.getData().getStringExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA);
-            if (infoModifyType == 1) vm.UPDATEGroup(vm.groupId, var, null, null, null, null);
+            if (infoModifyType == 1)
+                vm.UPDATEGroup(vm.groupId, var, null, null, null, null);
             if (infoModifyType == 2)
                 vm.setGroupMemberNickname(vm.groupId, vm.loginCertificate.userID, var);
         });
@@ -291,6 +292,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             }
 
             adapter.setItems(groupMembersInfos1);
+            spanCount=5;
         });
 
         iConversationBridge.setNotDisturbStatusListener(this, data -> {

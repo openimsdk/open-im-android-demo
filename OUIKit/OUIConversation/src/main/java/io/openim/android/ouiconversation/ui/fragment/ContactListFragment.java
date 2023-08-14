@@ -172,7 +172,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
             MsgConversation conversationInfo = vm.conversations.getValue().get(position);
             SwipeMenuItem top = new SwipeMenuItem(getContext());
             top.setText(conversationInfo.conversationInfo.isPinned() ?
-                io.openim.android.ouicore.R.string.cancel_top : R.string.top);
+                io.openim.android.ouicore.R.string.cancel_top : io.openim.android.ouicore.R.string.top);
             top.setHeight(MATCH_PARENT);
             top.setWidth(Common.dp2px(73));
             top.setTextSize(16);

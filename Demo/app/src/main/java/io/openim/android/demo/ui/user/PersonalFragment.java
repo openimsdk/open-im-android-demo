@@ -73,7 +73,7 @@ public class PersonalFragment extends BaseFragment implements Observer {
         view.aboutLy.setOnClickListener(v -> {
             startActivity(new Intent(getActivity(),AboutUsActivity.class));
         });
-        view.personalInfo.setOnClickListener(new OnDedrepClickListener() {
+        view.personalInfo.setOnClickListener(new OnDedrepClickListener(1000) {
             @Override
             public void click(View v) {
                 startActivity(new Intent(getActivity(), PersonalInfoActivity.class));

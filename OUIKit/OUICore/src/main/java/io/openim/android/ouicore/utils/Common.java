@@ -43,9 +43,12 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.widget.WebViewActivity;
@@ -133,6 +136,7 @@ public class Common {
         float scale = BaseApp.inst().getResources().getDisplayMetrics().density;
         return (int) (px / scale + 0.5f);
     }
+
     //收起键盘
     public static void hideKeyboard(Context context, View v) {
         InputMethodManager imm =
@@ -148,9 +152,11 @@ public class Common {
             (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
     }
+
     //软键盘是否弹出
-    public static boolean isShowKeyboard(Context context){
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+    public static boolean isShowKeyboard(Context context) {
+        InputMethodManager imm =
+            (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         //获取状态信息
         return imm.isActive();//true 打开
     }
@@ -173,12 +179,7 @@ public class Common {
      */
     public static void setFullScreen(Activity activity) {
         View decorView = activity.getWindow().getDecorView();
-        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_FULLSCREEN
-            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
     }
 
@@ -235,17 +236,16 @@ public class Common {
 
     public static void permission(Context context, OnGrantedListener onGrantedListener,
                                   boolean hasPermission, String... permissions) {
-        if (hasPermission)
-            onGrantedListener.onGranted();
+        if (hasPermission) onGrantedListener.onGranted();
         else {
             AndPermission.with(context).runtime()
                 .permission(permissions)
                 .onGranted(permission -> {
-                    // Storage permission are allowed.
-                    onGrantedListener.onGranted();
-                }).onDenied(permission -> {
-                    // Storage permission are not allowed.
-                }).start();
+                // Storage permission are allowed.
+                onGrantedListener.onGranted();
+            }).onDenied(permission -> {
+                // Storage permission are not allowed.
+            }).start();
         }
     }
 
@@ -296,42 +296,6 @@ public class Common {
         });
     }
 
-
-    /**
-     * 加载图片
-     * 判断本地是否存在 本地存在直接加载 不存在加载网络
-     *
-     * @return
-     */
-    public static void loadPicture(ImageView iv, PictureElem elem) {
-        String url = elem.getSourcePicture().getUrl();
-        try {
-            String filePath = elem.getSourcePath();
-            if (new File(filePath).exists()) url = filePath;
-        } catch (Exception ignore) {
-        }
-        Glide.with(iv.getContext()).load(url).placeholder(R.mipmap.ic_chat_photo).centerInside().into(iv);
-    }
-
-    /**
-     * 加载视频缩略图
-     * 判断本地是否存在 本地存在直接加载 不存在加载网络
-     *
-     * @return
-     */
-    public static void loadVideoSnapshot(ImageView iv, VideoElem elem) {
-        //本地
-        String path = elem.getSnapshotPath();
-        if (!GetFilePathFromUri.fileIsExists(path)) {
-            //远程
-            path = elem.getSnapshotUrl();
-        }
-        Glide.with(iv.getContext()).load(path)
-            .placeholder(R.mipmap.ic_chat_photo)
-            .error(R.mipmap.ic_chat_photo)
-            .into(iv);
-    }
-
     /**
      * 地图导航
      *
@@ -339,9 +303,7 @@ public class Common {
      * @param v
      */
     public static void toMap(Message message, View v) {
-        v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class)
-            .putExtra(WebViewActivity.LOAD_URL,
-                "https://apis.map.qq.com/uri/v1/geocoder?coord=" + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey));
+        v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord=" + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey));
     }
 
     /***
@@ -400,23 +362,18 @@ public class Common {
      * @param target      目标view
      * @param badgeNumber 数
      */
-    public static void buildBadgeView(Context context, View target,
-                                      int badgeNumber) {
+    public static void buildBadgeView(Context context, View target, int badgeNumber) {
         QBadgeView badgeView = (QBadgeView) target.getTag();
         if (null != badgeView) {
             badgeView.setBadgeNumber(badgeNumber);
             return;
         }
-        target.setTag(new QBadgeView(context).bindTarget(target)
-            .setGravityOffset(10, -2,
-                true)
-            .setBadgeNumber(badgeNumber)
-            .setBadgeTextSize(8, true)
-            .setShowShadow(false));
+        target.setTag(new QBadgeView(context).bindTarget(target).setGravityOffset(10, -2, true).setBadgeNumber(badgeNumber).setBadgeTextSize(8, true).setShowShadow(false));
     }
 
     /**
      * (x,y)是否在view的区域内
+     *
      * @param view
      * @param x
      * @param y
@@ -433,11 +390,12 @@ public class Common {
         int right = left + view.getMeasuredWidth();
         int bottom = top + view.getMeasuredHeight();
         //view.isClickable() &&
-        if (y >= top && y <= bottom && x >= left
-            && x <= right) {
+        if (y >= top && y <= bottom && x >= left && x <= right) {
             return true;
         }
         return false;
     }
+
+
 }
 

@@ -46,25 +46,25 @@ public class GroupVM extends SocialityVM {
     public MutableLiveData<Boolean> isGroupOwner = new MutableLiveData<>(true);
     //群所有成员
     public MutableLiveData<List<GroupMembersInfo>> groupMembers =
-            new MutableLiveData<>(new ArrayList<>());
+        new MutableLiveData<>(new ArrayList<>());
     //超级群成员分页加载
-    public MutableLiveData<List<ExGroupMemberInfo>> superGroupMembers =
-            new MutableLiveData<>(new ArrayList<>());
+    public State<List<ExGroupMemberInfo>> superGroupMembers =
+        new State<>(new ArrayList<>());
     //封装过的群成员 用于字母导航
     public MutableLiveData<List<ExGroupMemberInfo>> exGroupMembers =
-            new MutableLiveData<>(new ArrayList<>());
+        new MutableLiveData<>(new ArrayList<>());
     //群管理
     public MutableLiveData<List<ExGroupMemberInfo>> exGroupManagement =
-            new MutableLiveData<>(new ArrayList<>());
+        new MutableLiveData<>(new ArrayList<>());
     //群字母导航
     public MutableLiveData<List<String>> groupLetters = new MutableLiveData<>(new ArrayList<>());
     //封装过的好友信息 用于字母导航
     public String groupId;
     public MutableLiveData<List<FriendInfo>> selectedFriendInfo =
-            new MutableLiveData<>(new ArrayList<>());
+        new MutableLiveData<>(new ArrayList<>());
     public LoginCertificate loginCertificate;
 
-    public List<FriendInfo> selectedFriendInfoV3=new ArrayList<>();
+    public List<FriendInfo> selectedFriendInfoV3 = new ArrayList<>();
 
     public int page = 0;
     public int pageSize = 20;
@@ -117,20 +117,20 @@ public class GroupVM extends SocialityVM {
         groupInfo.setGroupName(groupName.getValue());
         groupInfo.setGroupType(GroupType.WORK);
         OpenIMClient.getInstance().groupManager.createGroup(memberUserIDs, null, groupInfo,
-                loginCertificate.userID, new OnBase<GroupInfo>() {
-            @Override
-            public void onError(int code, String error) {
-                waitDialog.dismiss();
-                getIView().onError(error);
-            }
+            loginCertificate.userID, new OnBase<GroupInfo>() {
+                @Override
+                public void onError(int code, String error) {
+                    waitDialog.dismiss();
+                    getIView().onError(error);
+                }
 
-            @Override
-            public void onSuccess(GroupInfo data) {
-                Easy.delete(MultipleChoiceVM.class);
-                getIView().onSuccess(data);
-                Common.UIHandler.postDelayed(waitDialog::dismiss, 200);
-            }
-        });
+                @Override
+                public void onSuccess(GroupInfo data) {
+                    Easy.delete(MultipleChoiceVM.class);
+                    getIView().onSuccess(data);
+                    Common.UIHandler.postDelayed(waitDialog::dismiss, 200);
+                }
+            });
     }
 
     public void selectMute(int status) {
@@ -185,17 +185,11 @@ public class GroupVM extends SocialityVM {
      * @param groupNickname 群内显示名称
      */
     public void setGroupMemberNickname(String gid, String uid, String groupNickname) {
-        OpenIMClient.getInstance().groupManager.setGroupMemberNickname(new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-
-            }
-
+        OpenIMClient.getInstance().groupManager.setGroupMemberNickname(new IMUtil.IMCallBack<String>() {
             @Override
             public void onSuccess(String data) {
                 getIView().onSuccess(data);
                 getGroupsInfo();
-
             }
         }, gid, uid, groupNickname);
     }
@@ -211,8 +205,8 @@ public class GroupVM extends SocialityVM {
             @Override
             public void onSuccess(List<GroupMembersInfo> data) {
                 if (data.isEmpty()) return;
-                superGroupMembers.getValue().addAll(getExGroupMemberInfos(data));
-                superGroupMembers.setValue(superGroupMembers.getValue());
+                superGroupMembers.val().addAll(getExGroupMemberInfos(data));
+                superGroupMembers.update();
             }
 
 
@@ -273,9 +267,11 @@ public class GroupVM extends SocialityVM {
             }
         }, groupId, ids);
     }
-    public void getGroupMemberList(){
-        getGroupMemberList(0);
+
+    public void getGroupMemberList() {
+        getGroupMemberList(pageSize);
     }
+
     /**
      * 获取群成员信息
      */
@@ -337,7 +333,7 @@ public class GroupVM extends SocialityVM {
                 });
                 exGroupMembers.setValue(exGroupMembers.getValue());
             }
-        }, groupId, 0, 0, pageSize);
+        }, groupId, 0, 0, count);
     }
 
     /**

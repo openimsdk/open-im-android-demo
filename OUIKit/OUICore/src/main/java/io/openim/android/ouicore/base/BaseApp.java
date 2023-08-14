@@ -2,6 +2,8 @@ package io.openim.android.ouicore.base;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.SparseArray;
 
@@ -16,6 +18,7 @@ import java.util.List;
 
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.LanguageUtil;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -91,5 +94,17 @@ public class BaseApp extends Application {
         return isAppBackground;
     }
 
+
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LanguageUtil.attachBaseContext(base));
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        LanguageUtil.attachBaseContext(this);
+    }
 
 }

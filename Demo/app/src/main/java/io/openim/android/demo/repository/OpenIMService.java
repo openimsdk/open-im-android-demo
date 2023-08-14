@@ -21,6 +21,8 @@ public interface OpenIMService {
     @POST("account/register")
     Observable<ResponseBody> register(@Body RequestBody requestBody);
 
+    @POST("account/password/change")
+    Observable<ResponseBody> changePassword(@Body RequestBody requestBody);
     @POST("user/find/full")
     Observable<ResponseBody> getUsersFullInfo(@Body RequestBody requestBody);
 
@@ -43,7 +45,7 @@ public interface OpenIMService {
             Base<T> base = GsonHel.dataObject(body, tClass);
             if (base.errCode == 0)
                 return null == base.data ? tClass.newInstance() : base.data;
-            throw new RXRetrofitException(base.errCode, base.errMsg);
+            throw new RXRetrofitException(base.errCode, base.errDlt);
         };
     }
 }

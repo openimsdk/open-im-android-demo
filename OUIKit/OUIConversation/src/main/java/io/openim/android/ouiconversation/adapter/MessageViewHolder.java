@@ -362,7 +362,7 @@ public class MessageViewHolder {
             } else notice.setVisibility(View.GONE);
         }
 
-        private void hContentView() {
+        public void hContentView() {
             View contentView;
             if (isOwn)
                 contentView = itemView.findViewById(R.id.content2);
@@ -769,7 +769,9 @@ public class MessageViewHolder {
                 Glide.with(img.getContext()).load(url).placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo).centerInside().into(img);
             } else {
                 url = message.getPictureElem().getSourcePicture().getUrl();
-                Common.loadPicture(img, message.getPictureElem());
+                IMUtil.loadPicture( message.getPictureElem())
+                    .centerInside()
+                    .into(img);
             }
             return url;
         }
@@ -922,6 +924,18 @@ public class MessageViewHolder {
         }
 
         @Override
+        public void hContentView() {
+            View contentView;
+            if (isOwn)
+                contentView = itemView.findViewById(R.id.videoPlay2);
+            else
+                contentView  = itemView.findViewById(R.id.contentGroup);
+            if (null == contentView) return;
+
+            showMsgExMenu(contentView);
+        }
+
+        @Override
         protected void bindRight(View itemView, Message message) {
             LayoutMsgImgRightBinding view = LayoutMsgImgRightBinding.bind(itemView);
             view.sendState2.setSendState(message.getStatus());
@@ -940,9 +954,12 @@ public class MessageViewHolder {
             String secondFormat = TimeUtil.getTime((int) videoElem.getDuration(),
                 TimeUtil.minuteTimeFormat);
             view.duration2.setText(secondFormat);
-            Common.loadVideoSnapshot(view.content2, videoElem);
+            IMUtil.loadVideoSnapshot(videoElem)
+                .centerInside()
+                .into(view.content2);
             preview(message, view.videoPlay2);
         }
+
 
         private void preview(Message message, View view) {
             String snapshotUrl = message.getVideoElem().getSnapshotUrl();
@@ -958,11 +975,13 @@ public class MessageViewHolder {
             LayoutMsgImgLeftBinding view = LayoutMsgImgLeftBinding.bind(itemView);
 
             view.sendState.setSendState(message.getStatus());
-            view.videoPlay.setVisibility(View.VISIBLE);
+            view.playBtn.setVisibility(View.VISIBLE);
             view.circleBar.setVisibility(View.VISIBLE);
 
-            Common.loadVideoSnapshot(view.content, message.getVideoElem());
-            preview(message, view.videoPlay);
+            IMUtil.loadVideoSnapshot( message.getVideoElem())
+                .centerInside()
+                .into(view.content);
+            preview(message, view.contentGroup);
         }
     }
 
@@ -1310,13 +1329,17 @@ public class MessageViewHolder {
                 v.picture1.setVisibility(View.VISIBLE);
                 if (contentType == MessageType.PICTURE) {
                     v.quoteContent1.setText(message.getSenderNickname() + ":");
-                    Common.loadPicture(v.picture1, message.getPictureElem());
+                    IMUtil.loadPicture( message.getPictureElem())
+                        .centerCrop()
+                        .into(v.picture1);
                     toPreview(v.quoteLy1, message.getPictureElem().getSourcePicture().getUrl(),
                         null);
                 }
                 if (contentType == MessageType.VIDEO) {
                     v.quoteContent1.setText(message.getSenderNickname() + ":");
-                    Common.loadVideoSnapshot(v.picture1, message.getVideoElem());
+                    IMUtil.loadVideoSnapshot(message.getVideoElem())
+                        .centerCrop()
+                        .into(v.picture1);
                     toPreview(v.quoteLy1, message.getVideoElem().getVideoUrl(),
                         message.getVideoElem().getSnapshotUrl());
                 }
@@ -1352,13 +1375,17 @@ public class MessageViewHolder {
                 v.picture2.setVisibility(View.VISIBLE);
                 if (contentType == MessageType.PICTURE) {
                     v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
-                    Common.loadPicture(v.picture2, message.getPictureElem());
+                    IMUtil.loadPicture(message.getPictureElem())
+                        .centerInside()
+                        .into(v.picture2);
                     toPreview(v.quoteLy2, message.getPictureElem().getSourcePicture().getUrl(),
                         null);
                 }
                 if (contentType == MessageType.VIDEO) {
                     v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
-                    Common.loadVideoSnapshot(v.picture2, message.getVideoElem());
+                    IMUtil.loadVideoSnapshot( message.getVideoElem())
+                        .centerInside()
+                        .into(v.picture2);
                     toPreview(v.quoteLy2, message.getVideoElem().getVideoUrl(),
                         message.getVideoElem().getSnapshotUrl());
                 }

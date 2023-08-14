@@ -286,7 +286,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                     continue;
                 }
                 if (null == msg)
-                    msg = OpenIMClient.getInstance().messageManager.createTextMessage("[" + getString(R.string.unsupported_type) + "]");
+                    msg = OpenIMClient.getInstance().messageManager.createTextMessage("[" + getString(io.openim.android.ouicore.R.string.unsupported_type) + "]");
                 vm.sendMsg(msg);
             }
         }

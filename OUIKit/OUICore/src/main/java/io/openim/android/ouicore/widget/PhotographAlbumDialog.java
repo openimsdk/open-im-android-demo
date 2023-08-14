@@ -77,8 +77,10 @@ public class PhotographAlbumDialog extends BaseDialog {
 
     public void initView() {
         initLauncher();
-        hasStorage = AndPermission.hasPermissions(getContext(), Permission.Group.STORAGE);
-        hasShoot = AndPermission.hasPermissions(getContext(), Permission.CAMERA);
+        Common.UIHandler.postDelayed(() -> {
+            hasStorage = AndPermission.hasPermissions(getContext(), Permission.Group.STORAGE);
+            hasShoot = AndPermission.hasPermissions(getContext(), Permission.CAMERA);
+        },200);
 
         Window win = this.getWindow();
         win.requestFeature(Window.FEATURE_NO_TITLE);

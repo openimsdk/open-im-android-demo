@@ -233,7 +233,7 @@ public class BottomInputCote {
             view.touchSay.setBackground(AppCompatResources.getDrawable(context,
                 io.openim.android.ouicore.R.drawable.sty_radius_4_white));
             view.touchSay.setTextColor(context.getResources().getColor(io.openim.android.ouicore.R.color.txt_black));
-            view.touchSay.setText(R.string.touch_say);
+            view.touchSay.setText(io.openim.android.ouicore.R.string.touch_say);
         }
     }
 
