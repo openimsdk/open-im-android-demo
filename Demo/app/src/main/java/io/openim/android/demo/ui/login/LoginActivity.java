@@ -73,11 +73,18 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
     void initView() {
         waitDialog = new WaitDialog(this);
         view.loginContent.setLoginVM(vm);
-        Locale locale = LanguageUtil.getCurrentLocale(this);
-        CountryCodePicker.Language language;
-        if (locale == Locale.CHINA) language = CountryCodePicker.Language.CHINESE_SIMPLIFIED;
-        else language = CountryCodePicker.Language.forCountryNameCode(locale.getLanguage());
+
+        CountryCodePicker.Language language = buildDefaultLanguage();
         view.loginContent.countryCode.changeDefaultLanguage(language);
+    }
+
+    public static CountryCodePicker.Language buildDefaultLanguage() {
+        Locale locale = LanguageUtil.getCurrentLocale(BaseApp.inst());
+        CountryCodePicker.Language language;
+        if (locale.getLanguage().equals(Locale.CHINA.getLanguage()))
+            language = CountryCodePicker.Language.CHINESE_SIMPLIFIED;
+        else language = CountryCodePicker.Language.forCountryNameCode(locale.getLanguage());
+        return language;
     }
 
     private void listener() {
