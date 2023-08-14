@@ -314,7 +314,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                         toast(getString(io.openim.android.ouicore.R.string.group_calling_tips2));
                         return;
                     }
-                    vm.signalingGetTokenByRoomID(vm.getRoomCallingInfoRoomID());
                 });
                 return;
             }
@@ -336,7 +335,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 return false;
             });
         });
-        view.join.setOnClickListener(v -> vm.signalingGetTokenByRoomID(vm.getRoomCallingInfoRoomID()));
         view.delete.setOnClickListener(v -> {
             List<Message> selectMsg = getSelectMsg();
             for (Message message : selectMsg) {

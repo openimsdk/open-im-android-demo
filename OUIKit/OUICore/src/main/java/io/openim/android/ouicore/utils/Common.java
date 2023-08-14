@@ -371,6 +371,7 @@ public class Common {
         target.setTag(new QBadgeView(context).bindTarget(target).setGravityOffset(10, -2, true).setBadgeNumber(badgeNumber).setBadgeTextSize(8, true).setShowShadow(false));
     }
 
+
     /**
      * (x,y)是否在view的区域内
      *

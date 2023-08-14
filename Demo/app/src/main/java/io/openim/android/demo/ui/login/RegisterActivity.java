@@ -57,11 +57,7 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
     }
 
     private void initView() {
-        Locale locale = LanguageUtil.getCurrentLocale(this);
-        CountryCodePicker.Language language;
-        if (locale == Locale.CHINA) language = CountryCodePicker.Language.CHINESE_SIMPLIFIED;
-        else language = CountryCodePicker.Language.forCountryNameCode(locale.getLanguage());
-        view.countryCode.changeDefaultLanguage(language);
+        view.countryCode.changeDefaultLanguage(LoginActivity.buildDefaultLanguage());
 
         view.tips.setText(vm.isPhone.getValue() ? getString(io.openim.android.ouicore.R.string.phone_register) : getString(io.openim.android.ouicore.R.string.mail_register));
         view.edt1.setHint(vm.isPhone.getValue() ? getString(io.openim.android.ouicore.R.string.input_phone) : getString(io.openim.android.ouicore.R.string.input_mail));
