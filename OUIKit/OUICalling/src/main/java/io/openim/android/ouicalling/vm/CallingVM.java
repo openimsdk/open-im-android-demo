@@ -165,27 +165,27 @@ public class CallingVM {
                             Participant participant = v.get(i);
                             if (participant instanceof RemoteParticipant) {
                                 for (TextureViewRenderer remoteSpeakerVideoView :
-                                        remoteSpeakerVideoViews) {
+                                    remoteSpeakerVideoViews) {
                                     callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoView,
-                                            participant, new Continuation<Unit>() {
-                                                @NonNull
-                                                @Override
-                                                public CoroutineContext getContext() {
-                                                    return EmptyCoroutineContext.INSTANCE;
-                                                }
+                                        participant, new Continuation<Unit>() {
+                                        @NonNull
+                                        @Override
+                                        public CoroutineContext getContext() {
+                                            return EmptyCoroutineContext.INSTANCE;
+                                        }
 
-                                                @Override
-                                                public void resumeWith(@NonNull Object o) {
-                                                L.e("");
-                                                }
-                                            });
+                                        @Override
+                                        public void resumeWith(@NonNull Object o) {
+                                            L.e("");
+                                        }
+                                    });
                                 }
                             }
                         }
                     }
 
                     return null;
-                },callViewModel.buildScope());
+                }, callViewModel.buildScope());
             }
         });
     }
@@ -217,6 +217,7 @@ public class CallingVM {
     }
 
     public void signalingHungUp(SignalingInfo signalingInfo) {
+        Common.UIHandler.postDelayed(this::dismissUI, 18 * 1000);
         if (!isStartCall) {
             signalingCancel(signalingInfo);
             return;
@@ -240,7 +241,8 @@ public class CallingVM {
 
                 @Override
                 public void onSuccess(SignalingCertificate data) {
-                    renewalDB(signalingInfo.getInvitation().getCustomData(), (realm, v) -> v.setFailedState(1));
+                    renewalDB(signalingInfo.getInvitation().getCustomData(),
+                        (realm, v) -> v.setFailedState(1));
                     dismissUI();
                 }
             }, signalingInfo);
@@ -302,11 +304,9 @@ public class CallingVM {
 
     public void renewalDB(String id, OnRenewalDBListener onRenewalDBListener) {
         BaseApp.inst().realm.executeTransactionAsync(realm -> {
-            CallHistory callHistory =
-                realm.where(CallHistory.class).equalTo("id",
-                    id).findFirst();
+            CallHistory callHistory = realm.where(CallHistory.class).equalTo("id", id).findFirst();
             if (null == callHistory) return;
-            onRenewalDBListener.onRenewal(realm,callHistory);
+            onRenewalDBListener.onRenewal(realm, callHistory);
         });
     }
 
