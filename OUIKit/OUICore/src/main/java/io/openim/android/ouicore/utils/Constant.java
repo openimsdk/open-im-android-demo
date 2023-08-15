@@ -24,6 +24,11 @@ public class Constant {
     private static final String IM_API = "http://" + DEFAULT_HOST + ":10002";
     private static final String IM_WS = "ws://" + DEFAULT_HOST + ":10001";
     //--------------------
+
+    public static boolean getIsIp() {
+        return SharedPreferencesUtil.get(BaseApp.inst()).getBoolean("IS_IP",true);
+    }
+
     public static String getHost() {
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("DEFAULT_IP");
         if (TextUtils.isEmpty(url)) return DEFAULT_HOST;
@@ -37,9 +42,6 @@ public class Constant {
         return url;
     }
 
-    private static boolean getIsIp() {
-        return SharedPreferencesUtil.get(BaseApp.inst()).getBoolean("IS_IP",true);
-    }
 
     public static String getAppAuthUrl() {
         boolean isIp = getIsIp();

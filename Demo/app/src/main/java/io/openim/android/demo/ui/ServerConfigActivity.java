@@ -28,7 +28,7 @@ import io.openim.android.ouicore.widget.WaitDialog;
 public class ServerConfigActivity extends BaseActivity<BaseViewModel, ActivityServerConfigBinding> {
 
     private final ServerConfigVM serverConfigVM = new ServerConfigVM();
-    private boolean isIP;
+    private boolean isIP = Constant.getIsIp();
     private boolean isFirst = true;
 
     @Override
