@@ -22,20 +22,20 @@ public class SharedPreferencesUtil {
         /***
          * 传入上下文获取SharedPreferences对象的实例 参数分别为存储的文件名和存储模式
          */
-        sharedPreference = context.getSharedPreferences("sharedPreference",
-                Activity.MODE_PRIVATE);
+        sharedPreference = context.getSharedPreferences("sharedPreference", Activity.MODE_PRIVATE);
         editor = sharedPreference.edit();// 获取接口对象的实例
     }
 
     /**
-     *  获得实例
+     * 获得实例
+     *
      * @param context
      * @return
      */
     public synchronized static SharedPreferencesUtil get(Context context) {
-            if (sharePrifaceUtil == null) {
-                sharePrifaceUtil = new SharedPreferencesUtil(context);
-            }
+        if (sharePrifaceUtil == null) {
+            sharePrifaceUtil = new SharedPreferencesUtil(context);
+        }
         return sharePrifaceUtil;
     }
 
@@ -70,6 +70,10 @@ public class SharedPreferencesUtil {
 
     public boolean getBoolean(String key) {
         return sharedPreference.getBoolean(key, false);
+    }
+
+    public boolean getBoolean(String key, boolean defValue) {
+        return sharedPreference.getBoolean(key, defValue);
     }
 
     public long getLong(String key) {
@@ -147,7 +151,8 @@ public class SharedPreferencesUtil {
                     sApplyMethod.invoke(editor);
                     return;
                 }
-            } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
+            } catch (IllegalArgumentException | InvocationTargetException |
+                     IllegalAccessException e) {
                 e.printStackTrace();
             }
             editor.commit();
