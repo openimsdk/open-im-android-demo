@@ -6,43 +6,52 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IM;
 
 public class Constant {
-//  public static final String DEFAULT_IP = "test-web.rentsoft.cn";//43
-//  public static final String DEFAULT_IP = "web.rentsoft.cn";//121
 
-//     public static final String DEFAULT_IP = "14.29.213.197";
-    public static final String DEFAULT_IP = "203.56.175.233";
-//    public static final String DEFAULT_IP = "43.154.157.177";
-
+//    public static final String DEFAULT_HOST = "test-web.rentsoft.cn";//43
+//    public static final String DEFAULT_HOST = "web.rentsoft.cn";//121
+    public static final String DEFAULT_HOST = "14.29.213.197";
+//    public static final String DEFAULT_HOST = "203.56.175.233";
 
     //登录注册手机验 证服务器地址
-    private static final String APP_AUTH_URL = "https://" + DEFAULT_IP + "/chat/";
+    private static final String APP_AUTH_URL = "https://" + DEFAULT_HOST + "/chat/";
     //IM sdk api地址
-    private static final String IM_API_URL = "https://" + DEFAULT_IP + "/api";
+    private static final String IM_API_URL = "https://" + DEFAULT_HOST + "/api";
     //web socket
-    private static final String IM_WS_URL = "wss://" + DEFAULT_IP + "/msg_gateway";
+    private static final String IM_WS_URL = "wss://" + DEFAULT_HOST + "/msg_gateway";
 
     //--------IP----------
-    private static final String APP_AUTH = "http://" + DEFAULT_IP + ":10008/";
-    private static final String IM_API = "http://" + DEFAULT_IP + ":10002";
-    private static final String IM_WS = "ws://" + DEFAULT_IP + ":10001";
-    private static final Boolean isIP = true;
+    private static final String APP_AUTH = "http://" + DEFAULT_HOST + ":10008/";
+    private static final String IM_API = "http://" + DEFAULT_HOST + ":10002";
+    private static final String IM_WS = "ws://" + DEFAULT_HOST + ":10001";
     //--------------------
-
-    public static String getImApiUrl() {
-        String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("IM_API_URL");
-        if (TextUtils.isEmpty(url)) return isIP ? IM_API : IM_API_URL;
+    public static String getHost() {
+        String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("DEFAULT_IP");
+        if (TextUtils.isEmpty(url)) return DEFAULT_HOST;
         return url;
     }
 
+    public static String getImApiUrl() {
+        boolean isIp = getIsIp();
+        String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("IM_API_URL");
+        if (TextUtils.isEmpty(url)) return isIp ? IM_API : IM_API_URL;
+        return url;
+    }
+
+    private static boolean getIsIp() {
+        return SharedPreferencesUtil.get(BaseApp.inst()).getBoolean("IS_IP",true);
+    }
+
     public static String getAppAuthUrl() {
+        boolean isIp = getIsIp();
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("APP_AUTH_URL");
-        if (TextUtils.isEmpty(url)) return isIP ? APP_AUTH : APP_AUTH_URL;
+        if (TextUtils.isEmpty(url)) return isIp ? APP_AUTH : APP_AUTH_URL;
         return url;
     }
 
     public static String getImWsUrl() {
+        boolean isIp = getIsIp();
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("IM_WS_URL");
-        if (TextUtils.isEmpty(url)) return isIP ? IM_WS : IM_WS_URL;
+        if (TextUtils.isEmpty(url)) return isIp ? IM_WS : IM_WS_URL;
         return url;
     }
 

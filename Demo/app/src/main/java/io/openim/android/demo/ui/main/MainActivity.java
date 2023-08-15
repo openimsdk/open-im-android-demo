@@ -1,6 +1,7 @@
 package io.openim.android.demo.ui.main;
 
 
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +17,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.fragment.app.FragmentTransaction;
 
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.hjq.window.EasyWindow;
@@ -42,8 +45,6 @@ import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouimeeting.MeetingHomeActivity;
-import q.rorbin.badgeview.QBadgeView;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
@@ -75,9 +76,15 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        ActivityManager.finishActivity(MeetingHomeActivity.class);
-        EasyWindow.cancelAll();
+        try {
+            Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
+            LogisticsCenter.completion(postcard);
+            ActivityManager.finishActivity(postcard.getDestination());
+            EasyWindow.cancelAll();
+        } catch (Exception ignore) {
+        }
     }
+
 
     private void init() {
         runOnUiThread(() -> {
@@ -107,6 +114,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
                 View.VISIBLE : View.GONE);
         });
     }
+
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
