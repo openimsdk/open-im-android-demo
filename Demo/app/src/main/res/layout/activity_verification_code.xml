@@ -19,25 +19,27 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="@drawable/splash_shape_gradient"
         android:orientation="vertical"
         tools:context=".ui.login.VerificationCodeActivity">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:paddingLeft="32dp"
             android:paddingRight="32dp">
 
             <ImageView
+                android:id="@+id/back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
                 android:layout_marginBottom="50dp"
                 android:onClick="back"
-                android:src="@mipmap/ic_back" />
+                android:padding="5dp"
+                android:src="@mipmap/ic_back2" />
 
             <TextView
                 android:id="@+id/tips"
@@ -111,8 +113,21 @@
                     android:textColor="#ff333333"
                     android:textSize="12sp" />
             </LinearLayout>
+
+
         </LinearLayout>
 
+        <Button
+            android:id="@+id/submit"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginBottom="120dp"
+            android:enabled="false"
+            android:text="@string/next"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 </layout>

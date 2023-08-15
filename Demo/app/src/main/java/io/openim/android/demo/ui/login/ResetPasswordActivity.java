@@ -14,6 +14,8 @@ import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityResetPasswordBinding;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.utils.RegexValid;
 
 public class ResetPasswordActivity extends BaseActivity<LoginVM, ActivityResetPasswordBinding> implements LoginVM.ViewAction {
 
@@ -26,8 +28,9 @@ public class ResetPasswordActivity extends BaseActivity<LoginVM, ActivityResetPa
         listener();
     }
 
+
     private void listener() {
-        view.edt2.addTextChangedListener(new TextWatcher() {
+        TextWatcher textWatcher=   new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -35,38 +38,37 @@ public class ResetPasswordActivity extends BaseActivity<LoginVM, ActivityResetPa
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                submitEnabled();
+
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                submitEnabled();
             }
-        });
+        };
+        view.edt2.addTextChangedListener(textWatcher);
+        view.edt3.addTextChangedListener(textWatcher);
+
         view.eyes.setOnCheckedChangeListener((buttonView, isChecked) ->
             view.edt2.setTransformationMethod(isChecked ? HideReturnsTransformationMethod.getInstance() : PasswordTransformationMethod.getInstance()));
+        view.eyes2.setOnCheckedChangeListener((buttonView, isChecked) ->
+            view.edt3.setTransformationMethod(isChecked ? HideReturnsTransformationMethod.getInstance() : PasswordTransformationMethod.getInstance()));
+
     }
 
     private void submitEnabled() {
         String password = view.edt2.getText().toString();
-        view.submit.setEnabled(!password.isEmpty());
+        String surePassword = view.edt3.getText().toString();
+        view.submit.setEnabled(!password.isEmpty() && password.equals(surePassword));
 
         view.submit.setOnClickListener(v -> {
-            if (password.length() < 6 || password.length() > 20) {
-                toast(getString(io.openim.android.ouicore.R.string.login_tips3));
+            if (!RegexValid.isValidPassword(password)) {
+                toast(BaseApp.inst().getString(
+                    io.openim.android.ouicore.R.string.password_valid_tips));
                 return;
             }
             vm.resetPassword(password);
         });
-    }
-
-    // 禁止返回
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
     }
 
     @Override

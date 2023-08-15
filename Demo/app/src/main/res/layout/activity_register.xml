@@ -106,7 +106,7 @@
             android:layout_height="60dp"
             android:layout_marginLeft="32dp"
             android:layout_marginRight="32dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="80dp"
             android:enabled="false"
             android:text="@string/next"
             android:textSize="18sp"

@@ -485,5 +485,8 @@
     <string name="password_valid_tips2">Confirm password does not match the new password</string>
     <string name="do_not_account">Don\'t have an account yet?</string>
     <string name="next">下一步</string>
+    <string name="setting_info">设置信息</string>
+    <string name="input_nick_name">Please enter your nickname</string>
+    <string name="sure_password_tips">请再次确认您的密码</string>
 
 </resources>
