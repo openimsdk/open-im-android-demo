@@ -72,7 +72,7 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
 
     private void submitEnabled() {
         id = view.edt1.getText().toString();
-        view.submit.setEnabled(!id.isEmpty() && view.protocol.isChecked());
+        view.submit.setEnabled(!id.isEmpty());
     }
 
     public void back(View view) {

@@ -87,7 +87,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="查找聊天记录"
+                android:text="@string/view_chat_history"
                 android:textColor="#ff333333"
                 android:textSize="16sp" />
 
