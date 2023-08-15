@@ -85,9 +85,9 @@ public class ServerConfigActivity extends BaseActivity<BaseViewModel, ActivitySe
                 return;
             }
             if (isIP) {
-                setAddress("http://" + s + ":10002",
-                    "http://" + s + ":10008/",
-                    "ws://" + s + ":10001");
+                setAddress("http://" + s + ":50002",
+                    "http://" + s + ":50008/",
+                    "ws://" + s + ":50001");
             } else {
                 setAddress(
                     "https://" + s + "/api",
