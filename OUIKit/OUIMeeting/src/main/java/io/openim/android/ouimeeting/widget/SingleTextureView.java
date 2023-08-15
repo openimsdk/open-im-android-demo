@@ -105,11 +105,13 @@ public class SingleTextureView extends FrameLayout {
     }
 
     private void handleCenter(Participant data) {
-        view.textureView.setVisibility(data.isCameraEnabled() ? View.VISIBLE : View.GONE);
-        view.avatar.setVisibility(data.isCameraEnabled() ? View.GONE : View.VISIBLE);
+        boolean textureViewUse = data.isCameraEnabled() || data.isScreenShareEnabled();
+        view.textureView.setVisibility(textureViewUse ? View.VISIBLE : View.GONE);
+        view.avatar.setVisibility(textureViewUse ? View.GONE : View.VISIBLE);
         ParticipantMeta meta = GsonHel.fromJson(data.getMetadata(), ParticipantMeta.class);
         L.e(TAG,
-            "------name-----" + vm.getMetaUserName(meta) + "----isCameraEnabled----" + data.isCameraEnabled());
+            "------name-----" + vm.getMetaUserName(meta) + "----isCameraEnabled----"
+                + data.isCameraEnabled());
         if (null != meta)
             view.avatar.load(meta.userInfo.getFaceURL(), vm.getMetaUserName(meta));
     }

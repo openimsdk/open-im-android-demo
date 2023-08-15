@@ -6,7 +6,6 @@ import android.media.AudioManager;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,11 +51,11 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     //预约上传的参数
     public static class TimingParameter {
-        public MutableLiveData<String> meetingTheme = new MutableLiveData<>("");
-        public MutableLiveData<Long> startTime = new MutableLiveData(0L);
-        public MutableLiveData<String> startTimeStr = new MutableLiveData<>("");
-        public MutableLiveData<Integer> duration = new MutableLiveData(0);
-        public MutableLiveData<String> durationStr = new MutableLiveData("");
+        public State<String> meetingTheme = new State<>("");
+        public State<Long> startTime = new State(0L);
+        public State<String> startTimeStr = new State<>("");
+        public State<Integer> duration = new State(0);
+        public State<String> durationStr = new State("");
     }
 
     public TimingParameter timingParameter = new TimingParameter();
@@ -71,30 +70,30 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     //通话时间
     private Timer timer;
     public int second = 0;
-    public MutableLiveData<String> timeStr = new MutableLiveData<>("");
+    public State<String> timeStr = new State<>("");
 
     private List<TextureViewRenderer> textureViews;
 
     //是否听筒模式
-    public MutableLiveData<Boolean> isReceiver = new MutableLiveData<>(false);
+    public State<Boolean> isReceiver = new State<>(false);
 
     public SignalingCertificate signalingCertificate;
     public CallViewModel callViewModel;
     public State<RoomMetadata> roomMetadata = new State<>();
     //在列表点击item选择的会议信息实体
     public MeetingInfo selectMeetingInfo;
-    public MutableLiveData<List<MeetingInfo>> meetingInfoList = new MutableLiveData<>();
+    public State<List<MeetingInfo>> meetingInfoList = new State<>();
     //发起人信息
     public List<UserInfo> userInfos = new ArrayList<>();
     //都看他
     public State<String> allWatchedUserId = new State<>("");
 
     //下边菜单栏可点击权限
-    public MutableLiveData<Boolean> micPermission = new MutableLiveData<>(false);
-    public MutableLiveData<Boolean> cameraPermission = new MutableLiveData<>(false);
-    public MutableLiveData<Boolean> sharePermission = new MutableLiveData<>(false);
-    public MutableLiveData<Boolean> memberPermission = new MutableLiveData<>(false);
-    public MutableLiveData<Boolean> isSelfHostUser = new MutableLiveData<>(false);
+    public State<Boolean> micPermission = new State<>(false);
+    public State<Boolean> cameraPermission = new State<>(false);
+    public State<Boolean> sharePermission = new State<>(false);
+    public State<Boolean> memberPermission = new State<>(false);
+    public State<Boolean> isSelfHostUser = new State<>(false);
 
     public void buildTimer() {
         cancelTimer();

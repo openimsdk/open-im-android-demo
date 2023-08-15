@@ -493,4 +493,5 @@
     <string name="next">下一步</string>
     <string name="setting_info">设置信息</string>
     <string name="sure_password_tips">请再次确认您的密码</string>
+    <string name="host_exit_tips">主持人已结束会议，是否离开？</string>
 </resources>

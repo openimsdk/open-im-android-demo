@@ -488,5 +488,6 @@
     <string name="setting_info">设置信息</string>
     <string name="input_nick_name">Please enter your nickname</string>
     <string name="sure_password_tips">请再次确认您的密码</string>
+    <string name="host_exit_tips">主持人已离开，是否退出会议？</string>
 
 </resources>
