@@ -81,7 +81,8 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
             LogisticsCenter.completion(postcard);
             ActivityManager.finishActivity(postcard.getDestination());
             EasyWindow.cancelAll();
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
     }
 
 

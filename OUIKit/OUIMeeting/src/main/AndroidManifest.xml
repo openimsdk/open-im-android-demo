@@ -20,9 +20,10 @@
         </activity>
         <activity
             android:name=".MeetingHomeActivity"
+            android:exported="true"
             android:launchMode="singleInstance"
-            android:theme="@style/NotAnimation"
-            android:exported="false" />
+            android:taskAffinity=".meeting_task"
+            android:theme="@style/NotAnimation" />
         <activity
             android:name=".MeetingLaunchActivity"
             android:exported="false" />

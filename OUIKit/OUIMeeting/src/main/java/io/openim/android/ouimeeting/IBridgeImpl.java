@@ -59,8 +59,7 @@ public class IBridgeImpl implements IMeetingBridge, MeetingVM.Interaction {
     @Override
     public void onSuccess(Object body) {
         waitDialog.dismiss();
-        context.startActivity(new Intent(context, MeetingHomeActivity.class)
-            .addFlags(FLAG_ACTIVITY_NEW_TASK));
+        context.startActivity(new Intent(context, MeetingHomeActivity.class));
         if (context instanceof Activity){
             ((Activity)context).overridePendingTransition(0, 0);
         }

@@ -109,7 +109,7 @@
         </activity>
         <activity
             android:name=".ui.main.MainActivity"
-            android:launchMode="singleTask"
+            android:theme="@style/NotAnimation"
             android:windowSoftInputMode="adjustResize" />
 
         <provider

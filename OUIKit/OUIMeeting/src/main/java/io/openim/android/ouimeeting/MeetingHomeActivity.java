@@ -55,6 +55,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
 import io.openim.android.ouicore.entity.ParticipantMeta;
+import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
@@ -81,6 +82,7 @@ import io.openim.android.ouimeeting.vm.MeetingVM;
 import io.openim.android.ouimeeting.widget.SingleTextureView;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.listener.OnConnListener;
 import io.openim.android.sdk.models.UserInfo;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
@@ -242,15 +244,15 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             view.horn.setImageResource(aBoolean ? R.mipmap.ic_m_horn : R.mipmap.ic_m_receiver);
         });
         view.zoomOut.setOnClickListener(v -> {
-            android.app.ActivityManager manager =
-                (android.app.ActivityManager) BaseApp.inst().getSystemService(ACTIVITY_SERVICE);
 
+
+//            moveTaskToBack(true);
+//            showFloatView();
             Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
             LogisticsCenter.completion(postcard);
             Activity activity = ActivityManager.isExist(postcard.getDestination());
             if (null != activity) {
-                manager.moveTaskToFront(activity.getTaskId(),
-                    android.app.ActivityManager.MOVE_TASK_NO_USER_ACTION);
+                moveTaskToFront(activity.getTaskId());
                 showFloatView();
             }
         });
@@ -266,24 +268,35 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         });
     }
 
+    private static void moveTaskToFront(int taskId) {
+        android.app.ActivityManager manager =
+            (android.app.ActivityManager) BaseApp.inst().getSystemService(ACTIVITY_SERVICE);
+        manager.moveTaskToFront(taskId,
+            android.app.ActivityManager.MOVE_TASK_WITH_HOME);
+        L.e("---moveTaskToFront----="+ taskId);
+    }
+
+
     private void showFloatView() {
         // 传入 Activity 对象表示设置成局部的，不需要有悬浮窗权限
         // 传入 Application 对象表示设置成全局的，但需要有悬浮窗权限
         ViewMeetingFloatBinding floatView = ViewMeetingFloatBinding.inflate(getLayoutInflater());
         if (null == easyWindow) {
             easyWindow =
-                new EasyWindow<>(getApplication()).setContentView(floatView.getRoot()).setWidth(Common.dp2px(107)).setHeight(Common.dp2px(160)).setGravity(Gravity.RIGHT | Gravity.TOP)
+                new EasyWindow<>(BaseApp.inst())
+                    .setContentView(floatView.getRoot())
+                    .setWidth(Common.dp2px(107))
+                    .setHeight(Common.dp2px(160))
+                    .setGravity(Gravity.RIGHT | Gravity.TOP)
                     // 设置成可拖拽的
-                    .setDraggable().setOnClickListener(floatView.getRoot().getId(), (window,
+                    .setDraggable()
+                    .setOnClickListener(floatView.getRoot().getId(), (window,
                                                                                      view) -> {
                         Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
                         LogisticsCenter.completion(postcard);
                         Activity activity = ActivityManager.isExist(postcard.getDestination());
                         if (null != activity) {
-                            android.app.ActivityManager manager =
-                                (android.app.ActivityManager) BaseApp.inst().getSystemService(ACTIVITY_SERVICE);
-                            manager.moveTaskToFront(activity.getTaskId(),
-                                android.app.ActivityManager.MOVE_TASK_NO_USER_ACTION);
+                            moveTaskToFront(activity.getTaskId());
                             easyWindow.cancel();
                         }
                     });
@@ -713,6 +726,32 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             }
             return null;
         });
+        IMEvent.getInstance().addConnListener(new OnConnListener() {
+            @Override
+            public void onConnectFailed(long code, String error) {
+
+            }
+
+            @Override
+            public void onConnectSuccess() {
+
+            }
+
+            @Override
+            public void onConnecting() {
+
+            }
+
+            @Override
+            public void onKickedOffline() {
+                finish();
+            }
+
+            @Override
+            public void onUserTokenExpired() {
+
+            }
+        });
     }
 
     private void showHostExitDialog() {
@@ -771,16 +810,17 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
     @Override
     protected void onPause() {
-        overridePendingTransition(0, 0);
         super.onPause();
         release();
 
-        if (!isFinishing() && !isShareScreen) showFloatView();
+        if (!isFinishing()
+            && !isShareScreen) showFloatView();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        overridePendingTransition(0, 0);
         release();
     }
 
