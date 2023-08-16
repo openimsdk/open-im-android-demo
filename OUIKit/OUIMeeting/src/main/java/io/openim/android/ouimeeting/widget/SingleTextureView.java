@@ -128,6 +128,7 @@ public class SingleTextureView extends FrameLayout {
 
     private void bindConnectionQuality(LayoutUserStatusBinding holder, ConnectionQuality quality) {
         switch (quality) {
+            case UNKNOWN:
             case EXCELLENT:
                 holder.net.setImageResource(io.openim.android.ouicore.R.mipmap.ic_net_excellent);
                 break;

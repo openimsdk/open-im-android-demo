@@ -40,6 +40,7 @@ import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
+import io.openim.android.sdk.models.SignalingInvitationInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 
@@ -234,11 +235,10 @@ public class CallDialog extends BaseDialog {
         view.hangUp.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(),
+                callingVM.renewalDB(callingVM.buildPrimaryKey(signalingInfo),
                     (realm, callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
 
                 callingVM.signalingHungUp(signalingInfo);
-                Common.UIHandler.postDelayed(() -> dismiss(), 18 * 1000);
             }
         });
         view.reject.setOnClickListener(new OnDedrepClickListener() {
@@ -260,7 +260,7 @@ public class CallDialog extends BaseDialog {
                     public void onSuccess(Object data) {
                         changeView();
 
-                        callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(), (realm
+                        callingVM.renewalDB(callingVM.buildPrimaryKey(signalingInfo), (realm
                             , v) -> v.setSuccess(true));
                     }
                 });
@@ -324,12 +324,12 @@ public class CallDialog extends BaseDialog {
     @Override
     public void dismiss() {
         try {
+            insertChatHistory();
             MediaPlayerUtil.INSTANCE.pause();
             MediaPlayerUtil.INSTANCE.release();
             callingVM.audioManager.setSpeakerphoneOn(true);
             callingVM.timeStr.removeObserver(bindTime);
             callingVM.unBindView();
-            insertChatHistory();
             super.dismiss();
             ((CallingServiceImp) callingVM.callingService).callDialog = null;
         } catch (Exception e) {
@@ -343,9 +343,9 @@ public class CallDialog extends BaseDialog {
         if (!isShowing()
             || isGroup
             || (null != signalingInfo
-            && TextUtils.isEmpty(signalingInfo.getInvitation().getCustomData())))
+            && TextUtils.isEmpty(callingVM.buildPrimaryKey(signalingInfo))))
             return;
-        String id = signalingInfo.getInvitation().getCustomData();
+        String id = callingVM.buildPrimaryKey(signalingInfo);
         String senderID = isGroup ? BaseApp.inst().loginCertificate.userID :
             signalingInfo.getInvitation().getInviterUserID();
         String receiver = signalingInfo.getInvitation().getInviteeUserIDList().get(0);
@@ -370,6 +370,7 @@ public class CallDialog extends BaseDialog {
         });
     }
 
+
     public void otherSideAccepted() {
         callingVM.isStartCall = true;
         callingVM.buildTimer();
@@ -378,4 +379,7 @@ public class CallDialog extends BaseDialog {
         MediaPlayerUtil.INSTANCE.release();
     }
 
+    public String buildPrimaryKey() {
+        return callingVM.buildPrimaryKey(signalingInfo);
+    }
 }

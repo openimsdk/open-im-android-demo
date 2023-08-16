@@ -140,7 +140,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="90dp"
                 android:paddingBottom="10dp"
-                android:text="预约会议"
+                android:text="@string/timing_meeting"
                 android:textColor="#ffffffff"
                 android:textSize="18sp" />
         </LinearLayout>

@@ -244,10 +244,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             view.horn.setImageResource(aBoolean ? R.mipmap.ic_m_horn : R.mipmap.ic_m_receiver);
         });
         view.zoomOut.setOnClickListener(v -> {
-
-
-//            moveTaskToBack(true);
-//            showFloatView();
             Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
             LogisticsCenter.completion(postcard);
             Activity activity = ActivityManager.isExist(postcard.getDestination());
@@ -820,7 +816,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        overridePendingTransition(0, 0);
         release();
     }
 
@@ -835,6 +830,17 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                 easyWindow = null;
             }
         }
+    }
+
+    @Override
+    public void finish() {
+        Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
+        LogisticsCenter.completion(postcard);
+        Activity activity = ActivityManager.isExist(postcard.getDestination());
+        if (null != activity) {
+            moveTaskToFront(activity.getTaskId());
+        }
+        super.finish();
     }
 
     private static class PageAdapter extends PagerAdapter {

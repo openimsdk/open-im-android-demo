@@ -125,7 +125,7 @@ public class MeetingDetailActivity extends BaseActivity<MeetingVM, ActivityMeeti
         view.startTime2.setText(startTime2);
 
         boolean isStart =
-            vm.selectMeetingInfo.getCreateTime() < (System.currentTimeMillis() / 1000L);
+            vm.selectMeetingInfo.getStartTime() < (System.currentTimeMillis() / 1000L);
         view.status.setText(getString(isStart ? io.openim.android.ouicore.R.string.have_begun :
             io.openim.android.ouicore.R.string.not_started));
         view.status.setBackgroundResource(isStart ?

@@ -28,6 +28,7 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.SignalingCertificate;
 import io.openim.android.sdk.models.SignalingInfo;
+import io.openim.android.sdk.models.SignalingInvitationInfo;
 import io.realm.Realm;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
@@ -96,7 +97,7 @@ public class CallingVM {
         isVideoCalls = videoCalls;
     }
 
-    private OnBase<SignalingCertificate> callBackDismissUI = new OnBase<SignalingCertificate>() {
+    private OnBase<String> callBackDismissUI = new OnBase<String>() {
         @Override
         public void onError(int code, String error) {
             L.e(CallingServiceImp.TAG, error + "-" + code);
@@ -104,7 +105,7 @@ public class CallingVM {
         }
 
         @Override
-        public void onSuccess(SignalingCertificate data) {
+        public void onSuccess(String data) {
             dismissUI();
         }
     };
@@ -168,17 +169,17 @@ public class CallingVM {
                                     remoteSpeakerVideoViews) {
                                     callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoView,
                                         participant, new Continuation<Unit>() {
-                                        @NonNull
-                                        @Override
-                                        public CoroutineContext getContext() {
-                                            return EmptyCoroutineContext.INSTANCE;
-                                        }
+                                            @NonNull
+                                            @Override
+                                            public CoroutineContext getContext() {
+                                                return EmptyCoroutineContext.INSTANCE;
+                                            }
 
-                                        @Override
-                                        public void resumeWith(@NonNull Object o) {
-                                            L.e("");
-                                        }
-                                    });
+                                            @Override
+                                            public void resumeWith(@NonNull Object o) {
+                                                L.e("");
+                                            }
+                                        });
                                 }
                             }
                         }
@@ -231,24 +232,19 @@ public class CallingVM {
     }
 
     private void signalingCancel(SignalingInfo signalingInfo) {
-        if (isCallOut)
-            OpenIMClient.getInstance().signalingManager.signalingCancel(new OnBase<SignalingCertificate>() {
-                @Override
-                public void onError(int code, String error) {
-                    L.e(CallingServiceImp.TAG, error + "-" + code);
-                    dismissUI();
-                }
-
-                @Override
-                public void onSuccess(SignalingCertificate data) {
-                    renewalDB(signalingInfo.getInvitation().getCustomData(),
-                        (realm, v) -> v.setFailedState(1));
-                    dismissUI();
-                }
-            }, signalingInfo);
-        else
+        if (isCallOut) {
+            renewalDB(buildPrimaryKey(signalingInfo), (realm, v) -> v.setFailedState(1));
+            OpenIMClient.getInstance().signalingManager.signalingCancel(callBackDismissUI,
+                signalingInfo);
+        } else {
+            renewalDB(buildPrimaryKey(signalingInfo), (realm, v) -> v.setFailedState(3));
             OpenIMClient.getInstance().signalingManager.signalingReject(callBackDismissUI,
                 signalingInfo);
+        }
+    }
+
+    public String buildPrimaryKey(SignalingInfo signalingInfo) {
+        return signalingInfo.getInvitation().getRoomID() + signalingInfo.getInvitation().getInitiateTime();
     }
 
     public void signalingAccept(SignalingInfo signalingInfo, OnBase onBase) {
@@ -277,7 +273,10 @@ public class CallingVM {
             callViewModel.onCleared();
             cancelTimer();
             if (null != localVideoTrack) {
-                localVideoTrack.stop();
+                try {
+                    localVideoTrack.stop();
+                } catch (Exception ignore) {
+                }
                 if (null != localSpeakerVideoViews) {
                     for (TextureViewRenderer localSpeakerVideoView : localSpeakerVideoViews) {
                         localVideoTrack.removeRenderer(localSpeakerVideoView);
@@ -309,6 +308,7 @@ public class CallingVM {
             onRenewalDBListener.onRenewal(realm, callHistory);
         });
     }
+
 
     public interface OnRenewalDBListener {
         void onRenewal(Realm realm, CallHistory callHistory);

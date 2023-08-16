@@ -162,7 +162,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     public void fastMeeting() {
         String name =
             String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.meeting_initiator), BaseApp.inst().loginCertificate.nickname);
-        long startTime = System.currentTimeMillis() / 1000;
+        long startTime = System.currentTimeMillis() ;
         createMeeting(name, startTime, 2 * 60 * 60);
     }
 

@@ -22,8 +22,7 @@
             android:name=".MeetingHomeActivity"
             android:exported="true"
             android:launchMode="singleInstance"
-            android:taskAffinity=".meeting_task"
-            android:theme="@style/NotAnimation" />
+            android:taskAffinity=".meeting_task" />
         <activity
             android:name=".MeetingLaunchActivity"
             android:exported="false" />

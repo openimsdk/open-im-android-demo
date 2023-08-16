@@ -41,9 +41,6 @@ public class CallingServiceImp implements CallingService {
     private SignalingInfo signalingInfo;
 
     public void setSignalingInfo(SignalingInfo signalingInfo) {
-        if (TextUtils.isEmpty(signalingInfo.getInvitation().getCustomData())) {
-            signalingInfo.getInvitation().setCustomData(String.valueOf(UUID.randomUUID()));
-        }
         this.signalingInfo = signalingInfo;
     }
 
@@ -82,7 +79,7 @@ public class CallingServiceImp implements CallingService {
     public void onInvitationCancelled(SignalingInfo s) {
         L.e(TAG, "----onInvitationCancelled-----");
         if (null == callDialog) return;
-        callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(),
+        callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(),
             (realm, callHistory) -> callHistory.setFailedState(1));
         callDialog.dismiss();
     }
@@ -97,7 +94,7 @@ public class CallingServiceImp implements CallingService {
         L.e(TAG, "----onInviteeAccepted-----");
         if (null == callDialog) return;
         callDialog.otherSideAccepted();
-        callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(),
+        callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(),
             (realm, callHistory) -> callHistory.setSuccess(true));
     }
 
@@ -110,7 +107,7 @@ public class CallingServiceImp implements CallingService {
     public void onInviteeRejected(SignalingInfo signalingInfo) {
         L.e(TAG, "----onInviteeRejected-----");
         if (null == callDialog) return;
-        callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(), (realm,
+        callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(), (realm,
                                                                                        callHistory) -> {
             callHistory.setSuccess(false);
             callHistory.setFailedState(2);
@@ -152,8 +149,7 @@ public class CallingServiceImp implements CallingService {
                 }
             }
             insetDB();
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
         return callDialog;
     }
 
@@ -162,6 +158,7 @@ public class CallingServiceImp implements CallingService {
         if (isCalling()) return;
         setSignalingInfo(signalingInfo);
         buildCallDialog(null, true);
+
         callDialog.show();
     }
 
@@ -188,7 +185,7 @@ public class CallingServiceImp implements CallingService {
     public void onHangup(SignalingInfo signalingInfo) {
         L.e(TAG, "----onHangup-----");
         if (null == callDialog || callDialog.callingVM.isGroup) return;
-        callDialog.callingVM.renewalDB(signalingInfo.getInvitation().getCustomData(),
+        callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(),
             (realm, callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
         callDialog.dismiss();
     }
@@ -239,7 +236,7 @@ public class CallingServiceImp implements CallingService {
 
                 BaseApp.inst().realm.executeTransactionAsync(realm -> {
                     CallHistory callHistory =
-                        new CallHistory(signalingInfo.getInvitation().getCustomData(),
+                        new CallHistory(callDialog.buildPrimaryKey(),
                             userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(),
                             signalingInfo.getInvitation().getMediaType(), false, 0, isCallOut,
                             System.currentTimeMillis(), 0);

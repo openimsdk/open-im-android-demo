@@ -124,7 +124,7 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
                         name = vm.userInfos.get(position).getNickname();
                     } else name = vm.userInfos.get(vm.userInfos.size() - 1).getNickname();
 
-                    holder.view.description.setText(TimeUtil.getTime(data.getCreateTime() * 1000,
+                    holder.view.description.setText(TimeUtil.getTime(data.getStartTime() * 1000,
                         TimeUtil.yearMonthDayFormat) + "\t\t\t" + TimeUtil.getTime(data.getStartTime() * 1000, TimeUtil.hourTimeFormat) + "-"
                         + TimeUtil.getTime(data.getEndTime() * 1000, TimeUtil.hourTimeFormat) +
                         "\t\t\t"

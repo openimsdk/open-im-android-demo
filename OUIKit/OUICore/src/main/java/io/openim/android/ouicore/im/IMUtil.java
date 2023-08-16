@@ -723,7 +723,7 @@ public class IMUtil {
         signalingInvitationInfo.setInviteeUserIDList(inviteeUserIDs);
         signalingInvitationInfo.setRoomID(groupID);
         signalingInvitationInfo.setTimeout(30);
-        signalingInvitationInfo.setCustomData(String.valueOf(UUID.randomUUID()));
+        signalingInvitationInfo.setInitiateTime(System.currentTimeMillis());
 
         signalingInvitationInfo.setMediaType(isVideoCalls ? Constant.MediaType.VIDEO :
             Constant.MediaType.AUDIO);
