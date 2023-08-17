@@ -51,7 +51,7 @@ public class CallingServiceImp implements CallingService {
 
     @Override
     public void stopAudioVideoService(Context base) {
-        Alive.finishService(base);
+//        Alive.finishService(base);
     }
 
     @Override

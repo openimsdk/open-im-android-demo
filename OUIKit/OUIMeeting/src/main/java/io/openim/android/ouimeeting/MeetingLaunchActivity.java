@@ -88,8 +88,8 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
         vm.second = 0;
         //这里有可能被释放 所以需要重新放入
         BaseApp.inst().putVM(vm);
-        meetingHomeActivityCallBack.launch(new Intent(getApplication(),
-            MeetingHomeActivity.class));
+        meetingHomeActivityCallBack.launch(new Intent(this,
+            MeetingHomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     private ActivityResultLauncher<Intent> meetingHomeActivityCallBack =
@@ -110,7 +110,7 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
                                    int position) {
                 try {
                     holder.view.title.setText(data.getMeetingName());
-                    boolean isStart = data.getCreateTime() < (System.currentTimeMillis() / 1000L);
+                    boolean isStart = data.getStartTime() <= (System.currentTimeMillis() / 1000L);
                     holder.view.status.setText(getString(isStart ?
                         io.openim.android.ouicore.R.string.have_begun :
                         io.openim.android.ouicore.R.string.not_started));

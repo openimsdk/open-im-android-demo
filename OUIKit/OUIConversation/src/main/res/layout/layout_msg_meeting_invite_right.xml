@@ -75,7 +75,6 @@
                         android:id="@+id/meetingName2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="顾萌萌发起的快速会议"
                         android:textColor="#ff0c1c33"
                         android:textSize="17sp" />
                 </LinearLayout>

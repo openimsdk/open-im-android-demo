@@ -3,6 +3,7 @@ package io.openim.android.ouicore.utils;
 import android.app.Activity;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
@@ -43,6 +44,7 @@ public class ActivityManager {
         }
     }
 
+
     /**
      * 除传入的外 结束所有Activity
      */
@@ -61,7 +63,8 @@ public class ActivityManager {
             }
         }
         activityStack.clear();
-        if (!excepts.isEmpty()) activityStack.addAll(excepts);
+        if (!excepts.isEmpty())
+            activityStack.addAll(excepts);
     }
 
     /**
@@ -72,13 +75,13 @@ public class ActivityManager {
      */
     public static Activity isExist(Class<?> cls) {
         for (Activity activity : activityStack) {
-            if (activity.getClass().equals(cls)
-                && !activity.isFinishing()) {
+            if (activity.getClass().equals(cls) && !activity.isFinishing()) {
                 return activity;
             }
         }
         return null;
     }
+
     public static Stack<Activity> getActivityStack() {
         return activityStack;
     }

@@ -63,7 +63,7 @@ public class TimingMeetingActivity extends BaseActivity<MeetingVM, ActivityTimin
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        vm=Easy.find(MeetingVM.class);
+        vm = Easy.find(MeetingVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityTimingMeetingBinding.inflate(getLayoutInflater()));
         isUpdateInfo = getIntent().getBooleanExtra(Constant.K_RESULT, false);
@@ -121,10 +121,15 @@ public class TimingMeetingActivity extends BaseActivity<MeetingVM, ActivityTimin
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.MONTH, 5);
             TimePickerView pvTime = new TimePickerBuilder(this, (date, v1) -> {
+                if (date.getTime() < System.currentTimeMillis()) {
+                    toast(getString(io.openim.android.ouicore.R.string.timing_meeting_tips));
+                    return;
+                }
                 long time = date.getTime() / 1000;
                 vm.timingParameter.startTime.setValue(time);
 
-            }).setType(new boolean[]{true, true, true, true, true, false}).setRangDate(Calendar.getInstance(), calendar).build();
+            }).setType(new boolean[]{true, true, true, true, true, false})
+                .setRangDate(Calendar.getInstance(), calendar).build();
             pvTime.show(v);
         });
         view.submit.setOnClickListener(v -> {

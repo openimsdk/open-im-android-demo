@@ -10,8 +10,8 @@ ext {
             minSdk     : 21,
             targetSdk  : 33,
             compileSdk : 33,
-            versionCode: 48,
-            versionName: "c_enterpise_rtc_v3.2.0-alpha.0-e-1.0.0+3",
+            versionCode: 50,
+            versionName: "OpenIM-Android(toc_enterprise_rtc) 3.2.0+4 SDK 3.2.0-alpha.0.e-1.0.0",
             abiFilters : ['armeabi-v7a', 'arm64-v8a']
     ]
 

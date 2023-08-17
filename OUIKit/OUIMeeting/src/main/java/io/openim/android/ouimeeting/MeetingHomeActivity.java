@@ -350,7 +350,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                     (BigDecimal.valueOf(roomMetadata.endTime - roomMetadata.startTime).divide(BigDecimal.valueOf(3600), 1, BigDecimal.ROUND_HALF_DOWN));
                 String durationStr =
                     bigDecimal.toString() + BaseApp.inst().getString(io.openim.android.ouicore.R.string.hour);
-                v.description.setText(getString(io.openim.android.ouicore.R.string.meeting_num) + "：" + roomMetadata.roomID + "\n" + getString(io.openim.android.ouicore.R.string.emcee) + "：" + data.get(0).getNickname() + "\n" + getString(io.openim.android.ouicore.R.string.start_time) + "：" + TimeUtil.getTime(roomMetadata.createTime * 1000, TimeUtil.yearMonthDayFormat) + "\t\t" + TimeUtil.getTime(roomMetadata.startTime * 1000, TimeUtil.hourTimeFormat) + "\n" + getString(io.openim.android.ouicore.R.string.meeting_duration) + "：" + durationStr);
+                v.description.setText(getString(io.openim.android.ouicore.R.string.meeting_num) + "：" + roomMetadata.roomID + "\n" + getString(io.openim.android.ouicore.R.string.emcee) + "：" + data.get(0).getNickname() + "\n" + getString(io.openim.android.ouicore.R.string.start_time) + "：" + TimeUtil.getTime(roomMetadata.startTime * 1000, TimeUtil.yearMonthDayFormat) + "\t\t" + TimeUtil.getTime(roomMetadata.startTime * 1000, TimeUtil.hourTimeFormat) + "\n" + getString(io.openim.android.ouicore.R.string.meeting_duration) + "：" + durationStr);
             }
         }, ids);
         return v.getRoot();
@@ -722,32 +722,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             }
             return null;
         });
-        IMEvent.getInstance().addConnListener(new OnConnListener() {
-            @Override
-            public void onConnectFailed(long code, String error) {
-
-            }
-
-            @Override
-            public void onConnectSuccess() {
-
-            }
-
-            @Override
-            public void onConnecting() {
-
-            }
-
-            @Override
-            public void onKickedOffline() {
-                finish();
-            }
-
-            @Override
-            public void onUserTokenExpired() {
-
-            }
-        });
     }
 
     private void showHostExitDialog() {
@@ -767,13 +741,13 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
      * @param first
      */
     private void showPageFirst(Participant first) {
-        if (null != activeSpeaker && Objects.equals(first.getIdentity(),
-            activeSpeaker.getIdentity()))
-            return;
-        adapter.getList().remove(activeSpeaker);
-        activeSpeaker = first;
-        adapter.getList().add(0, activeSpeaker);
-        adapter.notifyDataSetChanged();
+//        if (null != activeSpeaker && Objects.equals(first.getIdentity(),
+//            activeSpeaker.getIdentity()))
+//            return;
+//        adapter.getList().remove(activeSpeaker);
+//        activeSpeaker = first;
+//        adapter.getList().add(0, activeSpeaker);
+//        adapter.notifyDataSetChanged();
     }
 
     @Override
