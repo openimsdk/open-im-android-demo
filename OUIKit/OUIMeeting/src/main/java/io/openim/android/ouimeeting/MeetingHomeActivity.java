@@ -2,7 +2,10 @@ package io.openim.android.ouimeeting;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.ColorDrawable;
@@ -121,6 +124,31 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
         bindVM();
         listener();
+        registerHomeKey(this);
+    }
+
+    //监听Home键
+    private HomeWatcherReceiver mHomeKeyReceiver;
+    public void registerHomeKey(Context context) {
+        //注册Home监听广播
+        mHomeKeyReceiver = new HomeWatcherReceiver();
+        final IntentFilter homeFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+        context.registerReceiver(mHomeKeyReceiver, homeFilter);
+    }
+    public static final String SYSTEM_DIALOG_REASON_KEY = "reason";
+    public static final String SYSTEM_DIALOG_REASON_HOME_KEY = "homekey";
+    private class HomeWatcherReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)) {
+                String reason = intent.getStringExtra(SYSTEM_DIALOG_REASON_KEY);
+                if (SYSTEM_DIALOG_REASON_HOME_KEY.equals(reason)) {
+                    // TODO:  HOME键，做你想做的事
+                    showFloatView();
+                }
+            }
+        }
     }
 
 
@@ -137,14 +165,14 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     //分享屏幕
     private ActivityResultLauncher<Intent> screenCaptureIntentLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            int resultCode = result.getResultCode();
-            Intent data = result.getData();
-            if (resultCode != Activity.RESULT_OK || data == null) {
-                return;
-            }
-            vm.startShareScreen(data);
-            toast(getString(io.openim.android.ouicore.R.string.share_screen));
-        });
+        int resultCode = result.getResultCode();
+        Intent data = result.getData();
+        if (resultCode != Activity.RESULT_OK || data == null) {
+            return;
+        }
+        vm.startShareScreen(data);
+        toast(getString(io.openim.android.ouicore.R.string.share_screen));
+    });
 
     private void listener() {
         vm.allWatchedUserId.observe(this, v -> {
@@ -267,37 +295,32 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     private static void moveTaskToFront(int taskId) {
         android.app.ActivityManager manager =
             (android.app.ActivityManager) BaseApp.inst().getSystemService(ACTIVITY_SERVICE);
-        manager.moveTaskToFront(taskId,
-            android.app.ActivityManager.MOVE_TASK_WITH_HOME);
-        L.e("---moveTaskToFront----="+ taskId);
+        manager.moveTaskToFront(taskId, android.app.ActivityManager.MOVE_TASK_WITH_HOME);
+        L.e("---moveTaskToFront----=" + taskId);
     }
 
 
     private void showFloatView() {
         // 传入 Activity 对象表示设置成局部的，不需要有悬浮窗权限
         // 传入 Application 对象表示设置成全局的，但需要有悬浮窗权限
-        ViewMeetingFloatBinding floatView = ViewMeetingFloatBinding.inflate(getLayoutInflater());
         if (null == easyWindow) {
+            ViewMeetingFloatBinding floatView =
+                ViewMeetingFloatBinding.inflate(getLayoutInflater());
             easyWindow =
-                new EasyWindow<>(BaseApp.inst())
-                    .setContentView(floatView.getRoot())
-                    .setWidth(Common.dp2px(107))
-                    .setHeight(Common.dp2px(160))
-                    .setGravity(Gravity.RIGHT | Gravity.TOP)
-                    // 设置成可拖拽的
-                    .setDraggable()
-                    .setOnClickListener(floatView.getRoot().getId(), (window,
-                                                                                     view) -> {
-                        Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
-                        LogisticsCenter.completion(postcard);
-                        Activity activity = ActivityManager.isExist(postcard.getDestination());
-                        if (null != activity) {
-                            moveTaskToFront(activity.getTaskId());
-                            easyWindow.cancel();
-                        }
-                    });
+                new EasyWindow<>(BaseApp.inst()).setContentView(floatView.getRoot()).setWidth(Common.dp2px(107)).setHeight(Common.dp2px(160)).setGravity(Gravity.RIGHT | Gravity.TOP)
+                // 设置成可拖拽的
+                .setDraggable().setOnClickListener(floatView.getRoot().getId(), (window, view) -> {
+                    Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
+                    LogisticsCenter.completion(postcard);
+                    Activity activity = ActivityManager.isExist(postcard.getDestination());
+                    if (null != activity) {
+                        moveTaskToFront(activity.getTaskId());
+                        easyWindow.cancel();
+                    }
+                });
         }
-        if (!easyWindow.isShowing()) easyWindow.show();
+        if (!easyWindow.isShowing())
+            easyWindow.show();
     }
 
     @Override
@@ -782,9 +805,11 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     protected void onPause() {
         super.onPause();
         release();
+    }
 
-        if (!isFinishing()
-            && !isShareScreen) showFloatView();
+    @Override
+    protected void fasterDestroy() {
+        unregisterReceiver(mHomeKeyReceiver);
     }
 
     @Override

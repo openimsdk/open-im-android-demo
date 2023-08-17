@@ -355,7 +355,7 @@ public class CallDialog extends BaseDialog {
 
             HashMap<String, Object> map = new HashMap<>();
             map.put(Constant.K_CUSTOM_TYPE, Constant.MsgType.LOCAL_CALL_HISTORY);
-            map.put(Constant.K_RESULT, callHistory);
+            map.put(Constant.K_DATA, callHistory);
 
             String data = GsonHel.toJson(map);
             Message message = OpenIMClient.getInstance().messageManager.createCustomMessage(data,

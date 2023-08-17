@@ -392,7 +392,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
         HashMap<String, Object> map = new HashMap<>();
         map.put(Constant.K_CUSTOM_TYPE, Constant.MsgType.CUSTOMIZE_MEETING);
-        map.put(Constant.K_RESULT, meetingInfo);
+        map.put(Constant.K_DATA, meetingInfo);
 
         Message msg =
             OpenIMClient.getInstance().messageManager.createCustomMessage(GsonHel.toJson(map),

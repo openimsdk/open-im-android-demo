@@ -11,5 +11,4 @@ public class MeetingInfo {
 
     public String inviterFaceURL;
     public String inviterUserID;
-
 }

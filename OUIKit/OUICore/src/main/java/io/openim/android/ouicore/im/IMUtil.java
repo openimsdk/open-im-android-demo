@@ -209,7 +209,7 @@ public class IMUtil {
                 Map map = JSONArray.parseObject(msg.getCustomElem().getData(), Map.class);
                 if (map.containsKey(Constant.K_CUSTOM_TYPE)) {
                     int customType = (int) map.get(Constant.K_CUSTOM_TYPE);
-                    Object result = map.get(Constant.K_RESULT);
+                    Object result = map.get(Constant.K_DATA);
                     msg.setContentType(customType);
 
                     if (customType == Constant.MsgType.CUSTOMIZE_MEETING) {
