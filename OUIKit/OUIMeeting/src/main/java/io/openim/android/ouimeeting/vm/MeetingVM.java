@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -20,6 +21,7 @@ import io.livekit.android.renderer.TextureViewRenderer;
 import io.livekit.android.room.participant.Participant;
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.base.vm.State;
@@ -27,10 +29,12 @@ import io.openim.android.ouicore.entity.MeetingInfoAttach;
 import io.openim.android.ouicore.entity.ParticipantMeta;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.ouimeeting.MeetingHomeActivity;
 import io.openim.android.ouimeeting.entity.RoomMetadata;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
@@ -126,6 +130,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
             return null;
         });
     }
+
     public void buildMetaData(List<Participant> v) {
         try {
             for (int i = 0; i < v.size(); i++) {
@@ -139,6 +144,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
         } catch (Exception ignored) {
         }
     }
+
     public String getMetaUserName(ParticipantMeta participantMeta) {
         try {
             String name = participantMeta.groupMemberInfo.getNickname();
@@ -162,7 +168,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     public void fastMeeting() {
         String name =
             String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.meeting_initiator), BaseApp.inst().loginCertificate.nickname);
-        long startTime = System.currentTimeMillis()/ 1000;
+        long startTime = System.currentTimeMillis() / 1000;
         createMeeting(name, startTime, 2 * 60 * 60);
     }
 
@@ -181,12 +187,25 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
             }
         };
 
+    private boolean isCalling() {
+        if (null != ActivityManager.isExist(MeetingHomeActivity.class)) {
+            Toast.makeText(BaseApp.inst(), io.openim.android.ouicore.R.string.now_calling,
+                Toast.LENGTH_SHORT).show();
+            BaseDialog.dismissAll();
+            return true;
+        }
+        return false;
+    }
+
     public void joinMeeting(String roomID) {
+        if (isCalling()) return;
+
         //3185791707
         OpenIMClient.getInstance().signalingManager.signalingJoinMeeting(signalingCertificateCallBack, roomID, null, null);
     }
 
     public void createMeeting(String meetingName, long startTime, int duration) {
+        if (isCalling()) return;
         OpenIMClient.getInstance().signalingManager.signalingCreateMeeting(signalingCertificateCallBack, meetingName, BaseApp.inst().loginCertificate.userID, startTime, duration, null, null);
     }
 

@@ -14,6 +14,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.services.IMeetingBridge;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.ouimeeting.vm.MeetingVM;
@@ -60,8 +61,8 @@ public class IBridgeImpl implements IMeetingBridge, MeetingVM.Interaction {
     public void onSuccess(Object body) {
         waitDialog.dismiss();
         context.startActivity(new Intent(context, MeetingHomeActivity.class));
-        if (context instanceof Activity){
-            ((Activity)context).overridePendingTransition(0, 0);
+        if (context instanceof Activity) {
+            ((Activity) context).overridePendingTransition(0, 0);
         }
 
     }
