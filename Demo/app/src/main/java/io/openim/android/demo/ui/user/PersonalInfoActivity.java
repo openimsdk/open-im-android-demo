@@ -109,7 +109,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
         });
         view.birthdayLy.setOnClickListener(v -> {
             TimePickerView pvTime = new TimePickerBuilder(this,
-                (date, v12) -> vm.setBirthday(date.getTime() / 1000)).build();
+                (date, v12) -> vm.setBirthday(date.getTime())).build();
             pvTime.show(v);
 
         });
@@ -142,7 +142,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
             view.gender.setText(v.getGender() == 1 ? io.openim.android.ouicore.R.string.male :
                 io.openim.android.ouicore.R.string.girl);
             if (v.getBirth() > 0) {
-                view.birthday.setText(TimeUtil.getTime(v.getBirth() * 1000,
+                view.birthday.setText(TimeUtil.getTime(v.getBirth(),
                     TimeUtil.yearMonthDayFormat));
             }
             view.phoneNumTv.setText(v.getPhoneNumber());
