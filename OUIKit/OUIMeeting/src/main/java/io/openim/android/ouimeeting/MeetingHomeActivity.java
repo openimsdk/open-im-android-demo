@@ -35,6 +35,8 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.hjq.window.EasyWindow;
+import com.yanzhenjie.permission.Action;
+import com.yanzhenjie.permission.AndPermission;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -129,14 +131,17 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
     //监听Home键
     private HomeWatcherReceiver mHomeKeyReceiver;
+
     public void registerHomeKey(Context context) {
         //注册Home监听广播
         mHomeKeyReceiver = new HomeWatcherReceiver();
         final IntentFilter homeFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         context.registerReceiver(mHomeKeyReceiver, homeFilter);
     }
+
     public static final String SYSTEM_DIALOG_REASON_KEY = "reason";
     public static final String SYSTEM_DIALOG_REASON_HOME_KEY = "homekey";
+
     private class HomeWatcherReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -165,14 +170,14 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     //分享屏幕
     private ActivityResultLauncher<Intent> screenCaptureIntentLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        int resultCode = result.getResultCode();
-        Intent data = result.getData();
-        if (resultCode != Activity.RESULT_OK || data == null) {
-            return;
-        }
-        vm.startShareScreen(data);
-        toast(getString(io.openim.android.ouicore.R.string.share_screen));
-    });
+            int resultCode = result.getResultCode();
+            Intent data = result.getData();
+            if (resultCode != Activity.RESULT_OK || data == null) {
+                return;
+            }
+            vm.startShareScreen(data);
+            toast(getString(io.openim.android.ouicore.R.string.share_screen));
+        });
 
     private void listener() {
         vm.allWatchedUserId.observe(this, v -> {
@@ -272,13 +277,15 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             view.horn.setImageResource(aBoolean ? R.mipmap.ic_m_horn : R.mipmap.ic_m_receiver);
         });
         view.zoomOut.setOnClickListener(v -> {
-            Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
-            LogisticsCenter.completion(postcard);
-            Activity activity = ActivityManager.isExist(postcard.getDestination());
-            if (null != activity) {
-                moveTaskToFront(activity.getTaskId());
-                showFloatView();
-            }
+            AndPermission.with(this).overlay().onGranted(data -> {
+                Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
+                LogisticsCenter.completion(postcard);
+                Activity activity = ActivityManager.isExist(postcard.getDestination());
+                if (null != activity) {
+                    moveTaskToFront(activity.getTaskId());
+                    showFloatView();
+                }
+            }).start();
         });
 
         vm.roomMetadata.observe(this, meta -> {
@@ -308,25 +315,25 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                 ViewMeetingFloatBinding.inflate(getLayoutInflater());
             easyWindow =
                 new EasyWindow<>(BaseApp.inst()).setContentView(floatView.getRoot()).setWidth(Common.dp2px(107)).setHeight(Common.dp2px(160)).setGravity(Gravity.RIGHT | Gravity.TOP)
-                // 设置成可拖拽的
-                .setDraggable().setOnClickListener(floatView.getRoot().getId(), (window, view) -> {
-                    Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
-                    LogisticsCenter.completion(postcard);
-                    Activity activity = ActivityManager.isExist(postcard.getDestination());
-                    if (null != activity) {
-                        moveTaskToFront(activity.getTaskId());
-                        easyWindow.cancel();
-                    }
-                });
+                    // 设置成可拖拽的
+                    .setDraggable().setOnClickListener(floatView.getRoot().getId(), (window,
+                                                                                     view) -> {
+                        Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
+                        LogisticsCenter.completion(postcard);
+                        Activity activity = ActivityManager.isExist(postcard.getDestination());
+                        if (null != activity) {
+                            moveTaskToFront(activity.getTaskId());
+                            easyWindow.cancel();
+                        }
+                    });
         }
-        if (!easyWindow.isShowing())
-            easyWindow.show();
+        if (!easyWindow.isShowing()) easyWindow.show();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (null != easyWindow) easyWindow.cancel();
+        EasyWindow.cancelAll();
     }
 
 
