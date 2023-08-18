@@ -1275,8 +1275,8 @@ public class MessageViewHolder {
                     v.duration.setText(io.openim.android.ouicore.R.string.conn_failed);
                 if (callHistory.getFailedState() == 1)
                     v.duration.setText(io.openim.android.ouicore.R.string.cancelled);
-                if (callHistory.getFailedState() == 2)
-                    v.duration.setText(io.openim.android.ouicore.R.string.ot_refuses);
+                if (callHistory.getFailedState() == 3)
+                    v.duration.setText(io.openim.android.ouicore.R.string.declined);
             }
             v.content.setOnClickListener(v1 -> chatVM.singleChatCall(!isAudio));
         }

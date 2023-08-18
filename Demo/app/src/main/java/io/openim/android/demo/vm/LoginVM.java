@@ -5,7 +5,6 @@ import static io.openim.android.ouicore.utils.Common.md5;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
 
 
 import java.util.HashMap;
@@ -35,12 +34,12 @@ import io.openim.android.sdk.listener.OnBase;
 public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     public static final int MAX_COUNTDOWN = 60;
 
-    public MutableLiveData<String> account = new MutableLiveData<>("");
+    public State<String> account = new State<>("");
     //密码或验证码
-    public MutableLiveData<String> pwd = new MutableLiveData<>("");
-    public MutableLiveData<Boolean> isPhone = new MutableLiveData<>(true);
-    public MutableLiveData<Integer> countdown = new MutableLiveData<>(MAX_COUNTDOWN);
-    public MutableLiveData<String> nickName = new MutableLiveData<>("");
+    public State<String> pwd = new State<>("");
+    public State<Boolean> isPhone = new State<>(true);
+    public State<Integer> countdown = new State<>(MAX_COUNTDOWN);
+    public State<String> nickName = new State<>("");
     public State<String> areaCode = new State<>("+86");
 
     public String verificationCode;

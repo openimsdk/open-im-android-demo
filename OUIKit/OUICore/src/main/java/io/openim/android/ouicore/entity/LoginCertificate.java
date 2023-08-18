@@ -4,9 +4,11 @@ import android.content.Context;
 
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.net.bage.GsonHel;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 
 public class LoginCertificate {
+    private static final String TAG = "LoginCertificate";
     public String nickname;
     public String faceURL;
     public String userID;
@@ -37,6 +39,7 @@ public class LoginCertificate {
     public static void clear() {
         SharedPreferencesUtil.remove(BaseApp.inst(),
             "user.LoginCertificate");
+        L.e(TAG,"LoginCertificate 已移除");
     }
 
 }

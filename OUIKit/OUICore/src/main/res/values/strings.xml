@@ -449,6 +449,7 @@
 
     <string name="name">你的姓名</string>
     <string name="input_name">请填写真实姓名</string>
+    <string name="input_nick_name">请输入您的昵称</string>
     <string name="welcome">欢迎使用OpenIM</string>
     <string name="join_im">进入OpenIM</string>
     <string name="add_group">添加群聊</string>
@@ -485,8 +486,14 @@
     <string name="old_password">原密码：</string>
     <string name="new_password">新密码：</string>
     <string name="sure_password">确认密码：</string>
+    <string name="sure_password2">确认密码</string>
     <string name="please_input_complete">请填写完整</string>
     <string name="password_valid_tips2">新密码与确认密码不匹配</string>
     <string name="do_not_account">还没有账号？</string>
     <string name="next">下一步</string>
+    <string name="setting_info">设置信息</string>
+    <string name="sure_password_tips">请再次确认您的密码</string>
+    <string name="host_exit_tips">主持人已结束会议，是否离开？</string>
+    <string name="declined">已拒绝</string>
+    <string name="timing_meeting_tips">不能选择已过去的时间</string>
 </resources>

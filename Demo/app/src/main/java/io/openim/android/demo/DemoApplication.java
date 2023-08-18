@@ -1,5 +1,6 @@
 package io.openim.android.demo;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -98,6 +99,13 @@ public class DemoApplication extends BaseApp {
     private void initIM() {
         IM.initSdk(this);
         listenerIMOffline();
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null != callingService) {
+            callingService.initKeepAlive(getPackageName());
+            IMEvent.getInstance().addSignalingListener(callingService);
+        }
+
     }
 
     private void listenerIMOffline() {
@@ -134,9 +142,9 @@ public class DemoApplication extends BaseApp {
                 if (null != callingService)
                     callingService.stopAudioVideoService(BaseApp.inst());
 
-                BaseApp.inst().startActivity(new Intent(BaseApp.inst(), LoginActivity.class)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        | Intent.FLAG_ACTIVITY_NEW_TASK));
+                ActivityManager.finishAllExceptActivity();
+                startActivity(new Intent(BaseApp.inst(), LoginActivity.class)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             }
         });
     }
