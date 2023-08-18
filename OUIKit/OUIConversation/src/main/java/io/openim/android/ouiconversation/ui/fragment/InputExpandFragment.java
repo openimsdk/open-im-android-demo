@@ -69,9 +69,9 @@ import io.openim.android.sdk.models.SignalingInfo;
 
 
 public class InputExpandFragment extends BaseFragment<ChatVM> {
-    public static List<Integer> menuIcons = Arrays.asList(io.openim.android.ouicore.R.mipmap.ic_chat_photo, R.mipmap.ic_chat_shoot, R.mipmap.ic_tools_video_call, R.mipmap.ic_chat_menu_file,
+    public static List<Integer> menuIcons = Arrays.asList(io.openim.android.ouicore.R.mipmap.ic_chat_photo, R.mipmap.ic_chat_shoot,  R.mipmap.ic_chat_menu_file,
         R.mipmap.ic_chat_location, R.mipmap.ic_business_card);
-    public static List<String> menuTitles = Arrays.asList(BaseApp.inst().getString(io.openim.android.ouicore.R.string.album), BaseApp.inst().getString(io.openim.android.ouicore.R.string.shoot), BaseApp.inst().getString(io.openim.android.ouicore.R.string.video_calls), BaseApp.inst().getString(io.openim.android.ouicore.R.string.file), BaseApp.inst().getString(io.openim.android.ouicore.R.string.location), BaseApp.inst().getString(io.openim.android.ouicore.R.string.business_card));
+    public static List<String> menuTitles = Arrays.asList(BaseApp.inst().getString(io.openim.android.ouicore.R.string.album), BaseApp.inst().getString(io.openim.android.ouicore.R.string.shoot),  BaseApp.inst().getString(io.openim.android.ouicore.R.string.file), BaseApp.inst().getString(io.openim.android.ouicore.R.string.location), BaseApp.inst().getString(io.openim.android.ouicore.R.string.business_card));
 
     FragmentInputExpandBinding v;
     //权限
@@ -112,16 +112,16 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                         case 1:
                             goToShoot();
                             break;
+//                        case 2:
+//                            goToCall();
+//                            break;
                         case 2:
-                            goToCall();
-                            break;
-                        case 3:
                             gotoSelectFile();
                             break;
-                        case 4:
+                        case 3:
                             gotoShareLocation();
                             break;
-                        case 5:
+                        case 4:
                             Postcard postcard = ARouter.getInstance().build(Routes.Contact.ALL_FRIEND);
                             LogisticsCenter.completion(postcard);
                             businessCardLauncher.launch(new Intent(getContext(), postcard.getDestination()).putExtra("formChat", true));

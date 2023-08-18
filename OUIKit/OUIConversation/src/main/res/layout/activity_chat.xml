@@ -121,6 +121,7 @@
                     android:layout_centerInParent="true"
                     android:layout_marginRight="18dp"
                     android:layout_toStartOf="@id/more"
+                    android:visibility="invisible"
                     android:src="@mipmap/ic_phone" />
 
                 <ImageView

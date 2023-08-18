@@ -90,10 +90,8 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         runOnUiThread(() -> {
             hasShoot = AndPermission.hasPermissions(MainActivity.this, Permission.CAMERA,
                 Permission.RECORD_AUDIO);
-            Common.permission(MainActivity.this, () -> {
-                hasShoot = true;
-                AndPermission.with(this).overlay().start();
-            }, hasShoot, Permission.CAMERA, Permission.RECORD_AUDIO);
+            Common.permission(MainActivity.this, () -> hasShoot = true, hasShoot, Permission.CAMERA,
+                Permission.RECORD_AUDIO);
         });
     }
 

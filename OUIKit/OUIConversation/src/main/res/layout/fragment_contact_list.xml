@@ -101,6 +101,7 @@
                     android:layout_height="31dp"
                     android:layout_marginRight="15dp"
                     android:padding="5dp"
+                    android:visibility="invisible"
                     android:src="@mipmap/ic_call_white" />
 
                 <ImageView

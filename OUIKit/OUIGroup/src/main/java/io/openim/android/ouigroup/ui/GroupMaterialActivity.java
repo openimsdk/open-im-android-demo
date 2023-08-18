@@ -272,7 +272,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
         vm.groupMembers.observe(this, groupMembersInfos -> {
             if (groupMembersInfos.isEmpty()) return;
-            view.all.setText(String.format(getResources().getString(io.openim.android.ouicore.R.string.view_all_member), groupMembersInfos.size()));
             spanCount = spanCount * 2;
             boolean owner = vm.isOwner();
             int end = owner ? spanCount - 2 : spanCount - 1;
