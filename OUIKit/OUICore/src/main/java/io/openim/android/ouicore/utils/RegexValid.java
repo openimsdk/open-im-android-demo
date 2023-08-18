@@ -11,7 +11,7 @@ public class RegexValid {
      */
     public static  boolean isValidPassword(String password) {
         // 定义正则表达式
-        String regex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,18}$";
+        String regex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,20}$";
 
         // 编译正则表达式
         Pattern pattern = Pattern.compile(regex);

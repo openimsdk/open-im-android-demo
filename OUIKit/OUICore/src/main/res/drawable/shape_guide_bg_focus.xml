@@ -4,6 +4,6 @@
     android:useLevel="false">
 
     <solid android:color="@android:color/white"/>
-    <size android:height="@dimen/gudieview_heigh"
-        android:width="@dimen/gudieview_width"/>
+    <size android:height="3dp"
+        android:width="3dp"/>
 </shape>

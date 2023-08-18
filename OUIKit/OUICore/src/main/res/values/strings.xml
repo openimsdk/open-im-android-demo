@@ -405,7 +405,7 @@
     <string name="read_vanish_tips">在此之后发送的消息，好友已读后会在 选择的时间之后自动删除</string>
     <string name="seconds">秒</string>
     <string name="minute">分钟</string>
-    <string name="password_valid_tips">密码请输入6-18位包含数字与字母</string>
+    <string name="password_valid_tips">密码请输入6-20位包含数字与字母</string>
     <string name="periodic_deletion">定期删除消息记录</string>
     <string name="week">周</string>
     <string name="month">月</string>

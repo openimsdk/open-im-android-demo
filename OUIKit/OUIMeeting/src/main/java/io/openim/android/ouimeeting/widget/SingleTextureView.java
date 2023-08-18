@@ -111,7 +111,7 @@ public class SingleTextureView extends FrameLayout {
         ParticipantMeta meta = GsonHel.fromJson(data.getMetadata(), ParticipantMeta.class);
         L.e(TAG,
             "------name-----" + vm.getMetaUserName(meta) + "----isCameraEnabled----"
-                + data.isCameraEnabled());
+                + textureViewUse);
         if (null != meta)
             view.avatar.load(meta.userInfo.getFaceURL(), vm.getMetaUserName(meta));
     }

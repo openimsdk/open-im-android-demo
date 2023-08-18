@@ -154,7 +154,7 @@ class CallViewModel(
         mutablePrimarySpeaker.value = speaker
     }
 
-    suspend fun bindRemoteViewRenderer(viewRenderer: TextureViewRenderer, participant: Participant) :Unit{
+    suspend fun bindRemoteViewRenderer(viewRenderer: TextureViewRenderer, participant: Participant) {
         // observe videoTracks changes.
         val videoTrackPubFlow = participant::videoTracks.flow.map { participant to it }.flatMapLatest { (participant, videoTracks) ->
             // Prioritize any screenshare streams.
