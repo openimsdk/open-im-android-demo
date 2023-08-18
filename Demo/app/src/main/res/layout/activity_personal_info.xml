@@ -103,7 +103,6 @@
                         android:id="@+id/nickName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="李来莺"
                         android:textColor="#ff999999"
                         android:textSize="16sp" />
 
@@ -136,7 +135,6 @@
                         android:id="@+id/gender"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="女"
                         android:textColor="#ff999999"
                         android:textSize="16sp" />
 
