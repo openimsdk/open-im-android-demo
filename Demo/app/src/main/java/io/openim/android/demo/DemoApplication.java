@@ -1,11 +1,7 @@
 package io.openim.android.demo;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 
-import androidx.annotation.NonNull;
 import androidx.multidex.MultiDex;
 
 
@@ -99,13 +95,6 @@ public class DemoApplication extends BaseApp {
     private void initIM() {
         IM.initSdk(this);
         listenerIMOffline();
-        CallingService callingService =
-            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-        if (null != callingService) {
-            callingService.initKeepAlive(getPackageName());
-            IMEvent.getInstance().addSignalingListener(callingService);
-        }
-
     }
 
     private void listenerIMOffline() {

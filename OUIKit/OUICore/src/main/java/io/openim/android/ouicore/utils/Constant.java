@@ -20,9 +20,9 @@ public class Constant {
     private static final String IM_WS_URL = "wss://" + DEFAULT_HOST + "/msg_gateway";
 
     //--------IP----------
-    private static final String APP_AUTH = "http://" + DEFAULT_HOST + ":50008/";
-    private static final String IM_API = "http://" + DEFAULT_HOST + ":50002";
-    private static final String IM_WS = "ws://" + DEFAULT_HOST + ":50001";
+    private static final String APP_AUTH = "http://" + DEFAULT_HOST + ":10008/";
+    private static final String IM_API = "http://" + DEFAULT_HOST + ":10002";
+    private static final String IM_WS = "ws://" + DEFAULT_HOST + ":10001";
     //--------------------
 
     public static boolean getIsIp() {
