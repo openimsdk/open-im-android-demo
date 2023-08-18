@@ -32,6 +32,7 @@ import io.openim.android.sdk.listener.OnConnListener;
 import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.listener.OnFriendshipListener;
 import io.openim.android.sdk.listener.OnGroupListener;
+import io.openim.android.sdk.listener.OnUserListener;
 import io.openim.android.sdk.models.BlacklistInfo;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.CustomSignalingInfo;
@@ -47,6 +48,7 @@ import io.openim.android.sdk.models.ReadReceiptInfo;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SignalingInfo;
+import io.openim.android.sdk.models.UserInfo;
 
 ///im事件 统一处理
 public class IMEvent {
@@ -477,8 +479,16 @@ public class IMEvent {
 
     // 用户资料变更监听
     private void userListener() {
-        OpenIMClient.getInstance().userInfoManager.setOnUserListener(info -> {
-            // 当前登录用户资料变更回调
+        OpenIMClient.getInstance().userInfoManager.setOnUserListener(new OnUserListener() {
+            @Override
+            public void onSelfInfoUpdated(UserInfo info) {
+
+            }
+
+            @Override
+            public void onUserStatusChanged(String s) {
+
+            }
         });
     }
 }
