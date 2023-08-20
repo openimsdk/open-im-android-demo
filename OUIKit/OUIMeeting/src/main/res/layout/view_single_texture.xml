@@ -4,6 +4,10 @@
     android:layout_height="match_parent"
     android:background="@color/gray">
 
+    <io.livekit.android.renderer.TextureViewRenderer
+        android:id="@+id/textureView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <io.openim.android.ouicore.widget.AvatarImage
         android:id="@+id/avatar"
@@ -11,11 +15,6 @@
         android:layout_height="@dimen/button_height"
         android:layout_centerInParent="true"
         android:visibility="visible" />
-
-    <io.livekit.android.renderer.TextureViewRenderer
-        android:id="@+id/textureView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
     <include
         android:id="@+id/userStatus"

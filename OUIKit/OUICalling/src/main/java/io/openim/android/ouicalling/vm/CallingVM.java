@@ -275,8 +275,8 @@ public class CallingVM {
             if (null != localVideoTrack) {
                 try {
                     localVideoTrack.stop();
-                } catch (Exception ignore) {
-                }
+                } catch (Exception ignore) {}
+
                 if (null != localSpeakerVideoViews) {
                     for (TextureViewRenderer localSpeakerVideoView : localSpeakerVideoViews) {
                         localVideoTrack.removeRenderer(localSpeakerVideoView);

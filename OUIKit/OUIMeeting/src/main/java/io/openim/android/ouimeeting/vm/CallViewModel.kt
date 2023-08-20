@@ -170,6 +170,10 @@ class CallViewModel(
             }
         }.collectLatest1 { videoTrack ->
             val videoTrack = videoTrack as? VideoTrack
+            if (null != viewRenderer.tag) {
+                val lastTrack = viewRenderer.tag as VideoTrack
+                lastTrack.removeRenderer(viewRenderer);
+            }
             if (null != videoTrack) {
                 viewRenderer.tag = videoTrack
                 videoTrack.addRenderer(viewRenderer)
@@ -214,11 +218,12 @@ class CallViewModel(
 
     override fun onCleared() {
         super.onCleared()
-       try {
-           scopes.forEach { it.cancel() }
-           scopes.clear()
-           room.disconnect()
-       }catch (_:Exception){}
+        try {
+            scopes.forEach { it.cancel() }
+            scopes.clear()
+            room.disconnect()
+        } catch (_: Exception) {
+        }
     }
 
     fun setMicEnabled(enabled: Boolean) {
@@ -257,7 +262,7 @@ class CallViewModel(
 
 
     fun buildScope(): CoroutineScope {
-        val scope = CoroutineScope(SupervisorJob()+ Dispatchers.Main);
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
         scopes.add(scope)
         return scope;
     }

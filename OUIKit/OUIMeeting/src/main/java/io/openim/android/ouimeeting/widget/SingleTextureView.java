@@ -38,7 +38,7 @@ import kotlinx.coroutines.flow.StateFlow;
 public class SingleTextureView extends FrameLayout {
     private static final String TAG = "SingleTextureView";
     private ViewSingleTextureBinding view;
-    private final CoroutineScope scope = MainScope();
+    public CoroutineScope scope;
     private MeetingVM vm;
 
     public SingleTextureView(@NonNull Context context) {
@@ -65,36 +65,32 @@ public class SingleTextureView extends FrameLayout {
 
     public void subscribeParticipant(MeetingVM vm, Participant participant) {
         this.vm = vm;
+        initScope();
 
         vm.initVideoView(view.textureView);
         removeRenderer(view.textureView);
         bindUserStatus(participant);
         handleCenter(participant);
-        Common.UIHandler.postDelayed(() ->
-            vm.callViewModel.bindRemoteViewRenderer(view.textureView, participant,
-                new Continuation<Unit>() {
-                    @NonNull
-                    @Override
-                    public CoroutineContext getContext() {
-                        return EmptyCoroutineContext.INSTANCE;
-                    }
+        vm.callViewModel.bindRemoteViewRenderer(view.textureView, participant, new Continuation<Unit>() {
+            @NonNull
+            @Override
+            public CoroutineContext getContext() {
+                return EmptyCoroutineContext.INSTANCE;
+            }
 
-                    @Override
-                    public void resumeWith(@NonNull Object o) {
-                    }
-                }), 200);
+            @Override
+            public void resumeWith(@NonNull Object o) {
+            }
+        });
 
 
         vm.callViewModel.subscribe(participant.getEvents().getEvents(), (v) -> {
-            ParticipantMeta meta = GsonHel.fromJson(v.getParticipant().getMetadata(),
-                ParticipantMeta.class);
-            L.e(TAG,
-                "------name-----" + vm.getMetaUserName(meta) + "----Events----" + v.getParticipant().getEvents().getEvents());
+            ParticipantMeta meta = GsonHel.fromJson(v.getParticipant().getMetadata(), ParticipantMeta.class);
+            L.e(TAG, "------name-----" + vm.getMetaUserName(meta) + "----Events----" + v.getParticipant().getEvents().getEvents());
             bindUserStatus(v.getParticipant());
             handleCenter(v.getParticipant());
 
-            StateFlow<ConnectionQuality> flow =
-                vm.callViewModel.getConnectionFlow(v.getParticipant());
+            StateFlow<ConnectionQuality> flow = vm.callViewModel.getConnectionFlow(v.getParticipant());
             vm.callViewModel.subscribe(flow, (quality) -> {
                 bindConnectionQuality(view.userStatus, quality);
                 return null;
@@ -104,23 +100,26 @@ public class SingleTextureView extends FrameLayout {
         }, scope);
     }
 
+    private void initScope() {
+        if (null != scope) {
+            vm.callViewModel.scopeCancel(scope);
+            scope = null;
+        }
+        scope = vm.callViewModel.buildScope();
+    }
+
     private void handleCenter(Participant data) {
         boolean textureViewUse = data.isCameraEnabled() || data.isScreenShareEnabled();
         view.textureView.setVisibility(textureViewUse ? View.VISIBLE : View.GONE);
         view.avatar.setVisibility(textureViewUse ? View.GONE : View.VISIBLE);
         ParticipantMeta meta = GsonHel.fromJson(data.getMetadata(), ParticipantMeta.class);
-        L.e(TAG,
-            "------name-----" + vm.getMetaUserName(meta) + "----isCameraEnabled----"
-                + textureViewUse);
-        if (null != meta)
-            view.avatar.load(meta.userInfo.getFaceURL(), vm.getMetaUserName(meta));
+        L.e(TAG, "------name-----" + vm.getMetaUserName(meta) + "----isCameraEnabled----" + textureViewUse);
+        if (null != meta) view.avatar.load(meta.userInfo.getFaceURL(), vm.getMetaUserName(meta));
     }
 
     private void bindUserStatus(Participant participant) {
         view.userStatus.mc.setVisibility(vm.isHostUser(participant) ? View.VISIBLE : View.GONE);
-        view.userStatus.mic.setImageResource(participant.isMicrophoneEnabled() ?
-            io.openim.android.ouicore.R.mipmap.ic__mic_on :
-            io.openim.android.ouicore.R.mipmap.ic__mic_off);
+        view.userStatus.mic.setImageResource(participant.isMicrophoneEnabled() ? io.openim.android.ouicore.R.mipmap.ic__mic_on : io.openim.android.ouicore.R.mipmap.ic__mic_off);
         ParticipantMeta meta = GsonHel.fromJson(participant.getMetadata(), ParticipantMeta.class);
         view.userStatus.name.setText(vm.getMetaUserName(meta));
         bindConnectionQuality(view.userStatus, participant.getConnectionQuality());
@@ -140,9 +139,8 @@ public class SingleTextureView extends FrameLayout {
         }
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
+
+    public void recycle() {
         if (null != vm) {
             vm.callViewModel.scopeCancel(scope);
             removeRenderer(view.textureView);
