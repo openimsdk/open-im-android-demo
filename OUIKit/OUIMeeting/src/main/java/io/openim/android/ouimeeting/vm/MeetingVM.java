@@ -126,7 +126,6 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
         audioManager = (AudioManager) BaseApp.inst().getSystemService(Context.AUDIO_SERVICE);
         callViewModel = new CallViewModel(BaseApp.inst());
         callViewModel.subscribe(callViewModel.getRoomMetadata(), (v) -> {
-            L.e("-------room subscribe--------" + callViewModel.getRoom().getLocalParticipant().getConnectionQuality());
             fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
             return null;
         });

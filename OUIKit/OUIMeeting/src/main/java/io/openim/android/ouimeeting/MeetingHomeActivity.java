@@ -177,14 +177,14 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     //分享屏幕
     private ActivityResultLauncher<Intent> screenCaptureIntentLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        int resultCode = result.getResultCode();
-        Intent data = result.getData();
-        if (resultCode != Activity.RESULT_OK || data == null) {
-            return;
-        }
-        vm.startShareScreen(data);
-        toast(getString(io.openim.android.ouicore.R.string.share_screen));
-    });
+            int resultCode = result.getResultCode();
+            Intent data = result.getData();
+            if (resultCode != Activity.RESULT_OK || data == null) {
+                return;
+            }
+            vm.startShareScreen(data);
+            toast(getString(io.openim.android.ouicore.R.string.share_screen));
+        });
 
 
     private static void moveTaskToFront(int taskId) {
@@ -203,16 +203,17 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                 ViewMeetingFloatBinding.inflate(getLayoutInflater());
             easyWindow =
                 new EasyWindow<>(BaseApp.inst()).setContentView(floatView.getRoot()).setWidth(Common.dp2px(107)).setHeight(Common.dp2px(160)).setGravity(Gravity.RIGHT | Gravity.TOP)
-                // 设置成可拖拽的
-                .setDraggable().setOnClickListener(floatView.getRoot().getId(), (window, view) -> {
-                    Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
-                    LogisticsCenter.completion(postcard);
-                    Activity activity = ActivityManager.isExist(postcard.getDestination());
-                    if (null != activity) {
-                        moveTaskToFront(activity.getTaskId());
-                        easyWindow.cancel();
-                    }
-                });
+                    // 设置成可拖拽的
+                    .setDraggable().setOnClickListener(floatView.getRoot().getId(), (window,
+                                                                                     view) -> {
+                        Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
+                        LogisticsCenter.completion(postcard);
+                        Activity activity = ActivityManager.isExist(postcard.getDestination());
+                        if (null != activity) {
+                            moveTaskToFront(activity.getTaskId());
+                            easyWindow.cancel();
+                        }
+                    });
         }
         if (!easyWindow.isShowing()) easyWindow.show();
     }
@@ -360,7 +361,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                                 vm.muteCamera(data.getIdentity(), !holder.view.camera.isChecked());
                             }
                         });
-                        holder.view.more.setOnClickListener(v -> showPopupWindow(v, data, participantMeta));
+                        holder.view.more.setOnClickListener(v -> showPopupWindow(v, data,
+                            participantMeta));
                     } else {
                         holder.view.mic.setVisibility(View.GONE);
                         holder.view.camera.setVisibility(View.GONE);
@@ -385,13 +387,13 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
                 view.setTop.setOnClickListener(v1 -> {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("roomID", vm.signalingCertificate.getRoomID());
                     List<String> ids = new ArrayList<>();
                     ids.add(data.getIdentity());
+                    map.put("roomID", vm.signalingCertificate.getRoomID());
                     if (meta.setTop)
-                        map.put("pinedUserIDList",null);
+                        map.put("reducePinedUserIDList", ids);
                     else
-                        map.put("pinedUserIDList", ids);
+                        map.put("addPinedUserIDList", ids);
 
                     vm.updateMeetingInfo(map, data1 -> {
                         ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
@@ -412,16 +414,15 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                     Map<String, Object> map = new HashMap<>();
                     map.put("roomID", vm.signalingCertificate.getRoomID());
                     List<String> ids = new ArrayList<>();
-                    ids.add(data.getIdentity());
-                    if (vm.isAllSeeHe(data)) {
-                        map.put("beWatchedUserIDList",new ArrayList<>());
-                    } else {
-                        map.put("beWatchedUserIDList", ids);
+                    if (!vm.isAllSeeHe(data)) {
+                        ids.add(data.getIdentity());
                     }
+                    map.put("beWatchedUserIDList", ids);
+
                     vm.updateMeetingInfo(map, data1 -> {
-                        vm.roomMetadata.val().beWatchedUserIDList =
-                            (List<String>) map.get("beWatchedUserIDList");
+                        vm.roomMetadata.val().beWatchedUserIDList = ids;
                         vm.roomMetadata.update();
+
                         memberAdapter.notifyDataSetChanged();
                         popupWindow.dismiss();
                     });
@@ -702,7 +703,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         });
         commonDialog.show();
     }
-
 
 
     @Override
