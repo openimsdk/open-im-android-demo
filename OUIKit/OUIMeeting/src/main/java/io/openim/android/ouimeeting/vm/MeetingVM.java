@@ -90,7 +90,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     //发起人信息
     public List<UserInfo> userInfos = new ArrayList<>();
     //都看他
-    public State<String> allWatchedUserId = new State<>("");
+    public State<Participant> allWatchedUser = new State<>();
 
     //下边菜单栏可点击权限
     public State<Boolean> micPermission = new State<>(false);
@@ -125,7 +125,6 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
         audioManager = (AudioManager) BaseApp.inst().getSystemService(Context.AUDIO_SERVICE);
         callViewModel = new CallViewModel(BaseApp.inst());
         callViewModel.subscribe(callViewModel.getRoomMetadata(), (v) -> {
-            L.e("-------room subscribe--------" + callViewModel.getRoom().getLocalParticipant().getConnectionQuality());
             fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
             return null;
         });
@@ -133,16 +132,16 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     public void buildMetaData(List<Participant> v) {
         try {
+
             for (int i = 0; i < v.size(); i++) {
                 Participant data = v.get(i);
                 ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
                     ParticipantMeta.class);
-                participantMeta.setTop =
-                    roomMetadata.getValue().pinedUserIDList.contains(data.getIdentity());
+                participantMeta.setTop = null!= roomMetadata.val().pinedUserIDList&&
+                    roomMetadata.val().pinedUserIDList.contains(data.getIdentity());
                 data.setMetadata$livekit_android_sdk_release(GsonHel.toJson(participantMeta));
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
     }
 
     public String getMetaUserName(ParticipantMeta participantMeta) {
@@ -197,6 +196,11 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
         return false;
     }
 
+    public boolean isAllSeeHe(Participant data) {
+        if (null == allWatchedUser.val()) return false;
+        return Objects.equals(allWatchedUser.val().getIdentity(), data.getIdentity());
+    }
+
     public void joinMeeting(String roomID) {
         if (isCalling()) return;
 
@@ -221,15 +225,17 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
             @Override
             public void resumeWith(@NonNull Object o) {
-                buildTimer();
-                fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
-                VideoTrack localVideoTrack =
-                    callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
+                Common.UIHandler.post(() -> {
+                    buildTimer();
+                    fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
+                    VideoTrack localVideoTrack =
+                        callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
 
-                //  callViewModel.setCameraEnabled(false);
-                callViewModel.setCameraEnabled(!roomMetadata.getValue().joinDisableVideo);
-                callViewModel.setMicEnabled(!roomMetadata.getValue().joinDisableMicrophone);
-                getIView().connectRoomSuccess(localVideoTrack);
+                    //  callViewModel.setCameraEnabled(false);
+                    callViewModel.setCameraEnabled(!roomMetadata.getValue().joinDisableVideo);
+                    callViewModel.setMicEnabled(!roomMetadata.getValue().joinDisableMicrophone);
+                    getIView().connectRoomSuccess(localVideoTrack);
+                });
             }
         });
     }
@@ -264,9 +270,23 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     public void allSeeHe() {
         RoomMetadata meta = roomMetadata.val();
         if (null == meta) return;
-        if (null != meta.beWatchedUserIDList && !meta.beWatchedUserIDList.isEmpty()) {
-            String id = meta.beWatchedUserIDList.get(0);
-            allWatchedUserId.setValue(id);
+        if (null != meta.beWatchedUserIDList) {
+            if (meta.beWatchedUserIDList.isEmpty()) {
+                allWatchedUser.setValue(null);
+            } else {
+                String id = meta.beWatchedUserIDList.get(0);
+                Participant localParticipant = callViewModel.getRoom().getLocalParticipant();
+                if (Objects.equals(localParticipant.getIdentity(), id)) {
+                    allWatchedUser.setValue(localParticipant);
+                } else {
+                    for (Participant value :
+                        callViewModel.getRoom().getRemoteParticipants().values()) {
+                        if (Objects.equals(value.getIdentity(), id)) {
+                            allWatchedUser.setValue(value);
+                        }
+                    }
+                }
+            }
         }
     }
 

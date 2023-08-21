@@ -180,7 +180,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         });
 
 
-
     private static void moveTaskToFront(int taskId) {
         android.app.ActivityManager manager =
             (android.app.ActivityManager) BaseApp.inst().getSystemService(ACTIVITY_SERVICE);
@@ -335,11 +334,14 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                     holder.view.avatar.load(participantMeta.userInfo.getFaceURL());
                     holder.view.name.setText(vm.getMetaUserName(participantMeta));
 
-                    if (vm.isSelfHostUser.getValue()) {
+                    if (vm.isSelfHostUser.val()) {
                         holder.view.mic.setVisibility(View.VISIBLE);
                         holder.view.camera.setVisibility(View.VISIBLE);
                         holder.view.mic.setChecked(data.isMicrophoneEnabled());
                         holder.view.camera.setChecked(data.isCameraEnabled());
+                        holder.view.allSeeIv.setVisibility(vm.isAllSeeHe(data) ? View.VISIBLE :
+                            View.GONE);
+
                         holder.view.mic.setOnClickListener(new OnDedrepClickListener() {
                             @Override
                             public void click(View v) {
@@ -352,9 +354,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                                 vm.muteCamera(data.getIdentity(), !holder.view.camera.isChecked());
                             }
                         });
-                        holder.view.more.setOnClickListener(v -> {
-                            showPopupWindow(v, data, participantMeta);
-                        });
+                        holder.view.more.setOnClickListener(v -> showPopupWindow(v, data,
+                            participantMeta));
                     } else {
                         holder.view.mic.setVisibility(View.GONE);
                         holder.view.camera.setVisibility(View.GONE);
@@ -373,6 +374,10 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                 view.setTop.setText(getText(meta.setTop ?
                     io.openim.android.ouicore.R.string.cancel_top :
                     io.openim.android.ouicore.R.string.set_top));
+                view.allSee.setText(getString(vm.isAllSeeHe(data) ?
+                    io.openim.android.ouicore.R.string.cancle_see_he :
+                    io.openim.android.ouicore.R.string.all_see_the));
+
                 view.setTop.setOnClickListener(v1 -> {
                     Map<String, Object> map = new HashMap<>();
                     List<String> ids = new ArrayList<>();
@@ -400,18 +405,18 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                 });
                 view.allSee.setOnClickListener(v1 -> {
                     Map<String, Object> map = new HashMap<>();
-                    List<String> ids = new ArrayList<>();
-                    ids.add(data.getIdentity());
                     map.put("roomID", vm.signalingCertificate.getRoomID());
-                    map.put("addBeWatchedUserIDList", ids);
-
-                    vm.roomMetadata.val().beWatchedUserIDList.remove(ids.get(0));
-                    map.put("reduceBeWatchedUserIDList",
-                        vm.roomMetadata.val().beWatchedUserIDList);
+                    List<String> ids = new ArrayList<>();
+                    if (!vm.isAllSeeHe(data)) {
+                        ids.add(data.getIdentity());
+                    }
+                    map.put("beWatchedUserIDList", ids);
 
                     vm.updateMeetingInfo(map, data1 -> {
                         vm.roomMetadata.val().beWatchedUserIDList = ids;
                         vm.roomMetadata.update();
+
+                        memberAdapter.notifyDataSetChanged();
                         popupWindow.dismiss();
                     });
                 });
@@ -533,7 +538,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             if (v.isEmpty()) return null;
             memberParticipants = vm.handleParticipants(v);
             vm.buildMetaData(memberParticipants);
-            List<List<Participant>> data = new ArrayList<>();
+            List<Object> data = new ArrayList<>();
 
             int pageNum = memberParticipants.size() / pageShow;
             if (pageNum == 0) {
@@ -544,20 +549,28 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                         i * pageShow + pageShow));
                 data.add(participants);
             }
-            adapter.setList(data);
-            updateGuideView(0, data.size());
-
-            if (null!=activeSpeaker){
-                adapter.getList().add(0, activeSpeaker);
-                adapter.notifyDataSetChanged();
-                view.pager.setCurrentItem(0);
+            if (null == activeSpeaker)
+                activeSpeaker = v.get(0);
+            else {
+                boolean isExist = false;
+                for (Participant participant : v) {
+                    isExist = Objects.equals(participant.getIdentity(),
+                        activeSpeaker.getIdentity());
+                }
+                if (!isExist)
+                    activeSpeaker = v.get(0);
             }
+            data.add(0, activeSpeaker);
+            adapter.setList(data);
+
+            updateGuideView(0, data.size());
+            view.pager.setCurrentItem(0);
             return null;
         });
 
 
         vm.callViewModel.subscribe(vm.callViewModel.getActiveSpeakersFlow(), (v) -> {
-            if (v.isEmpty() || !TextUtils.isEmpty(vm.allWatchedUserId.val())) return null;
+            if (v.isEmpty() || null != vm.allWatchedUser.val()) return null;
             showPageFirst(v.get(0));
             updateGuideView(0, adapter.getCount());
             return null;
@@ -575,14 +588,12 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             return null;
         });
     }
+
     private void listener() {
-        vm.allWatchedUserId.observe(this, v -> {
-            for (Participant participant : memberParticipants) {
-                if (v.equals(participant.getIdentity())) {
-                    showPageFirst(participant);
-                    updateGuideView(0, adapter.getCount());
-                }
-            }
+        vm.allWatchedUser.observe(this, v -> {
+            if (null == v) return;
+            showPageFirst(v);
+            updateGuideView(0, adapter.getCount());
         });
         view.landscape.setOnClickListener(v -> {
             triggerLandscape = true;
@@ -600,7 +611,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         view.topCenter.setOnClickListener(clickListener);
         view.down.setOnClickListener(clickListener);
         view.end.setOnClickListener(v -> {
-            if (!vm.isSelfHostUser.getValue()) {
+            if (!vm.isSelfHostUser.val()) {
                 exit(false);
                 return;
             }
@@ -695,6 +706,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             }
         });
     }
+
     private void showHostExitDialog() {
         CommonDialog commonDialog = new CommonDialog(this);
         commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.host_exit_tips);
