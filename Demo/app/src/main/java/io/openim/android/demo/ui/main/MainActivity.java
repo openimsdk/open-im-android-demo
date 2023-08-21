@@ -45,6 +45,7 @@ import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouimeeting.MeetingHomeActivity;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
@@ -185,6 +186,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         }
         Common.UIHandler.postDelayed(this::bindDot, 500);
     }
+
 
 
     /**

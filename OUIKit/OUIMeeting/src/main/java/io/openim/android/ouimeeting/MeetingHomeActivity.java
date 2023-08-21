@@ -112,7 +112,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     //触发横屏 决定当前绑定的MeetingVM 是否释放
     private boolean triggerLandscape = false;
     private List<Participant> memberParticipants = new ArrayList<>();
-    private Participant activeSpeaker;
     //每页显示多少Participant
     private final int pageShow = 4;
     private List<View> guideViews = new ArrayList<>();

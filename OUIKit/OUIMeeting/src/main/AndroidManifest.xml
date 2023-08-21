@@ -22,6 +22,7 @@
             android:name=".MeetingHomeActivity"
             android:exported="true"
             android:launchMode="singleInstance"
+            android:excludeFromRecents="true"
             android:taskAffinity=".meeting_task" />
         <activity
             android:name=".MeetingLaunchActivity"
