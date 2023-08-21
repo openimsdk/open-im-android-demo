@@ -69,21 +69,15 @@ public class SingleTextureFragment extends LazyFragment {
         vm.allWatchedUser.observe(this, v -> {
             if (v == null) return;
             isAllWatchedUser = true;
-            Common.UIHandler.postDelayed(() -> subscribeParticipant(v), 300);
-
-            if (null != allWatchedUserScope) {
-                vm.callViewModel.scopeCancel(allWatchedUserScope);
-            }
-            vm.callViewModel.subscribe(v.getEvents().getEvents(), v1 -> {
-                if (v1 instanceof ParticipantEvent.TrackUnpublished){
-                    isAllWatchedUser = false;
-                    bindLocalParticipant();
-                }
-                return null;
-            }, allWatchedUserScope = vm.callViewModel.buildScope());
-
+            subscribeParticipant(v);
         });
-
+//        vm.callViewModel.subscribe(v.getEvents().getEvents(), v1 -> {
+//            if (v1 instanceof ParticipantEvent.TrackUnpublished){
+//                isAllWatchedUser = false;
+//                bindLocalParticipant();
+//            }
+//            return null;
+//        }, allWatchedUserScope = vm.callViewModel.buildScope());
     }
 
     private void bindLocalParticipant() {

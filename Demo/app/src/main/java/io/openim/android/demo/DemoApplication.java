@@ -104,7 +104,6 @@ public class DemoApplication extends BaseApp {
             callingService.initKeepAlive(getPackageName());
             IMEvent.getInstance().addSignalingListener(callingService);
         }
-
     }
 
     private void listenerIMOffline() {
