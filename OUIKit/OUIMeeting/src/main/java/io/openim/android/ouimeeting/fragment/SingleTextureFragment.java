@@ -67,23 +67,35 @@ public class SingleTextureFragment extends LazyFragment {
         }, scope);
 
         vm.allWatchedUser.observe(this, v -> {
-            if (v == null) return;
+            if (v == null) {
+                isAllWatchedUser=false;
+                cancleAllWatch();
+                return;
+            }
             isAllWatchedUser = true;
             subscribeParticipant(v);
+
+            cancleAllWatch();
+            vm.callViewModel.subscribe(v.getEvents().getEvents(), v1 -> {
+                if (v1 instanceof ParticipantEvent.TrackUnpublished) {
+                    isAllWatchedUser = false;
+                    bindLocalParticipant();
+                }
+                return null;
+            }, allWatchedUserScope = vm.callViewModel.buildScope());
         });
-//        vm.callViewModel.subscribe(v.getEvents().getEvents(), v1 -> {
-//            if (v1 instanceof ParticipantEvent.TrackUnpublished){
-//                isAllWatchedUser = false;
-//                bindLocalParticipant();
-//            }
-//            return null;
-//        }, allWatchedUserScope = vm.callViewModel.buildScope());
+
+    }
+
+    private void cancleAllWatch() {
+        if (null != allWatchedUserScope) {
+            vm.callViewModel.scopeCancel(allWatchedUserScope);
+        }
     }
 
     private void bindLocalParticipant() {
-        singleTextureView.subscribeParticipant(
-            vm, vm.callViewModel.getRoom().getLocalParticipant()
-        );
+        singleTextureView.subscribeParticipant(vm,
+            vm.callViewModel.getRoom().getLocalParticipant());
     }
 
     private void subscribeParticipant(Participant activeSpeaker) {

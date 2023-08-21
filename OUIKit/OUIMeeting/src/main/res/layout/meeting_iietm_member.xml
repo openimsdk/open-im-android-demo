@@ -22,19 +22,28 @@
         android:textColor="#ff16191c"
         android:textSize="17sp" />
 
+    <ImageView
+        android:id="@+id/allSeeIv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5dp"
+        android:src="@mipmap/ic_all_see" />
+
+
     <CheckBox
         android:id="@+id/mic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:button="@null"
+        android:layout_marginRight="5dp"
         android:drawableRight="@drawable/selector_m_mic2" />
 
     <CheckBox
         android:id="@+id/camera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
+        android:layout_marginRight="5dp"
         android:background="@android:color/transparent"
         android:button="@null"
         android:drawableRight="@drawable/selector_m_camera2" />
@@ -49,16 +58,15 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
-            android:layout_marginLeft="10dp"
             android:src="@mipmap/ic_more" />
 
         <ImageView
-            android:visibility="gone"
             android:id="@+id/angleMark"
-            android:layout_alignParentEnd="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/ic_angle_mark" />
+            android:layout_alignParentEnd="true"
+            android:src="@mipmap/ic_angle_mark"
+            android:visibility="visible" />
     </RelativeLayout>
 
 </LinearLayout>

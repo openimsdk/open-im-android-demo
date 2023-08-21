@@ -496,4 +496,5 @@
     <string name="host_exit_tips">主持人已结束会议，是否离开？</string>
     <string name="declined">已拒绝</string>
     <string name="timing_meeting_tips">不能选择已过去的时间</string>
+    <string name="cancle_see_he">取消看他</string>
 </resources>
