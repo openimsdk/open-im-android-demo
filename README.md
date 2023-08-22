@@ -1,6 +1,6 @@
 ## For educational purposes only. Commercial use is strictly prohibited without authorization. Violators will be prosecuted
 ## Open-IM-Android-Demo
-![avatar](https://github.com/OpenIMSDK/OpenIM-Docs/blob/main/docs/images/WechatIMG20.jpeg)
+<img src="https://github.com/OpenIMSDK/OpenIM-Docs/blob/main/docs/images/WechatIMG20.jpeg" alt="image" style="width: 350px; " />
 
 #### Demo content
 Demo is a set of UI components implemented based on the Open-IM SDK, which includes functionalities such as conversations, chats, relationships, and groups. The project adopts MVVM+modular development, with high decoupling, independent business logic, code separation, making it easy to integrate the functionalities you need quickly and conveniently
