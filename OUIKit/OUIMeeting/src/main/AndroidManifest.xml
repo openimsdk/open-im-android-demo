@@ -20,7 +20,6 @@
         </activity>
         <activity
             android:name=".MeetingHomeActivity"
-            android:excludeFromRecents="true"
             android:exported="true"
             android:launchMode="singleInstance"
             android:excludeFromRecents="true"
