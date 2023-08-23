@@ -6,7 +6,7 @@
 Demo is a set of UI components implemented based on the Open-IM SDK, which includes functionalities such as conversations, chats, relationships, and groups. The project adopts MVVM+modular development, with high decoupling, independent business logic, code separation, making it easy to integrate the functionalities you need quickly and conveniently
 #### Download and experience
 
-![Android](https://www.pgyer.com/app/qrcode/OpenIM-Android)
+![Android](https://www.pgyer.com/app/qrcode/OpenIM-Enterprise)
 
 #### Dependency Description
 
