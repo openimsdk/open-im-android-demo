@@ -24,10 +24,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -61,7 +57,6 @@ import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.base.LazyFragment;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
 import io.openim.android.ouicore.entity.ParticipantMeta;
@@ -88,8 +83,6 @@ import io.openim.android.ouimeeting.databinding.MenuUserSettingBinding;
 import io.openim.android.ouimeeting.databinding.ViewMeetingFloatBinding;
 import io.openim.android.ouimeeting.databinding.ViewSingleTextureBinding;
 import io.openim.android.ouimeeting.entity.RoomMetadata;
-import io.openim.android.ouimeeting.fragment.MultipleTextureFragment;
-import io.openim.android.ouimeeting.fragment.SingleTextureFragment;
 import io.openim.android.ouimeeting.vm.MeetingVM;
 import io.openim.android.ouimeeting.widget.SingleTextureView;
 import io.openim.android.sdk.OpenIMClient;
@@ -112,6 +105,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     //触发横屏 决定当前绑定的MeetingVM 是否释放
     private boolean triggerLandscape = false;
     private List<Participant> memberParticipants = new ArrayList<>();
+    private Participant activeSpeaker;
     //每页显示多少Participant
     private final int pageShow = 4;
     private List<View> guideViews = new ArrayList<>();
@@ -494,7 +488,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     }
 
     private void initView() {
-        view.pager.setAdapter(adapter = new PageAdapter(getSupportFragmentManager(), view.pager));
+        view.pager.setAdapter(adapter = new PageAdapter(getLayoutInflater(), vm));
 
         view.pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
@@ -539,17 +533,12 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     @Override
     public void connectRoomSuccess(VideoTrack localVideoTrack) {
         view.landscape.setVisibility(View.VISIBLE);
-        List<List<Participant>> data = new ArrayList<>();
-        data.add(new ArrayList<>());
-        adapter.setList(data);
 
         vm.callViewModel.subscribe(vm.callViewModel.getAllParticipants(), (v) -> {
             if (v.isEmpty()) return null;
             memberParticipants = vm.handleParticipants(v);
             vm.buildMetaData(memberParticipants);
-
-            data.clear();
-            data.add(new ArrayList<>());
+            List<Object> data = new ArrayList<>();
 
             int pageNum = memberParticipants.size() / pageShow;
             if (pageNum == 0) {
@@ -560,8 +549,30 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                         i * pageShow + pageShow));
                 data.add(participants);
             }
+            if (null == activeSpeaker)
+                activeSpeaker = v.get(0);
+            else {
+                boolean isExist = false;
+                for (Participant participant : v) {
+                    isExist = Objects.equals(participant.getIdentity(),
+                        activeSpeaker.getIdentity());
+                }
+                if (!isExist)
+                    activeSpeaker = v.get(0);
+            }
+            data.add(0, activeSpeaker);
             adapter.setList(data);
+
             updateGuideView(0, data.size());
+            view.pager.setCurrentItem(0);
+            return null;
+        });
+
+
+        vm.callViewModel.subscribe(vm.callViewModel.getActiveSpeakersFlow(), (v) -> {
+            if (v.isEmpty() || null != vm.allWatchedUser.val()) return null;
+            showPageFirst(v.get(0));
+            updateGuideView(0, adapter.getCount());
             return null;
         });
 
@@ -579,7 +590,11 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     }
 
     private void listener() {
-
+        vm.allWatchedUser.observe(this, v -> {
+            if (null == v) return;
+            showPageFirst(v);
+            updateGuideView(0, adapter.getCount());
+        });
         view.landscape.setOnClickListener(v -> {
             triggerLandscape = true;
             vm.isInit = true;
@@ -703,6 +718,21 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         commonDialog.show();
     }
 
+    /**
+     * 在说话用户/都看他
+     *
+     * @param first
+     */
+    private void showPageFirst(Participant first) {
+        if (null != activeSpeaker && Objects.equals(first.getIdentity(),
+            activeSpeaker.getIdentity()))
+            return;
+        adapter.getList().remove(activeSpeaker);
+        activeSpeaker = first;
+        adapter.getList().add(0, activeSpeaker);
+        adapter.notifyDataSetChanged();
+        view.pager.setCurrentItem(0);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -770,30 +800,15 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         super.finish();
     }
 
-
-    private static class PageAdapter extends FragmentPagerAdapter {
-
+    private static class PageAdapter extends PagerAdapter {
+        private final LayoutInflater inflater;
         private List<Object> list = new ArrayList<>();
-        private ViewPager viewPager;
+        private final MeetingVM vm;
 
-        public PageAdapter(@NonNull FragmentManager fm, ViewPager view) {
-            super(fm);
-            this.viewPager = view;
+        public PageAdapter(LayoutInflater inflater, MeetingVM vm) {
+            this.inflater = inflater;
+            this.vm = vm;
         }
-
-
-        @NonNull
-        @Override
-        public Fragment getItem(int position) {
-            if (position == 0) {
-                return SingleTextureFragment.newInstance(() -> viewPager.setCurrentItem(0));
-            }
-            LazyFragment fragment =
-                MultipleTextureFragment.newInstance((List<Participant>) getList().get(position));
-            fragment.setTagData(position);
-            return fragment;
-        }
-
 
         public List<Object> getList() {
             return list;
@@ -810,15 +825,78 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         }
 
         @Override
-        public int getItemPosition(@NonNull Object object) {
-            if (object instanceof MultipleTextureFragment) {
-                MultipleTextureFragment textureFragment = (MultipleTextureFragment) object;
-                Object tagData = textureFragment.getTagData();
-                if (null != tagData) {
-                    textureFragment.update((List<Participant>) getList().get((Integer) tagData));
+        public int getItemPosition(Object object) {
+            //  notifyDataSetChanged() 页面不刷新问题的方法
+            return POSITION_NONE;
+        }
+
+        @NonNull
+        @Override
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
+            Object ob = list.get(position);
+            View view_ = null;
+            if (ob instanceof Participant) {
+                Participant participant = (Participant) ob;
+
+                SingleTextureView singleTextureView = new SingleTextureView(container.getContext());
+                singleTextureView.subscribeParticipant(vm, participant);
+                view_ = singleTextureView;
+            }
+            if (ob instanceof List) {
+                List<Participant> participants = (List<Participant>) ob;
+                ViewRecyclerViewBinding view = ViewRecyclerViewBinding.inflate(inflater);
+                view.recyclerView.setLayoutManager(new GridLayoutManager(container.getContext(),
+                    2));
+                RecyclerViewAdapter<Participant, UserStreamViewHolder> adapter;
+                GridSpaceItemDecoration divItemDecoration =
+                    new GridSpaceItemDecoration(Common.dp2px(1));
+                view.recyclerView.addItemDecoration(divItemDecoration);
+                view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<Participant,
+                    UserStreamViewHolder>(UserStreamViewHolder.class) {
+
+                    @Override
+                    public void onBindView(@NonNull UserStreamViewHolder holder, Participant data
+                        , int position) {
+                        holder.setItemHeight(view.recyclerView.getHeight() / 2);
+                        holder.view.subscribeParticipant(vm, data);
+                    }
+                });
+                adapter.setItems(participants);
+                view_ = view.getRoot();
+            }
+            if (null != view_) {
+                container.addView(view_);
+                return view_;
+            }
+            return container;
+        }
+
+
+        public static class UserStreamViewHolder extends RecyclerView.ViewHolder {
+            public final SingleTextureView view;
+
+            public UserStreamViewHolder(@NonNull View itemView) {
+                super(new SingleTextureView(itemView.getContext()));
+                view = (SingleTextureView) this.itemView;
+            }
+
+            public void setItemHeight(int height) {
+                View childAt = view.getChildAt(0);
+                if (null != childAt) {
+                    ViewGroup.LayoutParams params = childAt.getLayoutParams();
+                    params.height = height;
                 }
             }
-            return super.getItemPosition(object);
+        }
+
+        @Override
+        public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
+            return view == object;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, @NonNull Object object) {
+            container.removeView((View) object);
         }
 
 

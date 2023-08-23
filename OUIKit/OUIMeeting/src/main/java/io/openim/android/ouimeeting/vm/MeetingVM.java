@@ -19,7 +19,6 @@ import java.util.TimerTask;
 
 import io.livekit.android.renderer.TextureViewRenderer;
 import io.livekit.android.room.participant.Participant;
-import io.livekit.android.room.participant.RemoteParticipant;
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseDialog;
@@ -143,7 +142,6 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
                 data.setMetadata$livekit_android_sdk_release(GsonHel.toJson(participantMeta));
             }
         } catch (Exception ignored) {}
-        L.e("");
     }
 
     public String getMetaUserName(ParticipantMeta participantMeta) {

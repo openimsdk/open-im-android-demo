@@ -597,6 +597,11 @@ public class IMEvent {
             public void onSelfInfoUpdated(UserInfo info) {
                 // 当前登录用户资料变更回调
             }
+
+            @Override
+            public void onUserStatusChanged(String s) {
+
+            }
         });
     }
 }
