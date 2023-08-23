@@ -99,11 +99,10 @@ public class Common {
             PackageManager pm = context.getPackageManager();
             PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
             versionName = pi.versionName;
-            if (versionName == null || versionName.length() <= 0) {
+            if (TextUtils.isEmpty(versionName)) {
                 return "";
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception ignored) {}
         return versionName;
     }
 

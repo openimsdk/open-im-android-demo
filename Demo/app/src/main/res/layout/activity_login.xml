@@ -7,175 +7,184 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:focusableInTouchMode="true"
-        android:orientation="vertical"
-        android:background="@color/white"
-        tools:context=".ui.login.LoginActivity">
-
-
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:focusableInTouchMode="true"
             android:orientation="vertical"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp">
+            tools:context=".ui.login.LoginActivity">
 
-            <TextView
-                android:layout_width="wrap_content"
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="80dp"
-                android:text="@string/welcome"
-                android:textColor="#ff333333"
-                android:id="@+id/welcome"
-                android:textSize="32sp"
-                android:clickable="true"
-                android:focusable="true"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp">
+
+                <TextView
+                    android:id="@+id/welcome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="80dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="@string/welcome"
+                    android:textColor="#ff333333"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="58dp"
+                    android:layout_marginBottom="30dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/phoneTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/phone_num"
+                            android:textColor="#ff1d6bed"
+                            android:textSize="14sp" />
+
+                        <View
+                            android:id="@+id/phoneVv"
+                            android:layout_width="58dp"
+                            android:layout_height="1dp"
+                            android:background="#1D6BED" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="32dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/mailTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="@string/mail"
+                            android:textColor="#333333"
+                            android:textSize="14sp" />
+
+                        <View
+                            android:id="@+id/mailVv"
+                            android:layout_width="29dp"
+                            android:layout_height="1dp"
+                            android:background="#1D6BED"
+                            android:visibility="invisible" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="56dp"
+                    android:layout_height="20dp"
+                    android:layout_marginBottom="6dp"
+                    android:text="@string/phone_num"
+                    android:textColor="#ff171a1d"
+                    android:textSize="14sp" />
+
+                <include
+                    android:id="@+id/login_content"
+                    layout="@layout/layout_login" />
+            </LinearLayout>
+
+
+            <Button
+                android:id="@+id/submit"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginBottom="30dp"
+                android:enabled="false"
+                android:text="@string/login"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="58dp"
-                android:layout_marginBottom="30dp">
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-                <LinearLayout
-                    android:visibility="gone"
+                <CheckBox
+                    android:id="@+id/protocol"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:button="@null"
+                    android:drawableLeft="@drawable/selector_checkbox"
+                    android:paddingLeft="17dp" />
 
-                    <TextView
-                        android:id="@+id/phoneTv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/phone_num"
-                        android:textColor="#ff1d6bed"
-                        android:textSize="14sp" />
-
-                    <View
-                        android:id="@+id/phoneVv"
-                        android:layout_width="58dp"
-                        android:layout_height="1dp"
-                        android:background="#1D6BED" />
-
-                </LinearLayout>
-
-                <LinearLayout
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="32dp"
-                    android:visibility="gone"
-                    android:orientation="vertical">
+                    android:text="@string/read"
+                    android:textColor="#ff333333"
+                    android:textSize="12sp" />
 
-                    <TextView
-                        android:id="@+id/mailTv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:text="@string/mail"
-                        android:textColor="#333333"
-                        android:textSize="14sp" />
-
-                    <View
-                        android:id="@+id/mailVv"
-                        android:layout_width="29dp"
-                        android:layout_height="1dp"
-                        android:background="#1D6BED"
-                        android:visibility="invisible" />
-
-                </LinearLayout>
+                <TextView
+                    android:layout_width="169dp"
+                    android:layout_height="17dp"
+                    android:text="@string/protocol"
+                    android:textColor="#ff1d6bed"
+                    android:textSize="12sp" />
 
             </LinearLayout>
+
             <TextView
-                android:layout_width="56dp"
-                android:layout_height="20dp"
-                android:text="@string/phone_num"
-                android:textColor="#ff171a1d"
-                android:layout_marginBottom="6dp"
-                android:textSize="14sp"
-                />
-
-            <include
-                android:id="@+id/login_content"
-                layout="@layout/layout_login" />
-        </LinearLayout>
-
-
-        <Button
-            android:id="@+id/submit"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginRight="32dp"
-            android:layout_marginBottom="30dp"
-            android:enabled="false"
-            android:text="@string/login"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-android:visibility="gone"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <CheckBox
-                android:id="@+id/protocol"
+                android:id="@+id/version"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:button="@null"
-                android:drawableLeft="@drawable/selector_checkbox"
-                android:paddingLeft="17dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/read"
-                android:textColor="#ff333333"
-                android:textSize="12sp" />
-
-            <TextView
-                android:layout_width="169dp"
-                android:layout_height="17dp"
-                android:text="@string/protocol"
-                android:textColor="#ff1d6bed"
-                android:textSize="12sp" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="80dp"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/do_not_account"
+                android:layout_gravity="center_horizontal"
                 android:textColor="#ff8e9ab0"
-                android:textSize="12sp"
-                />
-
-            <TextView
-                android:id="@+id/registerTv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/phone_register"
-                android:padding="4dp"
-                android:textColor="#ff0089ff"
                 android:textSize="12sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="80dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/do_not_account"
+                    android:textColor="#ff8e9ab0"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/registerTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="@string/phone_register"
+                    android:textColor="#ff0089ff"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="210dp"
