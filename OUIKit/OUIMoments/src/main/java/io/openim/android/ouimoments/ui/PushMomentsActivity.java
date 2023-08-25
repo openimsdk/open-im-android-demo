@@ -285,6 +285,8 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
     private final ActivityResultLauncher<Intent> shootLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == Activity.RESULT_OK) {
+                if (null!=bottomPopDialog)
+                    bottomPopDialog.dismiss();
                 String fileUrl = result.getData().getStringExtra("fileUrl");
                 if (MediaFileUtil.isVideoType(fileUrl)) {
                     String firstFrameUrl = result.getData().getStringExtra("firstFrameUrl");
