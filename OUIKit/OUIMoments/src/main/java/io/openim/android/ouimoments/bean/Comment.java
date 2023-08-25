@@ -6,7 +6,7 @@ public class Comment {
     public String faceURL;
     public String nickname;
     public String replyUserID;
-    public String replyUserName;
+    public String replyNickname;
     public String replyFaceURL;
 
     public String content;

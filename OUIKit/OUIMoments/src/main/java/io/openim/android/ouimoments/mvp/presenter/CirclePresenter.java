@@ -2,11 +2,9 @@ package io.openim.android.ouimoments.mvp.presenter;
 
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +19,6 @@ import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.NotificationVM;
 import io.openim.android.ouimoments.api.MomentsService;
@@ -39,7 +36,6 @@ import io.openim.android.ouimoments.bean.WorkMoments;
 import io.openim.android.ouimoments.mvp.contract.CircleContract;
 import io.openim.android.ouimoments.mvp.modle.CircleModel;
 import io.openim.android.ouimoments.utils.DatasUtil;
-import io.openim.android.sdk.OpenIMClient;
 
 /**
  * 通知model请求服务器和通知view更新
@@ -230,7 +226,7 @@ public class CirclePresenter implements CircleContract.Presenter {
         else commentItem.setUser(new User(comment.userID, comment.nickname, ""));
         if (comment.replyUserID.equals(DatasUtil.curUser.getId()))
             commentItem.setToReplyUser(DatasUtil.curUser);
-        else commentItem.setToReplyUser(new User(comment.replyUserID, comment.replyUserName, ""));
+        else commentItem.setToReplyUser(new User(comment.replyUserID, comment.replyNickname, ""));
     }
 
 
@@ -383,7 +379,8 @@ public class CirclePresenter implements CircleContract.Presenter {
 
     public void getMomentsDetail(String momentID) {
         N.API(MomentsService.class).getCommentDetail(new Parameter().add("workMomentID",
-            momentID).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(WorkMoments.class)).subscribe(new NetObserver<WorkMoments>(TAG) {
+            momentID).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(WorkMoments.class))
+            .subscribe(new NetObserver<WorkMoments>(TAG) {
             @Override
             public void onSuccess(WorkMoments o) {
                 try {
@@ -394,8 +391,7 @@ public class CirclePresenter implements CircleContract.Presenter {
                     if (view != null) {
                         view.update2loadData(0, circleItems);
                     }
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
             }
 
             @Override
@@ -409,7 +405,7 @@ public class CirclePresenter implements CircleContract.Presenter {
      * 清除对外部对象的引用，反正内存泄露。
      */
     public void recycle() {
-        N.clearDispose(TAG);
+//        N.clearDispose(TAG);
         this.view = null;
     }
 

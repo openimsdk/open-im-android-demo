@@ -135,7 +135,7 @@ public class CommentListView extends LinearLayout {
 
         if (!TextUtils.isEmpty(toReplyName)) {
 
-            builder.append(" 回复 ");
+            builder.append(getContext().getString(io.openim.android.ouicore.R.string.recover));
             builder.append(setClickableSpan(toReplyName, bean.getToReplyUser().getId()));
         }
         builder.append(": ");

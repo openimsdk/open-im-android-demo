@@ -1,39 +1,27 @@
 package io.openim.android.ouimoments.ui;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-
-import java.util.List;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.adapter.viewholder.MsgDetailViewHolder;
 import io.openim.android.ouimoments.bean.Comment;
-import io.openim.android.ouimoments.bean.EXWorkMomentsInfo;
 import io.openim.android.ouimoments.bean.WorkMoments;
 import io.openim.android.ouimoments.databinding.ActivityMsgDetailBinding;
-import io.openim.android.ouimoments.mvp.contract.CircleContract;
 import io.openim.android.ouimoments.mvp.presenter.MsgDetailVM;
 import io.openim.android.ouimoments.utils.DatasUtil;
-import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.models.WorkMomentsInfo;
 
 public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDetailBinding> {
 
@@ -78,7 +66,8 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
             public void onBindView(@NonNull MsgDetailViewHolder holder, WorkMoments data,
                                    int position) {
                 holder.view.getRoot().setOnClickListener(v -> {
-                    startActivity(new Intent(MsgDetailActivity.this,MomentsDetailActivity.class).putExtra(Constant.K_ID,
+                    startActivity(new Intent(MsgDetailActivity.this,MomentsDetailActivity.class)
+                        .putExtra(Constant.K_ID,
                         data.workMomentID));
                 });
                 holder.view.avatar.load(data
@@ -94,7 +83,7 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
                         String targetUser =
                             DatasUtil.curUser.getId().equals(comment.replyUserID) ?
                                 DatasUtil.curUser.getName() :
-                                comment.replyUserName;
+                                comment.replyNickname;
                         Common.stringBindForegroundColorSpan(holder.view.action,
                             getString(io.openim.android.ouicore.R.string.reply)
                                 + targetUser + ":" + comment.content,
@@ -117,7 +106,10 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
                 }else {
                     holder.view.media.setVisibility(View.VISIBLE);
                     holder.view.content.setVisibility(View.GONE);
-                    Glide.with(MsgDetailActivity.this).load(data.content.metas.get(0).thumb)
+                    String pictureUrl=data.content.metas.get(0).thumb;
+                    if (TextUtils.isEmpty(pictureUrl))
+                        pictureUrl=data.content.metas.get(0).original;
+                    Glide.with(MsgDetailActivity.this).load(pictureUrl)
                         .into(holder.view.img);
                     holder.view.play.setVisibility(data.content.type != 0 ? View.VISIBLE :
                         View.GONE);

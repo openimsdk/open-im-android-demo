@@ -492,5 +492,6 @@
     <string name="declined">已拒绝</string>
     <string name="timing_meeting_tips">不能选择已过去的时间</string>
     <string name="cancle_see_he">取消看他</string>
+    <string name="recover">" 回复 "</string>
 
 </resources>

@@ -160,7 +160,8 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         if (presenter != null) {
             presenter.recycle();
         }
-        getActivity().getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
+        getActivity().getWindow().getDecorView().getViewTreeObserver()
+            .removeOnGlobalLayoutListener(mGlobalLayoutListener);
         super.onDestroy();
     }
 
