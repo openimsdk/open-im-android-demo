@@ -231,10 +231,10 @@ public class CallingServiceImp implements CallingService {
 
             @Override
             public void onSuccess(List<UserInfo> data) {
-                if (data.isEmpty()) return;
+                if (data.isEmpty()||null==callDialog) return;
                 UserInfo userInfo = data.get(0);
-
                 BaseApp.inst().realm.executeTransactionAsync(realm -> {
+                    if (null==callDialog)return;
                     CallHistory callHistory =
                         new CallHistory(callDialog.buildPrimaryKey(),
                             userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(),

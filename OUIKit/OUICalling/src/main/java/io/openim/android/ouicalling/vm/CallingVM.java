@@ -3,6 +3,7 @@ package io.openim.android.ouicalling.vm;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.media.AudioManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
@@ -114,8 +115,8 @@ public class CallingVM {
         OnBase<SignalingCertificate> certificateOnBase = new OnBase<SignalingCertificate>() {
             @Override
             public void onError(int code, String error) {
-                L.e(CallingServiceImp.TAG, error + "-" + code);
                 dismissUI();
+                Toast.makeText(BaseApp.inst(), error+"("+code+")", Toast.LENGTH_SHORT).show();
             }
 
             @Override
