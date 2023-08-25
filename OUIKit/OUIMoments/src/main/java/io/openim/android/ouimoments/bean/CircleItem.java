@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.view.View;
 
 import java.util.List;
+import java.util.Objects;
 
 
 public class CircleItem extends BaseBean{
@@ -180,4 +181,18 @@ public class CircleItem extends BaseBean{
 		}
 		return favortid;
 	}
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CircleItem)) return false;
+        CircleItem that = (CircleItem) o;
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

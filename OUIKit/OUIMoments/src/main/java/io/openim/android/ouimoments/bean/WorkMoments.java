@@ -1,6 +1,7 @@
 package io.openim.android.ouimoments.bean;
 
 import java.util.List;
+import java.util.Objects;
 
 public class WorkMoments {
     public WorkMoments workMoment;

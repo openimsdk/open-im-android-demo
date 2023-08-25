@@ -21,6 +21,7 @@ public interface CircleContract {
         void updateEditTextBodyVisible(int visibility, CommentConfig commentConfig);
         void update2loadData(int loadType, List<CircleItem> datas);
         void setRefreshing(Boolean isRefresh);
+        List<CircleItem> getAdapterData();
     }
 
     interface Presenter extends BasePresenter{

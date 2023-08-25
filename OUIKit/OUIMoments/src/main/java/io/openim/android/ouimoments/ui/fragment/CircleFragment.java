@@ -481,6 +481,11 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         recyclerView.setRefreshing(isRefresh);
     }
 
+    @Override
+    public List<CircleItem> getAdapterData() {
+        return  circleAdapter.getDatas();
+    }
+
 
     /**
      * 测量偏移量

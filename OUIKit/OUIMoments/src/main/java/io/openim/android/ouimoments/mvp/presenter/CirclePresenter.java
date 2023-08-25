@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
@@ -20,6 +21,7 @@ import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.NotificationVM;
 import io.openim.android.ouimoments.api.MomentsService;
@@ -79,6 +81,22 @@ public class CirclePresenter implements CircleContract.Presenter {
                 view.updateAdapterIndex(0);
             }
         });
+        notificationVM.customBusinessMessage.observe((LifecycleOwner) view, v -> {
+            try {
+                Map map = GsonHel.fromJson(v, Map.class);
+                String data = (String) map.get("data");
+                Map body = GsonHel.fromJson(data, Map.class);
+                WorkMoments moments = GsonHel.fromJson(GsonHel.toJson(body.get("body")),
+                    WorkMoments.class);
+                CircleItem item = getPackInCircleData(moments);
+                int index = view.getAdapterData().indexOf(item);
+                if (index >= 0) {
+                    view.getAdapterData().set(index, item);
+                    view.updateAdapterIndex(index+1);//+ header
+                }
+            } catch (Exception ignore) {
+            }
+        });
     }
 
     public void getWorkMomentsUnReadCount() {
@@ -91,13 +109,11 @@ public class CirclePresenter implements CircleContract.Presenter {
     }
 
     public void loadData(int loadType, String userID) {
-        if (loadType == TYPE_PULLREFRESH)
-            pageIndex = 1;
-        else
-            pageIndex++;
+        if (loadType == TYPE_PULLREFRESH) pageIndex = 1;
+        else pageIndex++;
 
-        Parameter parameter = MomentsService.buildPagination(pageIndex, pageSize)
-            .add("userID", userID);
+        Parameter parameter = MomentsService.buildPagination(pageIndex, pageSize).add("userID",
+            userID);
         NetObserver<MomentsBean> netObserver = new NetObserver<MomentsBean>(TAG) {
             @Override
             public void onSuccess(MomentsBean o) {
@@ -119,18 +135,9 @@ public class CirclePresenter implements CircleContract.Presenter {
             }
         };
         if (TextUtils.isEmpty(userID)) {
-            N.API(MomentsService.class)
-                .getMyMoments(parameter.buildJsonBody())
-                .compose(N.IOMain())
-                .map(OneselfService.turn(MomentsBean.class))
-                .subscribe(netObserver);
+            N.API(MomentsService.class).getMyMoments(parameter.buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(MomentsBean.class)).subscribe(netObserver);
         } else {
-            N.API(MomentsService.class)
-                .getMyMomentsById(
-                    parameter.buildJsonBody())
-                .compose(N.IOMain())
-                .map(OneselfService.turn(MomentsBean.class))
-                .subscribe(netObserver);
+            N.API(MomentsService.class).getMyMomentsById(parameter.buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(MomentsBean.class)).subscribe(netObserver);
         }
     }
 
@@ -166,8 +173,7 @@ public class CirclePresenter implements CircleContract.Presenter {
         }
         item.setContent(workMoment.content.text);
         item.setCreateTimeL(workMoment.createTime);
-        item.setCreateTime(TimeUtil.getTime(workMoment.createTime,
-            TimeUtil.yearTimeFormat));
+        item.setCreateTime(TimeUtil.getTime(workMoment.createTime, TimeUtil.yearTimeFormat));
 
         List<FavortItem> favortItems = new ArrayList<>();
         if (null != workMoment.likeUsers) {
@@ -236,26 +242,21 @@ public class CirclePresenter implements CircleContract.Presenter {
      * @Description: 删除动态
      */
     public void deleteCircle(final String circleId) {
-        N.API(MomentsService.class)
-            .deleteMoments(
-                new Parameter().add("workMomentID"
-                    , circleId).buildJsonBody()).compose(N.IOMain())
-            .map(OneselfService.turn(Object.class))
-            .subscribe(new NetObserver<Object>(TAG) {
-                @Override
-                public void onSuccess(Object o) {
-                    if (view != null) {
-                        view.update2DeleteCircle(circleId);
-                    }
+        N.API(MomentsService.class).deleteMoments(new Parameter().add("workMomentID", circleId).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Object.class)).subscribe(new NetObserver<Object>(TAG) {
+            @Override
+            public void onSuccess(Object o) {
+                if (view != null) {
+                    view.update2DeleteCircle(circleId);
                 }
+            }
 
-                @Override
-                protected void onFailure(Throwable e) {
-                    if (view != null) {
-                        view.showError(e.getMessage());
-                    }
+            @Override
+            protected void onFailure(Throwable e) {
+                if (view != null) {
+                    view.showError(e.getMessage());
                 }
-            });
+            }
+        });
     }
 
     /**
@@ -270,31 +271,28 @@ public class CirclePresenter implements CircleContract.Presenter {
     }
 
     void favortorDeleteFavort(final int circlePosition, final String mFavorId, Boolean isStar) {
-        N.API(MomentsService.class)
-            .like(new Parameter().add("workMomentID"
-                    , mFavorId)
-                .add("like", isStar)
-                .buildJsonBody()).map(OneselfService.turn(Object.class)).compose(N.IOMain()).subscribe(new NetObserver<Object>(TAG) {
-                @Override
-                public void onSuccess(Object o) {
-                    if (isStar) {
-                        FavortItem favortItem = new FavortItem();
-                        favortItem.setId(BaseApp.inst().loginCertificate.userID);
-                        favortItem.setUser(new User(BaseApp.inst().loginCertificate.userID,
-                            BaseApp.inst().loginCertificate.nickname,
-                            BaseApp.inst().loginCertificate.faceURL));
-                        view.update2AddFavorite(circlePosition, favortItem);
-                    } else {
-                        view.update2DeleteFavort(circlePosition,
-                            BaseApp.inst().loginCertificate.userID);
-                    }
+        N.API(MomentsService.class).like(new Parameter().add("workMomentID", mFavorId).add("like"
+            , isStar).buildJsonBody()).map(OneselfService.turn(Object.class)).compose(N.IOMain()).subscribe(new NetObserver<Object>(TAG) {
+            @Override
+            public void onSuccess(Object o) {
+                if (isStar) {
+                    FavortItem favortItem = new FavortItem();
+                    favortItem.setId(BaseApp.inst().loginCertificate.userID);
+                    favortItem.setUser(new User(BaseApp.inst().loginCertificate.userID,
+                        BaseApp.inst().loginCertificate.nickname,
+                        BaseApp.inst().loginCertificate.faceURL));
+                    view.update2AddFavorite(circlePosition, favortItem);
+                } else {
+                    view.update2DeleteFavort(circlePosition,
+                        BaseApp.inst().loginCertificate.userID);
                 }
+            }
 
-                @Override
-                protected void onFailure(Throwable e) {
-                    view.showError(e.getMessage());
-                }
-            });
+            @Override
+            protected void onFailure(Throwable e) {
+                view.showError(e.getMessage());
+            }
+        });
     }
 
     /**
@@ -321,37 +319,33 @@ public class CirclePresenter implements CircleContract.Presenter {
         if (config == null) {
             return;
         }
-        N.API(MomentsService.class).addComment(
-                new Parameter().add("workMomentID"
-                        , config.momentID)
-                    .add("replyUserID", null == config.replyUser ? "" : config.replyUser.getId())
-                    .add("content", content).buildJsonBody())
-            .compose(N.IOMain()).map(OneselfService.turn(HashMap.class))
-            .subscribe(new NetObserver<HashMap>(TAG) {
-                @Override
-                public void onSuccess(HashMap map) {
-                    try {
-                        String commentID = (String) map.get("commentID");
-                        CommentItem newItem = null;
-                        if (config.commentType == CommentConfig.Type.PUBLIC) {
-                            newItem = DatasUtil.createPublicComment(content);
-                        } else if (config.commentType == CommentConfig.Type.REPLY) {
-                            newItem = DatasUtil.createReplyComment(config.replyUser, content);
-                        }
-                        if (view != null && null != newItem) {
-                            newItem.setId(commentID);
-                            view.update2AddComment(config.circlePosition, newItem);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+        N.API(MomentsService.class).addComment(new Parameter().add("workMomentID",
+            config.momentID).add("replyUserID", null == config.replyUser ? "" :
+            config.replyUser.getId()).add("content", content).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(HashMap.class)).subscribe(new NetObserver<HashMap>(TAG) {
+            @Override
+            public void onSuccess(HashMap map) {
+                try {
+                    String commentID = (String) map.get("commentID");
+                    CommentItem newItem = null;
+                    if (config.commentType == CommentConfig.Type.PUBLIC) {
+                        newItem = DatasUtil.createPublicComment(content);
+                    } else if (config.commentType == CommentConfig.Type.REPLY) {
+                        newItem = DatasUtil.createReplyComment(config.replyUser, content);
                     }
+                    if (view != null && null != newItem) {
+                        newItem.setId(commentID);
+                        view.update2AddComment(config.circlePosition, newItem);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+            }
 
-                @Override
-                protected void onFailure(Throwable e) {
-                    view.showError(e.getMessage());
-                }
-            });
+            @Override
+            protected void onFailure(Throwable e) {
+                view.showError(e.getMessage());
+            }
+        });
     }
 
     /**
@@ -363,26 +357,19 @@ public class CirclePresenter implements CircleContract.Presenter {
      * @Description: 删除评论
      */
     public void deleteComment(String momentID, final int circlePosition, final String commentId) {
-        N.API(MomentsService.class)
-            .deleteComment(
-                new Parameter().add("workMomentID"
-                    , momentID).add("commentID",
-                    commentId).buildJsonBody())
-            .compose(N.IOMain())
-            .map(OneselfService.turn(Object.class))
-            .subscribe(new NetObserver<Object>(TAG) {
-                @Override
-                public void onSuccess(Object o) {
-                    if (view != null) {
-                        view.update2DeleteComment(circlePosition, commentId);
-                    }
+        N.API(MomentsService.class).deleteComment(new Parameter().add("workMomentID", momentID).add("commentID", commentId).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Object.class)).subscribe(new NetObserver<Object>(TAG) {
+            @Override
+            public void onSuccess(Object o) {
+                if (view != null) {
+                    view.update2DeleteComment(circlePosition, commentId);
                 }
+            }
 
-                @Override
-                protected void onFailure(Throwable e) {
-                    view.showError(e.getMessage());
-                }
-            });
+            @Override
+            protected void onFailure(Throwable e) {
+                view.showError(e.getMessage());
+            }
+        });
     }
 
     /**
@@ -395,30 +382,27 @@ public class CirclePresenter implements CircleContract.Presenter {
     }
 
     public void getMomentsDetail(String momentID) {
-        N.API(MomentsService.class)
-            .getCommentDetail(new Parameter().add("workMomentID"
-                , momentID).buildJsonBody())
-            .compose(N.IOMain()).map(OneselfService.turn(WorkMoments.class))
-            .subscribe(new NetObserver<WorkMoments>(TAG) {
-                @Override
-                public void onSuccess(WorkMoments o) {
-                    try {
-                        WorkMoments workMoment = o.workMoment;
-                        List<CircleItem> circleItems = new ArrayList<>();
-                        circleItems.add(getPackInCircleData(workMoment));
+        N.API(MomentsService.class).getCommentDetail(new Parameter().add("workMomentID",
+            momentID).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(WorkMoments.class)).subscribe(new NetObserver<WorkMoments>(TAG) {
+            @Override
+            public void onSuccess(WorkMoments o) {
+                try {
+                    WorkMoments workMoment = o.workMoment;
+                    List<CircleItem> circleItems = new ArrayList<>();
+                    circleItems.add(getPackInCircleData(workMoment));
 
-                        if (view != null) {
-                            view.update2loadData(0, circleItems);
-                        }
-                    } catch (Exception ignored) {
+                    if (view != null) {
+                        view.update2loadData(0, circleItems);
                     }
+                } catch (Exception ignored) {
                 }
+            }
 
-                @Override
-                protected void onFailure(Throwable e) {
-                    view.showError(e.getMessage());
-                }
-            });
+            @Override
+            protected void onFailure(Throwable e) {
+                view.showError(e.getMessage());
+            }
+        });
     }
 
     /**
