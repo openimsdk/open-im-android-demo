@@ -197,8 +197,6 @@ public class SelectTargetActivityV3 extends BaseActivity<BaseViewModel,
         });
 
     void init() {
-
-
     }
 
     @Override

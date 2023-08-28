@@ -38,6 +38,7 @@ import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
 
 
+@Deprecated
 public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> extends AppCompatActivity implements IView {
     //是否释放资源
     private boolean isRelease = true;
@@ -77,7 +78,6 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     }
 
 
-    @SuppressLint("SourceLockedOrientationActivity")
     protected void requestedOrientation() {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
@@ -195,6 +195,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     @Override
     protected void onDestroy() {
+        fasterDestroy();
         ActivityManager.remove(this);
         N.clearDispose(this);
         releaseRes();

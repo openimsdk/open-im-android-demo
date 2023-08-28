@@ -29,13 +29,16 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.ex.User;
 import io.openim.android.ouicore.net.bage.GsonHel;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.widget.CommonDialog;
@@ -153,18 +156,20 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
     }
 
     private void sendChatWindow(FriendInfo friendInfo) {
-        CommonDialog commonDialog = new CommonDialog(AllFriendActivity.this);
-        commonDialog.show();
-        LayoutCommonDialogBinding mainView = commonDialog.getMainView();
-        mainView.tips.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.send_card_confirm));
-        mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
-        mainView.confirm.setOnClickListener(v1 -> {
-            commonDialog.dismiss();
+      try {
+          MultipleChoiceVM multipleChoiceVM = Easy.find(MultipleChoiceVM.class);
+          if (null != multipleChoiceVM) {
+              multipleChoiceVM.addMetaData(friendInfo.getUserID(),
+                  friendInfo.getNickname(), friendInfo.getFaceURL());
+              multipleChoiceVM.shareCard();
 
-            setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
-                GsonHel.toJson(friendInfo)));
-            finish();
-        });
+              Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
+              Postcard postcard2 = ARouter.getInstance().build(Routes.Conversation.CHAT);
+              LogisticsCenter.completion(postcard);
+              LogisticsCenter.completion(postcard2);
+              ActivityManager.finishAllExceptActivity(postcard.getDestination(),postcard2.getDestination());
+          }
+      }catch (Exception ignored){}
     }
 
     private void sendCardMessage(FriendInfo friendInfo) {

@@ -25,9 +25,11 @@ import io.openim.android.ouicontact.databinding.ActivityOftenSerchBinding;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
@@ -206,6 +208,18 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
                     multipleChoice.key = id;
                     itemViewHo.view.select.setChecked(null != selectIds && selectIds.contains(id));
                     ((ViewHol.ItemViewHo) holder).view.getRoot().setOnClickListener(v -> {
+                       try {
+                           MultipleChoiceVM multipleChoiceVM=Easy.find(MultipleChoiceVM.class);
+                           if (null != multipleChoiceVM) {
+                               multipleChoiceVM.addMetaData( multipleChoice.key,
+                                   multipleChoice.name, multipleChoice.icon);
+                               multipleChoiceVM.shareCard();
+                               finish();
+                           }
+                           return;
+                       }catch (Exception ignore){}
+
+
                         if (null != selectIds) {
                             itemViewHo.view.select.setChecked(!itemViewHo.view.select.isChecked());
                             multipleChoice.isSelect = itemViewHo.view.select.isChecked();

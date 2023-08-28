@@ -45,6 +45,7 @@ import java.util.Map;
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.FragmentInputExpandBinding;
 import io.openim.android.ouiconversation.databinding.ItemExpandMenuBinding;
+import io.openim.android.ouiconversation.ui.ChatActivity;
 import io.openim.android.ouiconversation.ui.ShootActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
@@ -56,6 +57,7 @@ import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
@@ -146,7 +148,9 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                                 ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
                                 multipleChoiceVM.subscribe(subject -> {
                                     if (subject.equals(MultipleChoiceVM.SHARE_CARD)) {
-                                        CommonDialog commonDialog = new CommonDialog(getContext());
+                                        Activity activity=ActivityManager.isExist(ChatActivity.class);
+                                        if (null==activity)return;
+                                        CommonDialog commonDialog = new CommonDialog(activity);
                                         LayoutCommonDialogBinding mainView =
                                             commonDialog.getMainView();
                                         mainView.tips.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.send_card_confirm));

@@ -7,6 +7,7 @@ import java.lang.ref.WeakReference;
 
 import io.openim.android.ouicore.base.vm.injection.BaseVM;
 
+@Deprecated
 public class BaseViewModel<T extends IView> extends BaseVM {
     public WeakReference<Context> context;
     private WeakReference<T> IView;
