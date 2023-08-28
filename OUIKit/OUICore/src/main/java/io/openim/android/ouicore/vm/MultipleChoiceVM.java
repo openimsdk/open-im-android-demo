@@ -30,6 +30,7 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.FriendInfo;
 
 public class MultipleChoiceVM extends BaseVM {
+    public static final String SHARE_CARD = "shareCard";
     /**
      * 发起群聊
      * true 隐藏最近会话、隐藏群，只显示好友
@@ -40,10 +41,19 @@ public class MultipleChoiceVM extends BaseVM {
      * true 显示最近会话、隐藏群，只显示好友
      */
     public boolean invite;
+    /**
+     * 分享名片
+     * 隐藏最近会话、隐藏群、隐藏底部菜单、只显示好友、单选
+     */
+    public boolean isShareCard;
 
 
     public static final String NOTIFY_ITEM_REMOVED = "notify_item_removed";
     public State<List<MultipleChoice>> metaData = new State<>(new ArrayList<>());
+
+    public void shareCard() {
+        postSubject(SHARE_CARD);
+    }
 
     public boolean contains(MultipleChoice data) {
         return metaData.val().contains(data);

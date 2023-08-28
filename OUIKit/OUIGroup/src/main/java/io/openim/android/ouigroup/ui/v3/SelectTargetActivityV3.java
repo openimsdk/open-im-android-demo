@@ -61,17 +61,34 @@ public class SelectTargetActivityV3 extends BaseActivity<BaseViewModel,
 
         init();
         initView();
+        click();
         listener();
 
+
+    }
+
+    private void click() {
         view.myFriends.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withBoolean(Constant.K_RESULT,
-                true).navigation();
+            if (multipleChoiceVM.isShareCard) {
+                ARouter.getInstance().build(Routes.Contact.ALL_FRIEND)
+                    .withBoolean("formChat", true).navigation();
+            } else {
+                ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
+                    .withBoolean(Constant.IS_SELECT_FRIEND, true)
+                    .withString(Constant.K_NAME, getString(io.openim.android.ouicore.R.string.my_good_friend))
+                    .navigation();
+            }
         });
 
         view.group.setOnClickListener(v -> {
             startActivity(new Intent(this, AllGroupActivity.class));
         });
         view.searchView.setOnClickListener(v -> {
+            if (multipleChoiceVM.isShareCard){
+                ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS_GROUP).navigation();
+                return;
+            }
+
             List<String> ids = new ArrayList<>();
             for (MultipleChoice multipleChoice : multipleChoiceVM.metaData.val()) {
                 ids.add(multipleChoice.key);
@@ -93,65 +110,72 @@ public class SelectTargetActivityV3 extends BaseActivity<BaseViewModel,
     }
 
     private void initView() {
-        view.divider2.getRoot().setVisibility(!multipleChoiceVM.isCreateGroup || !multipleChoiceVM.invite ? View.GONE : View.VISIBLE);
-        //创建群、邀请入群都不显示group
-        view.group.setVisibility(multipleChoiceVM.isCreateGroup || multipleChoiceVM.invite ?
-            View.GONE : View.VISIBLE);
-
-        view.recentContact.setVisibility(View.VISIBLE);
-        view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<MsgConversation,
-            ViewHol.ItemViewHo>(ViewHol.ItemViewHo.class) {
-
-            @Override
-            public void onBindView(@NonNull ViewHol.ItemViewHo holder, MsgConversation data,
-                                   int position) {
-                boolean isGroup =
-                    data.conversationInfo.getConversationType() != ConversationType.SINGLE_CHAT;
-                String id = isGroup ? data.conversationInfo.getGroupID() :
-                    data.conversationInfo.getUserID();
-                String faceURL = data.conversationInfo.getFaceURL();
-                String name = data.conversationInfo.getShowName();
-                holder.view.avatar.load(faceURL, isGroup, isGroup ? null : name);
-                holder.view.nickName.setText(name);
-
-                holder.view.select.setVisibility(View.VISIBLE);
-
-                holder.view.select.setChecked(multipleChoiceVM.contains(new MultipleChoice(id)));
-                for (MultipleChoice choice : multipleChoiceVM.metaData.val()) {
-                    if (choice.key.equals(id)) {
-                        holder.view.select.setEnabled(choice.isEnabled);
-                    }
-                }
-
-                holder.view.getRoot().setOnClickListener(v -> {
-                    holder.view.select.setChecked(!holder.view.select.isChecked());
-
-                    if (holder.view.select.isChecked()) {
-                        MultipleChoice meta = new MultipleChoice(id);
-                        meta.isGroup = isGroup;
-                        meta.name = name;
-                        meta.icon = faceURL;
-                        multipleChoiceVM.metaData.val().add(meta);
-                        multipleChoiceVM.metaData.update();
-                    } else {
-                        multipleChoiceVM.removeMetaData(id);
-                    }
-                });
-            }
-        });
-        ContactListVM vmByCache = BaseApp.inst().getVMByCache(ContactListVM.class);
-        List<MsgConversation> conversations = new ArrayList<>();
-        if (multipleChoiceVM.invite || multipleChoiceVM.isCreateGroup) {
-            //只保留单聊
-            for (MsgConversation msgConversation : vmByCache.conversations.getValue()) {
-                if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT)
-                    conversations.add(msgConversation);
-            }
+        if (multipleChoiceVM.isShareCard) {
+            view.recentContact.setVisibility(View.GONE);
+            view.group.setVisibility(View.GONE);
+            view.myFriends.setVisibility(View.VISIBLE);
+            view.bottom.getRoot().setVisibility(View.GONE);
         } else {
-            conversations.addAll(vmByCache.conversations.getValue());
+            view.divider2.getRoot().setVisibility(!multipleChoiceVM.isCreateGroup || !multipleChoiceVM.invite ? View.GONE : View.VISIBLE);
+            //创建群、邀请入群都不显示group
+            view.group.setVisibility(multipleChoiceVM.isCreateGroup || multipleChoiceVM.invite ?
+                View.GONE : View.VISIBLE);
+
+            view.recentContact.setVisibility(View.VISIBLE);
+            view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<MsgConversation,
+                ViewHol.ItemViewHo>(ViewHol.ItemViewHo.class) {
+
+                @Override
+                public void onBindView(@NonNull ViewHol.ItemViewHo holder, MsgConversation data,
+                                       int position) {
+                    boolean isGroup =
+                        data.conversationInfo.getConversationType() != ConversationType.SINGLE_CHAT;
+                    String id = isGroup ? data.conversationInfo.getGroupID() :
+                        data.conversationInfo.getUserID();
+                    String faceURL = data.conversationInfo.getFaceURL();
+                    String name = data.conversationInfo.getShowName();
+                    holder.view.avatar.load(faceURL, isGroup, isGroup ? null : name);
+                    holder.view.nickName.setText(name);
+
+                    holder.view.select.setVisibility(View.VISIBLE);
+
+                    holder.view.select.setChecked(multipleChoiceVM.contains(new MultipleChoice(id)));
+                    for (MultipleChoice choice : multipleChoiceVM.metaData.val()) {
+                        if (choice.key.equals(id)) {
+                            holder.view.select.setEnabled(choice.isEnabled);
+                        }
+                    }
+
+                    holder.view.getRoot().setOnClickListener(v -> {
+                        holder.view.select.setChecked(!holder.view.select.isChecked());
+
+                        if (holder.view.select.isChecked()) {
+                            MultipleChoice meta = new MultipleChoice(id);
+                            meta.isGroup = isGroup;
+                            meta.name = name;
+                            meta.icon = faceURL;
+                            multipleChoiceVM.metaData.val().add(meta);
+                            multipleChoiceVM.metaData.update();
+                        } else {
+                            multipleChoiceVM.removeMetaData(id);
+                        }
+                    });
+                }
+            });
+            ContactListVM vmByCache = BaseApp.inst().getVMByCache(ContactListVM.class);
+            List<MsgConversation> conversations = new ArrayList<>();
+            if (multipleChoiceVM.invite || multipleChoiceVM.isCreateGroup) {
+                //只保留单聊
+                for (MsgConversation msgConversation : vmByCache.conversations.getValue()) {
+                    if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT)
+                        conversations.add(msgConversation);
+                }
+            } else {
+                conversations.addAll(vmByCache.conversations.getValue());
+            }
+            adapter.setItems(conversations);
         }
-        adapter.setItems(conversations);
     }
 
     private ActivityResultLauncher<Intent> launcher =

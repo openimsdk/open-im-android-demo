@@ -85,7 +85,6 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityInitiateGroupBinding.inflate(getLayoutInflater()));
 
-        buildSelectFriendsVM();
         initView();
 
         if (isSelectMember) {
@@ -94,18 +93,21 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         } else
             vm.getAllFriend();
         listener();
+        buildSelectFriendsVM();
     }
 
     private void buildSelectFriendsVM() {
         try {
             multipleChoiceVM = Easy.find(MultipleChoiceVM.class);
-            selectMemberNum= multipleChoiceVM.metaData.getValue().size();
+            selectMemberNum = multipleChoiceVM.metaData.getValue().size();
             multipleChoiceVM.bindDataToView(view.bottom);
-            multipleChoiceVM.showPopAllSelectFriends(view.bottom, LayoutPopSelectedFriendsBinding.inflate(getLayoutInflater()));
+            multipleChoiceVM.showPopAllSelectFriends(view.bottom,
+                LayoutPopSelectedFriendsBinding.inflate(getLayoutInflater()));
             multipleChoiceVM.submitTap(view.bottom.submit);
 
-            multipleChoiceVM.metaData.observe(this,v->adapter.notifyDataSetChanged());
-        } catch (Exception ignored) {}
+            multipleChoiceVM.metaData.observe(this, v -> adapter.notifyDataSetChanged());
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -118,7 +120,8 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         sink();
         if (isInviteToGroup)
             view.title.setText(io.openim.android.ouicore.R.string.Invite_to_the_group);
-        if (isRemoveGroup) view.title.setText(io.openim.android.ouicore.R.string.remove_group);
+        if (isRemoveGroup)
+            view.title.setText(io.openim.android.ouicore.R.string.remove_group);
         if (isSelectMember) {
             view.title.setText(io.openim.android.ouicore.R.string.selete_member);
             view.bottom.submit.setText("确定（0/" + maxNum + "）");
