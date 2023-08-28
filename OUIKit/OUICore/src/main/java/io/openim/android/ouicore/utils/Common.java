@@ -302,7 +302,11 @@ public class Common {
      * @param v
      */
     public static void toMap(Message message, View v) {
-        v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord=" + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey));
+        v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class)
+            .putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord="
+                + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude()
+                + "&referer=" + WebViewActivity.mapAppKey)
+            .putExtra(WebViewActivity.TITLE,v.getContext().getString(R.string.location)));
     }
 
     /***
@@ -368,6 +372,18 @@ public class Common {
             return;
         }
         target.setTag(new QBadgeView(context).bindTarget(target).setGravityOffset(10, -2, true).setBadgeNumber(badgeNumber).setBadgeTextSize(8, true).setShowShadow(false));
+    }
+
+    public static String containsLink(String text) {
+        StringBuilder links=new StringBuilder();
+        // 正则表达式模式匹配URL链接
+        String pattern = "(http|https)://[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3}(/\\S*)?";
+        Pattern regex = Pattern.compile(pattern);
+        Matcher matcher = regex.matcher(text);
+        while (matcher.find()) {
+            links.append(matcher.group());
+        }
+        return links.toString();
     }
 
     /**

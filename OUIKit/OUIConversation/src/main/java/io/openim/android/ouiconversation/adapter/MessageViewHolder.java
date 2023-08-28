@@ -36,10 +36,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
+import com.vanniktech.emoji.EmojiTextView;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.openim.android.ouiconversation.R;
 
@@ -95,6 +98,7 @@ import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.voice.listener.PlayerListener;
 import io.openim.android.ouicore.voice.player.SMediaPlayer;
 import io.openim.android.ouicore.widget.AvatarImage;
+import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.MessageStatus;
 import io.openim.android.sdk.enums.MessageType;
@@ -256,7 +260,8 @@ public class MessageViewHolder {
             if (null != chatVM.enableMultipleSelect.getValue() && chatVM.enableMultipleSelect.getValue() && message.getContentType() != MessageType.NTF_BEGIN) {
                 checkBox.setVisibility(View.VISIBLE);
                 checkBox.setChecked(msgExpand.isChoice);
-                checkBox.setOnClickListener((buttonView) -> msgExpand.isChoice = checkBox.isChecked());
+                checkBox.setOnClickListener((buttonView) -> msgExpand.isChoice =
+                    checkBox.isChecked());
             } else {
                 checkBox.setVisibility(View.GONE);
             }
@@ -367,7 +372,7 @@ public class MessageViewHolder {
             if (isOwn)
                 contentView = itemView.findViewById(R.id.content2);
             else
-                contentView  = itemView.findViewById(R.id.content);
+                contentView = itemView.findViewById(R.id.content);
             if (null == contentView) return;
 
             showMsgExMenu(contentView);
@@ -715,10 +720,11 @@ public class MessageViewHolder {
         @Override
         protected void bindLeft(View itemView, Message message) {
             LayoutMsgTxtLeftBinding v = LayoutMsgTxtLeftBinding.bind(itemView);
-            if (!handleSequence(v.content, message)) {
-                String content = message.getTextElem().getContent();
-                v.content.setText(content);
-            }
+            if (handleSequence(v.content, message)) return;
+            if (handleHyperlink(v.content, message)) return;
+
+            String content = message.getTextElem().getContent();
+            v.content.setText(content);
         }
 
         @Override
@@ -727,11 +733,31 @@ public class MessageViewHolder {
             v.avatar2.load(message.getSenderFaceUrl(), message.getSenderNickname());
             v.sendState2.setSendState(message.getStatus());
 
-            if (!handleSequence(v.content2, message)) {
-                String content = message.getTextElem().getContent();
-                v.content2.setText(content);
-            }
+            if (handleSequence(v.content2, message)) return;
+            if (handleHyperlink(v.content2, message)) return;
+
+            String content = message.getTextElem().getContent();
+            v.content2.setText(content);
         }
+
+        private boolean handleHyperlink(EmojiTextView emojiTextView, Message message) {
+            String content = message.getTextElem().getContent();
+            String link = Common.containsLink(content);
+            if (!TextUtils.isEmpty(link)) {
+                emojiTextView.setText(IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(content), link,
+                    new ClickableSpan() {
+                        @Override
+                        public void onClick(@NonNull View widget) {
+                            emojiTextView.getContext().startActivity(new Intent(emojiTextView.getContext()
+                                , WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, link));
+                        }
+                    }));
+                emojiTextView.setMovementMethod(LinkMovementMethod.getInstance());
+                return true;
+            }
+            return false;
+        }
+
 
     }
 
@@ -768,7 +794,7 @@ public class MessageViewHolder {
                 Glide.with(img.getContext()).load(url).placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo).centerInside().into(img);
             } else {
                 url = message.getPictureElem().getSourcePicture().getUrl();
-                IMUtil.loadPicture( message.getPictureElem())
+                IMUtil.loadPicture(message.getPictureElem())
                     .centerInside()
                     .into(img);
             }
@@ -928,7 +954,7 @@ public class MessageViewHolder {
             if (isOwn)
                 contentView = itemView.findViewById(R.id.videoPlay2);
             else
-                contentView  = itemView.findViewById(R.id.contentGroup);
+                contentView = itemView.findViewById(R.id.contentGroup);
             if (null == contentView) return;
 
             showMsgExMenu(contentView);
@@ -977,7 +1003,7 @@ public class MessageViewHolder {
             view.playBtn.setVisibility(View.VISIBLE);
             view.circleBar.setVisibility(View.VISIBLE);
 
-            IMUtil.loadVideoSnapshot( message.getVideoElem())
+            IMUtil.loadVideoSnapshot(message.getVideoElem())
                 .centerInside()
                 .into(view.content);
             preview(message, view.contentGroup);
@@ -1328,7 +1354,7 @@ public class MessageViewHolder {
                 v.picture1.setVisibility(View.VISIBLE);
                 if (contentType == MessageType.PICTURE) {
                     v.quoteContent1.setText(message.getSenderNickname() + ":");
-                    IMUtil.loadPicture( message.getPictureElem())
+                    IMUtil.loadPicture(message.getPictureElem())
                         .centerCrop()
                         .into(v.picture1);
                     toPreview(v.quoteLy1, message.getPictureElem().getSourcePicture().getUrl(),
@@ -1382,7 +1408,7 @@ public class MessageViewHolder {
                 }
                 if (contentType == MessageType.VIDEO) {
                     v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
-                    IMUtil.loadVideoSnapshot( message.getVideoElem())
+                    IMUtil.loadVideoSnapshot(message.getVideoElem())
                         .centerInside()
                         .into(v.picture2);
                     toPreview(v.quoteLy2, message.getVideoElem().getVideoUrl(),
