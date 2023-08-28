@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ import io.openim.android.ouicore.base.vm.injection.BaseVM;
 import io.openim.android.ouicore.databinding.LayoutPopSelectedFriendsBinding;
 import io.openim.android.ouicore.databinding.LayoutSelectedFriendsBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
@@ -53,6 +56,13 @@ public class MultipleChoiceVM extends BaseVM {
 
     public void shareCard() {
         postSubject(SHARE_CARD);
+
+        Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
+        Postcard postcard2 = ARouter.getInstance().build(Routes.Conversation.CHAT);
+        LogisticsCenter.completion(postcard);
+        LogisticsCenter.completion(postcard2);
+        ActivityManager.finishAllExceptActivity(postcard.getDestination(),
+            postcard2.getDestination());
     }
 
     public boolean contains(MultipleChoice data) {
@@ -159,7 +169,7 @@ public class MultipleChoiceVM extends BaseVM {
     }
 
     private void showConfirmDialog(Context context) {
-        ForwardDialog dialog=new ForwardDialog(context);
+        ForwardDialog dialog = new ForwardDialog(context);
         dialog.show();
     }
 }

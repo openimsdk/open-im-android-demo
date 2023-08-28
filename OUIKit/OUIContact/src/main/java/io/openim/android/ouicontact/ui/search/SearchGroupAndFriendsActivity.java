@@ -208,18 +208,6 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
                     multipleChoice.key = id;
                     itemViewHo.view.select.setChecked(null != selectIds && selectIds.contains(id));
                     ((ViewHol.ItemViewHo) holder).view.getRoot().setOnClickListener(v -> {
-                       try {
-                           MultipleChoiceVM multipleChoiceVM=Easy.find(MultipleChoiceVM.class);
-                           if (null != multipleChoiceVM) {
-                               multipleChoiceVM.addMetaData( multipleChoice.key,
-                                   multipleChoice.name, multipleChoice.icon);
-                               multipleChoiceVM.shareCard();
-                               finish();
-                           }
-                           return;
-                       }catch (Exception ignore){}
-
-
                         if (null != selectIds) {
                             itemViewHo.view.select.setChecked(!itemViewHo.view.select.isChecked());
                             multipleChoice.isSelect = itemViewHo.view.select.isChecked();
@@ -231,6 +219,18 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
                                 selectIds.remove(multipleChoice.key);
                             return;
                         }
+
+                        try {
+                            MultipleChoiceVM multipleChoiceVM=Easy.find(MultipleChoiceVM.class);
+                            if (null != multipleChoiceVM) {
+                                multipleChoiceVM.addMetaData( multipleChoice.key,
+                                    multipleChoice.name, multipleChoice.icon);
+                                multipleChoiceVM.shareCard();
+                            }
+                            return;
+                        }catch (Exception ignore){}
+
+
                         setResult(RESULT_OK, intent);
                         finish();
                     });

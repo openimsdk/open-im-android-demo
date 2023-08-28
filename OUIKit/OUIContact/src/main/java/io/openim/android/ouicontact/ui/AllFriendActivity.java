@@ -162,12 +162,6 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
               multipleChoiceVM.addMetaData(friendInfo.getUserID(),
                   friendInfo.getNickname(), friendInfo.getFaceURL());
               multipleChoiceVM.shareCard();
-
-              Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
-              Postcard postcard2 = ARouter.getInstance().build(Routes.Conversation.CHAT);
-              LogisticsCenter.completion(postcard);
-              LogisticsCenter.completion(postcard2);
-              ActivityManager.finishAllExceptActivity(postcard.getDestination(),postcard2.getDestination());
           }
       }catch (Exception ignored){}
     }

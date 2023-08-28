@@ -85,7 +85,8 @@ public class SelectTargetActivityV3 extends BaseActivity<BaseViewModel,
         });
         view.searchView.setOnClickListener(v -> {
             if (multipleChoiceVM.isShareCard){
-                ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS_GROUP).navigation();
+                ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS_GROUP)
+                    .withBoolean(Constant.IS_SELECT_FRIEND,true).navigation();
                 return;
             }
 
