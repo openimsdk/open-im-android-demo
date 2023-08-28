@@ -45,6 +45,7 @@ public class BasicActivity extends AppCompatActivity {
         if (isFinishing() && !isRecycle) {
             ActivityManager.remove(this);
             recycle();
+            isRecycle=true;
         }
     }
 
