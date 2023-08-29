@@ -450,7 +450,7 @@ public class IMEvent {
             Message msg= GsonHel.fromJson(conversationInfo.getLatestMsg(),Message.class);
             if (conversationInfo.getRecvMsgOpt() == 0
                 && conversationInfo.getUnreadCount() != 0) {
-                if (BaseApp.inst().isBackground())
+                if (BaseApp.inst().isAppBackground.val())
                     IMUtil.sendNotice(msg.getClientMsgID().hashCode());
                 else
                     IMUtil.playPrompt();

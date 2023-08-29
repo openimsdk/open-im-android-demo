@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.LanguageUtil;
@@ -26,7 +27,8 @@ public class BaseApp extends Application {
 
     private static BaseApp instance;
     public Realm realm;
-    private boolean isAppBackground;
+    public State<Boolean> isAppBackground = new State<>(false);
+    private int mActivityCount;
 
     public static BaseApp inst() {
         return instance;
@@ -77,23 +79,55 @@ public class BaseApp extends Application {
     }
 
     private void activityLifecycleCallback() {
-        ProcessLifecycleOwner.get().getLifecycle().addObserver(new DefaultLifecycleObserver() {
+//        ProcessLifecycleOwner.get().getLifecycle().addObserver(new DefaultLifecycleObserver() {
+//            @Override
+//            public void onResume(@NonNull LifecycleOwner owner) {
+//                isAppBackground.setValue(false);
+//            }
+//
+//            @Override
+//            public void onStop(@NonNull LifecycleOwner owner) {
+//                isAppBackground.setValue(true);
+//            }
+//        });
+
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
-            public void onResume(@NonNull LifecycleOwner owner) {
-                isAppBackground = false;
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
             }
 
             @Override
-            public void onStop(@NonNull LifecycleOwner owner) {
-                isAppBackground = true;
+            public void onActivityStarted(Activity activity) {
+                mActivityCount++;
+                if (isAppBackground.val())
+                    isAppBackground.setValue(false);
+            }
+
+            @Override
+            public void onActivityResumed(Activity activity) {
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity) {
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity) {
+                mActivityCount--;
+                if (mActivityCount == 0) {
+                    isAppBackground.setValue(true);
+                }
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity) {
             }
         });
     }
-
-    public boolean isBackground() {
-        return isAppBackground;
-    }
-
 
 
     @Override

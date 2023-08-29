@@ -24,6 +24,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -110,6 +111,9 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     private final int pageShow = 4;
     private List<View> guideViews = new ArrayList<>();
     private EasyWindow<?> easyWindow;
+    private Observer<? super Boolean> isAppBackgroundListener;
+    //恢复当前页面
+    boolean isRecover = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +138,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
     public void registerHomeKey(Context context) {
         //注册Home监听广播
-        mHomeKeyReceiver = new HomeWatcherReceiver();
+        if (null == mHomeKeyReceiver) mHomeKeyReceiver = new HomeWatcherReceiver();
         final IntentFilter homeFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         context.registerReceiver(mHomeKeyReceiver, homeFilter);
     }
@@ -149,8 +153,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             if (action.equals(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)) {
                 String reason = intent.getStringExtra(SYSTEM_DIALOG_REASON_KEY);
                 if (SYSTEM_DIALOG_REASON_HOME_KEY.equals(reason)) {
-                    // TODO:  HOME键，做你想做的事
-                    showFloatView();
+                    isRecover = true;
                 }
             }
         }
@@ -165,8 +168,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     public void onBackPressed() {
     }
 
-
-    private boolean isShareScreen = false;
     //分享屏幕
     private ActivityResultLauncher<Intent> screenCaptureIntentLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -195,7 +196,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             ViewMeetingFloatBinding floatView =
                 ViewMeetingFloatBinding.inflate(getLayoutInflater());
             easyWindow =
-                new EasyWindow<>(BaseApp.inst()).setContentView(floatView.getRoot()).setWidth(Common.dp2px(107)).setHeight(Common.dp2px(160)).setGravity(Gravity.RIGHT | Gravity.TOP)
+                new EasyWindow<>(BaseApp.inst()).setContentView(floatView.getRoot())
+                    .setWidth(Common.dp2px(107)).setHeight(Common.dp2px(160)).setGravity(Gravity.RIGHT | Gravity.TOP)
                     // 设置成可拖拽的
                     .setDraggable().setOnClickListener(floatView.getRoot().getId(), (window,
                                                                                      view) -> {
@@ -208,7 +210,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                         }
                     });
         }
-        if (!easyWindow.isShowing()) easyWindow.show();
+        if (!easyWindow.isShowing())
+            easyWindow.show();
     }
 
     @Override
@@ -383,10 +386,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                     List<String> ids = new ArrayList<>();
                     ids.add(data.getIdentity());
                     map.put("roomID", vm.signalingCertificate.getRoomID());
-                    if (meta.setTop)
-                        map.put("reducePinedUserIDList", ids);
-                    else
-                        map.put("addPinedUserIDList", ids);
+                    if (meta.setTop) map.put("reducePinedUserIDList", ids);
+                    else map.put("addPinedUserIDList", ids);
 
                     vm.updateMeetingInfo(map, data1 -> {
                         ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
@@ -549,16 +550,14 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                         i * pageShow + pageShow));
                 data.add(participants);
             }
-            if (null == activeSpeaker)
-                activeSpeaker = v.get(0);
+            if (null == activeSpeaker) activeSpeaker = v.get(0);
             else {
                 boolean isExist = false;
                 for (Participant participant : v) {
                     isExist = Objects.equals(participant.getIdentity(),
                         activeSpeaker.getIdentity());
                 }
-                if (!isExist)
-                    activeSpeaker = v.get(0);
+                if (!isExist) activeSpeaker = v.get(0);
             }
             data.add(0, activeSpeaker);
             adapter.setList(data);
@@ -590,6 +589,20 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     }
 
     private void listener() {
+        BaseApp.inst().isAppBackground.observeForever(isAppBackgroundListener = v -> {
+            if (isRecover && !v) {
+                moveTaskToFront(getTaskId());
+                isRecover=false;
+                return;
+            }
+            if (null != easyWindow) {
+                if (v)
+                    easyWindow.cancel();
+                else
+                    easyWindow.show();
+            }
+        });
+
         vm.allWatchedUser.observe(this, v -> {
             if (null == v) return;
             showPageFirst(v);
@@ -634,7 +647,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         view.mic.setOnClickListener(v -> vm.callViewModel.setMicEnabled(view.mic.isChecked()));
         view.camera.setOnClickListener(v -> vm.callViewModel.setCameraEnabled(view.camera.isChecked()));
         view.shareScreen.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            isShareScreen = isChecked;
             if (isChecked) {
                 requestMediaProjection();
             } else {
@@ -758,21 +770,29 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerHomeKey(this);
+    }
 
     @Override
     protected void onPause() {
         super.onPause();
+        unregisterReceiver(mHomeKeyReceiver);
         release();
     }
 
     @Override
     protected void fasterDestroy() {
         unregisterReceiver(mHomeKeyReceiver);
+        mHomeKeyReceiver = null;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        BaseApp.inst().isAppBackground.removeObserver(isAppBackgroundListener);
         release();
     }
 
@@ -901,4 +921,5 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
 
     }
+
 }
