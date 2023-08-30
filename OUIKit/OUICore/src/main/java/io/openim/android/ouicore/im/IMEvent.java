@@ -49,12 +49,14 @@ import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
+import io.openim.android.sdk.models.UsersOnlineStatus;
 
 ///im事件 统一处理
 public class IMEvent {
     private static final String TAG = "IMEvent";
     private static IMEvent listener = null;
     private List<OnConnListener> connListeners;
+    private List<OnUserListener> userListeners;
     private List<OnAdvanceMsgListener> advanceMsgListeners;
     private List<OnConversationListener> conversationListeners;
     private List<OnGroupListener> groupListeners;
@@ -63,6 +65,7 @@ public class IMEvent {
 
     public void init() {
         connListeners = new ArrayList<>();
+        userListeners = new ArrayList<>();
         advanceMsgListeners = new ArrayList<>();
         conversationListeners = new ArrayList<>();
         groupListeners = new ArrayList<>();
@@ -251,11 +254,12 @@ public class IMEvent {
 
     //连接事件
     public OnConnListener connListener = new OnConnListener() {
-        private UserLogic userLogic=Easy.find(UserLogic.class);
+        private UserLogic userLogic = Easy.find(UserLogic.class);
+
         @Override
         public void onConnectFailed(long code, String error) {
             // 连接服务器失败，可以提示用户当前网络连接不可用
-            L.d(TAG,"连接服务器失败(" + error + ")");
+            L.d(TAG, "连接服务器失败(" + error + ")");
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnectFailed(code, error);
             }
@@ -264,7 +268,7 @@ public class IMEvent {
         @Override
         public void onConnectSuccess() {
             // 已经成功连接到服务器
-            L.d(TAG,"已经成功连接到服务器");
+            L.d(TAG, "已经成功连接到服务器");
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnectSuccess();
             }
@@ -273,7 +277,7 @@ public class IMEvent {
         @Override
         public void onConnecting() {
             // 正在连接到服务器，适合在 UI 上展示“正在连接”状态。
-            L.d(TAG,"正在连接到服务器...");
+            L.d(TAG, "正在连接到服务器...");
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnecting();
             }
@@ -282,7 +286,7 @@ public class IMEvent {
         @Override
         public void onKickedOffline() {
             // 当前用户被踢下线，此时可以 UI 提示用户“您已经在其他端登录了当前账号，是否重新登录？”
-            L.d(TAG,"当前用户被踢下线");
+            L.d(TAG, "当前用户被踢下线");
             Toast.makeText(BaseApp.inst(),
                 BaseApp.inst().getString(io.openim.android.ouicore.R.string.kicked_offline_tips),
                 Toast.LENGTH_SHORT).show();
@@ -294,7 +298,7 @@ public class IMEvent {
         @Override
         public void onUserTokenExpired() {
             // 登录票据已经过期，请使用新签发的 UserSig 进行登录。
-            L.d(TAG,"登录票据已经过期");
+            L.d(TAG, "登录票据已经过期");
             Toast.makeText(BaseApp.inst(),
                 BaseApp.inst().getString(io.openim.android.ouicore.R.string.token_expired),
                 Toast.LENGTH_SHORT).show();
@@ -447,7 +451,7 @@ public class IMEvent {
     private void promptSoundOrNotification(ConversationInfo conversationInfo) {
         try {
             if (BaseApp.inst().loginCertificate.globalRecvMsgOpt == 2) return;
-            Message msg= GsonHel.fromJson(conversationInfo.getLatestMsg(),Message.class);
+            Message msg = GsonHel.fromJson(conversationInfo.getLatestMsg(), Message.class);
             if (conversationInfo.getRecvMsgOpt() == 0
                 && conversationInfo.getUnreadCount() != 0) {
                 if (BaseApp.inst().isAppBackground.val())
@@ -589,6 +593,18 @@ public class IMEvent {
         });
     }
 
+    /**
+     *  用户状态变化
+     * @param onUserListener
+     */
+    public void removeUserListener(OnUserListener onUserListener) {
+        userListeners.remove(onUserListener);
+    }
+
+    public void addUserListener(OnUserListener onUserListener) {
+        if (!userListeners.contains(onUserListener))
+            userListeners.add(onUserListener);
+    }
 
     // 用户资料变更监听
     private void userListener() {
@@ -596,11 +612,16 @@ public class IMEvent {
             @Override
             public void onSelfInfoUpdated(UserInfo info) {
                 // 当前登录用户资料变更回调
+                for (OnUserListener userListener : userListeners) {
+                    userListener.onSelfInfoUpdated(info);
+                }
             }
 
             @Override
-            public void onUserStatusChanged(String s) {
-
+            public void onUserStatusChanged(UsersOnlineStatus onlineStatus) {
+                for (OnUserListener userListener : userListeners) {
+                    userListener.onUserStatusChanged(onlineStatus);
+                }
             }
         });
     }

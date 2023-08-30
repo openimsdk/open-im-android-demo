@@ -39,19 +39,12 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
-import io.openim.android.ouicore.entity.OnlineStatus;
-import io.openim.android.ouicore.net.RXRetrofit.N;
-import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
-import io.openim.android.ouicore.net.RXRetrofit.Parameter;
-import io.openim.android.ouicore.net.bage.Base;
 import io.openim.android.ouicore.services.CallingService;
-import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
-import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.WaitDialog;
@@ -62,12 +55,14 @@ import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.enums.GroupType;
 import io.openim.android.sdk.enums.MessageStatus;
 import io.openim.android.sdk.enums.MessageType;
+import io.openim.android.sdk.enums.Platform;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.listener.OnGroupListener;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.listener.OnSignalingListener;
+import io.openim.android.sdk.listener.OnUserListener;
 import io.openim.android.sdk.models.AdvancedMessage;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.CustomSignalingInfo;
@@ -85,10 +80,12 @@ import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SearchResult;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.TextElem;
-import okhttp3.ResponseBody;
+import io.openim.android.sdk.models.UserInfo;
+import io.openim.android.sdk.models.UsersOnlineStatus;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener,
-    OnGroupListener, OnConversationListener, java.util.Observer, OnSignalingListener {
+    OnGroupListener, OnConversationListener, java.util.Observer, OnSignalingListener,
+    OnUserListener {
 
     public static final String REEDIT_MSG = "reeditMsg";
 
@@ -120,6 +117,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     //开启多选
     public State<Boolean> enableMultipleSelect = new State<>();
+
+    private UserOnlineStatusListener userOnlineStatusListener;
 
     public boolean viewPause = false;
     private MessageAdapter messageAdapter;
@@ -221,53 +220,37 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         viewPause = false;
     }
 
+
     //获取在线状态
     public void getUserOnlineStatus(UserOnlineStatusListener userOnlineStatusListener) {
+        this.userOnlineStatusListener = userOnlineStatusListener;
         List<String> uIds = new ArrayList<>();
         uIds.add(userID);
-        Parameter parameter = new Parameter().add("userIDList", uIds).add("operationID",
-            System.currentTimeMillis() + "");
-
-        N.API(OneselfService.class).getUsersOnlineStatus(Constant.getImApiUrl() + "/user" +
-                "/get_users_online_status", BaseApp.inst().loginCertificate.imToken,
-            parameter.buildJsonBody()).compose(N.IOMain()).subscribe(new NetObserver<ResponseBody>(getContext()) {
-
+        OpenIMClient.getInstance().userInfoManager.subscribeUsersOnlineStatus(new OnBase<List<UsersOnlineStatus>>() {
             @Override
-            public void onSuccess(ResponseBody o) {
-                try {
-                    String body = o.string();
-                    Base<List<OnlineStatus>> base = GsonHel.dataArray(body, OnlineStatus.class);
-                    if (base.errCode != 0) {
-                        getIView().toast(base.errDlt);
-                        return;
-                    }
-                    if (null == base.data || base.data.isEmpty()) return;
-                    userOnlineStatusListener.onResult(base.data.get(0));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            public void onError(int code, String error) {
 
             }
 
             @Override
-            protected void onFailure(Throwable e) {
-                getIView().toast(e.getMessage());
+            public void onSuccess(List<UsersOnlineStatus> data) {
+                if (null == data || data.isEmpty()) return;
+                userOnlineStatusListener.onResult(data.get(0));
             }
-        });
+        }, uIds);
+
     }
 
-    public String handlePlatformCode(List<OnlineStatus.DetailPlatformStatus> detailPlatformStatus) {
+    public String handlePlatformCode(List<Integer> platformList) {
         List<String> pList = new ArrayList<>();
-        for (OnlineStatus.DetailPlatformStatus platform : detailPlatformStatus) {
-            if (platform.platform.equals("Android") || platform.platform.equals("IOS")) {
+        for (int platform : platformList) {
+            if (platform == Platform.ANDROID || platform == Platform.IOS) {
                 pList.add(getContext().getString(io.openim.android.ouicore.R.string.mobile_phone));
-            } else if (platform.platform.equals("Windows")) {
+            } else if (platform == Platform.WIN) {
                 pList.add(getContext().getString(io.openim.android.ouicore.R.string.pc));
-            } else if (platform.platform.equals("Web")) {
+            } else if (platform == Platform.WEB) {
                 pList.add(getContext().getString(io.openim.android.ouicore.R.string.Web));
-            } else if (platform.platform.equals("MiniWeb")) {
+            } else if (platform == Platform.MINI_WEB) {
                 pList.add(getContext().getString(io.openim.android.ouicore.R.string.webMiniOnline));
             }
         }
@@ -532,8 +515,21 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         subject(REEDIT_MSG, content);
     }
 
+    @Override
+    public void onSelfInfoUpdated(UserInfo info) {
+
+    }
+
+    @Override
+    public void onUserStatusChanged(UsersOnlineStatus onlineStatus) {
+        if (onlineStatus.getUserID().equals(userID)
+            && null != userOnlineStatusListener) {
+            userOnlineStatusListener.onResult(onlineStatus);
+        }
+    }
+
     public interface UserOnlineStatusListener {
-        void onResult(OnlineStatus onlineStatus);
+        void onResult(UsersOnlineStatus onlineStatus);
     }
 
     private void getConversationInfo() {
@@ -597,8 +593,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private void loadHistory() {
         //加载消息记录
-        if (fromChatHistory)
-            loadHistoryMessageReverse();
+        if (fromChatHistory) loadHistoryMessageReverse();
         else loadHistoryMessage();
     }
 
@@ -609,6 +604,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         IMEvent.getInstance().removeGroupListener(this);
         IMEvent.getInstance().removeConversationListener(this);
         IMEvent.getInstance().removeSignalingListener(this);
+        IMEvent.getInstance().removeUserListener(this);
         inputMsg.removeObserver(inputObserver);
 
         for (Timer value : readVanishTimers.values()) {
@@ -704,6 +700,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 }
             }, userID, "");
         });
+        IMEvent.getInstance().addUserListener(this);
     }
 
 
@@ -1007,9 +1004,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 @Override
                 public void onSuccess(Message message) {
                     try {
-                        getIView().toast(getContext()
-                            .getString(io.openim.android.ouicore.R.string.send_succ));
-                    } catch (Exception ignored) {}
+                        getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.send_succ));
+                    } catch (Exception ignored) {
+                    }
                 }
             };
         }

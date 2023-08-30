@@ -76,6 +76,7 @@ import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.Participant;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SignalingInfo;
+import io.openim.android.sdk.models.UsersOnlineStatus;
 
 @Route(path = Routes.Conversation.CHAT)
 public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> implements ChatVM.ViewAction, Observer {
@@ -106,10 +107,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private ActivityResultLauncher<Intent> chatSettingActivityLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == RESULT_OK) {
-                finish();
-            }
-        });
+        if (result.getResultCode() == RESULT_OK) {
+            finish();
+        }
+    });
 
     private void initVM() {
         Easy.installVM(CustomEmojiVM.class);
@@ -246,25 +247,23 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         if (!chatBg.isEmpty()) Glide.with(this).load(chatBg).into(view.chatBg);
 
 
-//        if (vm.isSingleChat) {
-//            vm.getUserOnlineStatus(onlineStatus -> {
-//                boolean isOnline = onlineStatus.status.equals("online");
-//                view.leftBg.setVisibility(View.VISIBLE);
-//                if (isOnline) {
-//                    view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable
-//                    .sty_radius_max_10cc64);
-//                    view.onlineStatus.setText(String.format(getString(io.openim.android.ouicore
-//                    .R.string.online), vm.handlePlatformCode(onlineStatus.detailPlatformStatus)));
-//                } else {
-//                    view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable
-//                    .sty_radius_max_ff999999);
-//                    view.onlineStatus.setText(io.openim.android.ouicore.R.string.offline);
-//                }
-//            });
-//        }
+        if (vm.isSingleChat) {
+            vm.getUserOnlineStatus(this::showOnlineStatus);
+        }
         view.waterMark.setText(BaseApp.inst().loginCertificate.nickname);
+    }
 
-
+    private void showOnlineStatus(UsersOnlineStatus onlineStatus) {
+        boolean isOnline = onlineStatus.status == 1;
+        view.leftBg.setVisibility(View.VISIBLE);
+        if (isOnline) {
+            view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_max_10cc64);
+            view.onlineStatus.setText(String.format(getString(io.openim.android.ouicore.R.string.online),
+                vm.handlePlatformCode(onlineStatus.platformIDs)));
+        } else {
+            view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_max_ff999999);
+            view.onlineStatus.setText(io.openim.android.ouicore.R.string.offline);
+        }
     }
 
     //记录原始窗口高度
@@ -513,8 +512,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             try {
                 Editable editable = bottomInputCote.view.chatInput.getText();
                 if (!TextUtils.isEmpty(editable)) {
-                    CharSequence finallyStr = editable.subSequence(editable.length() - 1
-                        , editable.length());
+                    CharSequence finallyStr = editable.subSequence(editable.length() - 1,
+                        editable.length());
                     if (finallyStr.toString().equals("@")) {
                         editable.replace(editable.length() - 1, editable.length(),
                             new SpannableStringBuilder(""));
@@ -527,7 +526,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 List<MultipleChoice> extra =
                     (List<MultipleChoice>) data.getSerializableExtra(Constant.K_RESULT);
                 List<Message> atMessages = vm.atMessages.getValue();
-                t:for (MultipleChoice multipleChoice : extra) {
+                t:
+                for (MultipleChoice multipleChoice : extra) {
                     for (Message atMessage : atMessages) {
                         if (multipleChoice.key.equals(atMessage.getSendID())) {
                             continue t;
