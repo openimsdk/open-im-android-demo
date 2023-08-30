@@ -13,6 +13,8 @@ import androidx.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 import io.livekit.android.renderer.TextureViewRenderer;
 import io.livekit.android.room.participant.ConnectionQuality;
 import io.livekit.android.room.participant.Participant;
@@ -53,6 +55,7 @@ public class SingleTextureView extends FrameLayout {
 
     private void initView() {
         view = ViewSingleTextureBinding.inflate(LayoutInflater.from(getContext()));
+        view.switchCamera.setOnClickListener(v -> vm.callViewModel.flipCamera());
         addView(view.getRoot());
     }
 
@@ -110,10 +113,14 @@ public class SingleTextureView extends FrameLayout {
 
     private void handleCenter(Participant data) {
         boolean textureViewUse = data.isCameraEnabled() || data.isScreenShareEnabled();
+        boolean isShowSwitchCamera=data.isCameraEnabled()&& Objects.equals(data.getIdentity(),
+            BaseApp.inst().loginCertificate.userID);
+        view.switchCamera.setVisibility(isShowSwitchCamera?VISIBLE:GONE);
         view.textureView.setVisibility(textureViewUse ? View.VISIBLE : View.GONE);
         view.avatar.setVisibility(textureViewUse ? View.GONE : View.VISIBLE);
         ParticipantMeta meta = GsonHel.fromJson(data.getMetadata(), ParticipantMeta.class);
         L.e(TAG, "------name-----" + vm.getMetaUserName(meta) + "----isCameraEnabled----" + textureViewUse);
+
         if (null != meta) view.avatar.load(meta.userInfo.getFaceURL(), vm.getMetaUserName(meta));
     }
 

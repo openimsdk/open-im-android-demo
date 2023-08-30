@@ -9,6 +9,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <ImageView
+        android:id="@+id/switchCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:src="@mipmap/ic_switch_camera"
+        android:visibility="gone" />
+
     <io.openim.android.ouicore.widget.AvatarImage
         android:id="@+id/avatar"
         android:layout_width="@dimen/button_height"

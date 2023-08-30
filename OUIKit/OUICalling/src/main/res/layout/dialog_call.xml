@@ -53,10 +53,10 @@
                     <CheckBox
                         android:id="@+id/switchCamera"
                         android:layout_width="wrap_content"
-                        android:button="@null"
                         android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:background="@mipmap/ic_switch_camera" />
+                        android:background="@mipmap/ic_switch_camera"
+                        android:button="@null"
+                        android:padding="5dp" />
                 </LinearLayout>
 
 
