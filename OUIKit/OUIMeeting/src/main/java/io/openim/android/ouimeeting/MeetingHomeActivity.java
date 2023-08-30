@@ -196,8 +196,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             ViewMeetingFloatBinding floatView =
                 ViewMeetingFloatBinding.inflate(getLayoutInflater());
             easyWindow =
-                new EasyWindow<>(BaseApp.inst()).setContentView(floatView.getRoot())
-                    .setWidth(Common.dp2px(107)).setHeight(Common.dp2px(160)).setGravity(Gravity.RIGHT | Gravity.TOP)
+                new EasyWindow<>(BaseApp.inst()).setContentView(floatView.getRoot()).setWidth(Common.dp2px(107)).setHeight(Common.dp2px(160)).setGravity(Gravity.RIGHT | Gravity.TOP)
                     // 设置成可拖拽的
                     .setDraggable().setOnClickListener(floatView.getRoot().getId(), (window,
                                                                                      view) -> {
@@ -210,8 +209,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                         }
                     });
         }
-        if (!easyWindow.isShowing())
-            easyWindow.show();
+        if (!easyWindow.isShowing()) easyWindow.show();
     }
 
     @Override
@@ -592,14 +590,12 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         BaseApp.inst().isAppBackground.observeForever(isAppBackgroundListener = v -> {
             if (isRecover && !v) {
                 moveTaskToFront(getTaskId());
-                isRecover=false;
+                isRecover = false;
                 return;
             }
             if (null != easyWindow) {
-                if (v)
-                    easyWindow.cancel();
-                else
-                    easyWindow.show();
+                if (v) easyWindow.cancel();
+                else easyWindow.show();
             }
         });
 
@@ -779,13 +775,17 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(mHomeKeyReceiver);
+        unregisterHomeKey();
         release();
+    }
+
+    private void unregisterHomeKey() {
+        if (null != mHomeKeyReceiver) unregisterReceiver(mHomeKeyReceiver);
     }
 
     @Override
     protected void fasterDestroy() {
-        unregisterReceiver(mHomeKeyReceiver);
+        unregisterHomeKey();
         mHomeKeyReceiver = null;
     }
 
