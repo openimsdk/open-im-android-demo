@@ -31,6 +31,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.BaseRequestOptions;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.runtime.Permission;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -105,17 +107,13 @@ public class IMUtil {
     public static RequestBuilder<?> loadPicture(PictureElem elem) {
         String url = "";
         String filePath = elem.getSourcePath();
-        if (GetFilePathFromUri.fileIsExists(filePath))
-            url = filePath;
+        if (GetFilePathFromUri.fileIsExists(filePath)) url = filePath;
         if (TextUtils.isEmpty(url) && null != elem.getSnapshotPicture())
             url = elem.getSnapshotPicture().getUrl();
         if (TextUtils.isEmpty(url)) {
             url = elem.getSourcePicture().getUrl();
         }
-        return Glide.with(BaseApp.inst())
-            .load(url)
-            .placeholder(R.mipmap.ic_chat_photo)
-            .error(R.mipmap.ic_chat_photo);
+        return Glide.with(BaseApp.inst()).load(url).placeholder(R.mipmap.ic_chat_photo).error(R.mipmap.ic_chat_photo);
     }
 
     /**
@@ -131,10 +129,7 @@ public class IMUtil {
             //远程
             path = elem.getSnapshotUrl();
         }
-        return Glide.with(BaseApp.inst())
-            .load(path)
-            .placeholder(R.mipmap.ic_chat_photo)
-            .error(R.mipmap.ic_chat_photo);
+        return Glide.with(BaseApp.inst()).load(path).placeholder(R.mipmap.ic_chat_photo).error(R.mipmap.ic_chat_photo);
     }
 
 
@@ -213,13 +208,12 @@ public class IMUtil {
                     msg.setContentType(customType);
 
                     if (customType == Constant.MsgType.CUSTOMIZE_MEETING) {
-                        MeetingInfo meetingInfo = GsonHel.fromJson(JSONObject.toJSONString(result),
-                            MeetingInfo.class);
+                        MeetingInfo meetingInfo =
+                            GsonHel.fromJson(JSONObject.toJSONString(result), MeetingInfo.class);
                         meetingInfo.startTime = TimeUtil.getTime(meetingInfo.start * 1000,
                             TimeUtil.yearTimeFormat);
                         BigDecimal bigDecimal =
-                            (BigDecimal.valueOf(meetingInfo.duration)
-                                .divide(BigDecimal.valueOf(3600), 1, BigDecimal.ROUND_HALF_DOWN));
+                            (BigDecimal.valueOf(meetingInfo.duration).divide(BigDecimal.valueOf(3600), 1, BigDecimal.ROUND_HALF_DOWN));
                         meetingInfo.durationStr =
                             bigDecimal.toString() + BaseApp.inst().getString(R.string.hour);
                         msgExpand.meetingInfo = meetingInfo;
@@ -236,8 +230,7 @@ public class IMUtil {
                         int second = msgExpand.callHistory.getDuration() / 1000;
                         String secondFormat = TimeUtil.secondFormat(second, TimeUtil.secondFormat);
                         msgExpand.callDuration =
-                            BaseApp.inst().getString(io.openim.android.ouicore.R.string.call_time)
-                                + (second < 60 ? ("00:" + secondFormat) : secondFormat);
+                            BaseApp.inst().getString(io.openim.android.ouicore.R.string.call_time) + (second < 60 ? ("00:" + secondFormat) : secondFormat);
                     }
                 }
             }
@@ -288,8 +281,7 @@ public class IMUtil {
                 //a 撤回了一条消息
                 String txt = String.format(ctx.getString(R.string.revoke_tips),
                     revokedInfo.getRevokerNickname());
-                tips = getSingleSequence(msg.getGroupID(),
-                    revokedInfo.getRevokerNickname(),
+                tips = getSingleSequence(msg.getGroupID(), revokedInfo.getRevokerNickname(),
                     revokedInfo.getRevokerID(), txt);
                 break;
             }
@@ -621,8 +613,7 @@ public class IMUtil {
         try {
             switch (msg.getContentType()) {
                 default:
-                    if (!TextUtils.isEmpty(msgExpand.tips))
-                        lastMsg = msgExpand.tips.toString();
+                    if (!TextUtils.isEmpty(msgExpand.tips)) lastMsg = msgExpand.tips.toString();
                     break;
 
                 case MessageType.TEXT:
@@ -659,8 +650,7 @@ public class IMUtil {
                         lastMsg =
                             IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(atTxt),
                                 tar, android.R.color.holo_red_dark, null);
-                    } else
-                        lastMsg = atTxt;
+                    } else lastMsg = atTxt;
                     break;
 
                 case MessageType.MERGER:
@@ -712,8 +702,7 @@ public class IMUtil {
     public static SignalingInfo buildSignalingInfo(boolean isVideoCalls, boolean isSingleChat,
                                                    List<String> inviteeUserIDs, String groupID) {
         boolean isGroupChat = !TextUtils.isEmpty(groupID);
-        if (!isGroupChat)
-            groupID = UUID.randomUUID().toString(); //单聊Id自动生成
+        if (!isGroupChat) groupID = UUID.randomUUID().toString(); //单聊Id自动生成
 
         SignalingInfo signalingInfo = new SignalingInfo();
         String inId = BaseApp.inst().loginCertificate.userID;
@@ -728,10 +717,9 @@ public class IMUtil {
         signalingInvitationInfo.setMediaType(isVideoCalls ? Constant.MediaType.VIDEO :
             Constant.MediaType.AUDIO);
         signalingInvitationInfo.setPlatformID(IMUtil.PLATFORM_ID);
-        signalingInvitationInfo.setSessionType(isSingleChat ? ConversationType.SINGLE_CHAT
-            : ConversationType.SUPER_GROUP_CHAT);
-        if (isGroupChat)
-            signalingInvitationInfo.setGroupID(groupID);
+        signalingInvitationInfo.setSessionType(isSingleChat ? ConversationType.SINGLE_CHAT :
+            ConversationType.SUPER_GROUP_CHAT);
+        if (isGroupChat) signalingInvitationInfo.setGroupID(groupID);
 
         signalingInfo.setInvitation(signalingInvitationInfo);
         signalingInfo.setOfflinePushInfo(new OfflinePushInfo());
@@ -742,6 +730,8 @@ public class IMUtil {
      * 弹出底部菜单选择 音视通话
      */
     public static void showBottomPopMenu(Context context, View.OnKeyListener v) {
+        boolean hasPermissions = AndPermission.hasPermissions(context, Permission.CAMERA,
+            Permission.RECORD_AUDIO);
         BottomPopDialog dialog = new BottomPopDialog(context);
         dialog.show();
         dialog.getMainView().menu3.setOnClickListener(v1 -> dialog.dismiss());
@@ -749,12 +739,16 @@ public class IMUtil {
         dialog.getMainView().menu2.setText(io.openim.android.ouicore.R.string.video_calls);
 
         dialog.getMainView().menu1.setOnClickListener(v1 -> {
-            v.onKey(v1, 1, null);
-            dialog.dismiss();
+            Common.permission(context, () -> {
+                v.onKey(v1, 1, null);
+                dialog.dismiss();
+            }, hasPermissions, Permission.CAMERA, Permission.RECORD_AUDIO);
         });
         dialog.getMainView().menu2.setOnClickListener(v1 -> {
-            v.onKey(v1, 2, null);
-            dialog.dismiss();
+            Common.permission(context, () -> {
+                v.onKey(v1, 2, null);
+                dialog.dismiss();
+            }, hasPermissions, Permission.CAMERA, Permission.RECORD_AUDIO);
         });
     }
 
@@ -797,14 +791,7 @@ public class IMUtil {
         String CHANNEL_ID = Constant.NOTICE_TAG;
         String CHANNEL_NAME = BaseApp.inst().getString(R.string.msg_notification);
         Notification notification =
-            new NotificationCompat.Builder(BaseApp.inst(), CHANNEL_ID)
-                .setContentTitle(BaseApp.inst().getString(R.string.app_name)).setContentText(BaseApp.inst().getString(R.string.a_message_is_received))
-                .setSmallIcon(R.mipmap.ic_logo)
-                .setContentIntent(hangPendingIntent)
-                .setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
-                .setSound(Uri.parse("android.resource://"
-                    + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring)).build();
+            new NotificationCompat.Builder(BaseApp.inst(), CHANNEL_ID).setContentTitle(BaseApp.inst().getString(R.string.app_name)).setContentText(BaseApp.inst().getString(R.string.a_message_is_received)).setSmallIcon(R.mipmap.ic_logo).setContentIntent(hangPendingIntent).setAutoCancel(true).setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE).setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring)).build();
 
         //Android 8.0 以上需包添加渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

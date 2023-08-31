@@ -173,27 +173,23 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         adapter.setItems(menuIcons);
     }
 
-    @SuppressLint("WrongConstant")
     private void goToCall() {
-        Common.permission(getContext(), () -> {
-            hasStorage = true;
-            CallingService callingService =
-                (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-            if (null == callingService) return;
-            IMUtil.showBottomPopMenu(getContext(), (v1, keyCode, event) -> {
-                vm.isVideoCall = keyCode != 1;
-                if (vm.isSingleChat) {
-                    List<String> ids = new ArrayList<>();
-                    ids.add(vm.userID);
-                    SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
-                        vm.isSingleChat, ids, null);
-                    callingService.call(signalingInfo);
-                } else {
-                    toSelectMember();
-                }
-                return false;
-            });
-        }, hasStorage, Permission.Group.STORAGE);
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null == callingService) return;
+        IMUtil.showBottomPopMenu(getContext(), (v1, keyCode, event) -> {
+            vm.isVideoCall = keyCode != 1;
+            if (vm.isSingleChat) {
+                List<String> ids = new ArrayList<>();
+                ids.add(vm.userID);
+                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
+                    vm.isSingleChat, ids, null);
+                callingService.call(signalingInfo);
+            } else {
+                toSelectMember();
+            }
+            return false;
+        });
     }
 
     public void toSelectMember() {

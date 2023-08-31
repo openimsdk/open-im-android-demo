@@ -326,7 +326,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                         vm.isSingleChat, ids, null);
                     callingService.call(signalingInfo);
                 } else {
-
                     GroupVM groupVM = new GroupVM();
                     groupVM.groupId = vm.groupID;
                     BaseApp.inst().putVM(groupVM);

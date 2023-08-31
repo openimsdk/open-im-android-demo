@@ -23,6 +23,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.hjq.window.EasyWindow;
 import com.igexin.sdk.PushManager;
+import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 
@@ -91,10 +92,10 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         runOnUiThread(() -> {
             hasShoot = AndPermission.hasPermissions(MainActivity.this, Permission.CAMERA,
                 Permission.RECORD_AUDIO);
-            Common.permission(MainActivity.this, () -> {
-                hasShoot = true;
-                AndPermission.with(this).overlay().start();
-            }, hasShoot, Permission.CAMERA, Permission.RECORD_AUDIO);
+            AndPermission.with(this).overlay()
+                .onGranted(data -> Common.permission(MainActivity.this,
+                    () -> hasShoot = true, hasShoot,
+                    Permission.CAMERA, Permission.RECORD_AUDIO)).start();
         });
     }
 
@@ -186,7 +187,6 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         }
         Common.UIHandler.postDelayed(this::bindDot, 500);
     }
-
 
 
     /**
