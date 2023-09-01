@@ -136,8 +136,9 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
         view.addChat.setOnClickListener(v -> {
             MultipleChoiceVM choiceVM = Easy.installVM(MultipleChoiceVM.class);
             choiceVM.isCreateGroup = true;
-            if (null!=userInfo)
-            choiceVM.addMetaData(userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL());
+            if (null != userInfo)
+                choiceVM.addMetaData(userInfo.getUserID(), userInfo.getNickname(),
+                    userInfo.getFaceURL());
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
         });
         view.picture.setOnClickListener(v -> {
@@ -280,7 +281,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             @Override
             public void onSuccess(List<UserInfo> data) {
                 if (data.isEmpty()) return;
-                userInfo=data.get(0);
+                userInfo = data.get(0);
                 view.avatar.load(userInfo.getFaceURL());
                 view.userName.setText(userInfo.getNickname());
 
