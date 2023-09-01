@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
@@ -522,8 +523,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onUserStatusChanged(UsersOnlineStatus onlineStatus) {
-        if (onlineStatus.getUserID().equals(userID)
-            && null != userOnlineStatusListener) {
+        if (onlineStatus.getUserID().equals(userID) && null != userOnlineStatusListener) {
             userOnlineStatusListener.onResult(onlineStatus);
         }
     }
@@ -733,10 +733,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 removeLoading(list);
             }
             return;
-        } else {
-            startMsg = data.get(0);
-            Collections.reverse(data);
         }
+        startMsg = data.get(0);
+        Collections.reverse(data);
         if (list.isEmpty()) {
             IMUtil.calChatTimeInterval(data);
             messages.setValue(data);
@@ -749,7 +748,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             return;
         }
         removeLoading(list);
-        list.addAll(data);
+        if (!new HashSet<>(list).containsAll(data))
+            list.addAll(data);
         IMUtil.calChatTimeInterval(list);
         list.add(loading);
         messageAdapter.notifyItemRangeChanged(list.size() - 1 - data.size(), list.size() - 1);
@@ -1108,7 +1108,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     waitDialog.dismiss();
                     messages.getValue().clear();
                     messageAdapter.notifyDataSetChanged();
-                    getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.clear_succ));
+                    toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.clear_succ));
                 }
             });
     }

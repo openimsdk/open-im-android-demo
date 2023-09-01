@@ -26,6 +26,7 @@ import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IMBack;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.GroupVM;
@@ -184,7 +185,12 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         });
 
     private void click() {
-
+        view.userId.setOnClickListener(v -> {
+          try {
+              Common.copy(vm.userInfo.getValue().get(0).getUserID());
+              toast(getString(io.openim.android.ouicore.R.string.copy_succ));
+          }catch (Exception ignore){}
+        });
         view.userInfo.setOnClickListener(v -> {
             personDataActivityLauncher.launch(new Intent(this, PersonDataActivity.class).putExtra(Constant.K_ID, vm.userInfo.getValue().get(0).getUserID()));
         });

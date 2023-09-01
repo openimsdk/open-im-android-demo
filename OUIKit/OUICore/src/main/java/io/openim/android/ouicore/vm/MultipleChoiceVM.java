@@ -55,14 +55,14 @@ public class MultipleChoiceVM extends BaseVM {
     public State<List<MultipleChoice>> metaData = new State<>(new ArrayList<>());
 
     public void shareCard() {
-        postSubject(SHARE_CARD);
-
         Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
         Postcard postcard2 = ARouter.getInstance().build(Routes.Conversation.CHAT);
         LogisticsCenter.completion(postcard);
         LogisticsCenter.completion(postcard2);
         ActivityManager.finishAllExceptActivity(postcard.getDestination(),
             postcard2.getDestination());
+
+        postSubject(SHARE_CARD);
     }
 
     public boolean contains(MultipleChoice data) {
