@@ -259,6 +259,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         OpenIMClient.getInstance().conversationManager.pinConversation(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
+                toast(error+"("+code+")");
             }
 
             @Override
