@@ -264,7 +264,8 @@ public class GroupVM extends SocialityVM {
                 if (isAddUp) {
                     superGroupMembers.getValue().addAll(getExGroupMemberInfos(data));
                     superGroupMembers.setValue(superGroupMembers.getValue());
-                } else superGroupMembers.setValue(getExGroupMemberInfos(data));
+                } else
+                    superGroupMembers.setValue(getExGroupMemberInfos(data));
             }
         }, groupId, ids);
     }

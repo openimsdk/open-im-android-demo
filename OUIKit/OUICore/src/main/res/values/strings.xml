@@ -498,4 +498,7 @@
     <string name="timing_meeting_tips">不能选择已过去的时间</string>
     <string name="cancle_see_he">取消看他</string>
     <string name="recover">" 回复 "</string>
+    <string name="edit_group_name2">修改群聊名称</string>
+    <string name="edit_group_name_tips">修改群聊名称后，将在群内通知其他成员。</string>
+    <string name="in_group_name_tips">昵称修改后，只会在此群内显示，群内成员都可以看见。</string>
 </resources>

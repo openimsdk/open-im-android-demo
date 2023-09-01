@@ -17,6 +17,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.vanniktech.ui.Color;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
 import io.openim.android.ouicore.widget.SingleInfoModifyActivity;
+import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityGroupMaterialBinding;
 
@@ -82,14 +84,14 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         infoModifyLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-            if (result.getResultCode() != RESULT_OK) return;
-            String var =
-                result.getData().getStringExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA);
-            if (infoModifyType == 1)
-                vm.UPDATEGroup(vm.groupId, var, null, null, null, null);
-            if (infoModifyType == 2)
-                vm.setGroupMemberNickname(vm.groupId, vm.loginCertificate.userID, var);
-        });
+                    if (result.getResultCode() != RESULT_OK) return;
+                    String var =
+                        result.getData().getStringExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA);
+                    if (infoModifyType == 1)
+                        vm.UPDATEGroup(vm.groupId, var, null, null, null, null);
+                    if (infoModifyType == 2)
+                        vm.setGroupMemberNickname(vm.groupId, vm.loginCertificate.userID, var);
+                });
     }
 
     void init() {
@@ -104,7 +106,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
         view.noDisturb.setOnSlideButtonClickListener(is -> {
             if (null == iConversationBridge) return;
-            iConversationBridge.setConversationRecvMessageOpt(is ? Opt.ReceiveNotNotifyMessage : Opt.NORMAL,
+            iConversationBridge.setConversationRecvMessageOpt(is ? Opt.ReceiveNotNotifyMessage :
+                    Opt.NORMAL,
                 iConversationBridge.getConversationInfo().getConversationID());
         });
         view.chatHistory.setOnClickListener(v -> {
@@ -130,30 +133,61 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
         view.groupName.setOnClickListener(v -> {
             if (vm.isOwner()) {
-               try {
-                   infoModifyType = 1;
-                   SingleInfoModifyActivity.SingleInfoModifyData modifyData =
-                       new SingleInfoModifyActivity.SingleInfoModifyData();
-                   modifyData.title = "修改群聊名称";
-                   modifyData.description = "修改群聊名称后，将在群内通知其他成员。";
-                   modifyData.avatarUrl = vm.groupsInfo.getValue().getFaceURL();
-                   modifyData.editT = vm.groupsInfo.getValue().getGroupName();
-                   infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
-               }catch (Exception ignored){}
+                try {
+                    infoModifyType = 1;
+                    SingleInfoModifyActivity.SingleInfoModifyData modifyData =
+                        new SingleInfoModifyActivity.SingleInfoModifyData();
+                    modifyData.title =
+                        getString(io.openim.android.ouicore.R.string.edit_group_name2);
+                    modifyData.description =
+                        getString(io.openim.android.ouicore.R.string.edit_group_name_tips);
+                    modifyData.avatarUrl = vm.groupsInfo.getValue().getFaceURL();
+                    modifyData.editT = vm.groupsInfo.getValue().getGroupName();
+                    infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
+                } catch (Exception ignored) {
+                }
             }
         });
         view.myName.setOnClickListener(v -> {
             try {
-            infoModifyType = 2;
-            SingleInfoModifyActivity.SingleInfoModifyData modifyData =
-                new SingleInfoModifyActivity.SingleInfoModifyData();
-            modifyData.title = "我在群里的昵称";
-            modifyData.description = "昵称修改后，只会在此群内显示，群内成员都可以看见。";
-            ExGroupMemberInfo exGroupMemberInfo = vm.getOwnInGroup(vm.loginCertificate.userID);
-            modifyData.avatarUrl = exGroupMemberInfo.groupMembersInfo.getFaceURL();
-            modifyData.editT = exGroupMemberInfo.groupMembersInfo.getNickname();
-            infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
-            }catch (Exception ignored){}
+                infoModifyType = 2;
+                SingleInfoModifyActivity.SingleInfoModifyData modifyData =
+                    new SingleInfoModifyActivity.SingleInfoModifyData();
+                modifyData.title = getString(io.openim.android.ouicore.R.string.in_group_name);
+                modifyData.description =
+                    getString(io.openim.android.ouicore.R.string.in_group_name_tips);
+                ExGroupMemberInfo exGroupMemberInfo = vm.getOwnInGroup(vm.loginCertificate.userID);
+                if (null == exGroupMemberInfo) {
+                    WaitDialog waitDialog = new WaitDialog(this);
+                    waitDialog.show();
+                    vm.getGroupMembersInfo(
+                        new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
+                            @Override
+                            public void onError(int code, String error) {
+                                waitDialog.dismiss();
+                            }
+
+                            @Override
+                            public void onSuccess(List<GroupMembersInfo> data) {
+                                waitDialog.dismiss();
+                                if (data.isEmpty()) return;
+                                GroupMembersInfo membersInfo = data.get(0);
+                                modifyData.avatarUrl = membersInfo.getFaceURL();
+                                modifyData.editT = membersInfo.getNickname();
+                                infoModifyLauncher.launch(new Intent(GroupMaterialActivity.this,
+                                    SingleInfoModifyActivity.class)
+                                    .putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA,
+                                        modifyData));
+                            }
+                        },
+                        new ArrayList<>(Collections.singleton(BaseApp.inst().loginCertificate.userID)));
+                } else {
+                    modifyData.avatarUrl = exGroupMemberInfo.groupMembersInfo.getFaceURL();
+                    modifyData.editT = exGroupMemberInfo.groupMembersInfo.getNickname();
+                    infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
+                }
+            } catch (Exception ignored) {
+            }
         });
         view.avatarEdit.setOnClickListener(v -> {
             if (!vm.isGroupOwner.getValue()) return;
@@ -234,8 +268,10 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
                 holder.view.txt.setTextSize(12);
                 holder.view.txt.setTextColor(getResources().getColor(io.openim.android.ouicore.R.color.txt_shallow));
-                holder.view.img.setVisibility(TextUtils.isEmpty(data.getGroupID())?View.GONE:View.VISIBLE);
-                holder.view.img2.setVisibility(TextUtils.isEmpty(data.getGroupID())?View.VISIBLE:View.GONE);
+                holder.view.img.setVisibility(TextUtils.isEmpty(data.getGroupID()) ? View.GONE :
+                    View.VISIBLE);
+                holder.view.img2.setVisibility(TextUtils.isEmpty(data.getGroupID()) ?
+                    View.VISIBLE : View.GONE);
                 if (TextUtils.isEmpty(data.getGroupID())) {
                     //加/减按钮
                     int reId;
@@ -293,7 +329,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             }
 
             adapter.setItems(groupMembersInfos1);
-            spanCount=5;
+            spanCount = 5;
         });
 
         iConversationBridge.setNotDisturbStatusListener(this, data -> {
