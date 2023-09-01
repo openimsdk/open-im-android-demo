@@ -28,6 +28,7 @@ import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.ActivityChatSettingBinding;
 import io.openim.android.ouiconversation.databinding.LayoutBurnAfterReadingBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
@@ -35,6 +36,7 @@ import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.SlideButton;
@@ -47,6 +49,7 @@ import io.openim.android.sdk.models.UserInfo;
 public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding> implements ChatVM.ViewAction {
 
     ContactListVM contactListVM = new ContactListVM();
+    UserInfo userInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,32 +112,33 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
                     } else {
                         seconds = num * (60 * 60 * 24 * 30);
                     }
-                    OpenIMClient.getInstance().conversationManager.setConversationMsgDestructTime(new IMUtil.IMCallBack<String>(){
+                    OpenIMClient.getInstance().conversationManager.setConversationMsgDestructTime(new IMUtil.IMCallBack<String>() {
                         @Override
                         public void onSuccess(String data) {
                             vm.conversationInfo.val().setMsgDestructTime(seconds);
                             vm.conversationInfo.update();
                         }
-                    },vm.conversationID,seconds);
+                    }, vm.conversationID, seconds);
                 });
                 commonDialog.show();
             }
         });
-        view.periodicDeletion
-            .setOnSlideButtonClickListener(isChecked -> {
-                OpenIMClient.getInstance().conversationManager
-                    .setConversationIsMsgDestruct(new IMUtil.IMCallBack<String>() {
-                        @Override
-                        public void onSuccess(String data) {
-                            vm.conversationInfo.val().setMsgDestruct(isChecked);
-                            vm.conversationInfo.update();
-                        }
-                    }, vm.conversationID, isChecked);
-            });
+        view.periodicDeletion.setOnSlideButtonClickListener(isChecked -> {
+            OpenIMClient.getInstance().conversationManager.setConversationIsMsgDestruct(new IMUtil.IMCallBack<String>() {
+                @Override
+                public void onSuccess(String data) {
+                    vm.conversationInfo.val().setMsgDestruct(isChecked);
+                    vm.conversationInfo.update();
+                }
+            }, vm.conversationID, isChecked);
+        });
 
         view.addChat.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withString(Constant.K_ID,
-                vm.userID).withBoolean(Constant.K_RESULT, true).navigation();
+            MultipleChoiceVM choiceVM = Easy.installVM(MultipleChoiceVM.class);
+            choiceVM.isCreateGroup = true;
+            if (null!=userInfo)
+            choiceVM.addMetaData(userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL());
+            ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
         });
         view.picture.setOnClickListener(v -> {
             startActivity(new Intent(this, MediaHistoryActivity.class).putExtra(Constant.K_RESULT
@@ -204,10 +208,8 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
                 view.roller.setAdapter(new ArrayWheelAdapter(strings));
                 int duration = vm.conversationInfo.val().getBurnDuration();
                 int currentItem = 0;
-                if (duration == 300)
-                    currentItem = 1;
-                if (duration >= 3600)
-                    currentItem = 2;
+                if (duration == 300) currentItem = 1;
+                if (duration >= 3600) currentItem = 2;
                 view.roller.setCurrentItem(currentItem);
                 view.roller.setCyclic(false);
                 commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
@@ -240,7 +242,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
         if (days <= 6) {
             return days + getString(io.openim.android.ouicore.R.string.day);
-        } else if (weeks <= 6 &&(days % 7==0)) {
+        } else if (weeks <= 6 && (days % 7 == 0)) {
             return weeks + getString(io.openim.android.ouicore.R.string.week);
         } else {
             return months + getString(io.openim.android.ouicore.R.string.month);
@@ -278,8 +280,10 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             @Override
             public void onSuccess(List<UserInfo> data) {
                 if (data.isEmpty()) return;
-                view.avatar.load(data.get(0).getFaceURL());
-                view.userName.setText(data.get(0).getNickname());
+                userInfo=data.get(0);
+                view.avatar.load(userInfo.getFaceURL());
+                view.userName.setText(userInfo.getNickname());
+
             }
         }, uid);
 
