@@ -262,7 +262,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             // 不允许添加组成员为好友
             applyMemberFriend = groupInfo.getApplyMemberFriend() == 1;
 
-            view.addFriend.setVisibility((applyMemberFriend || isFriend||oneself()) ? View.GONE :
+            view.addFriend.setVisibility((applyMemberFriend || isFriend || oneself()) ? View.GONE :
                 View.VISIBLE);
             view.userId.setVisibility(applyMemberFriend ? View.GONE : View.VISIBLE);
 
@@ -284,7 +284,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                     isFriend = true;
                 } else {
                     view.userInfo.setVisibility(View.GONE);
-                    view.addFriend.setVisibility(View.VISIBLE);
+                    view.addFriend.setVisibility(oneself()?View.GONE:View.VISIBLE);
                 }
             }
             if (!TextUtils.isEmpty(groupId)) {
