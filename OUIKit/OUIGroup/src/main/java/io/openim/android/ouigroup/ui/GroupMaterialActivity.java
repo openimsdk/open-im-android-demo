@@ -100,6 +100,10 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     private void click() {
+        view.groupId.setOnClickListener(v -> {
+            Common.copy(vm.groupId);
+            toast(getString(io.openim.android.ouicore.R.string.copy_succ));
+        });
         view.topSlideButton.setOnSlideButtonClickListener(is -> {
             if (null == iConversationBridge) return;
             iConversationBridge.pinConversation(iConversationBridge.getConversationInfo(), is);
