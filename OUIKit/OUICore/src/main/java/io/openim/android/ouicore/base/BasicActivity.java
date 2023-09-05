@@ -10,11 +10,13 @@ import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.ViewDataBinding;
 
 import io.openim.android.ouicore.utils.ActivityManager;
 
-public class BasicActivity extends AppCompatActivity {
+public class BasicActivity<T extends ViewDataBinding> extends AppCompatActivity {
     boolean isRecycle;
+    protected T view;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -22,6 +24,12 @@ public class BasicActivity extends AppCompatActivity {
         requestedOrientation();
         super.onCreate(savedInstanceState);
         setLightStatus();
+    }
+
+    public void viewBinding(T viewDataBinding) {
+        view = viewDataBinding;
+        setContentView(view.getRoot());
+        view.setLifecycleOwner(this);
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -43,9 +51,10 @@ public class BasicActivity extends AppCompatActivity {
 
     void fasterDestroy() {
         if (isFinishing() && !isRecycle) {
+            isRecycle = true;
             ActivityManager.remove(this);
+            view.unbind();
             recycle();
-            isRecycle=true;
         }
     }
 
@@ -61,8 +70,7 @@ public class BasicActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
     }
 }
