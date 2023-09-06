@@ -164,10 +164,12 @@ public class IMUtil {
         for (int i = list.size() - 1; i >= 0; i--) {
             Message message = list.get(i);
             MsgExpand msgExpand = (MsgExpand) message.getExt();
-            if (null == msgExpand) msgExpand = new MsgExpand();
+            if (null == msgExpand)
+                msgExpand = new MsgExpand();
             //重置
             msgExpand.isShowTime = false;
-            if (message.getContentType() >= MessageType.NTF_BEGIN || message.getContentType() == MessageType.REVOKE_MESSAGE_NTF)
+            if (message.getContentType() >= MessageType.NTF_BEGIN
+                || message.getContentType() == MessageType.REVOKE_MESSAGE_NTF)
                 continue;
 
             if (lastShowTimeStamp == 0 || (message.getSendTime() - lastShowTimeStamp > (1000 * 60 * 10))) {

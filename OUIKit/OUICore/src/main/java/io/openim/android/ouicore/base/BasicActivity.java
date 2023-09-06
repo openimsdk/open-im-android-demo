@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -60,6 +61,10 @@ public class BasicActivity<T extends ViewDataBinding> extends AppCompatActivity 
 
     protected void recycle() {
 
+    }
+
+    public void toast(String tips) {
+        Toast.makeText(this, tips, Toast.LENGTH_LONG).show();
     }
 
     protected void setLightStatus() {

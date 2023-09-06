@@ -43,7 +43,7 @@ public class ImagePagerActivity extends AppCompatActivity {
     public static final String INTENT_POSITION = "position";
     public static final String INTENT_IMAGESIZE = "imagesize";
 
-    private List<View> guideViewList = new ArrayList<View>();
+    private List<View> guideViewList = new ArrayList<>();
     private LinearLayout guideGroup;
     public ImageSize imageSize;
     private int startPos;
@@ -123,7 +123,9 @@ public class ImagePagerActivity extends AppCompatActivity {
                 view.setBackgroundResource(io.openim.android.ouicore.R.drawable.selector_guide_bg);
                 view.setSelected(i == startPos ? true : false);
                 LinearLayout.LayoutParams layoutParams =
-                    new LinearLayout.LayoutParams(getResources().getDimensionPixelSize(R.dimen.gudieview_width), getResources().getDimensionPixelSize(R.dimen.gudieview_heigh));
+                    new LinearLayout.LayoutParams(getResources().getDimensionPixelSize(
+                        io.openim.android.ouicore.R.dimen.gudieview_width),
+                        getResources().getDimensionPixelSize(io.openim.android.ouicore.R.dimen.gudieview_heigh));
                 layoutParams.setMargins(10, 0, 0, 0);
                 guideGroup.addView(view, layoutParams);
                 guideViewList.add(view);

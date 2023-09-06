@@ -41,16 +41,13 @@ import com.vanniktech.emoji.EmojiTextView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import io.openim.android.ouiconversation.R;
+
 
 import io.openim.android.ouiconversation.databinding.LayoutLoadingSmallBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgAudioLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgAudioRightBinding;
-
-
 import io.openim.android.ouiconversation.databinding.LayoutMsgCardLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgCardRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgExMenuBinding;
@@ -71,7 +68,7 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
 import io.openim.android.ouiconversation.ui.ChatHistoryDetailsActivity;
 import io.openim.android.ouiconversation.ui.MsgReadStatusActivity;
-import io.openim.android.ouiconversation.ui.PreviewActivity;
+import io.openim.android.ouiconversation.ui.PreviewMediaActivity;
 import io.openim.android.ouiconversation.vm.CustomEmojiVM;
 import io.openim.android.ouiconversation.widget.SendStateView;
 import io.openim.android.ouiconversation.vm.ChatVM;
@@ -94,6 +91,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.ForwardVM;
 import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.voice.listener.PlayerListener;
 import io.openim.android.ouicore.voice.player.SMediaPlayer;
@@ -106,7 +104,6 @@ import io.openim.android.sdk.models.CardElem;
 import io.openim.android.sdk.models.MergeElem;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.QuoteElem;
-import io.openim.android.sdk.models.TextElem;
 import io.openim.android.sdk.models.VideoElem;
 
 public class MessageViewHolder {
@@ -308,10 +305,8 @@ public class MessageViewHolder {
         @SuppressLint("SetTextI18n")
         private void hName() {
             TextView nickName;
-            if (isOwn)
-                nickName = itemView.findViewById(R.id.nickName2);
-            else
-                nickName = itemView.findViewById(R.id.nickName);
+            if (isOwn) nickName = itemView.findViewById(R.id.nickName2);
+            else nickName = itemView.findViewById(R.id.nickName);
             if (null != nickName) {
                 String time = TimeUtil.getTimeString(message.getSendTime());
                 nickName.setVisibility(View.VISIBLE);
@@ -369,10 +364,8 @@ public class MessageViewHolder {
 
         public void hContentView() {
             View contentView;
-            if (isOwn)
-                contentView = itemView.findViewById(R.id.content2);
-            else
-                contentView = itemView.findViewById(R.id.content);
+            if (isOwn) contentView = itemView.findViewById(R.id.content2);
+            else contentView = itemView.findViewById(R.id.content);
             if (null == contentView) return;
 
             showMsgExMenu(contentView);
@@ -402,8 +395,7 @@ public class MessageViewHolder {
          */
         protected void showMsgExMenu(View view) {
             view.setOnLongClickListener(v -> {
-                if (null != chatVM.enableMultipleSelect.val()
-                    && chatVM.enableMultipleSelect.val())
+                if (null != chatVM.enableMultipleSelect.val() && chatVM.enableMultipleSelect.val())
                     return true;
                 List<Integer> menuIcons = new ArrayList<>();
                 List<String> menuTitles = new ArrayList<>();
@@ -566,8 +558,10 @@ public class MessageViewHolder {
                 if (message.getContentType() == MessageType.CUSTOM_FACE) {
 
                 } else {
+                    PreviewMediaVM previewMediaVM = Easy.installVM(PreviewMediaVM.class);
+                    previewMediaVM.previewMultiple(chatVM.mediaDataList, url);
                     view.getContext().startActivity(new Intent(view.getContext(),
-                        PreviewActivity.class).putExtra(PreviewActivity.MEDIA_URL, url).putExtra(PreviewActivity.FIRST_FRAME, firstFrameUrl));
+                        PreviewMediaActivity.class));
                 }
             });
         }
@@ -744,14 +738,12 @@ public class MessageViewHolder {
             String content = message.getTextElem().getContent();
             String link = Common.containsLink(content);
             if (!TextUtils.isEmpty(link)) {
-                emojiTextView.setText(IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(content), link,
-                    new ClickableSpan() {
-                        @Override
-                        public void onClick(@NonNull View widget) {
-                            emojiTextView.getContext().startActivity(new Intent(emojiTextView.getContext()
-                                , WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, link));
-                        }
-                    }));
+                emojiTextView.setText(IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(content), link, new ClickableSpan() {
+                    @Override
+                    public void onClick(@NonNull View widget) {
+                        emojiTextView.getContext().startActivity(new Intent(emojiTextView.getContext(), WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, link));
+                    }
+                }));
                 emojiTextView.setMovementMethod(LinkMovementMethod.getInstance());
                 return true;
             }
@@ -794,9 +786,7 @@ public class MessageViewHolder {
                 Glide.with(img.getContext()).load(url).placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo).centerInside().into(img);
             } else {
                 url = message.getPictureElem().getSourcePicture().getUrl();
-                IMUtil.loadPicture(message.getPictureElem())
-                    .centerInside()
-                    .into(img);
+                IMUtil.loadPicture(message.getPictureElem()).centerInside().into(img);
             }
             return url;
         }
@@ -951,10 +941,8 @@ public class MessageViewHolder {
         @Override
         public void hContentView() {
             View contentView;
-            if (isOwn)
-                contentView = itemView.findViewById(R.id.videoPlay2);
-            else
-                contentView = itemView.findViewById(R.id.contentGroup);
+            if (isOwn) contentView = itemView.findViewById(R.id.videoPlay2);
+            else contentView = itemView.findViewById(R.id.contentGroup);
             if (null == contentView) return;
 
             showMsgExMenu(contentView);
@@ -979,9 +967,7 @@ public class MessageViewHolder {
             String secondFormat = TimeUtil.getTime((int) videoElem.getDuration(),
                 TimeUtil.minuteTimeFormat);
             view.duration2.setText(secondFormat);
-            IMUtil.loadVideoSnapshot(videoElem)
-                .centerInside()
-                .into(view.content2);
+            IMUtil.loadVideoSnapshot(videoElem).centerInside().into(view.content2);
             preview(message, view.videoPlay2);
         }
 
@@ -1003,9 +989,7 @@ public class MessageViewHolder {
             view.playBtn.setVisibility(View.VISIBLE);
             view.circleBar.setVisibility(View.VISIBLE);
 
-            IMUtil.loadVideoSnapshot(message.getVideoElem())
-                .centerInside()
-                .into(view.content);
+            IMUtil.loadVideoSnapshot(message.getVideoElem()).centerInside().into(view.content);
             preview(message, view.contentGroup);
         }
     }
@@ -1354,17 +1338,13 @@ public class MessageViewHolder {
                 v.picture1.setVisibility(View.VISIBLE);
                 if (contentType == MessageType.PICTURE) {
                     v.quoteContent1.setText(message.getSenderNickname() + ":");
-                    IMUtil.loadPicture(message.getPictureElem())
-                        .centerCrop()
-                        .into(v.picture1);
+                    IMUtil.loadPicture(message.getPictureElem()).centerCrop().into(v.picture1);
                     toPreview(v.quoteLy1, message.getPictureElem().getSourcePicture().getUrl(),
                         null);
                 }
                 if (contentType == MessageType.VIDEO) {
                     v.quoteContent1.setText(message.getSenderNickname() + ":");
-                    IMUtil.loadVideoSnapshot(message.getVideoElem())
-                        .centerCrop()
-                        .into(v.picture1);
+                    IMUtil.loadVideoSnapshot(message.getVideoElem()).centerCrop().into(v.picture1);
                     toPreview(v.quoteLy1, message.getVideoElem().getVideoUrl(),
                         message.getVideoElem().getSnapshotUrl());
                 }
@@ -1400,17 +1380,13 @@ public class MessageViewHolder {
                 v.picture2.setVisibility(View.VISIBLE);
                 if (contentType == MessageType.PICTURE) {
                     v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
-                    IMUtil.loadPicture(message.getPictureElem())
-                        .centerInside()
-                        .into(v.picture2);
+                    IMUtil.loadPicture(message.getPictureElem()).centerInside().into(v.picture2);
                     toPreview(v.quoteLy2, message.getPictureElem().getSourcePicture().getUrl(),
                         null);
                 }
                 if (contentType == MessageType.VIDEO) {
                     v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
-                    IMUtil.loadVideoSnapshot(message.getVideoElem())
-                        .centerInside()
-                        .into(v.picture2);
+                    IMUtil.loadVideoSnapshot(message.getVideoElem()).centerInside().into(v.picture2);
                     toPreview(v.quoteLy2, message.getVideoElem().getVideoUrl(),
                         message.getVideoElem().getSnapshotUrl());
                 }

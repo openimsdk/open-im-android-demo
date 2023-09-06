@@ -48,6 +48,7 @@ import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 
@@ -75,6 +76,7 @@ import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
+import io.openim.android.sdk.models.PictureElem;
 import io.openim.android.sdk.models.ReadReceiptInfo;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.RoomCallingInfo;
@@ -83,12 +85,15 @@ import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.TextElem;
 import io.openim.android.sdk.models.UserInfo;
 import io.openim.android.sdk.models.UsersOnlineStatus;
+import io.openim.android.sdk.models.VideoElem;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener,
     OnGroupListener, OnConversationListener, java.util.Observer, OnSignalingListener,
     OnUserListener {
 
     public static final String REEDIT_MSG = "reeditMsg";
+    //图片、视频消息 用于预览
+    public List<PreviewMediaVM.MediaData> mediaDataList = new ArrayList<>();
 
     public CallingService callingService =
         (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
@@ -726,9 +731,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         for (Message datum : data) {
             IMUtil.buildExpandInfo(datum);
         }
-        List<Message> list = messages.getValue();
+        List<Message> list = messages.val();
         if (data.isEmpty()) {
-            if (!messages.getValue().isEmpty()) {
+            if (!messages.val().isEmpty()) {
                 isNoData.setValue(true);
                 removeLoading(list);
             }
@@ -737,22 +742,51 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         startMsg = data.get(0);
         Collections.reverse(data);
         if (list.isEmpty()) {
-            IMUtil.calChatTimeInterval(data);
+            lastHandleMsg(data);
             messages.setValue(data);
             return;
         }
         if (isReverse) {
             list.addAll(0, data);
-            IMUtil.calChatTimeInterval(list);
+            lastHandleMsg(list);
             messageAdapter.notifyItemRangeInserted(0, data.size());
             return;
         }
         removeLoading(list);
-        if (!new HashSet<>(list).containsAll(data))
-            list.addAll(data);
-        IMUtil.calChatTimeInterval(list);
+        if (!new HashSet<>(list).containsAll(data)) list.addAll(data);
+        lastHandleMsg(list);
         list.add(loading);
         messageAdapter.notifyItemRangeChanged(list.size() - 1 - data.size(), list.size() - 1);
+    }
+
+    private void lastHandleMsg(List<Message> list) {
+        IMUtil.calChatTimeInterval(list);
+        for (Message message : list) {
+            addMediaList(message);
+        }
+    }
+
+    /**
+     * 添加到媒体集合
+     *
+     * @param datum
+     */
+    private void addMediaList(Message datum) {
+        PreviewMediaVM.MediaData mediaData = null;
+        if (datum.getContentType() == MessageType.PICTURE) {
+            PictureElem pictureElem = datum.getPictureElem();
+            mediaData = new PreviewMediaVM.MediaData(pictureElem.getSourcePicture().getUrl());
+            mediaData.thumbnail = pictureElem.getSnapshotPicture().getUrl();
+        }
+        if (datum.getContentType() == MessageType.VIDEO) {
+            VideoElem videoElem = datum.getVideoElem();
+            mediaData = new PreviewMediaVM.MediaData(videoElem.getVideoUrl());
+            mediaData.isVideo = true;
+            mediaData.thumbnail = videoElem.getSnapshotUrl();
+        }
+        if (null != mediaData && !mediaDataList.contains(mediaData)) {
+            mediaDataList.add(0,mediaData);
+        }
     }
 
     //移除加载视图
@@ -799,6 +833,11 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         return isCurSingleChat || isCurGroupChat;
     }
 
+    /**
+     * 接收到新消息
+     *
+     * @param msg
+     */
     @Override
     public void onRecvNewMessage(Message msg) {
         if (!isCurrentChat(msg)) return;
@@ -813,9 +852,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
         }
         if (isTyp) return;
-
         messages.getValue().add(0, IMUtil.buildExpandInfo(msg));
-        IMUtil.calChatTimeInterval(messages.getValue());
+
         UIHandler.post(() -> {
             getIView().scrollToPosition(0);
             messageAdapter.notifyItemInserted(0);
@@ -969,7 +1007,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 int index = messages.val().indexOf(msg);
                 messages.val().remove(index);
                 messages.val().add(index, IMUtil.buildExpandInfo(message));
-                IMUtil.calChatTimeInterval(messages.val());
+                lastHandleMsg(messages.val());
                 messageAdapter.notifyItemChanged(index);
             }
         }, msg, userID, groupID, offlinePushInfo);

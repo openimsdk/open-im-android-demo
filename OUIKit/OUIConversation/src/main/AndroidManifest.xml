@@ -40,7 +40,7 @@
             android:name=".ui.ChatHistorySearchActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.PreviewActivity"
+            android:name=".ui.PreviewMediaActivity"
             android:exported="false" />
         <activity
             android:name=".ui.ShootActivity"
