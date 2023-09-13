@@ -11,8 +11,9 @@ ext {
             targetSdk  : 32,
             compileSdk : 33,
             versionCode: 53,
-            versionName: "OpenIM-Android(toc_enterprise_rtc) 3.2.1 SDK v3.2.1-rc.0-e-v1.0.1",
-            abiFilters : ['armeabi-v7a', 'arm64-v8a']
+            versionName: "OpenIM-Android(toc_enterprise_rtc) 3.3.0 SDK v3.3.0-e-v1.0.1",
+            abiFilters : [ 'arm64-v8a']
+//            'armeabi-v7a',
     ]
 
     applicationId = [

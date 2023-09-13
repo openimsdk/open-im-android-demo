@@ -12,6 +12,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.vanniktech.ui.Color;
@@ -26,12 +28,16 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
+import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.IConversationBridge;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
@@ -94,6 +100,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                 });
     }
 
+
     void init() {
         iConversationBridge =
             (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();
@@ -111,15 +118,13 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         view.noDisturb.setOnSlideButtonClickListener(is -> {
             if (null == iConversationBridge) return;
             iConversationBridge.setConversationRecvMessageOpt(is ? Opt.ReceiveNotNotifyMessage :
-                    Opt.NORMAL,
-                iConversationBridge.getConversationInfo().getConversationID());
+                Opt.NORMAL, iConversationBridge.getConversationInfo().getConversationID());
         });
         view.chatHistory.setOnClickListener(v -> {
             ARouter.getInstance().build(Routes.Conversation.CHAT_HISTORY).navigation();
         });
         view.photo.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Conversation.MEDIA_HISTORY)
-                .withBoolean(Constant.K_RESULT, true).navigation();
+            ARouter.getInstance().build(Routes.Conversation.MEDIA_HISTORY).withBoolean(Constant.K_RESULT, true).navigation();
         });
         view.video.setOnClickListener(v -> {
             ARouter.getInstance().build(Routes.Conversation.MEDIA_HISTORY).navigation();
@@ -164,27 +169,23 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                 if (null == exGroupMemberInfo) {
                     WaitDialog waitDialog = new WaitDialog(this);
                     waitDialog.show();
-                    vm.getGroupMembersInfo(
-                        new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
-                            @Override
-                            public void onError(int code, String error) {
-                                waitDialog.dismiss();
-                            }
+                    vm.getGroupMembersInfo(new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
+                        @Override
+                        public void onError(int code, String error) {
+                            waitDialog.dismiss();
+                        }
 
-                            @Override
-                            public void onSuccess(List<GroupMembersInfo> data) {
-                                waitDialog.dismiss();
-                                if (data.isEmpty()) return;
-                                GroupMembersInfo membersInfo = data.get(0);
-                                modifyData.avatarUrl = membersInfo.getFaceURL();
-                                modifyData.editT = membersInfo.getNickname();
-                                infoModifyLauncher.launch(new Intent(GroupMaterialActivity.this,
-                                    SingleInfoModifyActivity.class)
-                                    .putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA,
-                                        modifyData));
-                            }
-                        },
-                        new ArrayList<>(Collections.singleton(BaseApp.inst().loginCertificate.userID)));
+                        @Override
+                        public void onSuccess(List<GroupMembersInfo> data) {
+                            waitDialog.dismiss();
+                            if (data.isEmpty()) return;
+                            GroupMembersInfo membersInfo = data.get(0);
+                            modifyData.avatarUrl = membersInfo.getFaceURL();
+                            modifyData.editT = membersInfo.getNickname();
+                            infoModifyLauncher.launch(new Intent(GroupMaterialActivity.this,
+                                SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
+                        }
+                    }, new ArrayList<>(Collections.singleton(BaseApp.inst().loginCertificate.userID)));
                 } else {
                     modifyData.avatarUrl = exGroupMemberInfo.groupMembersInfo.getFaceURL();
                     modifyData.editT = exGroupMemberInfo.groupMembersInfo.getNickname();
@@ -292,8 +293,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     holder.view.img.load(data.getFaceURL(), data.getNickname());
                     holder.view.txt.setText(data.getNickname());
                     holder.view.getRoot().setOnClickListener(v -> {
-                        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID,
-                            data.getUserID()).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
+                        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, data.getUserID()).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
                     });
                 }
             }
@@ -308,12 +308,29 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                 io.openim.android.ouicore.R.string.quit_group));
 
             view.all.setText(String.format(getResources().getString(io.openim.android.ouicore.R.string.view_all_member), groupInfo.getMemberCount()));
+            if (groupInfo.getMemberCount() == 0) {
+                view.quitGroup.setText(io.openim.android.ouicore.R.string.delete_conversiton);
+                view.quitGroup.setOnClickListener(new OnDedrepClickListener() {
+                    @Override
+                    public void click(View v) {
+                        ContactListVM contactListVM =
+                            BaseApp.inst().getVMByCache(ContactListVM.class);
+                        if (null != contactListVM) {
+                            contactListVM.deleteConversationAndDeleteAllMsg(conversationId);
+                            Postcard postcard =
+                                ARouter.getInstance().build(Routes.Conversation.CHAT);
+                            LogisticsCenter.completion(postcard);
+                            ActivityManager.finishActivity(postcard.getDestination());
+                            finish();
+                        }
+                    }
+                });
+            }
         });
 
         vm.groupMembers.observe(this, groupMembersInfos -> {
             if (groupMembersInfos.isEmpty()) return;
-            view.all.setText(String.format(getResources().getString(io.openim.android.ouicore.R.string.view_all_member),
-                vm.groupsInfo.getValue().getMemberCount()));
+            view.all.setText(String.format(getResources().getString(io.openim.android.ouicore.R.string.view_all_member), vm.groupsInfo.getValue().getMemberCount()));
             spanCount = spanCount * 2;
             boolean owner = vm.isOwner();
             int end = owner ? spanCount - 2 : spanCount - 1;

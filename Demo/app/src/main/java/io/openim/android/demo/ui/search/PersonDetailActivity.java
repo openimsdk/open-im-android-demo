@@ -133,13 +133,13 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             if (oneself()) return;
 
             view.manager.setVisibility(isOwner(oneselfGroupMembersInfo) ? View.VISIBLE : View.GONE);
-            if (isOwner(oneselfGroupMembersInfo)){
+            if (isOwner(oneselfGroupMembersInfo)) {
                 //自己是群主-显示
                 view.mute.setVisibility(View.VISIBLE);
-            }else {
+            } else {
                 //自己是管理员且对方不是群主不是管理员-显示
                 if (isAdmin(oneselfGroupMembersInfo)
-                    && !isOwner(targetGroupMembersInfo)&& !isAdmin(targetGroupMembersInfo))
+                    && !isOwner(targetGroupMembersInfo) && !isAdmin(targetGroupMembersInfo))
                     view.mute.setVisibility(View.VISIBLE);
                 else
                     view.mute.setVisibility(View.GONE);
@@ -165,9 +165,11 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                     @Override
                     public void onSuccess(String data) {
                         GroupVM groupVM = BaseApp.inst().getVMByCache(GroupVM.class);
-                        groupVM.superGroupMembers.getValue().clear();
-                        groupVM.page = 0;
-                        groupVM.getSuperGroupMemberList();
+                        if (null != groupVM) {
+                            groupVM.superGroupMembers.val().clear();
+                            groupVM.page = 0;
+                            groupVM.getSuperGroupMemberList();
+                        }
                     }
                 }, groupId, uid, isChecked ? GroupRole.ADMIN :
                     GroupRole.MEMBER);
@@ -186,10 +188,11 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
 
     private void click() {
         view.userId.setOnClickListener(v -> {
-          try {
-              Common.copy(vm.userInfo.getValue().get(0).getUserID());
-              toast(getString(io.openim.android.ouicore.R.string.copy_succ));
-          }catch (Exception ignore){}
+            try {
+                Common.copy(vm.userInfo.getValue().get(0).getUserID());
+                toast(getString(io.openim.android.ouicore.R.string.copy_succ));
+            } catch (Exception ignore) {
+            }
         });
         view.userInfo.setOnClickListener(v -> {
             personDataActivityLauncher.launch(new Intent(this, PersonDataActivity.class).putExtra(Constant.K_ID, vm.userInfo.getValue().get(0).getUserID()));
@@ -284,7 +287,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                     isFriend = true;
                 } else {
                     view.userInfo.setVisibility(View.GONE);
-                    view.addFriend.setVisibility(oneself()?View.GONE:View.VISIBLE);
+                    view.addFriend.setVisibility(oneself() ? View.GONE : View.VISIBLE);
                 }
             }
             if (!TextUtils.isEmpty(groupId)) {

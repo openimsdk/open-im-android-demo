@@ -338,7 +338,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public void onConversationChanged(List<ConversationInfo> list) {
         try {
             for (ConversationInfo info : list) {
-                if (info.getConversationID().equals(conversationInfo.getValue().getConversationID()))
+                if (info.getConversationID().equals(conversationInfo.val().getConversationID()))
                     conversationInfo.setValue(info);
             }
         } catch (Exception ignored) {

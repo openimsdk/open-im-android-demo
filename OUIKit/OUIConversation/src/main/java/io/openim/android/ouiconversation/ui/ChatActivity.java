@@ -426,6 +426,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
         vm.conversationInfo.observe(this, conversationInfo -> {
             bindShowName();
+            vm.getGroupsInfo(vm.groupID, data -> {
+                if (data.isEmpty())return;
+                vm.groupInfo.setValue(data.get(0));
+            });
         });
 
         vm.roomCallingInfo.observe(this, roomCallingInfo -> {

@@ -222,8 +222,17 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         view.bottom.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectMemberNum));
         if (isSelectMember)
             view.bottom.submit.setText("确定（" + selectMemberNum + "/" + maxNum + "）");
-        else view.bottom.submit.setText("确定（" + selectMemberNum + "/999）");
-        view.bottom.submit.setEnabled(selectMemberNum > 0);
+        else
+            view.bottom.submit.setText("确定（" + selectMemberNum + "/999）");
+
+        if (isInviteToGroup){
+            view.bottom.selectNum.setVisibility(vm.selectedFriendInfoV3.size()>0?View.VISIBLE:View.GONE);
+            view.bottom.submit.setEnabled(selectMemberNum > 0&&vm.selectedFriendInfoV3.size()>0);
+        }else {
+            view.bottom.submit.setEnabled(selectMemberNum > 0);
+        }
+
+
     }
 
     private int getSelectNum() {

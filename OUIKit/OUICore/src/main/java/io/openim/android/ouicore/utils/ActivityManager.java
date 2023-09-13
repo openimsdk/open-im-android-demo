@@ -37,9 +37,14 @@ public class ActivityManager {
      * 结束指定类名的Activity
      */
     public static void finishActivity(Class<?> cls) {
-        for (Activity activity : activityStack) {
+        Iterator<Activity> iterator = activityStack.iterator();
+        while (iterator.hasNext()) {
+            Activity activity = iterator.next();
             if (activity.getClass().equals(cls)) {
-                finishActivity(activity);
+                if (!activity.isFinishing()) {
+                    activity.finish();
+                }
+                iterator.remove();
             }
         }
     }

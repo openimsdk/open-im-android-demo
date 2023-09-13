@@ -503,4 +503,5 @@
     <string name="in_group_name_tips">昵称修改后，只会在此群内显示，群内成员都可以看见。</string>
     <string name="create_group_tips2">创建群聊，全面使用OpenIM</string>
     <string name="add_group_tips">向管理员或群聊成员询问ID</string>
+    <string name="delete_conversiton">删除会话</string>
 </resources>
