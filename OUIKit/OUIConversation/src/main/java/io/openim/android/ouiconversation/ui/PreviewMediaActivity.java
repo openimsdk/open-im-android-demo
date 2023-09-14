@@ -202,4 +202,9 @@ public class PreviewMediaActivity extends BasicActivity<ActivityPreviewBinding> 
         Easy.delete(PreviewMediaVM.class);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        view.pager.setAdapter(null);
+    }
 }

@@ -21,7 +21,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Main"
         android:usesCleartextTraffic="true"
-        tools:targetApi="tiramisu">
+        android:largeHeap="true"
+        android:hardwareAccelerated="false"
+        tools:targetApi="tiramisu"
+        >
         <activity
             android:name=".ui.user.ChangePasswordActivity"
             android:exported="false" />

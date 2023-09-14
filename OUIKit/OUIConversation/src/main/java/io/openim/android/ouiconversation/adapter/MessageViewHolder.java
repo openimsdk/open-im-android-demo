@@ -4,9 +4,11 @@ package io.openim.android.ouiconversation.adapter;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -27,6 +29,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,6 +39,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.load.resource.bitmap.TransformationUtils;
+import com.bumptech.glide.request.target.CustomViewTarget;
+import com.bumptech.glide.request.target.ImageViewTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.ViewTarget;
+import com.bumptech.glide.util.Executors;
 import com.vanniktech.emoji.EmojiTextView;
 
 import java.util.ArrayList;
@@ -89,6 +99,7 @@ import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.ouicore.utils.TransformationUtil;
 import io.openim.android.ouicore.vm.ForwardVM;
 import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouicore.vm.PreviewMediaVM;
@@ -786,9 +797,39 @@ public class MessageViewHolder {
                 Glide.with(img.getContext()).load(url).placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo).centerInside().into(img);
             } else {
                 url = message.getPictureElem().getSourcePicture().getUrl();
-                IMUtil.loadPicture(message.getPictureElem()).centerInside().into(img);
+
+                int w = message.getPictureElem().getSourcePicture().getWidth();
+                int h = message.getPictureElem().getSourcePicture().getHeight();
+                scale(img, w, h, 180);
+                IMUtil.loadPicture(message.getPictureElem())
+                    .fitCenter()
+                    .transform(new RoundedCorners(15))
+                    .into(img);
             }
             return url;
+        }
+
+        public void scale(ImageView img, int sourceW, int sourceH, int baseDPW) {
+            int pictureWidth = Common.dp2px(baseDPW);
+            int _trulyWidth;
+            int _trulyHeight;
+            if (sourceW == 0) {
+                sourceW = 1;
+            }
+            if (sourceH == 0) {
+                sourceH = 1;
+            }
+            if (pictureWidth > sourceW) {
+                _trulyWidth = sourceW;
+                _trulyHeight = sourceH;
+            } else {
+                _trulyWidth = pictureWidth;
+                _trulyHeight = _trulyWidth * sourceH / sourceW;
+            }
+            ViewGroup.LayoutParams params = img.getLayoutParams();
+            params.width = _trulyWidth;
+            params.height = _trulyHeight;
+            img.setLayoutParams(params);
         }
 
         @Override
@@ -989,7 +1030,13 @@ public class MessageViewHolder {
             view.playBtn.setVisibility(View.VISIBLE);
             view.circleBar.setVisibility(View.VISIBLE);
 
-            IMUtil.loadVideoSnapshot(message.getVideoElem()).centerInside().into(view.content);
+            int w = message.getVideoElem().getSnapshotWidth();
+            int h = message.getVideoElem().getSnapshotHeight();
+            scale(view.content, w, h, 170);
+            IMUtil.loadVideoSnapshot(message.getVideoElem())
+                .fitCenter()
+                .transform(new RoundedCorners(15))
+                .into(view.content);
             preview(message, view.contentGroup);
         }
     }
