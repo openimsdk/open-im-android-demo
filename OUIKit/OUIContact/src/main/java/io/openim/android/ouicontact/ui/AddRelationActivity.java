@@ -18,7 +18,7 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 
 public class AddRelationActivity extends BasicActivity<ActivityAddRelationBinding> {
 
@@ -52,7 +52,8 @@ public class AddRelationActivity extends BasicActivity<ActivityAddRelationBindin
         view.createGroup.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                Easy.installVM(MultipleChoiceVM.class).isCreateGroup = true;
+                Easy.installVM(SelectTargetVM.class)
+                    .setIntention(SelectTargetVM.Intention.isCreateGroup);
                 ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
             }
         });

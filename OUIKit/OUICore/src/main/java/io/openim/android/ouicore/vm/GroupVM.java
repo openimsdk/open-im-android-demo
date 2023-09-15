@@ -127,7 +127,7 @@ public class GroupVM extends SocialityVM {
 
                 @Override
                 public void onSuccess(GroupInfo data) {
-                    Easy.delete(MultipleChoiceVM.class);
+                    Easy.delete(SelectTargetVM.class);
                     getIView().onSuccess(data);
                     Common.UIHandler.postDelayed(waitDialog::dismiss, 200);
                 }
@@ -341,11 +341,7 @@ public class GroupVM extends SocialityVM {
     /**
      * 邀请入群
      */
-    public void inviteUserToGroup(List<FriendInfo> friendInfos) {
-        List<String> userIds = new ArrayList<>();
-        for (FriendInfo friendInfo : friendInfos) {
-            userIds.add(friendInfo.getUserID());
-        }
+    public void inviteUserToGroup(List<String> userIds) {
         OpenIMClient.getInstance().groupManager
             .inviteUserToGroup(new OnBase<String>() {
                 @Override
@@ -355,13 +351,13 @@ public class GroupVM extends SocialityVM {
 
                 @Override
                 public void onSuccess(String data) {
-                    getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.Invitation_succeeded));
+                    toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.Invitation_succeeded));
                     getGroupMemberList();
                     getIView().onSuccess(null);
 
                     Obs.newMessage(Constant.Event.UPDATE_GROUP_INFO, groupName);
                 }
-            }, groupId, userIds, "com");
+            }, groupId, userIds, "welcome");
     }
 
     /**

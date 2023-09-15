@@ -109,9 +109,9 @@ public class GroupCallDialog extends CallDialog {
                 String name = participantMeta.groupMemberInfo.getNickname();
                 if (TextUtils.isEmpty(name)) name = participantMeta.userInfo.getNickname();
                 holder.view.name.setText(name);
+                holder.view.avatar.load(participantMeta.userInfo.getFaceURL());
                 holder.view.avatarRl.setVisibility(callingVM.isVideoCalls ? View.GONE :
                     View.VISIBLE);
-                holder.view.avatar.load(participantMeta.userInfo.getFaceURL());
 
                 callingVM.callViewModel.subscribe(data.getEvents().getEvents(), (v) -> {
                     ParticipantMeta participantMeta2 =
@@ -166,7 +166,7 @@ public class GroupCallDialog extends CallDialog {
         callingVM.isGroup =
             signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT;
         callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
-
+        view.cameraControl.setVisibility(callingVM.isVideoCalls?View.VISIBLE:View.GONE);
         if (callingVM.isCallOut) {
             view.ask.setVisibility(View.GONE);
             view.callingMenu.setVisibility(View.VISIBLE);

@@ -7,43 +7,30 @@ import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.lifecycle.Observer;
 
 import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bigkoo.pickerview.adapter.ArrayWheelAdapter;
-import com.bigkoo.pickerview.builder.OptionsPickerBuilder;
-import com.bigkoo.pickerview.builder.TimePickerBuilder;
-import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
-import com.bigkoo.pickerview.listener.OnTimeSelectListener;
-import com.bigkoo.pickerview.view.OptionsPickerView;
-import com.bigkoo.pickerview.view.TimePickerView;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.ActivityChatSettingBinding;
 import io.openim.android.ouiconversation.databinding.LayoutBurnAfterReadingBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMUtil;
-import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
-import io.openim.android.ouicore.widget.BottomPopDialog;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouicore.widget.SlideButton;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding> implements ChatVM.ViewAction {
@@ -134,11 +121,12 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
         });
 
         view.addChat.setOnClickListener(v -> {
-            MultipleChoiceVM choiceVM = Easy.installVM(MultipleChoiceVM.class);
-            choiceVM.isCreateGroup = true;
-            if (null != userInfo)
+            SelectTargetVM choiceVM = Easy.installVM(SelectTargetVM.class);
+            choiceVM.setIntention(SelectTargetVM.Intention.isCreateGroup);
+            if (null != userInfo) {
                 choiceVM.addMetaData(userInfo.getUserID(), userInfo.getNickname(),
                     userInfo.getFaceURL());
+            }
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
         });
         view.picture.setOnClickListener(v -> {

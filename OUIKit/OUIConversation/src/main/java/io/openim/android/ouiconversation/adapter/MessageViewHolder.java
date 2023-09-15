@@ -4,11 +4,9 @@ package io.openim.android.ouiconversation.adapter;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -29,7 +27,6 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,12 +37,6 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.load.resource.bitmap.TransformationUtils;
-import com.bumptech.glide.request.target.CustomViewTarget;
-import com.bumptech.glide.request.target.ImageViewTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.target.ViewTarget;
-import com.bumptech.glide.util.Executors;
 import com.vanniktech.emoji.EmojiTextView;
 
 import java.util.ArrayList;
@@ -99,9 +90,8 @@ import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
-import io.openim.android.ouicore.utils.TransformationUtil;
 import io.openim.android.ouicore.vm.ForwardVM;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.voice.listener.PlayerListener;
@@ -451,7 +441,7 @@ public class MessageViewHolder {
                                     if (iconRes == R.mipmap.ic_forward) {
                                         Easy.find(ForwardVM.class).createForwardMessage(message);
 
-                                        Easy.installVM(MultipleChoiceVM.class);
+                                        Easy.installVM(SelectTargetVM.class);
                                         ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
                                     }
                                     if (iconRes == R.mipmap.ic_multiple_choice) {

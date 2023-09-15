@@ -2,43 +2,28 @@ package io.openim.android.demo.ui.user;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityPersonInfoBinding;
-import io.openim.android.demo.databinding.ActivityPersonalInfoBinding;
 import io.openim.android.demo.ui.main.EditTextActivity;
 import io.openim.android.demo.vm.FriendVM;
 import io.openim.android.demo.vm.PersonalVM;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
-import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.ex.User;
-import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ContactListVM;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouicore.widget.SlideButton;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;

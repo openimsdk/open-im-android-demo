@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -29,7 +28,7 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
@@ -45,11 +44,11 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
     private static final int GROUP_ITEM = 2;
     private RecyclerViewAdapter adapter;
 
-    //不为空表示多选
-    private ArrayList<String> selectIds;
     private Set<MultipleChoice> result = new HashSet<>();
     //只选择联系人
     private boolean isOnlyFriend;
+    //不为空表示多选
+    private List<MultipleChoice> choices;
 
 
     @Override
@@ -63,6 +62,10 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
         listener();
     }
 
+    public boolean isMultipleSelect() {
+        return null != choices && !choices.isEmpty();
+    }
+
     @Override
     public void onBackPressed() {
         setResult();
@@ -71,8 +74,7 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
 
     private void setResult() {
         if (!result.isEmpty()) {
-            setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
-                (Serializable) result));
+            setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT, (Serializable) result));
 
         }
     }
@@ -174,8 +176,8 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
                     titleViewHolder.view.title.setText(title);
                 } else {
                     ViewHol.ItemViewHo itemViewHo = (ViewHol.ItemViewHo) holder;
-                    itemViewHo.view.select.setVisibility(null == selectIds ? View.GONE :
-                        View.VISIBLE);
+                    itemViewHo.view.select.setVisibility(isMultipleSelect() ? View.VISIBLE :
+                        View.GONE);
 
                     final Intent intent = new Intent();
 
@@ -206,29 +208,44 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
                         multipleChoice.icon = groupInfo.getFaceURL();
                     }
                     multipleChoice.key = id;
-                    itemViewHo.view.select.setChecked(null != selectIds && selectIds.contains(id));
-                    ((ViewHol.ItemViewHo) holder).view.getRoot().setOnClickListener(v -> {
-                        if (null != selectIds) {
+                    MultipleChoice target = null;
+                    itemViewHo.view.select.setChecked(false);
+                    if (isMultipleSelect()){
+                        int index = choices.indexOf(new MultipleChoice(id));
+                        if (index != -1) {
+                            itemViewHo.view.select.setChecked(true);
+                            target =choices.get(index);
+                            itemViewHo.view.select.setEnabled(target.isEnabled);
+                            itemViewHo.view.select.setAlpha(target.isEnabled ? 1f : 0.5f);
+                        }
+                    }
+
+                    MultipleChoice finalTarget = target;
+                    itemViewHo.view.getRoot().setOnClickListener(v -> {
+                        if (null != finalTarget && !finalTarget.isEnabled) return;
+
+                        if (isMultipleSelect()) {
                             itemViewHo.view.select.setChecked(!itemViewHo.view.select.isChecked());
                             multipleChoice.isSelect = itemViewHo.view.select.isChecked();
                             result.add(multipleChoice);
 
                             if (multipleChoice.isSelect)
-                                selectIds.add(multipleChoice.key);
+                                choices.add(multipleChoice);
                             else
-                                selectIds.remove(multipleChoice.key);
+                                choices.remove(multipleChoice);
                             return;
                         }
 
                         try {
-                            MultipleChoiceVM multipleChoiceVM=Easy.find(MultipleChoiceVM.class);
-                            if (null != multipleChoiceVM) {
-                                multipleChoiceVM.addMetaData( multipleChoice.key,
+                            SelectTargetVM selectTargetVM = Easy.find(SelectTargetVM.class);
+                            if (null != selectTargetVM) {
+                                selectTargetVM.addMetaData(multipleChoice.key,
                                     multipleChoice.name, multipleChoice.icon);
-                                multipleChoiceVM.shareCard();
+                                selectTargetVM.finishIntention();
                             }
                             return;
-                        }catch (Exception ignore){}
+                        } catch (Exception ignore) {
+                        }
 
 
                         setResult(RESULT_OK, intent);
@@ -242,7 +259,7 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
     }
 
     void init() {
-        selectIds = getIntent().getStringArrayListExtra(Constant.K_RESULT);
+        choices = (List<MultipleChoice>) getIntent().getSerializableExtra(Constant.K_RESULT);
         isOnlyFriend = getIntent().getBooleanExtra(Constant.IS_SELECT_FRIEND, false);
     }
 }

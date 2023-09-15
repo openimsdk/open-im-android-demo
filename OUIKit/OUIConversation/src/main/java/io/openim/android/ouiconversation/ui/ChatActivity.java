@@ -3,11 +3,9 @@ package io.openim.android.ouiconversation.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.LauncherActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
@@ -22,9 +20,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -37,7 +33,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouiconversation.databinding.ActivityChatBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
@@ -47,10 +42,7 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.base.vm.ISubscribe;
-import io.openim.android.ouicore.base.vm.Subject;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.ex.MultipleChoice;
@@ -59,22 +51,18 @@ import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.vm.ForwardVM;
 import io.openim.android.ouicore.vm.GroupVM;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
-import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.Participant;
-import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UsersOnlineStatus;
 
@@ -160,6 +148,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             Easy.delete(CustomEmojiVM.class);
             Easy.delete(ForwardVM.class);
 
+            BaseApp.inst().removeCacheVM(GroupVM.class);
             N.clearDispose(this);
             view.waterMark.onDestroy();
             Obs.inst().deleteObserver(this);
@@ -329,7 +318,11 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                     GroupVM groupVM = new GroupVM();
                     groupVM.groupId = vm.groupID;
                     BaseApp.inst().putVM(groupVM);
-                    ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER).withInt(Constant.K_SIZE, 9).withBoolean(Constant.IS_GROUP_CALL, true).navigation(this, Constant.Event.CALLING_REQUEST_CODE);
+                    ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
+                        .withInt(Constant.K_SIZE, 9)
+                        .withBoolean(Constant.IS_GROUP_CALL, true)
+                        .navigation(this,
+                            Constant.Event.CALLING_REQUEST_CODE);
                 }
                 return false;
             });
@@ -347,7 +340,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             Easy.find(ForwardVM.class).createMergerMessage(vm.isSingleChat,
                 vm.conversationInfo.getValue().getShowName(), getSelectMsg());
 
-            Easy.installVM(MultipleChoiceVM.class);
+            Easy.installVM(SelectTargetVM.class);
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) this,
                 Constant.Event.FORWARD);
             Common.UIHandler.postDelayed(() -> vm.enableMultipleSelect.setValue(false), 300);

@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.alibaba.android.arouter.core.LogisticsCenter;
@@ -29,12 +28,12 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ForwardVM;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 
 public class ForwardDialog extends BaseDialog {
 
     @NotNull("choiceVM cannot be empty")
-    private MultipleChoiceVM choiceVM = Easy.find(MultipleChoiceVM.class);
+    private SelectTargetVM choiceVM = Easy.find(SelectTargetVM.class);
     @NotNull("forwardVM cannot be empty")
     private ForwardVM forwardVM = Easy.find(ForwardVM.class);
 

@@ -22,8 +22,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-import com.alibaba.android.arouter.core.LogisticsCenter;
-import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -38,9 +36,7 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.FragmentInputExpandBinding;
@@ -55,7 +51,6 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
-import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
@@ -65,12 +60,11 @@ import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.GroupVM;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.CardElem;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
 
@@ -142,28 +136,25 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                                 gotoShareLocation();
                                 break;
                             case 5:
-                                MultipleChoiceVM multipleChoiceVM =
-                                    Easy.installVM(MultipleChoiceVM.class);
-                                multipleChoiceVM.isShareCard = true;
-                                ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
-                                multipleChoiceVM.subscribe(subject -> {
-                                    if (subject.equals(MultipleChoiceVM.SHARE_CARD)) {
-                                        Activity activity=ActivityManager.isExist(ChatActivity.class);
-                                        if (null==activity)return;
-                                        CommonDialog commonDialog = new CommonDialog(activity);
-                                        LayoutCommonDialogBinding mainView =
-                                            commonDialog.getMainView();
-                                        mainView.tips.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.send_card_confirm));
-                                        mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
-                                        mainView.confirm.setOnClickListener(v1 -> {
-                                            commonDialog.dismiss();
+                                SelectTargetVM selectTargetVM =
+                                    Easy.installVM(SelectTargetVM.class);
+                                selectTargetVM.setIntention(SelectTargetVM.Intention.isShareCard);
+                                selectTargetVM.setOnFinishListener(() -> {
+                                    Activity activity=ActivityManager.isExist(ChatActivity.class);
+                                    if (null==activity)return;
+                                    CommonDialog commonDialog = new CommonDialog(activity);
+                                    LayoutCommonDialogBinding mainView =
+                                        commonDialog.getMainView();
+                                    mainView.tips.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.send_card_confirm));
+                                    mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
+                                    mainView.confirm.setOnClickListener(v1 -> {
+                                        commonDialog.dismiss();
 
-                                            sendCardMessage(multipleChoiceVM.metaData.val().get(0));
-                                        });
-                                        commonDialog.show();
-                                    }
+                                        sendCardMessage(selectTargetVM.metaData.val().get(0));
+                                    });
+                                    commonDialog.show();
                                 });
-
+                                ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
                                 break;
                         }
                     });
@@ -186,20 +177,21 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                     vm.isSingleChat, ids, null);
                 callingService.call(signalingInfo);
             } else {
-                toSelectMember();
+                GroupVM groupVM = new GroupVM();
+                groupVM.groupId = vm.groupID;
+                BaseApp.inst().putVM(groupVM);
+                ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
+                    .withBoolean(Constant.IS_SELECT_MEMBER, true)
+                    .withBoolean(Constant.IS_GROUP_CALL, true)
+                    .withInt(Constant.K_SIZE, 9)
+                    .navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
             }
             return false;
         });
     }
 
     public void toSelectMember() {
-        GroupVM groupVM = new GroupVM();
-        groupVM.groupId = vm.groupID;
-        BaseApp.inst().putVM(groupVM);
-        ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
-            .withBoolean(Constant.IS_SELECT_MEMBER, true)
-            .withInt(Constant.K_SIZE, 9)
-            .navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
+
     }
 
 

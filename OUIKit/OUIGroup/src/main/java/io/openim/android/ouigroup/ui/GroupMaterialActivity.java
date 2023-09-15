@@ -16,7 +16,6 @@ import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.vanniktech.ui.Color;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +27,8 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
-import io.openim.android.ouicore.im.IMEvent;
+import io.openim.android.ouicore.entity.MsgConversation;
+import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.IConversationBridge;
@@ -38,8 +38,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ContactListVM;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
-import io.openim.android.ouicore.widget.BottomPopDialog;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
@@ -50,13 +49,11 @@ import io.openim.android.ouigroup.databinding.ActivityGroupMaterialBinding;
 
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouigroup.ui.v3.GroupManageActivity;
+import io.openim.android.ouigroup.ui.v3.SelectTargetActivityV3;
 import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.enums.GroupVerification;
+import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
-import io.openim.android.sdk.listener.OnPutFileListener;
-import io.openim.android.sdk.models.ConversationInfo;
-import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.PutArgs;
 
@@ -73,6 +70,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         bindVM(GroupVM.class, true);
+        vm.setContext(this);
         Easy.put(vm);
         vm.groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
         conversationId = getIntent().getStringExtra(Constant.K_ID);
@@ -285,9 +283,28 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                         io.openim.android.ouicore.R.string.add :
                         io.openim.android.ouicore.R.string.remove);
                     holder.view.getRoot().setOnClickListener(v -> {
-                        startActivity(new Intent(GroupMaterialActivity.this,
-                            InitiateGroupActivity.class).putExtra(reId == R.mipmap.ic_group_add ?
-                            Constant.IS_INVITE_TO_GROUP : Constant.IS_REMOVE_GROUP, true));
+                        boolean isAdd = reId == R.mipmap.ic_group_add;
+                        if (isAdd) {
+                            SelectTargetVM sv = Easy.installVM(SelectTargetVM.class);
+                            sv.setIntention(SelectTargetVM.Intention.invite);
+                            ContactListVM ctv = BaseApp.inst().getVMByCache(ContactListVM.class);
+                            List<String> ids = new ArrayList<>();
+                            for (MsgConversation msgConversation : ctv.conversations.val()) {
+                                if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT) {
+                                    ids.add(msgConversation.conversationInfo.getUserID());
+                                }
+                            }
+                            sv.isInGroup(GroupMaterialActivity.this.vm.groupId, ids);
+                            sv.setOnFinishListener(() -> {
+                                List<String> selectIds = new ArrayList<>();
+                                for (MultipleChoice choice : sv.inviteList.val()) {
+                                    selectIds.add(choice.key);
+                                }
+                                vm.inviteUserToGroup(selectIds);
+                            });
+                            startActivity(new Intent(GroupMaterialActivity.this,
+                                SelectTargetActivityV3.class));
+                        }
                     });
                 } else {
                     holder.view.img.load(data.getFaceURL(), data.getNickname());

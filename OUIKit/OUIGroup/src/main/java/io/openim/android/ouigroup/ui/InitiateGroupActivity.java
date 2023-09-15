@@ -34,7 +34,7 @@ import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 
 
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouigroup.databinding.ActivityInitiateGroupBinding;
 
 import io.openim.android.ouicore.vm.GroupVM;
@@ -64,7 +64,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
     //默认已选择的id
     private String defSelectId;
 
-    private MultipleChoiceVM multipleChoiceVM;
+    private SelectTargetVM selectTargetVM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,14 +98,14 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
 
     private void buildSelectFriendsVM() {
         try {
-            multipleChoiceVM = Easy.find(MultipleChoiceVM.class);
-            selectMemberNum = multipleChoiceVM.metaData.getValue().size();
-            multipleChoiceVM.bindDataToView(view.bottom);
-            multipleChoiceVM.showPopAllSelectFriends(view.bottom,
+            selectTargetVM = Easy.find(SelectTargetVM.class);
+            selectMemberNum = selectTargetVM.metaData.getValue().size();
+            selectTargetVM.bindDataToView(view.bottom);
+            selectTargetVM.showPopAllSelectFriends(view.bottom,
                 LayoutPopSelectedFriendsBinding.inflate(getLayoutInflater()));
-            multipleChoiceVM.submitTap(view.bottom.submit);
+            selectTargetVM.submitTap(view.bottom.submit);
 
-            multipleChoiceVM.metaData.observe(this, v -> adapter.notifyDataSetChanged());
+            selectTargetVM.metaData.observe(this, v -> adapter.notifyDataSetChanged());
         } catch (Exception ignored) {
         }
     }
@@ -199,12 +199,12 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                         notifyItemChanged(position);
                         selected();
 
-                        if (null != multipleChoiceVM) {
+                        if (null != selectTargetVM) {
                             if (data.isSelect)
-                                multipleChoiceVM.addMetaData(data.userInfo.getUserID(),
+                                selectTargetVM.addMetaData(data.userInfo.getUserID(),
                                     data.userInfo.getNickname(),data.userInfo.getFaceURL());
                             else
-                                multipleChoiceVM.removeMetaData(data.userInfo.getUserID());
+                                selectTargetVM.removeMetaData(data.userInfo.getUserID());
                         }
 
                     });
@@ -331,10 +331,10 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                         exUserInfo.isSelect = true;
                     }
 
-                    if (null != multipleChoiceVM) {
+                    if (null != selectTargetVM) {
                         MultipleChoice data=new MultipleChoice();
                         data.key=exUserInfo.userInfo.getUserID();
-                        exUserInfo.isSelect = multipleChoiceVM.contains(data);
+                        exUserInfo.isSelect = selectTargetVM.contains(data);
                     }
                 }
                 adapter.setItems(exUserInfos);
@@ -360,7 +360,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
             public void click(View v) {
                 try {
                     if (isInviteToGroup) {
-                        vm.inviteUserToGroup(vm.selectedFriendInfoV3);
+//                        vm.inviteUserToGroup(vm.selectedFriendInfoV3);
                         return;
                     }
                     if (isRemoveGroup) {

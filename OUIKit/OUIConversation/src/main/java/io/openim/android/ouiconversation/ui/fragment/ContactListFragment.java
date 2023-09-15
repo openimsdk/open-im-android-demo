@@ -17,7 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,16 +56,14 @@ import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgConversation;
-import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
-import io.openim.android.sdk.enums.GroupAtType;
 
 @Route(path = Routes.Conversation.CONTACT_LIST)
 public class ContactListFragment extends BaseFragment<ContactListVM> implements ContactListVM.ViewAction, Observer {
@@ -214,7 +211,6 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
 
         adapter = new CustomAdapter(onItemClickListener);
         view.recyclerView.setAdapter(adapter);
-        view.recyclerView.addHeaderView(createHeaderView());
         view.recyclerView.setItemAnimator(null);
 
         vm.conversations.observe(getActivity(), v -> {
@@ -249,6 +245,9 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         view.callRecord.setOnClickListener(view -> {
             ARouter.getInstance().build(Routes.Main.CALL_HISTORY).navigation();
         });
+
+        view. search.getRoot().setOnClickListener(v -> startActivity(new Intent(getActivity(),
+            SearchActivity.class)));
     }
 
 
@@ -276,7 +275,8 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         view.createGroup.setOnClickListener(c -> {
             popupWindow.dismiss();
 
-            Easy.installVM(MultipleChoiceVM.class).isCreateGroup = true;
+            Easy.installVM(SelectTargetVM.class)
+                    .setIntention(SelectTargetVM.Intention.isCreateGroup);
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
         });
         view.videoMeeting.setOnClickListener(c -> {
@@ -297,13 +297,6 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
         });
         //PopupWindow在targetView下方弹出
         popupWindow.showAsDropDown(v);
-    }
-
-    private View createHeaderView() {
-        View header = getLayoutInflater().inflate(R.layout.view_search, view.recyclerView, false);
-        header.setOnClickListener(v -> startActivity(new Intent(getActivity(),
-            SearchActivity.class)));
-        return header;
     }
 
 

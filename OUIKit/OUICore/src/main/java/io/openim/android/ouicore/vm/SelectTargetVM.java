@@ -24,37 +24,81 @@ import io.openim.android.ouicore.base.vm.injection.BaseVM;
 import io.openim.android.ouicore.databinding.LayoutPopSelectedFriendsBinding;
 import io.openim.android.ouicore.databinding.LayoutSelectedFriendsBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.ActivityManager;
+import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.BottomPopDialog;
-import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.ForwardDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
+import io.openim.android.sdk.models.GroupMembersInfo;
 
-public class MultipleChoiceVM extends BaseVM {
-    public static final String SHARE_CARD = "shareCard";
-    /**
-     * 发起群聊
-     * true 隐藏最近会话、隐藏群，只显示好友
-     */
-    public boolean isCreateGroup;
-    /**
-     * 邀请入群
-     * true 显示最近会话、隐藏群，只显示好友
-     */
-    public boolean invite;
-    /**
-     * 分享名片
-     * 隐藏最近会话、隐藏群、隐藏底部菜单、只显示好友、单选
-     */
-    public boolean isShareCard;
-
-
+public class SelectTargetVM extends BaseVM {
     public static final String NOTIFY_ITEM_REMOVED = "notify_item_removed";
-    public State<List<MultipleChoice>> metaData = new State<>(new ArrayList<>());
 
-    public void shareCard() {
+    public enum Intention {
+        /**
+         * 发起群聊
+         * 隐藏最近会话、隐藏群，只显示好友
+         */
+        isCreateGroup,
+        /**
+         * 邀请入群
+         * 显示最近会话、隐藏群，只显示好友、新增inviteList用于底部显示
+         */
+        invite,
+        /**
+         * 分享名片
+         * 隐藏最近会话、隐藏群、隐藏底部菜单、只显示好友、单选
+         */
+        isShareCard
+    }
+
+    private OnFinishListener onFinishListener;
+    private Intention intention;
+
+    public void setIntention(Intention intention) {
+        this.intention = intention;
+    }
+
+    public boolean isShareCard() {
+        return intention == Intention.isShareCard;
+    }
+
+    public boolean isInvite() {
+        return intention == Intention.invite;
+    }
+
+    public boolean isCreateGroup() {
+        return intention == Intention.isCreateGroup;
+    }
+
+    public void isInGroup(String groupId, List<String> ids) {
+        OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
+            @Override
+            public void onSuccess(List<GroupMembersInfo> data) {
+                if (data.isEmpty()) return;
+                for (GroupMembersInfo datum : data) {
+                    MultipleChoice choice = new MultipleChoice(datum.getUserID());
+                    choice.name = datum.getNickname();
+                    choice.icon = datum.getFaceURL();
+                    choice.isSelect = true;
+                    choice.isEnabled = false;
+                   if (!contains(choice))
+                       metaData.val().add(choice);
+                }
+                metaData.update();
+            }
+        }, groupId, ids);
+    }
+
+    public State<List<MultipleChoice>> metaData = new State<>(new ArrayList<>());
+    public State<List<MultipleChoice>> inviteList = new State<>(new ArrayList<>());
+
+    public void finishIntention() {
         Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
         Postcard postcard2 = ARouter.getInstance().build(Routes.Conversation.CHAT);
         LogisticsCenter.completion(postcard);
@@ -62,7 +106,7 @@ public class MultipleChoiceVM extends BaseVM {
         ActivityManager.finishAllExceptActivity(postcard.getDestination(),
             postcard2.getDestination());
 
-        postSubject(SHARE_CARD);
+        if (null != onFinishListener) onFinishListener.onFinish();
     }
 
     public boolean contains(MultipleChoice data) {
@@ -74,8 +118,12 @@ public class MultipleChoiceVM extends BaseVM {
         data.key = id;
         data.name = name;
         data.icon = faceUrl;
-        if (!metaData.getValue().contains(data)) {
-            metaData.getValue().add(data);
+        addDate(data);
+    }
+
+    public void addDate(MultipleChoice choice) {
+        if (!metaData.val().contains(choice)) {
+            metaData.val().add(choice);
             metaData.update();
         }
     }
@@ -83,8 +131,8 @@ public class MultipleChoiceVM extends BaseVM {
     public void removeMetaData(String id) {
         MultipleChoice data = new MultipleChoice();
         data.key = id;
-        if (metaData.getValue().contains(data)) {
-            metaData.getValue().remove(data);
+        if (metaData.val().contains(data)) {
+            metaData.val().remove(data);
             metaData.update();
         }
     }
@@ -92,23 +140,38 @@ public class MultipleChoiceVM extends BaseVM {
     @SuppressLint("SetTextI18n")
     public void bindDataToView(LayoutSelectedFriendsBinding view) {
         Context context = view.getRoot().getContext();
-        metaData.observe((LifecycleOwner) context, userInfos -> {
-            if (!userInfos.isEmpty()) {
+        metaData.observe((LifecycleOwner) context, v -> {
+            List<MultipleChoice> userInfoList = new ArrayList<>();
+            if (isInvite()) {
+                //邀请入群 这里只加入新邀请人员
+                for (MultipleChoice choice : v) {
+                    if (choice.isEnabled && choice.isSelect) {
+                        userInfoList.add(choice);
+                    }
+                }
+                inviteList.val().clear();
+                inviteList.val().addAll(userInfoList);
+                inviteList.update();
+            } else {
+                userInfoList.addAll(v);
+            }
+
+            if (!userInfoList.isEmpty()) {
                 view.more2.setVisibility(View.VISIBLE);
                 view.content.setVisibility(View.VISIBLE);
             } else {
                 view.content.setVisibility(View.GONE);
                 view.more2.setVisibility(View.GONE);
             }
-            view.selectNum.setText(String.format(context.getString(io.openim.android.ouicore.R.string.selected_tips2), userInfos.size()));
+            view.selectNum.setText(String.format(context.getString(io.openim.android.ouicore.R.string.selected_tips2), userInfoList.size()));
             StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < userInfos.size(); i++) {
-                builder.append(userInfos.get(i).name);
-                if (i != userInfos.size() - 1) builder.append("、");
+            for (int i = 0; i < userInfoList.size(); i++) {
+                builder.append(userInfoList.get(i).name);
+                if (i != userInfoList.size() - 1) builder.append("、");
             }
             view.content.setText(builder.toString());
-            view.submit.setEnabled(userInfos.size() > 0);
-            view.submit.setText(context.getString(io.openim.android.ouicore.R.string.sure) + "（" + userInfos.size() + "/999）");
+            view.submit.setEnabled(userInfoList.size() > 0);
+            view.submit.setText(context.getString(io.openim.android.ouicore.R.string.sure) + "（" + userInfoList.size() + "/999）");
         });
     }
 
@@ -135,18 +198,25 @@ public class MultipleChoiceVM extends BaseVM {
                 });
             }
         });
-        adapter.setItems(metaData.getValue());
-        metaData.observe((LifecycleOwner) context, userInfos -> {
-            view2.selectedNum.setText(String.format(context.getString(io.openim.android.ouicore.R.string.selected_tips2), userInfos.size()));
-        });
+        if (isInvite()) {
+            inviteList.observe((LifecycleOwner) context, userInfos -> {
+                view2.selectedNum.setText(String.format(context.getString(io.openim.android.ouicore.R.string.selected_tips2), userInfos.size()));
+            });
+        } else {
+            metaData.observe((LifecycleOwner) context, userInfos -> {
+                view2.selectedNum.setText(String.format(context.getString(io.openim.android.ouicore.R.string.selected_tips2), userInfos.size()));
+            });
+        }
+
         view.selectLy.setOnClickListener(v -> {
+            adapter.setItems(isInvite() ? inviteList.val() : metaData.val());
             bottomPopDialog.show();
         });
     }
 
     public void submitTap(Button button) {
         button.setOnClickListener(v -> {
-            if (isCreateGroup) {
+            if (isCreateGroup()) {
                 GroupVM groupVM = BaseApp.inst().getVMByCache(GroupVM.class);
                 if (null == groupVM) groupVM = new GroupVM();
                 groupVM.selectedFriendInfo.getValue().clear();
@@ -163,6 +233,10 @@ public class MultipleChoiceVM extends BaseVM {
                 ARouter.getInstance().build(Routes.Group.CREATE_GROUP2).navigation();
                 return;
             }
+            if (isInvite()) {
+                finishIntention();
+                return;
+            }
 
             showConfirmDialog(v.getContext());
         });
@@ -171,5 +245,14 @@ public class MultipleChoiceVM extends BaseVM {
     private void showConfirmDialog(Context context) {
         ForwardDialog dialog = new ForwardDialog(context);
         dialog.show();
+    }
+
+
+    public void setOnFinishListener(OnFinishListener onFinishListener) {
+        this.onFinishListener = onFinishListener;
+    }
+
+    public interface OnFinishListener {
+        void onFinish();
     }
 }

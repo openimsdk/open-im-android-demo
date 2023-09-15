@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,28 +18,20 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import io.openim.android.ouicontact.R;
 import io.openim.android.ouicontact.databinding.ActivityAllFriendBinding;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.ex.User;
-import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.SocialityVM;
-import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
@@ -157,11 +148,11 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
 
     private void sendChatWindow(FriendInfo friendInfo) {
       try {
-          MultipleChoiceVM multipleChoiceVM = Easy.find(MultipleChoiceVM.class);
-          if (null != multipleChoiceVM) {
-              multipleChoiceVM.addMetaData(friendInfo.getUserID(),
+          SelectTargetVM selectTargetVM = Easy.find(SelectTargetVM.class);
+          if (null != selectTargetVM) {
+              selectTargetVM.addMetaData(friendInfo.getUserID(),
                   friendInfo.getNickname(), friendInfo.getFaceURL());
-              multipleChoiceVM.shareCard();
+              selectTargetVM.finishIntention();
           }
       }catch (Exception ignored){}
     }

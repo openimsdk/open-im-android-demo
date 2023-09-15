@@ -78,4 +78,8 @@ public class BasicActivity<T extends ViewDataBinding> extends AppCompatActivity 
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
     }
+
+    public void toBack(View view) {
+        finish();
+    }
 }
