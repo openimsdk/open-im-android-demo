@@ -26,6 +26,7 @@ import io.openim.android.ouicore.databinding.LayoutSelectedFriendsBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.ActivityManager;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
@@ -42,12 +43,12 @@ public class SelectTargetVM extends BaseVM {
     public enum Intention {
         /**
          * 发起群聊
-         * 隐藏最近会话、隐藏群，只显示好友
+         * 隐藏最近会话、隐藏群，只显示好友、多选
          */
         isCreateGroup,
         /**
          * 邀请入群
-         * 显示最近会话、隐藏群，只显示好友、新增inviteList用于底部显示
+         * 显示最近会话、隐藏群，只显示好友、新增inviteList用于底部显示、多选
          */
         invite,
         /**
@@ -87,8 +88,8 @@ public class SelectTargetVM extends BaseVM {
                     choice.icon = datum.getFaceURL();
                     choice.isSelect = true;
                     choice.isEnabled = false;
-                   if (!contains(choice))
-                       metaData.val().add(choice);
+                    if (!contains(choice))
+                        metaData.val().add(choice);
                 }
                 metaData.update();
             }
@@ -106,7 +107,12 @@ public class SelectTargetVM extends BaseVM {
         ActivityManager.finishAllExceptActivity(postcard.getDestination(),
             postcard2.getDestination());
 
-        if (null != onFinishListener) onFinishListener.onFinish();
+        toFinish();
+    }
+
+    public void toFinish() {
+        if (null != onFinishListener)
+            onFinishListener.onFinish();
     }
 
     public boolean contains(MultipleChoice data) {

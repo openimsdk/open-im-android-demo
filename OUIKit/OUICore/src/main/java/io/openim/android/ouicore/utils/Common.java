@@ -28,6 +28,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.yanzhenjie.permission.AndPermission;
@@ -64,7 +66,17 @@ public class Common {
      */
     public final static Handler UIHandler = new Handler(Looper.getMainLooper());
 
-
+    /**
+     *  finish routes
+     * @param routes
+     */
+    public static  void finishRoute(String... routes) {
+        for (String route : routes) {
+            Postcard postcard = ARouter.getInstance().build(route);
+            LogisticsCenter.completion(postcard);
+            ActivityManager.finishActivity(postcard.getDestination());
+        }
+    }
     public static void stringBindForegroundColorSpan(TextView textView, String data,
                                                      String target) {
         stringBindForegroundColorSpan(textView, data, target, R.color.theme);

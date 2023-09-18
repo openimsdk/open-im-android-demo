@@ -5,10 +5,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.PointF;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -26,13 +29,18 @@ import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
+import io.openim.android.ouicore.databinding.LayoutPopSelectedFriendsBinding;
 import io.openim.android.ouicore.entity.ExUserInfo;
+import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.ex.User;
+import io.openim.android.ouicore.utils.ActivityManager;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.ouicore.widget.CommonDialog;
+import io.openim.android.ouicore.widget.StickyDecoration;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.models.CardElem;
@@ -44,10 +52,12 @@ import io.openim.android.sdk.models.OfflinePushInfo;
 public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFriendBinding> {
 
     private RecyclerViewAdapter<ExUserInfo, RecyclerView.ViewHolder> adapter;
-    //从聊天跳转过来
-    private boolean formChat;
-    //从推荐好友跳转过来 带的userinfo
-    private User recommend;
+    private LinearLayoutManager mLayoutManager;
+    //目标项是否在最后一个可见项之后
+    private boolean mShouldScroll;
+    //记录目标项位置
+    private int mToPosition;
+    private SelectTargetVM selectTargetVM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,133 +65,138 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityAllFriendBinding.inflate(getLayoutInflater()));
         sink();
-        formChat = getIntent().getBooleanExtra("formChat", false);
-        recommend = (User) getIntent().getSerializableExtra("recommend");
+        init();
         vm.getAllFriend();
 
         listener();
         initView();
     }
 
-    private void initView() {
-        view.scrollView.fullScroll(View.FOCUS_DOWN);
-        view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RecyclerViewAdapter<ExUserInfo, RecyclerView.ViewHolder>() {
-            private int STICKY = 1;
-            private int ITEM = 2;
+    void init() {
+        try {
+            selectTargetVM = Easy.find(SelectTargetVM.class);
+            view.bottom.getRoot().setVisibility(View.VISIBLE);
+            view.searchView.setVisibility(View.GONE);
+            if (!selectTargetVM.isShareCard()) {
+                selectTargetVM.bindDataToView(view.bottom);
+                selectTargetVM.showPopAllSelectFriends(view.bottom,
+                    LayoutPopSelectedFriendsBinding.inflate(getLayoutInflater()));
+                selectTargetVM.submitTap(view.bottom.submit);
+            }
 
-            private String lastSticky = "";
+            selectTargetVM.metaData.observe(this, v -> {
+                if (null != adapter)
+                    adapter.notifyDataSetChanged();
+            });
+        } catch (Exception ignore) {
+        }
+    }
+
+    private void initView() {
+        view.recyclerView.setLayoutManager(mLayoutManager = new LinearLayoutManager(this) {
+            @Override
+            public void smoothScrollToPosition(RecyclerView recyclerView,
+                                               RecyclerView.State state, int position) {
+                LinearSmoothScroller linearSmoothScroller =
+                    new LinearSmoothScroller(recyclerView.getContext()) {
+                        @Override
+                        protected int calculateTimeForScrolling(int dx) {
+                            // 此函数计算滚动dx的距离需要多久，当要滚动的距离很大时，比如说52000，
+                            // 经测试，系统会多次调用此函数，每10000距离调一次，所以总的滚动时间
+                            // 是多次调用此函数返回的时间的和，所以修改每次调用该函数时返回的时间的
+                            // 大小就可以影响滚动需要的总时间，可以直接修改些函数的返回值，也可以修改
+                            // dx的值，这里暂定使用后者.
+                            // (See LinearSmoothScroller.TARGET_SEEK_SCROLL_DISTANCE_PX)
+                            if (dx > 1500) {
+                                dx = 1500;
+                            }
+                            return super.calculateTimeForScrolling(dx);
+                        }
+
+                        @Override
+                        public PointF computeScrollVectorForPosition(int targetPosition) {
+                            return mLayoutManager.computeScrollVectorForPosition(targetPosition);
+                        }
+                    };
+                linearSmoothScroller.setTargetPosition(position);
+                startSmoothScroll(linearSmoothScroller);
+            }
+        });
+        adapter = new RecyclerViewAdapter<ExUserInfo, RecyclerView.ViewHolder>() {
+
+            @NonNull
+            @Override
+            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+                                                              int viewType) {
+                return new ViewHol.ItemViewHo(parent);
+            }
 
             @Override
-            public void setItems(List<ExUserInfo> items) {
-                lastSticky = items.get(0).sortLetter;
-                items.add(0, getExUserInfo());
-                for (int i = 0; i < items.size(); i++) {
-                    ExUserInfo userInfo = items.get(i);
-                    if (!lastSticky.equals(userInfo.sortLetter)) {
-                        lastSticky = userInfo.sortLetter;
-                        items.add(i, getExUserInfo());
+            public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExUserInfo data,
+                                   int position) {
+                ViewHol.ItemViewHo itemViewHo = (ViewHol.ItemViewHo) holder;
+                FriendInfo friendInfo = data.userInfo.getFriendInfo();
+                itemViewHo.view.avatar.load(friendInfo.getFaceURL());
+                itemViewHo.view.nickName.setText(friendInfo.getNickname());
+
+                MultipleChoice target = null;
+                if (null!=selectTargetVM && !selectTargetVM.isShareCard()){
+                    itemViewHo.view.select.setVisibility(View.VISIBLE);
+                    itemViewHo.view.select.setChecked(selectTargetVM
+                        .contains(new MultipleChoice(friendInfo.getUserID())));
+                    int index = selectTargetVM.metaData.val()
+                        .indexOf(new MultipleChoice(friendInfo.getUserID()));
+
+                    if (index != -1) {
+                        target = selectTargetVM.metaData.val().get(index);
+                        itemViewHo.view.select.setEnabled(target.isEnabled);
+                        itemViewHo.view.select.setAlpha(target.isEnabled ? 1f : 0.5f);
                     }
                 }
-                super.setItems(items);
-            }
+                MultipleChoice finalTarget = target;
+                itemViewHo.view.getRoot().setOnClickListener(v -> {
+                    if (null != selectTargetVM) {
+                        if (selectTargetVM.isShareCard()){
+                            selectTargetVM.addMetaData(friendInfo.getUserID(), friendInfo.getNickname(),
+                                friendInfo.getFaceURL());
 
-            @NonNull
-            private ExUserInfo getExUserInfo() {
-                ExUserInfo exUserInfo = new ExUserInfo();
-                exUserInfo.sortLetter = lastSticky;
-                exUserInfo.isSticky = true;
-                return exUserInfo;
-            }
-
-            @Override
-            public int getItemViewType(int position) {
-                return getItems().get(position).isSticky ? STICKY : ITEM;
-            }
-
-            @NonNull
-            @Override
-            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                if (viewType == ITEM)
-                    return new ViewHol.ItemViewHo(parent);
-
-                return new ViewHol.StickyViewHo(parent);
-            }
-
-            @Override
-            public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExUserInfo data, int position) {
-                if (getItemViewType(position) == ITEM) {
-                    ViewHol.ItemViewHo itemViewHo = (ViewHol.ItemViewHo) holder;
-                    FriendInfo friendInfo = data.userInfo.getFriendInfo();
-                    itemViewHo.view.avatar.load(friendInfo.getFaceURL());
-                    itemViewHo.view.nickName.setText(friendInfo.getNickname());
-                    itemViewHo.view.select.setVisibility(View.GONE);
-                    itemViewHo.view.getRoot().setOnClickListener(v -> {
-                        if (null!=recommend) {
-                            CommonDialog commonDialog = new CommonDialog(AllFriendActivity.this);
-                            commonDialog.show();
-                            LayoutCommonDialogBinding mainView = commonDialog.getMainView();
-                            mainView.tips.setText(String.format(getString(io.openim.android.ouicore.R.string.recommend_who)
-                                , friendInfo.getNickname()));
-                            mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
-                            mainView.confirm.setOnClickListener(v1 -> {
-                                commonDialog.dismiss();
-                                sendCardMessage(friendInfo);
-                            });
+                            finish();
+                            Common.finishRoute(Routes.Group.SELECT_TARGET);
+                            selectTargetVM.toFinish();
                             return;
                         }
-                        if (formChat) {
-                            sendChatWindow(friendInfo);
-                            return;
+                        if (null != finalTarget && !finalTarget.isEnabled) return;
+                        itemViewHo.view.select.setChecked(!itemViewHo.view.select.isChecked());
+
+                        if (itemViewHo.view.select.isChecked()) {
+                            MultipleChoice meta = new MultipleChoice(friendInfo.getUserID());
+                            meta.name = friendInfo.getNickname();
+                            meta.icon = friendInfo.getFaceURL();
+                            meta.isSelect = true;
+                            selectTargetVM.addDate(meta);
+                        } else {
+                            selectTargetVM.removeMetaData(friendInfo.getUserID());
                         }
-                        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                            .withString(Constant.K_ID, friendInfo.getUserID()).navigation(AllFriendActivity.this, 1001);
-                    });
-                } else {
-                    ViewHol.StickyViewHo stickyViewHo = (ViewHol.StickyViewHo) holder;
-                    stickyViewHo.view.title.setText(data.sortLetter);
-                }
+                        return;
+                    }
+
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                        .withString(Constant.K_ID, friendInfo.getUserID())
+                        .navigation(AllFriendActivity.this, 1001);
+                });
             }
         };
         view.recyclerView.setAdapter(adapter);
+        view.recyclerView.addItemDecoration(new StickyDecoration(this,
+            position -> adapter.getItems().get(position).sortLetter));
     }
 
     private void sendChatWindow(FriendInfo friendInfo) {
-      try {
-          SelectTargetVM selectTargetVM = Easy.find(SelectTargetVM.class);
-          if (null != selectTargetVM) {
-              selectTargetVM.addMetaData(friendInfo.getUserID(),
-                  friendInfo.getNickname(), friendInfo.getFaceURL());
-              selectTargetVM.finishIntention();
-          }
-      }catch (Exception ignored){}
+        if (null != selectTargetVM) {
+
+        }
     }
 
-    private void sendCardMessage(FriendInfo friendInfo) {
-        CardElem cardElem=new CardElem();
-        cardElem.setUserID(recommend.key);
-        cardElem.setNickname(recommend.getName());
-        cardElem.setFaceURL(recommend.getFaceUrl());
-        Message message = OpenIMClient.getInstance().messageManager.createCardMessage(cardElem);
-        OfflinePushInfo offlinePushInfo = new OfflinePushInfo(); // 离线推送的消息备注；不为null
-        OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
-            @Override
-            public void onError(int code, String error) {
-                toast(error + code);
-            }
-
-            @Override
-            public void onProgress(long progress) {
-            }
-
-            @Override
-            public void onSuccess(Message message) {
-                toast(AllFriendActivity.this.
-                    getString(io.openim.android.ouicore.R.string.send_succ));
-                finish();
-            }
-        }, message, friendInfo.getUserID(), null, offlinePushInfo);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -191,36 +206,33 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
         }
     }
 
-    private ActivityResultLauncher<Intent> searchFriendLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-        result -> {
-        try {
-            if (result.getResultCode()!=RESULT_OK)return;
+    private ActivityResultLauncher<Intent> searchFriendLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            try {
+                if (result.getResultCode() != RESULT_OK) return;
 
-            String uid = result.getData().getStringExtra(Constant.K_ID);
-            if (formChat){
-                for (ExUserInfo item : adapter.getItems()) {
-                    if (null!=item.userInfo&&item.userInfo.getUserID().equals(uid)){
-                        sendChatWindow(item.userInfo.getFriendInfo());
-                        return;
+                String uid = result.getData().getStringExtra(Constant.K_ID);
+                if (null != selectTargetVM) {
+                    for (ExUserInfo item : adapter.getItems()) {
+                        if (null != item.userInfo && item.userInfo.getUserID().equals(uid)) {
+                            sendChatWindow(item.userInfo.getFriendInfo());
+                            return;
+                        }
                     }
                 }
-            }
-            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                .withString(Constant.K_ID, uid)
-                .navigation();
-        } catch (Exception ignored) {
+                ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                    .withString(Constant.K_ID, uid).navigation();
+            } catch (Exception ignored) {
 
-        }
-    });
+            }
+        });
 
     private void listener() {
-        view.searchView.setOnClickListener(v ->
-            {
-                Postcard postcard = ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS);
-                LogisticsCenter.completion(postcard);
-                searchFriendLauncher.launch(new Intent(this, postcard.getDestination()));
-            }
-        );
+        view.searchView.setOnClickListener(v -> {
+            Postcard postcard = ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS);
+            LogisticsCenter.completion(postcard);
+            searchFriendLauncher.launch(new Intent(this, postcard.getDestination()));
+        });
         vm.letters.observe(this, v -> {
             if (null == v || v.isEmpty()) return;
             StringBuilder letters = new StringBuilder();
@@ -229,7 +241,6 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
             }
             view.sortView.setLetters(letters.toString());
         });
-
 
         vm.exUserInfo.observe(this, v -> {
             if (null == v || v.isEmpty()) return;
@@ -240,17 +251,52 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
         view.sortView.setOnLetterChangedListener((letter, position) -> {
             for (int i = 0; i < adapter.getItems().size(); i++) {
                 ExUserInfo exUserInfo = adapter.getItems().get(i);
-                if (!exUserInfo.isSticky)
-                    continue;
                 if (exUserInfo.sortLetter.equalsIgnoreCase(letter)) {
-                    View viewByPosition = view.recyclerView.getLayoutManager().findViewByPosition(i);
-                    if (viewByPosition != null) {
-                        view.scrollView.smoothScrollTo(0, viewByPosition.getTop());
-                    }
+                    smoothMoveToPosition(view.recyclerView, i);
                     return;
                 }
             }
         });
 
+        view.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (mShouldScroll && RecyclerView.SCROLL_STATE_IDLE == newState) {
+                    mShouldScroll = false;
+                    smoothMoveToPosition(view.recyclerView, mToPosition);
+                }
+            }
+        });
+    }
+
+
+    /**
+     * 滑动到指定位置
+     */
+    private void smoothMoveToPosition(RecyclerView mRecyclerView, final int position) {
+        // 第一个可见位置
+        int firstItem = mRecyclerView.getChildLayoutPosition(mRecyclerView.getChildAt(0));
+        // 最后一个可见位置
+        int lastItem =
+            mRecyclerView.getChildLayoutPosition(mRecyclerView.getChildAt(mRecyclerView.getChildCount() - 1));
+        if (position < firstItem) {
+            // 第一种可能:跳转位置在第一个可见位置之前，使用smoothScrollToPosition
+            mRecyclerView.smoothScrollToPosition(position);
+        } else if (position <= lastItem) {
+            // 第二种可能:跳转位置在第一个可见位置之后，最后一个可见项之前
+            int movePosition = position - firstItem;
+            if (movePosition >= 0 && movePosition < mRecyclerView.getChildCount()) {
+                int top = mRecyclerView.getChildAt(movePosition).getTop();
+                // smoothScrollToPosition 不会有效果，此时调用smoothScrollBy来滑动到指定位置
+                mRecyclerView.smoothScrollBy(0, top);
+            }
+        } else {
+            // 第三种可能:跳转位置在最后可见项之后，则先调用smoothScrollToPosition将要跳转的位置滚动到可见位置
+            // 再通过onScrollStateChanged控制再次调用smoothMoveToPosition，执行上一个判断中的方法
+            mRecyclerView.smoothScrollToPosition(position);
+            mToPosition = position;
+            mShouldScroll = true;
+        }
     }
 }

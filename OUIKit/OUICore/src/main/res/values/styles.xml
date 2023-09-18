@@ -1,5 +1,4 @@
 <resources>
-
     <style name="dialog_tran" parent="android:style/Theme.Dialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>
@@ -76,6 +75,7 @@
     <style name="NotAnimation" parent="Theme.Main">
         <item name="android:windowAnimationStyle">@style/Animation</item>
     </style>
+
     <style name="Animation">
         <item name="android:activityOpenEnterAnimation">@null</item>
         <item name="android:activityOpenExitAnimation">@null</item>

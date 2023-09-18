@@ -14,19 +14,30 @@ import io.openim.android.demo.databinding.ActivityPersonInfoBinding;
 import io.openim.android.demo.ui.main.EditTextActivity;
 import io.openim.android.demo.vm.FriendVM;
 import io.openim.android.demo.vm.PersonalVM;
+import io.openim.android.ouicontact.ui.AllFriendActivity;
+import io.openim.android.ouiconversation.ui.ChatActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
+import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.ex.User;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ContactListVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.listener.OnMsgSendCallback;
+import io.openim.android.sdk.models.CardElem;
+import io.openim.android.sdk.models.FriendInfo;
+import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonInfoBinding> {
@@ -88,13 +99,46 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             });
         });
         view.recommend.setOnClickListener(v -> {
-            UserInfo userInfo = vm.userInfo.val();
-            User user=new User(userInfo.getUserID());
-            user.setName(userInfo.getNickname());
-            user.setFaceUrl(userInfo.getFaceURL());
-            ARouter.getInstance().build(Routes.Contact.ALL_FRIEND)
-                .withSerializable("recommend",
-                    user).navigation();
+            SelectTargetVM selectTargetVM =
+                Easy.installVM(SelectTargetVM.class);
+            selectTargetVM.setIntention(SelectTargetVM.Intention.isShareCard);
+            selectTargetVM.setOnFinishListener(() -> {
+                CommonDialog commonDialog = new CommonDialog(this);
+                commonDialog.show();
+                MultipleChoice target =selectTargetVM.metaData.val().get(0);
+                LayoutCommonDialogBinding mainView = commonDialog.getMainView();
+                mainView.tips.setText(String.format(getString(io.openim.android.ouicore.R.string.recommend_who),
+                    target.name));
+                mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
+                mainView.confirm.setOnClickListener(v1 -> {
+                    commonDialog.dismiss();
+
+                    CardElem cardElem = new CardElem();
+                    cardElem.setUserID(vm.userInfo.val().getUserID());
+                    cardElem.setNickname(vm.userInfo.val().getNickname());
+                    cardElem.setFaceURL(vm.userInfo.val().getFaceURL());
+                    Message message = OpenIMClient.getInstance().messageManager.createCardMessage(cardElem);
+                    OfflinePushInfo offlinePushInfo = new OfflinePushInfo(); // 离线推送的消息备注；不为null
+                    OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
+                        @Override
+                        public void onError(int code, String error) {
+                            toast(error + code);
+                        }
+
+                        @Override
+                        public void onProgress(long progress) {
+                        }
+
+                        @Override
+                        public void onSuccess(Message message) {
+                            toast(PersonDataActivity.this
+                                .getString(io.openim.android.ouicore.R.string.send_succ));
+                        }
+                    }, message,target.key,
+                        null, offlinePushInfo);
+                });
+            });
+            ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
         });
         view.moreData.setOnClickListener(v -> {
             startActivity(new Intent(this, MoreDataActivity.class));
