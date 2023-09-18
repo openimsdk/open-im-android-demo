@@ -91,6 +91,7 @@ import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.ForwardVM;
+import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouicore.voice.SPlayer;
@@ -1467,6 +1468,27 @@ public class MessageViewHolder {
                 LayoutMsgGroupAnnouncementLeftBinding.bind(itemView);
             MsgExpand msgExpand = (MsgExpand) message.getExt();
             v.detail.setText(msgExpand.notificationMsg.group.notification);
+
+            v.content.setOnClickListener(new OnDedrepClickListener() {
+                @Override
+                public void click(View v) {
+                    toDetail();
+                }
+            });
+        }
+
+        private void toDetail() {
+            GroupVM groupVM= BaseApp.inst().getVMByCache(GroupVM.class);
+            if (null==groupVM){
+                groupVM=new GroupVM();
+                groupVM.groupId=chatVM.groupID;
+                BaseApp.inst().putVM(groupVM);
+            }
+            groupVM.getGroupsInfo();
+            boolean isOw = chatVM.groupInfo.val().getOwnerUserID()
+                .equals(BaseApp.inst().loginCertificate.userID);
+            ARouter.getInstance().build(Routes.Group.GROUP_BULLETIN)
+                .withBoolean(Constant.K_RESULT, isOw).navigation();
         }
 
         @Override
@@ -1475,7 +1497,12 @@ public class MessageViewHolder {
                 LayoutMsgGroupAnnouncementRightBinding.bind(itemView);
             MsgExpand msgExpand = (MsgExpand) message.getExt();
             v.detail2.setText(msgExpand.notificationMsg.group.notification);
-
+            v.content2.setOnClickListener(new OnDedrepClickListener() {
+                @Override
+                public void click(View v) {
+                    toDetail();
+                }
+            });
         }
     }
 }

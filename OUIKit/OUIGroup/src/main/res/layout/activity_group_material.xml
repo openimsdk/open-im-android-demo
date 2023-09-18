@@ -111,7 +111,6 @@
                                   android:layout_width="wrap_content"
                                   android:layout_height="wrap_content"
                                   android:layout_marginRight="5dp"
-                                  android:text="@{GroupVM.groupsInfo.groupName}"
                                   android:textColor="@color/txt_black"
                                   android:textSize="17sp" />
                               <ImageView

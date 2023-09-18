@@ -63,7 +63,6 @@ public class GroupVM extends SocialityVM {
     public String groupId;
     public MutableLiveData<List<FriendInfo>> selectedFriendInfo =
         new MutableLiveData<>(new ArrayList<>());
-    public LoginCertificate loginCertificate;
 
     public List<FriendInfo> selectedFriendInfoV3 = new ArrayList<>();
 
@@ -75,7 +74,6 @@ public class GroupVM extends SocialityVM {
     @Override
     protected void viewCreate() {
         super.viewCreate();
-        loginCertificate = LoginCertificate.getCache(getContext());
     }
 
     /**
@@ -84,12 +82,7 @@ public class GroupVM extends SocialityVM {
     public void getGroupsInfo() {
         List<String> groupIds = new ArrayList<>(); // 群ID集合
         groupIds.add(groupId);
-        OpenIMClient.getInstance().groupManager.getGroupsInfo(new OnBase<List<GroupInfo>>() {
-            @Override
-            public void onError(int code, String error) {
-
-            }
-
+        OpenIMClient.getInstance().groupManager.getGroupsInfo(new IMUtil.IMCallBack<List<GroupInfo>>(){
             @Override
             public void onSuccess(List<GroupInfo> data) {
                 if (data.isEmpty()) return;
@@ -407,7 +400,7 @@ public class GroupVM extends SocialityVM {
     public boolean isOwner() {
         GroupInfo groupInfo = groupsInfo.getValue();
         if (null == groupInfo) return false;
-        return groupInfo.getOwnerUserID().equals(loginCertificate.userID);
+        return groupInfo.getOwnerUserID().equals(BaseApp.inst().loginCertificate.userID);
     }
 
     public void getGroupMembersInfo(OnBase<List<GroupMembersInfo>> onBase, List<String> uIds) {

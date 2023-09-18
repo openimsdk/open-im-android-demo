@@ -424,8 +424,7 @@ public class IMUtil {
                 String txt = String.format(ctx.getString(R.string.Muted_group),
                     memberNotification.mutedUser.getNickname(),
                     memberNotification.opUser.getNickname(),
-                    TimeUtil.secondFormat(memberNotification.mutedSeconds,
-                        TimeUtil.secondFormatZh));
+                    TimeUtil.secondFormat(memberNotification.mutedSeconds));
 
                 List<MultipleChoice> choices = new ArrayList<>();
                 MultipleChoice choice1 = new MultipleChoice(memberNotification.opUser.getUserID());

@@ -94,7 +94,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     if (infoModifyType == 1)
                         vm.UPDATEGroup(vm.groupId, var, null, null, null, null);
                     if (infoModifyType == 2)
-                        vm.setGroupMemberNickname(vm.groupId, vm.loginCertificate.userID, var);
+                        vm.setGroupMemberNickname(vm.groupId, BaseApp.inst().loginCertificate.userID, var);
                 });
     }
 
@@ -163,7 +163,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                 modifyData.title = getString(io.openim.android.ouicore.R.string.in_group_name);
                 modifyData.description =
                     getString(io.openim.android.ouicore.R.string.in_group_name_tips);
-                ExGroupMemberInfo exGroupMemberInfo = vm.getOwnInGroup(vm.loginCertificate.userID);
+                ExGroupMemberInfo exGroupMemberInfo = vm.getOwnInGroup(BaseApp.inst().loginCertificate.userID);
                 if (null == exGroupMemberInfo) {
                     WaitDialog waitDialog = new WaitDialog(this);
                     waitDialog.show();

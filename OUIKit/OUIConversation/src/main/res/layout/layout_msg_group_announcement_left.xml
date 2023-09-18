@@ -36,6 +36,7 @@
                 android:minHeight="@dimen/msg_min_height"
                 android:maxWidth="@dimen/msg_max_width"
                 android:minWidth="@dimen/msg_min_width"
+                android:id="@+id/content"
                 android:padding="12dp"
                 android:background="@drawable/sty_radius_unleft_stroke_30"
                 android:layout_height="wrap_content">

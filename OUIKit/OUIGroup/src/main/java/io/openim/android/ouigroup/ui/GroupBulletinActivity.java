@@ -3,12 +3,16 @@ package io.openim.android.ouigroup.ui;
 import android.os.Bundle;
 import android.view.View;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
+
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouigroup.databinding.ActivityGroupBulletinBinding;
 import io.openim.android.ouicore.vm.GroupVM;
 
+@Route(path = Routes.Group.GROUP_BULLETIN)
 public class GroupBulletinActivity extends BaseActivity<GroupVM, ActivityGroupBulletinBinding> {
 
 
