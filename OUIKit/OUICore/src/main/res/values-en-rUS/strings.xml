@@ -505,5 +505,8 @@
     <string name="group_ban">群已被禁</string>
     <string name="you_mute">你已被禁言</string>
     <string name="file_download">文件下载中请稍后...</string>
+    <string name="message_tone">新消息提示音</string>
+    <string name="vibration">新消息震动</string>
+    <string name="not_be_added">禁止添加我为好友</string>
 
 </resources>

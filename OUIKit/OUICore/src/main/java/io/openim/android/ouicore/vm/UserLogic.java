@@ -5,6 +5,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.BaseVM;
 import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.sdk.models.UserInfo;
 
 public class UserLogic extends BaseVM {
     public enum ConnectStatus {
@@ -19,8 +20,7 @@ public class UserLogic extends BaseVM {
             this.value = value;
         }
     }
-
     public State<ConnectStatus> connectStatus = new State<>(ConnectStatus.DEFAULT);
 
-
+    public State<UserInfo> info=new State<>();
 }

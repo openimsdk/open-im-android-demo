@@ -15,9 +15,10 @@ public class LoginCertificate {
     public String imToken;
     public String chatToken;
 
+    //允许非好友发送消息
     public boolean allowSendMsgNotFriend;
+    //允许添加好友
     public boolean allowAddFriend;
-
     //允许响铃
     public boolean allowBeep;
     //允许振动

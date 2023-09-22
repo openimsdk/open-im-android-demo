@@ -42,8 +42,15 @@ public class AccountSettingActivity extends BaseActivity<PersonalVM, ActivityAcc
         vm.userInfo.observe(this, extendUserInfo -> {
             if (null == extendUserInfo) return;
             view.slideButton.setCheckedWithAnimation(extendUserInfo.getGlobalRecvMsgOpt() == 2);
+            view.messageTone.setCheckedWithAnimation(extendUserInfo.getAllowBeep() == 1);
+            view.vibration.setCheckedWithAnimation(extendUserInfo.getAllowVibration() == 1);
+            view.notAdd.setCheckedWithAnimation(extendUserInfo.getAllowAddFriend() != 1);
         });
         view.slideButton.setOnSlideButtonClickListener(isChecked -> vm.setGlobalRecvMessageOpt(isChecked));
+        view.messageTone.setOnSlideButtonClickListener(isChecked -> vm.setAllowBeep(isChecked));
+        view.vibration.setOnSlideButtonClickListener(isChecked -> vm.setAllowVibration(isChecked));
+        view.notAdd.setOnSlideButtonClickListener(isChecked -> vm.setAllowAddFriend(!isChecked));
+
         view.clearRecord.setOnClickListener(v -> {
             CommonDialog commonDialog = new CommonDialog(this);
             commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.clear_chat_all_record);

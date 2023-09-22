@@ -156,6 +156,22 @@ public class PersonalVM extends BaseViewModel {
         setSelfInfo(new Parameter().add("globalRecvMsgOpt", globalRecvMsgOpt));
     }
 
+    public void setAllowBeep(boolean isOpen) {
+        int allow = isOpen ?  1:2;
+        userInfo.val().setAllowBeep(allow);
+        setSelfInfo(new Parameter().add("allowBeep", allow));
+    }
+    public void setAllowVibration(boolean isOpen) {
+        int allow = isOpen ?  1:2;
+        userInfo.val().setAllowVibration(allow);
+        setSelfInfo(new Parameter().add("allowVibration", allow));
+    }
+    public void setAllowAddFriend(boolean isOpen) {
+        int allow = isOpen ?  1:2;
+        userInfo.val().setAllowAddFriend(allow);
+        setSelfInfo(new Parameter().add("allowAddFriend", allow));
+    }
+
     public void setEmail(String email) {
         userInfo.val().setEmail(email);
         setSelfInfo(new Parameter().add("email", email));

@@ -6,10 +6,12 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.openim.android.demo.repository.OpenIMService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.base.vm.injection.Easy;
@@ -19,6 +21,8 @@ import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
+import io.openim.android.ouicore.net.RXRetrofit.Parameter;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.api.NiService;
 import io.openim.android.ouicore.api.OneselfService;
@@ -116,26 +120,49 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
             }
         });
     }
+    public void updateConfig(UserInfo userInfo) {
+        LoginCertificate certificate = BaseApp.inst().loginCertificate;
+        if (!userInfo.getUserID().equals(certificate.userID)) return;
 
+        certificate.nickname = userInfo.getNickname();
+        certificate.faceURL = userInfo.getFaceURL();
+
+        certificate.globalRecvMsgOpt = userInfo.getGlobalRecvMsgOpt();
+        certificate.allowAddFriend = userInfo.getAllowAddFriend() == 1;
+        certificate.allowBeep = userInfo.getAllowBeep() == 1;
+        certificate.allowVibration = userInfo.getAllowVibration() == 1;
+
+        BaseApp.inst().loginCertificate.cache(BaseApp.inst());
+    }
     void getSelfUserInfo() {
-        OpenIMClient.getInstance().userInfoManager.getSelfUserInfo(new OnBase<UserInfo>() {
-
-
+        List<String> ids = new ArrayList<>();
+        ids.add(BaseApp.inst().loginCertificate.userID);
+        Parameter parameter = new Parameter().add("userIDs", ids);
+        N.API(OpenIMService.class).getUsersFullInfo(parameter.buildJsonBody())
+            .map(OpenIMService.turn(HashMap.class))
+            .compose(N.IOMain())
+            .subscribe(new NetObserver<HashMap>(getContext()) {
             @Override
-            public void onError(int code, String error) {
-                getIView().toast(error + code);
+            protected void onFailure(Throwable e) {
+                toast(e.getMessage());
             }
 
             @Override
-            public void onSuccess(UserInfo data) {
-                // 返回当前登录用户的资料
-                LoginCertificate loginCertificate= BaseApp.inst().loginCertificate;
-                loginCertificate.nickname = (null==data.getNickname())?"":data.getNickname();
-                loginCertificate.faceURL = data.getFaceURL();
-                loginCertificate.cache(getContext());
-                loginCertificate.globalRecvMsgOpt=data.getGlobalRecvMsgOpt();
-                nickname.setValue(loginCertificate.nickname);
-                Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
+            public void onSuccess(HashMap map) {
+                try {
+                    List arrayList = (List) map.get("users");
+                    if (null == arrayList || arrayList.isEmpty()) return;
+
+                    UserInfo us = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
+                        UserInfo.class);
+                    updateConfig(us);
+                    userLogic.info.setValue(us);
+                    nickname.setValue(us.getNickname());
+                    Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         });
     }
