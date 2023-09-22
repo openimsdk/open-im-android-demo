@@ -69,7 +69,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_centerVertical="true"
-                        android:text="已开启群禁言"
+                        android:text="@string/start_group_mute"
                         android:textColor="#ff999999"
                         android:textSize="12sp"
                         android:visibility="gone" />

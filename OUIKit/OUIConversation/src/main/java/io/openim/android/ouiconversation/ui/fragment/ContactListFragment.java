@@ -381,7 +381,7 @@ public class ContactListFragment extends BaseFragment<ContactListVM> implements 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        BaseApp.viewModels.remove(vm.getClass().getCanonicalName());
+        BaseApp.inst().removeCacheVM(vm.getClass());
         Obs.inst().deleteObserver(this);
 
         Animation animation = view.status.getAnimation();

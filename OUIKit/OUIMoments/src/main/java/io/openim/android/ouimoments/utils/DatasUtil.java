@@ -77,7 +77,7 @@ public class DatasUtil {
      * 评论id自增长
      */
     public static User curUser = new User(BaseApp.inst().loginCertificate.userID,
-       "你", BaseApp.inst().loginCertificate.faceURL);
+        BaseApp.inst().loginCertificate.nickname, BaseApp.inst().loginCertificate.faceURL);
 
     static {
         User user1 = new User("1", "张三", HEADIMG[1]);

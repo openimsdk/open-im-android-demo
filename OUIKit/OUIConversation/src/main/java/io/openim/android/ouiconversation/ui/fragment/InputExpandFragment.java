@@ -247,7 +247,8 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
 
     //去拍摄
     private void goToShoot() {
-        if (hasShoot) shootLauncher.launch(new Intent(getActivity(), ShootActivity.class));
+        if (hasShoot)
+            shootLauncher.launch(new Intent(getActivity(), ShootActivity.class));
         else {
             AndPermission.with(this).runtime().permission(Permission.CAMERA,
                 Permission.RECORD_AUDIO).onGranted(permissions -> {

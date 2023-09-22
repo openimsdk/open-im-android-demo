@@ -63,6 +63,7 @@
                 android:paddingLeft="10dp"
                 android:text="@={LoginVM.nickName}"
                 android:textColor="#ff333333"
+                android:maxLength="16"
                 android:textSize="18sp" />
 
             <TextView

@@ -150,7 +150,10 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
                 remark = vm.userInfo.val().getFriendInfo().getRemark();
             } catch (Exception e) {
             }
-            resultLauncher.launch(new Intent(this, EditTextActivity.class).putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.remark)).putExtra(EditTextActivity.INIT_TXT, remark));
+            resultLauncher.launch(new Intent(this, EditTextActivity.class)
+                .putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.remark))
+                    .putExtra(EditTextActivity.MAX_LENGTH,16)
+                .putExtra(EditTextActivity.INIT_TXT, remark));
         });
         friendVM.blackListUser.observe(this, userInfos -> {
             boolean isCon = false;

@@ -35,6 +35,7 @@ import java.util.Vector;
 
 import javax.annotation.Nullable;
 
+import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.State;
@@ -250,8 +251,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public String handlePlatformCode(List<Integer> platformList) {
         List<String> pList = new ArrayList<>();
         for (int platform : platformList) {
-            if (platform == Platform.ANDROID || platform == Platform.IOS) {
-                pList.add(getContext().getString(io.openim.android.ouicore.R.string.mobile_phone));
+            if (platform == Platform.ANDROID) {
+                pList.add(getContext().getString(io.openim.android.ouicore.R.string.android));
+            } else if (platform == Platform.IOS) {
+                pList.add(getContext().getString(io.openim.android.ouicore.R.string.ios));
             } else if (platform == Platform.WIN) {
                 pList.add(getContext().getString(io.openim.android.ouicore.R.string.pc));
             } else if (platform == Platform.WEB) {
@@ -306,7 +309,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onGroupInfoChanged(GroupInfo info) {
-        groupInfo.setValue(info);
+        if (info.getGroupID().equals(groupID))
+            groupInfo.setValue(info);
     }
 
     @Override
@@ -321,7 +325,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onGroupMemberInfoChanged(GroupMembersInfo info) {
-
+        if (info.getGroupID().equals(groupID)
+            && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+            hasPermission = info.getRoleLevel() != GroupRole.MEMBER;
+        }
     }
 
     @Override
@@ -761,8 +768,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private void lastHandleMsg(List<Message> list) {
         IMUtil.calChatTimeInterval(list);
+        mediaDataList.clear();
         for (Message message : list) {
-            addMediaList(message);
+            addMediaList(message,true);
         }
     }
 
@@ -771,21 +779,37 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
      *
      * @param datum
      */
-    private void addMediaList(Message datum) {
-        PreviewMediaVM.MediaData mediaData = null;
-        if (datum.getContentType() == MessageType.PICTURE) {
-            PictureElem pictureElem = datum.getPictureElem();
-            mediaData = new PreviewMediaVM.MediaData(pictureElem.getSourcePicture().getUrl());
-            mediaData.thumbnail = pictureElem.getSnapshotPicture().getUrl();
-        }
-        if (datum.getContentType() == MessageType.VIDEO) {
-            VideoElem videoElem = datum.getVideoElem();
-            mediaData = new PreviewMediaVM.MediaData(videoElem.getVideoUrl());
-            mediaData.isVideo = true;
-            mediaData.thumbnail = videoElem.getSnapshotUrl();
-        }
-        if (null != mediaData && !mediaDataList.contains(mediaData)) {
-            mediaDataList.add(0,mediaData);
+    private void addMediaList(Message datum, boolean isPour) {
+        try {
+            PreviewMediaVM.MediaData mediaData = null;
+            if (datum.getContentType() == MessageType.PICTURE) {
+                PictureElem pictureElem = datum.getPictureElem();
+                String sUrl=pictureElem.getSourcePicture().getUrl();
+                if (TextUtils.isEmpty(sUrl)){
+                    sUrl=pictureElem.getSourcePath();
+                }
+                mediaData = new PreviewMediaVM.MediaData(sUrl);
+                if (null != pictureElem.getSnapshotPicture())
+                    mediaData.thumbnail = pictureElem.getSnapshotPicture().getUrl();
+            }
+            if (datum.getContentType() == MessageType.VIDEO) {
+                VideoElem videoElem = datum.getVideoElem();
+                String sUrl=videoElem.getVideoUrl();
+                if (TextUtils.isEmpty(sUrl)){
+                    sUrl=videoElem.getVideoPath();
+                }
+                mediaData = new PreviewMediaVM.MediaData(sUrl);
+                mediaData.isVideo = true;
+                mediaData.thumbnail = videoElem.getSnapshotUrl();
+            }
+            if (null != mediaData && !mediaDataList.contains(mediaData)) {
+                if (isPour)//反着
+                    mediaDataList.add(0, mediaData);
+                else
+                    mediaDataList.add(mediaData);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -975,6 +999,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         if (messages.val().contains(msg)) {
             messageAdapter.notifyItemChanged(messages.val().indexOf(msg));
         } else {
+            addMediaList(msg,false);
             messages.val().add(0, IMUtil.buildExpandInfo(msg));
             messageAdapter.notifyItemInserted(0);
             getIView().scrollToPosition(0);
@@ -1067,7 +1092,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             @Override
             @SuppressLint("StringFormatInvalid")
             public void onSuccess(String data) {
-                final boolean firstType = message.getContentType() == MessageType.TEXT;
+                final boolean isTxt = message.getContentType() == MessageType.TEXT;
                 message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
                 if (hasPermission)
                     message.setSenderNickname(BaseApp.inst().loginCertificate.nickname);
@@ -1079,8 +1104,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips), message.getSenderNickname());
 
                 MsgExpand msgExpand = ((MsgExpand) message.getExt());
-                if (firstType) {
-                    //只有文本才支持重新编辑
+                if (isTxt&& message.getSendID().equals(uid)) {
+                    //只有是自己发的文本才支持重新编辑
                     String reedit =
                         BaseApp.inst().getString(io.openim.android.ouicore.R.string.re_edit);
                     txt += "\t" + reedit;

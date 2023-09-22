@@ -71,6 +71,7 @@
                         android:imeOptions="actionDone"
                         android:inputType="text"
                         android:singleLine="true"
+                        android:maxLength="16"
                         android:maxLines="1"
                         android:paddingLeft="12dp" />
                 </LinearLayout>

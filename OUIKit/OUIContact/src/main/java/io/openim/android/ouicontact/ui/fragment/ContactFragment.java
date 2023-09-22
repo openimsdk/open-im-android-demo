@@ -133,9 +133,8 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
             header.newFriendNoticeBadge.badge.setText(v + "");
         });
 
-        Easy.find(NotificationVM.class).momentsUnread.observe(getActivity(),v->{
-            header.newMomentsMsg.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE);
-        });
+        Easy.find(NotificationVM.class).momentsUnread.observe(getActivity(),v->
+            header.newMomentsMsg.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE));
     }
 
     @Override

@@ -22,7 +22,9 @@ import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 import java.io.File;
 import java.io.InputStream;
 
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.widgets.videolist.VideoListGlideModule;
 import io.openim.android.ouimoments.widgets.videolist.model.VideoLoadMvpView;
@@ -126,6 +128,12 @@ public class CircleVideoView extends LinearLayout implements VideoLoadMvpView, L
                         Toast.LENGTH_LONG).show();
                     return;
                 }
+                PreviewMediaVM mediaVM=Easy.installVM(PreviewMediaVM.class);
+                PreviewMediaVM.MediaData data =new PreviewMediaVM
+                    .MediaData(videoUrl);
+                data.thumbnail=imgUrl;
+                data.isVideo=true;
+                mediaVM .previewSingle(data);
                 ARouter.getInstance().build(Routes.Conversation.PREVIEW)
                     .withString("media_url",videoUrl)
                     .withString("first_frame",imgUrl).navigation();

@@ -1,5 +1,6 @@
 package io.openim.android.ouiconversation.ui;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -146,12 +147,17 @@ public class PreviewMediaActivity extends BasicActivity<ActivityPreviewBinding> 
         @NonNull
         @Override
         public Object instantiateItem(@NonNull ViewGroup container, int position) {
+
+
             PreviewMediaVM.MediaData mediaData = pvm.mediaDataList.get(position);
             if (mediaData.isVideo) {
                 JzvdStd std = new JzvdStd(container.getContext());
                 std.setVisibility(View.VISIBLE);
                 std.setUp(mediaData.mediaUrl, "");
-
+                if (pvm.mediaDataList.size()==1){
+                    //单个预览 自动播放
+                    std.startVideoAfterPreloading();
+                }
                 std.posterImageView.setScaleType(ImageView.ScaleType.CENTER);
                 Glide.with(container.getContext()).load(mediaData.thumbnail).into(std.posterImageView);
                 container.addView(std);
@@ -164,7 +170,7 @@ public class PreviewMediaActivity extends BasicActivity<ActivityPreviewBinding> 
                     .centerInside()
                     .into(pinchImageView);
 
-
+                pinchImageView.setOnClickListener(v -> ((Activity)v.getContext()).finish());
                 container.addView(pinchImageView);
                 return pinchImageView;
             }

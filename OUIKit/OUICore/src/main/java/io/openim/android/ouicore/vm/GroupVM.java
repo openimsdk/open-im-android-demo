@@ -3,7 +3,6 @@ package io.openim.android.ouicore.vm;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.github.promeg.pinyinhelper.Pinyin;
@@ -20,6 +19,7 @@ import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
 
 import io.openim.android.ouicore.im.IMBack;
+import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.Common;
@@ -31,38 +31,44 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.enums.GroupType;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.listener.OnGroupListener;
+import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.FriendInfo;
+import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class GroupVM extends SocialityVM {
     //禁言状态
-    public MutableLiveData<Integer> muteStatus = new MutableLiveData<>(-1);
-    public MutableLiveData<String> groupName = new MutableLiveData<>("");
-    public MutableLiveData<GroupInfo> groupsInfo = new MutableLiveData<>();
-    //当前用户是否是群主
-    public MutableLiveData<Boolean> isGroupOwner = new MutableLiveData<>(true);
+    public State<Integer> muteStatus = new State<>(-1);
+    public State<String> groupName = new State<>("");
+    public State<GroupInfo> groupsInfo = new State<>();
+    public State<ConversationInfo> conversationInfo = new State<>();
+    //当前用户是否是群主或管理员
+    public State<Boolean> isOwnerOrAdmin = new State<>(false);
+    public State<Boolean> isOwner = new State<>(false);
     //群所有成员
-    public MutableLiveData<List<GroupMembersInfo>> groupMembers =
-        new MutableLiveData<>(new ArrayList<>());
+    public State<List<GroupMembersInfo>> groupMembers =
+        new State<>(new ArrayList<>());
     //超级群成员分页加载
     public State<List<ExGroupMemberInfo>> superGroupMembers =
         new State<>(new ArrayList<>());
     //封装过的群成员 用于字母导航
-    public MutableLiveData<List<ExGroupMemberInfo>> exGroupMembers =
-        new MutableLiveData<>(new ArrayList<>());
+    public State<List<ExGroupMemberInfo>> exGroupMembers =
+        new State<>(new ArrayList<>());
     //群管理
-    public MutableLiveData<List<ExGroupMemberInfo>> exGroupManagement =
-        new MutableLiveData<>(new ArrayList<>());
+    public State<List<ExGroupMemberInfo>> exGroupManagement =
+        new State<>(new ArrayList<>());
     //群字母导航
-    public MutableLiveData<List<String>> groupLetters = new MutableLiveData<>(new ArrayList<>());
+    public State<List<String>> groupLetters = new State<>(new ArrayList<>());
     //封装过的好友信息 用于字母导航
     public String groupId;
-    public MutableLiveData<List<FriendInfo>> selectedFriendInfo =
-        new MutableLiveData<>(new ArrayList<>());
+    public State<List<FriendInfo>> selectedFriendInfo =
+        new State<>(new ArrayList<>());
 
     public List<FriendInfo> selectedFriendInfoV3 = new ArrayList<>();
 
@@ -71,9 +77,15 @@ public class GroupVM extends SocialityVM {
     //已读Ids
     public List<String> hasReadIDList = new ArrayList<>();
 
-    @Override
-    protected void viewCreate() {
-        super.viewCreate();
+
+    public void getConversationInfo() {
+        OpenIMClient.getInstance().conversationManager.getOneConversation(new IMUtil.IMCallBack<ConversationInfo>() {
+            @Override
+            public void onSuccess(ConversationInfo data) {
+                if (null != data)
+                    conversationInfo.setValue(data);
+            }
+        }, groupId, ConversationType.SUPER_GROUP_CHAT);
     }
 
     /**
@@ -82,14 +94,31 @@ public class GroupVM extends SocialityVM {
     public void getGroupsInfo() {
         List<String> groupIds = new ArrayList<>(); // 群ID集合
         groupIds.add(groupId);
-        OpenIMClient.getInstance().groupManager.getGroupsInfo(new IMUtil.IMCallBack<List<GroupInfo>>(){
+        OpenIMClient.getInstance().groupManager.getGroupsInfo(new IMUtil.IMCallBack<List<GroupInfo>>() {
             @Override
             public void onSuccess(List<GroupInfo> data) {
                 if (data.isEmpty()) return;
                 groupsInfo.setValue(data.get(0));
-                isGroupOwner.setValue(isOwner());
             }
         }, groupIds);
+    }
+
+    public void getMyMemberInfo() {
+        OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
+            @Override
+            public void onSuccess(List<GroupMembersInfo> data) {
+                if (data.isEmpty()) return;
+                updateRole(data.get(0));
+            }
+        }, groupId, new ArrayList<>(Collections.singleton(BaseApp
+            .inst().loginCertificate.userID)));
+    }
+
+    public void updateRole(GroupMembersInfo data) {
+        isOwnerOrAdmin.setValue(data.getRoleLevel()
+            != GroupRole.MEMBER);
+        isOwner.setValue(data.getRoleLevel()
+            == GroupRole.OWNER);
     }
 
     /**
@@ -397,12 +426,6 @@ public class GroupVM extends SocialityVM {
     }
 
 
-    public boolean isOwner() {
-        GroupInfo groupInfo = groupsInfo.getValue();
-        if (null == groupInfo) return false;
-        return groupInfo.getOwnerUserID().equals(BaseApp.inst().loginCertificate.userID);
-    }
-
     public void getGroupMembersInfo(OnBase<List<GroupMembersInfo>> onBase, List<String> uIds) {
         OpenIMClient.getInstance().groupManager.getGroupMembersInfo(onBase, groupId, uIds);
     }
@@ -557,4 +580,6 @@ public class GroupVM extends SocialityVM {
         }
         changeGroupMemberMute(imBack, uid, seconds);
     }
+
+
 }

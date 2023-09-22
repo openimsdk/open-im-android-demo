@@ -77,12 +77,12 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     }
 
     private void initDate() {
+        initGlobalVM();
         if (isInitDate) return;
         isInitDate = true;
         if (null != callingService)
             callingService.startAudioVideoService(getContext());
 
-        initGlobalVM();
         getIView().initDate();
         getSelfUserInfo();
         onConnectSuccess();

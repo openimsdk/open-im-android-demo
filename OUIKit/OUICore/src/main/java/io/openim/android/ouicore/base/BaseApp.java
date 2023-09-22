@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.openim.android.ouicore.base.vm.State;
+import io.openim.android.ouicore.base.vm.injection.BaseVM;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.LanguageUtil;
@@ -36,30 +38,24 @@ public class BaseApp extends Application {
 
     public LoginCertificate loginCertificate;
 
-    public static final HashMap<String, BaseViewModel> viewModels = new HashMap<>();
-
-    public <T> T getVMByCache(Class<T> vm) {
-        String key = vm.getCanonicalName();
-        if (BaseApp.viewModels.containsKey(key)) {
-            return (T) BaseApp.viewModels.get(key);
+    public <T extends BaseVM> T getVMByCache(Class<T> vm) {
+        try {
+            return Easy.find(vm);
+        } catch (Exception ignored) {
         }
         return null;
     }
 
     public <T extends BaseViewModel> void putVM(T vm) {
-        String key = vm.getClass().getCanonicalName();
-        if (!BaseApp.viewModels.containsKey(key)) {
-            BaseApp.viewModels.put(key, vm);
-        }
+        Easy.put(vm);
     }
 
-    public void removeCacheVM(Class<?> cl) {
-        String key = cl.getCanonicalName();
-        BaseViewModel viewModel = BaseApp.viewModels.get(key);
-        if (null != viewModel) {
-            viewModel.releaseRes();
-            BaseApp.viewModels.remove(key);
-        }
+    public void removeCacheVM(Class<? extends BaseViewModel> cl) {
+        try {
+            BaseViewModel vm = Easy.find(cl);
+            vm.releaseRes();
+        } catch (Exception ignored) {}
+        Easy.delete(cl);
     }
 
     private void realmInit() {

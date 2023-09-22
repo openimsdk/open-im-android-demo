@@ -3,6 +3,8 @@ package io.openim.android.ouigroup.ui;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.lifecycle.Observer;
+
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import io.openim.android.ouicore.base.BaseActivity;
@@ -24,12 +26,13 @@ public class GroupBulletinActivity extends BaseActivity<GroupVM, ActivityGroupBu
         view.setGroupVM(vm);
 
         sink();
-        boolean isEditValid = getIntent().getBooleanExtra(Constant.K_RESULT, true);
-        view.edit.setVisibility(isEditValid ? View.VISIBLE : View.GONE);
+        vm.isOwnerOrAdmin.observe(this, aBoolean -> view.edit.setVisibility(aBoolean ? View.VISIBLE : View.GONE));
+
         click();
     }
 
     private void click() {
+
         view.edit.setOnClickListener(v -> {
             view.content.setEnabled(true);
             view.content.requestFocus();

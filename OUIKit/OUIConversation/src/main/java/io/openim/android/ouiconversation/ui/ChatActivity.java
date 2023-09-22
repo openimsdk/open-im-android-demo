@@ -446,6 +446,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             if (subject.equals(ChatVM.REEDIT_MSG)) {
                 view.layoutInputCote.chatInput.requestFocus();
                 view.layoutInputCote.chatInput.setText((String) subject.value);
+                view.layoutInputCote.chatInput.setSelection(((String) subject.value).length());
                 Common.pushKeyboard(this);
             }
         });

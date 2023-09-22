@@ -612,7 +612,7 @@ public class IMUtil {
      */
     public static CharSequence getMsgParse(Message msg) {
         MsgExpand msgExpand = (MsgExpand) msg.getExt();
-        CharSequence lastMsg = "";
+        CharSequence lastMsg = msg.getSenderNickname()+": ";
         try {
             switch (msg.getContentType()) {
                 default:
@@ -620,26 +620,26 @@ public class IMUtil {
                     break;
 
                 case MessageType.TEXT:
-                    lastMsg = msg.getTextElem().getContent();
+                    lastMsg += msg.getTextElem().getContent();
                     break;
                 case MessageType.PICTURE:
-                    lastMsg =
+                    lastMsg +=
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.picture) + "]";
                     break;
                 case MessageType.VOICE:
-                    lastMsg =
+                    lastMsg +=
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.voice) + "]";
                     break;
                 case MessageType.VIDEO:
-                    lastMsg =
+                    lastMsg +=
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.video) + "]";
                     break;
                 case MessageType.FILE:
-                    lastMsg =
+                    lastMsg +=
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.file) + "]";
                     break;
                 case MessageType.LOCATION:
-                    lastMsg =
+                    lastMsg +=
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.location) + "]";
                     break;
                 case MessageType.AT_TEXT:
@@ -653,38 +653,38 @@ public class IMUtil {
                         lastMsg =
                             IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(atTxt),
                                 tar, android.R.color.holo_red_dark, null);
-                    } else lastMsg = atTxt;
+                    } else lastMsg +=  atTxt;
                     break;
 
                 case MessageType.MERGER:
-                    lastMsg =
+                    lastMsg +=
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";
                     break;
                 case MessageType.CARD:
-                    lastMsg =
+                    lastMsg +=
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.card) + "]";
                     break;
                 case MessageType.OA_NTF:
-                    lastMsg = ((MsgExpand) msg.getExt()).oaNotification.text;
+                    lastMsg +=  ((MsgExpand) msg.getExt()).oaNotification.text;
                     break;
                 case MessageType.QUOTE:
-                    lastMsg = msg.getQuoteElem().getText();
+                    lastMsg += msg.getQuoteElem().getText();
                     break;
                 case MessageType.GROUP_ANNOUNCEMENT_NTF:
                     String target =
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.group_bulletin) + "]";
-                    lastMsg = target + msgExpand.notificationMsg.group.notification;
+                    lastMsg += target + msgExpand.notificationMsg.group.notification;
                     lastMsg =
                         IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(lastMsg),
                             target, android.R.color.holo_red_dark, null);
                     break;
                 case Constant.MsgType.LOCAL_CALL_HISTORY:
                     boolean isAudio = msgExpand.callHistory.getType().equals("audio");
-                    lastMsg = "[" + (isAudio ? BaseApp.inst().getString(R.string.voice_calls) :
+                    lastMsg += "[" + (isAudio ? BaseApp.inst().getString(R.string.voice_calls) :
                         BaseApp.inst().getString(R.string.video_calls)) + "]";
                     break;
                 case Constant.MsgType.CUSTOMIZE_MEETING:
-                    lastMsg = "[" + BaseApp.inst().getString(R.string.video_meeting) + "]";
+                    lastMsg += "[" + BaseApp.inst().getString(R.string.video_meeting) + "]";
                     break;
             }
         } catch (Exception e) {

@@ -17,20 +17,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouiconversation.databinding.ActivityChatSettingBinding;
-import io.openim.android.ouiconversation.databinding.LayoutBurnAfterReadingBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.databinding.LayoutBurnAfterReadingBinding;
+import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding> implements ChatVM.ViewAction {
@@ -122,11 +126,33 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
         view.addChat.setOnClickListener(v -> {
             SelectTargetVM choiceVM = Easy.installVM(SelectTargetVM.class);
-            choiceVM.setIntention(SelectTargetVM.Intention.isCreateGroup);
+            choiceVM.setIntention(SelectTargetVM.Intention.invite);
             if (null != userInfo) {
-                choiceVM.addMetaData(userInfo.getUserID(), userInfo.getNickname(),
-                    userInfo.getFaceURL());
+                MultipleChoice choice=new MultipleChoice();
+                choice.key=userInfo.getUserID();
+                choice.name=userInfo.getNickname();
+                choice.icon=userInfo.getFaceURL();
+                choice.isSelect=true;
+                choice.isEnabled=false;
+                choiceVM.addDate(choice);
             }
+            choiceVM.setOnFinishListener(() -> {
+                GroupVM groupVM = BaseApp.inst().getVMByCache(GroupVM.class);
+                if (null == groupVM) groupVM = new GroupVM();
+                groupVM.selectedFriendInfo.getValue().clear();
+
+                for (int i = 0; i < choiceVM.metaData.val().size(); i++) {
+                    MultipleChoice us = choiceVM.metaData.val().get(i);
+                    FriendInfo friendInfo = new FriendInfo();
+                    friendInfo.setUserID(us.key);
+                    friendInfo.setNickname(us.name);
+                    friendInfo.setFaceURL(us.icon);
+                    groupVM.selectedFriendInfo.getValue().add(friendInfo);
+                }
+                BaseApp.inst().putVM(groupVM);
+                ARouter.getInstance().build(Routes.Group.CREATE_GROUP2).navigation();
+            });
+
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
         });
         view.picture.setOnClickListener(v -> {

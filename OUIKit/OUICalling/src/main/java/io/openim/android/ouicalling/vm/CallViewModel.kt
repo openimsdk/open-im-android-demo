@@ -165,7 +165,11 @@ class CallViewModel(
                 flowOf(null)
             }
         }.collectLatest1 { videoTrack ->
-            val videoTrack = videoTrack as? VideoTrack;
+            val videoTrack = videoTrack as? VideoTrack
+            if (null != viewRenderer.tag) {
+                val lastTrack = viewRenderer.tag as VideoTrack
+                lastTrack.removeRenderer(viewRenderer);
+            }
             if (null != videoTrack) {
                 viewRenderer.tag = videoTrack;
                 videoTrack.addRenderer(viewRenderer);

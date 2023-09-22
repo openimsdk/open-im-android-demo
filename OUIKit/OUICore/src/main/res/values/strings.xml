@@ -165,7 +165,7 @@
     <string name="offline">离线</string>
     <string name="online">%1$s在线</string>
     <string name="mobile_phone">手机</string>
-    <string name="pc">电脑</string>
+    <string name="pc">PC</string>
     <string name="Web">Web</string>
     <string name="webMiniOnline">小程序</string>
     <string name="synthesis">综合</string>
@@ -261,9 +261,9 @@
     <string name="moments">朋友圈</string>
     <string name="to_user_moments">%1$s的动态</string>
     <string name="msg">消息</string>
-    <string name="star_tips">为你点赞</string>
+    <string name="star_tips">点赞了</string>
     <string name="star_tips2">评论了</string>
-    <string name="about_you">提到了你</string>
+    <string name="about_you">提到了</string>
     <string name="clear_null">清空</string>
     <string name="push_photo">发布图文</string>
     <string name="who_see">谁可以看</string>
@@ -504,4 +504,10 @@
     <string name="create_group_tips2">创建群聊，全面使用OpenIM</string>
     <string name="add_group_tips">向管理员或群聊成员询问ID</string>
     <string name="delete_conversiton">删除会话</string>
+    <string name="android">Android</string>
+    <string name="ios">ios</string>
+    <string name="start_group_mute">已开启群禁言</string>
+    <string name="group_ban">群已被禁</string>
+    <string name="you_mute">你已被禁言</string>
+    <string name="file_download">文件下载中请稍后...</string>
 </resources>

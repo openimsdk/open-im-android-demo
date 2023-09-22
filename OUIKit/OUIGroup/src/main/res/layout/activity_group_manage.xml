@@ -59,7 +59,7 @@
                 android:gravity="center_vertical"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
-                android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}">
+                android:visibility="@{GroupVM.isOwnerOrAdmin?View.VISIBLE:View.GONE}">
 
                 <TextView
                     android:layout_width="0dp"
@@ -88,7 +88,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}">
+                android:visibility="@{GroupVM.isOwnerOrAdmin?View.VISIBLE:View.GONE}">
 
                 <LinearLayout
                     android:id="@+id/memberPermissions"
@@ -123,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:background="@color/white"
-                android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}">
+                android:visibility="@{GroupVM.isOwnerOrAdmin?View.VISIBLE:View.GONE}">
 
                 <LinearLayout
                     android:id="@+id/joinValidation"
@@ -167,7 +167,7 @@
                 android:paddingLeft="15dp"
                 android:background="@color/white"
                 android:paddingRight="15dp"
-                android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}">
+                android:visibility="@{GroupVM.isOwner?View.VISIBLE:View.GONE}">
 
                 <TextView
                     android:layout_width="0dp"

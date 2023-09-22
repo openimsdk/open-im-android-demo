@@ -104,8 +104,6 @@ public class CallDialog extends BaseDialog {
         window.setBackgroundDrawableResource(android.R.color.transparent);
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-
-        view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.VISIBLE : View.GONE);
     }
 
     //收起/展开
@@ -137,6 +135,7 @@ public class CallDialog extends BaseDialog {
         callingVM.isGroup =
             signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT;
         callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
+        view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.VISIBLE : View.GONE);
         if (!callingVM.isVideoCalls) {
             callingVM.callViewModel.setCameraEnabled(false);
             view.localSpeakerVideoView.setVisibility(View.GONE);

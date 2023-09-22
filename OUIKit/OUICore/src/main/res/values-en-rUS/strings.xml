@@ -499,5 +499,11 @@
     <string name="create_group_tips2">创建群聊，全面使用OpenIM</string>
     <string name="add_group_tips">向管理员或群聊成员询问ID</string>
     <string name="delete_conversiton">删除会话</string>
+    <string name="android">Android</string>
+    <string name="ios">ios</string>
+    <string name="start_group_mute">已开启群禁言</string>
+    <string name="group_ban">群已被禁</string>
+    <string name="you_mute">你已被禁言</string>
+    <string name="file_download">文件下载中请稍后...</string>
 
 </resources>

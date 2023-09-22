@@ -42,7 +42,10 @@
                 android:id="@+id/nickName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxWidth="220dp"
                 android:layout_marginLeft="16dp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="#ff333333"
                 android:textSize="16sp" />
 

@@ -346,7 +346,9 @@ public class IMEvent {
 
             @Override
             public void onGroupDismissed(GroupInfo info) {
-
+                for (OnGroupListener onGroupListener : groupListeners) {
+                    onGroupListener.onGroupDismissed(info);
+                }
             }
 
             @Override
@@ -368,11 +370,17 @@ public class IMEvent {
             @Override
             public void onGroupMemberDeleted(GroupMembersInfo info) {
                 // 组成员退出
+                for (OnGroupListener onGroupListener : groupListeners) {
+                    onGroupListener.onGroupMemberDeleted(info);
+                }
             }
 
             @Override
             public void onGroupMemberInfoChanged(GroupMembersInfo info) {
                 // 组成员信息发生变化
+                for (OnGroupListener onGroupListener : groupListeners) {
+                    onGroupListener.onGroupMemberInfoChanged(info);
+                }
             }
 
             @Override

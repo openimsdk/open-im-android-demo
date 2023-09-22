@@ -16,6 +16,7 @@ import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.bigkoo.pickerview.adapter.ArrayWheelAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,15 +27,18 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.databinding.LayoutBurnAfterReadingBinding;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.ex.MultipleChoice;
+import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ContactListVM;
@@ -54,11 +58,15 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
+import io.openim.android.sdk.listener.OnGroupListener;
+import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.GroupApplicationInfo;
+import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.PutArgs;
 
 @Route(path = Routes.Group.MATERIAL)
-public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMaterialBinding> {
+public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMaterialBinding> implements OnGroupListener {
 
     int spanCount = 5;
     private PhotographAlbumDialog albumDialog;
@@ -77,7 +85,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityGroupMaterialBinding.inflate(getLayoutInflater()));
         view.setGroupVM(vm);
-        vm.getGroupsInfo();
 
         sink();
 
@@ -102,9 +109,15 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     void init() {
         iConversationBridge =
             (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();
+     IMEvent.getInstance().addGroupListener(this);
+
+        vm.getGroupsInfo();
+        vm.getMyMemberInfo();
+        vm.getConversationInfo();
     }
 
     private void click() {
+        periodicDeletionClick();
         view.groupId.setOnClickListener(v -> {
             Common.copy(vm.groupId);
             toast(getString(io.openim.android.ouicore.R.string.copy_succ));
@@ -133,13 +146,12 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         view.qrCode.setOnClickListener(v -> startActivity(new Intent(this,
             ShareQrcodeActivity.class)));
         view.bulletin.setOnClickListener(v -> startActivity(new Intent(this,
-            GroupBulletinActivity.class).putExtra(Constant.K_RESULT, vm.isOwner())));
+            GroupBulletinActivity.class)));
 
         view.groupMember.setOnClickListener(v -> {
             gotoMemberList(false);
         });
         view.groupName.setOnClickListener(v -> {
-            if (vm.isOwner()) {
                 try {
                     infoModifyType = 1;
                     SingleInfoModifyActivity.SingleInfoModifyData modifyData =
@@ -153,7 +165,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
                 } catch (Exception ignored) {
                 }
-            }
         });
         view.myName.setOnClickListener(v -> {
             try {
@@ -193,12 +204,12 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             }
         });
         view.avatarEdit.setOnClickListener(v -> {
-            if (!vm.isGroupOwner.getValue()) return;
+            if (!vm.isOwnerOrAdmin.val()) return;
             albumDialog.show();
         });
 
         view.quitGroup.setOnClickListener(v -> {
-            if (vm.isOwner()) {
+            if (vm.isOwner.val()) {
                 vm.dissolveGroup();
             } else {
                 vm.quitGroup();
@@ -217,10 +228,75 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
     }
 
+    private void periodicDeletionClick() {
+        view.periodicDeletionTime.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                LayoutBurnAfterReadingBinding view =
+                    LayoutBurnAfterReadingBinding.inflate(getLayoutInflater());
+                CommonDialog commonDialog = new CommonDialog(GroupMaterialActivity.this);
+                commonDialog.setCustomCentral(view.getRoot());
+                view.title.setText(io.openim.android.ouicore.R.string.period_deletion_tips1);
+                view.description.setText(io.openim.android.ouicore.R.string.period_deletion_tips2);
+                List<String> numList = new ArrayList<>();
+                List<String> units = new ArrayList<>();
+                for (int i = 0; i < 6; i++) {
+                    numList.add(String.valueOf(i + 1));
+                }
+                units.add(getString(io.openim.android.ouicore.R.string.day));
+                units.add(getString(io.openim.android.ouicore.R.string.week));
+                units.add(getString(io.openim.android.ouicore.R.string.month));
+
+                view.roller.setAdapter(new ArrayWheelAdapter(numList));
+                view.roller.setCyclic(false);
+                view.roller.setCurrentItem(0);
+
+                view.roller2.setVisibility(View.VISIBLE);
+                view.roller2.setAdapter(new ArrayWheelAdapter(units));
+                view.roller2.setCyclic(false);
+                view.roller2.setCurrentItem(0);
+
+                commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
+                commonDialog.getMainView().confirm.setOnClickListener(v1 -> {
+                    commonDialog.dismiss();
+                    int position = view.roller.getCurrentItem();
+                    int unit = view.roller2.getCurrentItem();
+                    int num = Integer.parseInt(numList.get(position));
+                    long seconds;
+                    if (unit == 0) {
+                        seconds = num * (60 * 60 * 24);
+                    } else if (unit == 1) {
+                        seconds = num * (60 * 60 * 24 * 7);
+                    } else {
+                        seconds = num * (60 * 60 * 24 * 30);
+                    }
+                    OpenIMClient.getInstance().conversationManager.setConversationMsgDestructTime(new IMUtil.IMCallBack<String>() {
+                        @Override
+                        public void onSuccess(String data) {
+                            vm.conversationInfo.val().setMsgDestructTime(seconds);
+                            vm.conversationInfo.update();
+                        }
+                    }, conversationId, seconds);
+                });
+                commonDialog.show();
+            }
+        });
+        view.periodicDeletion.setOnSlideButtonClickListener(isChecked -> {
+            OpenIMClient.getInstance().conversationManager.setConversationIsMsgDestruct(new IMUtil.IMCallBack<String>() {
+                @Override
+                public void onSuccess(String data) {
+                    vm.conversationInfo.val().setMsgDestruct(isChecked);
+                    vm.conversationInfo.update();
+                }
+            }, conversationId, isChecked);
+        });
+    }
+
     @Override
     protected void fasterDestroy() {
         removeCacheVM();
         Easy.delete(GroupVM.class);
+        IMEvent.getInstance().removeGroupListener(this);
     }
 
     @Override
@@ -230,7 +306,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     private void initView() {
-        if (vm.isOwner()) view.quitGroup.setText(io.openim.android.ouicore.R.string.dissolve_group);
+        if (vm.isOwner.val()) view.quitGroup.setText(io.openim.android.ouicore.R.string.dissolve_group);
+
         albumDialog = new PhotographAlbumDialog(this);
         albumDialog.setOnSelectResultListener(path -> {
             PutArgs putArgs = new PutArgs(path[0]);
@@ -305,6 +382,10 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                             startActivity(new Intent(GroupMaterialActivity.this,
                                 SelectTargetActivityV3.class));
                         }
+                        else {
+                            startActivity(new Intent(GroupMaterialActivity.this,
+                                InitiateGroupActivity.class).putExtra( Constant.IS_REMOVE_GROUP, true));
+                        }
                     });
                 } else {
                     holder.view.img.load(data.getFaceURL(), data.getNickname());
@@ -320,7 +401,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         vm.groupsInfo.observe(this, groupInfo -> {
             view.avatar.load(groupInfo.getFaceURL(), true);
             vm.getGroupMemberList(spanCount * 2);
-            view.quitGroup.setText(getString(vm.isOwner() ?
+            view.quitGroup.setText(getString(vm.isOwner.val() ?
                 io.openim.android.ouicore.R.string.dissolve_group :
                 io.openim.android.ouicore.R.string.quit_group));
 
@@ -349,7 +430,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             if (groupMembersInfos.isEmpty()) return;
             view.all.setText(String.format(getResources().getString(io.openim.android.ouicore.R.string.view_all_member), vm.groupsInfo.getValue().getMemberCount()));
             spanCount = spanCount * 2;
-            boolean owner = vm.isOwner();
+            boolean owner = vm.isOwnerOrAdmin.val();
             int end = owner ? spanCount - 2 : spanCount - 1;
             if (groupMembersInfos.size() < end) {
                 end = groupMembersInfos.size();
@@ -379,18 +460,93 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         view.groupManage.setOnClickListener(v -> {
             startActivity(new Intent(this, GroupManageActivity.class));
         });
+        vm.conversationInfo.observe(this, conversationInfo -> showPeriodicDeletionTime());
 
     }
+    private void showPeriodicDeletionTime() {
+        view.periodicDeletion.setCheckedWithAnimation(vm.conversationInfo.val().isMsgDestruct());
+        view.periodicDeletionTime.setVisibility(vm.conversationInfo.val().isMsgDestruct() ?
+            View.VISIBLE : View.GONE);
+        long destructTime = vm.conversationInfo.val().getMsgDestructTime();
+        if (0 != destructTime) {
+            view.periodicDeletionStr.setText(convertToDaysWeeksMonths(destructTime));
+        }
+    }
+    public String convertToDaysWeeksMonths(long seconds) {
+        long days = seconds / (60 * 60 * 24);
+        long weeks = days / 7;
+        long months = weeks / 4;
 
-
+        if (days <= 6) {
+            return days + getString(io.openim.android.ouicore.R.string.day);
+        } else if (weeks <= 6 && (days % 7 == 0)) {
+            return weeks + getString(io.openim.android.ouicore.R.string.week);
+        } else {
+            return months + getString(io.openim.android.ouicore.R.string.month);
+        }
+    }
     private void gotoMemberList(boolean transferPermissions) {
-//        if (vm.groupMembers.getValue().isEmpty()) return;
-//        if (vm.groupMembers.getValue().size() > Constant.SUPER_GROUP_LIMIT)
-        startActivity(new Intent(this, SuperGroupMemberActivity.class).putExtra(Constant.K_FROM,
+        startActivity(new Intent(this,
+            SuperGroupMemberActivity.class).putExtra(Constant.K_FROM,
             transferPermissions));
-//        else
-//            startActivity(new Intent(GroupMaterialActivity.this, GroupMemberActivity.class)
-//            .putExtra(Constant.K_FROM, transferPermissions));
     }
 
+    @Override
+    public void onGroupApplicationAccepted(GroupApplicationInfo info) {
+
+    }
+
+    @Override
+    public void onGroupApplicationAdded(GroupApplicationInfo info) {
+
+    }
+
+    @Override
+    public void onGroupApplicationDeleted(GroupApplicationInfo info) {
+
+    }
+
+    @Override
+    public void onGroupApplicationRejected(GroupApplicationInfo info) {
+
+    }
+
+    @Override
+    public void onGroupDismissed(GroupInfo info) {
+
+    }
+
+    @Override
+    public void onGroupInfoChanged(GroupInfo info) {
+    }
+
+    @Override
+    public void onGroupMemberAdded(GroupMembersInfo info) {
+
+    }
+
+    @Override
+    public void onGroupMemberDeleted(GroupMembersInfo info) {
+
+    }
+
+    @Override
+    public void onGroupMemberInfoChanged(GroupMembersInfo info) {
+        if (info.getGroupID().equals(vm.groupId) &&
+            info.getUserID().
+                equals(BaseApp.inst().loginCertificate.userID)) {
+            vm.updateRole(info);
+            vm.getGroupsInfo();
+        }
+    }
+
+    @Override
+    public void onJoinedGroupAdded(GroupInfo info) {
+
+    }
+
+    @Override
+    public void onJoinedGroupDeleted(GroupInfo info) {
+
+    }
 }
