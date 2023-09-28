@@ -1,4 +1,4 @@
-## For educational purposes only. Commercial use is strictly prohibited without authorization. Violators will be prosecuted
+
 ## Open-IM-Android-Demo
 <img src="https://github.com/OpenIMSDK/OpenIM-Docs/blob/main/docs/images/WechatIMG20.jpeg" alt="image" style="width: 350px; " />
 
