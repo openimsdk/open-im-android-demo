@@ -309,8 +309,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onGroupInfoChanged(GroupInfo info) {
-        if (info.getGroupID().equals(groupID))
-            groupInfo.setValue(info);
+        if (info.getGroupID().equals(groupID)) groupInfo.setValue(info);
     }
 
     @Override
@@ -325,8 +324,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onGroupMemberInfoChanged(GroupMembersInfo info) {
-        if (info.getGroupID().equals(groupID)
-            && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+        if (info.getGroupID().equals(groupID) && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
             hasPermission = info.getRoleLevel() != GroupRole.MEMBER;
         }
     }
@@ -770,7 +768,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         IMUtil.calChatTimeInterval(list);
         mediaDataList.clear();
         for (Message message : list) {
-            addMediaList(message,true);
+            addMediaList(message, true);
         }
     }
 
@@ -784,9 +782,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             PreviewMediaVM.MediaData mediaData = null;
             if (datum.getContentType() == MessageType.PICTURE) {
                 PictureElem pictureElem = datum.getPictureElem();
-                String sUrl=pictureElem.getSourcePicture().getUrl();
-                if (TextUtils.isEmpty(sUrl)){
-                    sUrl=pictureElem.getSourcePath();
+                String sUrl = pictureElem.getSourcePicture().getUrl();
+                if (TextUtils.isEmpty(sUrl)) {
+                    sUrl = pictureElem.getSourcePath();
                 }
                 mediaData = new PreviewMediaVM.MediaData(sUrl);
                 if (null != pictureElem.getSnapshotPicture())
@@ -794,9 +792,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
             if (datum.getContentType() == MessageType.VIDEO) {
                 VideoElem videoElem = datum.getVideoElem();
-                String sUrl=videoElem.getVideoUrl();
-                if (TextUtils.isEmpty(sUrl)){
-                    sUrl=videoElem.getVideoPath();
+                String sUrl = videoElem.getVideoUrl();
+                if (TextUtils.isEmpty(sUrl)) {
+                    sUrl = videoElem.getVideoPath();
                 }
                 mediaData = new PreviewMediaVM.MediaData(sUrl);
                 mediaData.isVideo = true;
@@ -805,8 +803,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             if (null != mediaData && !mediaDataList.contains(mediaData)) {
                 if (isPour)//反着
                     mediaDataList.add(0, mediaData);
-                else
-                    mediaDataList.add(mediaData);
+                else mediaDataList.add(mediaData);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -946,27 +943,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }
     }
 
-    @Override
-    public void onRecvMessageRevokedV2(RevokedInfo info) {
-        try {
-            if (info.getRevokerID().equals(BaseApp.inst().loginCertificate.userID)) return;
-            for (Message message : messages.val()) {
-                if (message.getClientMsgID().equals(info.getClientMsgID())) {
-                    message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
-                    //a 撤回了一条消息
-                    String txt =
-                        String.format(getContext().getString(io.openim.android.ouicore.R.string.revoke_tips), info.getRevokerNickname());
-                    ((MsgExpand) message.getExt()).tips =
-                        IMUtil.getSingleSequence(message.getGroupID(), info.getRevokerNickname(),
-                            info.getRevokerID(), txt);
-                    messageAdapter.notifyItemChanged(messages.getValue().indexOf(message));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
     @Override
     public void onRecvMessageExtensionsChanged(String msgID, List<KeyValue> list) {
@@ -999,7 +975,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         if (messages.val().contains(msg)) {
             messageAdapter.notifyItemChanged(messages.val().indexOf(msg));
         } else {
-            addMediaList(msg,false);
+            addMediaList(msg, false);
             messages.val().add(0, IMUtil.buildExpandInfo(msg));
             messageAdapter.notifyItemInserted(0);
             getIView().scrollToPosition(0);
@@ -1077,54 +1053,64 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             otherSideGroupID, offlinePushInfo);
     }
 
+    @Override
+    public void onRecvMessageRevokedV2(RevokedInfo info) {
+        try {
+            for (Message message : messages.val()) {
+                if (message.getClientMsgID().equals(info.getClientMsgID())) {
+                    message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
+                    //a 撤回了一条消息
+                    String txt;
+                    CharSequence tips;
+                    if (info.getRevokerID().equals(info.getSourceMessageSendID())) {
+                        txt =
+                            String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips), info.getRevokerNickname());
+                        if (message.getSendID().equals(BaseApp.inst().loginCertificate.userID)) {
+                            //只有是自己发的文本才支持重新编辑
+                            String reedit =
+                                BaseApp.inst().getString(io.openim.android.ouicore.R.string.re_edit);
+                            txt += "\t" + reedit;
+                            tips =
+                                IMUtil.buildClickAndColorSpannable((SpannableStringBuilder) IMUtil
+                                        .getSingleSequence(message.getGroupID(),
+                                            message.getSenderNickname(), message.getSendID(), txt),
+                                    reedit, new
+                                        ClickableSpan() {
+                                            @Override
+                                            public void onClick(@NonNull View widget) {
+                                                TextElem txt = message.getTextElem();
+                                                if (null != txt) {
+                                                    reeditMsg(txt.getContent());
+                                                }
+                                            }
+                                        });
+                        } else {
+                            tips = IMUtil.getSingleSequence(message.getGroupID(),
+                                info.getRevokerNickname(), info.getRevokerID(), txt);
+                        }
+                    } else {
+                        txt =
+                            String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips2), info.getRevokerNickname(), info.getSourceMessageSenderNickname());
+
+                        tips = IMUtil.twoPeopleRevoker(message, info, txt);
+                    }
+                    ((MsgExpand) message.getExt()).tips = tips;
+                    messageAdapter.notifyItemChanged(messages.getValue().indexOf(message));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     /**
      * 撤回消息
      *
      * @param message
      */
     public void revokeMessage(Message message) {
-        OpenIMClient.getInstance().messageManager.revokeMessageV2(new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-                getIView().toast(error + code);
-            }
-
-            @Override
-            @SuppressLint("StringFormatInvalid")
-            public void onSuccess(String data) {
-                final boolean isTxt = message.getContentType() == MessageType.TEXT;
-                message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
-                if (hasPermission)
-                    message.setSenderNickname(BaseApp.inst().loginCertificate.nickname);
-
-                String name = BaseApp.inst().loginCertificate.nickname;
-                String uid = BaseApp.inst().loginCertificate.userID;
-                //a 撤回了一条消息
-                String txt =
-                    String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips), message.getSenderNickname());
-
-                MsgExpand msgExpand = ((MsgExpand) message.getExt());
-                if (isTxt&& message.getSendID().equals(uid)) {
-                    //只有是自己发的文本才支持重新编辑
-                    String reedit =
-                        BaseApp.inst().getString(io.openim.android.ouicore.R.string.re_edit);
-                    txt += "\t" + reedit;
-                    msgExpand.tips =
-                        IMUtil.buildClickAndColorSpannable((SpannableStringBuilder) IMUtil.getSingleSequence(message.getGroupID(), name, uid, txt), reedit, new ClickableSpan() {
-                            @Override
-                            public void onClick(@NonNull View widget) {
-                                TextElem txt = message.getTextElem();
-                                if (null != txt) {
-                                    reeditMsg(txt.getContent());
-                                }
-                            }
-                        });
-                } else {
-                    msgExpand.tips = IMUtil.getSingleSequence(message.getGroupID(), name, uid, txt);
-                }
-                messageAdapter.notifyItemChanged(messageAdapter.getMessages().indexOf(message));
-            }
-        }, conversationID, message.getClientMsgID());
+        OpenIMClient.getInstance().messageManager.revokeMessageV2(new IMUtil.IMCallBack<>(), conversationID, message.getClientMsgID());
 
     }
 

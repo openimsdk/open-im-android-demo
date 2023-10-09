@@ -63,6 +63,7 @@
     <string name="withdraw">Withdraw</string>
     <string name="delete">Delete</string>
     <string name="revoke_tips">%1$s revoked a message</string>
+    <string name="revoke_tips2">%1$s revoked %2$s\' message</string>
     <string name="forward">Forward</string>
     <string name="multiple_choice">Multiple Choice</string>
     <string name="merge_forward">Merge Forward</string>

@@ -61,6 +61,7 @@ import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
+import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.Participant;
 import io.openim.android.sdk.models.SignalingInfo;
@@ -239,7 +240,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         if (vm.isSingleChat) {
             vm.getUserOnlineStatus(this::showOnlineStatus);
         }
-        view.waterMark.setText(BaseApp.inst().loginCertificate.nickname);
+       try {
+           view.waterMark.setText(BaseApp.inst().loginCertificate.nickname);
+       }catch (Exception ignored){}
     }
 
     private void showOnlineStatus(UsersOnlineStatus onlineStatus) {

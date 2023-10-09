@@ -45,8 +45,7 @@
                 <io.openim.android.ouicore.widget.AvatarImage
                     android:id="@+id/avatar"
                     android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:background="@mipmap/ic_my_friend" />
+                    android:layout_height="60dp" />
 
                 <LinearLayout
                     android:layout_width="0dp"

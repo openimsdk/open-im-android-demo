@@ -276,11 +276,21 @@ public class IMUtil {
         switch (msg.getContentType()) {
             case MessageType.REVOKE_MESSAGE_NTF: {
                 RevokedInfo revokedInfo = GsonHel.fromJson(detail, RevokedInfo.class);
+                String txt;
                 //a 撤回了一条消息
-                String txt = String.format(ctx.getString(R.string.revoke_tips),
-                    revokedInfo.getRevokerNickname());
-                tips = getSingleSequence(msg.getGroupID(), revokedInfo.getRevokerNickname(),
-                    revokedInfo.getRevokerID(), txt);
+                if (revokedInfo.getRevokerID().equals(revokedInfo.getSourceMessageSendID())){
+                    txt = String.format(ctx.getString(R.string.revoke_tips),
+                        revokedInfo.getRevokerNickname());
+                    tips = getSingleSequence(msg.getGroupID(), revokedInfo.getRevokerNickname(),
+                        revokedInfo.getRevokerID(), txt);
+                }else {
+                    txt = String.format(ctx.getString(R.string.revoke_tips2),
+                        revokedInfo.getRevokerNickname(),
+                        revokedInfo.getSourceMessageSenderNickname());
+
+                    tips = twoPeopleRevoker(msg, revokedInfo, txt);
+                }
+
                 break;
             }
             case MessageType.GROUP_CREATED_NTF: {
@@ -510,6 +520,21 @@ public class IMUtil {
                 break;
         }
         msgExpand.tips = tips;
+    }
+
+    public static CharSequence twoPeopleRevoker(Message msg, RevokedInfo revokedInfo, String txt) {
+        List<MultipleChoice> choices=new ArrayList<>();
+        MultipleChoice choice = new MultipleChoice(revokedInfo.getRevokerID());
+        choice.name = revokedInfo.getRevokerNickname();
+        choice.groupId = msg.getGroupID();
+        choices.add(choice);
+
+        MultipleChoice choice2 = new MultipleChoice(revokedInfo.getSourceMessageSendID());
+        choice2.name = revokedInfo.getSourceMessageSenderNickname();
+        choice2.groupId = msg.getGroupID();
+        choices.add(choice2);
+
+        return getMultipleSequence(new SpannableStringBuilder(txt),choices);
     }
 
     /**

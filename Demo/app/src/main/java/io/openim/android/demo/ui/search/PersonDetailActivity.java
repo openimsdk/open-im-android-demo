@@ -311,7 +311,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 }
                 view.nickName.setText(nickName);
                 view.userId.setText(userInfo.getUserID());
-                view.avatar.load(userInfo.getFaceURL());
+                view.avatar.load(userInfo.getFaceURL(),userInfo.getNickname());
                 view.bottomMenu.setVisibility(oneself() ? View.GONE : View.VISIBLE);
             }
         });
