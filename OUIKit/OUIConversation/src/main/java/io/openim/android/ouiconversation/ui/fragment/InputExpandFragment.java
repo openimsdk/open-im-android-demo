@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.text.TextUtils;
@@ -56,6 +57,7 @@ import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
@@ -70,7 +72,7 @@ import io.openim.android.sdk.models.SignalingInfo;
 
 public class InputExpandFragment extends BaseFragment<ChatVM> {
     public static List<Integer> menuIcons = Arrays.asList(io.openim.android.ouicore.R.mipmap.ic_chat_photo,
-        R.mipmap.ic_chat_shoot, R.mipmap.ic_tools_video_call);
+        R.mipmap.ic_chat_shoot);
     public static List<String> menuTitles = Arrays.asList(BaseApp.inst().getString(io.openim.android.ouicore.R.string.album), BaseApp.inst().getString(io.openim.android.ouicore.R.string.shoot), BaseApp.inst().getString(io.openim.android.ouicore.R.string.video_calls));
 
     FragmentInputExpandBinding v;
@@ -81,7 +83,8 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MThreadTool.executorService.execute(() -> {
-            hasStorage = AndPermission.hasPermissions(getActivity(), Permission.Group.STORAGE);
+            hasStorage = AndPermission.hasPermissions(getActivity(),
+                getPhotoAlbumPermission());
             hasShoot = AndPermission.hasPermissions(getActivity(), Permission.CAMERA, Permission.RECORD_AUDIO);
             hasLocation = AndPermission.hasPermissions(getActivity(), Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
         });
@@ -112,9 +115,6 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                         case 1:
                             goToShoot();
                             break;
-                        case 2:
-                            goToCall();
-                            break;
                     }
                 });
             }
@@ -122,37 +122,6 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         v.getRoot().setAdapter(adapter);
         adapter.setItems(menuIcons);
     }
-
-    @SuppressLint("WrongConstant")
-    private void goToCall() {
-        Common.permission(getContext(), () -> {
-            hasStorage = true;
-            CallingService callingService = (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-            if (null == callingService) return;
-            IMUtil.showBottomPopMenu(getContext(), (v1, keyCode, event) -> {
-                vm.isVideoCall = keyCode != 1;
-                if (vm.isSingleChat) {
-                    List<String> ids = new ArrayList<>();
-                    ids.add(vm.userID);
-                    SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall, vm.isSingleChat, ids, null);
-                    callingService.call(signalingInfo);
-                } else {
-                    toSelectMember();
-                }
-                return false;
-            });
-        }, hasStorage, Permission.Group.STORAGE);
-    }
-
-    public void toSelectMember() {
-            GroupVM groupVM = new GroupVM();
-            groupVM.groupId = vm.groupID;
-            BaseApp.inst().putVM(groupVM);
-            ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
-                .withBoolean(Constant.IS_SELECT_MEMBER, true)
-                .withInt(Constant.K_SIZE, 9).navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
-    }
-
 
     //去拍摄
     private void goToShoot() {
@@ -191,7 +160,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                     continue;
                 }
                 if (null == msg)
-                    msg = OpenIMClient.getInstance().messageManager.createTextMessage("[" + getString(R.string.unsupported_type) + "]");
+                    msg = OpenIMClient.getInstance().messageManager.createTextMessage("[" + getString(io.openim.android.ouicore.R.string.unsupported_type) + "]");
                 vm.sendMsg(msg);
             }
         }
@@ -217,9 +186,13 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
 
     @SuppressLint("WrongConstant")
     private void showMediaPicker() {
-        if (hasStorage) goMediaPicker();
+        if (hasStorage)
+            goMediaPicker();
         else
-            AndPermission.with(this).runtime().permission(Permission.Group.STORAGE).onGranted(permissions -> {
+            AndPermission.with(this)
+                .runtime()
+                .permission(getPhotoAlbumPermission())
+                .onGranted(permissions -> {
                 // Storage permission are allowed.
                 hasStorage = true;
                 goMediaPicker();
@@ -228,8 +201,18 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
             }).start();
     }
 
+    @NonNull
+    private static String[] getPhotoAlbumPermission() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+            ? Permission.Group.CAMERA : Permission.Group.STORAGE;
+    }
+
     private void goMediaPicker() {
-        Matisse.from(getActivity()).choose(MimeType.ofAll()).countable(true).maxSelectable(9).restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED).thumbnailScale(0.85f).imageEngine(new GlideEngine()).forResult(captureLauncher);
+        Matisse.from(getActivity()).choose(MimeType.ofAll())
+            .countable(true).maxSelectable(9)
+            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+            .thumbnailScale(0.85f)
+            .imageEngine(new GlideEngine()).forResult(captureLauncher);
     }
 
 

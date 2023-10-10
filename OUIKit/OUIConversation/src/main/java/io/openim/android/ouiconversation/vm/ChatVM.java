@@ -577,7 +577,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         IMEvent.getInstance().removeAdvanceMsgListener(this);
         IMEvent.getInstance().removeGroupListener(this);
         IMEvent.getInstance().removeConversationListener(this);
-        IMEvent.getInstance().removeSignalingListener(this);
         IMEvent.getInstance().removeUserListener(this);
         inputMsg.removeObserver(inputObserver);
 
