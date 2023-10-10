@@ -26,8 +26,11 @@ import java.util.List;
 
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.ActivityChatSettingBinding;
-import io.openim.android.ouiconversation.databinding.LayoutBurnAfterReadingBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
+import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.databinding.LayoutBurnAfterReadingBinding;
+import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
@@ -35,6 +38,8 @@ import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.SlideButton;
@@ -42,11 +47,13 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding> implements ChatVM.ViewAction {
 
     ContactListVM contactListVM = new ContactListVM();
+    UserInfo userInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

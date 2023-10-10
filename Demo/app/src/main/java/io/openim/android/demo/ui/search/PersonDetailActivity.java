@@ -219,18 +219,6 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 vm.searchContent.getValue()));
         });
 
-
-        view.call.setOnClickListener(v -> {
-            if (null == callingService) return;
-            IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
-                List<String> ids = new ArrayList<>();
-                ids.add(vm.searchContent.getValue());
-                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1, true, ids,
-                    null);
-                callingService.call(signalingInfo);
-                return false;
-            });
-        });
     }
 
     @Override
@@ -298,7 +286,6 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             boolean allowSendMsgNotFriend = BaseApp.inst().loginCertificate.allowSendMsgNotFriend;
             view.sendMsg.setVisibility(isFriend || allowSendMsgNotFriend ? View.VISIBLE :
                 View.GONE);
-            view.call.setVisibility(isFriend || allowSendMsgNotFriend ? View.VISIBLE : View.GONE);
         });
         vm.userInfo.observe(this, v -> {
             if (null != v && !v.isEmpty()) {

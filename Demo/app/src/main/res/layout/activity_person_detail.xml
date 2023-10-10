@@ -304,34 +304,10 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginBottom="60dp"
                 android:orientation="horizontal"
+                android:gravity="center"
                 android:visibility="gone">
 
-                <LinearLayout
-                    android:id="@+id/call"
-                    android:layout_width="170dp"
-                    android:layout_height="46dp"
-                    android:gravity="center"
-                    android:background="@drawable/sty_radius_6_white"
-                    >
 
-                    <RadioButton
-                        android:clickable="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:button="@null"
-                        android:drawableLeft="@mipmap/ic_call"
-                        android:drawablePadding="10dp"
-                        android:text="@string/media_call"
-                        android:textColor="@color/txt_black"
-                        android:textSize="17sp" />
-                </LinearLayout>
-
-
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1" />
 
                 <LinearLayout
                     android:layout_width="170dp"

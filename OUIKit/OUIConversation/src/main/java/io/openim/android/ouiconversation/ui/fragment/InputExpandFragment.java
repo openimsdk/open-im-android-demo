@@ -45,14 +45,19 @@ import java.util.Map;
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.FragmentInputExpandBinding;
 import io.openim.android.ouiconversation.databinding.ItemExpandMenuBinding;
+import io.openim.android.ouiconversation.ui.ChatActivity;
 import io.openim.android.ouiconversation.ui.ShootActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
+import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
+import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
@@ -60,6 +65,8 @@ import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
+import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.CardElem;
@@ -129,7 +136,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                                 Easy.installVM(SelectTargetVM.class);
                             selectTargetVM.setIntention(SelectTargetVM.Intention.isShareCard);
                             selectTargetVM.setOnFinishListener(() -> {
-                                Activity activity=ActivityManager.isExist(ChatActivity.class);
+                                Activity activity= ActivityManager.isExist(ChatActivity.class);
                                 if (null==activity)return;
                                 CommonDialog commonDialog = new CommonDialog(activity);
                                 LayoutCommonDialogBinding mainView =
