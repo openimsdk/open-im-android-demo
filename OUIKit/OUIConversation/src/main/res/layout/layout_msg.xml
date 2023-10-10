@@ -21,7 +21,9 @@
             android:id="@+id/root"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp">
 
             <TextView
                 android:id="@+id/notice"
@@ -34,9 +36,9 @@
                 android:paddingRight="10dp"
                 android:paddingBottom="3dp"
                 android:textColor="#ff999999"
+                android:layout_marginBottom="3dp"
                 android:textSize="12sp"
-                android:visibility="gone"
-                />
+                android:visibility="gone" />
 
             <ViewStub
                 android:id="@+id/left"
@@ -56,8 +58,8 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="@dimen/avatar_size"
                 android:textColor="#ff5496eb"
-                android:visibility="invisible"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:visibility="invisible" />
         </LinearLayout>
     </LinearLayout>
 

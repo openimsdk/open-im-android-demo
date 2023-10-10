@@ -126,14 +126,14 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
             for (ExGroupMemberInfo exGroupMemberInfo : vm.superGroupMembers.getValue()) {
                 if (exGroupMemberInfo.isSelect) {
                     ids.add(exGroupMemberInfo.groupMembersInfo.getUserID());
-                    MultipleChoice multipleChoice=new MultipleChoice(exGroupMemberInfo.groupMembersInfo.getUserID());
-                    multipleChoice.name=exGroupMemberInfo.groupMembersInfo.getNickname();
+                    MultipleChoice multipleChoice =
+                        new MultipleChoice(exGroupMemberInfo.groupMembersInfo.getUserID());
+                    multipleChoice.name = exGroupMemberInfo.groupMembersInfo.getNickname();
                     members.add(multipleChoice);
                 }
             }
             if (groupCall) {
-                if (ids.size() == 1 && ids.get(0).
-                    equals(BaseApp.inst().loginCertificate.userID)) {
+                if (ids.size() == 1 && ids.get(0).equals(BaseApp.inst().loginCertificate.userID)) {
                     toast(getString(io.openim.android.ouicore.R.string.group_call_tips3));
                     return;
                 }
@@ -141,7 +141,8 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
 
             }
             if (isSelectMember) {
-                setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT, (Serializable) members));
+                setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
+                    (Serializable) members));
             }
             finish();
             BaseApp.inst().removeCacheVM(GroupVM.class);
@@ -168,7 +169,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
             PopupWindow popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
             LayoutMemberActionBinding view = LayoutMemberActionBinding.inflate(getLayoutInflater());
-            view.deleteFriend.setVisibility(vm.isOwner() ? View.VISIBLE : View.GONE);
+            view.deleteFriend.setVisibility(vm.isOwner.val() ? View.VISIBLE : View.GONE);
             view.addFriend.setOnClickListener(v1 -> {
                 popupWindow.dismiss();
                 startActivity(new Intent(this, InitiateGroupActivity.class).putExtra(Constant.IS_INVITE_TO_GROUP, true));
@@ -193,17 +194,11 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
 
         vm.superGroupMembers.observe(this, v -> {
             if (v.isEmpty()) return;
-            if (groupCall){
+            if (groupCall) {
                 vm.buildOwnSelect();
             }
             updateSelectedNum();
-//            if (v.size() > vm.pageSize) {
-//               int lastIndex=vm.superGroupMembers.val().size();
-//                adapter.notifyItemRangeInserted(lastIndex
-//                    - vm.pageSize, lastIndex);
-//            } else {
-                adapter.notifyDataSetChanged();
-//            }
+            adapter.notifyDataSetChanged();
         });
     }
 
@@ -249,8 +244,8 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
 
 
                 itemViewHo.view.getRoot().setOnClickListener(v -> {
-                    if (groupCall||isSelectMember) {
-                        if (groupCall&&!data.isEnabled) {
+                    if (groupCall || isSelectMember) {
+                        if (groupCall && !data.isEnabled) {
                             toast(getString(io.openim.android.ouicore.R.string.group_call_tips));
                             return;
                         }
@@ -266,11 +261,10 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
                         view.bottomLayout.more2.setVisibility(View.VISIBLE);
                         view.bottomLayout.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectNum));
                         view.bottomLayout.submit.setEnabled(selectNum > 0);
-                        view.bottomLayout.selectLy.setOnClickListener(selectNum > 0 ?
-                            v1 -> {
-                                selectMemberLauncher.launch(new Intent(SuperGroupMemberActivity.this,
-                                    SelectedMemberActivity.class));
-                            } : null);
+                        view.bottomLayout.selectLy.setOnClickListener(selectNum > 0 ? v1 -> {
+                            selectMemberLauncher.launch(new Intent(SuperGroupMemberActivity.this,
+                                SelectedMemberActivity.class));
+                        } : null);
                         return;
                     }
                     if (isTransferPermission) {
@@ -293,9 +287,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
                             commonDialog.show();
                         }
                     } else {
-                        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID,
-                            data.groupMembersInfo.getUserID()).withString(Constant.K_GROUP_ID,
-                            vm.groupId).navigation();
+                        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, data.groupMembersInfo.getUserID()).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
                     }
                 });
 
@@ -305,7 +297,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
         adapter.setItems(vm.superGroupMembers.getValue());
         view.recyclerview.setAdapter(adapter);
 
-        vm.page=0;
+        vm.page = 0;
         vm.superGroupMembers.getValue().clear();
         loadMember();
     }

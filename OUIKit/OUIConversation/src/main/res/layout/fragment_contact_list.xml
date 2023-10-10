@@ -25,7 +25,7 @@
         android:layout_height="match_parent"
         android:background="@android:color/white"
         android:orientation="vertical"
-        tools:context=".ui.fragment.ContactListFragment">
+        tools:context=".ui.fragment.ConversationListFragment">
 
         <FrameLayout
             android:id="@+id/header"
@@ -57,6 +57,7 @@
                     android:ellipsize="end"
                     android:maxWidth="120dp"
                     android:maxLines="1"
+                    android:text="@{user.info.nickname}"
                     android:textColor="@color/txt_black"
                     android:textSize="@dimen/main_body" />
 
@@ -113,6 +114,10 @@
 
             </LinearLayout>
         </FrameLayout>
+
+        <include
+            android:id="@+id/search"
+            layout="@layout/view_search" />
 
 
         <com.yanzhenjie.recyclerview.SwipeRecyclerView

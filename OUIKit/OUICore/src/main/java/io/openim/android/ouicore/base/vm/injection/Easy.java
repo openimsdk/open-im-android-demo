@@ -57,15 +57,19 @@ public class Easy {
 
     public static <T extends BaseVM> T installVM(ViewModelStoreOwner owner, Class<T> dependency,
                                                  String tag) {
-        T vm = null;
+        T vm;
         if (null == owner) {
             //global
-            try {
-                vm = dependency.newInstance();
-                Easy.put(vm, tag);
-            } catch (IllegalAccessException | InstantiationException e) {
-                e.printStackTrace();
-            }
+           try {
+              return Easy.find(dependency,tag);
+           }catch (Exception e){
+               try {
+                   vm = dependency.newInstance();
+                   Easy.put(vm, tag);
+               } catch (IllegalAccessException | InstantiationException ex) {
+                   throw new RuntimeException(ex);
+               }
+           }
         } else {
             if (null == tag)
                 vm = new ViewModelProvider(owner).get(dependency);

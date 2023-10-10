@@ -3,7 +3,7 @@
 
     <string name="app_name">OpenIM</string>
     <string name="group_bulletin">群公告</string>
-    <string name="search_by_id">通过用户ID号搜索添加</string>
+    <string name="search_by_id">通过手机号/ID号/搜索添加</string>
     <string name="send_succ">发送成功</string>
 
     <string name="sunday">星期日</string>
@@ -67,6 +67,7 @@
     <string name="withdraw">撤回</string>
     <string name="delete">删除</string>
     <string name="revoke_tips">%1$s 撤回了一条消息</string>
+    <string name="revoke_tips2">%1$s 撤回了 %2$s 的消息</string>
     <string name="forward">转发</string>
     <string name="multiple_choice">多选</string>
     <string name="merge_forward">合并转发</string>
@@ -165,7 +166,7 @@
     <string name="offline">离线</string>
     <string name="online">%1$s在线</string>
     <string name="mobile_phone">手机</string>
-    <string name="pc">电脑</string>
+    <string name="pc">PC</string>
     <string name="Web">Web</string>
     <string name="webMiniOnline">小程序</string>
     <string name="synthesis">综合</string>
@@ -261,9 +262,9 @@
     <string name="moments">朋友圈</string>
     <string name="to_user_moments">%1$s的动态</string>
     <string name="msg">消息</string>
-    <string name="star_tips">为你点赞</string>
+    <string name="star_tips">点赞了</string>
     <string name="star_tips2">评论了</string>
-    <string name="about_you">提到了你</string>
+    <string name="about_you">提到了</string>
     <string name="clear_null">清空</string>
     <string name="push_photo">发布图文</string>
     <string name="who_see">谁可以看</string>
@@ -496,4 +497,21 @@
     <string name="host_exit_tips">主持人已结束会议，是否离开？</string>
     <string name="declined">已拒绝</string>
     <string name="timing_meeting_tips">不能选择已过去的时间</string>
+    <string name="cancle_see_he">取消看他</string>
+    <string name="recover">" 回复 "</string>
+    <string name="edit_group_name2">修改群聊名称</string>
+    <string name="edit_group_name_tips">修改群聊名称后，将在群内通知其他成员。</string>
+    <string name="in_group_name_tips">昵称修改后，只会在此群内显示，群内成员都可以看见。</string>
+    <string name="create_group_tips2">创建群聊，全面使用OpenIM</string>
+    <string name="add_group_tips">向管理员或群聊成员询问ID</string>
+    <string name="delete_conversiton">删除会话</string>
+    <string name="android">Android</string>
+    <string name="ios">ios</string>
+    <string name="start_group_mute">已开启群禁言</string>
+    <string name="group_ban">群已被禁</string>
+    <string name="you_mute">你已被禁言</string>
+    <string name="file_download">文件下载中请稍后...</string>
+    <string name="message_tone">新消息提示音</string>
+    <string name="vibration">新消息震动</string>
+    <string name="not_be_added">禁止添加我为好友</string>
 </resources>

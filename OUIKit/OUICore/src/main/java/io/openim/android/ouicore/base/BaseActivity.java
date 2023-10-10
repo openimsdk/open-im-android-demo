@@ -28,6 +28,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.List;
 
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 
 import io.openim.android.ouicore.utils.ActivityManager;
@@ -38,6 +39,7 @@ import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
 
 
+@Deprecated
 public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> extends AppCompatActivity implements IView {
     //是否释放资源
     private boolean isRelease = true;
@@ -77,7 +79,6 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     }
 
 
-    @SuppressLint("SourceLockedOrientationActivity")
     protected void requestedOrientation() {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
@@ -104,8 +105,8 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     @Deprecated
     protected void bindVM(Class<T> vm, boolean shareVM) {
         bindVM(vm);
-        if (shareVM && !BaseApp.viewModels.containsKey(vmCanonicalName)) {
-            BaseApp.viewModels.put(vmCanonicalName, this.vm);
+        if (shareVM) {
+            BaseApp.inst().putVM(this.vm);
         }
     }
 
@@ -141,22 +142,19 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     @Deprecated
     public void bindVMByCache(Class<T> vm) {
-        String key = vm.getCanonicalName();
-        if (BaseApp.viewModels.containsKey(key)) {
-            this.vm = (T) BaseApp.viewModels.get(key);
+        try {
+            this.vm=Easy.find(vm);
             isRelease = false;
             bind();
-        }
+        }catch (Exception ignore){}
     }
 
     @Deprecated
     public void removeCacheVM() {
-        String key = vm.getClass().getCanonicalName();
-        BaseViewModel viewModel = BaseApp.viewModels.get(key);
-        if (null != viewModel && viewModel == vm) {
-            vm.releaseRes();
+        if (null!=vm){
             vm.context.clear();
-            BaseApp.viewModels.remove(key);
+            vm.releaseRes();
+            BaseApp.inst().removeCacheVM(vm.getClass());
         }
     }
 
@@ -195,6 +193,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     @Override
     protected void onDestroy() {
+        fasterDestroy();
         ActivityManager.remove(this);
         N.clearDispose(this);
         releaseRes();

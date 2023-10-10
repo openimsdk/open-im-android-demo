@@ -82,15 +82,18 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         super.onCreate(savedInstanceState);
         MThreadTool.executorService.execute(() -> {
             hasStorage = AndPermission.hasPermissions(getActivity(), Permission.Group.STORAGE);
-            hasShoot = AndPermission.hasPermissions(getActivity(), Permission.CAMERA, Permission.RECORD_AUDIO);
-            hasLocation = AndPermission.hasPermissions(getActivity(), Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
+            hasShoot = AndPermission.hasPermissions(getActivity(), Permission.CAMERA,
+                Permission.RECORD_AUDIO);
+            hasLocation = AndPermission.hasPermissions(getActivity(),
+                Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
         });
 
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         v = FragmentInputExpandBinding.inflate(inflater);
         init();
         return v.getRoot();
@@ -122,9 +125,25 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                             gotoShareLocation();
                             break;
                         case 4:
-                            Postcard postcard = ARouter.getInstance().build(Routes.Contact.ALL_FRIEND);
-                            LogisticsCenter.completion(postcard);
-                            businessCardLauncher.launch(new Intent(getContext(), postcard.getDestination()).putExtra("formChat", true));
+                            SelectTargetVM selectTargetVM =
+                                Easy.installVM(SelectTargetVM.class);
+                            selectTargetVM.setIntention(SelectTargetVM.Intention.isShareCard);
+                            selectTargetVM.setOnFinishListener(() -> {
+                                Activity activity=ActivityManager.isExist(ChatActivity.class);
+                                if (null==activity)return;
+                                CommonDialog commonDialog = new CommonDialog(activity);
+                                LayoutCommonDialogBinding mainView =
+                                    commonDialog.getMainView();
+                                mainView.tips.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.send_card_confirm));
+                                mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
+                                mainView.confirm.setOnClickListener(v1 -> {
+                                    commonDialog.dismiss();
+
+                                    sendCardMessage(selectTargetVM.metaData.val().get(0));
+                                });
+                                commonDialog.show();
+                            });
+                            ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
                             break;
                     }
                 });
@@ -134,61 +153,60 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         adapter.setItems(menuIcons);
     }
 
-    @SuppressLint("WrongConstant")
     private void goToCall() {
-        Common.permission(getContext(), () -> {
-            hasStorage = true;
-            CallingService callingService = (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-            if (null == callingService) return;
-            IMUtil.showBottomPopMenu(getContext(), (v1, keyCode, event) -> {
-                vm.isVideoCall = keyCode != 1;
-                if (vm.isSingleChat) {
-                    List<String> ids = new ArrayList<>();
-                    ids.add(vm.userID);
-                    SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall, vm.isSingleChat, ids, null);
-                    callingService.call(signalingInfo);
-                } else {
-                    toSelectMember();
-                }
-                return false;
-            });
-        }, hasStorage, Permission.Group.STORAGE);
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null == callingService) return;
+        IMUtil.showBottomPopMenu(getContext(), (v1, keyCode, event) -> {
+            vm.isVideoCall = keyCode != 1;
+            if (vm.isSingleChat) {
+                List<String> ids = new ArrayList<>();
+                ids.add(vm.userID);
+                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
+                    vm.isSingleChat, ids, null);
+                callingService.call(signalingInfo);
+            } else {
+                GroupVM groupVM = new GroupVM();
+                groupVM.groupId = vm.groupID;
+                BaseApp.inst().putVM(groupVM);
+                ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
+                    .withBoolean(Constant.IS_SELECT_MEMBER, true)
+                    .withBoolean(Constant.IS_GROUP_CALL, true)
+                    .withInt(Constant.K_SIZE, 9)
+                    .navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
+            }
+            return false;
+        });
     }
 
     public void toSelectMember() {
-            GroupVM groupVM = new GroupVM();
-            groupVM.groupId = vm.groupID;
-            BaseApp.inst().putVM(groupVM);
-            ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
-                .withBoolean(Constant.IS_SELECT_MEMBER, true)
-                .withInt(Constant.K_SIZE, 9).navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
+
     }
 
-    private final ActivityResultLauncher<Intent> businessCardLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() != Activity.RESULT_OK) return;
-        String friendInfo = result.getData().getStringExtra(Constant.K_RESULT);
 
-        FriendInfo friendInfoBean = GsonHel.fromJson(friendInfo, FriendInfo.class);
-
-        CardElem cardElem=new CardElem();
-        cardElem.setUserID(friendInfoBean.getUserID());
-        cardElem.setNickname(friendInfoBean.getNickname());
-        cardElem.setFaceURL(friendInfoBean.getFaceURL());
+    private void sendCardMessage(MultipleChoice multipleChoice) {
+        CardElem cardElem = new CardElem();
+        cardElem.setUserID(multipleChoice.key);
+        cardElem.setNickname(multipleChoice.name);
+        cardElem.setFaceURL(multipleChoice.icon);
         Message message = OpenIMClient.getInstance().messageManager.createCardMessage(cardElem);
         vm.sendMsg(message);
-    });
+    }
 
-    private final ActivityResultLauncher<Intent> shareLocationLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() != Activity.RESULT_OK) return;
-        Bundle resultBundle = result.getData().getBundleExtra("result");
-        if (null == resultBundle) return;
+    private final ActivityResultLauncher<Intent> shareLocationLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() != Activity.RESULT_OK) return;
+            Bundle resultBundle = result.getData().getBundleExtra("result");
+            if (null == resultBundle) return;
 
-        Double latitude = resultBundle.getDouble("latitude");
-        Double longitude = resultBundle.getDouble("longitude");
-        String description = resultBundle.getString("description");
-        Message message = OpenIMClient.getInstance().messageManager.createLocationMessage(latitude, longitude, description);
-        vm.sendMsg(message);
-    });
+            Double latitude = resultBundle.getDouble("latitude");
+            Double longitude = resultBundle.getDouble("longitude");
+            String description = resultBundle.getString("description");
+            Message message =
+                OpenIMClient.getInstance().messageManager.createLocationMessage(latitude, longitude,
+                    description);
+            vm.sendMsg(message);
+        });
 
     //分享位置
     @SuppressLint("WrongConstant")

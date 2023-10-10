@@ -63,6 +63,7 @@
     <string name="withdraw">Withdraw</string>
     <string name="delete">Delete</string>
     <string name="revoke_tips">%1$s revoked a message</string>
+    <string name="revoke_tips2">%1$s revoked %2$s\' message</string>
     <string name="forward">Forward</string>
     <string name="multiple_choice">Multiple Choice</string>
     <string name="merge_forward">Merge Forward</string>
@@ -491,5 +492,22 @@
     <string name="host_exit_tips">主持人已离开，是否退出会议？</string>
     <string name="declined">已拒绝</string>
     <string name="timing_meeting_tips">不能选择已过去的时间</string>
+    <string name="cancle_see_he">取消看他</string>
+    <string name="recover">" 回复 "</string>
+    <string name="edit_group_name2">修改群聊名称</string>
+    <string name="edit_group_name_tips">修改群聊名称后，将在群内通知其他成员。</string>
+    <string name="in_group_name_tips">昵称修改后，只会在此群内显示，群内成员都可以看见。</string>
+    <string name="create_group_tips2">创建群聊，全面使用OpenIM</string>
+    <string name="add_group_tips">向管理员或群聊成员询问ID</string>
+    <string name="delete_conversiton">删除会话</string>
+    <string name="android">Android</string>
+    <string name="ios">ios</string>
+    <string name="start_group_mute">已开启群禁言</string>
+    <string name="group_ban">群已被禁</string>
+    <string name="you_mute">你已被禁言</string>
+    <string name="file_download">文件下载中请稍后...</string>
+    <string name="message_tone">新消息提示音</string>
+    <string name="vibration">新消息震动</string>
+    <string name="not_be_added">禁止添加我为好友</string>
 
 </resources>

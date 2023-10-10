@@ -1,6 +1,7 @@
 package io.openim.android.ouicore.widget;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -14,6 +15,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 
 import org.raphets.roundimageview.RoundImageView;
@@ -45,16 +48,18 @@ public class AvatarImage extends FrameLayout {
 
 
     void init(Context context) {
-        roundImageView = new RoundImageView(context);
-        roundImageView.setType(RoundImageView.TYPE_ROUND);
-        roundImageView.setCornerRadius(6);
-        addView(roundImageView);
-        nameTv = new TextView(context);
-        nameTv.setTextColor(Color.WHITE);
-        nameTv.setTextSize(14);
         LinearLayout.LayoutParams params =
             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT
                 , LinearLayout.LayoutParams.MATCH_PARENT);
+
+        roundImageView = new RoundImageView(context);
+        roundImageView.setType(RoundImageView.TYPE_ROUND);
+        roundImageView.setCornerRadius(6);
+        roundImageView.setScaleType(ImageView.ScaleType.CENTER);
+        addView(roundImageView,params);
+        nameTv = new TextView(context);
+        nameTv.setTextColor(Color.WHITE);
+        nameTv.setTextSize(14);
         nameTv.setGravity(Gravity.CENTER);
         addView(nameTv, params);
     }
@@ -89,14 +94,29 @@ public class AvatarImage extends FrameLayout {
             }
         } else {
             roundImageView.setVisibility(VISIBLE);
-            roundImageView.setScaleType(ImageView.ScaleType.CENTER);
+
             Glide.with(getContext())
                 .load(url)
-                .centerCrop()
-                .placeholder(resId)
                 .error(resId)
-//                .apply(RequestOptions.bitmapTransform(new RoundedCorners(15)))
-                .into(roundImageView);
+                .centerInside()
+                .into(new CustomTarget<Drawable>() {
+                    @Override
+                    public void onLoadStarted(@Nullable Drawable placeholder) {
+                        roundImageView.setImageResource(resId);
+                    }
+
+                    @Override
+                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<
+                        ? super Drawable> transition) {
+                        roundImageView.setImageDrawable(resource);
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                        roundImageView.setImageDrawable(null);
+                    }
+                });
+
         }
     }
 }

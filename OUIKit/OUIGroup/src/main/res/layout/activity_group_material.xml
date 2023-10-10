@@ -92,7 +92,7 @@
                                 android:layout_marginBottom="-3dp"
                                 android:padding="5dp"
                                 android:src="@mipmap/ic_edit"
-                                android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}" />
+                                android:visibility="@{GroupVM.isOwnerOrAdmin?View.VISIBLE:View.GONE}" />
                         </RelativeLayout>
 
                         <LinearLayout
@@ -111,8 +111,8 @@
                                   android:layout_width="wrap_content"
                                   android:layout_height="wrap_content"
                                   android:layout_marginRight="5dp"
-                                  android:text="@{GroupVM.groupsInfo.groupName}"
                                   android:textColor="@color/txt_black"
+                                  android:text="@{GroupVM.groupsInfo.groupName}"
                                   android:textSize="17sp" />
                               <ImageView
                                   android:id="@+id/groupName"
@@ -120,10 +120,11 @@
                                   android:layout_height="wrap_content"
                                   android:src="@mipmap/ic_g_edit2"
                                   android:padding="4dp"
-                                  android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}" />
+                                  android:visibility="@{GroupVM.isOwnerOrAdmin?View.VISIBLE:View.GONE}" />
                           </LinearLayout>
 
                             <TextView
+                                android:id="@+id/groupId"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@{GroupVM.groupsInfo.groupID}"
@@ -327,7 +328,7 @@
                             android:gravity="center_vertical"
                             android:paddingLeft="15dp"
                             android:paddingRight="15dp"
-                            android:visibility="@{GroupVM.isGroupOwner?View.VISIBLE:View.GONE}">
+                            android:visibility="@{GroupVM.isOwnerOrAdmin?View.VISIBLE:View.GONE}">
 
                             <TextView
                                 android:layout_width="0dp"
@@ -432,10 +433,70 @@
                             android:layout_width="38dp"
                             android:layout_height="23dp" />
                     </LinearLayout>
-
-
                     <include layout="@layout/view_dividing_line" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:background="@drawable/sty_radius_6_white"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:paddingLeft="15dp"
+                        android:animateLayoutChanges="true"
+                        android:paddingRight="15dp">
 
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/periodic_deletion"
+                                android:textColor="#ff333333"
+                                android:textSize="16sp" />
+
+                            <io.openim.android.ouicore.widget.SlideButton
+                                android:id="@+id/periodicDeletion"
+                                android:layout_width="38dp"
+                                android:layout_height="23dp" />
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/periodicDeletionTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:gravity="center_vertical"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/time_set"
+                                android:textColor="#ff333333"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/periodicDeletionStr"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:textColor="#ff333333"
+                                android:textSize="16sp" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@mipmap/ic_right" />
+                        </LinearLayout>
+
+
+                    </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/clearRecord"
@@ -444,7 +505,8 @@
                         android:background="@color/white"
                         android:gravity="center_vertical"
                         android:paddingLeft="15dp"
-                        android:paddingRight="15dp">
+                        android:paddingRight="15dp"
+                        >
 
                         <TextView
                             android:layout_width="0dp"

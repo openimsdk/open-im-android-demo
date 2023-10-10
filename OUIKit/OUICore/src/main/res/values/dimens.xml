@@ -11,7 +11,12 @@
     <dimen name="avatar_size2">42dp</dimen>
 
     <dimen name="main_body">17sp</dimen>
+    <dimen name="main_body2">25dp</dimen>
     <dimen name="description_txt">14sp</dimen>
     <dimen name="min_txt">12sp</dimen>
     <dimen name="tab_txt">10sp</dimen>
+
+
+    <dimen name="gudieview_width">6dp</dimen>
+    <dimen name="gudieview_heigh">6dp</dimen>
 </resources>

@@ -6,29 +6,26 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.ActivityMediaHistoryBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.Message;
 
@@ -196,17 +193,17 @@ public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHist
                                     .centerCrop().into(holder.view.getRoot());
 
                             holder.view.getRoot().setOnClickListener(v -> {
+                                PreviewMediaVM  previewMediaVM = Easy.installVM(PreviewMediaVM.class);
+                                PreviewMediaVM.MediaData  mediaData =new PreviewMediaVM.MediaData(url);
+                                previewMediaVM.previewSingle(mediaData);
                                 if (isPicture) {
-                                    startActivity(
-                                        new Intent(MediaHistoryActivity.this,
-                                            PreviewActivity.class).putExtra(PreviewActivity.MEDIA_URL, url));
+                                    mediaData.thumbnail= data.getPictureElem().getSnapshotPicture().getUrl();
                                 } else {
-                                    startActivity(
-                                        new Intent(MediaHistoryActivity.this, PreviewActivity.class)
-                                            .putExtra(PreviewActivity.MEDIA_URL, url)
-                                            .putExtra(PreviewActivity.FIRST_FRAME,
-                                                data.getVideoElem().getSnapshotUrl()));
+                                    mediaData.isVideo=true;
+                                    mediaData.thumbnail= data.getVideoElem().getSnapshotUrl();
                                 }
+                                v.getContext().startActivity(
+                                    new Intent(v.getContext(), PreviewMediaActivity.class));
                             });
                         }
                     }

@@ -27,7 +27,10 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.yanzhenjie.permission.AndPermission;
@@ -65,6 +68,53 @@ public class Common {
     public final static Handler UIHandler = new Handler(Looper.getMainLooper());
 
 
+
+    //目标项是否在最后一个可见项之后
+    public static  boolean mShouldScroll;
+    //记录目标项位置
+    public  static int mToPosition;
+    /**
+     * 滑动到指定位置
+     */
+    public static  void smoothMoveToPosition(RecyclerView mRecyclerView,  int position) {
+        // 第一个可见位置
+        int firstItem = mRecyclerView.getChildLayoutPosition(mRecyclerView.getChildAt(0));
+        // 最后一个可见位置
+        int lastItem =
+            mRecyclerView.getChildLayoutPosition(mRecyclerView.getChildAt(mRecyclerView.getChildCount() - 1));
+        if (position < firstItem) {
+            // 第一种可能:跳转位置在第一个可见位置之前，使用smoothScrollToPosition
+            mRecyclerView.smoothScrollToPosition(position);
+        } else if (position <= lastItem) {
+            // 第二种可能:跳转位置在第一个可见位置之后，最后一个可见项之前
+            int movePosition = position - firstItem;
+            if (movePosition >= 0 && movePosition < mRecyclerView.getChildCount()) {
+                int top = mRecyclerView.getChildAt(movePosition).getTop();
+                // smoothScrollToPosition 不会有效果，此时调用smoothScrollBy来滑动到指定位置
+                mRecyclerView.smoothScrollBy(0, top);
+            }
+        } else {
+            // 第三种可能:跳转位置在最后可见项之后，则先调用smoothScrollToPosition将要跳转的位置滚动到可见位置
+            // 再通过onScrollStateChanged控制再次调用smoothMoveToPosition，执行上一个判断中的方法
+            mRecyclerView.smoothScrollToPosition(position);
+            mToPosition = position;
+            mShouldScroll = true;
+        }
+    }
+
+
+
+    /**
+     *  finish routes
+     * @param routes
+     */
+    public static  void finishRoute(String... routes) {
+        for (String route : routes) {
+            Postcard postcard = ARouter.getInstance().build(route);
+            LogisticsCenter.completion(postcard);
+            ActivityManager.finishActivity(postcard.getDestination());
+        }
+    }
     public static void stringBindForegroundColorSpan(TextView textView, String data,
                                                      String target) {
         stringBindForegroundColorSpan(textView, data, target, R.color.theme);
@@ -99,11 +149,10 @@ public class Common {
             PackageManager pm = context.getPackageManager();
             PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
             versionName = pi.versionName;
-            if (versionName == null || versionName.length() <= 0) {
+            if (TextUtils.isEmpty(versionName)) {
                 return "";
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception ignored) {}
         return versionName;
     }
 
@@ -303,7 +352,11 @@ public class Common {
      * @param v
      */
     public static void toMap(Message message, View v) {
-        v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord=" + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey));
+        v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class)
+            .putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord="
+                + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude()
+                + "&referer=" + WebViewActivity.mapAppKey)
+            .putExtra(WebViewActivity.TITLE,v.getContext().getString(R.string.location)));
     }
 
     /***
@@ -371,6 +424,17 @@ public class Common {
         target.setTag(new QBadgeView(context).bindTarget(target).setGravityOffset(10, -2, true).setBadgeNumber(badgeNumber).setBadgeTextSize(8, true).setShowShadow(false));
     }
 
+    public static String containsLink(String text) {
+        StringBuilder links=new StringBuilder();
+        // 正则表达式模式匹配URL链接
+        String pattern = "(http|https)://[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3}(/\\S*)?";
+        Pattern regex = Pattern.compile(pattern);
+        Matcher matcher = regex.matcher(text);
+        while (matcher.find()) {
+            links.append(matcher.group());
+        }
+        return links.toString();
+    }
 
     /**
      * (x,y)是否在view的区域内

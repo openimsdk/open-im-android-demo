@@ -69,8 +69,35 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
     private void click() {
         view.addChat.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withString(Constant.K_ID,
-                vm.userID).withBoolean(Constant.K_RESULT, true).navigation();
+            SelectTargetVM choiceVM = Easy.installVM(SelectTargetVM.class);
+            choiceVM.setIntention(SelectTargetVM.Intention.invite);
+            if (null != userInfo) {
+                MultipleChoice choice=new MultipleChoice();
+                choice.key=userInfo.getUserID();
+                choice.name=userInfo.getNickname();
+                choice.icon=userInfo.getFaceURL();
+                choice.isSelect=true;
+                choice.isEnabled=false;
+                choiceVM.addDate(choice);
+            }
+            choiceVM.setOnFinishListener(() -> {
+                GroupVM groupVM = BaseApp.inst().getVMByCache(GroupVM.class);
+                if (null == groupVM) groupVM = new GroupVM();
+                groupVM.selectedFriendInfo.getValue().clear();
+
+                for (int i = 0; i < choiceVM.metaData.val().size(); i++) {
+                    MultipleChoice us = choiceVM.metaData.val().get(i);
+                    FriendInfo friendInfo = new FriendInfo();
+                    friendInfo.setUserID(us.key);
+                    friendInfo.setNickname(us.name);
+                    friendInfo.setFaceURL(us.icon);
+                    groupVM.selectedFriendInfo.getValue().add(friendInfo);
+                }
+                BaseApp.inst().putVM(groupVM);
+                ARouter.getInstance().build(Routes.Group.CREATE_GROUP2).navigation();
+            });
+
+            ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
         });
         view.picture.setOnClickListener(v -> {
             startActivity(new Intent(this, MediaHistoryActivity.class).putExtra(Constant.K_RESULT
@@ -212,8 +239,10 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             @Override
             public void onSuccess(List<UserInfo> data) {
                 if (data.isEmpty()) return;
-                view.avatar.load(data.get(0).getFaceURL());
-                view.userName.setText(data.get(0).getNickname());
+                userInfo = data.get(0);
+                view.avatar.load(userInfo.getFaceURL());
+                view.userName.setText(userInfo.getNickname());
+
             }
         }, uid);
     }

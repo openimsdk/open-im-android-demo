@@ -36,7 +36,8 @@ public class TimeUtil {
 
             if (todayCalendar.get(Calendar.YEAR) == calendar.get(Calendar.YEAR)) {//当年
                 if (todayCalendar.get(Calendar.MONTH) == calendar.get(Calendar.MONTH)) {//当月
-                    int temp = todayCalendar.get(Calendar.DAY_OF_MONTH) - calendar.get(Calendar.DAY_OF_MONTH);
+                    int temp =
+                        todayCalendar.get(Calendar.DAY_OF_MONTH) - calendar.get(Calendar.DAY_OF_MONTH);
                     switch (temp) {
                         case 0://今天
                             result = getTime(timestamp, hourTimeFormat);
@@ -50,7 +51,8 @@ public class TimeUtil {
                         case 5:
                         case 6:
                             int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-                            result = weekNames[dayOfWeek - 1] + " " + getTime(timestamp, hourTimeFormat);
+                            result = weekNames[dayOfWeek - 1] + " " + getTime(timestamp,
+                                hourTimeFormat);
                             break;
                         default:
                             result = getTime(timestamp, monthTimeFormat);
@@ -97,6 +99,27 @@ public class TimeUtil {
             return String.format(format.substring(10), second);
         return "";
     }
+
+    public static String secondFormat(int seconds) {
+        int hours = seconds / 3600;
+        int remainingSeconds = seconds % 3600;
+        int minutes = remainingSeconds / 60;
+        int remainingSeconds2 = remainingSeconds % 60;
+
+        String result = "";
+
+        if (hours > 0) {
+            result += hours + "小时";
+        }
+        if (minutes > 0) {
+            result += minutes + "分钟";
+        }
+        if (remainingSeconds2 > 0) {
+            result += remainingSeconds2 + "秒";
+        }
+        return result;
+    }
+
 
     private static String repair0(int v) {
         return v < 10 ? ("0" + v) : (v + "");

@@ -5,30 +5,23 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutPopSelectedFriendsBinding;
 import io.openim.android.ouicore.databinding.LayoutSelectedFriendsBinding;
 import io.openim.android.ouicore.databinding.OftenRecyclerViewBinding;
-import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.ex.MultipleChoice;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.vm.ContactListVM;
-import io.openim.android.ouicore.vm.GroupVM;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.SocialityVM;
-import io.openim.android.ouigroup.R;
 import io.openim.android.sdk.models.GroupInfo;
 
 public class AllGroupActivity extends BaseActivity<SocialityVM, OftenRecyclerViewBinding> {
 
     private LayoutSelectedFriendsBinding selectedFriendsBinding;
-    private MultipleChoiceVM choiceVM;
+    private SelectTargetVM choiceVM;
     private  RecyclerViewAdapter<GroupInfo, ViewHol.ItemViewHo> adapter;
 
     @Override
@@ -52,7 +45,7 @@ public class AllGroupActivity extends BaseActivity<SocialityVM, OftenRecyclerVie
     void init() {
         vm.getAllGroup();
         try {
-            choiceVM = Easy.find(MultipleChoiceVM.class);
+            choiceVM = Easy.find(SelectTargetVM.class);
             choiceVM.metaData.observe(this,v->adapter.notifyDataSetChanged());
         }catch (Exception ignored){}
     }

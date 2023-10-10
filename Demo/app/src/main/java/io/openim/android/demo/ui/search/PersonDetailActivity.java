@@ -26,6 +26,7 @@ import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IMBack;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.GroupVM;
@@ -132,13 +133,13 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             if (oneself()) return;
 
             view.manager.setVisibility(isOwner(oneselfGroupMembersInfo) ? View.VISIBLE : View.GONE);
-            if (isOwner(oneselfGroupMembersInfo)){
+            if (isOwner(oneselfGroupMembersInfo)) {
                 //自己是群主-显示
                 view.mute.setVisibility(View.VISIBLE);
-            }else {
+            } else {
                 //自己是管理员且对方不是群主不是管理员-显示
                 if (isAdmin(oneselfGroupMembersInfo)
-                    && !isOwner(targetGroupMembersInfo)&& !isAdmin(targetGroupMembersInfo))
+                    && !isOwner(targetGroupMembersInfo) && !isAdmin(targetGroupMembersInfo))
                     view.mute.setVisibility(View.VISIBLE);
                 else
                     view.mute.setVisibility(View.GONE);
@@ -164,9 +165,11 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                     @Override
                     public void onSuccess(String data) {
                         GroupVM groupVM = BaseApp.inst().getVMByCache(GroupVM.class);
-                        groupVM.superGroupMembers.getValue().clear();
-                        groupVM.page = 0;
-                        groupVM.getSuperGroupMemberList();
+                        if (null != groupVM) {
+                            groupVM.superGroupMembers.val().clear();
+                            groupVM.page = 0;
+                            groupVM.getSuperGroupMemberList();
+                        }
                     }
                 }, groupId, uid, isChecked ? GroupRole.ADMIN :
                     GroupRole.MEMBER);
@@ -184,7 +187,13 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         });
 
     private void click() {
-
+        view.userId.setOnClickListener(v -> {
+            try {
+                Common.copy(vm.userInfo.getValue().get(0).getUserID());
+                toast(getString(io.openim.android.ouicore.R.string.copy_succ));
+            } catch (Exception ignore) {
+            }
+        });
         view.userInfo.setOnClickListener(v -> {
             personDataActivityLauncher.launch(new Intent(this, PersonDataActivity.class).putExtra(Constant.K_ID, vm.userInfo.getValue().get(0).getUserID()));
         });
@@ -256,7 +265,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             // 不允许添加组成员为好友
             applyMemberFriend = groupInfo.getApplyMemberFriend() == 1;
 
-            view.addFriend.setVisibility((applyMemberFriend || isFriend||oneself()) ? View.GONE :
+            view.addFriend.setVisibility((applyMemberFriend || isFriend || oneself()) ? View.GONE :
                 View.VISIBLE);
             view.userId.setVisibility(applyMemberFriend ? View.GONE : View.VISIBLE);
 
@@ -278,7 +287,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                     isFriend = true;
                 } else {
                     view.userInfo.setVisibility(View.GONE);
-                    view.addFriend.setVisibility(View.VISIBLE);
+                    view.addFriend.setVisibility(oneself() ? View.GONE : View.VISIBLE);
                 }
             }
             if (!TextUtils.isEmpty(groupId)) {
@@ -302,7 +311,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 }
                 view.nickName.setText(nickName);
                 view.userId.setText(userInfo.getUserID());
-                view.avatar.load(userInfo.getFaceURL());
+                view.avatar.load(userInfo.getFaceURL(),userInfo.getNickname());
                 view.bottomMenu.setVisibility(oneself() ? View.GONE : View.VISIBLE);
             }
         });
