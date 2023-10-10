@@ -9,9 +9,9 @@
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <application android:theme="@style/Theme.Main">
+
         <activity
             android:name=".ui.NotificationActivity"
             android:exported="false" />
@@ -40,7 +40,7 @@
             android:name=".ui.ChatHistorySearchActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.PreviewActivity"
+            android:name=".ui.PreviewMediaActivity"
             android:exported="false" />
         <activity
             android:name=".ui.ShootActivity"
@@ -48,7 +48,7 @@
         <activity
             android:name=".ui.ChatActivity"
             android:exported="false" />
-        <activity android:name=".ui.emoji.CustomEmojiManageActivity"/>
+        <activity android:name=".ui.emoji.CustomEmojiManageActivity" />
     </application>
 
 </manifest>

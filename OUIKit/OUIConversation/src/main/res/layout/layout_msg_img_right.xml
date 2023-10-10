@@ -29,8 +29,8 @@
 
         <LinearLayout
             android:id="@+id/contentGroup2"
-            android:layout_width="140dp"
-            android:layout_height="230dp"
+            android:layout_width="150dp"
+            android:layout_height="250dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_toLeftOf="@id/avatar2"
@@ -60,8 +60,8 @@
 
                 <View
                     android:id="@+id/mask2"
-                    android:layout_width="140dp"
-                    android:layout_height="230dp"
+                    android:layout_width="150dp"
+                    android:layout_height="250dp"
                     android:alpha="0.6"
                     android:background="@drawable/sty_radius_6_000000" />
 

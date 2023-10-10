@@ -6,25 +6,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black"
-        tools:context=".ui.PreviewActivity">
+        tools:context=".ui.PreviewMediaActivity">
 
-        <RelativeLayout
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
-
-            <cn.jzvd.JzvdStd
-                android:id="@+id/jzVideo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-
-            <io.openim.android.ouicore.widget.PinchImageView
-                android:id="@+id/pic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-        </RelativeLayout>
+            android:layout_height="match_parent" />
 
         <TextView
             android:id="@+id/download"
@@ -32,15 +19,24 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="100dp"
+            android:layout_marginBottom="80dp"
             android:background="@drawable/sty_radius_10_aa666666"
             android:paddingLeft="20dp"
             android:paddingTop="5dp"
             android:paddingRight="20dp"
             android:paddingBottom="5dp"
             android:text="@string/download"
-            android:visibility="gone"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/guide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal" />
     </RelativeLayout>
 </layout>
 

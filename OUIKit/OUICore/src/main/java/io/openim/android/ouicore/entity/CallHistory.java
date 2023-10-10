@@ -40,7 +40,7 @@ public class CallHistory extends RealmObject {
 
     /**
      *
-     * @param failedState 失败状态 0连接中 1取消 2对方拒绝
+     * @param failedState 失败状态 0连接中 1取消 2对方拒绝 3己方已拒绝
      */
     public void setFailedState(int failedState) {
         this.failedState = failedState;

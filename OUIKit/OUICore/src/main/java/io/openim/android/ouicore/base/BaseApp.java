@@ -2,6 +2,8 @@ package io.openim.android.ouicore.base;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.SparseArray;
 
@@ -14,8 +16,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import io.openim.android.ouicore.base.vm.State;
+import io.openim.android.ouicore.base.vm.injection.BaseVM;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.LanguageUtil;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -23,7 +29,8 @@ public class BaseApp extends Application {
 
     private static BaseApp instance;
     public Realm realm;
-    private boolean isAppBackground;
+    public State<Boolean> isAppBackground = new State<>(false);
+    private int mActivityCount;
 
     public static BaseApp inst() {
         return instance;
@@ -31,30 +38,24 @@ public class BaseApp extends Application {
 
     public LoginCertificate loginCertificate;
 
-    public static final HashMap<String, BaseViewModel> viewModels = new HashMap<>();
-
-    public <T> T getVMByCache(Class<T> vm) {
-        String key = vm.getCanonicalName();
-        if (BaseApp.viewModels.containsKey(key)) {
-            return (T) BaseApp.viewModels.get(key);
+    public <T extends BaseVM> T getVMByCache(Class<T> vm) {
+        try {
+            return Easy.find(vm);
+        } catch (Exception ignored) {
         }
         return null;
     }
 
     public <T extends BaseViewModel> void putVM(T vm) {
-        String key = vm.getClass().getCanonicalName();
-        if (!BaseApp.viewModels.containsKey(key)) {
-            BaseApp.viewModels.put(key, vm);
-        }
+        Easy.put(vm);
     }
 
-    public void removeCacheVM(Class<?> cl) {
-        String key = cl.getCanonicalName();
-        BaseViewModel viewModel = BaseApp.viewModels.get(key);
-        if (null != viewModel) {
-            viewModel.releaseRes();
-            BaseApp.viewModels.remove(key);
-        }
+    public void removeCacheVM(Class<? extends BaseViewModel> cl) {
+        try {
+            BaseViewModel vm = Easy.find(cl);
+            vm.releaseRes();
+        } catch (Exception ignored) {}
+        Easy.delete(cl);
     }
 
     private void realmInit() {
@@ -74,22 +75,66 @@ public class BaseApp extends Application {
     }
 
     private void activityLifecycleCallback() {
-        ProcessLifecycleOwner.get().getLifecycle().addObserver(new DefaultLifecycleObserver() {
+//        ProcessLifecycleOwner.get().getLifecycle().addObserver(new DefaultLifecycleObserver() {
+//            @Override
+//            public void onResume(@NonNull LifecycleOwner owner) {
+//                isAppBackground.setValue(false);
+//            }
+//
+//            @Override
+//            public void onStop(@NonNull LifecycleOwner owner) {
+//                isAppBackground.setValue(true);
+//            }
+//        });
+
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
-            public void onResume(@NonNull LifecycleOwner owner) {
-                isAppBackground = false;
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
             }
 
             @Override
-            public void onStop(@NonNull LifecycleOwner owner) {
-                isAppBackground = true;
+            public void onActivityStarted(Activity activity) {
+                mActivityCount++;
+                if (isAppBackground.val())
+                    isAppBackground.setValue(false);
+            }
+
+            @Override
+            public void onActivityResumed(Activity activity) {
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity) {
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity) {
+                mActivityCount--;
+                if (mActivityCount == 0) {
+                    isAppBackground.setValue(true);
+                }
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity) {
             }
         });
     }
 
-    public boolean isBackground() {
-        return isAppBackground;
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LanguageUtil.attachBaseContext(base));
     }
 
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        LanguageUtil.attachBaseContext(this);
+    }
 
 }

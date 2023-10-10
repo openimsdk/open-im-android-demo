@@ -49,7 +49,7 @@ public class ShareQrcodeActivity extends BaseActivity<GroupVM, ActivityGroupQrCo
                 view.title.setText(io.openim.android.ouicore.R.string.group_qrcode);
                 tips = getString(io.openim.android.ouicore.R.string.share_group_tips2);
             } else {
-                view.title.setText(R.string.group_id);
+                view.title.setText(io.openim.android.ouicore.R.string.group_id);
                 tips = getString(io.openim.android.ouicore.R.string.share_group_tips1);
             }
         }

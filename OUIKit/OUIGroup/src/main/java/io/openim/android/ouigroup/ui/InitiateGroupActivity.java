@@ -34,7 +34,7 @@ import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 
 
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouigroup.databinding.ActivityInitiateGroupBinding;
 
 import io.openim.android.ouicore.vm.GroupVM;
@@ -64,7 +64,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
     //默认已选择的id
     private String defSelectId;
 
-    private MultipleChoiceVM multipleChoiceVM;
+    private SelectTargetVM selectTargetVM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +85,6 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityInitiateGroupBinding.inflate(getLayoutInflater()));
 
-        buildSelectFriendsVM();
         initView();
 
         if (isSelectMember) {
@@ -94,18 +93,21 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         } else
             vm.getAllFriend();
         listener();
+        buildSelectFriendsVM();
     }
 
     private void buildSelectFriendsVM() {
         try {
-            multipleChoiceVM = Easy.find(MultipleChoiceVM.class);
-            selectMemberNum= multipleChoiceVM.metaData.getValue().size();
-            multipleChoiceVM.bindDataToView(view.bottom);
-            multipleChoiceVM.showPopAllSelectFriends(view.bottom, LayoutPopSelectedFriendsBinding.inflate(getLayoutInflater()));
-            multipleChoiceVM.submitTap(view.bottom.submit);
+            selectTargetVM = Easy.find(SelectTargetVM.class);
+            selectMemberNum = selectTargetVM.metaData.getValue().size();
+            selectTargetVM.bindDataToView(view.bottom);
+            selectTargetVM.showPopAllSelectFriends(view.bottom,
+                LayoutPopSelectedFriendsBinding.inflate(getLayoutInflater()));
+            selectTargetVM.submitTap(view.bottom.submit);
 
-            multipleChoiceVM.metaData.observe(this,v->adapter.notifyDataSetChanged());
-        } catch (Exception ignored) {}
+            selectTargetVM.metaData.observe(this, v -> adapter.notifyDataSetChanged());
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -118,7 +120,8 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         sink();
         if (isInviteToGroup)
             view.title.setText(io.openim.android.ouicore.R.string.Invite_to_the_group);
-        if (isRemoveGroup) view.title.setText(io.openim.android.ouicore.R.string.remove_group);
+        if (isRemoveGroup)
+            view.title.setText(io.openim.android.ouicore.R.string.remove_group);
         if (isSelectMember) {
             view.title.setText(io.openim.android.ouicore.R.string.selete_member);
             view.bottom.submit.setText("确定（0/" + maxNum + "）");
@@ -196,12 +199,12 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                         notifyItemChanged(position);
                         selected();
 
-                        if (null != multipleChoiceVM) {
+                        if (null != selectTargetVM) {
                             if (data.isSelect)
-                                multipleChoiceVM.addMetaData(data.userInfo.getUserID(),
+                                selectTargetVM.addMetaData(data.userInfo.getUserID(),
                                     data.userInfo.getNickname(),data.userInfo.getFaceURL());
                             else
-                                multipleChoiceVM.removeMetaData(data.userInfo.getUserID());
+                                selectTargetVM.removeMetaData(data.userInfo.getUserID());
                         }
 
                     });
@@ -219,8 +222,17 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
         view.bottom.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectMemberNum));
         if (isSelectMember)
             view.bottom.submit.setText("确定（" + selectMemberNum + "/" + maxNum + "）");
-        else view.bottom.submit.setText("确定（" + selectMemberNum + "/999）");
-        view.bottom.submit.setEnabled(selectMemberNum > 0);
+        else
+            view.bottom.submit.setText("确定（" + selectMemberNum + "/999）");
+
+        if (isInviteToGroup){
+            view.bottom.selectNum.setVisibility(vm.selectedFriendInfoV3.size()>0?View.VISIBLE:View.GONE);
+            view.bottom.submit.setEnabled(selectMemberNum > 0&&vm.selectedFriendInfoV3.size()>0);
+        }else {
+            view.bottom.submit.setEnabled(selectMemberNum > 0);
+        }
+
+
     }
 
     private int getSelectNum() {
@@ -319,10 +331,10 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
                         exUserInfo.isSelect = true;
                     }
 
-                    if (null != multipleChoiceVM) {
+                    if (null != selectTargetVM) {
                         MultipleChoice data=new MultipleChoice();
                         data.key=exUserInfo.userInfo.getUserID();
-                        exUserInfo.isSelect = multipleChoiceVM.contains(data);
+                        exUserInfo.isSelect = selectTargetVM.contains(data);
                     }
                 }
                 adapter.setItems(exUserInfos);
@@ -348,7 +360,7 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
             public void click(View v) {
                 try {
                     if (isInviteToGroup) {
-                        vm.inviteUserToGroup(vm.selectedFriendInfoV3);
+//                        vm.inviteUserToGroup(vm.selectedFriendInfoV3);
                         return;
                     }
                     if (isRemoveGroup) {

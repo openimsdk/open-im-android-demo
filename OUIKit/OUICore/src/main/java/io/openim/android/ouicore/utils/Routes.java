@@ -66,6 +66,8 @@ public class Routes {
         public static final String SHARE_QRCODE = "/group/ShareQrcodeActivity";
 
         public static final String SUPER_GROUP_MEMBER = "/group/SuperGroupMemberActivity";
+        //群公告
+        public static final String GROUP_BULLETIN="/group/GroupBulletinActivity";
     }
 
     //关系链

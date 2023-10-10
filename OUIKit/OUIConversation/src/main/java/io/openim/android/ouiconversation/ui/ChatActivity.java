@@ -3,12 +3,13 @@ package io.openim.android.ouiconversation.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.LauncherActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -19,9 +20,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -34,7 +33,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouiconversation.databinding.ActivityChatBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
@@ -44,10 +42,7 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.base.vm.ISubscribe;
-import io.openim.android.ouicore.base.vm.Subject;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.ex.MultipleChoice;
@@ -56,23 +51,21 @@ import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.vm.ForwardVM;
 import io.openim.android.ouicore.vm.GroupVM;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
 import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.Participant;
-import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SignalingInfo;
+import io.openim.android.sdk.models.UsersOnlineStatus;
 
 @Route(path = Routes.Conversation.CHAT)
 public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> implements ChatVM.ViewAction, Observer {
@@ -103,10 +96,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private ActivityResultLauncher<Intent> chatSettingActivityLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == RESULT_OK) {
-                finish();
-            }
-        });
+        if (result.getResultCode() == RESULT_OK) {
+            finish();
+        }
+    });
 
     private void initVM() {
         Easy.installVM(CustomEmojiVM.class);
@@ -156,6 +149,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             Easy.delete(CustomEmojiVM.class);
             Easy.delete(ForwardVM.class);
 
+            BaseApp.inst().removeCacheVM(GroupVM.class);
             N.clearDispose(this);
             view.waterMark.onDestroy();
             Obs.inst().deleteObserver(this);
@@ -243,26 +237,25 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         if (!chatBg.isEmpty()) Glide.with(this).load(chatBg).into(view.chatBg);
 
 
-//        if (vm.isSingleChat) {
-//            vm.getUserOnlineStatus(onlineStatus -> {
-//                boolean isOnline = onlineStatus.status.equals("online");
-//                view.leftBg.setVisibility(View.VISIBLE);
-//                if (isOnline) {
-//                    view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable
-//                    .sty_radius_max_10cc64);
-//                    view.onlineStatus.setText(String.format(getString(io.openim.android.ouicore
-//                    .R.string.online), vm.handlePlatformCode(onlineStatus.detailPlatformStatus)));
-//                } else {
-//                    view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable
-//                    .sty_radius_max_ff999999);
-//                    view.onlineStatus.setText(io.openim.android.ouicore.R.string.offline);
-//                }
-//            });
-//        }
-        view.waterMark.setText(BaseApp.inst().loginCertificate.nickname);
+        if (vm.isSingleChat) {
+            vm.getUserOnlineStatus(this::showOnlineStatus);
+        }
+       try {
+           view.waterMark.setText(BaseApp.inst().loginCertificate.nickname);
+       }catch (Exception ignored){}
+    }
 
-
-
+    private void showOnlineStatus(UsersOnlineStatus onlineStatus) {
+        boolean isOnline = onlineStatus.status == 1;
+        view.leftBg.setVisibility(View.VISIBLE);
+        if (isOnline) {
+            view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_max_10cc64);
+            view.onlineStatus.setText(String.format(getString(io.openim.android.ouicore.R.string.online),
+                vm.handlePlatformCode(onlineStatus.platformIDs)));
+        } else {
+            view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_max_ff999999);
+            view.onlineStatus.setText(io.openim.android.ouicore.R.string.offline);
+        }
     }
 
     //记录原始窗口高度
@@ -296,11 +289,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             GroupVM groupVM = new GroupVM();
             groupVM.groupId = vm.groupID;
             BaseApp.inst().putVM(groupVM);
-            ARouter.getInstance()
-                .build(Routes.Group.SUPER_GROUP_MEMBER)
-                .withInt(Constant.K_SIZE, 9)
-                .withBoolean(Constant.IS_SELECT_MEMBER, true)
-                .navigation(this, Constant.Event.AT_USER);
+            ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER).withInt(Constant.K_SIZE,
+                9).withBoolean(Constant.IS_SELECT_MEMBER, true).navigation(this,
+                Constant.Event.AT_USER);
         });
         view.call.setOnClickListener(v -> {
             if (null == callingService) return;
@@ -326,15 +317,14 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                         vm.isSingleChat, ids, null);
                     callingService.call(signalingInfo);
                 } else {
-
                     GroupVM groupVM = new GroupVM();
                     groupVM.groupId = vm.groupID;
                     BaseApp.inst().putVM(groupVM);
-                    ARouter.getInstance()
-                        .build(Routes.Group.SUPER_GROUP_MEMBER)
+                    ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
                         .withInt(Constant.K_SIZE, 9)
                         .withBoolean(Constant.IS_GROUP_CALL, true)
-                        .navigation(this, Constant.Event.CALLING_REQUEST_CODE);
+                        .navigation(this,
+                            Constant.Event.CALLING_REQUEST_CODE);
                 }
                 return false;
             });
@@ -351,7 +341,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             Easy.find(ForwardVM.class).createMergerMessage(vm.isSingleChat,
                 vm.conversationInfo.getValue().getShowName(), getSelectMsg());
 
-            Easy.installVM(MultipleChoiceVM.class);
+            Easy.installVM(SelectTargetVM.class);
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) this,
                 Constant.Event.FORWARD);
             Common.UIHandler.postDelayed(() -> vm.enableMultipleSelect.setValue(false), 300);
@@ -402,8 +392,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                     linearLayoutManager.findFirstCompletelyVisibleItemPosition();
                 int lastVisiblePosition =
                     linearLayoutManager.findLastCompletelyVisibleItemPosition();
-                if (lastVisiblePosition == vm.messages.getValue().size() - 1
-                    && !vm.isNoData.val()) {
+                if (lastVisiblePosition == vm.messages.getValue().size() - 1 && !vm.isNoData.val()) {
                     vm.loadHistoryMessage();
                 }
 //                if (vm.fromChatHistory && firstVisiblePosition < 2) {
@@ -431,6 +420,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
         vm.conversationInfo.observe(this, conversationInfo -> {
             bindShowName();
+            vm.getGroupsInfo(vm.groupID, data -> {
+                if (data.isEmpty())return;
+                vm.groupInfo.setValue(data.get(0));
+            });
         });
 
         vm.roomCallingInfo.observe(this, roomCallingInfo -> {
@@ -454,11 +447,11 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             if (subject.equals(ChatVM.REEDIT_MSG)) {
                 view.layoutInputCote.chatInput.requestFocus();
                 view.layoutInputCote.chatInput.setText((String) subject.value);
+                view.layoutInputCote.chatInput.setSelection(((String) subject.value).length());
                 Common.pushKeyboard(this);
             }
         });
     }
-
 
 
     private void bindShowName() {
@@ -496,9 +489,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != RESULT_OK||null==data) return;
+        if (resultCode != RESULT_OK || null == data) return;
 
-        if (requestCode == Constant.Event.CALLING_REQUEST_CODE ) {
+        if (requestCode == Constant.Event.CALLING_REQUEST_CODE) {
             //发起群通话
             List<String> ids = data.getStringArrayListExtra(Constant.K_RESULT);
             //邀请列表中移除自己
@@ -508,22 +501,38 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             if (null == callingService) return;
             callingService.call(signalingInfo);
         }
-        if (requestCode == Constant.Event.AT_USER){
-            List<MultipleChoice> extra = (List<MultipleChoice>)
-                data.getSerializableExtra(Constant.K_RESULT);
-            List<Message> atMessages = vm.atMessages.getValue();
-            t:for (MultipleChoice multipleChoice : extra) {
-                for (Message atMessage : atMessages) {
-                    if (multipleChoice.key.equals(atMessage.getSendID())){
-                        continue t;
+        if (requestCode == Constant.Event.AT_USER) {
+            try {
+                Editable editable = bottomInputCote.view.chatInput.getText();
+                if (!TextUtils.isEmpty(editable)) {
+                    CharSequence finallyStr = editable.subSequence(editable.length() - 1,
+                        editable.length());
+                    if (finallyStr.toString().equals("@")) {
+                        editable.replace(editable.length() - 1, editable.length(),
+                            new SpannableStringBuilder(""));
                     }
                 }
-                Message message=new Message();
-                message.setSendID(multipleChoice.key);
-                message.setSenderNickname(multipleChoice.name);
-                atMessages.add(message);
-                vm.atMessages.setValue(atMessages);
+            } catch (Exception ignore) {
             }
+
+            Common.UIHandler.postDelayed(() -> {
+                List<MultipleChoice> extra =
+                    (List<MultipleChoice>) data.getSerializableExtra(Constant.K_RESULT);
+                List<Message> atMessages = vm.atMessages.getValue();
+                t:
+                for (MultipleChoice multipleChoice : extra) {
+                    for (Message atMessage : atMessages) {
+                        if (multipleChoice.key.equals(atMessage.getSendID())) {
+                            continue t;
+                        }
+                    }
+                    Message message = new Message();
+                    message.setSendID(multipleChoice.key);
+                    message.setSenderNickname(multipleChoice.name);
+                    atMessages.add(message);
+                    vm.atMessages.setValue(atMessages);
+                }
+            }, 150);
         }
     }
 
@@ -545,8 +554,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         ForwardVM forwardVM = Easy.find(ForwardVM.class);
         for (MultipleChoice choice : choices) {
             aloneSendMsg(forwardVM.forwardMsg, choice);
-            if (null != forwardVM.leaveMsg)
-                aloneSendMsg(forwardVM.leaveMsg, choice);
+            if (null != forwardVM.leaveMsg) aloneSendMsg(forwardVM.leaveMsg, choice);
         }
         vm.clearSelectMsg();
     }

@@ -27,6 +27,7 @@ import java.util.Observer;
 
 import io.openim.android.ouicontact.databinding.FragmentContactMainBinding;
 import io.openim.android.ouicontact.databinding.ViewContactHeaderBinding;
+import io.openim.android.ouicontact.ui.AddRelationActivity;
 import io.openim.android.ouicontact.ui.AllFriendActivity;
 import io.openim.android.ouicontact.ui.GroupNoticeListActivity;
 import io.openim.android.ouicontact.ui.LabelActivity;
@@ -93,10 +94,7 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
         view.header.moments.setVisibility(null==momentsBridge?View.GONE:View.VISIBLE);
         view.header.moments.setOnClickListener(v -> ARouter.getInstance().build(Routes.Moments.HOME).navigation());
 
-        view.addFriend.setOnClickListener(view1 -> {
-            ARouter.getInstance().build(Routes.Main.ADD_CONVERS)
-                .navigation();
-        });
+        view.addFriend.setOnClickListener(view1 -> startActivity(new Intent(getActivity(), AddRelationActivity.class)));
         view.search.setOnClickListener(view1 -> {
             ARouter.getInstance().build(Routes.Conversation.SEARCH).navigation();
         });
@@ -135,9 +133,8 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
             header.newFriendNoticeBadge.badge.setText(v + "");
         });
 
-        Easy.find(NotificationVM.class).momentsUnread.observe(getActivity(),v->{
-            header.newMomentsMsg.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE);
-        });
+        Easy.find(NotificationVM.class).momentsUnread.observe(getActivity(),v->
+            header.newMomentsMsg.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE));
     }
 
     @Override

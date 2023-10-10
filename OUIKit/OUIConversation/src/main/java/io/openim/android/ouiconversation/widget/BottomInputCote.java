@@ -28,6 +28,7 @@ import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.openim.android.ouiconversation.R;
@@ -43,9 +44,12 @@ import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
+import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.enums.GroupStatus;
 import io.openim.android.sdk.models.AtUserInfo;
+import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 
 /**
@@ -91,11 +95,10 @@ public class BottomInputCote {
                 final Message msg;
                 if (null != vm.replyMessage.getValue()) {
                     msg =
-                        OpenIMClient.getInstance().messageManager
-                            .createQuoteMessage(vm.inputMsg.getValue(), vm.replyMessage.getValue());
+                        OpenIMClient.getInstance().messageManager.createQuoteMessage(vm.inputMsg.val(), vm.replyMessage.getValue());
                 } else if (atMessages.isEmpty())
                     msg =
-                        OpenIMClient.getInstance().messageManager.createTextMessage(vm.inputMsg.getValue());
+                        OpenIMClient.getInstance().messageManager.createTextMessage(vm.inputMsg.val());
                 else {
                     List<String> atUserIDList = new ArrayList<>();
                     List<AtUserInfo> atUserInfoList = new ArrayList<>();
@@ -158,10 +161,14 @@ public class BottomInputCote {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() > 0 && null != onAtUserListener) {
-                    if (s.toString().equals("@")) {
-                        onAtUserListener.onAtUser();
+                try {
+                    String content = s.toString().substring(s.length() - 1);
+                    if (!TextUtils.isEmpty(content) && null != onAtUserListener) {
+                        if (content.equals("@")) {
+                            onAtUserListener.onAtUser();
+                        }
                     }
+                } catch (Exception ignore) {
                 }
             }
 
@@ -226,8 +233,11 @@ public class BottomInputCote {
             spannableString.setSpan(colorSpan, 0, spannableString.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             Message lastMsg = messages.get(messages.size() - 1);
+            if (null == lastMsg.getExt()) {
+                lastMsg.setExt(new MsgExpand());
+            }
             MsgExpand msgExpand = (MsgExpand) lastMsg.getExt();
-            if (null != msgExpand) msgExpand.spanHashCode = colorSpan.hashCode();
+            msgExpand.spanHashCode = colorSpan.hashCode();
             view.chatInput.append(spannableString);
         });
         vm.emojiMessages.observe((LifecycleOwner) context, messages -> {
@@ -253,20 +263,37 @@ public class BottomInputCote {
         if (!vm.isSingleChat) {
             vm.groupInfo.observe((LifecycleOwner) context, groupInfo -> {
                 if (null == groupInfo) return;
-                if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED
-                    && !groupInfo.getOwnerUserID().equals(BaseApp.inst().loginCertificate.userID)) {
-                    view.inputLy.setVisibility(VISIBLE);
-                    setSendButton(true);
-                    view.touchSay.setVisibility(GONE);
 
-                    view.root.setIntercept(true);
-                    view.root.setAlpha(0.5f);
-                    view.notice.setVisibility(VISIBLE);
+                if (groupInfo.getStatus() == GroupStatus.GROUP_DISSOLVE) {
+                    editMute(true);
+                    view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
+                } else if (groupInfo.getStatus() == GroupStatus.GROUP_BANNED) {
+                    editMute(true);
+                    view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.group_ban));
                 } else {
-                    view.root.setIntercept(false);
-                    view.root.setAlpha(1f);
-                    view.notice.setVisibility(GONE);
+                    OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
+                        @Override
+                        public void onSuccess(List<GroupMembersInfo> data) {
+                            if (data.isEmpty()) return;
+                            GroupMembersInfo mem = data.get(0);
+
+                            if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED
+                                && mem.getRoleLevel() == GroupRole.MEMBER) {
+                                editMute(true);
+                                view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.start_group_mute));
+                                return;
+                            }
+                            if (mem.getMuteEndTime()>0){
+                                editMute(true);
+                                view.notice.setText(io.openim.android.ouicore.R.string.you_mute);
+                                return;
+                            }
+                            editMute(false);
+                        }
+                    }, groupInfo.getGroupID(),
+                        new ArrayList<>(Collections.singleton(BaseApp.inst().loginCertificate.userID)));
                 }
+
             });
         }
         vm.replyMessage.observe((LifecycleOwner) context, message -> {
@@ -277,6 +304,21 @@ public class BottomInputCote {
                 view.replyContent.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
             }
         });
+    }
+
+    private void editMute(boolean isMute) {
+        if (isMute) {
+            view.inputLy.setVisibility(VISIBLE);
+            setSendButton(true);
+            view.touchSay.setVisibility(GONE);
+            view.root.setIntercept(true);
+            view.root.setAlpha(0.5f);
+            view.notice.setVisibility(VISIBLE);
+        } else {
+            view.root.setIntercept(false);
+            view.root.setAlpha(1f);
+            view.notice.setVisibility(GONE);
+        }
     }
 
     //设置扩展菜单隐藏

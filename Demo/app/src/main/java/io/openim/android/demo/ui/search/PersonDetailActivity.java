@@ -26,6 +26,7 @@ import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IMBack;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.GroupVM;
@@ -176,18 +177,6 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 vm.searchContent.getValue()));
         });
 
-
-        view.call.setOnClickListener(v -> {
-            if (null == callingService) return;
-            IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
-                List<String> ids = new ArrayList<>();
-                ids.add(vm.searchContent.getValue());
-                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1, true, ids,
-                    null);
-                callingService.call(signalingInfo);
-                return false;
-            });
-        });
     }
 
     @Override
@@ -244,7 +233,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                     isFriend = true;
                 } else {
                     view.userInfo.setVisibility(View.GONE);
-                    view.addFriend.setVisibility(View.VISIBLE);
+                    view.addFriend.setVisibility(oneself() ? View.GONE : View.VISIBLE);
                 }
             }
             if (!TextUtils.isEmpty(groupId)) {
@@ -255,7 +244,6 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             boolean allowSendMsgNotFriend = BaseApp.inst().loginCertificate.allowSendMsgNotFriend;
             view.sendMsg.setVisibility(isFriend || allowSendMsgNotFriend ? View.VISIBLE :
                 View.GONE);
-            view.call.setVisibility(isFriend || allowSendMsgNotFriend ? View.VISIBLE : View.GONE);
         });
         vm.userInfo.observe(this, v -> {
             if (null != v && !v.isEmpty()) {
@@ -268,7 +256,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 }
                 view.nickName.setText(nickName);
                 view.userId.setText(userInfo.getUserID());
-                view.avatar.load(userInfo.getFaceURL());
+                view.avatar.load(userInfo.getFaceURL(),userInfo.getNickname());
                 view.bottomMenu.setVisibility(oneself() ? View.GONE : View.VISIBLE);
             }
         });

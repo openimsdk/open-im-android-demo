@@ -12,7 +12,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
 
+import com.hbb20.CountryCodePicker;
+
 import java.io.IOException;
+import java.util.Locale;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityRegisterBinding;
@@ -20,6 +23,7 @@ import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
 import okhttp3.ResponseBody;
 
@@ -47,17 +51,19 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
         view.clear.setOnClickListener(v -> view.edt1.setText(""));
 
         view.submit.setOnClickListener(v -> {
-//            startActivity(new Intent(this,ResetPasswordActivity.class));
+            vm.areaCode.setValue("+"+view.countryCode.getSelectedCountryCode());
             vm.getVerificationCode(vm.isFindPassword?2:1);
         });
     }
 
     private void initView() {
-        view.tips.setText(vm.isPhone.getValue() ? getString(R.string.phone_register) : getString(R.string.mail_register));
-        view.edt1.setHint(vm.isPhone.getValue() ? getString(R.string.input_phone) : getString(R.string.input_mail));
+        view.countryCode.changeDefaultLanguage(LoginActivity.buildDefaultLanguage());
+
+        view.tips.setText(vm.isPhone.getValue() ? getString(io.openim.android.ouicore.R.string.phone_register) : getString(io.openim.android.ouicore.R.string.mail_register));
+        view.edt1.setHint(vm.isPhone.getValue() ? getString(io.openim.android.ouicore.R.string.input_phone) : getString(io.openim.android.ouicore.R.string.input_mail));
         if (vm.isFindPassword){
-            view.tips.setText(R.string.phone_num);
-            view.title.setText(R.string.forgot_password);
+            view.tips.setText(io.openim.android.ouicore.R.string.phone_num);
+            view.title.setText(io.openim.android.ouicore.R.string.forgot_password);
             view.protocolLy.setVisibility(View.GONE);
             view.submit.setText(io.openim.android.ouicore.R.string.get_vc);
             view.protocol.setChecked(true);
@@ -66,7 +72,7 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
 
     private void submitEnabled() {
         id = view.edt1.getText().toString();
-        view.submit.setEnabled(!id.isEmpty() && view.protocol.isChecked());
+        view.submit.setEnabled(!id.isEmpty());
     }
 
     public void back(View view) {
@@ -85,7 +91,7 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
 
     @Override
     public void succ(Object o) {
-        Toast.makeText(this, R.string.send_succ, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, io.openim.android.ouicore.R.string.send_succ, Toast.LENGTH_SHORT).show();
         startActivity(new Intent(this, VerificationCodeActivity.class));
     }
 

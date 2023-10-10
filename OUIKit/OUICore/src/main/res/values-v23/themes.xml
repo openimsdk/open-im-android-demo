@@ -23,5 +23,16 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
+    <!--activity 淡入淡出-->
+    <style name="AnimFadeActivity" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowAnimationStyle">@style/anim_fade</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 
+    <style name="anim_fade" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/anim_fade_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/anim_fade_out</item>
+        <item name="android:activityCloseEnterAnimation">@anim/anim_fade_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/anim_fade_out</item>
+    </style>
 </resources>

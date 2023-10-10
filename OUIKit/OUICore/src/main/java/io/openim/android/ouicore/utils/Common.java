@@ -27,7 +27,10 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.yanzhenjie.permission.AndPermission;
@@ -43,9 +46,12 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.widget.WebViewActivity;
@@ -62,6 +68,53 @@ public class Common {
     public final static Handler UIHandler = new Handler(Looper.getMainLooper());
 
 
+
+    //目标项是否在最后一个可见项之后
+    public static  boolean mShouldScroll;
+    //记录目标项位置
+    public  static int mToPosition;
+    /**
+     * 滑动到指定位置
+     */
+    public static  void smoothMoveToPosition(RecyclerView mRecyclerView,  int position) {
+        // 第一个可见位置
+        int firstItem = mRecyclerView.getChildLayoutPosition(mRecyclerView.getChildAt(0));
+        // 最后一个可见位置
+        int lastItem =
+            mRecyclerView.getChildLayoutPosition(mRecyclerView.getChildAt(mRecyclerView.getChildCount() - 1));
+        if (position < firstItem) {
+            // 第一种可能:跳转位置在第一个可见位置之前，使用smoothScrollToPosition
+            mRecyclerView.smoothScrollToPosition(position);
+        } else if (position <= lastItem) {
+            // 第二种可能:跳转位置在第一个可见位置之后，最后一个可见项之前
+            int movePosition = position - firstItem;
+            if (movePosition >= 0 && movePosition < mRecyclerView.getChildCount()) {
+                int top = mRecyclerView.getChildAt(movePosition).getTop();
+                // smoothScrollToPosition 不会有效果，此时调用smoothScrollBy来滑动到指定位置
+                mRecyclerView.smoothScrollBy(0, top);
+            }
+        } else {
+            // 第三种可能:跳转位置在最后可见项之后，则先调用smoothScrollToPosition将要跳转的位置滚动到可见位置
+            // 再通过onScrollStateChanged控制再次调用smoothMoveToPosition，执行上一个判断中的方法
+            mRecyclerView.smoothScrollToPosition(position);
+            mToPosition = position;
+            mShouldScroll = true;
+        }
+    }
+
+
+
+    /**
+     *  finish routes
+     * @param routes
+     */
+    public static  void finishRoute(String... routes) {
+        for (String route : routes) {
+            Postcard postcard = ARouter.getInstance().build(route);
+            LogisticsCenter.completion(postcard);
+            ActivityManager.finishActivity(postcard.getDestination());
+        }
+    }
     public static void stringBindForegroundColorSpan(TextView textView, String data,
                                                      String target) {
         stringBindForegroundColorSpan(textView, data, target, R.color.theme);
@@ -96,11 +149,10 @@ public class Common {
             PackageManager pm = context.getPackageManager();
             PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
             versionName = pi.versionName;
-            if (versionName == null || versionName.length() <= 0) {
+            if (TextUtils.isEmpty(versionName)) {
                 return "";
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception ignored) {}
         return versionName;
     }
 
@@ -133,6 +185,7 @@ public class Common {
         float scale = BaseApp.inst().getResources().getDisplayMetrics().density;
         return (int) (px / scale + 0.5f);
     }
+
     //收起键盘
     public static void hideKeyboard(Context context, View v) {
         InputMethodManager imm =
@@ -148,9 +201,11 @@ public class Common {
             (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
     }
+
     //软键盘是否弹出
-    public static boolean isShowKeyboard(Context context){
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+    public static boolean isShowKeyboard(Context context) {
+        InputMethodManager imm =
+            (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         //获取状态信息
         return imm.isActive();//true 打开
     }
@@ -173,12 +228,7 @@ public class Common {
      */
     public static void setFullScreen(Activity activity) {
         View decorView = activity.getWindow().getDecorView();
-        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_FULLSCREEN
-            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
     }
 
@@ -235,17 +285,16 @@ public class Common {
 
     public static void permission(Context context, OnGrantedListener onGrantedListener,
                                   boolean hasPermission, String... permissions) {
-        if (hasPermission)
-            onGrantedListener.onGranted();
+        if (hasPermission) onGrantedListener.onGranted();
         else {
             AndPermission.with(context).runtime()
                 .permission(permissions)
                 .onGranted(permission -> {
-                    // Storage permission are allowed.
-                    onGrantedListener.onGranted();
-                }).onDenied(permission -> {
-                    // Storage permission are not allowed.
-                }).start();
+                // Storage permission are allowed.
+                onGrantedListener.onGranted();
+            }).onDenied(permission -> {
+                // Storage permission are not allowed.
+            }).start();
         }
     }
 
@@ -296,42 +345,6 @@ public class Common {
         });
     }
 
-
-    /**
-     * 加载图片
-     * 判断本地是否存在 本地存在直接加载 不存在加载网络
-     *
-     * @return
-     */
-    public static void loadPicture(ImageView iv, PictureElem elem) {
-        String url = elem.getSourcePicture().getUrl();
-        try {
-            String filePath = elem.getSourcePath();
-            if (new File(filePath).exists()) url = filePath;
-        } catch (Exception ignore) {
-        }
-        Glide.with(iv.getContext()).load(url).placeholder(R.mipmap.ic_chat_photo).centerInside().into(iv);
-    }
-
-    /**
-     * 加载视频缩略图
-     * 判断本地是否存在 本地存在直接加载 不存在加载网络
-     *
-     * @return
-     */
-    public static void loadVideoSnapshot(ImageView iv, VideoElem elem) {
-        //本地
-        String path = elem.getSnapshotPath();
-        if (!GetFilePathFromUri.fileIsExists(path)) {
-            //远程
-            path = elem.getSnapshotUrl();
-        }
-        Glide.with(iv.getContext()).load(path)
-            .placeholder(R.mipmap.ic_chat_photo)
-            .error(R.mipmap.ic_chat_photo)
-            .into(iv);
-    }
-
     /**
      * 地图导航
      *
@@ -340,8 +353,10 @@ public class Common {
      */
     public static void toMap(Message message, View v) {
         v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class)
-            .putExtra(WebViewActivity.LOAD_URL,
-                "https://apis.map.qq.com/uri/v1/geocoder?coord=" + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey));
+            .putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord="
+                + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude()
+                + "&referer=" + WebViewActivity.mapAppKey)
+            .putExtra(WebViewActivity.TITLE,v.getContext().getString(R.string.location)));
     }
 
     /***
@@ -400,23 +415,30 @@ public class Common {
      * @param target      目标view
      * @param badgeNumber 数
      */
-    public static void buildBadgeView(Context context, View target,
-                                      int badgeNumber) {
+    public static void buildBadgeView(Context context, View target, int badgeNumber) {
         QBadgeView badgeView = (QBadgeView) target.getTag();
         if (null != badgeView) {
             badgeView.setBadgeNumber(badgeNumber);
             return;
         }
-        target.setTag(new QBadgeView(context).bindTarget(target)
-            .setGravityOffset(10, -2,
-                true)
-            .setBadgeNumber(badgeNumber)
-            .setBadgeTextSize(8, true)
-            .setShowShadow(false));
+        target.setTag(new QBadgeView(context).bindTarget(target).setGravityOffset(10, -2, true).setBadgeNumber(badgeNumber).setBadgeTextSize(8, true).setShowShadow(false));
+    }
+
+    public static String containsLink(String text) {
+        StringBuilder links=new StringBuilder();
+        // 正则表达式模式匹配URL链接
+        String pattern = "(http|https)://[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3}(/\\S*)?";
+        Pattern regex = Pattern.compile(pattern);
+        Matcher matcher = regex.matcher(text);
+        while (matcher.find()) {
+            links.append(matcher.group());
+        }
+        return links.toString();
     }
 
     /**
      * (x,y)是否在view的区域内
+     *
      * @param view
      * @param x
      * @param y
@@ -433,11 +455,12 @@ public class Common {
         int right = left + view.getMeasuredWidth();
         int bottom = top + view.getMeasuredHeight();
         //view.isClickable() &&
-        if (y >= top && y <= bottom && x >= left
-            && x <= right) {
+        if (y >= top && y <= bottom && x >= left && x <= right) {
             return true;
         }
         return false;
     }
+
+
 }
 

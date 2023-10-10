@@ -84,12 +84,12 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
                     }
                 }, null, putArgs);
             });
-
             albumDialog.show();
         });
         view.nickNameLy.setOnClickListener(v ->
             nicknameLauncher.launch(new Intent(this, EditTextActivity.class)
                 .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.val().getNickname())
+                .putExtra(EditTextActivity.MAX_LENGTH, 16)
                 .putExtra(EditTextActivity.TITLE,
                     getString(io.openim.android.ouicore.R.string.NickName))));
         view.genderLy.setOnClickListener(v -> {
@@ -109,12 +109,8 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
             });
         });
         view.birthdayLy.setOnClickListener(v -> {
-            TimePickerView pvTime = new TimePickerBuilder(this, new OnTimeSelectListener() {
-                @Override
-                public void onTimeSelect(Date date, View v) {
-                    vm.setBirthday(date.getTime() / 1000);
-                }
-            }).build();
+            TimePickerView pvTime = new TimePickerBuilder(this,
+                (date, v12) -> vm.setBirthday(date.getTime())).build();
             pvTime.show(v);
 
         });
@@ -122,7 +118,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
             emailLauncher.launch(new Intent(this, EditTextActivity.class)
                 .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.val().getEmail())
                 .putExtra(EditTextActivity.TITLE,
-                    getString(R.string.mail)));
+                    getString(io.openim.android.ouicore.R.string.mail)));
         });
     }
 
@@ -147,7 +143,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
             view.gender.setText(v.getGender() == 1 ? io.openim.android.ouicore.R.string.male :
                 io.openim.android.ouicore.R.string.girl);
             if (v.getBirth() > 0) {
-                view.birthday.setText(TimeUtil.getTime(v.getBirth() * 1000,
+                view.birthday.setText(TimeUtil.getTime(v.getBirth(),
                     TimeUtil.yearMonthDayFormat));
             }
             view.phoneNumTv.setText(v.getPhoneNumber());

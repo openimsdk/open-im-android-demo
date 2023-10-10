@@ -70,6 +70,9 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/txt_black"
                         android:textSize="@dimen/main_body"
+                        android:maxWidth="170dp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         android:textStyle="bold"
                         android:visibility="visible" />
 
@@ -121,6 +124,7 @@
                     android:layout_centerInParent="true"
                     android:layout_marginRight="18dp"
                     android:layout_toStartOf="@id/more"
+                    android:visibility="invisible"
                     android:src="@mipmap/ic_phone" />
 
                 <ImageView

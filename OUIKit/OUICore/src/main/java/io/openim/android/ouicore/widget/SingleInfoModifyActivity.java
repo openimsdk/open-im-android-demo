@@ -26,7 +26,11 @@ public class SingleInfoModifyActivity extends BaseActivity<BaseViewModel, Activi
         view.description.setText(singleInfoModifyData.description);
         view.avatar.load(singleInfoModifyData.avatarUrl);
         view.editText.setText(singleInfoModifyData.editT);
-        view.editText.post(() -> view.editText.requestFocus());
+        view.editText.post(() -> {
+            view.editText.requestFocus();
+            view.editText.setSelection(view.editText
+                .getText().length());
+        });
     }
 
     public void complete(View v) {

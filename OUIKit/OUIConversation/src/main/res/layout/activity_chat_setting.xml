@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fitsSystemWindows="true"
+    >
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#F6F6F6FF"
@@ -87,7 +93,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="查找聊天记录"
+                android:text="@string/view_chat_history"
                 android:textColor="#ff333333"
                 android:textSize="16sp" />
 
@@ -240,7 +246,6 @@
         <include layout="@layout/view_dividing_line" />
 
         <LinearLayout
-            android:id="@+id/letbe"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@color/white"
@@ -261,70 +266,70 @@
                 android:layout_width="38dp"
                 android:layout_height="23dp" />
         </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:orientation="vertical"
-        android:layout_marginBottom="12dp"
-        android:background="@drawable/sty_radius_6_white"
-        android:gravity="center_vertical"
-        android:paddingLeft="22dp"
-        android:paddingRight="22dp">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            >
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/read_vanish"
-                android:textColor="#ff333333"
-                android:textSize="16sp" />
-
-            <io.openim.android.ouicore.widget.SlideButton
-                android:id="@+id/readVanish"
-                android:layout_width="38dp"
-                android:layout_height="23dp" />
-        </LinearLayout>
-
 
         <LinearLayout
-            android:visibility="gone"
-            android:id="@+id/readVanishTime"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/sty_radius_6_white"
             android:gravity="center_vertical"
-            >
+            android:orientation="vertical"
+            android:animateLayoutChanges="true"
+            android:paddingLeft="22dp"
+            android:paddingRight="22dp">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/time_set"
-                android:textColor="#ff333333"
-                android:textSize="16sp" />
-            <TextView
-                android:id="@+id/readVanishNum"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:textColor="#ff333333"
-                android:textSize="16sp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@mipmap/ic_right" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/read_vanish"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
+
+                <io.openim.android.ouicore.widget.SlideButton
+                    android:id="@+id/readVanish"
+                    android:layout_width="38dp"
+                    android:layout_height="23dp" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/readVanishTime"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/time_set"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/readVanishNum"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/ic_right" />
+            </LinearLayout>
+
+
         </LinearLayout>
-
-
-    </LinearLayout>
-
 
 
         <LinearLayout
@@ -333,6 +338,7 @@
             android:layout_height="50dp"
             android:background="@color/white"
             android:gravity="center_vertical"
+            android:layout_marginTop="10dp"
             android:paddingLeft="22dp"
             android:paddingRight="22dp">
 
@@ -340,7 +346,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="设置聊天背景"
+                android:text="@string/setting_chat_bg"
                 android:textColor="#ff333333"
                 android:textSize="16sp" />
 
@@ -375,5 +381,7 @@
         </LinearLayout>
 
     </LinearLayout>
+</FrameLayout>
+
 </layout>
 

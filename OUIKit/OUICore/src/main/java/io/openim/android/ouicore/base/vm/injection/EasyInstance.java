@@ -30,7 +30,7 @@ class EasyInstance {
         } else if (!_single.containsKey(key)) {
             _single.put(key, new _InstanceInfo<>(dependency));
         }
-        L.d(TAG, "Instance " + dependency + "put");
+        L.d(TAG, "Instance " + dependency + " put");
         return find(dependency.getClass(), tag);
     }
 

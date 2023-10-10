@@ -28,8 +28,8 @@ import io.openim.android.ouicore.widget.WaitDialog;
 public class ServerConfigActivity extends BaseActivity<BaseViewModel, ActivityServerConfigBinding> {
 
     private final ServerConfigVM serverConfigVM = new ServerConfigVM();
-    private boolean isIP;
-
+    private boolean isIP = Constant.getIsIp();
+    private boolean isFirst = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,22 +38,29 @@ public class ServerConfigActivity extends BaseActivity<BaseViewModel, ActivitySe
         sink();
         view.setServerConfigVM(serverConfigVM);
         view.restart.setOnClickListener(v -> {
+            if (!serverConfigVM.HEAD.getValue().equals(Constant.getHost()))
+                SharedPreferencesUtil.get(BaseApp.inst()).setCache("DEFAULT_IP",
+                    serverConfigVM.HEAD.getValue());
+
             if (!serverConfigVM.IM_API_URL.getValue().equals(Constant.getImApiUrl()))
-                SharedPreferencesUtil.get(BaseApp.inst()).setCache("IM_API_URL", serverConfigVM.IM_API_URL.getValue());
-            if (!serverConfigVM.APP_AUTH_URL.getValue().equals(Constant.getAppAuthUrl()))
-            {
-                String appAuthUrl=serverConfigVM.APP_AUTH_URL.getValue();
-                if (!appAuthUrl.endsWith("/")){
-                    appAuthUrl+="/";
+                SharedPreferencesUtil.get(BaseApp.inst()).setCache("IM_API_URL",
+                    serverConfigVM.IM_API_URL.getValue());
+
+            if (!serverConfigVM.APP_AUTH_URL.getValue().equals(Constant.getAppAuthUrl())) {
+                String appAuthUrl = serverConfigVM.APP_AUTH_URL.getValue();
+                if (!appAuthUrl.endsWith("/")) {
+                    appAuthUrl += "/";
                 }
                 SharedPreferencesUtil.get(BaseApp.inst()).setCache("APP_AUTH_URL", appAuthUrl);
             }
             if (!serverConfigVM.IM_WS_URL.getValue().equals(Constant.getImWsUrl()))
-                SharedPreferencesUtil.get(BaseApp.inst()).setCache("IM_WS_URL", serverConfigVM.IM_WS_URL.getValue());
+                SharedPreferencesUtil.get(BaseApp.inst()).setCache("IM_WS_URL",
+                    serverConfigVM.IM_WS_URL.getValue());
             if (!serverConfigVM.STORAGE_TYPE.getValue().equals(Constant.getStorageType()))
-                SharedPreferencesUtil.get(BaseApp.inst()).setCache("STORAGE_TYPE", serverConfigVM.STORAGE_TYPE.getValue());
+                SharedPreferencesUtil.get(BaseApp.inst()).setCache("STORAGE_TYPE",
+                    serverConfigVM.STORAGE_TYPE.getValue());
 
-            WaitDialog waitDialog=new WaitDialog(this);
+            WaitDialog waitDialog = new WaitDialog(this);
             waitDialog.setNotDismiss();
             waitDialog.show();
             Common.UIHandler.postDelayed(this::restart, 1000);
@@ -62,19 +69,26 @@ public class ServerConfigActivity extends BaseActivity<BaseViewModel, ActivitySe
         view.swDomain.setOnClickListener(v -> {
             isIP = false;
             view.head.setText("域名");
-            serverConfigVM.HEAD.setValue("web.rentsoft.cn");
+            SharedPreferencesUtil.get(BaseApp.inst()).setCache("IS_IP", isIP);
+            serverConfigVM.HEAD.setValue(Constant.DEFAULT_HOST);
         });
         view.swIP.setOnClickListener(v -> {
             isIP = true;
             view.head.setText("IP");
-            serverConfigVM.HEAD.setValue("121.37.25.71");
+            SharedPreferencesUtil.get(BaseApp.inst()).setCache("IS_IP", isIP);
+            serverConfigVM.HEAD.setValue(Constant.DEFAULT_HOST);
         });
+
         serverConfigVM.HEAD.observe(this, s -> {
-            if (isIP)
+            if (isFirst) {
+                isFirst = false;
+                return;
+            }
+            if (isIP) {
                 setAddress("http://" + s + ":10002",
                     "http://" + s + ":10008/",
                     "ws://" + s + ":10001");
-            else {
+            } else {
                 setAddress(
                     "https://" + s + "/api",
                     "https://" + s + "/chat/",
@@ -97,10 +111,12 @@ public class ServerConfigActivity extends BaseActivity<BaseViewModel, ActivitySe
     }
 
     public static class ServerConfigVM {
-        public MutableLiveData<String> HEAD = new MutableLiveData<>(Constant.DEFAULT_IP);
+        public MutableLiveData<String> HEAD = new MutableLiveData<>(Constant.getHost());
         public MutableLiveData<String> IM_API_URL = new MutableLiveData<>(Constant.getImApiUrl());
-        public MutableLiveData<String> APP_AUTH_URL = new MutableLiveData<>(Constant.getAppAuthUrl());
+        public MutableLiveData<String> APP_AUTH_URL =
+            new MutableLiveData<>(Constant.getAppAuthUrl());
         public MutableLiveData<String> IM_WS_URL = new MutableLiveData<>(Constant.getImWsUrl());
-        public MutableLiveData<String> STORAGE_TYPE = new MutableLiveData<>(Constant.getStorageType());
+        public MutableLiveData<String> STORAGE_TYPE =
+            new MutableLiveData<>(Constant.getStorageType());
     }
 }

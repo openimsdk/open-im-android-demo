@@ -1,9 +1,7 @@
 package io.openim.android.demo;
 
-import android.content.Context;
 import android.content.Intent;
 
-import androidx.annotation.NonNull;
 import androidx.multidex.MultiDex;
 
 
@@ -28,6 +26,7 @@ import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.voice.SPlayer;
@@ -40,7 +39,6 @@ import okhttp3.Response;
 
 public class DemoApplication extends BaseApp {
     private static final String TAG = BaseApp.class.getSimpleName();
-    public Realm realm;
 
 
     @Override
@@ -133,9 +131,9 @@ public class DemoApplication extends BaseApp {
                 if (null != callingService)
                     callingService.stopAudioVideoService(BaseApp.inst());
 
-                BaseApp.inst().startActivity(new Intent(BaseApp.inst(), LoginActivity.class)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        | Intent.FLAG_ACTIVITY_NEW_TASK));
+                ActivityManager.finishAllExceptActivity();
+                startActivity(new Intent(BaseApp.inst(), LoginActivity.class)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             }
         });
     }

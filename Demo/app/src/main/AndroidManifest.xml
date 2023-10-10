@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="io.openim.android.demo">
     <!-- getui -->
     <queries>
@@ -11,13 +12,25 @@
     <application
         android:name=".DemoApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_splash"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
         android:networkSecurityConfig="@xml/network_security_config"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.Main"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:largeHeap="true"
+        android:hardwareAccelerated="false"
+        tools:targetApi="tiramisu"
+        >
+        <activity
+            android:name=".ui.user.ChangePasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.user.LanguageSettingActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.login.ResetPasswordActivity"
             android:exported="false">
@@ -100,7 +113,7 @@
         </activity>
         <activity
             android:name=".ui.main.MainActivity"
-            android:launchMode="singleTask"
+            android:theme="@style/NotAnimation"
             android:windowSoftInputMode="adjustResize" />
 
         <provider

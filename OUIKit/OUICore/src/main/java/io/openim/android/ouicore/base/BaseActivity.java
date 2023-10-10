@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,15 +28,18 @@ import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.util.List;
 
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
 
 
+@Deprecated
 public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> extends AppCompatActivity implements IView {
     //是否释放资源
     private boolean isRelease = true;
@@ -58,7 +62,23 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         setLightStatus();
     }
 
-    @SuppressLint("SourceLockedOrientationActivity")
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        //多语言适配
+        super.attachBaseContext(LanguageUtil.getNewLocalContext(newBase));
+    }
+    @Override
+    public void applyOverrideConfiguration(Configuration overrideConfiguration) {
+        // 兼容androidX在部分手机切换语言失败问题
+        if (overrideConfiguration != null) {
+            int uiMode = overrideConfiguration.uiMode;
+            overrideConfiguration.setTo(getBaseContext().getResources().getConfiguration());
+            overrideConfiguration.uiMode = uiMode;
+        }
+        super.applyOverrideConfiguration(overrideConfiguration);
+    }
+
+
     protected void requestedOrientation() {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
@@ -85,8 +105,8 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     @Deprecated
     protected void bindVM(Class<T> vm, boolean shareVM) {
         bindVM(vm);
-        if (shareVM && !BaseApp.viewModels.containsKey(vmCanonicalName)) {
-            BaseApp.viewModels.put(vmCanonicalName, this.vm);
+        if (shareVM) {
+            BaseApp.inst().putVM(this.vm);
         }
     }
 
@@ -122,22 +142,19 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     @Deprecated
     public void bindVMByCache(Class<T> vm) {
-        String key = vm.getCanonicalName();
-        if (BaseApp.viewModels.containsKey(key)) {
-            this.vm = (T) BaseApp.viewModels.get(key);
+        try {
+            this.vm=Easy.find(vm);
             isRelease = false;
             bind();
-        }
+        }catch (Exception ignore){}
     }
 
     @Deprecated
     public void removeCacheVM() {
-        String key = vm.getClass().getCanonicalName();
-        BaseViewModel viewModel = BaseApp.viewModels.get(key);
-        if (null != viewModel && viewModel == vm) {
-            vm.releaseRes();
+        if (null!=vm){
             vm.context.clear();
-            BaseApp.viewModels.remove(key);
+            vm.releaseRes();
+            BaseApp.inst().removeCacheVM(vm.getClass());
         }
     }
 
@@ -176,6 +193,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     @Override
     protected void onDestroy() {
+        fasterDestroy();
         ActivityManager.remove(this);
         N.clearDispose(this);
         releaseRes();
@@ -190,7 +208,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if (!touchClearFocus) return super.dispatchTouchEvent(ev);
         View v = getCurrentFocus();
-        if (v != null && v instanceof EditText) {
+        if (v instanceof EditText) {
             Rect outRect = new Rect();
             v.getGlobalVisibleRect(outRect);
             if (!outRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
@@ -236,6 +254,5 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     public void close() {
         finish();
     }
-
 
 }

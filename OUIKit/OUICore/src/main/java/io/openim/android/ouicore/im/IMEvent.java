@@ -3,6 +3,7 @@ package io.openim.android.ouicore.im;
 
 import android.content.res.AssetFileDescriptor;
 import android.os.Build;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -10,6 +11,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 import io.openim.android.ouicore.R;
@@ -26,8 +28,9 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
-import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConnListener;
 import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.listener.OnFriendshipListener;
@@ -49,11 +52,14 @@ import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
+import io.openim.android.sdk.models.UsersOnlineStatus;
 
 ///im事件 统一处理
 public class IMEvent {
+    private static final String TAG = "IMEvent";
     private static IMEvent listener = null;
     private List<OnConnListener> connListeners;
+    private List<OnUserListener> userListeners;
     private List<OnAdvanceMsgListener> advanceMsgListeners;
     private List<OnConversationListener> conversationListeners;
     private List<OnGroupListener> groupListeners;
@@ -61,6 +67,7 @@ public class IMEvent {
 
     public void init() {
         connListeners = new ArrayList<>();
+        userListeners = new ArrayList<>();
         advanceMsgListeners = new ArrayList<>();
         conversationListeners = new ArrayList<>();
         groupListeners = new ArrayList<>();
@@ -135,11 +142,12 @@ public class IMEvent {
 
     //连接事件
     public OnConnListener connListener = new OnConnListener() {
-        private UserLogic userLogic=Easy.find(UserLogic.class);
+        private UserLogic userLogic = Easy.find(UserLogic.class);
+
         @Override
         public void onConnectFailed(long code, String error) {
             // 连接服务器失败，可以提示用户当前网络连接不可用
-            L.d("连接服务器失败(" + error + ")");
+            L.d(TAG, "连接服务器失败(" + error + ")");
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnectFailed(code, error);
             }
@@ -148,7 +156,7 @@ public class IMEvent {
         @Override
         public void onConnectSuccess() {
             // 已经成功连接到服务器
-            L.d("已经成功连接到服务器");
+            L.d(TAG, "已经成功连接到服务器");
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnectSuccess();
             }
@@ -157,7 +165,7 @@ public class IMEvent {
         @Override
         public void onConnecting() {
             // 正在连接到服务器，适合在 UI 上展示“正在连接”状态。
-            L.d("正在连接到服务器...");
+            L.d(TAG, "正在连接到服务器...");
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onConnecting();
             }
@@ -166,7 +174,7 @@ public class IMEvent {
         @Override
         public void onKickedOffline() {
             // 当前用户被踢下线，此时可以 UI 提示用户“您已经在其他端登录了当前账号，是否重新登录？”
-            L.d("当前用户被踢下线");
+            L.d(TAG, "当前用户被踢下线");
             Toast.makeText(BaseApp.inst(),
                 BaseApp.inst().getString(io.openim.android.ouicore.R.string.kicked_offline_tips),
                 Toast.LENGTH_SHORT).show();
@@ -178,7 +186,7 @@ public class IMEvent {
         @Override
         public void onUserTokenExpired() {
             // 登录票据已经过期，请使用新签发的 UserSig 进行登录。
-            L.d("登录票据已经过期");
+            L.d(TAG, "登录票据已经过期");
             Toast.makeText(BaseApp.inst(),
                 BaseApp.inst().getString(io.openim.android.ouicore.R.string.token_expired),
                 Toast.LENGTH_SHORT).show();
@@ -226,7 +234,9 @@ public class IMEvent {
 
             @Override
             public void onGroupDismissed(GroupInfo info) {
-
+                for (OnGroupListener onGroupListener : groupListeners) {
+                    onGroupListener.onGroupDismissed(info);
+                }
             }
 
             @Override
@@ -248,11 +258,17 @@ public class IMEvent {
             @Override
             public void onGroupMemberDeleted(GroupMembersInfo info) {
                 // 组成员退出
+                for (OnGroupListener onGroupListener : groupListeners) {
+                    onGroupListener.onGroupMemberDeleted(info);
+                }
             }
 
             @Override
             public void onGroupMemberInfoChanged(GroupMembersInfo info) {
                 // 组成员信息发生变化
+                for (OnGroupListener onGroupListener : groupListeners) {
+                    onGroupListener.onGroupMemberInfoChanged(info);
+                }
             }
 
             @Override
@@ -279,9 +295,6 @@ public class IMEvent {
 
             @Override
             public void onConversationChanged(List<ConversationInfo> list) {
-                for (ConversationInfo conversationInfo : list) {
-                    promptSoundOrNotification(conversationInfo);
-                }
                 // 已添加的会话发生改变
                 for (OnConversationListener onConversationListener : conversationListeners) {
                     onConversationListener.onConversationChanged(list);
@@ -328,18 +341,36 @@ public class IMEvent {
         });
     }
 
-    private void promptSoundOrNotification(ConversationInfo conversationInfo) {
+    private void promptSoundOrNotification(Message msg) {
+        if (BaseApp.inst().loginCertificate.globalRecvMsgOpt == 2
+            || msg.getContentType() == MessageType.TYPING ||
+            Objects.equals(msg.getSendID(), BaseApp.inst().loginCertificate.userID)) return;
         try {
-            if (BaseApp.inst().loginCertificate.globalRecvMsgOpt == 2) return;
-            Message msg= GsonHel.fromJson(conversationInfo.getLatestMsg(),Message.class);
-            if (conversationInfo.getRecvMsgOpt() == 0
-                && conversationInfo.getUnreadCount() != 0) {
-                if (BaseApp.inst().isBackground())
-                    IMUtil.sendNotice(msg.getClientMsgID().hashCode());
-                else
-                    IMUtil.playPrompt();
-            }
-        } catch (Exception ignored) {
+            if (Easy.find(UserLogic.class).connectStatus.val()
+                == UserLogic.ConnectStatus.SYNCING) return;
+        } catch (Exception ignore) {
+        }
+
+        String sourceID = msg.getSessionType() == ConversationType.SINGLE_CHAT
+            ? msg.getSendID() : msg.getGroupID();
+
+        if (!TextUtils.isEmpty(sourceID)) {
+            OpenIMClient.getInstance().conversationManager.getOneConversation(new IMUtil.IMCallBack<ConversationInfo>() {
+                @Override
+                public void onSuccess(ConversationInfo data) {
+                    if (null == data) return;
+                    if (data.getRecvMsgOpt() == 0) {
+                        if (BaseApp.inst().isAppBackground.val())
+                            IMUtil.sendNotice(msg.getClientMsgID().hashCode());
+                        else {
+                            if (BaseApp.inst().loginCertificate.allowBeep)
+                                IMUtil.playPrompt();
+                            if (BaseApp.inst().loginCertificate.allowVibration)
+                                IMUtil.vibrate(200);
+                        }
+                    }
+                }
+            }, sourceID, msg.getSessionType());
         }
     }
 
@@ -410,6 +441,7 @@ public class IMEvent {
         OpenIMClient.getInstance().messageManager.setAdvancedMsgListener(new OnAdvanceMsgListener() {
             @Override
             public void onRecvNewMessage(Message msg) {
+                promptSoundOrNotification(msg);
                 // 收到新消息，界面添加新消息
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
                     onAdvanceMsgListener.onRecvNewMessage(msg);
@@ -473,11 +505,38 @@ public class IMEvent {
         });
     }
 
+    /**
+     * 用户状态变化
+     *
+     * @param onUserListener
+     */
+    public void removeUserListener(OnUserListener onUserListener) {
+        userListeners.remove(onUserListener);
+    }
+
+    public void addUserListener(OnUserListener onUserListener) {
+        if (!userListeners.contains(onUserListener)) userListeners.add(onUserListener);
+    }
 
     // 用户资料变更监听
     private void userListener() {
-        OpenIMClient.getInstance().userInfoManager.setOnUserListener(info -> {
-            // 当前登录用户资料变更回调
+        OpenIMClient.getInstance().userInfoManager.setOnUserListener(new OnUserListener() {
+            private final  UserLogic userLogic = Easy.find(UserLogic.class);
+            @Override
+            public void onSelfInfoUpdated(UserInfo info) {
+                userLogic.info.setValue(info);
+                // 当前登录用户资料变更回调
+                for (OnUserListener userListener : userListeners) {
+                    userListener.onSelfInfoUpdated(info);
+                }
+            }
+
+            @Override
+            public void onUserStatusChanged(UsersOnlineStatus onlineStatus) {
+                for (OnUserListener userListener : userListeners) {
+                    userListener.onUserStatusChanged(onlineStatus);
+                }
+            }
         });
     }
 }

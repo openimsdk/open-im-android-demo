@@ -1,21 +1,17 @@
 package io.openim.android.demo.ui.main;
 
 
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.fragment.app.FragmentTransaction;
 
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.hjq.window.EasyWindow;
@@ -31,7 +27,7 @@ import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.demo.vm.MainVM;
 import io.openim.android.ouicontact.ui.fragment.ContactFragment;
 import io.openim.android.ouicontact.vm.ContactVM;
-import io.openim.android.ouiconversation.ui.fragment.ContactListFragment;
+import io.openim.android.ouiconversation.ui.fragment.ConversationListFragment;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.im.IMUtil;
@@ -66,14 +62,27 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         view.men1.setChecked(true);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        try {
+            Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
+            LogisticsCenter.completion(postcard);
+            ActivityManager.finishActivity(postcard.getDestination());
+            EasyWindow.cancelAll();
+        } catch (Exception ignore) {
+        }
+    }
+
+
     private void init() {
         runOnUiThread(() -> {
             hasShoot = AndPermission.hasPermissions(MainActivity.this, Permission.CAMERA,
                 Permission.RECORD_AUDIO);
-            Common.permission(MainActivity.this, () -> {
-                hasShoot = true;
-                AndPermission.with(this).overlay().start();
-            }, hasShoot, Permission.CAMERA, Permission.RECORD_AUDIO);
+            AndPermission.with(this).overlay()
+                .onGranted(data -> Common.permission(MainActivity.this,
+                    () -> hasShoot = true, hasShoot,
+                    Permission.CAMERA, Permission.RECORD_AUDIO)).start();
         });
     }
 
@@ -94,11 +103,15 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
                 View.VISIBLE : View.GONE);
         });
     }
+
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             RadioButton[] menus = new RadioButton[]{view.men1, view.men2, view.men3, view.men4};
-            if (v == view.men1) switchFragment(conversationListFragment);
+            if (v == view.men1){
+                switchFragment(conversationListFragment);
+                ((ConversationListFragment)conversationListFragment).clickSlideSet();
+            }
             if (v == view.men2) switchFragment(contactFragment);
             if (v == view.men3) switchFragment(appletFragment);
             if (v == view.men4) switchFragment(personalFragment);
@@ -138,7 +151,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         contactFragment =
             (ContactFragment) ARouter.getInstance().build(Routes.Contact.HOME).navigation();
         conversationListFragment =
-            (ContactListFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
+            (ConversationListFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
         personalFragment = PersonalFragment.newInstance();
 
         appletFragment =
@@ -158,7 +171,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
             switchFragment(contactFragment);
         }
         if (null != conversationListFragment) {
-            ((ContactListFragment) conversationListFragment).setResultLauncher(resultLauncher);
+            ((ConversationListFragment) conversationListFragment).setResultLauncher(resultLauncher);
             conversationListFragment.setPage(1);
             switchFragment(conversationListFragment);
         }

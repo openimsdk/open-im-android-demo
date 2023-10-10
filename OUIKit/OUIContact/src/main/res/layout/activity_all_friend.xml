@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context=".ui.AllFriendActivity">
+
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="@dimen/comm_title_high"
@@ -33,6 +34,7 @@
 
 
         </androidx.cardview.widget.CardView>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,21 +59,13 @@
             android:layout_weight="1">
 
 
-            <com.yanzhenjie.recyclerview.widget.StickyNestedScrollView
-                android:id="@+id/scroll_view"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:overScrollMode="never"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+                android:background="@color/white"
+                android:overScrollMode="never" />
 
-                <com.yanzhenjie.recyclerview.SwipeRecyclerView
-                    android:id="@+id/recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:overScrollMode="never" />
-
-            </com.yanzhenjie.recyclerview.widget.StickyNestedScrollView>
 
             <com.mao.sortletterlib.SortLetterView
                 android:id="@+id/sort_view"
@@ -88,7 +82,10 @@
                 app:selectLetterColor="@color/white"
                 app:selectbigtTextColor="#000093" />
         </RelativeLayout>
-
+        <include
+            android:id="@+id/bottom"
+            android:visibility="gone"
+            layout="@layout/layout_selected_friends"/>
     </LinearLayout>
 </layout>
 

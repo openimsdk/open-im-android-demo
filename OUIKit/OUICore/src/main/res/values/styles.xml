@@ -1,5 +1,4 @@
 <resources>
-
     <style name="dialog_tran" parent="android:style/Theme.Dialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>
@@ -50,15 +49,15 @@
     </style>
 
 
-<!--    <style name="ThemeWithoutAnim" parent="Theme.AppCompat.Light.NoActionBar.FullScreen">-->
-<!--        <item name="android:windowAnimationStyle">@style/Animation</item>-->
-<!--        <item name="android:windowBackground">@android:color/transparent</item>-->
-<!--    </style>-->
+    <style name="ThemeWithoutAnim" parent="Theme.AppCompat.Light.NoActionBar.FullScreen">
+        <item name="android:windowAnimationStyle">@style/Animation2</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
 
-<!--    <style name="Animation">-->
-<!--        <item name="android:windowEnterAnimation">@null</item>-->
-<!--        <item name="android:windowExitAnimation">@null</item>-->
-<!--    </style>-->
+    <style name="Animation2">
+        <item name="android:windowEnterAnimation">@null</item>
+        <item name="android:windowExitAnimation">@null</item>
+    </style>
 
     <style name="backgroundTransparent" parent="@style/Theme.AppCompat.Light">
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -76,6 +75,7 @@
     <style name="NotAnimation" parent="Theme.Main">
         <item name="android:windowAnimationStyle">@style/Animation</item>
     </style>
+
     <style name="Animation">
         <item name="android:activityOpenEnterAnimation">@null</item>
         <item name="android:activityOpenExitAnimation">@null</item>

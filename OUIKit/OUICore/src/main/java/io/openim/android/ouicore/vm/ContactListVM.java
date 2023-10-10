@@ -96,25 +96,25 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         }, cid, isChecked);
     }
 
-    /**
-     * 更新常联系
-     *
-     * @param data
-     */
-    private void updateFrequentContacts(List<ConversationInfo> data) {
-        List<UserInfo> uList = new ArrayList<>();
-        for (ConversationInfo datum : data) {
-            if (datum.getConversationType() == ConversationType.SINGLE_CHAT) {
-                UserInfo u = new UserInfo();
-                u.setUserID(datum.getUserID());
-                u.setNickname(datum.getShowName());
-                u.setFaceURL(datum.getFaceURL());
-                uList.add(u);
-            }
-        }
-        if (uList.isEmpty()) return;
-        frequentContacts.setValue(uList.size() > 15 ? uList.subList(0, 15) : uList);
-    }
+//    /**
+//     * 更新常联系
+//     *
+//     * @param data
+//     */
+//    private void updateFrequentContacts(List<ConversationInfo> data) {
+//        List<UserInfo> uList = new ArrayList<>();
+//        for (ConversationInfo datum : data) {
+//            if (datum.getConversationType() == ConversationType.SINGLE_CHAT) {
+//                UserInfo u = new UserInfo();
+//                u.setUserID(datum.getUserID());
+//                u.setNickname(datum.getShowName());
+//                u.setFaceURL(datum.getFaceURL());
+//                uList.add(u);
+//            }
+//        }
+//        if (uList.isEmpty()) return;
+//        frequentContacts.setValue(uList.size() > 15 ? uList.subList(0, 15) : uList);
+//    }
 
 //    @RequiresApi(api = Build.VERSION_CODES.N)
 //    private void insertDBContact(List<ConversationInfo> data) {
@@ -152,18 +152,6 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
     @Override
     public void onConversationChanged(List<ConversationInfo> list) {
         updateConversation();
-//        for (ConversationInfo info : list) {
-//            Message message=GsonHel.fromJson(info.getLatestMsg(),
-//                Message.class);
-//            MsgConversation msgConversation =
-//                new MsgConversation(message, info);
-//            int index = conversations.val()
-//                .indexOf(msgConversation);
-//            if (index != -1) {
-//                conversations.val().set(index, msgConversation);
-//                subject(NOTIFY_ITEM_CHANGED, index);
-//            }
-//        }
     }
 
 
@@ -259,6 +247,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         OpenIMClient.getInstance().conversationManager.pinConversation(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
+                toast(error+"("+code+")");
             }
 
             @Override

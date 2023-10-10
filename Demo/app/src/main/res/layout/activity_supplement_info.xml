@@ -13,8 +13,19 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/splash_shape_gradient"
         android:orientation="vertical"
         tools:context=".ui.login.SupplementInfoActivity">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="28dp"
+            android:layout_marginTop="20dp"
+            android:onClick="toBack"
+            android:padding="5dp"
+            android:src="@mipmap/ic_back2" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,13 +35,36 @@
             android:paddingTop="48dp"
             android:paddingRight="32dp">
 
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/welcome"
-                android:textColor="#ff333333"
-                android:textSize="26sp"
+                android:text="@string/setting_info"
+                android:textColor="@color/theme"
+                android:textSize="22sp"
                 android:textStyle="bold" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="20dp"
+                android:text="@string/nickname"
+                android:textColor="#ff000000"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/nickName"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@drawable/sty_radius_6_tr_stroke_e6e6e6"
+                android:hint="@string/input_nick_name"
+                android:paddingLeft="10dp"
+                android:text="@={LoginVM.nickName}"
+                android:textColor="#ff333333"
+                android:maxLength="16"
+                android:textSize="18sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -45,9 +79,10 @@
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
-                android:background="@android:color/transparent"
-                android:hint="@string/login_tips"
+                android:background="@drawable/sty_radius_6_tr_stroke_e6e6e6"
+                android:hint="@string/password_valid_tips"
                 android:inputType="textPassword"
+                android:paddingLeft="10dp"
                 android:text="@={LoginVM.pwd}"
                 android:textColor="#ff333333"
                 android:textSize="18sp" />
@@ -57,17 +92,18 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
                 android:layout_marginBottom="20dp"
-                android:text="@string/name"
+                android:text="@string/sure_password2"
                 android:textColor="#ff000000"
                 android:textSize="14sp" />
 
             <EditText
-                android:id="@+id/nickName"
+                android:id="@+id/surePassword"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
-                android:background="@android:color/transparent"
-                android:hint="@string/input_name"
-                android:text="@={LoginVM.nickName}"
+                android:background="@drawable/sty_radius_6_tr_stroke_e6e6e6"
+                android:hint="@string/sure_password_tips"
+                android:inputType="textPassword"
+                android:paddingLeft="10dp"
                 android:textColor="#ff333333"
                 android:textSize="18sp" />
 
@@ -79,11 +115,11 @@
             android:layout_weight="1" />
 
         <Button
+            android:id="@+id/submit"
             android:layout_width="match_parent"
             android:layout_height="@dimen/button_height"
             android:layout_marginLeft="32dp"
             android:layout_marginRight="32dp"
-            android:enabled="@{LoginVM.nickName.length()!=0 &amp;&amp; LoginVM.pwd.length()>=6}"
             android:onClick="@{(v)->LoginVM.register()}"
             android:text="@string/join_im"
             android:textColor="#ffffffff"

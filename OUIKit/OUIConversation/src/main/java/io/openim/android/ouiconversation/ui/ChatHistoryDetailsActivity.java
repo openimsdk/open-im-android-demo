@@ -1,38 +1,31 @@
 package io.openim.android.ouiconversation.ui;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.ActivityChatHistoryDetailsBinding;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.sdk.enums.MessageType;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.Message;
 
 public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, ActivityChatHistoryDetailsBinding> {
@@ -64,6 +57,8 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, Acti
 
                 holder.viewBinding.getRoot().setOnClickListener(v -> {
                     String url;
+                    PreviewMediaVM previewMediaVM;
+                    PreviewMediaVM.MediaData mediaData;
                     switch (data.getContentType()) {
                         case MessageType.MERGER:
                             startActivity(new Intent(ChatHistoryDetailsActivity.this,
@@ -72,17 +67,23 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, Acti
                             break;
                         case MessageType.PICTURE:
                             url = data.getPictureElem().getSourcePicture().getUrl();
+                            previewMediaVM = Easy.installVM(PreviewMediaVM.class);
+                            mediaData =new PreviewMediaVM.MediaData(url);
+                            mediaData.thumbnail= data.getPictureElem().getSnapshotPicture().getUrl();
+                            previewMediaVM.previewSingle(mediaData);
                             startActivity(
                                 new Intent(v.getContext(),
-                                    PreviewActivity.class).putExtra(PreviewActivity.MEDIA_URL, url));
+                                    PreviewMediaActivity.class));
                             break;
                         case MessageType.VIDEO:
                             String snapshotUrl = data.getVideoElem().getSnapshotUrl();
                             url = data.getVideoElem().getVideoUrl();
+                            previewMediaVM = Easy.installVM(PreviewMediaVM.class);
+                            mediaData =new PreviewMediaVM.MediaData(url);
+                            mediaData.thumbnail= snapshotUrl;
+                            previewMediaVM.previewSingle(mediaData);
                             v.getContext().startActivity(
-                                new Intent(v.getContext(), PreviewActivity.class)
-                                    .putExtra(PreviewActivity.MEDIA_URL, url)
-                                    .putExtra(PreviewActivity.FIRST_FRAME, snapshotUrl));
+                                new Intent(v.getContext(), PreviewMediaActivity.class));
                             break;
                         case MessageType.CARD:
                             ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)

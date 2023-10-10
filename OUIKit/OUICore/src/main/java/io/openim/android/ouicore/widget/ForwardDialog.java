@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.alibaba.android.arouter.core.LogisticsCenter;
@@ -29,12 +28,12 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ForwardVM;
-import io.openim.android.ouicore.vm.MultipleChoiceVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 
 public class ForwardDialog extends BaseDialog {
 
     @NotNull("choiceVM cannot be empty")
-    private MultipleChoiceVM choiceVM = Easy.find(MultipleChoiceVM.class);
+    private SelectTargetVM choiceVM = Easy.find(SelectTargetVM.class);
     @NotNull("forwardVM cannot be empty")
     private ForwardVM forwardVM = Easy.find(ForwardVM.class);
 
@@ -46,7 +45,7 @@ public class ForwardDialog extends BaseDialog {
 
 
     private void initView() {
-        DialogForwardBinding view = DialogForwardBinding.inflate(getLayoutInflater(),null, false);
+        DialogForwardBinding view = DialogForwardBinding.inflate(getLayoutInflater(), null, false);
         setContentView(view.getRoot());
 
         WindowManager.LayoutParams params = getWindow().getAttributes();
@@ -67,7 +66,7 @@ public class ForwardDialog extends BaseDialog {
             view.tips.setText(R.string.multiple_send);
             view.recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
             RecyclerViewAdapter<MultipleChoice, ViewHol.ImageTxtViewHolder> adapter;
-            view.recyclerView.setAdapter(adapter=new RecyclerViewAdapter<MultipleChoice, ViewHol.ImageTxtViewHolder>(ViewHol.ImageTxtViewHolder.class) {
+            view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<MultipleChoice, ViewHol.ImageTxtViewHolder>(ViewHol.ImageTxtViewHolder.class) {
 
                 @Override
                 public void onBindView(@NonNull ViewHol.ImageTxtViewHolder holder, MultipleChoice data, int position) {
@@ -79,21 +78,24 @@ public class ForwardDialog extends BaseDialog {
         }
         view.cancel.setOnClickListener(view1 -> dismiss());
         view.sure.setOnClickListener(view1 -> {
-            String leave=view.leave.getText().toString();
-            if (!TextUtils.isEmpty(leave)){
+            String leave = view.leave.getText().toString();
+            if (!TextUtils.isEmpty(leave)) {
                 forwardVM.createLeaveMsg(leave);
             }
 
             finish();
-            Obs.newMessage(Constant.Event.FORWARD,choiceVM.metaData.val());
+            Obs.newMessage(Constant.Event.FORWARD, choiceVM.metaData.val());
             dismiss();
         });
     }
 
     private static void finish() {
-        Postcard postcard =ARouter.getInstance().build(Routes.Group.SELECT_TARGET);
+        Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
+        Postcard postcard2 = ARouter.getInstance().build(Routes.Conversation.CHAT);
+
         LogisticsCenter.completion(postcard);
-        ActivityManager.finishActivity(postcard.getDestination());
+        LogisticsCenter.completion(postcard2);
+        ActivityManager.finishAllExceptActivity(postcard.getDestination(),postcard2.getDestination());
     }
 
 }
