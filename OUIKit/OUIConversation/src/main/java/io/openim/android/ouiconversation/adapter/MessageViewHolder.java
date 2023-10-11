@@ -295,9 +295,11 @@ public class MessageViewHolder {
                         unRead.setText(unreadCount + chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
                         unRead.setOnClickListener(v -> {
                             v.getContext().startActivity(new Intent(v.getContext(),
-                                MsgReadStatusActivity.class).putExtra(Constant.K_GROUP_ID,
-                                message.getGroupID()).putStringArrayListExtra(Constant.K_ID,
-                                (ArrayList<String>) message.getAttachedInfoElem().getGroupHasReadInfo().getHasReadUserIDList()));
+                                MsgReadStatusActivity.class)
+                                .putExtra(Constant.K_ID, chatVM.conversationID)
+                                .putExtra(Constant.K_RESULT,message.getClientMsgID())
+                                .putExtra(Constant.K_RESULT2,message.getAttachedInfoElem().getGroupHasReadInfo())
+                            );
                         });
                     }
                 }
@@ -914,9 +916,6 @@ public class MessageViewHolder {
             view.content2.setOnClickListener(v -> clickPlay(message, view.lottieView2));
         }
 
-        private void markRead(Message message) {
-            if (!isOwn) chatVM.markRead(message);
-        }
 
         private void clickPlay(Message message, LottieAnimationView lottieView) {
             String sourceUrl = message.getSoundElem().getSourceUrl();
@@ -952,7 +951,8 @@ public class MessageViewHolder {
             SPlayer.instance().getMediaPlayer().setOnPlayStateListener(new SMediaPlayer.OnPlayStateListener() {
                 @Override
                 public void started() {
-                    markRead(message);
+                    if (!isOwn)
+                        chatVM.markRead(message);
 
                     playingMessage = message;
                     lottieView.playAnimation();

@@ -639,12 +639,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 }
             }
         }
-        OnBase<String> callBack = new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-                toast(error + code);
-            }
-
+        OnBase<String> callBack = new IMUtil.IMCallBack<String>() {
             @Override
             public void onSuccess(String data) {
                 if (null != msgList) {
@@ -663,8 +658,13 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         if (null == msgList || msgList.length == 0) {
             OpenIMClient.getInstance().messageManager.markConversationMessageAsRead(conversationID, callBack);
         } else {
-            OpenIMClient.getInstance().messageManager.markMessagesAsReadByMsgID(conversationID,
-                msgIDs, callBack);
+            if (isSingleChat) {
+                OpenIMClient.getInstance().messageManager.markMessagesAsReadByMsgID(conversationID,
+                    msgIDs, callBack);
+            } else {
+                OpenIMClient.getInstance().messageManager.sendGroupMessageReadReceipt(conversationID,
+                    msgIDs, callBack);
+            }
 
             NotificationManager manager =
                 (NotificationManager) BaseApp.inst().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -1110,7 +1110,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
      * @param message
      */
     public void revokeMessage(Message message) {
-        OpenIMClient.getInstance().messageManager.revokeMessageV2(new IMUtil.IMCallBack<>(), conversationID, message.getClientMsgID());
+        OpenIMClient.getInstance().messageManager.revokeMessageV2(new IMUtil.IMCallBack<>(),
+            conversationID, message.getClientMsgID());
 
     }
 

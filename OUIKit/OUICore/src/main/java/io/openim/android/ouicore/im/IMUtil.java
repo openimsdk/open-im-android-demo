@@ -69,6 +69,7 @@ import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
@@ -584,8 +585,9 @@ public class IMUtil {
 
 
     private static String atSelf(AtUserInfo atUsersInfo) {
-        return "@" + (atUsersInfo.getAtUserID().equals(BaseApp.inst().loginCertificate.userID) ?
-            BaseApp.inst().getString(R.string.you) : atUsersInfo.getGroupNickname());
+//        return "@" + (atUsersInfo.getAtUserID().equals(BaseApp.inst().loginCertificate.userID) ?
+//            BaseApp.inst().getString(R.string.you) : atUsersInfo.getGroupNickname());
+        return "@"+atUsersInfo.getGroupNickname();
     }
 
     private static void handleAt(MsgExpand msgExpand, String gid) {
@@ -658,16 +660,20 @@ public class IMUtil {
                     break;
                 case MessageType.AT_TEXT:
                     String atTxt = msgExpand.atMsgInfo.text;
+                    String tar ="";
                     for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
+                        if (atUsersInfo.getAtUserID()
+                            .equals(BaseApp.inst().loginCertificate.userID)){
+                            tar="@"+atUsersInfo.getGroupNickname();
+                        }
                         atTxt = atTxt.replace("@" + atUsersInfo.getAtUserID(), atSelf(atUsersInfo));
                     }
-                    String tar =
-                        "@" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.you);
                     if (atTxt.contains(tar)) {
                         lastMsg =
                             IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(atTxt),
                                 tar, android.R.color.holo_red_dark, null);
-                    } else lastMsg += atTxt;
+                    } else
+                        lastMsg += atTxt;
                     break;
 
                 case MessageType.MERGER:
@@ -869,7 +875,7 @@ public class IMUtil {
     public static class IMCallBack<T> implements OnBase<T> {
         @Override
         public void onError(int code, String error) {
-            Toast.makeText(BaseApp.inst(), error + "(" + code + ")", Toast.LENGTH_LONG).show();
+            L.e("IMCallBack","onError:("+code+")"+error);
         }
 
         public void onSuccess(T data) {
