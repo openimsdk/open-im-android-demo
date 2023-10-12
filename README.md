@@ -1,36 +1,49 @@
+<p align="center">
+    <a href="https://www.openim.online">
+        <img src="./openim-logo.gif" width="60%" height="30%"/>
+    </a>
+</p>
 
-## Open-IM-Android-Demo
-<img src="https://github.com/OpenIMSDK/OpenIM-Docs/blob/main/docs/images/WechatIMG20.jpeg" alt="image" style="width: 350px; " />
+# OpenIM Android Demo 💬💻
 
-#### Demo content
+<p>
+  <a href="https://doc.rentsoft.cn/">OpenIM Docs</a>
+  •
+  <a href="https://github.com/openimsdk/open-im-server">OpenIM Server</a>
+  •
+  <a href="https://github.com/openimsdk/openim-sdk-core">openim-sdk-core</a>
+  •
+  <a href="https://github.com/openimsdk/open-im-sdk-android">open-im-sdk-android</a>
+
+</p>
+
+<br>
 Demo is a set of UI components implemented based on the Open-IM SDK, which includes functionalities such as conversations, chats, relationships, and groups. The project adopts MVVM+modular development, with high decoupling, independent business logic, code separation, making it easy to integrate the functionalities you need quickly and conveniently
-#### Download and experience
 
-![Android](https://www.pgyer.com/app/qrcode/OpenIM-Enterprise)
+## Tech Stack 🛠️
+- This is a Android project
+- Using Java/kotlin
+- App is built with [open-im-sdk-android](https://github.com/openimsdk/open-im-sdk-android) library.
 
-#### Dependency Description
+## Official demo use
 
-```
- implementation project(':OUICore') required modules
- implementation project(':OUIConversation') Session-related modules
- implementation project(':OUIGroup') Group-related modules
- implementation project(':OUIContact') Contact-related modules
-```
-#### Development Environment Requirements
-```
-Android Studio 3.6.1 or above
-Gradle-5.1.1 or above
-Android Gradle Plugin Version-3.4.0 or above
-android x library
-```
-#### Development Configuration
+- Download the experience app
+
+  ![Android](https://www.pgyer.com/app/qrcode/OpenIM-Enterprise)
+
+## Dev Setup 🛠️
+- Android Studio 3.6.1 or above
+- Gradle-5.1.1 or above
+- Android Gradle Plugin Version-3.4.0 or above
+- android x library
+### Development Configuration
 ```
 minSdk     : 21
 targetSdk  : 32
 compileSdk : 32
-abiFilters : ['armeabi-v7a', 'arm64-v8a']
+abiFilters : ['armeabi-v7a', 'x86']
 ```
-#### Start
+## Build 🚀
 1.git clone：
 ```
 git clone https://github.com/OpenIMSDK/Open-IM-Android-Demo.git
@@ -59,7 +72,7 @@ ext {
     //The ID of the module
     applicationId = [
             "app" : "io.openim.android.demo",
-            "OUIConversation" : "io.openim.android.ouiconversation",
+            "OUIConversation" :"io.openim.android.ouiconversation",
             "OUIGroup" : "io.openim.android.ouigroup",
             "OUIContact" : "io.openim.android.ouicontact",
             "OUICalling" : "io.openim.android.ouicalling",
@@ -78,71 +91,32 @@ In the app/build.gradle file
        //implementation project(':OUICalling')
     }
 ```
-4.Initialization
-```
-OpenIMClient.getInstance().initSDK(
-    2,
-    "Your IM server address",
-    "Your IM server socket address",
-    getStorageDir(),
-    1,
-    "minio",
-    "",
-    IMEvent.getInstance().connListener
-);
-```
-5.Login
-  
-1.Log in to your business server to obtain the userID and token.  
-2.Use the userID and token obtained in step 1 to log in to the IM (Instant Messaging) server.
-```
-public void login() {
-        Parameter parameter = getParameter(null);
-	//1.Log in to your business server to obtain the userID and token.
-        N.API(OpenIMService.class).login(parameter.buildJsonBody())
-            .compose(N.IOMain())
-            .subscribe(new NetObserver<ResponseBody>(getContext()) {
+### Issues :bookmark_tabs:
+1. Reminder: If you encounter the "resource loading is not complete" error when calling SDK-related APIs, make sure to call other APIs after the login callback is executed.   
+2. After disabling or adding a module, if the app shows an error toast when calling the functionalities of that module, you can resolve the issue by uninstalling and reinstalling the app.  
+3. Reminder: Avoid using duplicate names for resources across different modules.  
+4. Some ViewModels need to be globally shared. Developers should pay attention to whether ViewModels are cached in viewModels and release them in a timely manner when they are no longer in use to avoid memory leaks.
 
-                @Override
-                public void onSuccess(ResponseBody o) {
-                    try {
-                        String body = o.string();
-                        Base<LoginCertificate> loginCertificate = GsonHel.dataObject(body, LoginCertificate.class);
-                        if (loginCertificate.errCode != 0) {
-                            IView.err(loginCertificate.errMsg);
-                            return;
-                        }
-			//2.Use the userID and token obtained in step 1 to log in to the IM (Instant Messaging) server.
-                        OpenIMClient.getInstance().login(new OnBase<String>() {
-                            @Override
-                            public void onError(int code, String error) {
-                                IView.err(error);
-                            }
 
-                            @Override
-                            public void onSuccess(String data) {
-                                //Cache login information and start a delightful chat
-                   
-                            }
-                        }, loginCertificate.data.userID, loginCertificate.data.token);
+## Community :busts_in_silhouette:
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+- 📚 [OpenIM Community](https://github.com/OpenIMSDK/community)
+- 💕 [OpenIM Interest Group](https://github.com/Openim-sigs)
+- 🚀 [Join our Slack community](https://join.slack.com/t/openimsdk/shared_invite/zt-22720d66b-o_FvKxMTGXtcnnnHiMqe9Q)
+- :eyes: [Join our wechat (微信群)](https://openim-1253691595.cos.ap-nanjing.myqcloud.com/WechatIMG20.jpeg)
 
-                }
+## Community Meetings :calendar:
 
-                @Override
-                protected void onFailure(Throwable e) {
-                    IView.err(e.getMessage());
-                }
-            });
-    }
-```
+We want anyone to get involved in our community and contributing code, we offer gifts and rewards, and we welcome you to join us every Thursday night.
 
-#### Common Questions
-1.Reminder: If you encounter the "resource loading is not complete" error when calling SDK-related APIs, make sure to call other APIs after the login callback is executed.   
-2.After disabling or adding a module, if the app shows an error toast when calling the functionalities of that module, you can resolve the issue by uninstalling and reinstalling the app.  
-3.Reminder: Avoid using duplicate names for resources across different modules.  
-4.Some ViewModels need to be globally shared. Developers should pay attention to whether ViewModels are cached in viewModels and release them in a timely manner when they are no longer in use to avoid memory leaks.
+Our conference is in the [OpenIM Slack](https://join.slack.com/t/openimsdk/shared_invite/zt-22720d66b-o_FvKxMTGXtcnnnHiMqe9Q) 🎯, then you can search the Open-IM-Server pipeline to join
 
+We take notes of each [biweekly meeting](https://github.com/orgs/OpenIMSDK/discussions/categories/meeting) in [GitHub discussions](https://github.com/openimsdk/open-im-server/discussions/categories/meeting), Our historical meeting notes, as well as replays of the meetings are available at [Google Docs :bookmark_tabs:](https://docs.google.com/document/d/1nx8MDpuG74NASx081JcCpxPgDITNTpIIos0DS6Vr9GU/edit?usp=sharing).
+
+## Who are using OpenIM :eyes:
+
+Check out our [user case studies](https://github.com/OpenIMSDK/community/blob/main/ADOPTERS.md) page for a list of the project users. Don't hesitate to leave a [📝comment](https://github.com/openimsdk/open-im-server/issues/379) and share your use case.
+
+## License :page_facing_up:
+
+OpenIM is licensed under the Apache 2.0 license. See [LICENSE](https://github.com/openimsdk/open-im-server/tree/main/LICENSE) for the full license text.
