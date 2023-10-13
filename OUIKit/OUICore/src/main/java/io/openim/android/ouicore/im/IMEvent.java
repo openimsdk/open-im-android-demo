@@ -38,6 +38,7 @@ import io.openim.android.sdk.listener.OnGroupListener;
 import io.openim.android.sdk.listener.OnSignalingListener;
 import io.openim.android.sdk.listener.OnUserListener;
 import io.openim.android.sdk.models.BlacklistInfo;
+import io.openim.android.sdk.models.C2CReadReceiptInfo;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.CustomSignalingInfo;
 import io.openim.android.sdk.models.FriendApplicationInfo;
@@ -45,10 +46,10 @@ import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
+import io.openim.android.sdk.models.GroupMessageReceipt;
 import io.openim.android.sdk.models.KeyValue;
 import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.ReadReceiptInfo;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SignalingInfo;
@@ -471,7 +472,8 @@ public class IMEvent {
             ? msg.getSendID() : msg.getGroupID();
 
         if (!TextUtils.isEmpty(sourceID)) {
-            OpenIMClient.getInstance().conversationManager.getOneConversation(new IMUtil.IMCallBack<ConversationInfo>() {
+            OpenIMClient.getInstance().conversationManager
+                .getOneConversation(new IMUtil.IMCallBack<ConversationInfo>() {
                 @Override
                 public void onSuccess(ConversationInfo data) {
                     if (null == data) return;
@@ -565,7 +567,7 @@ public class IMEvent {
             }
 
             @Override
-            public void onRecvC2CReadReceipt(List<ReadReceiptInfo> list) {
+            public void onRecvC2CReadReceipt(List<C2CReadReceiptInfo> list) {
                 // 消息被阅读回执，将消息标记为已读
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
                     onAdvanceMsgListener.onRecvC2CReadReceipt(list);
@@ -603,19 +605,23 @@ public class IMEvent {
 
             @Override
             public void onMsgDeleted(Message message) {
-
+                for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
+                    onAdvanceMsgListener.onMsgDeleted(message);
+                }
             }
 
             @Override
             public void onRecvOfflineNewMessage(List<Message> msg) {
-
+                for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
+                    onAdvanceMsgListener.onRecvOfflineNewMessage(msg);
+                }
             }
 
             @Override
-            public void onRecvGroupMessageReadReceipt(List<ReadReceiptInfo> list) {
+            public void onRecvGroupMessageReadReceipt(GroupMessageReceipt groupMessageReceipt) {
                 // 消息被阅读回执，将消息标记为已读
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
-                    onAdvanceMsgListener.onRecvGroupMessageReadReceipt(list);
+                    onAdvanceMsgListener.onRecvGroupMessageReadReceipt(groupMessageReceipt);
                 }
             }
         });

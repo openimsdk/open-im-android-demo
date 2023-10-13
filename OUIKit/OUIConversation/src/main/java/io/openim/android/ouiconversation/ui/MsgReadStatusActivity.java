@@ -57,7 +57,6 @@ public class MsgReadStatusActivity extends BasicActivity<ActivityMsgReadStatusBi
         vm.conversationId = getIntent().getStringExtra(Constant.K_ID);
         vm.msgId = getIntent().getStringExtra(Constant.K_RESULT);
          groupHasReadInfo = (GroupHasReadInfo) getIntent().getSerializableExtra(Constant.K_RESULT2);
-        vm.getGroupMessageReaderList(0);
     }
 
     private void initView() {
@@ -109,7 +108,8 @@ public class MsgReadStatusActivity extends BasicActivity<ActivityMsgReadStatusBi
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) view.recyclerview.getLayoutManager();
                 int lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
-                if (lastVisiblePosition >= adapter.getItems().size() - 3) {
+                if (adapter.getItems().size()>=vm.count
+                    &&lastVisiblePosition >= adapter.getItems().size() - 3) {
                     loadMembersInfo();
                 }
             }

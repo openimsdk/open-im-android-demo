@@ -204,13 +204,17 @@ public class MessageViewHolder {
         }
 
         int getHaveReadCount() {
-            List<String> hasReadUserIDList =
-                message.getAttachedInfoElem().getGroupHasReadInfo().getHasReadUserIDList();
-            return null == hasReadUserIDList ? 0 : hasReadUserIDList.size();
+            try {
+                return message.getAttachedInfoElem().getGroupHasReadInfo().getHasReadCount();
+            }catch (Exception ignored){}
+            return 0;
         }
 
         int getNeedReadCount() {
-            return message.getAttachedInfoElem().getGroupHasReadInfo().getGroupMemberCount();
+           try {
+               return message.getAttachedInfoElem().getGroupHasReadInfo().getUnreadCount();
+           }catch (Exception ignored){}
+               return 0;
         }
 
         /**
@@ -289,10 +293,9 @@ public class MessageViewHolder {
                     unRead.setText(message.isRead() ? readed : unread);
                     unRead.setTextColor(unRead.getContext().getResources().getColor(message.isRead() ? io.openim.android.ouicore.R.color.txt_shallow : io.openim.android.ouicore.R.color.theme));
                 } else {
-                    int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;
-                    if (unreadCount > 0) {
+                    if (getNeedReadCount() > 0) {
                         unRead.setTextColor(Color.parseColor("#0089FF"));
-                        unRead.setText(unreadCount + chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
+                        unRead.setText(getNeedReadCount() + chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
                         unRead.setOnClickListener(v -> {
                             v.getContext().startActivity(new Intent(v.getContext(),
                                 MsgReadStatusActivity.class)

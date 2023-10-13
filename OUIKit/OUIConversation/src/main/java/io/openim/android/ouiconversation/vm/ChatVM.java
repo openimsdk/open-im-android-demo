@@ -67,18 +67,21 @@ import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.listener.OnSignalingListener;
 import io.openim.android.sdk.listener.OnUserListener;
 import io.openim.android.sdk.models.AdvancedMessage;
+import io.openim.android.sdk.models.C2CReadReceiptInfo;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.CustomSignalingInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
+import io.openim.android.sdk.models.GroupHasReadInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
+import io.openim.android.sdk.models.GroupMessageReadInfo;
+import io.openim.android.sdk.models.GroupMessageReceipt;
 import io.openim.android.sdk.models.KeyValue;
 import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.PictureElem;
-import io.openim.android.sdk.models.ReadReceiptInfo;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SearchResult;
@@ -900,15 +903,16 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     @Override
-    public void onRecvC2CReadReceipt(List<ReadReceiptInfo> list) {
+    public void onRecvC2CReadReceipt(List<C2CReadReceiptInfo> list) {
         try {
-            for (ReadReceiptInfo readInfo : list) {
+            for (C2CReadReceiptInfo readInfo : list) {
                 if (readInfo.getUserID().equals(userID)) {
                     for (int i = 0; i < messages.val().size(); i++) {
                         Message message = messages.val().get(i);
                         if (readInfo.getMsgIDList().contains(message.getClientMsgID())) {
                             message.setRead(true);
-                            if (null != message.getAttachedInfoElem() && message.getAttachedInfoElem().isPrivateChat()) {
+                            if (null != message.getAttachedInfoElem()
+                                && message.getAttachedInfoElem().isPrivateChat()) {
                                 message.getAttachedInfoElem().setHasReadTime(readInfo.getReadTime());
                             }
                             messageAdapter.notifyItemChanged(i);
@@ -922,24 +926,25 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     @Override
-    public void onRecvGroupMessageReadReceipt(List<ReadReceiptInfo> list) {
+    public void onRecvGroupMessageReadReceipt(GroupMessageReceipt receipt) {
         try {
-            for (ReadReceiptInfo readInfo : list) {
-                if (readInfo.getGroupID().equals(groupID)) {
-                    for (Message e : messages.getValue()) {
-                        List<String> uidList =
-                            e.getAttachedInfoElem().getGroupHasReadInfo().getHasReadUserIDList();
-                        if (null == uidList) uidList = new ArrayList<>();
-                        if (!uidList.contains(readInfo.getUserID()) && (readInfo.getMsgIDList().contains(e.getClientMsgID()))) {
-                            uidList.add(readInfo.getUserID());
-                            e.getAttachedInfoElem().getGroupHasReadInfo().setHasReadUserIDList(uidList);
-                            messageAdapter.notifyItemChanged(messages.getValue().indexOf(e));
-                        }
+                if (receipt.getConversationID().equals(conversationID)) {
+                    List<GroupMessageReadInfo> groupMessageReadInfo =
+                        receipt.getGroupMessageReadInfo();
+                    for (GroupMessageReadInfo messageReadInfo : groupMessageReadInfo) {
+                        Message message = new Message();
+                        message.setClientMsgID(messageReadInfo.getClientMsgID());
+                        int index = messages.val().indexOf(message);
+                        if (index == -1) continue;
+                        Message localMsg = messages.val().get(index);
+                        GroupHasReadInfo hasReadInfo =
+                            localMsg.getAttachedInfoElem().getGroupHasReadInfo();
+                        hasReadInfo.setHasReadCount(messageReadInfo.getHasReadCount());
+                        hasReadInfo.setUnreadCount(messageReadInfo.getUnreadCount());
+                        messageAdapter.notifyItemChanged(index);
                     }
                 }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 

@@ -13,7 +13,6 @@ public class MsgStatusVM extends BaseVM {
     public String conversationId, msgId;
     public int offset = 0;
     public int count = 20;
-
     public State<List<GroupMembersInfo>> groupMembersInfoList = new State<>(new ArrayList<>());
 
     /**

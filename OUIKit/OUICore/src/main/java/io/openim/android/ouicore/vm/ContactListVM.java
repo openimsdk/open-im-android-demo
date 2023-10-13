@@ -18,15 +18,17 @@ import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Obs;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConversationListener;
+import io.openim.android.sdk.models.C2CReadReceiptInfo;
 import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.GroupMessageReceipt;
 import io.openim.android.sdk.models.KeyValue;
 import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.ReadReceiptInfo;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.UserInfo;
 
@@ -203,12 +205,12 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
     }
 
     @Override
-    public void onRecvC2CReadReceipt(List<ReadReceiptInfo> list) {
+    public void onRecvC2CReadReceipt(List<C2CReadReceiptInfo> list) {
 
     }
 
     @Override
-    public void onRecvGroupMessageReadReceipt(List<ReadReceiptInfo> list) {
+    public void onRecvGroupMessageReadReceipt(GroupMessageReceipt receipt) {
 
     }
 
