@@ -9,6 +9,7 @@
         </intent>
     </queries>
 
+<!--hardwareAccelerated=false livekit 会出问题    android:hardwareAccelerated="false"-->
     <application
         android:name=".DemoApplication"
         android:allowBackup="true"
@@ -22,7 +23,6 @@
         android:theme="@style/Theme.Main"
         android:usesCleartextTraffic="true"
         android:largeHeap="true"
-        android:hardwareAccelerated="false"
         tools:targetApi="tiramisu"
         >
         <activity

@@ -71,8 +71,7 @@ dependencies {
     annotationProcessor 'com.alibaba:arouter-compiler:1.5.2'
 
     //liveKit
-    implementation "io.livekit:livekit-android:1.4.1"
+    implementation "io.livekit:livekit-android:1.4.2"
     implementation "com.google.protobuf:protobuf-javalite:${versions.protobuf}"
     //-------
-
 }
