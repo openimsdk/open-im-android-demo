@@ -133,17 +133,18 @@ public class DemoApplication extends BaseApp {
                 offline();
             }
 
-            private void offline() {
-                LoginCertificate.clear();
-                CallingService callingService = (CallingService) ARouter.getInstance()
-                    .build(Routes.Service.CALLING).navigation();
-                if (null != callingService)
-                    callingService.stopAudioVideoService(BaseApp.inst());
 
-                ActivityManager.finishAllExceptActivity();
-                startActivity(new Intent(BaseApp.inst(), LoginActivity.class)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            }
         });
+    }
+    public void offline() {
+        LoginCertificate.clear();
+        CallingService callingService = (CallingService) ARouter.getInstance()
+            .build(Routes.Service.CALLING).navigation();
+        if (null != callingService)
+            callingService.stopAudioVideoService(BaseApp.inst());
+
+        ActivityManager.finishAllExceptActivity();
+        startActivity(new Intent(BaseApp.inst(), LoginActivity.class)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }
