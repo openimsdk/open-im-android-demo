@@ -164,6 +164,8 @@ public class PreviewMediaActivity extends BasicActivity<ActivityPreviewBinding> 
                 return std;
             } else {
                 PinchImageView pinchImageView = new PinchImageView(container.getContext());
+                //关闭硬件加速  Canvas: trying to draw too large(*bytes) bitmap
+                pinchImageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
                 Glide.with(container.getContext()).load(mediaData.mediaUrl)
                     .thumbnail(Glide.with(container.getContext())
                         .load(mediaData.thumbnail))

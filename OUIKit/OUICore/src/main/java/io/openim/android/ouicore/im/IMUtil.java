@@ -96,6 +96,19 @@ public class IMUtil {
     public static final int PLATFORM_ID = 2;
     private static final String TAG = "IMUtil";
 
+    public static String getFastVideoPath(VideoElem elem) {
+        String videoPath = elem.getVideoPath();
+        if (!GetFilePathFromUri.fileIsExists(videoPath))
+            videoPath = elem.getVideoUrl();
+        return videoPath;
+    }
+
+    public static String getFastPicturePath(PictureElem elem) {
+        String path = elem.getSourcePath();
+        if (!GetFilePathFromUri.fileIsExists(path))
+            path = elem.getSourcePicture().getUrl();
+        return path;
+    }
 
     /**
      * 加载图片
@@ -279,12 +292,12 @@ public class IMUtil {
                 RevokedInfo revokedInfo = GsonHel.fromJson(detail, RevokedInfo.class);
                 String txt;
                 //a 撤回了一条消息
-                if (revokedInfo.getRevokerID().equals(revokedInfo.getSourceMessageSendID())){
+                if (revokedInfo.getRevokerID().equals(revokedInfo.getSourceMessageSendID())) {
                     txt = String.format(ctx.getString(R.string.revoke_tips),
                         revokedInfo.getRevokerNickname());
                     tips = getSingleSequence(msg.getGroupID(), revokedInfo.getRevokerNickname(),
                         revokedInfo.getRevokerID(), txt);
-                }else {
+                } else {
                     txt = String.format(ctx.getString(R.string.revoke_tips2),
                         revokedInfo.getRevokerNickname(),
                         revokedInfo.getSourceMessageSenderNickname());
@@ -524,7 +537,7 @@ public class IMUtil {
     }
 
     public static CharSequence twoPeopleRevoker(Message msg, RevokedInfo revokedInfo, String txt) {
-        List<MultipleChoice> choices=new ArrayList<>();
+        List<MultipleChoice> choices = new ArrayList<>();
         MultipleChoice choice = new MultipleChoice(revokedInfo.getRevokerID());
         choice.name = revokedInfo.getRevokerNickname();
         choice.groupId = msg.getGroupID();
@@ -535,7 +548,7 @@ public class IMUtil {
         choice2.groupId = msg.getGroupID();
         choices.add(choice2);
 
-        return getMultipleSequence(new SpannableStringBuilder(txt),choices);
+        return getMultipleSequence(new SpannableStringBuilder(txt), choices);
     }
 
     /**
@@ -587,7 +600,7 @@ public class IMUtil {
     private static String atSelf(AtUserInfo atUsersInfo) {
 //        return "@" + (atUsersInfo.getAtUserID().equals(BaseApp.inst().loginCertificate.userID) ?
 //            BaseApp.inst().getString(R.string.you) : atUsersInfo.getGroupNickname());
-        return "@"+atUsersInfo.getGroupNickname();
+        return "@" + atUsersInfo.getGroupNickname();
     }
 
     private static void handleAt(MsgExpand msgExpand, String gid) {
@@ -660,11 +673,10 @@ public class IMUtil {
                     break;
                 case MessageType.AT_TEXT:
                     String atTxt = msgExpand.atMsgInfo.text;
-                    String tar ="";
+                    String tar = "";
                     for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
-                        if (atUsersInfo.getAtUserID()
-                            .equals(BaseApp.inst().loginCertificate.userID)){
-                            tar="@"+atUsersInfo.getGroupNickname();
+                        if (atUsersInfo.getAtUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+                            tar = "@" + atUsersInfo.getGroupNickname();
                         }
                         atTxt = atTxt.replace("@" + atUsersInfo.getAtUserID(), atSelf(atUsersInfo));
                     }
@@ -672,8 +684,7 @@ public class IMUtil {
                         lastMsg =
                             IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(atTxt),
                                 tar, android.R.color.holo_red_dark, null);
-                    } else
-                        lastMsg += atTxt;
+                    } else lastMsg += atTxt;
                     break;
 
                 case MessageType.MERGER:
@@ -812,22 +823,15 @@ public class IMUtil {
         String CHANNEL_ID = Constant.NOTICE_TAG;
         String CHANNEL_NAME = BaseApp.inst().getString(R.string.msg_notification);
         Notification notification =
-            new NotificationCompat.Builder(BaseApp.inst(), CHANNEL_ID).setContentTitle(BaseApp.inst().getString(R.string.app_name))
-                .setContentText(BaseApp.inst().getString(R.string.a_message_is_received)).setSmallIcon(R.mipmap.ic_logo)
-                .setContentIntent(hangPendingIntent).setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
-                .setSound(Uri.parse("android.resource://"
-                    + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring)).build();
+            new NotificationCompat.Builder(BaseApp.inst(), CHANNEL_ID).setContentTitle(BaseApp.inst().getString(R.string.app_name)).setContentText(BaseApp.inst().getString(R.string.a_message_is_received)).setSmallIcon(R.mipmap.ic_logo).setContentIntent(hangPendingIntent).setAutoCancel(true).setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE).setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring)).build();
 
         //Android 8.0 以上需包添加渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID,
                 CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
             AudioAttributes audioAttributes =
-                new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION).build();
-            notificationChannel.setSound(Uri.parse("android.resource://"
-                + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring), audioAttributes);
+                new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).setUsage(AudioAttributes.USAGE_NOTIFICATION).build();
+            notificationChannel.setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring), audioAttributes);
             manager.createNotificationChannel(notificationChannel);
         }
         manager.notify(id, notification);
@@ -839,27 +843,11 @@ public class IMUtil {
         MediaPlayerUtil.INSTANCE.playMedia();
         vibrate(200);
     }
+
     //震动milliseconds毫秒
-    public static void vibrate( long milliseconds) {
+    public static void vibrate(long milliseconds) {
         Vibrator vib = (Vibrator) BaseApp.inst().getSystemService(Service.VIBRATOR_SERVICE);
         vib.vibrate(milliseconds);
-    }
-
-    /**
-     * 获取语音播放路径 本地没有取网络
-     *
-     * @param soundElem
-     * @return
-     */
-    public static String getSoundPath(SoundElem soundElem) {
-        String path = "";
-        try {
-            path = soundElem.getSoundPath();
-            if (TextUtils.isEmpty(path)) path = soundElem.getSourceUrl();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return path;
     }
 
 
@@ -875,7 +863,7 @@ public class IMUtil {
     public static class IMCallBack<T> implements OnBase<T> {
         @Override
         public void onError(int code, String error) {
-            L.e("IMCallBack","onError:("+code+")"+error);
+            L.e("IMCallBack", "onError:(" + code + ")" + error);
         }
 
         public void onSuccess(T data) {

@@ -795,11 +795,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
             if (datum.getContentType() == MessageType.VIDEO) {
                 VideoElem videoElem = datum.getVideoElem();
-                String sUrl = videoElem.getVideoUrl();
-                if (TextUtils.isEmpty(sUrl)) {
-                    sUrl = videoElem.getVideoPath();
-                }
-                mediaData = new PreviewMediaVM.MediaData(sUrl);
+                mediaData = new PreviewMediaVM.MediaData(IMUtil.getFastVideoPath(datum.getVideoElem()));
                 mediaData.isVideo = true;
                 mediaData.thumbnail = videoElem.getSnapshotUrl();
             }

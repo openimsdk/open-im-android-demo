@@ -22,7 +22,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Main"
         android:usesCleartextTraffic="true"
-        android:largeHeap="true"
         tools:targetApi="tiramisu"
         >
         <activity

@@ -274,10 +274,6 @@ public class CallingVM {
             callViewModel.onCleared();
             cancelTimer();
             if (null != localVideoTrack) {
-                try {
-                    localVideoTrack.stop();
-                } catch (Exception ignore) {}
-
                 if (null != localSpeakerVideoViews) {
                     for (TextureViewRenderer localSpeakerVideoView : localSpeakerVideoViews) {
                         localVideoTrack.removeRenderer(localSpeakerVideoView);
