@@ -104,36 +104,42 @@ public class GroupCallDialog extends CallDialog {
                     callingVM.initRemoteVideoRenderer(holder.view.remoteSpeakerVideoView);
                 } catch (Exception ignored) {
                 }
-                ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
-                    ParticipantMeta.class);
-                String name = participantMeta.groupMemberInfo.getNickname();
-                if (TextUtils.isEmpty(name)) name = participantMeta.userInfo.getNickname();
-                holder.view.name.setText(name);
-                holder.view.avatar.load(participantMeta.userInfo.getFaceURL());
-                holder.view.avatarRl.setVisibility(callingVM.isVideoCalls ? View.GONE :
-                    View.VISIBLE);
+                try {
+                    showRemoteSpeakerVideoView(holder,false);
+                    ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
+                            ParticipantMeta.class);
+                    String name = participantMeta.groupMemberInfo.getNickname();
+                    if (TextUtils.isEmpty(name)) name = participantMeta.userInfo.getNickname();
+                    holder.view.name.setText(name);
+                    holder.view.avatar.load(participantMeta.userInfo.getFaceURL());
 
-                callingVM.callViewModel.subscribe(data.getEvents().getEvents(), (v) -> {
-                    ParticipantMeta participantMeta2 =
-                        GsonHel.fromJson(v.getParticipant().getMetadata(), ParticipantMeta.class);
-                    participantMeta.userInfo.getUserID().equals(participantMeta2);
-                    holder.view.micOn.setImageResource(v.getParticipant().isMicrophoneEnabled() ?
-                        R.mipmap.ic_mic_s_on : R.mipmap.ic_mic_s_off);
-                    return null;
-                });
+                    callingVM.callViewModel.subscribe(data.getEvents().getEvents(), (v) -> {
+                        ParticipantMeta participantMeta2 =
+                                GsonHel.fromJson(v.getParticipant().getMetadata(),
+                                        ParticipantMeta.class);
+                        participantMeta.userInfo.getUserID().equals(participantMeta2);
 
+                        holder.view.micOn.setImageResource(v.getParticipant().isMicrophoneEnabled() ?
+                            R.mipmap.ic_mic_s_on : R.mipmap.ic_mic_s_off);
+                        holder.view.avatarRl.setVisibility(v.getParticipant().isCameraEnabled() ?
+                            View.GONE : View.VISIBLE);
+                        return null;
+                    }, callingVM.callViewModel.buildScope());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (!callingVM.isVideoCalls) return;
                 if (data instanceof LocalParticipant) {
                     if (callingVM.callViewModel.getCameraEnabled().getValue()) {
-                        holder.view.remoteSpeakerVideoView.setVisibility(View.VISIBLE);
-                        holder.view.avatarRl.setVisibility(View.GONE);
+                        showRemoteSpeakerVideoView(holder,true);
                         VideoTrack localVideoTrack = callingVM.callViewModel.getVideoTrack(data);
-                        if (localVideoTrack != null) {
+                        if (null != localVideoTrack) {
                             localVideoTrack.addRenderer(holder.view.remoteSpeakerVideoView);
                             holder.view.remoteSpeakerVideoView.setTag(localVideoTrack);
                         }
                     } else {
-                        holder.view.avatarRl.setVisibility(View.VISIBLE);
-                        holder.view.remoteSpeakerVideoView.setVisibility(View.GONE);
+                        showRemoteSpeakerVideoView(holder,false);
                     }
                 } else {
                     callingVM.callViewModel.bindRemoteViewRenderer(holder.view.remoteSpeakerVideoView, data, new Continuation<Unit>() {
@@ -145,12 +151,18 @@ public class GroupCallDialog extends CallDialog {
 
                         @Override
                         public void resumeWith(@NonNull Object o) {
-                            L.e("");
+
                         }
                     });
                 }
+
             }
         });
+    }
+
+    private static void showRemoteSpeakerVideoView(@NonNull RendererViewHole holder,boolean isShow) {
+        holder.view.remoteSpeakerVideoView.setVisibility(isShow?View.VISIBLE:View.GONE);
+        holder.view.avatarRl.setVisibility(isShow?View.GONE:View.VISIBLE);
     }
 
 

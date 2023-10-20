@@ -263,7 +263,10 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
     }
 
     private void initHeader() {
-        user.info.observe(getActivity(),v-> view.avatar.load(v.getFaceURL(),v.getNickname()));
+        user.info.observe(getActivity(),v-> {
+            view.avatar.load(v.getFaceURL(),v.getNickname());
+            view.name.setText(v.getNickname());
+        });
         view.addFriend.setOnClickListener(this::showPopupWindow);
         view.callRecord.setOnClickListener(view -> {
             ARouter.getInstance().build(Routes.Main.CALL_HISTORY).navigation();
