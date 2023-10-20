@@ -96,10 +96,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private ActivityResultLauncher<Intent> chatSettingActivityLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK) {
-            finish();
-        }
-    });
+            if (result.getResultCode() == RESULT_OK) {
+                finish();
+            }
+        });
 
     private void initVM() {
         Easy.installVM(CustomEmojiVM.class);
@@ -240,9 +240,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         if (vm.isSingleChat) {
             vm.getUserOnlineStatus(this::showOnlineStatus);
         }
-       try {
-           view.waterMark.setText(BaseApp.inst().loginCertificate.nickname);
-       }catch (Exception ignored){}
+        try {
+            view.waterMark.setText(BaseApp.inst().loginCertificate.nickname);
+        } catch (Exception ignored) {
+        }
     }
 
     private void showOnlineStatus(UsersOnlineStatus onlineStatus) {
@@ -423,7 +424,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         vm.conversationInfo.observe(this, conversationInfo -> {
             bindShowName();
             vm.getGroupsInfo(vm.groupID, data -> {
-                if (data.isEmpty())return;
+                if (data.isEmpty()) return;
                 vm.groupInfo.setValue(data.get(0));
             });
         });
@@ -458,10 +459,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private void bindShowName() {
         try {
-            if (vm.isSingleChat)
-                view.nickName.setText(vm.conversationInfo.getValue().getShowName());
-            else
-                view.nickName.setText(vm.conversationInfo.getValue().getShowName() + "(" + vm.groupInfo.getValue().getMemberCount() + ")");
+            view.nickName.setText(vm.conversationInfo.getValue().getShowName());
+            if (!vm.isSingleChat)
+                view.groupMenberNum.setText("(" + vm.groupInfo.getValue().getMemberCount() + ")");
         } catch (Exception ignored) {
         }
     }

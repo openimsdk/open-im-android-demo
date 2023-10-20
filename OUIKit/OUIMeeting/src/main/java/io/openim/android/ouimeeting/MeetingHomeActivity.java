@@ -123,10 +123,10 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         initView();
 
         if (vm.isInit) {
-            if (vm.isLandscape)
-                toast(getString(io.openim.android.ouicore.R.string.double_tap_tips));
-            connectRoomSuccess(vm.callViewModel.getVideoTrack(vm.callViewModel.getRoom().getLocalParticipant()));
-        } else init();
+            connectRoomSuccess(vm.callViewModel.getVideoTrack(vm.callViewModel
+                .getRoom().getLocalParticipant()));
+        } else
+            init();
 
         bindVM();
         listener();
@@ -138,7 +138,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
     public void registerHomeKey(Context context) {
         //注册Home监听广播
-        if (null == mHomeKeyReceiver) mHomeKeyReceiver = new HomeWatcherReceiver();
+        mHomeKeyReceiver = new HomeWatcherReceiver();
         final IntentFilter homeFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         context.registerReceiver(mHomeKeyReceiver, homeFilter);
     }
@@ -339,6 +339,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                         holder.view.mic.setVisibility(View.VISIBLE);
                         holder.view.camera.setVisibility(View.VISIBLE);
                         holder.view.mic.setChecked(data.isMicrophoneEnabled());
+                        holder.view.camera.setEnabled(!data.isScreenShareEnabled());
+                            holder.view.camera.setAlpha(data.isScreenShareEnabled()?0.5F:1);
                         holder.view.camera.setChecked(data.isCameraEnabled());
                         holder.view.allSeeIv.setVisibility(vm.isAllSeeHe(data) ? View.VISIBLE :
                             View.GONE);
@@ -780,14 +782,10 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     }
 
     private void unregisterHomeKey() {
-        if (null != mHomeKeyReceiver) unregisterReceiver(mHomeKeyReceiver);
+        if (null != mHomeKeyReceiver)
+            unregisterReceiver(mHomeKeyReceiver);
     }
 
-    @Override
-    protected void fasterDestroy() {
-        unregisterHomeKey();
-        mHomeKeyReceiver = null;
-    }
 
     @Override
     protected void onDestroy() {

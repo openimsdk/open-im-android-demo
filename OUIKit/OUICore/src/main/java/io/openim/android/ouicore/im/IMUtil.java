@@ -596,11 +596,15 @@ public class IMUtil {
         ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, uid).withString(Constant.K_GROUP_ID, groupId).navigation();
     }
 
-
     private static String atSelf(AtUserInfo atUsersInfo) {
-//        return "@" + (atUsersInfo.getAtUserID().equals(BaseApp.inst().loginCertificate.userID) ?
-//            BaseApp.inst().getString(R.string.you) : atUsersInfo.getGroupNickname());
-        return "@" + atUsersInfo.getGroupNickname();
+        return atSelf(atUsersInfo, true);
+    }
+
+    private static String atSelf(AtUserInfo atUsersInfo, boolean isNickName) {
+        if (isNickName)
+            return "@" + atUsersInfo.getGroupNickname();
+        return "@" + (atUsersInfo.getAtUserID().equals(BaseApp.inst().loginCertificate.userID) ?
+            BaseApp.inst().getString(R.string.you) : atUsersInfo.getGroupNickname());
     }
 
     private static void handleAt(MsgExpand msgExpand, String gid) {
@@ -676,15 +680,16 @@ public class IMUtil {
                     String tar = "";
                     for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
                         if (atUsersInfo.getAtUserID().equals(BaseApp.inst().loginCertificate.userID)) {
-                            tar = "@" + atUsersInfo.getGroupNickname();
+                            tar = "[" + BaseApp.inst().getString(R.string.a_person_at_you) + "]";
                         }
                         atTxt = atTxt.replace("@" + atUsersInfo.getAtUserID(), atSelf(atUsersInfo));
                     }
-                    if (atTxt.contains(tar)) {
-                        lastMsg =
-                            IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(atTxt),
-                                tar, android.R.color.holo_red_dark, null);
-                    } else lastMsg += atTxt;
+                    if (!tar.isEmpty()) {
+                        atTxt = tar + atTxt;
+                        lastMsg =IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(atTxt),
+                            tar, R.color.theme, null);
+                    } else
+                        lastMsg += atTxt;
                     break;
 
                 case MessageType.MERGER:

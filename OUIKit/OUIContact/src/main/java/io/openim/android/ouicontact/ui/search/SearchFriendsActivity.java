@@ -55,8 +55,8 @@ public class SearchFriendsActivity extends BaseActivity<SearchVM, ActivityOftenS
         bindViewDataBinding(ActivityOftenSerchBinding.inflate(getLayoutInflater()));
         sink();
         init();
-        listener();
         initView();
+        listener();
     }
 
     private void initView() {
@@ -67,28 +67,30 @@ public class SearchFriendsActivity extends BaseActivity<SearchVM, ActivityOftenS
             public void onBindView(@NonNull ViewHol.ItemViewHo holder, Object data, int position) {
                 GroupMembersInfo da = null;
                 FriendInfo da2 = null;
-                holder.view.select.setVisibility(null==selectIds?View.GONE:View.VISIBLE);
+                holder.view.select.setVisibility(null == selectIds ? View.GONE : View.VISIBLE);
 
                 if (isSearchGroupMember) {
                     da = (GroupMembersInfo) data;
                     holder.view.avatar.load(da.getFaceURL());
                     Common.stringBindForegroundColorSpan(holder.view.nickName, da.getNickname(),
                         vm.searchContent.getValue());
-                    holder.view.select.setChecked(null!=selectIds&&selectIds.contains(da.getUserID()));
+                    holder.view.select.setChecked(null != selectIds && selectIds.contains(da.getUserID()));
                 } else {
                     da2 = (FriendInfo) data;
                     holder.view.avatar.load(da2.getFaceURL());
                     Common.stringBindForegroundColorSpan(holder.view.nickName, da2.getNickname(),
                         vm.searchContent.getValue());
-                    holder.view.select.setChecked(null!=selectIds&&selectIds.contains(da2.getUserID()));
+                    holder.view.select.setChecked(null != selectIds && selectIds.contains(da2.getUserID()));
                 }
 
 
                 final GroupMembersInfo finalDa = da;
                 final FriendInfo finalDa1 = da2;
                 holder.view.getRoot().setOnClickListener(v -> {
-                    setResult(RESULT_OK, new Intent().putExtra(Constant.K_ID, isSearchGroupMember ? finalDa.getUserID() : finalDa1.getUserID())
-                        .putExtra(Constant.K_RESULT, isSearchGroupMember ? GsonHel.toJson(finalDa) : GsonHel.toJson(finalDa1))
+                    setResult(RESULT_OK, new Intent().putExtra(Constant.K_ID,
+                            isSearchGroupMember ? finalDa.getUserID() : finalDa1.getUserID())
+                        .putExtra(Constant.K_RESULT, isSearchGroupMember ?
+                            GsonHel.toJson(finalDa) : GsonHel.toJson(finalDa1))
                     );
                     finish();
                 });
@@ -119,7 +121,8 @@ public class SearchFriendsActivity extends BaseActivity<SearchVM, ActivityOftenS
                 .clear();
             adapter.notifyDataSetChanged();
 
-            loadMore();
+            if (!s.isEmpty())
+                loadMore();
         });
 
         view.searchView.getEditText().addTextChangedListener(new TextWatcher() {
@@ -147,27 +150,18 @@ public class SearchFriendsActivity extends BaseActivity<SearchVM, ActivityOftenS
 
 
         if (isSearchGroupMember) {
-            view.recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                    LinearLayoutManager linearLayoutManager =
-                        (LinearLayoutManager) view.recyclerview.getLayoutManager();
-                    int lastVisiblePosition =
-                        linearLayoutManager.findLastCompletelyVisibleItemPosition();
-                    if (lastVisiblePosition >= adapter.getItems().size() - 3) {
-                        vm.page++;
-                        loadMore();
-                    }
-                }
+            adapter.setOnLoadMoreListener(view.recyclerview, vm.pageSize, () -> {
+                vm.page++;
+                loadMore();
             });
         }
-
     }
 
     private void loadMore() {
-        if (TextUtils.isEmpty(groupId))
-            vm.searchFriendV2();
-        else
+        if (isSearchGroupMember)
             vm.searchGroupMemberByNickname(groupId, vm.searchContent.getValue());
+        else
+            vm.searchFriendV2();
+
     }
 }

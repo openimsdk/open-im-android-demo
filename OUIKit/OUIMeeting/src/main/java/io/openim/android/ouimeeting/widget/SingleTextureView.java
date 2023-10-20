@@ -2,6 +2,7 @@ package io.openim.android.ouimeeting.widget;
 
 import static kotlinx.coroutines.CoroutineScopeKt.MainScope;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -88,6 +89,11 @@ public class SingleTextureView extends FrameLayout {
 
 
         vm.callViewModel.subscribe(participant.getEvents().getEvents(), (v) -> {
+            Context context=getContext();
+            if ( context instanceof Activity){
+                if (((Activity)context).isFinishing()||((Activity)context).isDestroyed())return null;
+            }
+
             ParticipantMeta meta = GsonHel.fromJson(v.getParticipant().getMetadata(), ParticipantMeta.class);
             L.e(TAG, "------name-----" + vm.getMetaUserName(meta) + "----Events----" + v.getParticipant().getEvents().getEvents());
             bindUserStatus(v.getParticipant());
@@ -121,7 +127,8 @@ public class SingleTextureView extends FrameLayout {
         ParticipantMeta meta = GsonHel.fromJson(data.getMetadata(), ParticipantMeta.class);
         L.e(TAG, "------name-----" + vm.getMetaUserName(meta) + "----isCameraEnabled----" + textureViewUse);
 
-        if (null != meta) view.avatar.load(meta.userInfo.getFaceURL(), vm.getMetaUserName(meta));
+        if (null != meta)
+            view.avatar.load(meta.userInfo.getFaceURL(), vm.getMetaUserName(meta));
     }
 
     private void bindUserStatus(Participant participant) {

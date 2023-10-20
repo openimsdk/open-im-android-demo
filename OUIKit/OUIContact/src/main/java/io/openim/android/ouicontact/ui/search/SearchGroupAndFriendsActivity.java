@@ -63,7 +63,7 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
     }
 
     public boolean isMultipleSelect() {
-        return null != choices && !choices.isEmpty();
+        return null != choices;
     }
 
     @Override
