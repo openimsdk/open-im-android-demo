@@ -25,8 +25,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
@@ -44,6 +43,7 @@ import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
@@ -70,7 +70,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
     public int successNum = 0;
     private BottomPopDialog bottomPopDialog;
 
-    private boolean hasStorage, hasShoot;
+    private HasPermissions hasStorage, hasShoot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,8 +87,8 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
 
     private void init() {
         MThreadTool.executorService.execute(() -> {
-            hasStorage = AndPermission.hasPermissions(this, Permission.Group.STORAGE);
-            hasShoot = AndPermission.hasPermissions(this, Permission.CAMERA,
+            hasStorage = new HasPermissions(this, Permission.Group.STORAGE);
+            hasShoot = new HasPermissions(this, Permission.CAMERA,
                 Permission.RECORD_AUDIO);
         });
     }
@@ -313,23 +313,15 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
             bottomPopDialog.getMainView().menu3.setOnClickListener(v1 -> bottomPopDialog.dismiss());
 
             bottomPopDialog.getMainView().menu1.setOnClickListener(v1 -> {
-                Common.permission(this, new Common.OnGrantedListener() {
-                    @Override
-                    public void onGranted() {
-                        hasStorage = true;
-                        Matisse.from(PushMomentsActivity.this).choose(MimeType.ofVideo()).countable(true).showSingleMediaType(true).maxSelectable(1).restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED).thumbnailScale(0.85f).imageEngine(new GlideEngine()).forResult(videoLauncher);
-                    }
-                }, hasStorage, Permission.Group.STORAGE);
-
+                hasStorage.safeGo(() -> Matisse.from(PushMomentsActivity.this).choose(MimeType.ofVideo()).countable(true).showSingleMediaType(true).maxSelectable(1).restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED).thumbnailScale(0.85f).imageEngine(new GlideEngine()).forResult(videoLauncher));
             });
             bottomPopDialog.getMainView().menu2.setOnClickListener(v1 -> {
-                Common.permission(this, () -> {
-                    hasShoot = true;
+                hasShoot.safeGo(() -> {
                     Postcard postcard = ARouter.getInstance().build(Routes.Conversation.SHOOT);
                     LogisticsCenter.completion(postcard);
                     shootLauncher.launch(new Intent(PushMomentsActivity.this,
                         postcard.getDestination()).putExtra(Constant.K_RESULT, 0x102));
-                }, hasShoot, Permission.Group.STORAGE);
+                });
             });
         }
 

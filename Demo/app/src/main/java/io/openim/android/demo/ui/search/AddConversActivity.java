@@ -8,13 +8,13 @@ import androidx.activity.result.ActivityResultLauncher;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityAddFriendBinding;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
@@ -24,7 +24,7 @@ import io.openim.android.ouicore.utils.SinkHelper;
 public class AddConversActivity extends BaseActivity<SearchVM, ActivityAddFriendBinding> {
 
 
-    private boolean hasScanPermission=false;
+    private HasPermissions hasScanPermission;
     private ActivityResultLauncher<Intent> resultLauncher=Common.getCaptureActivityLauncher(this);
 
     @Override
@@ -34,7 +34,7 @@ public class AddConversActivity extends BaseActivity<SearchVM, ActivityAddFriend
         bindViewDataBinding(ActivityAddFriendBinding.inflate(getLayoutInflater()));
         vm.isPerson = getIntent().getBooleanExtra(Constant.K_RESULT, true);
         runOnUiThread(() -> {
-            hasScanPermission = AndPermission.hasPermissions(this, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
+            hasScanPermission = new HasPermissions(this, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
         });
 
         setLightStatus();
@@ -59,10 +59,7 @@ public class AddConversActivity extends BaseActivity<SearchVM, ActivityAddFriend
             ARouter.getInstance().build(Routes.Group.SHARE_QRCODE).navigation();
         });
         view.scan.setOnClickListener(v -> {
-            Common.permission(AddConversActivity.this, () -> {
-                hasScanPermission = true;
-                Common.jumpScan(this,resultLauncher);
-            }, hasScanPermission, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
+            hasScanPermission.safeGo(()->Common.jumpScan(this,resultLauncher));
         });
     }
 

@@ -10,10 +10,6 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.Rationale;
-import com.yanzhenjie.permission.RequestExecutor;
-import com.yanzhenjie.permission.runtime.Permission;
 
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;

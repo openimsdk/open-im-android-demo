@@ -31,8 +31,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -69,6 +69,7 @@ import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.Routes;
@@ -98,15 +99,13 @@ public class IMUtil {
 
     public static String getFastVideoPath(VideoElem elem) {
         String videoPath = elem.getVideoPath();
-        if (!GetFilePathFromUri.fileIsExists(videoPath))
-            videoPath = elem.getVideoUrl();
+        if (!GetFilePathFromUri.fileIsExists(videoPath)) videoPath = elem.getVideoUrl();
         return videoPath;
     }
 
     public static String getFastPicturePath(PictureElem elem) {
         String path = elem.getSourcePath();
-        if (!GetFilePathFromUri.fileIsExists(path))
-            path = elem.getSourcePicture().getUrl();
+        if (!GetFilePathFromUri.fileIsExists(path)) path = elem.getSourcePicture().getUrl();
         return path;
     }
 
@@ -430,8 +429,8 @@ public class IMUtil {
                 choice.name = transferredGroupNotification.newGroupOwner.getNickname();
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(),
-                        transferredGroupNotification.opUser.getNickname(),
-                        transferredGroupNotification.opUser.getUserID(), txt),
+                    transferredGroupNotification.opUser.getNickname(),
+                    transferredGroupNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -471,8 +470,8 @@ public class IMUtil {
                 choice.name = memberNotification.mutedUser.getNickname();
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(),
-                        memberNotification.opUser.getNickname(),
-                        memberNotification.opUser.getUserID(), txt),
+                    memberNotification.opUser.getNickname(),
+                    memberNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -563,11 +562,11 @@ public class IMUtil {
         for (MultipleChoice choice : choices) {
             buildClickAndColorSpannable((SpannableStringBuilder) sequence, choice.name,
                 new ClickableSpan() {
-                    @Override
-                    public void onClick(@NonNull View widget) {
-                        toPersonDetail(choice.key, choice.groupId);
-                    }
-                });
+                @Override
+                public void onClick(@NonNull View widget) {
+                    toPersonDetail(choice.key, choice.groupId);
+                }
+            });
         }
         return sequence;
     }
@@ -585,11 +584,11 @@ public class IMUtil {
                                                  String txt) {
         return buildClickAndColorSpannable(new SpannableStringBuilder(txt), nickName,
             new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    toPersonDetail(uid, groupId);
-                }
-            });
+            @Override
+            public void onClick(@NonNull View widget) {
+                toPersonDetail(uid, groupId);
+            }
+        });
     }
 
     private static void toPersonDetail(String uid, String groupId) {
@@ -601,8 +600,7 @@ public class IMUtil {
     }
 
     private static String atSelf(AtUserInfo atUsersInfo, boolean isNickName) {
-        if (isNickName)
-            return "@" + atUsersInfo.getGroupNickname();
+        if (isNickName) return "@" + atUsersInfo.getGroupNickname();
         return "@" + (atUsersInfo.getAtUserID().equals(BaseApp.inst().loginCertificate.userID) ?
             BaseApp.inst().getString(R.string.you) : atUsersInfo.getGroupNickname());
     }
@@ -686,10 +684,10 @@ public class IMUtil {
                     }
                     if (!tar.isEmpty()) {
                         atTxt = tar + atTxt;
-                        lastMsg =IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(atTxt),
-                            tar, R.color.theme, null);
-                    } else
-                        lastMsg += atTxt;
+                        lastMsg =
+                            IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(atTxt),
+                                tar, R.color.theme, null);
+                    } else lastMsg += atTxt;
                     break;
 
                 case MessageType.MERGER:
@@ -767,8 +765,9 @@ public class IMUtil {
      * 弹出底部菜单选择 音视通话
      */
     public static void showBottomPopMenu(Context context, View.OnKeyListener v) {
-        boolean hasPermissions = AndPermission.hasPermissions(context, Permission.CAMERA,
+        HasPermissions hasPermissions = new HasPermissions(context, Permission.CAMERA,
             Permission.RECORD_AUDIO);
+
         BottomPopDialog dialog = new BottomPopDialog(context);
         dialog.show();
         dialog.getMainView().menu3.setOnClickListener(v1 -> dialog.dismiss());
@@ -776,16 +775,16 @@ public class IMUtil {
         dialog.getMainView().menu2.setText(io.openim.android.ouicore.R.string.video_calls);
 
         dialog.getMainView().menu1.setOnClickListener(v1 -> {
-            Common.permission(context, () -> {
+            hasPermissions.safeGo(() -> {
                 v.onKey(v1, 1, null);
                 dialog.dismiss();
-            }, hasPermissions, Permission.CAMERA, Permission.RECORD_AUDIO);
+            });
         });
         dialog.getMainView().menu2.setOnClickListener(v1 -> {
-            Common.permission(context, () -> {
+            hasPermissions.safeGo(() -> {
                 v.onKey(v1, 2, null);
                 dialog.dismiss();
-            }, hasPermissions, Permission.CAMERA, Permission.RECORD_AUDIO);
+            });
         });
     }
 

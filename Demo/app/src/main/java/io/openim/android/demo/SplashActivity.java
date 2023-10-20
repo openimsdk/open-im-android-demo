@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.yanzhenjie.permission.AndPermission;
 
 import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.demo.ui.main.MainActivity;

@@ -5,8 +5,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
 
 import java.util.List;
 
@@ -20,11 +18,8 @@ public class MessageAdapter extends RecyclerView.Adapter {
     private RecyclerView recyclerView;
 
     List<Message> messages;
-    boolean hasStorage;
 
-    public MessageAdapter() {
-        hasStorage = AndPermission.hasPermissions(BaseApp.inst(), Permission.Group.STORAGE);
-    }
+    public MessageAdapter() {}
 
     public void setMessages(List<Message> messages) {
         this.messages = messages;

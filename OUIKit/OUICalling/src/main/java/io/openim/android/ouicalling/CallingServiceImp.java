@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.yanzhenjie.permission.AndPermission;
+import com.hjq.permissions.Permission;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,9 @@ import io.openim.android.ouicalling.service.AudioVideoService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.CallHistory;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
@@ -39,6 +41,7 @@ public class CallingServiceImp implements CallingService {
     private Context context;
     public CallDialog callDialog;
     private SignalingInfo signalingInfo;
+    private HasPermissions hasSystemAlert;
 
     public void setSignalingInfo(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
@@ -108,7 +111,7 @@ public class CallingServiceImp implements CallingService {
         L.e(TAG, "----onInviteeRejected-----");
         if (null == callDialog) return;
         callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(), (realm,
-                                                                                       callHistory) -> {
+                                                                      callHistory) -> {
             callHistory.setSuccess(false);
             callHistory.setFailedState(2);
         });
@@ -128,8 +131,12 @@ public class CallingServiceImp implements CallingService {
         Common.wakeUp(context);
         setSignalingInfo(signalingInfo);
 
-        AndPermission.with(context).overlay().onGranted(data -> context.startActivity(new Intent(context, LockPushActivity.class)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))).start();
+        if (null == hasSystemAlert)
+            hasSystemAlert = new HasPermissions(ActivityManager.getActivityStack().peek(),
+                Permission.SYSTEM_ALERT_WINDOW);
+        hasSystemAlert.safeGo(() -> context.startActivity(new Intent(context,
+            LockPushActivity.class)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)));
     }
 
     @Override
@@ -149,7 +156,8 @@ public class CallingServiceImp implements CallingService {
                 }
             }
             insetDB();
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
         return callDialog;
     }
 
@@ -231,10 +239,10 @@ public class CallingServiceImp implements CallingService {
 
             @Override
             public void onSuccess(List<UserInfo> data) {
-                if (data.isEmpty()||null==callDialog) return;
+                if (data.isEmpty() || null == callDialog) return;
                 UserInfo userInfo = data.get(0);
                 BaseApp.inst().realm.executeTransactionAsync(realm -> {
-                    if (null==callDialog)return;
+                    if (null == callDialog) return;
                     CallHistory callHistory =
                         new CallHistory(callDialog.buildPrimaryKey(),
                             userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(),

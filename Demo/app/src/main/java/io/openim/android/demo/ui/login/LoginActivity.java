@@ -23,7 +23,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.hbb20.CountryCodePicker;
-import com.yanzhenjie.permission.AndPermission;
 
 import org.intellij.lang.annotations.Language;
 

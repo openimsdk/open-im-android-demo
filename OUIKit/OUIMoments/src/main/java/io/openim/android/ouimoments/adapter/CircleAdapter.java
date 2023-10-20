@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
-import com.yanzhenjie.permission.AndPermission;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -29,8 +29,7 @@ import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
 import com.yanzhenjie.recyclerview.OnItemClickListener;
 import com.yanzhenjie.recyclerview.SwipeMenuCreator;
 import com.yanzhenjie.recyclerview.SwipeMenuItem;
@@ -49,6 +48,7 @@ import io.openim.android.ouiconversation.ui.NotificationActivity;
 import io.openim.android.ouiconversation.ui.SearchActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.SinkHelper;
@@ -74,7 +74,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
 
     private FragmentContactListBinding view;
     private CustomAdapter adapter;
-    private boolean hasScanPermission = false;
+    private HasPermissions hasScanPermission;
     private ActivityResultLauncher<Intent> resultLauncher;
     private final UserLogic user = Easy.find(UserLogic.class);
     private final HashSet<Integer> slideSet = new HashSet<>();
@@ -100,7 +100,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
         Obs.inst().addObserver(this);
         Activity activity = getActivity();
         if (null != activity) {
-            activity.runOnUiThread(() -> hasScanPermission = AndPermission.hasPermissions(this,
+            activity.runOnUiThread(() -> hasScanPermission = new HasPermissions(getContext(),
                 Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE));
         }
         super.onCreate(savedInstanceState);
@@ -284,10 +284,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
         LayoutAddActionBinding view = LayoutAddActionBinding.inflate(getLayoutInflater());
         view.scan.setOnClickListener(c -> {
             popupWindow.dismiss();
-            Common.permission(getActivity(), () -> {
-                hasScanPermission = true;
-                Common.jumpScan(getActivity(), resultLauncher);
-            }, hasScanPermission, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
+            hasScanPermission.safeGo(() -> Common.jumpScan(getActivity(), resultLauncher));
         });
         view.addFriend.setOnClickListener(c -> {
             popupWindow.dismiss();

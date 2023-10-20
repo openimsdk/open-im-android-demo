@@ -35,9 +35,8 @@ import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.hjq.permissions.Permission;
 import com.hjq.window.EasyWindow;
-import com.yanzhenjie.permission.Action;
-import com.yanzhenjie.permission.AndPermission;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -66,6 +65,7 @@ import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
@@ -114,6 +114,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     private Observer<? super Boolean> isAppBackgroundListener;
     //恢复当前页面
     boolean isRecover = false;
+    private HasPermissions hasSystemAlert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +122,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMeetingHomeBinding.inflate(getLayoutInflater()));
         initView();
+
+        hasSystemAlert=new HasPermissions(this, Permission.SYSTEM_ALERT_WINDOW);
 
         if (vm.isInit) {
             connectRoomSuccess(vm.callViewModel.getVideoTrack(vm.callViewModel
@@ -695,7 +698,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             view.horn.setImageResource(aBoolean ? R.mipmap.ic_m_horn : R.mipmap.ic_m_receiver);
         });
         view.zoomOut.setOnClickListener(v -> {
-            AndPermission.with(this).overlay().onGranted(data -> {
+            hasSystemAlert.safeGo(()->{
                 Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
                 LogisticsCenter.completion(postcard);
                 Activity activity = ActivityManager.isExist(postcard.getDestination());
@@ -703,7 +706,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                     moveTaskToFront(activity.getTaskId());
                     showFloatView();
                 }
-            }).start();
+            });
         });
 
         vm.roomMetadata.observe(this, meta -> {

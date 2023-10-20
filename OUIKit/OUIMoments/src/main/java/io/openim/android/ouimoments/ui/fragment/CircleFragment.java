@@ -34,8 +34,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
 
 import java.util.List;
 import java.util.Observable;

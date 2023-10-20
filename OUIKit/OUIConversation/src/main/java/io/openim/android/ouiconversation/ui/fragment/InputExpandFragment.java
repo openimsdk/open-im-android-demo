@@ -26,8 +26,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
@@ -56,6 +55,7 @@ import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
@@ -84,16 +84,16 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
 
     FragmentInputExpandBinding v;
     //权限
-    boolean hasStorage, hasShoot, hasLocation;
+    private HasPermissions hasStorage, hasShoot, hasLocation;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MThreadTool.executorService.execute(() -> {
-            hasStorage = AndPermission.hasPermissions(getActivity(), Permission.Group.STORAGE);
-            hasShoot = AndPermission.hasPermissions(getActivity(), Permission.CAMERA,
+            hasStorage = new HasPermissions(getActivity(), Permission.Group.STORAGE);
+            hasShoot = new HasPermissions(getActivity(), Permission.CAMERA,
                 Permission.RECORD_AUDIO);
-            hasLocation = AndPermission.hasPermissions(getActivity(),
+            hasLocation = new HasPermissions(getActivity(),
                 Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
         });
 
@@ -140,8 +140,8 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                                     Easy.installVM(SelectTargetVM.class);
                                 selectTargetVM.setIntention(SelectTargetVM.Intention.isShareCard);
                                 selectTargetVM.setOnFinishListener(() -> {
-                                    Activity activity=ActivityManager.isExist(ChatActivity.class);
-                                    if (null==activity)return;
+                                    Activity activity = ActivityManager.isExist(ChatActivity.class);
+                                    if (null == activity) return;
                                     CommonDialog commonDialog = new CommonDialog(activity);
                                     LayoutCommonDialogBinding mainView =
                                         commonDialog.getMainView();
@@ -222,43 +222,24 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
     //分享位置
     @SuppressLint("WrongConstant")
     private void gotoShareLocation() {
-        if (hasLocation) {
-            shareLocationLauncher.launch(new Intent(getActivity(), WebViewActivity.class).putExtra(WebViewActivity.ACTION, WebViewActivity.LOCATION));
-        } else {
-            AndPermission.with(this).runtime().permission(Permission.ACCESS_FINE_LOCATION,
-                Permission.ACCESS_COARSE_LOCATION).onDenied(data -> {
-            }).onGranted(data -> {
-                hasLocation = true;
-                shareLocationLauncher.launch(new Intent(getActivity(), WebViewActivity.class).putExtra(WebViewActivity.ACTION, WebViewActivity.LOCATION));
-            }).start();
-        }
-
+        hasLocation.safeGo(() -> {
+            shareLocationLauncher.launch(new Intent(getActivity(), WebViewActivity.class)
+                .putExtra(WebViewActivity.ACTION, WebViewActivity.LOCATION));
+        });
     }
 
     private void gotoSelectFile() {
-        Common.permission(getContext(), () -> {
-            hasStorage = true;
+        hasStorage.safeGo(()->{
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("*/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             fileLauncher.launch(intent);
-        }, hasStorage, Permission.Group.STORAGE);
+        });
     }
 
     //去拍摄
     private void goToShoot() {
-        if (hasShoot)
-            shootLauncher.launch(new Intent(getActivity(), ShootActivity.class));
-        else {
-            AndPermission.with(this).runtime().permission(Permission.CAMERA,
-                Permission.RECORD_AUDIO).onGranted(permissions -> {
-                // Storage permission are allowed.
-                hasShoot = true;
-                shootLauncher.launch(new Intent(getActivity(), ShootActivity.class));
-            }).onDenied(permissions -> {
-                // Storage permission are not allowed.
-            }).start();
-        }
+        hasShoot.safeGo(()-> shootLauncher.launch(new Intent(getActivity(), ShootActivity.class)));
     }
 
     private final ActivityResultLauncher<Intent> fileLauncher =
@@ -355,21 +336,13 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
 
     @SuppressLint("WrongConstant")
     private void showMediaPicker() {
-        if (hasStorage) goMediaPicker();
-        else
-            AndPermission.with(this).runtime().permission(Permission.Group.STORAGE).onGranted(permissions -> {
-                // Storage permission are allowed.
-                hasStorage = true;
-                goMediaPicker();
-            }).onDenied(permissions -> {
-                // Storage permission are not allowed.
-            }).start();
+        hasStorage.safeGo(() -> Matisse.from(getActivity()).choose(MimeType.ofAll())
+            .countable(true).maxSelectable(9)
+            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+            .thumbnailScale(0.85f)
+            .imageEngine(new GlideEngine()).forResult(captureLauncher));
     }
 
-
-    private void goMediaPicker() {
-        Matisse.from(getActivity()).choose(MimeType.ofAll()).countable(true).maxSelectable(9).restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED).thumbnailScale(0.85f).imageEngine(new GlideEngine()).forResult(captureLauncher);
-    }
 
 
     public void setChatVM(ChatVM vm) {

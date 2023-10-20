@@ -24,8 +24,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,6 +43,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
@@ -58,7 +58,7 @@ import io.openim.android.sdk.models.Message;
  */
 public class BottomInputCote {
 
-    private boolean hasMicrophone = false;
+    private HasPermissions hasMicrophone;
     private ChatVM vm;
     private Context context;
     private OnAtUserListener onAtUserListener;
@@ -79,8 +79,8 @@ public class BottomInputCote {
         view.root.setIntercept(false);
 
         initFragment();
-        Common.UIHandler.postDelayed(() -> hasMicrophone = AndPermission.hasPermissions(context,
-            Permission.Group.MICROPHONE), 300);
+        Common.UIHandler.postDelayed(() -> hasMicrophone = new HasPermissions(context,
+            Permission.RECORD_AUDIO), 300);
 
         view.chatMoreOrSend.setOnClickListener(new OnDedrepClickListener() {
             @Override
@@ -171,10 +171,7 @@ public class BottomInputCote {
                 touchVoiceDialog.setOnShowListener(dialog -> showingViewChange());
                 touchVoiceDialog.setOnDismissListener(dialog -> showingViewChange());
             }
-            Common.permission(context, () -> {
-                touchVoiceDialog.show();
-                hasMicrophone = true;
-            }, hasMicrophone, Permission.Group.MICROPHONE);
+            hasMicrophone.safeGo(()-> touchVoiceDialog.show());
             return false;
         });
 

@@ -17,10 +17,9 @@ import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.hjq.permissions.Permission;
 import com.hjq.window.EasyWindow;
 import com.igexin.sdk.PushManager;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
@@ -38,6 +37,7 @@ import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Routes;
 
 @Route(path = Routes.Main.HOME)
@@ -47,7 +47,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     private BaseFragment lastFragment, conversationListFragment, contactFragment,
         personalFragment, appletFragment;
     private ActivityResultLauncher<Intent> resultLauncher = Common.getCaptureActivityLauncher(this);
-    private boolean hasShoot = false;
+    private HasPermissions hasShoot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,14 +81,10 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
 
     private void init() {
-        runOnUiThread(() -> {
-            hasShoot = AndPermission.hasPermissions(MainActivity.this, Permission.CAMERA,
-                Permission.RECORD_AUDIO);
-            AndPermission.with(this).overlay()
-                .onGranted(data -> Common.permission(MainActivity.this,
-                    () -> hasShoot = true, hasShoot,
-                    Permission.CAMERA, Permission.RECORD_AUDIO)).start();
-        });
+       Common.UIHandler.postDelayed(() -> new HasPermissions(MainActivity.this, Permission.SYSTEM_ALERT_WINDOW)
+           .safeGo(() -> new HasPermissions(MainActivity.this, Permission.CAMERA,
+               Permission.RECORD_AUDIO).safeGo(() -> {
+           })),2000);
     }
 
     private void listener() {
