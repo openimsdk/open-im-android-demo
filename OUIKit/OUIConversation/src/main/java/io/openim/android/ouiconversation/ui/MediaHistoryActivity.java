@@ -194,7 +194,8 @@ public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHist
 
                             holder.view.getRoot().setOnClickListener(v -> {
                                 PreviewMediaVM  previewMediaVM = Easy.installVM(PreviewMediaVM.class);
-                                PreviewMediaVM.MediaData  mediaData =new PreviewMediaVM.MediaData(url);
+                                PreviewMediaVM.MediaData  mediaData =new PreviewMediaVM.MediaData(data.getClientMsgID());
+                                mediaData.mediaUrl=url;
                                 previewMediaVM.previewSingle(mediaData);
                                 if (isPicture) {
                                     mediaData.thumbnail= data.getPictureElem().getSnapshotPicture().getUrl();

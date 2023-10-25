@@ -16,17 +16,18 @@ import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnConnListener;
+import io.openim.android.sdk.models.InitConfig;
 
 public class IM {
     public static void initSdk(Application app) {
         L.e("App", "---IM--initSdk");
+        InitConfig initConfig = new InitConfig(Constant.getImApiUrl(),
+            Constant.getImWsUrl(), getStorageDir());
+        initConfig.isLogStandardOutput = true;
+
         ///IM 初始化
-        OpenIMClient.getInstance().initSDK(app,2,
-            Constant.getImApiUrl(),
-            Constant.getImWsUrl(), getStorageDir(), 6,
-            true,
-            Constant.getStorageType(),
-            false,IMEvent.getInstance().connListener);
+        OpenIMClient.getInstance().initSDK(app,
+            initConfig, IMEvent.getInstance().connListener);
 
         IMEvent.getInstance().init();
     }
