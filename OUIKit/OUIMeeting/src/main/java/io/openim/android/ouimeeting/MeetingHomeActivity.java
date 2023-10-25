@@ -6,14 +6,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.ColorDrawable;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -45,13 +45,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.livekit.android.events.DisconnectReason;
 import io.livekit.android.events.RoomEvent;
-import io.livekit.android.renderer.TextureViewRenderer;
-import io.livekit.android.room.participant.ConnectionQuality;
 import io.livekit.android.room.participant.Participant;
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
@@ -60,7 +57,6 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
 import io.openim.android.ouicore.entity.ParticipantMeta;
-import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
@@ -69,7 +65,6 @@ import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
@@ -78,24 +73,15 @@ import io.openim.android.ouimeeting.databinding.ActivityMeetingHomeBinding;
 import io.openim.android.ouimeeting.databinding.LayoutMeetingInfoDialogBinding;
 import io.openim.android.ouimeeting.databinding.LayoutMemberDialogBinding;
 import io.openim.android.ouimeeting.databinding.LayoutSettingDialogBinding;
-import io.openim.android.ouimeeting.databinding.LayoutUserStatusBinding;
 import io.openim.android.ouimeeting.databinding.MeetingIietmMemberBinding;
 import io.openim.android.ouimeeting.databinding.MenuUserSettingBinding;
 import io.openim.android.ouimeeting.databinding.ViewMeetingFloatBinding;
-import io.openim.android.ouimeeting.databinding.ViewSingleTextureBinding;
 import io.openim.android.ouimeeting.entity.RoomMetadata;
 import io.openim.android.ouimeeting.vm.MeetingVM;
 import io.openim.android.ouimeeting.widget.SingleTextureView;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.listener.OnConnListener;
 import io.openim.android.sdk.models.UserInfo;
-import kotlin.Unit;
-import kotlin.coroutines.Continuation;
-import kotlin.coroutines.CoroutineContext;
-import kotlin.coroutines.EmptyCoroutineContext;
-import kotlinx.coroutines.CoroutineScope;
-import kotlinx.coroutines.flow.StateFlow;
 
 @Route(path = Routes.Meeting.HOME)
 public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeetingHomeBinding> implements MeetingVM.Interaction {
@@ -123,9 +109,11 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         bindViewDataBinding(ActivityMeetingHomeBinding.inflate(getLayoutInflater()));
         initView();
 
-        hasSystemAlert=new HasPermissions(this, Permission.SYSTEM_ALERT_WINDOW);
+        hasSystemAlert = new HasPermissions(this, Permission.SYSTEM_ALERT_WINDOW);
 
         if (vm.isInit) {
+            if (vm.isLandscape)
+                toast(getString(io.openim.android.ouicore.R.string.double_tap_tips));
             connectRoomSuccess(vm.callViewModel.getVideoTrack(vm.callViewModel
                 .getRoom().getLocalParticipant()));
         } else
@@ -343,7 +331,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                         holder.view.camera.setVisibility(View.VISIBLE);
                         holder.view.mic.setChecked(data.isMicrophoneEnabled());
                         holder.view.camera.setEnabled(!data.isScreenShareEnabled());
-                            holder.view.camera.setAlpha(data.isScreenShareEnabled()?0.5F:1);
+                        holder.view.camera.setAlpha(data.isScreenShareEnabled() ? 0.5F : 1);
                         holder.view.camera.setChecked(data.isCameraEnabled());
                         holder.view.allSeeIv.setVisibility(vm.isAllSeeHe(data) ? View.VISIBLE :
                             View.GONE);
@@ -492,7 +480,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     }
 
     private void initView() {
-        view.pager.setAdapter(adapter = new PageAdapter(getLayoutInflater(), vm));
+        view.pager.setAdapter(adapter = new PageAdapter(getLayoutInflater(), vm,gestureDetector));
 
         view.pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
@@ -591,7 +579,26 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         });
     }
 
+    private final GestureDetector gestureDetector = new GestureDetector(BaseApp.inst(),
+        new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                Object obj = view.pager.getTag();
+                boolean fixScreen = false;
+                if (obj instanceof Boolean)
+                    fixScreen = (Boolean) obj;
+
+                view.bottomMenu.setVisibility(fixScreen ? View.VISIBLE:View.GONE );
+                view.topTitle.setVisibility(fixScreen ? View.VISIBLE:View.GONE);
+
+                view.pager.setTag(!fixScreen);
+                return super.onDoubleTap(e);
+            }
+        });
+
     private void listener() {
+        view.pager.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
+
         BaseApp.inst().isAppBackground.observeForever(isAppBackgroundListener = v -> {
             if (isRecover && !v) {
                 moveTaskToFront(getTaskId());
@@ -698,7 +705,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             view.horn.setImageResource(aBoolean ? R.mipmap.ic_m_horn : R.mipmap.ic_m_receiver);
         });
         view.zoomOut.setOnClickListener(v -> {
-            hasSystemAlert.safeGo(()->{
+            hasSystemAlert.safeGo(() -> {
                 Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
                 LogisticsCenter.completion(postcard);
                 Activity activity = ActivityManager.isExist(postcard.getDestination());
@@ -825,10 +832,13 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         private final LayoutInflater inflater;
         private List<Object> list = new ArrayList<>();
         private final MeetingVM vm;
+        private final  GestureDetector gestureDetector;
 
-        public PageAdapter(LayoutInflater inflater, MeetingVM vm) {
+        public PageAdapter(LayoutInflater inflater, MeetingVM vm,
+                           GestureDetector gestureDetector) {
             this.inflater = inflater;
             this.vm = vm;
+            this.gestureDetector=gestureDetector;
         }
 
         public List<Object> getList() {
@@ -882,6 +892,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                         holder.view.subscribeParticipant(vm, data);
                     }
                 });
+                view.recyclerView.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
+
                 adapter.setItems(participants);
                 view_ = view.getRoot();
             }
