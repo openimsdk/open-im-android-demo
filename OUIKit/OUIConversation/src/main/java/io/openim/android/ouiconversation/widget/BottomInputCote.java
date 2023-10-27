@@ -19,6 +19,8 @@ import android.text.style.ImageSpan;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
 
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentTransaction;
@@ -70,7 +72,7 @@ public class BottomInputCote {
     //是否可发送内容
     private boolean isSend;
 
-
+    private  OnDedrepClickListener chatMoreOrSendClick;
     @SuppressLint("WrongConstant")
     public BottomInputCote(Context context, LayoutInputCoteBinding view) {
         this.context = context;
@@ -82,7 +84,7 @@ public class BottomInputCote {
         Common.UIHandler.postDelayed(() -> hasMicrophone = new HasPermissions(context,
             Permission.RECORD_AUDIO), 300);
 
-        view.chatMoreOrSend.setOnClickListener(new OnDedrepClickListener() {
+        view.chatMoreOrSend.setOnClickListener(chatMoreOrSendClick=new OnDedrepClickListener() {
             @Override
             public void click(View v) {
                 if (!isSend) {
@@ -177,9 +179,6 @@ public class BottomInputCote {
 
         view.chatInput.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) setExpandHide();
-//            InputMethodManager inputMethodManager =
-//                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-//            inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
         });
 
         view.emoji.setOnClickListener(v -> {
@@ -217,6 +216,14 @@ public class BottomInputCote {
 
 
             }
+        });
+        view.chatInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEND&& BottomInputCote.this.isSend) {
+                if (null!=chatMoreOrSendClick){
+                    chatMoreOrSendClick.click(view.chatMoreOrSend);
+                }
+            }
+            return true;
         });
     }
 

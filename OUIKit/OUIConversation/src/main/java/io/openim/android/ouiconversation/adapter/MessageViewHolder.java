@@ -321,17 +321,20 @@ public class MessageViewHolder {
             if (isOwn) nickName = itemView.findViewById(R.id.nickName2);
             else nickName = itemView.findViewById(R.id.nickName);
             if (null != nickName) {
+                nickName.setVisibility(View.VISIBLE);
                 nickName.setMaxLines(1);
                 nickName.setMaxEms(18);
                 nickName.setEllipsize(TextUtils.TruncateAt.MIDDLE);
 
-                String time = TimeUtil.getTimeString(message.getSendTime());
-                nickName.setVisibility(View.VISIBLE);
-                if (message.getSessionType() == ConversationType.SINGLE_CHAT) {
+                boolean isSending=message.getStatus() == MessageStatus.SENDING;
+                String time = TimeUtil.getTimeString(isSending
+                    ? System.currentTimeMillis()
+                    : message.getSendTime());
+                if (isSending
+                    || message.getSessionType() == ConversationType.SINGLE_CHAT) {
                     nickName.setText(time);
-                } else {
+                } else
                     nickName.setText(message.getSenderNickname() + "  " + time);
-                }
             }
         }
 

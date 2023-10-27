@@ -47,7 +47,6 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     private BaseFragment lastFragment, conversationListFragment, contactFragment,
         personalFragment, appletFragment;
     private ActivityResultLauncher<Intent> resultLauncher = Common.getCaptureActivityLauncher(this);
-    private HasPermissions hasShoot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

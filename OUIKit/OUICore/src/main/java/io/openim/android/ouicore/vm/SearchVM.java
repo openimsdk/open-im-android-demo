@@ -41,7 +41,6 @@ public class SearchVM extends BaseViewModel {
         new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<GroupInfo>> groupsInfo = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<UserInfo>> userInfo = new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<List<FriendInfo>> friendInfo = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<FriendshipInfo>> friendshipInfo =
         new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<GroupMembersInfo>> groupMembersInfo =
@@ -198,23 +197,33 @@ public class SearchVM extends BaseViewModel {
     }
 
     public void searchFriendV2() {
-        OpenIMClient.getInstance().friendshipManager.searchFriends(new OnBase<List<FriendInfo>>() {
-            @Override
-            public void onError(int code, String error) {
+        Parameter parameter = new Parameter();
 
-            }
+        Map<String, Integer> pa = new HashMap<>();
+        pa.put("pageNumber", 1);
+        pa.put("showNumber", 100);
+        parameter.add("pagination", pa);
+        parameter.add("keyword", searchContent.getValue());
 
-            @Override
-            public void onSuccess(List<FriendInfo> data) {
-                if (page == 1) {
-                    friendInfo.getValue().clear();
+        N.API(OneselfService.class).searchFriends(parameter.buildJsonBody())
+            .map(OneselfService.turn(UserList.class))
+            .compose(N.IOMain())
+            .subscribe(new NetObserver<UserList>("") {
+
+
+                @Override
+                public void onSuccess(UserList o) {
+                    try {
+                        if (page == 1) {
+                            userInfo.getValue().clear();
+                        }
+                        if (null!=o.users&& !o.users.isEmpty()) {
+                            userInfo.getValue().addAll(o.users);
+                        }
+                        userInfo.setValue(userInfo.getValue());
+                    }catch (Exception e){e.printStackTrace();}
                 }
-                if (!data.isEmpty()) {
-                    friendInfo.getValue().addAll(data);
-                }
-                friendInfo.setValue(friendInfo.getValue());
-            }
-        }, buildKeyWord(), true, true, true);
+            });
     }
 
     public void searchGroupV2() {
@@ -285,7 +294,6 @@ public class SearchVM extends BaseViewModel {
         fileItems.getValue().clear();
         groupsInfo.getValue().clear();
         userInfo.getValue().clear();
-        friendInfo.getValue().clear();
     }
 
     public void addTextChangedListener(EditText editText) {

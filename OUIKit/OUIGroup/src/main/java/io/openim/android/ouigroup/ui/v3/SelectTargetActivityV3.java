@@ -56,16 +56,6 @@ public class SelectTargetActivityV3 extends BasicActivity<
 
     private void click() {
         view.myFriends.setOnClickListener(v -> {
-//            if (selectTargetVM.isShareCard()) {
-//                ARouter.getInstance().build(Routes.Contact.ALL_FRIEND)
-//                    .withBoolean("formChat", true).navigation();
-//            } else {
-//                ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
-//                    .withBoolean(Constant.IS_SELECT_FRIEND, true)
-//                    .withString(Constant.K_NAME,
-//                        getString(io.openim.android.ouicore.R.string.my_good_friend))
-//                    .navigation();
-//            }
             ARouter.getInstance().build(Routes.Contact.ALL_FRIEND)
                 .withBoolean("formChat", true).navigation();
         });
@@ -84,7 +74,7 @@ public class SelectTargetActivityV3 extends BasicActivity<
             LogisticsCenter.completion(postcard);
             launcher.launch(new Intent(this, postcard.getDestination())
                 .putExtra(Constant.K_RESULT, (Serializable) selectTargetVM.metaData.val())
-                .putExtra(Constant.IS_SELECT_FRIEND, selectTargetVM.isCreateGroup()));
+                .putExtra(Constant.IS_SELECT_FRIEND, selectTargetVM.isInvite()));
         });
     }
 
