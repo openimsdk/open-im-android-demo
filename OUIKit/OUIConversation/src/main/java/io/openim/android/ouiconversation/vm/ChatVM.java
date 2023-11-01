@@ -3,7 +3,6 @@ package io.openim.android.ouiconversation.vm;
 
 import static io.openim.android.ouicore.utils.Common.UIHandler;
 
-import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
@@ -19,7 +18,6 @@ import androidx.lifecycle.Observer;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,12 +28,10 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Vector;
 
 
 import javax.annotation.Nullable;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.State;
@@ -113,6 +109,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     //通知消息
     public State<ConversationInfo> conversationInfo = new State<>();
     public State<GroupInfo> groupInfo = new State<>();
+    public State<GroupMembersInfo> memberInfo = new State<>();
     public State<NotificationMsg> notificationMsg = new State<>();
     public State<List<Message>> messages = new State<>(new ArrayList<>());
     //@消息
@@ -143,7 +140,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     public boolean fromChatHistory = false;//从查看聊天记录跳转过来
     public boolean firstChatHistory = true;// //用于第一次消息定位
-    public boolean hasPermission = false;// 为true 则是管理员或群主
+    public boolean isAdminOrCreator = false;// 为true 则是管理员或群主
 
     public int count = 20; //条数
     public Message loading;
@@ -215,7 +212,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             @Override
             public void onSuccess(List<GroupMembersInfo> data) {
                 if (data.isEmpty()) return;
-                hasPermission = data.get(0).getRoleLevel() != GroupRole.MEMBER;
+                isAdminOrCreator = data.get(0).getRoleLevel() != GroupRole.MEMBER;
+                memberInfo.setValue(data.get(0));
             }
         }, groupID, uid);
     }
@@ -327,8 +325,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onGroupMemberInfoChanged(GroupMembersInfo info) {
-        if (info.getGroupID().equals(groupID) && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
-            hasPermission = info.getRoleLevel() != GroupRole.MEMBER;
+        if (info.getGroupID().equals(groupID)
+            && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+            isAdminOrCreator = info.getRoleLevel() != GroupRole.MEMBER;
+            memberInfo.setValue(info);
         }
     }
 

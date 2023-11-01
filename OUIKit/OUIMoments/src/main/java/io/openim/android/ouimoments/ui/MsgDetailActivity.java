@@ -101,8 +101,10 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
                     holder.view.action.setText(tips);
                 }
                 if (data.type == MsgDetailVM.WorkMomentLogTypeAt) {
+                    nickName = data.nickname;
+                    faceURL = data.faceURL;
                     holder.view.action.setText(getString(io.openim.android.ouicore.R.string.about_you)
-                        + DatasUtil.curUser);
+                        + DatasUtil.curUser.getName());
                 }
                 holder.view.avatar.load(faceURL);
                 holder.view.nickName.setText(nickName);

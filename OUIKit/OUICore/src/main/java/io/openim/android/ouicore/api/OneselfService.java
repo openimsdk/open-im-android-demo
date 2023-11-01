@@ -47,6 +47,12 @@ public interface OneselfService {
     @POST("user/search/public")
     Observable<ResponseBody> searchUser(@Body RequestBody requestBody);
 
+    @POST("user/find/full")
+    Observable<ResponseBody> getUsersFullInfo(@Body RequestBody requestBody);
+
+    @POST("user/update")
+    Observable<ResponseBody> updateUserInfo(@Body RequestBody requestBody);
+
     @POST("friend/search")
     Observable<ResponseBody> searchFriends(@Body RequestBody requestBody);
 

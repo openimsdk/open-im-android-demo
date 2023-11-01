@@ -46,12 +46,14 @@ import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.HasPermissions;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.enums.GroupStatus;
 import io.openim.android.sdk.models.AtUserInfo;
+import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 
@@ -72,7 +74,8 @@ public class BottomInputCote {
     //是否可发送内容
     private boolean isSend;
 
-    private  OnDedrepClickListener chatMoreOrSendClick;
+    private OnDedrepClickListener chatMoreOrSendClick;
+
     @SuppressLint("WrongConstant")
     public BottomInputCote(Context context, LayoutInputCoteBinding view) {
         this.context = context;
@@ -84,7 +87,7 @@ public class BottomInputCote {
         Common.UIHandler.postDelayed(() -> hasMicrophone = new HasPermissions(context,
             Permission.RECORD_AUDIO), 300);
 
-        view.chatMoreOrSend.setOnClickListener(chatMoreOrSendClick=new OnDedrepClickListener() {
+        view.chatMoreOrSend.setOnClickListener(chatMoreOrSendClick = new OnDedrepClickListener() {
             @Override
             public void click(View v) {
                 if (!isSend) {
@@ -173,7 +176,7 @@ public class BottomInputCote {
                 touchVoiceDialog.setOnShowListener(dialog -> showingViewChange());
                 touchVoiceDialog.setOnDismissListener(dialog -> showingViewChange());
             }
-            hasMicrophone.safeGo(()-> touchVoiceDialog.show());
+            hasMicrophone.safeGo(() -> touchVoiceDialog.show());
             return false;
         });
 
@@ -218,8 +221,8 @@ public class BottomInputCote {
             }
         });
         view.chatInput.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEND&& BottomInputCote.this.isSend) {
-                if (null!=chatMoreOrSendClick){
+            if (actionId == EditorInfo.IME_ACTION_SEND && BottomInputCote.this.isSend) {
+                if (null != chatMoreOrSendClick) {
                     chatMoreOrSendClick.click(view.chatMoreOrSend);
                 }
             }
@@ -326,39 +329,13 @@ public class BottomInputCote {
         });
 
         if (!vm.isSingleChat) {
+            vm.memberInfo.observe((LifecycleOwner) context, mem -> {
+                if (null == mem) return;
+                setMute();
+            });
             vm.groupInfo.observe((LifecycleOwner) context, groupInfo -> {
                 if (null == groupInfo) return;
-
-                if (groupInfo.getStatus() == GroupStatus.GROUP_DISSOLVE) {
-                    editMute(true);
-                    view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
-                } else if (groupInfo.getStatus() == GroupStatus.GROUP_BANNED) {
-                    editMute(true);
-                    view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.group_ban));
-                } else {
-                    OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
-                        @Override
-                        public void onSuccess(List<GroupMembersInfo> data) {
-                            if (data.isEmpty()) return;
-                            GroupMembersInfo mem = data.get(0);
-
-                            if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED
-                                && mem.getRoleLevel() == GroupRole.MEMBER) {
-                                editMute(true);
-                                view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.start_group_mute));
-                                return;
-                            }
-                            if (mem.getMuteEndTime()>0){
-                                editMute(true);
-                                view.notice.setText(io.openim.android.ouicore.R.string.you_mute);
-                                return;
-                            }
-                            editMute(false);
-                        }
-                    }, groupInfo.getGroupID(),
-                        new ArrayList<>(Collections.singleton(BaseApp.inst().loginCertificate.userID)));
-                }
-
+                setMute();
             });
         }
         vm.replyMessage.observe((LifecycleOwner) context, message -> {
@@ -369,6 +346,31 @@ public class BottomInputCote {
                 view.replyContent.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
             }
         });
+    }
+
+    private void setMute() {
+        GroupInfo groupInfo = vm.groupInfo.val();
+        GroupMembersInfo mem = vm.memberInfo.val();
+        if (null == groupInfo || null == mem) return;
+        if (groupInfo.getStatus() == GroupStatus.GROUP_DISSOLVE) {
+            editMute(true);
+            view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
+        } else if (groupInfo.getStatus() == GroupStatus.GROUP_BANNED) {
+            editMute(true);
+            view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.group_ban));
+        } else {
+            if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED && mem.getRoleLevel() == GroupRole.MEMBER) {
+                editMute(true);
+                view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.start_group_mute));
+                return;
+            }
+            if (mem.getMuteEndTime() > 0) {
+                editMute(true);
+                view.notice.setText(io.openim.android.ouicore.R.string.you_mute);
+                return;
+            }
+            editMute(false);
+        }
     }
 
     private void editMute(boolean isMute) {

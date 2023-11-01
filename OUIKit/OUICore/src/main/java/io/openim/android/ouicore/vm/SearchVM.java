@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.api.OneselfService;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.MessageType;
@@ -66,20 +68,28 @@ public class SearchVM extends BaseViewModel {
             ids = new ArrayList<>(); // 用户ID集合
             ids.add(searchContent.getValue());
         }
-        //兼容旧版
-        OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
+        Parameter parameter = new Parameter().add("userIDs", ids);
+        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OneselfService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
             @Override
-            public void onError(int code, String error) {
-                L.e(error + "-" + code);
-                userInfo.setValue(null);
+            protected void onFailure(Throwable e) {
+                getIView().toast(e.getMessage());
             }
 
             @Override
-            public void onSuccess(List<UserInfo> data) {
-                if (data.isEmpty()) return;
-                userInfo.setValue(data);
+            public void onSuccess(HashMap map) {
+                try {
+                    List arrayList = (List) map.get("users");
+                    if (null == arrayList || arrayList.isEmpty()) return;
+
+                    UserInfo u = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
+                        UserInfo.class);
+                    userInfo.setValue(new ArrayList<>(Collections.singleton(u)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
-        }, ids);
+        });
     }
 
 
