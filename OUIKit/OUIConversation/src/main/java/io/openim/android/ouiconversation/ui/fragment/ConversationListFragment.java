@@ -231,11 +231,6 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
             adapter.setConversationInfos(v);
             adapter.notifyDataSetChanged();
         });
-        vm.subscribe(getActivity(), subject -> {
-            if (subject.equals(ContactListVM.NOTIFY_ITEM_CHANGED)) {
-                adapter.notifyItemChanged((Integer) subject.value);
-            }
-        });
 
         Animation animation = AnimationUtils.loadAnimation(getActivity(),
             R.anim.animation_repeat_spinning);
@@ -350,6 +345,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
 
         public void setConversationInfos(List<MsgConversation> conversationInfos) {
             this.conversationInfos = conversationInfos;
+            notifyItemChanged(1);
         }
 
         @Override
@@ -392,8 +388,6 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
             }
             viewHolder.viewBinding.time.setText(TimeUtil.getTimeString(msgConversation.conversationInfo.getLatestMsgSendTime()));
 
-//            viewHolder.viewBinding.getRoot().setBackgroundColor(Color.parseColor
-//            (msgConversation.conversationInfo.isPinned() ? "#FFF3F3F3" : "#FFFFFF"));
             viewHolder.viewBinding.setTop.setVisibility(msgConversation.conversationInfo.isPinned() ? View.VISIBLE : View.GONE);
 
             CharSequence lastMsg = msgConversation.lastMsg;

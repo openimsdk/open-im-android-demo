@@ -76,14 +76,12 @@ public class BottomInputCote {
 
     private OnDedrepClickListener chatMoreOrSendClick;
 
-    @SuppressLint("WrongConstant")
     public BottomInputCote(Context context, LayoutInputCoteBinding view) {
         this.context = context;
         this.view = view;
 
-        view.root.setIntercept(false);
+        initView(view);
 
-        initFragment();
         Common.UIHandler.postDelayed(() -> hasMicrophone = new HasPermissions(context,
             Permission.RECORD_AUDIO), 300);
 
@@ -141,6 +139,7 @@ public class BottomInputCote {
                         OpenIMClient.getInstance().messageManager.createTextAtMessage(msgEdit.toString(), atUserIDList, atUserInfoList, null);
                 }
                 if (null != msg) {
+                    IMUtil.cacheDraft(null,vm.conversationID);
                     vm.sendMsg(msg);
                     reset();
                 }
@@ -230,6 +229,18 @@ public class BottomInputCote {
         });
     }
 
+    private void initView(LayoutInputCoteBinding view) {
+        view.root.setIntercept(false);
+        initFragment();
+    }
+
+    private void bindDraft() {
+        String draft =IMUtil.getDraft(vm.conversationID);
+        if (!TextUtils.isEmpty(draft)){
+            vm.inputMsg.setValue(draft);
+        }
+    }
+
     public void setOnAtUserListener(OnAtUserListener onAtUserListener) {
         this.onAtUserListener = onAtUserListener;
     }
@@ -262,6 +273,7 @@ public class BottomInputCote {
         vm.atMessages.getValue().clear();
         vm.emojiMessages.getValue().clear();
         vm.replyMessage.setValue(null);
+
     }
 
     private void initFragment() {
@@ -293,6 +305,7 @@ public class BottomInputCote {
 
     @SuppressLint("SetTextI18n")
     private void vmListener() {
+        vm.conversationInfo.observe((LifecycleOwner) context, conversationInfo -> bindDraft());
         vm.atMessages.observe((LifecycleOwner) context, messages -> {
             if (messages.isEmpty()) return;
             SpannableString spannableString =

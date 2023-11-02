@@ -363,7 +363,7 @@ public class Common {
     }
 
     /***
-     * 判断字符串是否未null
+     * 判断字符串是否为全部空格
      * @param sc
      * @return
      */

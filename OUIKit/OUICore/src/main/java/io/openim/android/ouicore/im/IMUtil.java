@@ -73,6 +73,7 @@ import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.sdk.OpenIMClient;
@@ -638,6 +639,25 @@ public class IMUtil {
         spannableString.setSpan(colorSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         return spannableString;
+    }
+    /**
+     * 存储草稿
+     */
+    public static  void cacheDraft(String inputMsg,String conversationID) {
+        String cacheKey = conversationID + "_draft";
+        if (TextUtils.isEmpty(inputMsg)) {
+            SharedPreferencesUtil.remove(BaseApp.inst(), cacheKey);
+        } else if (!Common.isBlank(inputMsg)) {
+            SharedPreferencesUtil.get(BaseApp.inst()).setCache(cacheKey, inputMsg);
+        }
+    }
+
+    /**
+     * 获取草稿
+     */
+    public static String getDraft(String conversationID) {
+        String cacheKey = conversationID + "_draft";
+        return SharedPreferencesUtil.get(BaseApp.inst()).getString(cacheKey);
     }
 
     /**

@@ -51,8 +51,7 @@ public class PreviewMediaActivity extends BasicActivity<ActivityPreviewBinding> 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Common.UIHandler.postDelayed(() -> hasWrite = new HasPermissions(this,
-            Permission.WRITE_EXTERNAL_STORAGE), 300);
+        hasWrite = new HasPermissions(this, Permission.WRITE_EXTERNAL_STORAGE);
         viewBinding(ActivityPreviewBinding.inflate(getLayoutInflater()));
         vm = Easy.find(PreviewMediaVM.class);
         initView();
@@ -90,7 +89,7 @@ public class PreviewMediaActivity extends BasicActivity<ActivityPreviewBinding> 
         else addGuideView();
 
         view.download.setOnClickListener(v -> {
-            hasWrite.safeGo(()->{
+            hasWrite.safeGo(() -> {
                 toast(getString(io.openim.android.ouicore.R.string.start_download));
                 Common.downloadFile(vm.mediaDataList.get(view.pager.getCurrentItem()).mediaUrl,
                     null,
@@ -152,7 +151,7 @@ public class PreviewMediaActivity extends BasicActivity<ActivityPreviewBinding> 
                 JzvdStd std = new JzvdStd(container.getContext());
                 std.setVisibility(View.VISIBLE);
                 std.setUp(mediaData.mediaUrl, "");
-                if (pvm.mediaDataList.size()==1){
+                if (pvm.mediaDataList.size() == 1) {
                     //单个预览 自动播放
                     std.startVideoAfterPreloading();
                 }
@@ -170,7 +169,7 @@ public class PreviewMediaActivity extends BasicActivity<ActivityPreviewBinding> 
                     .centerInside()
                     .into(pinchImageView);
 
-                pinchImageView.setOnClickListener(v -> ((Activity)v.getContext()).finish());
+                pinchImageView.setOnClickListener(v -> ((Activity) v.getContext()).finish());
                 container.addView(pinchImageView);
                 return pinchImageView;
             }

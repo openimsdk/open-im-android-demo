@@ -30,6 +30,7 @@ import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -55,6 +56,7 @@ import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
+import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.vm.ForwardVM;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
@@ -158,6 +160,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 SPlayer.instance().stop();
             } catch (Exception ignore) {
             }
+           IMUtil.cacheDraft(Objects.requireNonNull(view.layoutInputCote.chatInput.getText())
+               .toString(),vm.conversationID);
+
+            BaseApp.inst().getVMByCache(ContactListVM.class).updateConversation();
         }
     }
 
@@ -544,20 +550,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     private void forward(List<MultipleChoice> choices) {
-//        MThreadTool.executorService.execute(() -> {
-//            ForwardVM forwardVM = Easy.find(ForwardVM.class);
-//            for (MultipleChoice choice : choices) {
-//                runOnUiThread(() -> aloneSendMsg(forwardVM.forwardMsg, choice));
-//                if (null != forwardVM.leaveMsg) {
-//                    try {
-//                        Thread.sleep(200);
-//                    } catch (InterruptedException ignored) {
-//                    }
-//                    runOnUiThread(() -> aloneSendMsg(forwardVM.leaveMsg, choice));
-//                }
-//            }
-//            vm.clearSelectMsg();
-//        });
         ForwardVM forwardVM = Easy.find(ForwardVM.class);
         for (MultipleChoice choice : choices) {
             aloneSendMsg(forwardVM.forwardMsg, choice);

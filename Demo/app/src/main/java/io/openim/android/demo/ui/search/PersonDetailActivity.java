@@ -22,14 +22,17 @@ import java.util.Observer;
 import io.openim.android.demo.databinding.ActivityPersonDetailBinding;
 import io.openim.android.demo.ui.user.PersonDataActivity;
 import io.openim.android.demo.vm.FriendVM;
+import io.openim.android.ouiconversation.ui.PreviewMediaActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMBack;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.im.IMUtil;
@@ -186,6 +189,15 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         });
 
     private void click() {
+        view.avatar.setOnClickListener(v -> {
+            UserInfo userInfo = vm.userInfo.getValue().get(0);
+            PreviewMediaVM mediaVM = Easy.installVM(PreviewMediaVM.class);
+            PreviewMediaVM .MediaData mediaData =new PreviewMediaVM.MediaData(userInfo.getNickname());
+            mediaData.mediaUrl=userInfo.getFaceURL();
+            mediaVM.previewSingle(mediaData);
+            v.getContext().startActivity(
+                new Intent(v.getContext(), PreviewMediaActivity.class));
+        });
         view.userId.setOnClickListener(v -> {
             try {
                 Common.copy(vm.userInfo.getValue().get(0).getUserID());

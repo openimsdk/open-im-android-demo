@@ -35,9 +35,11 @@ import javax.annotation.Nullable;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.State;
+import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
@@ -45,6 +47,8 @@ import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
+import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
@@ -256,6 +260,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 pList.add(getContext().getString(io.openim.android.ouicore.R.string.android));
             } else if (platform == Platform.IOS) {
                 pList.add(getContext().getString(io.openim.android.ouicore.R.string.ios));
+            } else if (platform == Platform.XOS) {
+                pList.add("Mac");
             } else if (platform == Platform.WIN) {
                 pList.add(getContext().getString(io.openim.android.ouicore.R.string.pc));
             } else if (platform == Platform.WEB) {
@@ -325,8 +331,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onGroupMemberInfoChanged(GroupMembersInfo info) {
-        if (info.getGroupID().equals(groupID)
-            && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+        if (info.getGroupID().equals(groupID) && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
             isAdminOrCreator = info.getRoleLevel() != GroupRole.MEMBER;
             memberInfo.setValue(info);
         }
@@ -541,6 +546,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }
     }
 
+
     public interface UserOnlineStatusListener {
         void onResult(UsersOnlineStatus onlineStatus);
     }
@@ -662,11 +668,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             OpenIMClient.getInstance().messageManager.markConversationMessageAsRead(conversationID, callBack);
         } else {
             if (isSingleChat) {
-                OpenIMClient.getInstance().messageManager.markMessagesAsReadByMsgID(conversationID,
-                    msgIDs, callBack);
+                OpenIMClient.getInstance().messageManager.markMessagesAsReadByMsgID(conversationID, msgIDs, callBack);
             } else {
-                OpenIMClient.getInstance().messageManager.sendGroupMessageReadReceipt(conversationID,
-                    msgIDs, callBack);
+                OpenIMClient.getInstance().messageManager.sendGroupMessageReadReceipt(conversationID, msgIDs, callBack);
             }
 
             NotificationManager manager =
@@ -786,23 +790,21 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             if (datum.getContentType() == MessageType.PICTURE) {
                 PictureElem pictureElem = datum.getPictureElem();
                 mediaData = new PreviewMediaVM.MediaData(datum.getClientMsgID());
-                mediaData.mediaUrl=IMUtil.getFastPicturePath(pictureElem);
+                mediaData.mediaUrl = IMUtil.getFastPicturePath(pictureElem);
                 if (null != pictureElem.getSnapshotPicture())
                     mediaData.thumbnail = pictureElem.getSnapshotPicture().getUrl();
             }
             if (datum.getContentType() == MessageType.VIDEO) {
                 VideoElem videoElem = datum.getVideoElem();
-                mediaData = new PreviewMediaVM.MediaData(
-                    datum.getClientMsgID());
+                mediaData = new PreviewMediaVM.MediaData(datum.getClientMsgID());
                 mediaData.isVideo = true;
-                mediaData.mediaUrl=IMUtil.getFastVideoPath(videoElem);
+                mediaData.mediaUrl = IMUtil.getFastVideoPath(videoElem);
                 mediaData.thumbnail = videoElem.getSnapshotUrl();
             }
-            if (null != mediaData) {
+            if (null != mediaData && !mediaDataList.contains(mediaData)) {
                 if (isPour)//反着
                     mediaDataList.add(0, mediaData);
-                else
-                    mediaDataList.add(mediaData);
+                else mediaDataList.add(mediaData);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -872,7 +874,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
         }
         if (isTyp) return;
-        messages.getValue().add(0, IMUtil.buildExpandInfo(msg));
+        messages.val().add(0, IMUtil.buildExpandInfo(msg));
+        addMediaList(msg, false);
 
         UIHandler.post(() -> {
             getIView().scrollToPosition(0);
@@ -907,8 +910,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                         Message message = messages.val().get(i);
                         if (readInfo.getMsgIDList().contains(message.getClientMsgID())) {
                             message.setRead(true);
-                            if (null != message.getAttachedInfoElem()
-                                && message.getAttachedInfoElem().isPrivateChat()) {
+                            if (null != message.getAttachedInfoElem() && message.getAttachedInfoElem().isPrivateChat()) {
                                 message.getAttachedInfoElem().setHasReadTime(readInfo.getReadTime());
                             }
                             messageAdapter.notifyItemChanged(i);
@@ -924,22 +926,21 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     @Override
     public void onRecvGroupMessageReadReceipt(GroupMessageReceipt receipt) {
         try {
-                if (receipt.getConversationID().equals(conversationID)) {
-                    List<GroupMessageReadInfo> groupMessageReadInfo =
-                        receipt.getGroupMessageReadInfo();
-                    for (GroupMessageReadInfo messageReadInfo : groupMessageReadInfo) {
-                        Message message = new Message();
-                        message.setClientMsgID(messageReadInfo.getClientMsgID());
-                        int index = messages.val().indexOf(message);
-                        if (index == -1) continue;
-                        Message localMsg = messages.val().get(index);
-                        GroupHasReadInfo hasReadInfo =
-                            localMsg.getAttachedInfoElem().getGroupHasReadInfo();
-                        hasReadInfo.setHasReadCount(messageReadInfo.getHasReadCount());
-                        hasReadInfo.setUnreadCount(messageReadInfo.getUnreadCount());
-                        messageAdapter.notifyItemChanged(index);
-                    }
+            if (receipt.getConversationID().equals(conversationID)) {
+                List<GroupMessageReadInfo> groupMessageReadInfo = receipt.getGroupMessageReadInfo();
+                for (GroupMessageReadInfo messageReadInfo : groupMessageReadInfo) {
+                    Message message = new Message();
+                    message.setClientMsgID(messageReadInfo.getClientMsgID());
+                    int index = messages.val().indexOf(message);
+                    if (index == -1) continue;
+                    Message localMsg = messages.val().get(index);
+                    GroupHasReadInfo hasReadInfo =
+                        localMsg.getAttachedInfoElem().getGroupHasReadInfo();
+                    hasReadInfo.setHasReadCount(messageReadInfo.getHasReadCount());
+                    hasReadInfo.setUnreadCount(messageReadInfo.getUnreadCount());
+                    messageAdapter.notifyItemChanged(index);
                 }
+            }
         } catch (Exception ignored) {
         }
     }
@@ -1072,19 +1073,15 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                                 BaseApp.inst().getString(io.openim.android.ouicore.R.string.re_edit);
                             txt += "\t" + reedit;
                             tips =
-                                IMUtil.buildClickAndColorSpannable((SpannableStringBuilder) IMUtil
-                                        .getSingleSequence(message.getGroupID(),
-                                            message.getSenderNickname(), message.getSendID(), txt),
-                                    reedit, new
-                                        ClickableSpan() {
-                                            @Override
-                                            public void onClick(@NonNull View widget) {
-                                                TextElem txt = message.getTextElem();
-                                                if (null != txt) {
-                                                    reeditMsg(txt.getContent());
-                                                }
-                                            }
-                                        });
+                                IMUtil.buildClickAndColorSpannable((SpannableStringBuilder) IMUtil.getSingleSequence(message.getGroupID(), message.getSenderNickname(), message.getSendID(), txt), reedit, new ClickableSpan() {
+                                    @Override
+                                    public void onClick(@NonNull View widget) {
+                                        TextElem txt = message.getTextElem();
+                                        if (null != txt) {
+                                            reeditMsg(txt.getContent());
+                                        }
+                                    }
+                                });
                         } else {
                             tips = IMUtil.getSingleSequence(message.getGroupID(),
                                 info.getRevokerNickname(), info.getRevokerID(), txt);

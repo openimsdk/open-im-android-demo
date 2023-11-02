@@ -17,6 +17,7 @@ import java.util.Observer;
 
 import io.openim.android.demo.databinding.FragmentPersonalBinding;
 import io.openim.android.demo.ui.login.LoginActivity;
+import io.openim.android.ouiconversation.ui.PreviewMediaActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.base.vm.injection.Easy;
@@ -26,6 +27,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
@@ -60,6 +62,7 @@ public class PersonalFragment extends BaseFragment implements Observer {
         user.info.observe(getActivity(),v-> {
             view.avatar.load(v.getFaceURL(),v.getNickname());
             view.name.setText(v.getNickname());
+
         });
         view.userId.setText("ID：" + BaseApp.inst().loginCertificate.userID);
     }
@@ -71,6 +74,14 @@ public class PersonalFragment extends BaseFragment implements Observer {
     }
 
     private void listener() {
+        view.avatar.setOnClickListener(v -> {
+            PreviewMediaVM mediaVM = Easy.installVM(PreviewMediaVM.class);
+            PreviewMediaVM .MediaData mediaData =new PreviewMediaVM.MediaData(user.info.val().getNickname());
+            mediaData.mediaUrl=user.info.val().getFaceURL();
+            mediaVM.previewSingle(mediaData);
+            v.getContext().startActivity(
+                new Intent(v.getContext(), PreviewMediaActivity.class));
+        });
         view.accountSetting.setOnClickListener(v->{
             startActivity(new Intent(getActivity(),AccountSettingActivity.class));
         });

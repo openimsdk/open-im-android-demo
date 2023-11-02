@@ -36,7 +36,7 @@ import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class MsgReadStatusActivity extends BasicActivity<ActivityMsgReadStatusBinding> {
 
-    private boolean isRead = true;
+    private boolean isRead = false;
     private RecyclerViewAdapter<GroupMembersInfo, RecyclerView.ViewHolder> adapter;
 
     private MsgStatusVM vm;
@@ -60,10 +60,11 @@ public class MsgReadStatusActivity extends BasicActivity<ActivityMsgReadStatusBi
     }
 
     private void initView() {
-        view.title1.setText(String.format(getString(io.openim.android.ouicore.R.string.readed),
-            groupHasReadInfo.getHasReadCount() + ""));
-        view.title2.setText(String.format(getString(io.openim.android.ouicore.R.string.unread),
+        view.title1.setText(String.format(getString(io.openim.android.ouicore.R.string.unread),
             groupHasReadInfo.getUnreadCount() + ""));
+        view.title2.setText(String.format(getString(io.openim.android.ouicore.R.string.readed),
+            groupHasReadInfo.getHasReadCount() + ""));
+
         view.recyclerview.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecyclerViewAdapter<GroupMembersInfo, RecyclerView.ViewHolder>() {
 
@@ -90,11 +91,11 @@ public class MsgReadStatusActivity extends BasicActivity<ActivityMsgReadStatusBi
 
     private void listener() {
         view.menu1.setOnClickListener(view1 -> {
-            isRead = true;
+            isRead = false;
             menuChange();
         });
         view.menu2.setOnClickListener(view1 -> {
-            isRead = false;
+            isRead = true;
             menuChange();
         });
 
@@ -118,11 +119,11 @@ public class MsgReadStatusActivity extends BasicActivity<ActivityMsgReadStatusBi
 
     private void menuChange() {
         if (isRead) {
-            view.menu1bg.setVisibility(View.VISIBLE);
-            view.menu2bg.setVisibility(View.GONE);
-        } else {
             view.menu1bg.setVisibility(View.GONE);
             view.menu2bg.setVisibility(View.VISIBLE);
+        } else {
+            view.menu1bg.setVisibility(View.VISIBLE);
+            view.menu2bg.setVisibility(View.GONE);
         }
         refreshMembersInfo();
     }
