@@ -67,7 +67,7 @@ public class MeetingDetailActivity extends BaseActivity<MeetingVM, ActivityMeeti
     public void onSuccess(Object body) {
         waitDialog.dismiss();
         finish();
-        startActivity(new Intent(this, MeetingHomeActivity.class));
+        startActivity(new Intent(this, MeetingHomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     private void listener() {

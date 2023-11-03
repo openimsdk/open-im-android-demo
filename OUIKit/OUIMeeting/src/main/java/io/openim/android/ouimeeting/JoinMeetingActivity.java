@@ -51,7 +51,7 @@ public class JoinMeetingActivity extends BaseActivity<MeetingVM, ActivityJoinMee
     public void onSuccess(Object body) {
         waitDialog.dismiss();
         finish();
-        startActivity(new Intent(this, MeetingHomeActivity.class));
+        startActivity(new Intent(this, MeetingHomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     @Override
