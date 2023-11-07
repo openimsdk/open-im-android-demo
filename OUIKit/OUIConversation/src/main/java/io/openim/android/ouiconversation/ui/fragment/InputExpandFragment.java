@@ -82,7 +82,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
 
     FragmentInputExpandBinding v;
     //权限
-    private HasPermissions hasStorage, hasShoot, hasLocation;
+    private HasPermissions hasStorage, hasShoot;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -91,8 +91,6 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
             hasStorage = new HasPermissions(getActivity(), Permission.Group.STORAGE);
             hasShoot = new HasPermissions(getActivity(), Permission.CAMERA,
                 Permission.RECORD_AUDIO);
-            hasLocation = new HasPermissions(getActivity(),
-                Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
         });
 
     }
@@ -129,80 +127,8 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         adapter.setItems(menuIcons);
     }
 
-    private void goToCall() {
-        CallingService callingService =
-            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-        if (null == callingService) return;
-        IMUtil.showBottomPopMenu(getContext(), (v1, keyCode, event) -> {
-            vm.isVideoCall = keyCode != 1;
-            if (vm.isSingleChat) {
-                List<String> ids = new ArrayList<>();
-                ids.add(vm.userID);
-                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
-                    vm.isSingleChat, ids, null);
-                callingService.call(signalingInfo);
-            } else {
-                GroupVM groupVM = new GroupVM();
-                groupVM.groupId = vm.groupID;
-                BaseApp.inst().putVM(groupVM);
-                ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
-                    .withBoolean(Constant.IS_SELECT_MEMBER, true)
-                    .withBoolean(Constant.IS_GROUP_CALL, true)
-                    .withInt(Constant.K_SIZE, 9)
-                    .navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
-            }
-            return false;
-        });
-    }
-
-    public void toSelectMember() {
-
-    }
 
 
-    private void sendCardMessage(MultipleChoice multipleChoice) {
-        CardElem cardElem = new CardElem();
-        cardElem.setUserID(multipleChoice.key);
-        cardElem.setNickname(multipleChoice.name);
-        cardElem.setFaceURL(multipleChoice.icon);
-        Message message = OpenIMClient.getInstance().messageManager.createCardMessage(cardElem);
-        vm.sendMsg(message);
-    }
-
-    private final ActivityResultLauncher<Intent> shareLocationLauncher =
-        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() != Activity.RESULT_OK) return;
-            Bundle resultBundle = result.getData().getBundleExtra("result");
-            if (null == resultBundle) return;
-
-            Double latitude = resultBundle.getDouble("latitude");
-            Double longitude = resultBundle.getDouble("longitude");
-            String description = resultBundle.getString("description");
-            Message message =
-                OpenIMClient.getInstance().messageManager.createLocationMessage(latitude, longitude,
-                    description);
-            vm.sendMsg(message);
-        });
-
-    //分享位置
-    @SuppressLint("WrongConstant")
-    private void gotoShareLocation() {
-        hasLocation.safeGo(() -> {
-            shareLocationLauncher.launch(new Intent(getActivity(), WebViewActivity.class)
-                .putExtra(WebViewActivity.ACTION, WebViewActivity.LOCATION));
-        });
-
-    }
-
-    private void gotoSelectFile() {
-        Common.permission(getContext(), () -> {
-            hasStorage = true;
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("*/*");
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            fileLauncher.launch(intent);
-        }, hasStorage, Permission.Group.STORAGE);
-    }
 
     //去拍摄
     private void goToShoot() {
