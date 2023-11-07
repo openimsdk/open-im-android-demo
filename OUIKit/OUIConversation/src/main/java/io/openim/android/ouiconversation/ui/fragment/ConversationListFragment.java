@@ -29,8 +29,7 @@ import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
 import com.yanzhenjie.recyclerview.OnItemClickListener;
 import com.yanzhenjie.recyclerview.SwipeMenuCreator;
 import com.yanzhenjie.recyclerview.SwipeMenuItem;
@@ -49,6 +48,7 @@ import io.openim.android.ouiconversation.ui.NotificationActivity;
 import io.openim.android.ouiconversation.ui.SearchActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.SinkHelper;
@@ -74,7 +74,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
 
     private FragmentContactListBinding view;
     private CustomAdapter adapter;
-    private boolean hasScanPermission = false;
+    private HasPermissions hasScanPermission;
     private ActivityResultLauncher<Intent> resultLauncher;
     private final UserLogic user = Easy.find(UserLogic.class);
     private final HashSet<Integer> slideSet = new HashSet<>();
@@ -100,7 +100,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
         Obs.inst().addObserver(this);
         Activity activity = getActivity();
         if (null != activity) {
-            activity.runOnUiThread(() -> hasScanPermission = AndPermission.hasPermissions(this,
+            activity.runOnUiThread(() -> hasScanPermission = new HasPermissions(getContext(),
                 Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE));
         }
         super.onCreate(savedInstanceState);
@@ -231,11 +231,6 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
             adapter.setConversationInfos(v);
             adapter.notifyDataSetChanged();
         });
-        vm.subscribe(getActivity(), subject -> {
-            if (subject.equals(ContactListVM.NOTIFY_ITEM_CHANGED)) {
-                adapter.notifyItemChanged((Integer) subject.value);
-            }
-        });
 
         Animation animation = AnimationUtils.loadAnimation(getActivity(),
             R.anim.animation_repeat_spinning);
@@ -263,7 +258,10 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
     }
 
     private void initHeader() {
-        user.info.observe(getActivity(),v-> view.avatar.load(v.getFaceURL(),v.getNickname()));
+        user.info.observe(getActivity(),v-> {
+            view.avatar.load(v.getFaceURL(),v.getNickname());
+            view.name.setText(v.getNickname());
+        });
         view.addFriend.setOnClickListener(this::showPopupWindow);
         view.callRecord.setOnClickListener(view -> {
             ARouter.getInstance().build(Routes.Main.CALL_HISTORY).navigation();
@@ -281,10 +279,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
         LayoutAddActionBinding view = LayoutAddActionBinding.inflate(getLayoutInflater());
         view.scan.setOnClickListener(c -> {
             popupWindow.dismiss();
-            Common.permission(getActivity(), () -> {
-                hasScanPermission = true;
-                Common.jumpScan(getActivity(), resultLauncher);
-            }, hasScanPermission, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
+            hasScanPermission.safeGo(() -> Common.jumpScan(getActivity(), resultLauncher));
         });
         view.addFriend.setOnClickListener(c -> {
             popupWindow.dismiss();
@@ -350,6 +345,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
 
         public void setConversationInfos(List<MsgConversation> conversationInfos) {
             this.conversationInfos = conversationInfos;
+            notifyItemChanged(1);
         }
 
         @Override
@@ -392,8 +388,6 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
             }
             viewHolder.viewBinding.time.setText(TimeUtil.getTimeString(msgConversation.conversationInfo.getLatestMsgSendTime()));
 
-//            viewHolder.viewBinding.getRoot().setBackgroundColor(Color.parseColor
-//            (msgConversation.conversationInfo.isPinned() ? "#FFF3F3F3" : "#FFFFFF"));
             viewHolder.viewBinding.setTop.setVisibility(msgConversation.conversationInfo.isPinned() ? View.VISIBLE : View.GONE);
 
             CharSequence lastMsg = msgConversation.lastMsg;

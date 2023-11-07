@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,7 +34,8 @@ import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
-import com.yanzhenjie.permission.AndPermission;
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.bean.ZxingConfig;
 
@@ -45,6 +47,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -282,25 +285,25 @@ public class Common {
         }
     }
 
-
-    public static void permission(Context context, OnGrantedListener onGrantedListener,
-                                  boolean hasPermission, String... permissions) {
-        if (hasPermission) onGrantedListener.onGranted();
-        else {
-            AndPermission.with(context).runtime()
-                .permission(permissions)
-                .onGranted(permission -> {
-                // Storage permission are allowed.
-                onGrantedListener.onGranted();
-            }).onDenied(permission -> {
-                // Storage permission are not allowed.
-            }).start();
-        }
-    }
-
-    public interface OnGrantedListener {
-        void onGranted();
-    }
+//
+//    public static void permission(Context context, OnGrantedListener onGrantedListener,
+//                                  boolean hasPermission, String... permissions) {
+//        if (hasPermission)
+//            onGrantedListener.onGranted();
+//        else {
+//            XXPermissions.with(context)
+//                .permission(permissions)
+//                .request((permissions1, allGranted) -> {
+//                    if (allGranted){
+//                        onGrantedListener.onGranted();
+//                    }
+//                });
+//        }
+//    }
+//
+//    public interface OnGrantedListener {
+//        void onGranted();
+//    }
 
 
     //下载图片
@@ -360,7 +363,7 @@ public class Common {
     }
 
     /***
-     * 判断字符串是否未null
+     * 判断字符串是否为全部空格
      * @param sc
      * @return
      */

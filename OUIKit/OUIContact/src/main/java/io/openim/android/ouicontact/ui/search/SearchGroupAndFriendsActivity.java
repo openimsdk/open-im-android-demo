@@ -32,6 +32,7 @@ import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
+import io.openim.android.sdk.models.UserInfo;
 
 @Route(path = Routes.Contact.SEARCH_FRIENDS_GROUP)
 public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
@@ -63,7 +64,7 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
     }
 
     public boolean isMultipleSelect() {
-        return null != choices && !choices.isEmpty();
+        return null != choices;
     }
 
     @Override
@@ -120,8 +121,8 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
             }
         });
 
-        vm.friendInfo.observe(this, friendInfos -> {
-            addNape(getString(io.openim.android.ouicore.R.string.contact), friendInfos);
+        vm.userInfo.observe(this, userInfos -> {
+            addNape(getString(io.openim.android.ouicore.R.string.contact), userInfos);
         });
         vm.groupsInfo.observe(this, groupInfos -> {
             addNape(getString(io.openim.android.ouicore.R.string.group), groupInfos);
@@ -151,7 +152,7 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
             public int getItemViewType(int position) {
                 Object o = getItems().get(position);
                 if (o instanceof String) return TITLE;
-                if (o instanceof FriendInfo) return CONTACT_ITEM;
+                if (o instanceof UserInfo) return CONTACT_ITEM;
                 if (o instanceof GroupInfo) return GROUP_ITEM;
                 return super.getItemViewType(position);
             }
@@ -183,9 +184,9 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
 
                     MultipleChoice multipleChoice = new MultipleChoice();
                     String id = "";
-                    if (data instanceof FriendInfo) {
+                    if (data instanceof UserInfo) {
                         //联系人
-                        FriendInfo da = (FriendInfo) data;
+                        UserInfo da = (UserInfo) data;
                         itemViewHo.view.avatar.load(da.getFaceURL());
                         itemViewHo.view.nickName.setText(da.getNickname());
 

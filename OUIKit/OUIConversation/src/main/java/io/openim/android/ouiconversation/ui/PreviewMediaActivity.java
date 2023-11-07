@@ -17,8 +17,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.bumptech.glide.Glide;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,24 +35,23 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.vm.PermissionVM;
 import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouicore.widget.PinchImageView;
 
 @Route(path = Routes.Conversation.PREVIEW)
 public class PreviewMediaActivity extends BasicActivity<ActivityPreviewBinding> {
 
-    private boolean hasWrite;
+    private HasPermissions hasWrite;
     private PreviewMediaVM vm;
     private List<View> guideView = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Common.UIHandler.postDelayed(() -> hasWrite = AndPermission.hasPermissions(this,
-            Permission.WRITE_EXTERNAL_STORAGE), 300);
+        hasWrite = new HasPermissions(this, Permission.WRITE_EXTERNAL_STORAGE);
         viewBinding(ActivityPreviewBinding.inflate(getLayoutInflater()));
         vm = Easy.find(PreviewMediaVM.class);
         initView();
@@ -91,8 +89,7 @@ public class PreviewMediaActivity extends BasicActivity<ActivityPreviewBinding> 
         else addGuideView();
 
         view.download.setOnClickListener(v -> {
-            Common.permission(this, () -> {
-                hasWrite = true;
+            hasWrite.safeGo(() -> {
                 toast(getString(io.openim.android.ouicore.R.string.start_download));
                 Common.downloadFile(vm.mediaDataList.get(view.pager.getCurrentItem()).mediaUrl,
                     null,
@@ -112,7 +109,7 @@ public class PreviewMediaActivity extends BasicActivity<ActivityPreviewBinding> 
                         toast(e.getMessage());
                     }
                 });
-            }, hasWrite, Permission.WRITE_EXTERNAL_STORAGE);
+            });
         });
     }
 
@@ -154,7 +151,7 @@ public class PreviewMediaActivity extends BasicActivity<ActivityPreviewBinding> 
                 JzvdStd std = new JzvdStd(container.getContext());
                 std.setVisibility(View.VISIBLE);
                 std.setUp(mediaData.mediaUrl, "");
-                if (pvm.mediaDataList.size()==1){
+                if (pvm.mediaDataList.size() == 1) {
                     //单个预览 自动播放
                     std.startVideoAfterPreloading();
                 }
@@ -164,13 +161,15 @@ public class PreviewMediaActivity extends BasicActivity<ActivityPreviewBinding> 
                 return std;
             } else {
                 PinchImageView pinchImageView = new PinchImageView(container.getContext());
+                //关闭硬件加速  Canvas: trying to draw too large(*bytes) bitmap
+                pinchImageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
                 Glide.with(container.getContext()).load(mediaData.mediaUrl)
                     .thumbnail(Glide.with(container.getContext())
                         .load(mediaData.thumbnail))
                     .centerInside()
                     .into(pinchImageView);
 
-                pinchImageView.setOnClickListener(v -> ((Activity)v.getContext()).finish());
+                pinchImageView.setOnClickListener(v -> ((Activity) v.getContext()).finish());
                 container.addView(pinchImageView);
                 return pinchImageView;
             }

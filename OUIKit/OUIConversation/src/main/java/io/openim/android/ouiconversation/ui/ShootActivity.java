@@ -45,7 +45,7 @@ public class ShootActivity extends BaseActivity<BaseViewModel, ActivityShootBind
         bindViewDataBinding(ActivityShootBinding.inflate(getLayoutInflater()));
         Common.setFullScreen(this);
         int status = getIntent().getIntExtra(Constant.K_RESULT, JCameraView.BUTTON_STATE_BOTH);
-        view.cameraView.setSaveVideoPath(Constant.VIDEO_DIR);
+        view.cameraView.setSaveVideoPath(Constant.VIDEO_DIR.substring(0,Constant.VIDEO_DIR.length()-1));
         view.cameraView.setFeatures(status);
         view.cameraView.setErrorLisenter(new ErrorListener() {
             @Override

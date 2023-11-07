@@ -30,6 +30,7 @@ import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -55,6 +56,7 @@ import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
+import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.vm.ForwardVM;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
@@ -96,10 +98,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private ActivityResultLauncher<Intent> chatSettingActivityLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK) {
-            finish();
-        }
-    });
+            if (result.getResultCode() == RESULT_OK) {
+                finish();
+            }
+        });
 
     private void initVM() {
         Easy.installVM(CustomEmojiVM.class);
@@ -158,6 +160,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 SPlayer.instance().stop();
             } catch (Exception ignore) {
             }
+           IMUtil.cacheDraft(Objects.requireNonNull(view.layoutInputCote.chatInput.getText())
+               .toString(),vm.conversationID);
+
+            BaseApp.inst().getVMByCache(ContactListVM.class).updateConversation();
         }
     }
 
@@ -240,9 +246,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         if (vm.isSingleChat) {
             vm.getUserOnlineStatus(this::showOnlineStatus);
         }
-       try {
-           view.waterMark.setText(BaseApp.inst().loginCertificate.nickname);
-       }catch (Exception ignored){}
+        try {
+            view.waterMark.setText(BaseApp.inst().loginCertificate.nickname);
+        } catch (Exception ignored) {
+        }
     }
 
     private void showOnlineStatus(UsersOnlineStatus onlineStatus) {
@@ -421,7 +428,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         vm.conversationInfo.observe(this, conversationInfo -> {
             bindShowName();
             vm.getGroupsInfo(vm.groupID, data -> {
-                if (data.isEmpty())return;
+                if (data.isEmpty()) return;
                 vm.groupInfo.setValue(data.get(0));
             });
         });
@@ -456,10 +463,9 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private void bindShowName() {
         try {
-            if (vm.isSingleChat)
-                view.nickName.setText(vm.conversationInfo.getValue().getShowName());
-            else
-                view.nickName.setText(vm.conversationInfo.getValue().getShowName() + "(" + vm.groupInfo.getValue().getMemberCount() + ")");
+            view.nickName.setText(vm.conversationInfo.getValue().getShowName());
+            if (!vm.isSingleChat)
+                view.groupMenberNum.setText("(" + vm.groupInfo.getValue().getMemberCount() + ")");
         } catch (Exception ignored) {
         }
     }
@@ -542,20 +548,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     private void forward(List<MultipleChoice> choices) {
-//        MThreadTool.executorService.execute(() -> {
-//            ForwardVM forwardVM = Easy.find(ForwardVM.class);
-//            for (MultipleChoice choice : choices) {
-//                runOnUiThread(() -> aloneSendMsg(forwardVM.forwardMsg, choice));
-//                if (null != forwardVM.leaveMsg) {
-//                    try {
-//                        Thread.sleep(200);
-//                    } catch (InterruptedException ignored) {
-//                    }
-//                    runOnUiThread(() -> aloneSendMsg(forwardVM.leaveMsg, choice));
-//                }
-//            }
-//            vm.clearSelectMsg();
-//        });
         ForwardVM forwardVM = Easy.find(ForwardVM.class);
         for (MultipleChoice choice : choices) {
             aloneSendMsg(forwardVM.forwardMsg, choice);

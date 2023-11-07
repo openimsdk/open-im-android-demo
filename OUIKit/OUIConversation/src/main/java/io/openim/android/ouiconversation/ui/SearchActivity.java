@@ -51,6 +51,7 @@ import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotificationElem;
 import io.openim.android.sdk.models.SearchResultItem;
+import io.openim.android.sdk.models.UserInfo;
 
 @Route(path = Routes.Conversation.SEARCH)
 public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding> {
@@ -170,8 +171,8 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
 
             }
         });
-        vm.friendInfo.observe(this, friendInfos -> {
-            addNape(tabTitles[1], friendInfos);
+        vm.userInfo.observe(this, userInfos -> {
+            addNape(tabTitles[1], userInfos);
         });
         vm.groupsInfo.observe(this, groupInfos -> {
             addNape(tabTitles[2], groupInfos);
@@ -233,7 +234,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                 Object o = getItems().get(position);
                 if (o instanceof String)
                     return TITLE;
-                if (o instanceof FriendInfo)
+                if (o instanceof UserInfo)
                     return CONTACT_ITEM;
                 if (o instanceof GroupInfo)
                     return GROUP_ITEM;
@@ -290,9 +291,9 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                             (ViewHol.ContactItemHolder) holder;
                         contactItemHolder.viewBinding.bottom.setVisibility(View.VISIBLE);
                         contactItemHolder.viewBinding.expand.setVisibility(View.VISIBLE);
-                        if (data instanceof FriendInfo) {
+                        if (data instanceof UserInfo) {
                             //联系人
-                            FriendInfo da = (FriendInfo) data;
+                            UserInfo da = (UserInfo) data;
                             contactItemHolder.viewBinding.avatar.load(da.getFaceURL());
                             Common.stringBindForegroundColorSpan(contactItemHolder.viewBinding.nickName, da.getNickname(), vm.searchContent.getValue());
                             if (TextUtils.isEmpty(da.getRemark()))

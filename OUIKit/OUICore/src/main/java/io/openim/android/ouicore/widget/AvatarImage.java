@@ -95,6 +95,7 @@ public class AvatarImage extends FrameLayout {
         } else {
             roundImageView.setVisibility(VISIBLE);
 
+
             Glide.with(getContext())
                 .load(url)
                 .error(resId)

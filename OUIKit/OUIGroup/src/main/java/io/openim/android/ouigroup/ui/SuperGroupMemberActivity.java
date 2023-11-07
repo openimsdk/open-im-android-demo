@@ -105,6 +105,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
             if (exGroupMemberInfo.isSelect) selectNum++;
         }
         view.bottomLayout.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectNum));
+        view.bottomLayout.submit.setEnabled(selectNum>0);
     }
 
     void init() {
@@ -152,19 +153,11 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
             LogisticsCenter.completion(postcard);
             searchFriendLauncher.launch(new Intent(this, postcard.getDestination()).putExtra(Constant.K_GROUP_ID, vm.groupId));
         });
-        view.recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                LinearLayoutManager linearLayoutManager =
-                    (LinearLayoutManager) view.recyclerview.getLayoutManager();
-                int lastVisiblePosition =
-                    linearLayoutManager.findLastCompletelyVisibleItemPosition();
-                if (lastVisiblePosition == adapter.getItems().size() - 1 && adapter.getItems().size() >= vm.pageSize) {
-                    vm.page++;
-                    loadMember();
-                }
-            }
+        adapter.setOnLoadMoreListener(view.recyclerview,vm.pageSize,()->{
+            vm.page++;
+            loadMember();
         });
+
         view.more.setOnClickListener(v -> {
             PopupWindow popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);

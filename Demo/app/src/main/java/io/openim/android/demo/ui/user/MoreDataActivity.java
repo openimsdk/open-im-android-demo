@@ -28,7 +28,7 @@ public class MoreDataActivity extends BaseActivity<PersonalVM, ActivityMoreDataB
             : io.openim.android.ouicore.R.string.girl);
         long birth = vm.userInfo.val().getBirth();
         if (birth != 0) {
-            view.birthday.setText(TimeUtil.getTime(birth * 1000,
+            view.birthday.setText(TimeUtil.getTime(birth ,
                 TimeUtil.yearMonthDayFormat));
         }
         view.phoneTv.setText(vm.userInfo.val().getPhoneNumber());

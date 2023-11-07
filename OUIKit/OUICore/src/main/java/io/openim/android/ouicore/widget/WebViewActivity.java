@@ -17,9 +17,6 @@ import android.net.Uri;
 import android.webkit.WebViewClient;
 
 
-import com.yanzhenjie.permission.Action;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
 
 import java.security.Permissions;
 import java.util.HashMap;

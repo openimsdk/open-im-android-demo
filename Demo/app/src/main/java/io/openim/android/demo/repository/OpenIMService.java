@@ -23,11 +23,6 @@ public interface OpenIMService {
 
     @POST("account/password/change")
     Observable<ResponseBody> changePassword(@Body RequestBody requestBody);
-    @POST("user/find/full")
-    Observable<ResponseBody> getUsersFullInfo(@Body RequestBody requestBody);
-
-    @POST("user/update")
-    Observable<ResponseBody> updateUserInfo(@Body RequestBody requestBody);
 
     @POST("account/code/send")
     Observable<ResponseBody> getVerificationCode(@Body RequestBody requestBody);

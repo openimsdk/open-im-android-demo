@@ -18,6 +18,7 @@ import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.SlideButton;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.AllowType;
 import io.openim.android.sdk.listener.OnBase;
 
 public class AccountSettingActivity extends BaseActivity<PersonalVM, ActivityAccountSettingBinding> {
@@ -44,12 +45,12 @@ public class AccountSettingActivity extends BaseActivity<PersonalVM, ActivityAcc
             view.slideButton.setCheckedWithAnimation(extendUserInfo.getGlobalRecvMsgOpt() == 2);
             view.messageTone.setCheckedWithAnimation(extendUserInfo.getAllowBeep() == 1);
             view.vibration.setCheckedWithAnimation(extendUserInfo.getAllowVibration() == 1);
-            view.notAdd.setCheckedWithAnimation(extendUserInfo.getAllowAddFriend() != 1);
+            view.notAdd.setCheckedWithAnimation(extendUserInfo.getAllowAddFriend() == AllowType.Allowed.value);
         });
         view.slideButton.setOnSlideButtonClickListener(isChecked -> vm.setGlobalRecvMessageOpt(isChecked));
         view.messageTone.setOnSlideButtonClickListener(isChecked -> vm.setAllowBeep(isChecked));
         view.vibration.setOnSlideButtonClickListener(isChecked -> vm.setAllowVibration(isChecked));
-        view.notAdd.setOnSlideButtonClickListener(isChecked -> vm.setAllowAddFriend(!isChecked));
+        view.notAdd.setOnSlideButtonClickListener(isChecked -> vm.setAllowAddFriend(isChecked));
 
         view.clearRecord.setOnClickListener(v -> {
             CommonDialog commonDialog = new CommonDialog(this);

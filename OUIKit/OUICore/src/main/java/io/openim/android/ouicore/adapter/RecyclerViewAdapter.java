@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.lang.reflect.InvocationTargetException;
@@ -18,8 +19,10 @@ public abstract class RecyclerViewAdapter<T, V extends RecyclerView.ViewHolder> 
     private List<T> items;
     private Class<V> viewHolder;
 
+
     public RecyclerViewAdapter() {
     }
+
 
     public RecyclerViewAdapter(Class<V> viewHolder) {
         this.viewHolder = viewHolder;
@@ -39,7 +42,8 @@ public abstract class RecyclerViewAdapter<T, V extends RecyclerView.ViewHolder> 
     public V onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         try {
             return viewHolder.getConstructor(View.class).newInstance(parent);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException |
+                 InstantiationException e) {
             e.printStackTrace();
             throw new NullPointerException();
         }
@@ -57,6 +61,28 @@ public abstract class RecyclerViewAdapter<T, V extends RecyclerView.ViewHolder> 
         return null == items ? 0 : items.size();
     }
 
+
+    public void setOnLoadMoreListener(RecyclerView view, int pageSize,
+                                      OnLoadMoreListener listener) {
+        view.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                LinearLayoutManager linearLayoutManager =
+                    (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (null!=linearLayoutManager){
+                    int lastVisiblePosition =
+                        linearLayoutManager.findLastCompletelyVisibleItemPosition();
+                    if (getItems().size()>=pageSize
+                        && lastVisiblePosition >= getItems().size() - 3) {
+                        listener.onLoad();
+                    }
+                }
+            }
+        });
+    }
+    public interface OnLoadMoreListener {
+        public void onLoad();
+    }
 }
 
 

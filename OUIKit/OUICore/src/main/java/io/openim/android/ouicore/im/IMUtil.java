@@ -31,8 +31,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -69,8 +69,11 @@ import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.HasPermissions;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.sdk.OpenIMClient;
@@ -95,6 +98,17 @@ public class IMUtil {
     public static final int PLATFORM_ID = 2;
     private static final String TAG = "IMUtil";
 
+    public static String getFastVideoPath(VideoElem elem) {
+        String videoPath = elem.getVideoPath();
+        if (!GetFilePathFromUri.fileIsExists(videoPath)) videoPath = elem.getVideoUrl();
+        return videoPath;
+    }
+
+    public static String getFastPicturePath(PictureElem elem) {
+        String path = elem.getSourcePath();
+        if (!GetFilePathFromUri.fileIsExists(path)) path = elem.getSourcePicture().getUrl();
+        return path;
+    }
 
     /**
      * 加载图片
@@ -278,12 +292,12 @@ public class IMUtil {
                 RevokedInfo revokedInfo = GsonHel.fromJson(detail, RevokedInfo.class);
                 String txt;
                 //a 撤回了一条消息
-                if (revokedInfo.getRevokerID().equals(revokedInfo.getSourceMessageSendID())){
+                if (revokedInfo.getRevokerID().equals(revokedInfo.getSourceMessageSendID())) {
                     txt = String.format(ctx.getString(R.string.revoke_tips),
                         revokedInfo.getRevokerNickname());
                     tips = getSingleSequence(msg.getGroupID(), revokedInfo.getRevokerNickname(),
                         revokedInfo.getRevokerID(), txt);
-                }else {
+                } else {
                     txt = String.format(ctx.getString(R.string.revoke_tips2),
                         revokedInfo.getRevokerNickname(),
                         revokedInfo.getSourceMessageSenderNickname());
@@ -416,8 +430,8 @@ public class IMUtil {
                 choice.name = transferredGroupNotification.newGroupOwner.getNickname();
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(),
-                        transferredGroupNotification.opUser.getNickname(),
-                        transferredGroupNotification.opUser.getUserID(), txt),
+                    transferredGroupNotification.opUser.getNickname(),
+                    transferredGroupNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -457,8 +471,8 @@ public class IMUtil {
                 choice.name = memberNotification.mutedUser.getNickname();
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(),
-                        memberNotification.opUser.getNickname(),
-                        memberNotification.opUser.getUserID(), txt),
+                    memberNotification.opUser.getNickname(),
+                    memberNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -523,7 +537,7 @@ public class IMUtil {
     }
 
     public static CharSequence twoPeopleRevoker(Message msg, RevokedInfo revokedInfo, String txt) {
-        List<MultipleChoice> choices=new ArrayList<>();
+        List<MultipleChoice> choices = new ArrayList<>();
         MultipleChoice choice = new MultipleChoice(revokedInfo.getRevokerID());
         choice.name = revokedInfo.getRevokerNickname();
         choice.groupId = msg.getGroupID();
@@ -534,7 +548,7 @@ public class IMUtil {
         choice2.groupId = msg.getGroupID();
         choices.add(choice2);
 
-        return getMultipleSequence(new SpannableStringBuilder(txt),choices);
+        return getMultipleSequence(new SpannableStringBuilder(txt), choices);
     }
 
     /**
@@ -549,11 +563,11 @@ public class IMUtil {
         for (MultipleChoice choice : choices) {
             buildClickAndColorSpannable((SpannableStringBuilder) sequence, choice.name,
                 new ClickableSpan() {
-                    @Override
-                    public void onClick(@NonNull View widget) {
-                        toPersonDetail(choice.key, choice.groupId);
-                    }
-                });
+                @Override
+                public void onClick(@NonNull View widget) {
+                    toPersonDetail(choice.key, choice.groupId);
+                }
+            });
         }
         return sequence;
     }
@@ -571,19 +585,23 @@ public class IMUtil {
                                                  String txt) {
         return buildClickAndColorSpannable(new SpannableStringBuilder(txt), nickName,
             new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    toPersonDetail(uid, groupId);
-                }
-            });
+            @Override
+            public void onClick(@NonNull View widget) {
+                toPersonDetail(uid, groupId);
+            }
+        });
     }
 
     private static void toPersonDetail(String uid, String groupId) {
         ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, uid).withString(Constant.K_GROUP_ID, groupId).navigation();
     }
 
-
     private static String atSelf(AtUserInfo atUsersInfo) {
+        return atSelf(atUsersInfo, true);
+    }
+
+    private static String atSelf(AtUserInfo atUsersInfo, boolean isNickName) {
+        if (isNickName) return "@" + atUsersInfo.getGroupNickname();
         return "@" + (atUsersInfo.getAtUserID().equals(BaseApp.inst().loginCertificate.userID) ?
             BaseApp.inst().getString(R.string.you) : atUsersInfo.getGroupNickname());
     }
@@ -622,6 +640,25 @@ public class IMUtil {
 
         return spannableString;
     }
+    /**
+     * 存储草稿
+     */
+    public static  void cacheDraft(String inputMsg,String conversationID) {
+        String cacheKey = conversationID + "_draft";
+        if (TextUtils.isEmpty(inputMsg)) {
+            SharedPreferencesUtil.remove(BaseApp.inst(), cacheKey);
+        } else if (!Common.isBlank(inputMsg)) {
+            SharedPreferencesUtil.get(BaseApp.inst()).setCache(cacheKey, inputMsg);
+        }
+    }
+
+    /**
+     * 获取草稿
+     */
+    public static String getDraft(String conversationID) {
+        String cacheKey = conversationID + "_draft";
+        return SharedPreferencesUtil.get(BaseApp.inst()).getString(cacheKey);
+    }
 
     /**
      * 解析消息内容
@@ -658,15 +695,18 @@ public class IMUtil {
                     break;
                 case MessageType.AT_TEXT:
                     String atTxt = msgExpand.atMsgInfo.text;
+                    String tar = "";
                     for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
+                        if (atUsersInfo.getAtUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+                            tar = "[" + BaseApp.inst().getString(R.string.a_person_at_you) + "]";
+                        }
                         atTxt = atTxt.replace("@" + atUsersInfo.getAtUserID(), atSelf(atUsersInfo));
                     }
-                    String tar =
-                        "@" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.you);
-                    if (atTxt.contains(tar)) {
+                    if (!tar.isEmpty()) {
+                        atTxt = tar + atTxt;
                         lastMsg =
                             IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(atTxt),
-                                tar, android.R.color.holo_red_dark, null);
+                                tar, R.color.theme, null);
                     } else lastMsg += atTxt;
                     break;
 
@@ -745,8 +785,9 @@ public class IMUtil {
      * 弹出底部菜单选择 音视通话
      */
     public static void showBottomPopMenu(Context context, View.OnKeyListener v) {
-        boolean hasPermissions = AndPermission.hasPermissions(context, Permission.CAMERA,
+        HasPermissions hasPermissions = new HasPermissions(context, Permission.CAMERA,
             Permission.RECORD_AUDIO);
+
         BottomPopDialog dialog = new BottomPopDialog(context);
         dialog.show();
         dialog.getMainView().menu3.setOnClickListener(v1 -> dialog.dismiss());
@@ -754,16 +795,16 @@ public class IMUtil {
         dialog.getMainView().menu2.setText(io.openim.android.ouicore.R.string.video_calls);
 
         dialog.getMainView().menu1.setOnClickListener(v1 -> {
-            Common.permission(context, () -> {
+            hasPermissions.safeGo(() -> {
                 v.onKey(v1, 1, null);
                 dialog.dismiss();
-            }, hasPermissions, Permission.CAMERA, Permission.RECORD_AUDIO);
+            });
         });
         dialog.getMainView().menu2.setOnClickListener(v1 -> {
-            Common.permission(context, () -> {
+            hasPermissions.safeGo(() -> {
                 v.onKey(v1, 2, null);
                 dialog.dismiss();
-            }, hasPermissions, Permission.CAMERA, Permission.RECORD_AUDIO);
+            });
         });
     }
 
@@ -806,22 +847,15 @@ public class IMUtil {
         String CHANNEL_ID = Constant.NOTICE_TAG;
         String CHANNEL_NAME = BaseApp.inst().getString(R.string.msg_notification);
         Notification notification =
-            new NotificationCompat.Builder(BaseApp.inst(), CHANNEL_ID).setContentTitle(BaseApp.inst().getString(R.string.app_name))
-                .setContentText(BaseApp.inst().getString(R.string.a_message_is_received)).setSmallIcon(R.mipmap.ic_logo)
-                .setContentIntent(hangPendingIntent).setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
-                .setSound(Uri.parse("android.resource://"
-                    + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring)).build();
+            new NotificationCompat.Builder(BaseApp.inst(), CHANNEL_ID).setContentTitle(BaseApp.inst().getString(R.string.app_name)).setContentText(BaseApp.inst().getString(R.string.a_message_is_received)).setSmallIcon(R.mipmap.ic_logo).setContentIntent(hangPendingIntent).setAutoCancel(true).setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE).setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring)).build();
 
         //Android 8.0 以上需包添加渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID,
                 CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
             AudioAttributes audioAttributes =
-                new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION).build();
-            notificationChannel.setSound(Uri.parse("android.resource://"
-                + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring), audioAttributes);
+                new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).setUsage(AudioAttributes.USAGE_NOTIFICATION).build();
+            notificationChannel.setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring), audioAttributes);
             manager.createNotificationChannel(notificationChannel);
         }
         manager.notify(id, notification);
@@ -833,27 +867,11 @@ public class IMUtil {
         MediaPlayerUtil.INSTANCE.playMedia();
         vibrate(200);
     }
+
     //震动milliseconds毫秒
-    public static void vibrate( long milliseconds) {
+    public static void vibrate(long milliseconds) {
         Vibrator vib = (Vibrator) BaseApp.inst().getSystemService(Service.VIBRATOR_SERVICE);
         vib.vibrate(milliseconds);
-    }
-
-    /**
-     * 获取语音播放路径 本地没有取网络
-     *
-     * @param soundElem
-     * @return
-     */
-    public static String getSoundPath(SoundElem soundElem) {
-        String path = "";
-        try {
-            path = soundElem.getSoundPath();
-            if (TextUtils.isEmpty(path)) path = soundElem.getSourceUrl();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return path;
     }
 
 
@@ -869,7 +887,7 @@ public class IMUtil {
     public static class IMCallBack<T> implements OnBase<T> {
         @Override
         public void onError(int code, String error) {
-            Toast.makeText(BaseApp.inst(), error + "(" + code + ")", Toast.LENGTH_LONG).show();
+            L.e("IMCallBack", "onError:(" + code + ")" + error);
         }
 
         public void onSuccess(T data) {

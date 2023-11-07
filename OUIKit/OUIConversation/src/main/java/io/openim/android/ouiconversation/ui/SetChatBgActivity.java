@@ -18,8 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
@@ -35,6 +34,7 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
@@ -43,7 +43,7 @@ import io.openim.android.ouicore.widget.PhotographAlbumDialog;
 public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBinding>implements ChatVM.ViewAction {
 
     private Uri fileUri;
-    boolean hasStorage, hasShoot;
+    HasPermissions hasStorage, hasShoot;
     private String id = "";
 
     @Override
@@ -53,8 +53,8 @@ public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBin
         bindViewDataBinding(ActivitySetChatBgBinding.inflate(getLayoutInflater()));
         sink();
 
-        hasStorage = AndPermission.hasPermissions(this, Permission.Group.STORAGE);
-        hasShoot = AndPermission.hasPermissions(this, Permission.CAMERA);
+        hasStorage = new HasPermissions(this, Permission.Group.STORAGE);
+        hasShoot = new HasPermissions(this, Permission.CAMERA);
         if (vm.isSingleChat)
             id = vm.userID;
         else
@@ -105,22 +105,7 @@ public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBin
      */
     @SuppressLint("WrongConstant")
     private void takePhoto() {
-        if (hasShoot) {
-            goTakePhoto();
-        } else {
-            AndPermission.with(this)
-                .runtime()
-                .permission(Permission.Group.CAMERA)
-                .onGranted(permissions -> {
-                    // Storage permission are allowed.
-                    hasShoot = true;
-                    goTakePhoto();
-                })
-                .onDenied(permissions -> {
-                    // Storage permission are not allowed.
-                })
-                .start();
-        }
+        hasShoot.safeGo(this::goTakePhoto);
     }
 
     public File buildTemporaryFile() {
@@ -147,21 +132,7 @@ public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBin
 
     @SuppressLint("WrongConstant")
     private void showMediaPicker() {
-        if (hasStorage)
-            goMediaPicker();
-        else
-            AndPermission.with(this)
-                .runtime()
-                .permission(Permission.Group.STORAGE)
-                .onGranted(permissions -> {
-                    // Storage permission are allowed.
-                    hasStorage = true;
-                    goMediaPicker();
-                })
-                .onDenied(permissions -> {
-                    // Storage permission are not allowed.
-                })
-                .start();
+        hasStorage.safeGo(this::goMediaPicker);
     }
 
     private void goMediaPicker() {

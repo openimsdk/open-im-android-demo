@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.openim.android.demo.repository.OpenIMService;
+import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.vm.State;
@@ -26,6 +27,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.AllowType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.UserInfo;
 
@@ -80,7 +82,7 @@ public class PersonalVM extends BaseViewModel {
         List<String> ids = new ArrayList<>();
         ids.add(uid);
         Parameter parameter = new Parameter().add("userIDs", ids);
-        N.API(OpenIMService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OpenIMService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
+        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OpenIMService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
             @Override
             protected void onFailure(Throwable e) {
                 getIView().toast(e.getMessage());
@@ -115,7 +117,7 @@ public class PersonalVM extends BaseViewModel {
     public void setSelfInfo(Parameter param) {
         param.add("userID", BaseApp.inst().loginCertificate.userID);
         waitDialog.show();
-        N.API(OpenIMService.class).updateUserInfo(param.buildJsonBody()).compose(N.IOMain()).map(OpenIMService.turn(Object.class))
+        N.API(OneselfService.class).updateUserInfo(param.buildJsonBody()).compose(N.IOMain()).map(OpenIMService.turn(Object.class))
 
             .subscribe(new NetObserver<Object>(getContext()) {
                 @Override
@@ -167,7 +169,7 @@ public class PersonalVM extends BaseViewModel {
         setSelfInfo(new Parameter().add("allowVibration", allow));
     }
     public void setAllowAddFriend(boolean isOpen) {
-        int allow = isOpen ?  1:2;
+        int allow = isOpen ? AllowType.Allowed.value :AllowType.NotAllowed.value;
         userInfo.val().setAllowAddFriend(allow);
         setSelfInfo(new Parameter().add("allowAddFriend", allow));
     }

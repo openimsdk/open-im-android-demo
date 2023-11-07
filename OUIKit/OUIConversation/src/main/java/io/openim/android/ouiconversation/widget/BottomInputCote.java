@@ -19,13 +19,14 @@ import android.text.style.ImageSpan;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
 
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,12 +45,15 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.HasPermissions;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.enums.GroupStatus;
 import io.openim.android.sdk.models.AtUserInfo;
+import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 
@@ -58,7 +62,7 @@ import io.openim.android.sdk.models.Message;
  */
 public class BottomInputCote {
 
-    private boolean hasMicrophone = false;
+    private HasPermissions hasMicrophone;
     private ChatVM vm;
     private Context context;
     private OnAtUserListener onAtUserListener;
@@ -70,19 +74,18 @@ public class BottomInputCote {
     //是否可发送内容
     private boolean isSend;
 
+    private OnDedrepClickListener chatMoreOrSendClick;
 
-    @SuppressLint("WrongConstant")
     public BottomInputCote(Context context, LayoutInputCoteBinding view) {
         this.context = context;
         this.view = view;
 
-        view.root.setIntercept(false);
+        initView(view);
 
-        initFragment();
-        Common.UIHandler.postDelayed(() -> hasMicrophone = AndPermission.hasPermissions(context,
-            Permission.Group.MICROPHONE), 300);
+        Common.UIHandler.postDelayed(() -> hasMicrophone = new HasPermissions(context,
+            Permission.RECORD_AUDIO), 300);
 
-        view.chatMoreOrSend.setOnClickListener(new OnDedrepClickListener() {
+        view.chatMoreOrSend.setOnClickListener(chatMoreOrSendClick = new OnDedrepClickListener() {
             @Override
             public void click(View v) {
                 if (!isSend) {
@@ -136,6 +139,7 @@ public class BottomInputCote {
                         OpenIMClient.getInstance().messageManager.createTextAtMessage(msgEdit.toString(), atUserIDList, atUserInfoList, null);
                 }
                 if (null != msg) {
+                    IMUtil.cacheDraft(null,vm.conversationID);
                     vm.sendMsg(msg);
                     reset();
                 }
@@ -171,18 +175,12 @@ public class BottomInputCote {
                 touchVoiceDialog.setOnShowListener(dialog -> showingViewChange());
                 touchVoiceDialog.setOnDismissListener(dialog -> showingViewChange());
             }
-            Common.permission(context, () -> {
-                touchVoiceDialog.show();
-                hasMicrophone = true;
-            }, hasMicrophone, Permission.Group.MICROPHONE);
+            hasMicrophone.safeGo(() -> touchVoiceDialog.show());
             return false;
         });
 
         view.chatInput.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) setExpandHide();
-//            InputMethodManager inputMethodManager =
-//                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-//            inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
         });
 
         view.emoji.setOnClickListener(v -> {
@@ -221,6 +219,26 @@ public class BottomInputCote {
 
             }
         });
+        view.chatInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEND && BottomInputCote.this.isSend) {
+                if (null != chatMoreOrSendClick) {
+                    chatMoreOrSendClick.click(view.chatMoreOrSend);
+                }
+            }
+            return true;
+        });
+    }
+
+    private void initView(LayoutInputCoteBinding view) {
+        view.root.setIntercept(false);
+        initFragment();
+    }
+
+    private void bindDraft() {
+        String draft =IMUtil.getDraft(vm.conversationID);
+        if (!TextUtils.isEmpty(draft)){
+            vm.inputMsg.setValue(draft);
+        }
     }
 
     public void setOnAtUserListener(OnAtUserListener onAtUserListener) {
@@ -255,6 +273,7 @@ public class BottomInputCote {
         vm.atMessages.getValue().clear();
         vm.emojiMessages.getValue().clear();
         vm.replyMessage.setValue(null);
+
     }
 
     private void initFragment() {
@@ -286,6 +305,7 @@ public class BottomInputCote {
 
     @SuppressLint("SetTextI18n")
     private void vmListener() {
+        vm.conversationInfo.observe((LifecycleOwner) context, conversationInfo -> bindDraft());
         vm.atMessages.observe((LifecycleOwner) context, messages -> {
             if (messages.isEmpty()) return;
             SpannableString spannableString =
@@ -322,39 +342,13 @@ public class BottomInputCote {
         });
 
         if (!vm.isSingleChat) {
+            vm.memberInfo.observe((LifecycleOwner) context, mem -> {
+                if (null == mem) return;
+                setMute();
+            });
             vm.groupInfo.observe((LifecycleOwner) context, groupInfo -> {
                 if (null == groupInfo) return;
-
-                if (groupInfo.getStatus() == GroupStatus.GROUP_DISSOLVE) {
-                    editMute(true);
-                    view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
-                } else if (groupInfo.getStatus() == GroupStatus.GROUP_BANNED) {
-                    editMute(true);
-                    view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.group_ban));
-                } else {
-                    OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
-                        @Override
-                        public void onSuccess(List<GroupMembersInfo> data) {
-                            if (data.isEmpty()) return;
-                            GroupMembersInfo mem = data.get(0);
-
-                            if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED
-                                && mem.getRoleLevel() == GroupRole.MEMBER) {
-                                editMute(true);
-                                view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.start_group_mute));
-                                return;
-                            }
-                            if (mem.getMuteEndTime()>0){
-                                editMute(true);
-                                view.notice.setText(io.openim.android.ouicore.R.string.you_mute);
-                                return;
-                            }
-                            editMute(false);
-                        }
-                    }, groupInfo.getGroupID(),
-                        new ArrayList<>(Collections.singleton(BaseApp.inst().loginCertificate.userID)));
-                }
-
+                setMute();
             });
         }
         vm.replyMessage.observe((LifecycleOwner) context, message -> {
@@ -365,6 +359,31 @@ public class BottomInputCote {
                 view.replyContent.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
             }
         });
+    }
+
+    private void setMute() {
+        GroupInfo groupInfo = vm.groupInfo.val();
+        GroupMembersInfo mem = vm.memberInfo.val();
+        if (null == groupInfo || null == mem) return;
+        if (groupInfo.getStatus() == GroupStatus.GROUP_DISSOLVE) {
+            editMute(true);
+            view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
+        } else if (groupInfo.getStatus() == GroupStatus.GROUP_BANNED) {
+            editMute(true);
+            view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.group_ban));
+        } else {
+            if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED && mem.getRoleLevel() == GroupRole.MEMBER) {
+                editMute(true);
+                view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.start_group_mute));
+                return;
+            }
+            if (mem.getMuteEndTime() > 0) {
+                editMute(true);
+                view.notice.setText(io.openim.android.ouicore.R.string.you_mute);
+                return;
+            }
+            editMute(false);
+        }
     }
 
     private void editMute(boolean isMute) {
