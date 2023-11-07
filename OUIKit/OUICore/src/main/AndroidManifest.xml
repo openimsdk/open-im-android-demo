@@ -23,6 +23,7 @@
 
 
     <application>
+        <meta-data android:name="ScopedStorage" android:value="true" />
         <activity
             android:name=".widget.SingleInfoModifyActivity"
             android:exported="false" />
