@@ -12,7 +12,7 @@ ext {
             compileSdk : 33,
             versionCode: 13,
             versionName: "OpenIM-Android(toc_base_open) 3.2.0+5 SDK 3.2.0",
-            abiFilters : ['armeabi-v7a', 'arm64-v8a']
+            abiFilters : ['armeabi-v7a']
     ]
 
     applicationId = [
