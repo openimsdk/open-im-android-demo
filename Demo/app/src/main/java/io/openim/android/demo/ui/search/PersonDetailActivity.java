@@ -22,14 +22,17 @@ import java.util.Observer;
 import io.openim.android.demo.databinding.ActivityPersonDetailBinding;
 import io.openim.android.demo.ui.user.PersonDataActivity;
 import io.openim.android.demo.vm.FriendVM;
+import io.openim.android.ouiconversation.ui.PreviewMediaActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMBack;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.im.IMUtil;
@@ -38,6 +41,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.ouigroup.ui.SetMuteActivity;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.AllowType;
 import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendshipInfo;
@@ -56,8 +60,6 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     private FriendshipInfo friendshipInfo;
     //表示群成员详情  群id
     private String groupId;
-    // 不允许查看群成员资料
-    private boolean notLookMemberInfo;
     // 不允许添加组成员为好友
     private boolean applyMemberFriend;
     //已经是好友
@@ -151,7 +153,22 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         });
 
     private void click() {
-
+        view.avatar.setOnClickListener(v -> {
+            UserInfo userInfo = vm.userInfo.getValue().get(0);
+            PreviewMediaVM mediaVM = Easy.installVM(PreviewMediaVM.class);
+            PreviewMediaVM .MediaData mediaData =new PreviewMediaVM.MediaData(userInfo.getNickname());
+            mediaData.mediaUrl=userInfo.getFaceURL();
+            mediaVM.previewSingle(mediaData);
+            v.getContext().startActivity(
+                new Intent(v.getContext(), PreviewMediaActivity.class));
+        });
+        view.userId.setOnClickListener(v -> {
+            try {
+                Common.copy(vm.userInfo.getValue().get(0).getUserID());
+                toast(getString(io.openim.android.ouicore.R.string.copy_succ));
+            } catch (Exception ignore) {
+            }
+        });
         view.userInfo.setOnClickListener(v -> {
             personDataActivityLauncher.launch(new Intent(this, PersonDataActivity.class).putExtra(Constant.K_ID, vm.userInfo.getValue().get(0).getUserID()));
         });
@@ -194,13 +211,21 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         return false;
     }
 
+    private boolean isHideAdd() {
+        List<UserInfo> userInfoList = vm.userInfo.getValue();
+        boolean notAllowed = false;
+        if (null != userInfoList&&!userInfoList.isEmpty())
+            notAllowed = userInfoList.get(0).getAllowAddFriend() == AllowType.NotAllowed.value;
+        return applyMemberFriend || isFriend || oneself() || notAllowed;
+    }
+
     private void listener() {
         vm.groupsInfo.observe(this, groupInfos -> {
             if (groupInfos.isEmpty()) return;
 
             GroupInfo groupInfo = groupInfos.get(0);
             // 不允许查看群成员资料
-            if (notLookMemberInfo = (groupInfo.getLookMemberInfo() == 1)) {
+            if (groupInfo.getLookMemberInfo() == 1) {
                 view.userInfo.setVisibility(View.GONE);
                 view.userId.setVisibility(View.GONE);
             } else {
@@ -211,7 +236,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             // 不允许添加组成员为好友
             applyMemberFriend = groupInfo.getApplyMemberFriend() == 1;
 
-            view.addFriend.setVisibility((applyMemberFriend || isFriend||oneself()) ? View.GONE :
+            view.addFriend.setVisibility(isHideAdd()? View.GONE :
                 View.VISIBLE);
             view.userId.setVisibility(applyMemberFriend ? View.GONE : View.VISIBLE);
 
@@ -228,12 +253,14 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             }
             if (null != friendshipInfo) {
                 if (friendshipInfo.getResult() == 1 || isCon) {
+                    //是好友或在黑名单
                     view.userInfo.setVisibility(View.VISIBLE);
                     view.addFriend.setVisibility(View.GONE);
-                    isFriend = true;
+                    isFriend = friendshipInfo.getResult() == 1;
                 } else {
                     view.userInfo.setVisibility(View.GONE);
-                    view.addFriend.setVisibility(oneself() ? View.GONE : View.VISIBLE);
+                    view.addFriend.setVisibility(isHideAdd()
+                        ? View.GONE : View.VISIBLE);
                 }
             }
             if (!TextUtils.isEmpty(groupId)) {
@@ -256,7 +283,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 }
                 view.nickName.setText(nickName);
                 view.userId.setText(userInfo.getUserID());
-                view.avatar.load(userInfo.getFaceURL(),userInfo.getNickname());
+                view.avatar.load(userInfo.getFaceURL(), userInfo.getNickname());
                 view.bottomMenu.setVisibility(oneself() ? View.GONE : View.VISIBLE);
             }
         });

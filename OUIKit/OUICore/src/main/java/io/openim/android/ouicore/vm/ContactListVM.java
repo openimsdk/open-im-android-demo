@@ -1,5 +1,8 @@
 package io.openim.android.ouicore.vm;
 
+import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
+
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
@@ -7,34 +10,37 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import io.openim.android.ouicore.R;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.base.vm.Subject;
 import io.openim.android.ouicore.entity.MsgConversation;
+import io.openim.android.ouicore.im.IM;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Obs;
+import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConversationListener;
+import io.openim.android.sdk.models.C2CReadReceiptInfo;
 import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.GroupMessageReceipt;
 import io.openim.android.sdk.models.KeyValue;
 import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.ReadReceiptInfo;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> implements OnConversationListener, OnAdvanceMsgListener {
-    public static final String NOTIFY_ITEM_CHANGED = "notify_item_changed";
-
     public State<List<MsgConversation>> conversations = new State<>(new ArrayList<>());
-    public State<List<UserInfo>> frequentContacts = new State<>(new ArrayList<>());
 
 
     @Override
@@ -59,7 +65,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         }, conversationId);
     }
 
-    private void updateConversation() {
+    public void updateConversation() {
         OpenIMClient.getInstance().conversationManager.getAllConversationList(new OnBase<List<ConversationInfo>>() {
             @Override
             public void onError(int code, String error) {
@@ -74,12 +80,30 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
                     if (null!=datum.getLatestMsg()){
                         msg = GsonHel.fromJson(datum.getLatestMsg(), Message.class);
                     }
-                    conversations.val().add(new MsgConversation(msg, datum));
+                    MsgConversation msgConversation=new MsgConversation(msg, datum);
+                    CharSequence draft=buildDraftMsg(datum);
+                    if (null!=draft)
+                        msgConversation.lastMsg=draft;
+                    conversations.val().add(msgConversation);
                 }
                 conversations.setValue(conversations.getValue());
             }
         });
     }
+
+    private CharSequence buildDraftMsg(ConversationInfo datum) {
+        String draft=IMUtil.getDraft(datum.getConversationID());
+        if (!TextUtils.isEmpty(draft)){
+            String target =
+                "[" + BaseApp.inst().getString(R.string.draft) + "]";
+
+            String txt= target+draft;
+          return  IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(txt),
+                target, R.color.theme, null);
+        }
+        return null;
+    }
+
 
     public void setOneConversationPrivateChat(IMUtil.OnSuccessListener<String> OnSuccessListener,
                                               String cid, boolean isChecked) {
@@ -203,12 +227,12 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
     }
 
     @Override
-    public void onRecvC2CReadReceipt(List<ReadReceiptInfo> list) {
+    public void onRecvC2CReadReceipt(List<C2CReadReceiptInfo> list) {
 
     }
 
     @Override
-    public void onRecvGroupMessageReadReceipt(List<ReadReceiptInfo> list) {
+    public void onRecvGroupMessageReadReceipt(GroupMessageReceipt receipt) {
 
     }
 

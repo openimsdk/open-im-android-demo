@@ -15,8 +15,8 @@ public class Ex implements Serializable {
     @Override
     public boolean equals(@Nullable Object obj) {
         if (null != obj) {
-            if (hashCode() ==
-                obj.hashCode()) return true;
+            if (hashCode() == obj.hashCode())
+                return true;
         }
         return super.equals(obj);
     }

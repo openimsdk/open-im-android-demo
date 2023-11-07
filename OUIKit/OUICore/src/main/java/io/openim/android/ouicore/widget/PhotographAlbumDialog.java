@@ -22,8 +22,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
@@ -38,6 +38,7 @@ import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.databinding.DialogPhotographAlbumBinding;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.sdk.OpenIMClient;
 
@@ -70,7 +71,7 @@ public class PhotographAlbumDialog extends BaseDialog {
         initView();
     }
 
-    boolean hasStorage, hasShoot;
+    private  HasPermissions hasStorage, hasShoot;
     DialogPhotographAlbumBinding view;
 
     Uri fileUri;
@@ -78,8 +79,8 @@ public class PhotographAlbumDialog extends BaseDialog {
     public void initView() {
         initLauncher();
         Common.UIHandler.postDelayed(() -> {
-            hasStorage = AndPermission.hasPermissions(getContext(), Permission.Group.STORAGE);
-            hasShoot = AndPermission.hasPermissions(getContext(), Permission.CAMERA);
+            hasStorage = new HasPermissions(getContext(), Permission.Group.STORAGE);
+            hasShoot = new HasPermissions(getContext(), Permission.CAMERA);
         },200);
 
         Window win = this.getWindow();
@@ -193,10 +194,7 @@ public class PhotographAlbumDialog extends BaseDialog {
      */
     @SuppressLint("WrongConstant")
     private void takePhoto() {
-        Common.permission(getContext(), () -> {
-            hasShoot = true;
-            goTakePhoto();
-        }, hasShoot, Permission.Group.CAMERA);
+        hasShoot.safeGo(this::goTakePhoto);
     }
 
     public File buildTemporaryFile() {
@@ -223,12 +221,8 @@ public class PhotographAlbumDialog extends BaseDialog {
         takePhotoLauncher.launch(intent);
     }
 
-    @SuppressLint("WrongConstant")
     private void showMediaPicker() {
-        Common.permission(getContext(), () -> {
-            hasStorage = true;
-            goMediaPicker();
-        }, hasStorage, Permission.Group.STORAGE);
+        hasStorage.safeGo(this::goMediaPicker);
     }
 
     private void goMediaPicker() {

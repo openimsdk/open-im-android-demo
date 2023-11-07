@@ -26,8 +26,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
@@ -53,6 +52,7 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.widget.GridSpaceItemDecoration;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
@@ -70,14 +70,14 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
     private boolean isEdit = false;
     private RecyclerViewAdapter<Object, ViewHol.SelectImageViewHolder> customEmojiAdapter;
     private List<Object> customEmojis = new ArrayList<>();
-    private boolean hasStorage;
+    private HasPermissions hasStorage;
     private PhotographAlbumDialog albumDialog;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        runOnUiThread(() -> hasStorage = AndPermission.hasPermissions(this,
+        runOnUiThread(() -> hasStorage = new HasPermissions(this,
             Permission.Group.STORAGE));
         customEmojiVM = Easy.find(CustomEmojiVM.class);
         bindViewDataBinding(ActivityCustomEmojiManageBinding.inflate(getLayoutInflater()));
@@ -148,10 +148,7 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
                     Glide.with(CustomEmojiManageActivity.this).load(obj).centerCrop().into(holder.view.img);
                     holder.view.select.setVisibility(View.GONE);
                     holder.view.getRoot().setOnClickListener(v1 -> {
-                        Common.permission(CustomEmojiManageActivity.this, () -> {
-                            hasStorage = true;
-                            goMediaPicker();
-                        }, hasStorage, Permission.Group.STORAGE);
+                        hasStorage.safeGo(CustomEmojiManageActivity.this::goMediaPicker);
                     });
                 }
             }

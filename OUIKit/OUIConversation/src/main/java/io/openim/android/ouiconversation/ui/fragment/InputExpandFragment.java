@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import android.text.TextUtils;
@@ -29,8 +28,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.runtime.Permission;
+import com.hjq.permissions.Permission;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
@@ -46,22 +44,29 @@ import java.util.Map;
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.FragmentInputExpandBinding;
 import io.openim.android.ouiconversation.databinding.ItemExpandMenuBinding;
+import io.openim.android.ouiconversation.ui.ChatActivity;
 import io.openim.android.ouiconversation.ui.ShootActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
+import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
+import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
+import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.CardElem;
@@ -77,16 +82,17 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
 
     FragmentInputExpandBinding v;
     //权限
-    boolean hasStorage, hasShoot, hasLocation;
+    private HasPermissions hasStorage, hasShoot, hasLocation;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MThreadTool.executorService.execute(() -> {
-            hasStorage = AndPermission.hasPermissions(getActivity(),
-                getPhotoAlbumPermission());
-            hasShoot = AndPermission.hasPermissions(getActivity(), Permission.CAMERA, Permission.RECORD_AUDIO);
-            hasLocation = AndPermission.hasPermissions(getActivity(), Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
+            hasStorage = new HasPermissions(getActivity(), Permission.Group.STORAGE);
+            hasShoot = new HasPermissions(getActivity(), Permission.CAMERA,
+                Permission.RECORD_AUDIO);
+            hasLocation = new HasPermissions(getActivity(),
+                Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
         });
 
     }
@@ -123,19 +129,84 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         adapter.setItems(menuIcons);
     }
 
+    private void goToCall() {
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null == callingService) return;
+        IMUtil.showBottomPopMenu(getContext(), (v1, keyCode, event) -> {
+            vm.isVideoCall = keyCode != 1;
+            if (vm.isSingleChat) {
+                List<String> ids = new ArrayList<>();
+                ids.add(vm.userID);
+                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
+                    vm.isSingleChat, ids, null);
+                callingService.call(signalingInfo);
+            } else {
+                GroupVM groupVM = new GroupVM();
+                groupVM.groupId = vm.groupID;
+                BaseApp.inst().putVM(groupVM);
+                ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
+                    .withBoolean(Constant.IS_SELECT_MEMBER, true)
+                    .withBoolean(Constant.IS_GROUP_CALL, true)
+                    .withInt(Constant.K_SIZE, 9)
+                    .navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
+            }
+            return false;
+        });
+    }
+
+    public void toSelectMember() {
+
+    }
+
+
+    private void sendCardMessage(MultipleChoice multipleChoice) {
+        CardElem cardElem = new CardElem();
+        cardElem.setUserID(multipleChoice.key);
+        cardElem.setNickname(multipleChoice.name);
+        cardElem.setFaceURL(multipleChoice.icon);
+        Message message = OpenIMClient.getInstance().messageManager.createCardMessage(cardElem);
+        vm.sendMsg(message);
+    }
+
+    private final ActivityResultLauncher<Intent> shareLocationLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() != Activity.RESULT_OK) return;
+            Bundle resultBundle = result.getData().getBundleExtra("result");
+            if (null == resultBundle) return;
+
+            Double latitude = resultBundle.getDouble("latitude");
+            Double longitude = resultBundle.getDouble("longitude");
+            String description = resultBundle.getString("description");
+            Message message =
+                OpenIMClient.getInstance().messageManager.createLocationMessage(latitude, longitude,
+                    description);
+            vm.sendMsg(message);
+        });
+
+    //分享位置
+    @SuppressLint("WrongConstant")
+    private void gotoShareLocation() {
+        hasLocation.safeGo(() -> {
+            shareLocationLauncher.launch(new Intent(getActivity(), WebViewActivity.class)
+                .putExtra(WebViewActivity.ACTION, WebViewActivity.LOCATION));
+        });
+
+    }
+
+    private void gotoSelectFile() {
+        Common.permission(getContext(), () -> {
+            hasStorage = true;
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("*/*");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            fileLauncher.launch(intent);
+        }, hasStorage, Permission.Group.STORAGE);
+    }
+
     //去拍摄
     private void goToShoot() {
-        if (hasShoot)
-            shootLauncher.launch(new Intent(getActivity(), ShootActivity.class));
-        else {
-            AndPermission.with(this).runtime().permission(Permission.CAMERA, Permission.RECORD_AUDIO).onGranted(permissions -> {
-                // Storage permission are allowed.
-                hasShoot = true;
-                shootLauncher.launch(new Intent(getActivity(), ShootActivity.class));
-            }).onDenied(permissions -> {
-                // Storage permission are not allowed.
-            }).start();
-        }
+        hasShoot.safeGo(()-> shootLauncher.launch(new Intent(getActivity(), ShootActivity.class)));
     }
     private final ActivityResultLauncher<Intent> captureLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
@@ -186,34 +257,13 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
 
     @SuppressLint("WrongConstant")
     private void showMediaPicker() {
-        if (hasStorage)
-            goMediaPicker();
-        else
-            AndPermission.with(this)
-                .runtime()
-                .permission(getPhotoAlbumPermission())
-                .onGranted(permissions -> {
-                // Storage permission are allowed.
-                hasStorage = true;
-                goMediaPicker();
-            }).onDenied(permissions -> {
-                // Storage permission are not allowed.
-            }).start();
-    }
-
-    @NonNull
-    private static String[] getPhotoAlbumPermission() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-            ? Permission.Group.CAMERA : Permission.Group.STORAGE;
-    }
-
-    private void goMediaPicker() {
-        Matisse.from(getActivity()).choose(MimeType.ofAll())
+        hasStorage.safeGo(() -> Matisse.from(getActivity()).choose(MimeType.ofAll())
             .countable(true).maxSelectable(9)
             .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
             .thumbnailScale(0.85f)
-            .imageEngine(new GlideEngine()).forResult(captureLauncher);
+            .imageEngine(new GlideEngine()).forResult(captureLauncher));
     }
+
 
 
     public void setChatVM(ChatVM vm) {

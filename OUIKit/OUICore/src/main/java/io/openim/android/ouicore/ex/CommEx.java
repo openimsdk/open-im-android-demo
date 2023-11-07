@@ -8,6 +8,7 @@ import java.util.Objects;
 /**
  * 常用扩展字段
  */
+@Deprecated
 public class CommEx implements Serializable {
     public String key; //Id
     public boolean isSticky = false; //是否是Sticky

@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
-import android.text.InputFilter;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -29,8 +28,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -204,13 +201,19 @@ public class MessageViewHolder {
         }
 
         int getHaveReadCount() {
-            List<String> hasReadUserIDList =
-                message.getAttachedInfoElem().getGroupHasReadInfo().getHasReadUserIDList();
-            return null == hasReadUserIDList ? 0 : hasReadUserIDList.size();
+            try {
+                return message.getAttachedInfoElem().getGroupHasReadInfo().getHasReadCount();
+            } catch (Exception ignored) {
+            }
+            return 0;
         }
 
         int getNeedReadCount() {
-            return message.getAttachedInfoElem().getGroupHasReadInfo().getGroupMemberCount();
+            try {
+                return message.getAttachedInfoElem().getGroupHasReadInfo().getUnreadCount();
+            } catch (Exception ignored) {
+            }
+            return 0;
         }
 
         /**
@@ -289,15 +292,17 @@ public class MessageViewHolder {
                     unRead.setText(message.isRead() ? readed : unread);
                     unRead.setTextColor(unRead.getContext().getResources().getColor(message.isRead() ? io.openim.android.ouicore.R.color.txt_shallow : io.openim.android.ouicore.R.color.theme));
                 } else {
-                    int unreadCount = getNeedReadCount() - getHaveReadCount() - 1;
-                    if (unreadCount > 0) {
+                    if (getNeedReadCount() > 0) {
                         unRead.setTextColor(Color.parseColor("#0089FF"));
-                        unRead.setText(unreadCount + chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
+                        unRead.setText(getNeedReadCount() + chatVM.getContext().getString(io.openim.android.ouicore.R.string.person_unRead));
                         unRead.setOnClickListener(v -> {
                             v.getContext().startActivity(new Intent(v.getContext(),
-                                MsgReadStatusActivity.class).putExtra(Constant.K_GROUP_ID,
-                                message.getGroupID()).putStringArrayListExtra(Constant.K_ID,
-                                (ArrayList<String>) message.getAttachedInfoElem().getGroupHasReadInfo().getHasReadUserIDList()));
+                                MsgReadStatusActivity.class)
+                                .putExtra(Constant.K_ID, chatVM.conversationID)
+                                .putExtra(Constant.K_RESULT, message.getClientMsgID())
+                                .putExtra(Constant.K_RESULT2,
+                                    message.getAttachedInfoElem().getGroupHasReadInfo())
+                            );
                         });
                     }
                 }
@@ -313,17 +318,20 @@ public class MessageViewHolder {
             if (isOwn) nickName = itemView.findViewById(R.id.nickName2);
             else nickName = itemView.findViewById(R.id.nickName);
             if (null != nickName) {
+                nickName.setVisibility(View.VISIBLE);
                 nickName.setMaxLines(1);
                 nickName.setMaxEms(18);
                 nickName.setEllipsize(TextUtils.TruncateAt.MIDDLE);
 
-                String time = TimeUtil.getTimeString(message.getSendTime());
-                nickName.setVisibility(View.VISIBLE);
-                if (message.getSessionType() == ConversationType.SINGLE_CHAT) {
+                boolean isSending=message.getStatus() == MessageStatus.SENDING;
+                String time = TimeUtil.getTimeString(isSending
+                    ? System.currentTimeMillis()
+                    : message.getSendTime());
+                if (isSending
+                    || message.getSessionType() == ConversationType.SINGLE_CHAT) {
                     nickName.setText(time);
-                } else {
+                } else
                     nickName.setText(message.getSenderNickname() + "  " + time);
-                }
             }
         }
 
@@ -406,8 +414,8 @@ public class MessageViewHolder {
             view.setOnLongClickListener(v -> {
                 if (null != chatVM.enableMultipleSelect.val() && chatVM.enableMultipleSelect.val())
                     return true;
-                 List<Integer> menuIcons = new ArrayList<>();
-                 List<String> menuTitles = new ArrayList<>();
+                List<Integer> menuIcons = new ArrayList<>();
+                List<String> menuTitles = new ArrayList<>();
 
                 if (null == popupWindow) {
                     popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -420,48 +428,49 @@ public class MessageViewHolder {
                     adapter =
                         new RecyclerViewAdapter<Object, InputExpandFragment.ExpandHolder>(InputExpandFragment.ExpandHolder.class) {
 
-                        @Override
-                        public void onBindView(@NonNull InputExpandFragment.ExpandHolder holder,
-                                               Object data, int position) {
-                            int iconRes = (int) getItems().get(position);
-                            List<String> menuTitles= (List<String>) popupWindow.getContentView().getTag();
+                            @Override
+                            public void onBindView(@NonNull InputExpandFragment.ExpandHolder holder,
+                                                   Object data, int position) {
+                                int iconRes = (int) getItems().get(position);
+                                List<String> menuTitles =
+                                    (List<String>) popupWindow.getContentView().getTag();
 
-                            holder.v.menu.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
-                                v.getContext().getDrawable(iconRes), null, null);
-                            holder.v.menu.setText(menuTitles.get(position));
-                            holder.v.menu.setTextColor(Color.WHITE);
-                            holder.v.menu.setOnClickListener(v1 -> {
-                                popupWindow.dismiss();
-                                if (iconRes == R.mipmap.ic_reply) {
-                                    chatVM.replyMessage.setValue(message);
-                                }
-                                if (iconRes == R.mipmap.ic_c_copy) {
-                                    Common.copy(message.getTextElem().getContent());
-                                    chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
-                                }
-                                if (iconRes == R.mipmap.ic_withdraw) {
-                                    chatVM.revokeMessage(message);
-                                }
-                                if (iconRes == R.mipmap.ic_add_emoji) {
-                                    Easy.find(CustomEmojiVM.class).insertEmojiDb(message);
-                                }
-                                if (iconRes == R.mipmap.ic_delete) {
-                                    chatVM.deleteMessageFromLocalAndSvr(message);
-                                }
-                                if (iconRes == R.mipmap.ic_forward) {
-                                    Easy.find(ForwardVM.class).createForwardMessage(message);
+                                holder.v.menu.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
+                                    v.getContext().getDrawable(iconRes), null, null);
+                                holder.v.menu.setText(menuTitles.get(position));
+                                holder.v.menu.setTextColor(Color.WHITE);
+                                holder.v.menu.setOnClickListener(v1 -> {
+                                    popupWindow.dismiss();
+                                    if (iconRes == R.mipmap.ic_reply) {
+                                        chatVM.replyMessage.setValue(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_c_copy) {
+                                        Common.copy(message.getTextElem().getContent());
+                                        chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
+                                    }
+                                    if (iconRes == R.mipmap.ic_withdraw) {
+                                        chatVM.revokeMessage(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_add_emoji) {
+                                        Easy.find(CustomEmojiVM.class).insertEmojiDb(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_delete) {
+                                        chatVM.deleteMessageFromLocalAndSvr(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_forward) {
+                                        Easy.find(ForwardVM.class).createForwardMessage(message);
 
-                                    Easy.installVM(SelectTargetVM.class);
-                                    ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
-                                }
-                                if (iconRes == R.mipmap.ic_multiple_choice) {
-                                    chatVM.enableMultipleSelect.setValue(true);
-                                    ((MsgExpand) message.getExt()).isChoice = true;
-                                    messageAdapter.notifyDataSetChanged();
-                                }
-                            });
-                        }
-                    };
+                                        Easy.installVM(SelectTargetVM.class);
+                                        ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
+                                    }
+                                    if (iconRes == R.mipmap.ic_multiple_choice) {
+                                        chatVM.enableMultipleSelect.setValue(true);
+                                        ((MsgExpand) message.getExt()).isChoice = true;
+                                        messageAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                        };
                     view1.recyclerview.setAdapter(adapter);
                 }
                 if (message.getContentType() == MessageType.TEXT) {
@@ -476,7 +485,7 @@ public class MessageViewHolder {
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.add));
                 }
 
-                if (chatVM.hasPermission) {
+                if (chatVM.isAdminOrCreator) {
                     //群
                     if (isOwn || !message.getSendID().equals(chatVM.groupInfo.val().getOwnerUserID())) {
                         menuIcons.add(R.mipmap.ic_withdraw);
@@ -561,6 +570,9 @@ public class MessageViewHolder {
             this.messageAdapter = messageAdapter;
         }
 
+        public void toPreview(View view, String url, String firstFrameUrl) {
+            toPreview(view, url, firstFrameUrl, false);
+        }
 
         /**
          * 预览图片或视频
@@ -569,13 +581,20 @@ public class MessageViewHolder {
          * @param url           地址
          * @param firstFrameUrl 缩略图
          */
-        public void toPreview(View view, String url, String firstFrameUrl) {
+        public void toPreview(View view, String url, String firstFrameUrl, boolean isSingle) {
             view.setOnClickListener(v -> {
-                if (message.getContentType() == MessageType.CUSTOM_FACE) {
-
+                if (message.getContentType() == MessageType.CUSTOM_FACE) {//TODO
                 } else {
                     PreviewMediaVM previewMediaVM = Easy.installVM(PreviewMediaVM.class);
-                    previewMediaVM.previewMultiple(chatVM.mediaDataList, url);
+                    if (isSingle) {
+                        PreviewMediaVM.MediaData mediaData = new
+                            PreviewMediaVM.MediaData(message.getClientMsgID());
+                        mediaData.mediaUrl = url;
+                        mediaData.thumbnail = firstFrameUrl;
+                        previewMediaVM.previewSingle(mediaData);
+                    } else
+                        previewMediaVM.previewMultiple(chatVM.mediaDataList,
+                            message.getClientMsgID());
                     view.getContext().startActivity(new Intent(view.getContext(),
                         PreviewMediaActivity.class));
                 }
@@ -803,7 +822,7 @@ public class MessageViewHolder {
             } else {
                 url = message.getPictureElem().getSourcePicture().getUrl();
                 if (TextUtils.isEmpty(url))
-                    url=message.getPictureElem().getSourcePath();
+                    url = message.getPictureElem().getSourcePath();
 
                 int w = message.getPictureElem().getSourcePicture().getWidth();
                 int h = message.getPictureElem().getSourcePicture().getHeight();
@@ -915,9 +934,6 @@ public class MessageViewHolder {
             view.content2.setOnClickListener(v -> clickPlay(message, view.lottieView2));
         }
 
-        private void markRead(Message message) {
-            if (!isOwn) chatVM.markRead(message);
-        }
 
         private void clickPlay(Message message, LottieAnimationView lottieView) {
             String sourceUrl = message.getSoundElem().getSourceUrl();
@@ -953,7 +969,8 @@ public class MessageViewHolder {
             SPlayer.instance().getMediaPlayer().setOnPlayStateListener(new SMediaPlayer.OnPlayStateListener() {
                 @Override
                 public void started() {
-                    markRead(message);
+                    if (!isOwn)
+                        chatVM.markRead(message);
 
                     playingMessage = message;
                     lottieView.playAnimation();
@@ -1019,10 +1036,7 @@ public class MessageViewHolder {
 
         private void preview(Message message, View view) {
             String snapshotUrl = message.getVideoElem().getSnapshotUrl();
-            String videoPath = message.getVideoElem().getVideoPath();
-            if (!GetFilePathFromUri.fileIsExists(videoPath))
-                videoPath = message.getVideoElem().getVideoUrl();
-            toPreview(view, videoPath, snapshotUrl);
+            toPreview(view, IMUtil.getFastVideoPath(message.getVideoElem()), snapshotUrl);
         }
 
 
@@ -1069,7 +1083,7 @@ public class MessageViewHolder {
 
             view.sendState.setSendState(message.getStatus());
             view.content.setOnClickListener(v -> {
-                if (!view.downloadView.completed){
+                if (!view.downloadView.completed) {
                     chatVM.toast(v.getContext().getString(io.openim.android.ouicore.R.string.file_download));
                     return;
                 }
@@ -1383,7 +1397,7 @@ public class MessageViewHolder {
 
             message = quoteElem.getQuoteMessage();
             int contentType = message.getContentType();
-            if (contentType == MessageType.TEXT) {
+            if (contentType == MessageType.TEXT || contentType == MessageType.AT_TEXT) {
                 v.quoteContent1.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
                 v.picture1.setVisibility(View.GONE);
             } else {
@@ -1392,13 +1406,14 @@ public class MessageViewHolder {
                     v.quoteContent1.setText(message.getSenderNickname() + ":");
                     IMUtil.loadPicture(message.getPictureElem()).centerCrop().into(v.picture1);
                     toPreview(v.quoteLy1, message.getPictureElem().getSourcePicture().getUrl(),
-                        null);
+                        message.getPictureElem().getSnapshotPicture()
+                            .getUrl(), true);
                 }
                 if (contentType == MessageType.VIDEO) {
                     v.quoteContent1.setText(message.getSenderNickname() + ":");
                     IMUtil.loadVideoSnapshot(message.getVideoElem()).centerCrop().into(v.picture1);
-                    toPreview(v.quoteLy1, message.getVideoElem().getVideoUrl(),
-                        message.getVideoElem().getSnapshotUrl());
+                    toPreview(v.quoteLy1, IMUtil.getFastVideoPath(message.getVideoElem()),
+                        message.getVideoElem().getSnapshotUrl(), true);
                 }
                 if (contentType == MessageType.LOCATION) {
                     try {
@@ -1425,7 +1440,7 @@ public class MessageViewHolder {
 
             message = quoteElem.getQuoteMessage();
             int contentType = message.getContentType();
-            if (contentType == MessageType.TEXT) {
+            if (contentType == MessageType.TEXT || contentType == MessageType.AT_TEXT) {
                 v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
                 v.picture2.setVisibility(View.GONE);
             } else {
@@ -1434,13 +1449,14 @@ public class MessageViewHolder {
                     v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
                     IMUtil.loadPicture(message.getPictureElem()).centerInside().into(v.picture2);
                     toPreview(v.quoteLy2, message.getPictureElem().getSourcePicture().getUrl(),
-                        null);
+                        message.getPictureElem().getSnapshotPicture()
+                            .getUrl(), true);
                 }
                 if (contentType == MessageType.VIDEO) {
                     v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
                     IMUtil.loadVideoSnapshot(message.getVideoElem()).centerInside().into(v.picture2);
-                    toPreview(v.quoteLy2, message.getVideoElem().getVideoUrl(),
-                        message.getVideoElem().getSnapshotUrl());
+                    toPreview(v.quoteLy2, IMUtil.getFastVideoPath(message.getVideoElem()),
+                        message.getVideoElem().getSnapshotUrl(), true);
                 }
                 if (contentType == MessageType.LOCATION) {
                     try {

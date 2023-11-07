@@ -68,7 +68,8 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, Acti
                         case MessageType.PICTURE:
                             url = data.getPictureElem().getSourcePicture().getUrl();
                             previewMediaVM = Easy.installVM(PreviewMediaVM.class);
-                            mediaData =new PreviewMediaVM.MediaData(url);
+                            mediaData =new PreviewMediaVM.MediaData(data.getClientMsgID());
+                            mediaData.mediaUrl=url;
                             mediaData.thumbnail= data.getPictureElem().getSnapshotPicture().getUrl();
                             previewMediaVM.previewSingle(mediaData);
                             startActivity(
@@ -79,7 +80,8 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, Acti
                             String snapshotUrl = data.getVideoElem().getSnapshotUrl();
                             url = data.getVideoElem().getVideoUrl();
                             previewMediaVM = Easy.installVM(PreviewMediaVM.class);
-                            mediaData =new PreviewMediaVM.MediaData(url);
+                            mediaData =new PreviewMediaVM.MediaData(data.getClientMsgID());
+                            mediaData.mediaUrl=url;
                             mediaData.thumbnail= snapshotUrl;
                             previewMediaVM.previewSingle(mediaData);
                             v.getContext().startActivity(

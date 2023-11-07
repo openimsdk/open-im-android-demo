@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.api.OneselfService;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.MessageType;
@@ -41,7 +43,6 @@ public class SearchVM extends BaseViewModel {
         new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<GroupInfo>> groupsInfo = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<UserInfo>> userInfo = new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<List<FriendInfo>> friendInfo = new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<FriendshipInfo>> friendshipInfo =
         new MutableLiveData<>(new ArrayList<>());
     public MutableLiveData<List<GroupMembersInfo>> groupMembersInfo =
@@ -67,20 +68,28 @@ public class SearchVM extends BaseViewModel {
             ids = new ArrayList<>(); // 用户ID集合
             ids.add(searchContent.getValue());
         }
-        //兼容旧版
-        OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
+        Parameter parameter = new Parameter().add("userIDs", ids);
+        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OneselfService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
             @Override
-            public void onError(int code, String error) {
-                L.e(error + "-" + code);
-                userInfo.setValue(null);
+            protected void onFailure(Throwable e) {
+                getIView().toast(e.getMessage());
             }
 
             @Override
-            public void onSuccess(List<UserInfo> data) {
-                if (data.isEmpty()) return;
-                userInfo.setValue(data);
+            public void onSuccess(HashMap map) {
+                try {
+                    List arrayList = (List) map.get("users");
+                    if (null == arrayList || arrayList.isEmpty()) return;
+
+                    UserInfo u = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
+                        UserInfo.class);
+                    userInfo.setValue(new ArrayList<>(Collections.singleton(u)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
-        }, ids);
+        });
     }
 
 
@@ -198,23 +207,33 @@ public class SearchVM extends BaseViewModel {
     }
 
     public void searchFriendV2() {
-        OpenIMClient.getInstance().friendshipManager.searchFriends(new OnBase<List<FriendInfo>>() {
-            @Override
-            public void onError(int code, String error) {
+        Parameter parameter = new Parameter();
 
-            }
+        Map<String, Integer> pa = new HashMap<>();
+        pa.put("pageNumber", 1);
+        pa.put("showNumber", 100);
+        parameter.add("pagination", pa);
+        parameter.add("keyword", searchContent.getValue());
 
-            @Override
-            public void onSuccess(List<FriendInfo> data) {
-                if (page == 1) {
-                    friendInfo.getValue().clear();
+        N.API(OneselfService.class).searchFriends(parameter.buildJsonBody())
+            .map(OneselfService.turn(UserList.class))
+            .compose(N.IOMain())
+            .subscribe(new NetObserver<UserList>("") {
+
+
+                @Override
+                public void onSuccess(UserList o) {
+                    try {
+                        if (page == 1) {
+                            userInfo.getValue().clear();
+                        }
+                        if (null!=o.users&& !o.users.isEmpty()) {
+                            userInfo.getValue().addAll(o.users);
+                        }
+                        userInfo.setValue(userInfo.getValue());
+                    }catch (Exception e){e.printStackTrace();}
                 }
-                if (!data.isEmpty()) {
-                    friendInfo.getValue().addAll(data);
-                }
-                friendInfo.setValue(friendInfo.getValue());
-            }
-        }, buildKeyWord(), true, true, true);
+            });
     }
 
     public void searchGroupV2() {
@@ -285,7 +304,6 @@ public class SearchVM extends BaseViewModel {
         fileItems.getValue().clear();
         groupsInfo.getValue().clear();
         userInfo.getValue().clear();
-        friendInfo.getValue().clear();
     }
 
     public void addTextChangedListener(EditText editText) {

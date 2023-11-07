@@ -19,11 +19,11 @@ public class MsgConversation {
 
     public MsgConversation(Message lastMsg, ConversationInfo conversationInfo) {
         try {
+            this.lastMsg = "";
             if (null != lastMsg) {
                 IMUtil.buildExpandInfo(lastMsg);
                 this.lastMsg = IMUtil.getMsgParse(lastMsg);
-            } else
-                this.lastMsg = "";
+            }
             this.conversationInfo = conversationInfo;
             if (lastMsg.getContentType() == MessageType.GROUP_INFO_SET_NTF) {
                 notificationMsg = GsonHel.fromJson(lastMsg.getNotificationElem().getDetail(),

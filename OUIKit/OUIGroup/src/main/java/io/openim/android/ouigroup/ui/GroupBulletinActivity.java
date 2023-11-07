@@ -1,6 +1,8 @@
 package io.openim.android.ouigroup.ui;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 
 import androidx.lifecycle.Observer;
@@ -13,6 +15,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouigroup.databinding.ActivityGroupBulletinBinding;
 import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.sdk.models.GroupInfo;
 
 @Route(path = Routes.Group.GROUP_BULLETIN)
 public class GroupBulletinActivity extends BaseActivity<GroupVM, ActivityGroupBulletinBinding> {
@@ -32,7 +35,21 @@ public class GroupBulletinActivity extends BaseActivity<GroupVM, ActivityGroupBu
     }
 
     private void click() {
+       view.content.addTextChangedListener(new TextWatcher() {
+           @Override
+           public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+           }
+
+           @Override
+           public void onTextChanged(CharSequence s, int start, int before, int count) {
+           }
+
+           @Override
+           public void afterTextChanged(Editable s) {
+               view.maxTips.setText(vm.groupsInfo.val().getNotification().length()+"/250");
+           }
+       });
         view.edit.setOnClickListener(v -> {
             view.content.setEnabled(true);
             view.content.requestFocus();
