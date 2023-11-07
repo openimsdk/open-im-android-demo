@@ -8,7 +8,7 @@ ext {
     //android 配置
     androidConfig = [
             minSdk     : 21,
-            targetSdk  : 33,
+            targetSdk  : 32,
             compileSdk : 33,
             versionCode: 13,
             versionName: "OpenIM-Android(toc_base_open) 3.2.0+5 SDK 3.2.0",
