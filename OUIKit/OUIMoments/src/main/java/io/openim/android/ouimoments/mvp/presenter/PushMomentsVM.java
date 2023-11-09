@@ -176,6 +176,7 @@ public class PushMomentsVM extends BaseViewModel {
                 @Override
                 protected void onFailure(Throwable e) {
                     getIView().toast(e.getMessage());
+                    getIView().onError(e.getMessage());
                 }
             });
     }

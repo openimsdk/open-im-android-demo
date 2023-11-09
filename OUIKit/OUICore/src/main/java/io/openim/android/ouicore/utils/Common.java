@@ -62,6 +62,8 @@ import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.PictureElem;
 import io.openim.android.sdk.models.VideoElem;
 import io.reactivex.Observable;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import q.rorbin.badgeview.QBadgeView;
 
 public class Common {

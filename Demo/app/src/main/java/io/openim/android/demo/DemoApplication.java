@@ -87,11 +87,14 @@ public class DemoApplication extends BaseApp {
                 String token = "";
                 try {
                     token = BaseApp.inst().loginCertificate.chatToken;
-                } catch (Exception ignored) {
-                }
-                return chain.proceed(chain.request().newBuilder().addHeader("token",
-                    token).addHeader("operationID",
-                    System.currentTimeMillis() + "").build());
+                } catch (Exception ignored) {}
+
+                Request request=chain.request().newBuilder()
+                    .addHeader("token", token)
+                    .addHeader("operationID", System.currentTimeMillis() + "")
+                    .build();
+                Response response= chain.proceed(request);
+                return response;
             }));
     }
 
@@ -136,6 +139,7 @@ public class DemoApplication extends BaseApp {
 
         });
     }
+
     public void offline() {
         LoginCertificate.clear();
         CallingService callingService = (CallingService) ARouter.getInstance()
