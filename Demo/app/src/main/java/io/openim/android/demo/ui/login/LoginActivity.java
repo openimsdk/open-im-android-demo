@@ -76,7 +76,7 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
         CountryCodePicker.Language language = buildDefaultLanguage();
         view.loginContent.countryCode.changeDefaultLanguage(language);
 
-        view.version.setText(Common.getAppPackageInfo(this).versionName);
+        view.version.setText(Common.getAppPackageInfo().versionName);
     }
 
     public static CountryCodePicker.Language buildDefaultLanguage() {

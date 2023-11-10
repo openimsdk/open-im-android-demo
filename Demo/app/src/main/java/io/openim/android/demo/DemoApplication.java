@@ -1,25 +1,24 @@
 package io.openim.android.demo;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
-import android.content.res.Configuration;
 
-import androidx.annotation.NonNull;
 import androidx.multidex.MultiDex;
 
 
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.igexin.sdk.IUserLoggerInterface;
+import com.cretin.www.cretinautoupdatelibrary.model.TypeConfig;
+import com.cretin.www.cretinautoupdatelibrary.model.UpdateConfig;
+import com.cretin.www.cretinautoupdatelibrary.utils.AppUpdateUtils;
 import com.igexin.sdk.PushManager;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
-import java.io.IOException;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.openim.android.demo.ui.login.LoginActivity;
+import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.LoginCertificate;
@@ -28,17 +27,17 @@ import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.net.RXRetrofit.HttpConfig;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.update.OkHttp3Connection;
+import io.openim.android.ouicore.update.UpdateApp;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.sdk.listener.OnConnListener;
-import io.realm.Realm;
-import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -58,11 +57,9 @@ public class DemoApplication extends BaseApp {
         ARouter.init(this);
 //        ARouter.openimLog();
 //        ARouter.openDebug();
-
+        initNet();
         initBugly();
         initPush();
-        //net init
-        initNet();
 
         //im 初始化
         initIM();
@@ -76,12 +73,17 @@ public class DemoApplication extends BaseApp {
 
     private void initBugly() {
         CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(this);
-        PackageInfo packageInfo = Common.getAppPackageInfo(this);
+        PackageInfo packageInfo = Common.getAppPackageInfo();
         if (null != packageInfo) {
             strategy.setAppPackageName(packageInfo.versionName);
             strategy.setAppVersion(packageInfo.versionCode + "");
         }
         CrashReport.initCrashReport(getApplicationContext(), "4d365d80d1", L.isDebug);
+
+
+        new UpdateApp()
+            .init(R.mipmap.ic_launcher)
+            .checkUpdate();
     }
 
 
@@ -101,9 +103,7 @@ public class DemoApplication extends BaseApp {
                 String token = "";
                 try {
                     token = BaseApp.inst().loginCertificate.chatToken;
-                } catch (Exception ignored) {
-                }
-
+                } catch (Exception ignored) {}
                 Request request = chain.request().newBuilder()
                     .addHeader("token", token)
                     .addHeader("operationID", System.currentTimeMillis() + "")

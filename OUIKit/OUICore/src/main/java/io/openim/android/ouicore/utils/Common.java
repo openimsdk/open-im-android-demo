@@ -149,10 +149,10 @@ public class Common {
         textView.setText(spannableString);
     }
 
-    public static PackageInfo getAppPackageInfo(Context context) {
+    public static PackageInfo getAppPackageInfo() {
         try {
-            PackageManager pm = context.getPackageManager();
-            return pm.getPackageInfo(context.getPackageName(), 0);
+            PackageManager pm = BaseApp.inst().getPackageManager();
+            return pm.getPackageInfo(BaseApp.inst().getPackageName(), 0);
         } catch (Exception ignored) {
         }
         return null;

@@ -511,5 +511,6 @@
     <string name="not_be_added">禁止添加我为好友</string>
     <string name="a_person_at_you">有人@你</string>
     <string name="draft">草稿</string>
+    <string name="is_lastest">您的是最新的版本</string>
 
 </resources>

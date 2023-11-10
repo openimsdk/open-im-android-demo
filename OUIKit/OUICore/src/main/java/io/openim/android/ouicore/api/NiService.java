@@ -1,5 +1,6 @@
 package io.openim.android.ouicore.api;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
@@ -26,10 +27,12 @@ public interface NiService {
     @POST
     Observable<ResponseBody> CommNI(@Url String url, @Header("token") String token,
                                     @Body RequestBody requestBody);
-//    @Multipart
-//    @POST
-//    Observable<ResponseBody> CommNI2(@Url String url,
-//                                    @PartMap Map<String, RequestBody> from);
+    @POST
+    Observable<ResponseBody> post(@Url String url, @Body RequestBody requestBody);
+    @Multipart
+    @POST
+    Observable<ResponseBody> post(@Url String url, @PartMap Map<String, RequestBody> from);
+
     static Parameter buildParameter() {
         return new Parameter().add("operationID",
             System.currentTimeMillis() + (new Random().nextInt(9999))+"");
