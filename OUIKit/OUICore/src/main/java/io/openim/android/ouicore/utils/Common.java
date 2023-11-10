@@ -73,15 +73,15 @@ public class Common {
     public final static Handler UIHandler = new Handler(Looper.getMainLooper());
 
 
-
     //目标项是否在最后一个可见项之后
-    public static  boolean mShouldScroll;
+    public static boolean mShouldScroll;
     //记录目标项位置
-    public  static int mToPosition;
+    public static int mToPosition;
+
     /**
      * 滑动到指定位置
      */
-    public static  void smoothMoveToPosition(RecyclerView mRecyclerView,  int position) {
+    public static void smoothMoveToPosition(RecyclerView mRecyclerView, int position) {
         // 第一个可见位置
         int firstItem = mRecyclerView.getChildLayoutPosition(mRecyclerView.getChildAt(0));
         // 最后一个可见位置
@@ -108,18 +108,19 @@ public class Common {
     }
 
 
-
     /**
-     *  finish routes
+     * finish routes
+     *
      * @param routes
      */
-    public static  void finishRoute(String... routes) {
+    public static void finishRoute(String... routes) {
         for (String route : routes) {
             Postcard postcard = ARouter.getInstance().build(route);
             LogisticsCenter.completion(postcard);
             ActivityManager.finishActivity(postcard.getDestination());
         }
     }
+
     public static void stringBindForegroundColorSpan(TextView textView, String data,
                                                      String target) {
         stringBindForegroundColorSpan(textView, data, target, R.color.theme);
@@ -148,17 +149,13 @@ public class Common {
         textView.setText(spannableString);
     }
 
-    public static String getAppVersionName(Context context) {
-        String versionName = "";
+    public static PackageInfo getAppPackageInfo(Context context) {
         try {
             PackageManager pm = context.getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
-            versionName = pi.versionName;
-            if (TextUtils.isEmpty(versionName)) {
-                return "";
-            }
-        } catch (Exception ignored) {}
-        return versionName;
+            return pm.getPackageInfo(context.getPackageName(), 0);
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
     public static String md5(String content) {
@@ -361,7 +358,7 @@ public class Common {
             .putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord="
                 + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude()
                 + "&referer=" + WebViewActivity.mapAppKey)
-            .putExtra(WebViewActivity.TITLE,v.getContext().getString(R.string.location)));
+            .putExtra(WebViewActivity.TITLE, v.getContext().getString(R.string.location)));
     }
 
     /***
@@ -430,7 +427,7 @@ public class Common {
     }
 
     public static String containsLink(String text) {
-        StringBuilder links=new StringBuilder();
+        StringBuilder links = new StringBuilder();
         // 正则表达式模式匹配URL链接
         String pattern = "(http|https)://[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3}(/\\S*)?";
         Pattern regex = Pattern.compile(pattern);

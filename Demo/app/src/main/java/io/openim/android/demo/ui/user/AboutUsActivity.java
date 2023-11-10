@@ -2,6 +2,7 @@ package io.openim.android.demo.ui.user;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
 
 import io.openim.android.demo.R;
@@ -18,8 +19,10 @@ public class AboutUsActivity extends BaseActivity<BaseViewModel, ActivityAboutUs
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityAboutUsBinding.inflate(getLayoutInflater()));
         sink();
-
-        view.version.setText(Common.getAppVersionName(this));
+        PackageInfo packageInfo=Common.getAppPackageInfo(this);
+        if (null!=packageInfo){
+            view.version.setText(packageInfo.versionName);
+        }
         view.update.setOnClickListener(v -> {
 
         });

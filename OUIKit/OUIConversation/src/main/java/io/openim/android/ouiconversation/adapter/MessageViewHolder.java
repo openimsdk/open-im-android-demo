@@ -323,7 +323,7 @@ public class MessageViewHolder {
                 nickName.setMaxEms(18);
                 nickName.setEllipsize(TextUtils.TruncateAt.MIDDLE);
 
-                boolean isSending=message.getStatus() == MessageStatus.SENDING;
+                boolean isSending = message.getStatus() == MessageStatus.SENDING;
                 String time = TimeUtil.getTimeString(isSending
                     ? System.currentTimeMillis()
                     : message.getSendTime());
@@ -582,10 +582,10 @@ public class MessageViewHolder {
          */
         public void toPreview(View view, String url, String firstFrameUrl, boolean isSingle) {
             view.setOnClickListener(v -> {
-                if (message.getContentType() == MessageType.CUSTOM_FACE) {//TODO
-                } else {
+//                if (message.getContentType() == MessageType.CUSTOM_FACE) {//TODO
+//                } else {
                     PreviewMediaVM previewMediaVM = Easy.installVM(PreviewMediaVM.class);
-                    if (isSingle) {
+                    if (isSingle||message.getContentType() == MessageType.CUSTOM_FACE) {
                         PreviewMediaVM.MediaData mediaData = new
                             PreviewMediaVM.MediaData(message.getClientMsgID());
                         mediaData.mediaUrl = url;
@@ -596,8 +596,9 @@ public class MessageViewHolder {
                             message.getClientMsgID());
                     view.getContext().startActivity(new Intent(view.getContext(),
                         PreviewMediaActivity.class));
+//                }
                 }
-            });
+            );
         }
     }
 
@@ -817,7 +818,11 @@ public class MessageViewHolder {
             if (message.getContentType() == MessageType.CUSTOM_FACE) {
                 MsgExpand msgExpand = (MsgExpand) message.getExt();
                 url = msgExpand.customEmoji.url;
-                Glide.with(img.getContext()).load(url).placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo).centerInside().into(img);
+                scale(img, msgExpand.customEmoji.width, msgExpand.customEmoji.height);
+                Glide.with(img.getContext()).load(url)
+                    .fitCenter().transform(new RoundedCorners(15))
+                    .placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo).error(io.openim.android.ouicore.R.mipmap.ic_chat_photo)
+                    .into(img);
             } else {
                 url = message.getPictureElem().getSourcePicture().getUrl();
                 if (TextUtils.isEmpty(url))
@@ -825,14 +830,14 @@ public class MessageViewHolder {
 
                 int w = message.getPictureElem().getSourcePicture().getWidth();
                 int h = message.getPictureElem().getSourcePicture().getHeight();
-                scale(img, w, h, 180);
+                scale(img, w, h);
                 IMUtil.loadPicture(message.getPictureElem()).fitCenter().transform(new RoundedCorners(15)).into(img);
             }
             return url;
         }
 
-        public void scale(ImageView img, int sourceW, int sourceH, int baseDPW) {
-            int pictureWidth = Common.dp2px(baseDPW);
+        public void scale(View img, int sourceW, int sourceH) {
+            int pictureWidth = Common.dp2px(180);
             int _trulyWidth;
             int _trulyHeight;
             if (sourceW == 0) {
@@ -1028,7 +1033,10 @@ public class MessageViewHolder {
             String secondFormat = TimeUtil.getTime((int) videoElem.getDuration(),
                 TimeUtil.minuteTimeFormat);
             view.duration2.setText(secondFormat);
-            IMUtil.loadVideoSnapshot(videoElem).centerInside().into(view.content2);
+            scale((View) view.content2.getParent(),videoElem.getSnapshotWidth(),videoElem.getSnapshotHeight());
+            scale(view.content2,videoElem.getSnapshotWidth(),videoElem.getSnapshotHeight());
+            IMUtil.loadVideoSnapshot(message.getVideoElem()).fitCenter()
+                .transform(new RoundedCorners(15)).into(view.content2);
             preview(message, view.videoPlay2);
         }
 
@@ -1049,7 +1057,7 @@ public class MessageViewHolder {
 
             int w = message.getVideoElem().getSnapshotWidth();
             int h = message.getVideoElem().getSnapshotHeight();
-            scale(view.content, w, h, 170);
+            scale(view.content, w, h);
             IMUtil.loadVideoSnapshot(message.getVideoElem()).fitCenter().transform(new RoundedCorners(15)).into(view.content);
             preview(message, view.contentGroup);
         }

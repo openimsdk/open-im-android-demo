@@ -2,6 +2,7 @@ package io.openim.android.demo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,7 @@ import androidx.multidex.MultiDex;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.igexin.sdk.IUserLoggerInterface;
 import com.igexin.sdk.PushManager;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
@@ -27,6 +29,7 @@ import io.openim.android.ouicore.net.RXRetrofit.HttpConfig;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.LanguageUtil;
@@ -56,6 +59,7 @@ public class DemoApplication extends BaseApp {
 //        ARouter.openimLog();
 //        ARouter.openDebug();
 
+        initBugly();
         initPush();
         //net init
         initNet();
@@ -68,6 +72,16 @@ public class DemoApplication extends BaseApp {
         SPlayer.instance().setCacheDirPath(Constant.AUDIO_DIR);
 
         EmojiManager.install(new GoogleEmojiProvider());
+    }
+
+    private void initBugly() {
+        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(this);
+        PackageInfo packageInfo = Common.getAppPackageInfo(this);
+        if (null != packageInfo) {
+            strategy.setAppPackageName(packageInfo.versionName);
+            strategy.setAppVersion(packageInfo.versionCode + "");
+        }
+        CrashReport.initCrashReport(getApplicationContext(), "4d365d80d1", L.isDebug);
     }
 
 
@@ -87,13 +101,14 @@ public class DemoApplication extends BaseApp {
                 String token = "";
                 try {
                     token = BaseApp.inst().loginCertificate.chatToken;
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
 
-                Request request=chain.request().newBuilder()
+                Request request = chain.request().newBuilder()
                     .addHeader("token", token)
                     .addHeader("operationID", System.currentTimeMillis() + "")
                     .build();
-                Response response= chain.proceed(request);
+                Response response = chain.proceed(request);
                 return response;
             }));
     }

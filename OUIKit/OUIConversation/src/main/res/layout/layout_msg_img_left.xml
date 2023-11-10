@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
-                    android:src="@mipmap/ic_file_download_pause"
+                    android:src="@mipmap/ic_video_pause"
                     android:visibility="gone" />
 
 

@@ -109,11 +109,6 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
     }
 
     void init() {
-        if (vm.superGroupMembers.getValue().size() > Constant.SUPER_GROUP_LIMIT) {
-            vm.superGroupMembers.getValue().clear();
-            vm.page = 0;
-            vm.pageSize = 20;
-        }
         isTransferPermission = getIntent().getBooleanExtra(Constant.K_FROM, false);
         groupCall = getIntent().getBooleanExtra(Constant.IS_GROUP_CALL, false);
         isSelectMember = getIntent().getBooleanExtra(Constant.IS_SELECT_MEMBER, false);
@@ -164,8 +159,8 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
             LayoutMemberActionBinding view = LayoutMemberActionBinding.inflate(getLayoutInflater());
             view.deleteFriend.setVisibility(vm.isOwner.val() ? View.VISIBLE : View.GONE);
             view.addFriend.setOnClickListener(v1 -> {
+                GroupMaterialActivity.inviteIntoGroup(this,vm);
                 popupWindow.dismiss();
-                startActivity(new Intent(this, InitiateGroupActivity.class).putExtra(Constant.IS_INVITE_TO_GROUP, true));
             });
             view.deleteFriend.setOnClickListener(v1 -> {
                 popupWindow.dismiss();

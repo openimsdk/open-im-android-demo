@@ -2,7 +2,9 @@ package io.openim.android.demo.vm;
 
 import android.view.View;
 
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
@@ -32,6 +34,7 @@ import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.NotificationVM;
 import io.openim.android.ouicore.vm.UserLogic;
+import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConnListener;
@@ -42,7 +45,6 @@ import io.openim.android.sdk.models.UserInfo;
 public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnListener,
     OnConversationListener {
 
-    public MutableLiveData<String> nickname = new MutableLiveData<>("");
     public MutableLiveData<Integer> visibility = new MutableLiveData<>(View.INVISIBLE);
     public boolean fromLogin, isInitDate;
     private CallingService callingService;
@@ -53,31 +55,31 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     protected void viewCreate() {
         IMEvent.getInstance().addConnListener(this);
         IMEvent.getInstance().addConversationListener(this);
-
         callingService =
             (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
         if (null != callingService) callingService.setOnServicePriorLoginCallBack(this::initDate);
 
-        BaseApp.inst().loginCertificate = LoginCertificate.getCache(getContext());
-        boolean logged = IMUtil.isLogged();
-        if (fromLogin || logged) {
+        if (fromLogin) {
             initDate();
         } else {
-            OpenIMClient.getInstance().login(new OnBase<String>() {
-                @Override
-                public void onError(int code, String error) {
-                    getIView().toast(error + code);
+            WaitDialog waitDialog=new WaitDialog(context.get());
+            waitDialog.setNotDismiss();
+            userLogic.loginStatus.observe((LifecycleOwner) context.get(), loginStatus -> {
+                if (loginStatus== UserLogic.LoginStatus.LOGGING){
+                    waitDialog.show();
+                }
+                if (loginStatus== UserLogic.LoginStatus.SUCCESS){
+                    initDate();
+                    waitDialog.dismiss();
+                }
+                if (loginStatus== UserLogic.LoginStatus.FAIL){
+                    waitDialog.dismiss();
+                    getIView().toast(loginStatus.value);
                     getIView().jump();
                 }
-
-                @Override
-                public void onSuccess(String data) {
-                    initDate();
-                }
-            }, BaseApp.inst().loginCertificate.userID, BaseApp.inst().loginCertificate.imToken);
+            });
         }
-        if (null != BaseApp.inst().loginCertificate.nickname)
-            nickname.setValue(BaseApp.inst().loginCertificate.nickname);
+
     }
 
     private void initDate() {
@@ -157,7 +159,6 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
                         UserInfo.class);
                     updateConfig(us);
                     userLogic.info.setValue(us);
-                    nickname.setValue(us.getNickname());
                     Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
                 } catch (Exception e) {
                     e.printStackTrace();

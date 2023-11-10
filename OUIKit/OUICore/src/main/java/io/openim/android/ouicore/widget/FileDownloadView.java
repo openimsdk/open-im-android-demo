@@ -12,12 +12,9 @@ import androidx.annotation.Nullable;
 import com.liulishuo.okdownload.DownloadTask;
 import com.liulishuo.okdownload.OkDownload;
 import com.liulishuo.okdownload.StatusUtil;
-import com.liulishuo.okdownload.UnifiedListenerManager;
-import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo;
 import com.liulishuo.okdownload.core.cause.EndCause;
 import com.liulishuo.okdownload.core.cause.ResumeFailedCause;
 import com.liulishuo.okdownload.core.listener.DownloadListener1;
-import com.liulishuo.okdownload.core.listener.DownloadListener4;
 import com.liulishuo.okdownload.core.listener.assist.Listener1Assist;
 
 import java.io.File;
@@ -28,7 +25,6 @@ import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.OpenFileUtil;
@@ -128,7 +124,7 @@ public class FileDownloadView extends RelativeLayout {
 
     public void setDownBtn(boolean isDown) {
         downBtn.setImageResource(isDown ?
-            R.mipmap.ic_file_download_pause : R.mipmap.ic_file_download);
+            R.mipmap.ic_file_download_pause2 : R.mipmap.ic_file_download);
     }
 
     public void setRes(String url) {

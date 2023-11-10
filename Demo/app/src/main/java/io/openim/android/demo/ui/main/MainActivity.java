@@ -80,10 +80,12 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
 
     private void init() {
-       Common.UIHandler.postDelayed(() -> new HasPermissions(MainActivity.this, Permission.SYSTEM_ALERT_WINDOW)
-           .safeGo(() -> new HasPermissions(MainActivity.this, Permission.CAMERA,
-               Permission.RECORD_AUDIO).safeGo(() -> {
-           })),2000);
+       Common.UIHandler.postDelayed(() -> {
+           if (isFinishing()) return;
+           new HasPermissions(MainActivity.this, Permission.SYSTEM_ALERT_WINDOW)
+               .safeGo(() -> new HasPermissions(MainActivity.this, Permission.CAMERA,
+                   Permission.RECORD_AUDIO).safeGo(() -> {}));
+       },2000);
     }
 
     private void listener() {

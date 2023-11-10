@@ -164,6 +164,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                .toString(),vm.conversationID);
 
             BaseApp.inst().getVMByCache(ContactListVM.class).updateConversation();
+            vm.markRead();
         }
     }
 

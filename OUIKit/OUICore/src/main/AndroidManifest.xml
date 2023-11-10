@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!--    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />-->
 
     <permission-group android:name="${applicationId}.andpermission" /> <!-- 录音 -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- 播音 -->
@@ -22,8 +23,11 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
 
-    <application>
-        <meta-data android:name="ScopedStorage" android:value="true" />
+    <application android:requestLegacyExternalStorage="true">
+<!--        <meta-data-->
+<!--            android:name="ScopedStorage"-->
+<!--            android:value="true" />-->
+
         <activity
             android:name=".widget.SingleInfoModifyActivity"
             android:exported="false" />

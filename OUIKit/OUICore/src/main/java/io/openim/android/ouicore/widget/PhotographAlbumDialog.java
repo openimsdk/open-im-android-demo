@@ -3,17 +3,22 @@ package io.openim.android.ouicore.widget;
 import static android.os.Environment.DIRECTORY_PICTURES;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -29,14 +34,22 @@ import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.openim.android.ouicore.R;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.databinding.DialogPhotographAlbumBinding;
+import io.openim.android.ouicore.im.IM;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.L;
@@ -71,7 +84,7 @@ public class PhotographAlbumDialog extends BaseDialog {
         initView();
     }
 
-    private  HasPermissions hasStorage, hasShoot;
+    private HasPermissions hasStorage, hasShoot;
     DialogPhotographAlbumBinding view;
 
     Uri fileUri;
@@ -81,7 +94,7 @@ public class PhotographAlbumDialog extends BaseDialog {
         Common.UIHandler.postDelayed(() -> {
             hasStorage = new HasPermissions(getContext(), Permission.Group.STORAGE);
             hasShoot = new HasPermissions(getContext(), Permission.CAMERA);
-        },200);
+        }, 200);
 
         Window win = this.getWindow();
         win.requestFeature(Window.FEATURE_NO_TITLE);
@@ -121,7 +134,8 @@ public class PhotographAlbumDialog extends BaseDialog {
         takePhotoLauncher =
             compatActivity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() != Activity.RESULT_OK) return;
-                if (isToCrop) goCrop(fileUri);
+                if (isToCrop)
+                    goCrop(fileUri);
                 else if (null != onSelectResultListener)
                     onSelectResultListener.onResult(GetFilePathFromUri.getFileAbsolutePath(getContext(), fileUri));
             });
@@ -155,6 +169,12 @@ public class PhotographAlbumDialog extends BaseDialog {
      * 裁剪照片
      */
     private void goCrop(Uri sourceUri) {
+        fileUri = Uri.fromFile(buildTemporaryFile());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            File file = uriToFileApiQ(sourceUri, BaseApp.inst());
+            fileUri = FileProvider.getUriForFile(BaseApp.inst(),
+                BaseApp.inst().getPackageName() + ".fileProvider", file);
+        }
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.putExtra("crop", "true");
         intent.putExtra("aspectX", 1);  //X方向上的比例
@@ -164,18 +184,51 @@ public class PhotographAlbumDialog extends BaseDialog {
         intent.putExtra("scale ", true); //是否保留比例
         intent.putExtra("return-data", false);
         intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
-        intent.setDataAndType(sourceUri, "image/*");
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            intent.setDataAndType(fileUri, "image/*");
+        } else {
+            intent.setDataAndType(sourceUri, "image/*");
+        }
         // 7.0 使用 FileProvider 并赋予临时权限
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         }
-        File temporaryFile = buildTemporaryFile();
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri = Uri.fromFile(temporaryFile));      //设置输出
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);      //设置输出
 
         waitDialog = new WaitDialog(getContext());
         waitDialog.show();
         cropLauncher.launch(intent);
+    }
+
+    @TargetApi(Build.VERSION_CODES.Q)
+    public static File uriToFileApiQ(Uri uri, Context context) {
+        File file = null;
+        //android10以上转换
+        if (uri.getScheme().equals(ContentResolver.SCHEME_FILE)) {
+            file = new File(uri.getPath());
+        } else if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            //把文件复制到沙盒目录
+            ContentResolver contentResolver = context.getContentResolver();
+            String displayName = System.currentTimeMillis() + Math.round((Math.random() + 1) * 1000)
+                + "." + MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri));
+//            注释掉的方法可以获取到原文件的文件名，但是比较耗时
+//            Cursor cursor = contentResolver.query(uri, null, null, null, null);
+//            if (cursor.moveToFirst()) {
+//                String displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns
+//                .DISPLAY_NAME));}
+            try {
+                InputStream is = contentResolver.openInputStream(uri);
+                File cache = new File(Constant.PICTURE_DIR, displayName);
+                FileOutputStream fos = new FileOutputStream(cache);
+                FileUtils.copy(is, fos);
+                file = cache;
+                fos.close();
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return file;
     }
 
 
@@ -198,14 +251,7 @@ public class PhotographAlbumDialog extends BaseDialog {
     }
 
     public File buildTemporaryFile() {
-        File file;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            file = new File(Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES),
-                System.currentTimeMillis()+".jpg");
-        } else {
-            file = new File(compatActivity.getExternalCacheDir(), System.currentTimeMillis()+".jpg");
-        }
-        return file;
+        return new File(Constant.PICTURE_DIR, System.currentTimeMillis() + ".jpg");
     }
 
     private void goTakePhoto() {
@@ -226,7 +272,11 @@ public class PhotographAlbumDialog extends BaseDialog {
     }
 
     private void goMediaPicker() {
-        Matisse.from(compatActivity).choose(MimeType.ofImage()).countable(true).maxSelectable(maxSelectable).restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED).thumbnailScale(0.85f).imageEngine(new GlideEngine()).forResult(albumLauncher);
+        Matisse.from(compatActivity).choose(MimeType.ofImage())
+            .countable(true).maxSelectable(maxSelectable)
+            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+            .thumbnailScale(0.85f).
+            imageEngine(new GlideEngine()).forResult(albumLauncher);
     }
 
     public void setMaxSelectable(int maxSelectable) {
