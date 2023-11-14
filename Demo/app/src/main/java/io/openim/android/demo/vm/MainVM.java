@@ -64,17 +64,17 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
         if (fromLogin) {
             initDate();
         } else {
-            WaitDialog waitDialog=new WaitDialog(context.get());
+            WaitDialog waitDialog = new WaitDialog(context.get());
             waitDialog.setNotDismiss();
             userLogic.loginStatus.observe((LifecycleOwner) context.get(), loginStatus -> {
-                if (loginStatus== UserLogic.LoginStatus.LOGGING){
+                if (loginStatus == UserLogic.LoginStatus.LOGGING) {
                     waitDialog.show();
                 }
-                if (loginStatus== UserLogic.LoginStatus.SUCCESS){
+                if (loginStatus == UserLogic.LoginStatus.SUCCESS) {
                     initDate();
                     waitDialog.dismiss();
                 }
-                if (loginStatus== UserLogic.LoginStatus.FAIL){
+                if (loginStatus == UserLogic.LoginStatus.FAIL) {
                     waitDialog.dismiss();
                     getIView().toast(loginStatus.value);
                     getIView().jump();
@@ -86,8 +86,8 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
 
     private void initDate() {
         initGlobalVM();
-        BaseApp.inst().loginCertificate=LoginCertificate.getCache(context.get());
-        new CrashReport.UserStrategy(context.get()).setDeviceID(BaseApp.inst().loginCertificate.userID);
+        BaseApp.inst().loginCertificate = LoginCertificate.getCache(context.get());
+        CrashReport.setDeviceId(context.get(), BaseApp.inst().loginCertificate.userID);
 
         if (null != callingService)
             callingService.startAudioVideoService(getContext());
@@ -110,9 +110,11 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
             @Override
             public void onSuccess(Map m) {
                 try {
-                   HashMap<String,Object> map = (HashMap) m.get("config");
-                    int allowSendMsgNotFriend= Integer.valueOf((String) map.get("allowSendMsgNotFriend"));
-                    BaseApp.inst().loginCertificate.allowSendMsgNotFriend = allowSendMsgNotFriend == 1;
+                    HashMap<String, Object> map = (HashMap) m.get("config");
+                    int allowSendMsgNotFriend = Integer.valueOf((String) map.get(
+                        "allowSendMsgNotFriend"));
+                    BaseApp.inst().loginCertificate.allowSendMsgNotFriend =
+                        allowSendMsgNotFriend == 1;
 
                     BaseApp.inst().loginCertificate.cache(BaseApp.inst());
                 } catch (Exception ignored) {
@@ -121,10 +123,11 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
 
             @Override
             protected void onFailure(Throwable e) {
-               toast(e.getMessage());
+                toast(e.getMessage());
             }
         });
     }
+
     public void updateConfig(UserInfo userInfo) {
         LoginCertificate certificate = BaseApp.inst().loginCertificate;
         if (!userInfo.getUserID().equals(certificate.userID)) return;
@@ -139,6 +142,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
 
         BaseApp.inst().loginCertificate.cache(BaseApp.inst());
     }
+
     void getSelfUserInfo() {
         List<String> ids = new ArrayList<>();
         ids.add(BaseApp.inst().loginCertificate.userID);
@@ -147,28 +151,28 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
             .map(OpenIMService.turn(HashMap.class))
             .compose(N.IOMain())
             .subscribe(new NetObserver<HashMap>(getContext()) {
-            @Override
-            protected void onFailure(Throwable e) {
-                toast(e.getMessage());
-            }
-
-            @Override
-            public void onSuccess(HashMap map) {
-                try {
-                    List arrayList = (List) map.get("users");
-                    if (null == arrayList || arrayList.isEmpty()) return;
-
-                    UserInfo us = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
-                        UserInfo.class);
-                    updateConfig(us);
-                    userLogic.info.setValue(us);
-                    Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                @Override
+                protected void onFailure(Throwable e) {
+                    toast(e.getMessage());
                 }
 
-            }
-        });
+                @Override
+                public void onSuccess(HashMap map) {
+                    try {
+                        List arrayList = (List) map.get("users");
+                        if (null == arrayList || arrayList.isEmpty()) return;
+
+                        UserInfo us = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
+                            UserInfo.class);
+                        updateConfig(us);
+                        userLogic.info.setValue(us);
+                        Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
     }
 
     @Override

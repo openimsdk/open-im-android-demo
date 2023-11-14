@@ -89,15 +89,7 @@ public class DemoApplication extends BaseApp {
     }
 
     private void initBugly() {
-        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(this);
-        PackageInfo packageInfo = Common.getAppPackageInfo();
-        if (null != packageInfo) {
-            String appName = packageInfo.versionName + "-" + (Common.isApkDebug() ? "debug" :
-                "release");
-            L.e(TAG, "-----versionName------" + appName);
-            strategy.setAppPackageName(appName);
-            strategy.setAppVersion(packageInfo.versionCode + "");
-        }
+        CrashReport.setAppChannel(this,Common.isApkDebug() ? "debug" : "release");
         CrashReport.initCrashReport(getApplicationContext(), "4d365d80d1", L.isDebug);
 
         new UpdateApp().init(R.mipmap.ic_launcher).checkUpdate();
