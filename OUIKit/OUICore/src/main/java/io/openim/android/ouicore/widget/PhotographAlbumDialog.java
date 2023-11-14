@@ -219,6 +219,8 @@ public class PhotographAlbumDialog extends BaseDialog {
             try {
                 InputStream is = contentResolver.openInputStream(uri);
                 File cache = new File(Constant.PICTURE_DIR, displayName);
+                cache.createNewFile();
+
                 FileOutputStream fos = new FileOutputStream(cache);
                 FileUtils.copy(is, fos);
                 file = cache;

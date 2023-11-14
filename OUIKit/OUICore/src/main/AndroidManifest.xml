@@ -23,10 +23,10 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
 
-    <application android:requestLegacyExternalStorage="true">
-<!--        <meta-data-->
-<!--            android:name="ScopedStorage"-->
-<!--            android:value="true" />-->
+    <application>
+        <meta-data
+            android:name="ScopedStorage"
+            android:value="true" />
 
         <activity
             android:name=".widget.SingleInfoModifyActivity"

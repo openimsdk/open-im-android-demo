@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +47,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     OnConversationListener {
 
     public MutableLiveData<Integer> visibility = new MutableLiveData<>(View.INVISIBLE);
-    public boolean fromLogin, isInitDate;
+    public boolean fromLogin;
     private CallingService callingService;
     public State<Integer> totalUnreadMsgCount = new State<>();
     private final UserLogic userLogic = Easy.find(UserLogic.class);
@@ -55,6 +56,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     protected void viewCreate() {
         IMEvent.getInstance().addConnListener(this);
         IMEvent.getInstance().addConversationListener(this);
+
         callingService =
             (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
         if (null != callingService) callingService.setOnServicePriorLoginCallBack(this::initDate);
@@ -84,8 +86,9 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
 
     private void initDate() {
         initGlobalVM();
-        if (isInitDate) return;
-        isInitDate = true;
+        BaseApp.inst().loginCertificate=LoginCertificate.getCache(context.get());
+        new CrashReport.UserStrategy(context.get()).setDeviceID(BaseApp.inst().loginCertificate.userID);
+
         if (null != callingService)
             callingService.startAudioVideoService(getContext());
 

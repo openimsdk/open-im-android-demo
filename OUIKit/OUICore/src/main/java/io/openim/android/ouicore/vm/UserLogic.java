@@ -40,8 +40,7 @@ public class UserLogic extends BaseVM {
 
 
     public boolean isCacheUser() {
-        return null != (BaseApp.inst().loginCertificate =
-            LoginCertificate.getCache(BaseApp.inst()));
+        return null!=LoginCertificate.getCache(BaseApp.inst());
     }
 
     public void loginCacheUser() {

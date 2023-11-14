@@ -15,6 +15,7 @@ import com.tencent.bugly.crashreport.CrashReport;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import io.openim.android.demo.ui.login.LoginActivity;
@@ -48,42 +49,58 @@ public class DemoApplication extends BaseApp {
 
     @Override
     public void onCreate() {
-        L.e("App", "-----onCreate");
+        L.e(TAG, "-----onCreate------");
         super.onCreate();
-        initController();
-
         MultiDex.install(this);
+
+        initFile();
+        initController();
+        initARouter();
+        initNet();
+        initBugly();
+        initPush();
+        initIM();
+
+        EmojiManager.install(new GoogleEmojiProvider());
+        //音频播放
+        SPlayer.init(this);
+        SPlayer.instance().setCacheDirPath(Constant.AUDIO_DIR);
+    }
+
+    private void initFile() {
+        buildDirectory(Constant.AUDIO_DIR);
+        buildDirectory(Constant.VIDEO_DIR);
+        buildDirectory(Constant.PICTURE_DIR);
+        buildDirectory(Constant.File_DIR);
+    }
+
+    private boolean buildDirectory(String path) {
+        File file = new File(path);
+        if (file.exists())
+            return true;
+        return file.mkdirs();
+    }
+
+    private void initARouter() {
         //ARouter init
         ARouter.init(this);
 //        ARouter.openimLog();
 //        ARouter.openDebug();
-        initNet();
-        initBugly();
-        initPush();
-
-        //im 初始化
-        initIM();
-
-        //音频播放
-        SPlayer.init(this);
-        SPlayer.instance().setCacheDirPath(Constant.AUDIO_DIR);
-
-        EmojiManager.install(new GoogleEmojiProvider());
     }
 
     private void initBugly() {
         CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(this);
         PackageInfo packageInfo = Common.getAppPackageInfo();
         if (null != packageInfo) {
-            strategy.setAppPackageName(packageInfo.versionName);
+            String appName = packageInfo.versionName + "-" + (Common.isApkDebug() ? "debug" :
+                "release");
+            L.e(TAG, "-----versionName------" + appName);
+            strategy.setAppPackageName(appName);
             strategy.setAppVersion(packageInfo.versionCode + "");
         }
         CrashReport.initCrashReport(getApplicationContext(), "4d365d80d1", L.isDebug);
 
-
-        new UpdateApp()
-            .init(R.mipmap.ic_launcher)
-            .checkUpdate();
+        new UpdateApp().init(R.mipmap.ic_launcher).checkUpdate();
     }
 
 
@@ -98,19 +115,17 @@ public class DemoApplication extends BaseApp {
     }
 
     private void initNet() {
-        N.init(new HttpConfig().setBaseUrl(Constant.getAppAuthUrl())
-            .addInterceptor(chain -> {
-                String token = "";
-                try {
-                    token = BaseApp.inst().loginCertificate.chatToken;
-                } catch (Exception ignored) {}
-                Request request = chain.request().newBuilder()
-                    .addHeader("token", token)
-                    .addHeader("operationID", System.currentTimeMillis() + "")
-                    .build();
-                Response response = chain.proceed(request);
-                return response;
-            }));
+        N.init(new HttpConfig().setBaseUrl(Constant.getAppAuthUrl()).addInterceptor(chain -> {
+            String token = "";
+            try {
+                token = BaseApp.inst().loginCertificate.chatToken;
+            } catch (Exception ignored) {
+            }
+            Request request = chain.request().newBuilder().addHeader("token", token).addHeader(
+                "operationID", System.currentTimeMillis() + "").build();
+            Response response = chain.proceed(request);
+            return response;
+        }));
     }
 
     private void initIM() {
@@ -157,13 +172,11 @@ public class DemoApplication extends BaseApp {
 
     public void offline() {
         LoginCertificate.clear();
-        CallingService callingService = (CallingService) ARouter.getInstance()
-            .build(Routes.Service.CALLING).navigation();
-        if (null != callingService)
-            callingService.stopAudioVideoService(BaseApp.inst());
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null != callingService) callingService.stopAudioVideoService(BaseApp.inst());
 
         ActivityManager.finishAllExceptActivity();
-        startActivity(new Intent(BaseApp.inst(), LoginActivity.class)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        startActivity(new Intent(BaseApp.inst(), LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }

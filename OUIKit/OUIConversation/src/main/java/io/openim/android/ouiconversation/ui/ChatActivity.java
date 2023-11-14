@@ -163,7 +163,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
            IMUtil.cacheDraft(Objects.requireNonNull(view.layoutInputCote.chatInput.getText())
                .toString(),vm.conversationID);
 
-            BaseApp.inst().getVMByCache(ContactListVM.class).updateConversation();
+            ContactListVM contactListVM=BaseApp.inst().getVMByCache(ContactListVM.class);
+            if (contactListVM != null) {
+                contactListVM.updateConversation();
+            }
             vm.markRead();
         }
     }

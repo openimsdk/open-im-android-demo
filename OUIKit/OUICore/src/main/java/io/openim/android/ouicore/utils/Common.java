@@ -6,6 +6,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -71,6 +72,15 @@ public class Common {
      * 主线程handler
      */
     public final static Handler UIHandler = new Handler(Looper.getMainLooper());
+
+
+    public static boolean isApkDebug() {
+        try {
+            ApplicationInfo info= BaseApp.inst().getApplicationInfo();
+            return (info.flags&ApplicationInfo.FLAG_DEBUGGABLE)!=0;
+        } catch (Exception ignored) {}
+        return false;
+    }
 
 
     //目标项是否在最后一个可见项之后
