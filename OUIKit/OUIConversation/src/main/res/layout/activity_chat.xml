@@ -326,7 +326,6 @@
             android:layout_marginLeft="-8dp"
             android:layout_marginRight="-8dp"
             android:visibility="gone"
-            app:hl_bottomShow="false"
             app:hl_shadowColor="#2a000000"
             app:hl_shadowLimit="8dp">
 
