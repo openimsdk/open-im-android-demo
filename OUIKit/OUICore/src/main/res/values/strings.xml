@@ -517,4 +517,6 @@
     <string name="a_person_at_you">有人@你</string>
     <string name="draft">草稿</string>
     <string name="is_lastest">您的是最新的版本</string>
+    <string name="open_permissions_tips">请先打开必要的权限</string>
+    <string name="open_setting_permissions_tips">请先前往设置打开%1$s权限</string>
 </resources>

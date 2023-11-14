@@ -14,7 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.hjq.permissions.Permission;
 import com.hjq.window.EasyWindow;
+
+import java.util.List;
 
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
@@ -22,6 +25,7 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.utils.ActivityManager;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
@@ -36,13 +40,14 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
 
     private RecyclerViewAdapter<MeetingInfo, MeetingItemViewHolder> adapter;
     private WaitDialog waitDialog;
+    private HasPermissions shoot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         vm = Easy.installVM(MeetingVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMeetingLaunchBinding.inflate(getLayoutInflater()));
-
+        shoot = new HasPermissions(this, Permission.RECORD_AUDIO, Permission.CAMERA);
         init();
         initView();
         listener();
@@ -52,7 +57,8 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
         view.timing.setOnClickListener(v -> {
             //这里有可能被释放 所以需要重新放入
             BaseApp.inst().putVM(vm);
-            startActivity(new Intent(MeetingLaunchActivity.this, TimingMeetingActivity.class));
+            shoot.safeGo(() -> startActivity(new Intent(MeetingLaunchActivity.this,
+                TimingMeetingActivity.class)));
         });
         view.timely.setOnClickListener(new OnDedrepClickListener() {
             @Override
@@ -66,7 +72,8 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
             public void click(View v) {
                 //这里有可能被释放 所以需要重新放入
                 BaseApp.inst().putVM(vm);
-                startActivity(new Intent(MeetingLaunchActivity.this, JoinMeetingActivity.class));
+                shoot.safeGo(() -> startActivity(new Intent(MeetingLaunchActivity.this,
+                    TimingMeetingActivity.class)));
             }
         });
         vm.meetingInfoList.observe(this, meetingInfos -> {
@@ -88,8 +95,8 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
         vm.second = 0;
         //这里有可能被释放 所以需要重新放入
         BaseApp.inst().putVM(vm);
-        meetingHomeActivityCallBack.launch(new Intent(this,
-            MeetingHomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        shoot.safeGo(() -> meetingHomeActivityCallBack.launch(new Intent(MeetingLaunchActivity.this,
+            MeetingHomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)));
     }
 
     private ActivityResultLauncher<Intent> meetingHomeActivityCallBack =
@@ -136,8 +143,9 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
                         //这里有可能被释放 所以需要重新放入
                         BaseApp.inst().putVM(vm);
                         vm.selectMeetingInfo = data;
-                        startActivity(new Intent(MeetingLaunchActivity.this,
-                            MeetingDetailActivity.class));
+                        shoot.safeGo(() -> startActivity(new Intent(MeetingLaunchActivity.this,
+                            MeetingDetailActivity.class)));
+
                     });
                 } catch (Exception ignored) {
 
