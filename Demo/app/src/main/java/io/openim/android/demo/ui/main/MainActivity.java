@@ -85,13 +85,22 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
     private void init(Intent intent) {
         Easy.find(UserLogic.class).loginCacheUser();
+        callingStatus();
+    }
 
-        boolean isCall=intent.getBooleanExtra(Constant.IS_CALL,false);
+    private void callingStatus() {
         CallingService callingService =
             (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-        if (null==callingService|| !isCall)return;
-        callingService.buildCallDialog(this, null,
-            false).show();
+        if (null != callingService && callingService.getCallStatus()) {
+            callingService.buildCallDialog(this, null,
+                false).show();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        callingStatus();
     }
 
     private void listener() {

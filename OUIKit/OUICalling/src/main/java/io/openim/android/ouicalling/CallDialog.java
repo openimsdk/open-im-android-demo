@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.openim.android.ouicalling.databinding.DialogCallBinding;
+import io.openim.android.ouicalling.service.AudioVideoService;
 import io.openim.android.ouicalling.vm.CallingVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseDialog;
@@ -36,6 +37,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.MediaPlayerListener;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
+import io.openim.android.ouicore.utils.NotificationUtil;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.sdk.OpenIMClient;
@@ -306,6 +308,7 @@ public class CallDialog extends BaseDialog {
     public void playRingtone() {
         try {
             Common.wakeUp(context);
+            NotificationUtil.cancelNotify(AudioVideoService.NOTIFY_ID);
 //           Ringtone铃声
             if (!MediaPlayerUtil.INSTANCE.isPlaying()) {
                 MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), R.raw.incoming_call_ring);

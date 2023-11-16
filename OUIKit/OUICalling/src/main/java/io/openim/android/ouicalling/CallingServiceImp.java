@@ -50,6 +50,8 @@ public class CallingServiceImp implements CallingService {
     public CallDialog callDialog;
     private SignalingInfo signalingInfo;
     public static final int A_NOTIFY_ID = 100;
+    private boolean isBeCalled;
+
 
     public void setSignalingInfo(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
@@ -80,6 +82,10 @@ public class CallingServiceImp implements CallingService {
         Alive.init(context, precessName, AudioVideoService.class);
     }
 
+    @Override
+    public boolean getCallStatus() {
+        return isBeCalled;
+    }
 
     @Override
     public void init(Context context) {
@@ -140,17 +146,19 @@ public class CallingServiceImp implements CallingService {
         if (callDialog != null) return;
         Common.wakeUp(context);
         setSignalingInfo(signalingInfo);
+        isBeCalled = true;
 
         boolean isSystemAlert =
             new HasPermissions(BaseApp.inst(), Permission.SYSTEM_ALERT_WINDOW).isAllGranted();
         Intent hangIntent;
-        boolean backgroundStart=BackgroundStartPermissions.INSTANCE.isBackgroundStartAllowed(context);
+        boolean backgroundStart =
+            BackgroundStartPermissions.INSTANCE.isBackgroundStartAllowed(context);
         if (isSystemAlert && backgroundStart) {
             hangIntent =
                 new Intent(context, LockPushActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(hangIntent);
         } else {
-            if (BaseApp.inst().isAppBackground.val()){
+            if (BaseApp.inst().isAppBackground.val()) {
                 Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
                 LogisticsCenter.completion(postcard);
                 hangIntent = new Intent(context, postcard.getDestination())
@@ -160,7 +168,8 @@ public class CallingServiceImp implements CallingService {
                 MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), R.raw.incoming_call_ring);
                 MediaPlayerUtil.INSTANCE.loopPlay();
 
-                PendingIntent hangPendingIntent = PendingIntent.getActivity(context, 1002, hangIntent
+                PendingIntent hangPendingIntent = PendingIntent.getActivity(context, 1002,
+                    hangIntent
                     , PendingIntent.FLAG_MUTABLE);
 
                 Notification notification =
@@ -171,14 +180,15 @@ public class CallingServiceImp implements CallingService {
                         .setAutoCancel(true).setOngoing(true).setContentIntent(hangPendingIntent).setCustomHeadsUpContentView(new RemoteViews(BaseApp.inst().getPackageName(), R.layout.layout_call_invite)).build();
 
                 NotificationUtil.sendNotify(A_NOTIFY_ID, notification);
-            }else {
-              buildCallDialog(ActivityManager.getActivityStack().peek(), null,
+            } else {
+                buildCallDialog(ActivityManager.getActivityStack().peek(), null,
                     false).show();
             }
         }
     }
 
     private void cancelNotify() {
+        isBeCalled = false;
         NotificationUtil.cancelNotify(A_NOTIFY_ID);
         if (BaseApp.inst().isAppBackground.val()) IMUtil.sendNotice(A_NOTIFY_ID);
         MediaPlayerUtil.INSTANCE.pause();
