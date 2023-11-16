@@ -18,6 +18,10 @@ public class HasPermissions {
     private final Context context;
     private final String[] permissions;
 
+    public boolean isAllGranted() {
+        return isAllGranted;
+    }
+
     public HasPermissions(Context context, @NonNull String... permissions) {
         this.context = context;
         this.permissions = permissions;

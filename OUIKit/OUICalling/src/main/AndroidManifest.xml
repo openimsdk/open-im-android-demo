@@ -15,6 +15,7 @@
             </intent-filter>
         </receiver>
 
+
         <activity
             android:name=".LockPushActivity"
             android:exported="false"

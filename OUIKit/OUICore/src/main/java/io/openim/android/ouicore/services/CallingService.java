@@ -16,6 +16,12 @@ public interface CallingService extends IProvider, OnSignalingListener {
     Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener,
                            boolean isCallOut);
 
+    default Dialog buildCallDialog(Context context,
+                                   DialogInterface.OnDismissListener dismissListener,
+                                   boolean isCallOut) {
+       throw new RuntimeException();
+    }
+
     /**
      * 呼叫
      */

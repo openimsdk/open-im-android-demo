@@ -11,7 +11,10 @@ pluginManagement {
         maven { url 'https://jitpack.io' }
         maven {url "https://mvn.getui.com/nexus/content/repositories/releases/"}
         maven {url 'https://developer.huawei.com/repo/'}
-
+        maven {
+            // r8 maven
+            url = uri("https://storage.googleapis.com/r8-releases/raw")
+        }
         mavenCentral()
         google()
         gradlePluginPortal()
@@ -31,6 +34,10 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
         maven {url "https://mvn.getui.com/nexus/content/repositories/releases/"}
         maven {url 'https://developer.huawei.com/repo/'}
+        maven {
+            // r8 maven
+            url = uri("https://storage.googleapis.com/r8-releases/raw")
+        }
 
         mavenCentral()
         google()

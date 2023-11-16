@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
 
 
+import com.hjq.permissions.Permission;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,7 @@ import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.MediaPlayerListener;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.Obs;
@@ -46,6 +49,7 @@ import io.openim.android.sdk.models.UserInfo;
 
 public class CallDialog extends BaseDialog {
 
+    private final HasPermissions hasShoot, hasRecord, hasSystemAlert;
     protected Context context;
     private DialogCallBinding view;
     public CallingVM callingVM;
@@ -66,6 +70,11 @@ public class CallDialog extends BaseDialog {
     public CallDialog(@NonNull Context context, CallingService callingService, boolean isCallOut) {
         super(context);
         this.context = context;
+        hasShoot = new HasPermissions(context, Permission.CAMERA,
+            Permission.RECORD_AUDIO);
+        hasRecord = new HasPermissions(context, Permission.RECORD_AUDIO);
+        hasSystemAlert = new HasPermissions(context, Permission.SYSTEM_ALERT_WINDOW);
+
         callingVM = new CallingVM(callingService, isCallOut);
         callingVM.setDismissListener(v -> {
             dismiss();
@@ -94,17 +103,16 @@ public class CallDialog extends BaseDialog {
         setCancelable(false);
         setCanceledOnTouchOutside(false);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-            params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-        }
+        Common.addTypeSystemAlert(params);
         window.setAttributes(params);
 
         window.setBackgroundDrawableResource(android.R.color.transparent);
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+
+        view.zoomOut.setVisibility( Common.isScreenLocked()?View.GONE:View.VISIBLE);
     }
+
 
     //收起/展开
     public void shrink(boolean isShrink) {
@@ -112,8 +120,7 @@ public class CallDialog extends BaseDialog {
         getWindow().setDimAmount(isShrink ? 0f : 1f);
         view.shrink.setVisibility(isShrink ? View.VISIBLE : View.GONE);
 
-        view.waiting.setVisibility(callingVM.isVideoCalls
-            ? View.GONE : View.VISIBLE);
+        view.waiting.setVisibility(callingVM.isVideoCalls ? View.GONE : View.VISIBLE);
         if (callingVM.isStartCall && !callingVM.isVideoCalls) {
             view.sTips.setText(io.openim.android.ouicore.R.string.calling);
         } else {
@@ -234,8 +241,8 @@ public class CallDialog extends BaseDialog {
         view.hangUp.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                callingVM.renewalDB(callingVM.buildPrimaryKey(signalingInfo),
-                    (realm, callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
+                callingVM.renewalDB(callingVM.buildPrimaryKey(signalingInfo), (realm,
+                                                                               callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
 
                 callingVM.signalingHungUp(signalingInfo);
             }
@@ -249,27 +256,36 @@ public class CallDialog extends BaseDialog {
         view.answer.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                callingVM.signalingAccept(signalingInfo, new OnBase() {
-                    @Override
-                    public void onError(int code, String error) {
-
-                    }
-
-                    @Override
-                    public void onSuccess(Object data) {
-                        changeView();
-
-                        callingVM.renewalDB(callingVM.buildPrimaryKey(signalingInfo), (realm
-                            , v) -> v.setSuccess(true));
-                    }
-                });
+                if (callingVM.isVideoCalls) {
+                    hasShoot.safeGo(() -> signalingAccept(signalingInfo));
+                } else {
+                    hasRecord.safeGo(() -> signalingAccept(signalingInfo));
+                }
             }
         });
         view.zoomOut.setOnClickListener(v -> {
-            shrink(true);
+            hasSystemAlert.safeGo(() -> {
+                shrink(true);
+            });
         });
         view.shrink.setOnClickListener(v -> {
             shrink(false);
+        });
+    }
+
+    private void signalingAccept(SignalingInfo signalingInfo) {
+        callingVM.signalingAccept(signalingInfo, new OnBase() {
+            @Override
+            public void onError(int code, String error) {
+            }
+
+            @Override
+            public void onSuccess(Object data) {
+                changeView();
+
+                callingVM.renewalDB(CallingVM.buildPrimaryKey(signalingInfo),
+                    (realm, v1) -> v1.setSuccess(true));
+            }
         });
     }
 
@@ -291,30 +307,10 @@ public class CallDialog extends BaseDialog {
         try {
             Common.wakeUp(context);
 //           Ringtone铃声
-            AssetFileDescriptor assetFileDescriptor = BaseApp.inst().getAssets().openFd(
-                "incoming_call_ring.mp3");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), assetFileDescriptor);
+            if (!MediaPlayerUtil.INSTANCE.isPlaying()) {
+                MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), R.raw.incoming_call_ring);
+                MediaPlayerUtil.INSTANCE.loopPlay();
             }
-            MediaPlayerUtil.INSTANCE.prepare();
-            MediaPlayerUtil.INSTANCE.setMediaListener(new MediaPlayerListener() {
-                @Override
-                public void finish() {
-                    MediaPlayerUtil.INSTANCE.playMedia();
-                }
-
-                @Override
-                public void onErr(int what) {
-
-                }
-
-                @Override
-                public void prepare() {
-                    MediaPlayerUtil.INSTANCE.playMedia();
-                }
-            });
-            MediaPlayerUtil.INSTANCE.playMedia();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -339,10 +335,7 @@ public class CallDialog extends BaseDialog {
 
     private void insertChatHistory() {
         boolean isGroup = callingVM.isGroup;
-        if (!isShowing()
-            || isGroup
-            || (null != signalingInfo
-            && TextUtils.isEmpty(callingVM.buildPrimaryKey(signalingInfo))))
+        if (!isShowing() || isGroup || (null != signalingInfo && TextUtils.isEmpty(callingVM.buildPrimaryKey(signalingInfo))))
             return;
         String id = callingVM.buildPrimaryKey(signalingInfo);
         String senderID = isGroup ? BaseApp.inst().loginCertificate.userID :

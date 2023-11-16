@@ -244,7 +244,7 @@ public class CallingVM {
         }
     }
 
-    public String buildPrimaryKey(SignalingInfo signalingInfo) {
+    public static String buildPrimaryKey(SignalingInfo signalingInfo) {
         return signalingInfo.getInvitation().getRoomID() + signalingInfo.getInvitation().getInitiateTime();
     }
 

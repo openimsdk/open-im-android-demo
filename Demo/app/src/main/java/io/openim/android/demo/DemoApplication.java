@@ -54,8 +54,8 @@ public class DemoApplication extends BaseApp {
         MultiDex.install(this);
 
         initFile();
-        initController();
         initARouter();
+        initController();
         initNet();
         initBugly();
         initPush();
@@ -82,10 +82,11 @@ public class DemoApplication extends BaseApp {
     }
 
     private void initARouter() {
-        //ARouter init
         ARouter.init(this);
-//        ARouter.openimLog();
-//        ARouter.openDebug();
+        if (L.isDebug){
+            ARouter.openLog();
+            ARouter.openDebug();
+        }
     }
 
     private void initBugly() {

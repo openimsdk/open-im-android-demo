@@ -50,6 +50,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+    }
 }
 
 dependencies {
@@ -69,7 +72,7 @@ dependencies {
     annotationProcessor 'com.alibaba:arouter-compiler:1.5.2'
 
     //liveKit
-    implementation "io.livekit:livekit-android:1.4.2"
+    implementation "io.livekit:livekit-android:1.5.1"
     implementation "com.google.protobuf:protobuf-javalite:${versions.protobuf}"
     //-------
 }

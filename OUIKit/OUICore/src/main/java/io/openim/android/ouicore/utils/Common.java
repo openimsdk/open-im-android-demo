@@ -36,6 +36,7 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.bean.ZxingConfig;
@@ -73,12 +74,27 @@ public class Common {
      */
     public final static Handler UIHandler = new Handler(Looper.getMainLooper());
 
+    public static boolean hasSystemAlertWindow() {
+        return new HasPermissions(BaseApp.inst(), Permission.SYSTEM_ALERT_WINDOW)
+            .isAllGranted();
+    }
+
+    public static void addTypeSystemAlert(WindowManager.LayoutParams params) {
+        if (hasSystemAlertWindow()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+            } else {
+                params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+            }
+        }
+    }
 
     public static boolean isApkDebug() {
         try {
-            ApplicationInfo info= BaseApp.inst().getApplicationInfo();
-            return (info.flags&ApplicationInfo.FLAG_DEBUGGABLE)!=0;
-        } catch (Exception ignored) {}
+            ApplicationInfo info = BaseApp.inst().getApplicationInfo();
+            return (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        } catch (Exception ignored) {
+        }
         return false;
     }
 

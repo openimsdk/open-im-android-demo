@@ -29,7 +29,6 @@ public class SplashActivity extends AppCompatActivity {
 
         UserLogic userLogic = Easy.find(UserLogic.class);
         if (userLogic.isCacheUser()) {
-            userLogic.loginCacheUser();
             startActivity(new Intent(this, MainActivity.class));
         } else
             startActivity(new Intent(this, LoginActivity.class));

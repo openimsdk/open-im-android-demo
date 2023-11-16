@@ -34,11 +34,15 @@ import io.openim.android.ouiconversation.ui.fragment.ConversationListFragment;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.UserLogic;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
@@ -50,7 +54,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        init();
+        init(getIntent());
 
         PushManager.getInstance().initialize(this);
         bindVM(MainVM.class);
@@ -79,13 +83,15 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     }
 
 
-    private void init() {
-       Common.UIHandler.postDelayed(() -> {
-           if (isFinishing()) return;
-           new HasPermissions(MainActivity.this, Permission.SYSTEM_ALERT_WINDOW)
-               .safeGo(() -> new HasPermissions(MainActivity.this, Permission.CAMERA,
-                   Permission.RECORD_AUDIO).safeGo(() -> {}));
-       },2000);
+    private void init(Intent intent) {
+        Easy.find(UserLogic.class).loginCacheUser();
+
+        boolean isCall=intent.getBooleanExtra(Constant.IS_CALL,false);
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null==callingService|| !isCall)return;
+        callingService.buildCallDialog(this, null,
+            false).show();
     }
 
     private void listener() {
@@ -110,8 +116,7 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         @Override
         public void onClick(View v) {
             RadioButton[] menus = new RadioButton[]{view.men1, view.men2, view.men3, view.men4};
-            if (v == view.men1)
-                switchFragment(conversationListFragment);
+            if (v == view.men1) switchFragment(conversationListFragment);
             if (v == view.men2) switchFragment(contactFragment);
             if (v == view.men3) switchFragment(appletFragment);
             if (v == view.men4) switchFragment(personalFragment);
@@ -217,5 +222,9 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         }
     }
 
-
+    @Override
+    protected void onNewIntent(Intent intent) {
+        init(intent);
+        super.onNewIntent(intent);
+    }
 }

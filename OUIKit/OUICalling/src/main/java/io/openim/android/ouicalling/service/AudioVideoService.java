@@ -55,7 +55,6 @@ public class AudioVideoService extends KeepAliveService {
                 CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
             manager.createNotificationChannel(notificationChannel);
         }
-        manager.notify(NOTIFY_ID, notification);
         startForeground(NOTIFY_ID, notification);
     }
 

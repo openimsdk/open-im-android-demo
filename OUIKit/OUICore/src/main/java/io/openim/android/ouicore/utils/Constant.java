@@ -128,6 +128,8 @@ public class Constant {
     public static final String IS_SELECT_MEMBER = "isSelectMember";
     //群通话
     public static final String IS_GROUP_CALL = "isGroupCall";
+    //通话
+    public static final String IS_CALL = "isCall";
     //选择好友
     public static final String IS_SELECT_FRIEND = "isSelectFriend";
     //自定义消息类型

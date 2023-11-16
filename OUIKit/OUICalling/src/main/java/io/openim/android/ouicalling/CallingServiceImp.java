@@ -1,28 +1,36 @@
 package io.openim.android.ouicalling;
 
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.text.TextUtils;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.hjq.permissions.Permission;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import io.openim.android.ouicalling.service.AudioVideoService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.CallHistory;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
+import io.openim.android.ouicore.utils.BackgroundStartPermissions;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.MediaPlayerUtil;
+import io.openim.android.ouicore.utils.NotificationUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
@@ -41,7 +49,7 @@ public class CallingServiceImp implements CallingService {
     private Context context;
     public CallDialog callDialog;
     private SignalingInfo signalingInfo;
-    private HasPermissions hasSystemAlert;
+    public static final int A_NOTIFY_ID = 100;
 
     public void setSignalingInfo(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
@@ -81,6 +89,7 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onInvitationCancelled(SignalingInfo s) {
         L.e(TAG, "----onInvitationCancelled-----");
+        cancelNotify();
         if (null == callDialog) return;
         callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(),
             (realm, callHistory) -> callHistory.setFailedState(1));
@@ -110,8 +119,7 @@ public class CallingServiceImp implements CallingService {
     public void onInviteeRejected(SignalingInfo signalingInfo) {
         L.e(TAG, "----onInviteeRejected-----");
         if (null == callDialog) return;
-        callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(), (realm,
-                                                                      callHistory) -> {
+        callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(), (realm, callHistory) -> {
             callHistory.setSuccess(false);
             callHistory.setFailedState(2);
         });
@@ -122,7 +130,9 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onInviteeRejectedByOtherDevice(SignalingInfo s) {
         L.e(TAG, "----onInviteeRejectedByOtherDevice-----");
+        cancelNotify();
     }
+
 
     @Override
     public void onReceiveNewInvitation(SignalingInfo signalingInfo) {
@@ -131,34 +141,76 @@ public class CallingServiceImp implements CallingService {
         Common.wakeUp(context);
         setSignalingInfo(signalingInfo);
 
-        if (null == hasSystemAlert)
-            hasSystemAlert = new HasPermissions(ActivityManager.getActivityStack().peek(),
-                Permission.SYSTEM_ALERT_WINDOW);
-        hasSystemAlert.safeGo(() -> context.startActivity(new Intent(context,
-            LockPushActivity.class)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)));
+        boolean isSystemAlert =
+            new HasPermissions(BaseApp.inst(), Permission.SYSTEM_ALERT_WINDOW).isAllGranted();
+        Intent hangIntent;
+        boolean backgroundStart=BackgroundStartPermissions.INSTANCE.isBackgroundStartAllowed(context);
+        if (isSystemAlert && backgroundStart) {
+            hangIntent =
+                new Intent(context, LockPushActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(hangIntent);
+        } else {
+            if (BaseApp.inst().isAppBackground.val()){
+                Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
+                LogisticsCenter.completion(postcard);
+                hangIntent = new Intent(context, postcard.getDestination())
+                    .putExtra(Constant.IS_CALL, true)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), R.raw.incoming_call_ring);
+                MediaPlayerUtil.INSTANCE.loopPlay();
+
+                PendingIntent hangPendingIntent = PendingIntent.getActivity(context, 1002, hangIntent
+                    , PendingIntent.FLAG_MUTABLE);
+
+                Notification notification =
+                    NotificationUtil.builder(NotificationUtil.CALL_CHANNEL_ID)
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .setContentTitle("OpenIM")
+                        .setContentText(context.getString(io.openim.android.ouicore.R.string.receive_call_invite))
+                        .setAutoCancel(true).setOngoing(true).setContentIntent(hangPendingIntent).setCustomHeadsUpContentView(new RemoteViews(BaseApp.inst().getPackageName(), R.layout.layout_call_invite)).build();
+
+                NotificationUtil.sendNotify(A_NOTIFY_ID, notification);
+            }else {
+              buildCallDialog(ActivityManager.getActivityStack().peek(), null,
+                    false).show();
+            }
+        }
     }
 
-    @Override
-    public Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener,
+    private void cancelNotify() {
+        NotificationUtil.cancelNotify(A_NOTIFY_ID);
+        if (BaseApp.inst().isAppBackground.val()) IMUtil.sendNotice(A_NOTIFY_ID);
+        MediaPlayerUtil.INSTANCE.pause();
+        MediaPlayerUtil.INSTANCE.release();
+    }
+
+    public Dialog buildCallDialog(Context context,
+                                  DialogInterface.OnDismissListener dismissListener,
                                   boolean isCallOut) {
         try {
             if (callDialog != null) return callDialog;
             if (signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT)
                 callDialog = new GroupCallDialog(context, this, isCallOut);
-            else
-                callDialog = new CallDialog(context, this, isCallOut);
+            else callDialog = new CallDialog(context, this, isCallOut);
             callDialog.bindData(signalingInfo);
             if (!callDialog.callingVM.isCallOut) {
                 callDialog.setOnDismissListener(dismissListener);
-                if (!Common.isScreenLocked()) {
+                if (!Common.isScreenLocked() && Common.hasSystemAlertWindow()) {
                     callDialog.setOnShowListener(dialog -> ARouter.getInstance().build(Routes.Main.HOME).navigation());
                 }
             }
             insetDB();
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return callDialog;
+    }
+
+    @Override
+    public Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener,
+                                  boolean isCallOut) {
+        return buildCallDialog(context, dismissListener, isCallOut);
     }
 
     @Override
@@ -243,11 +295,10 @@ public class CallingServiceImp implements CallingService {
                 UserInfo userInfo = data.get(0);
                 BaseApp.inst().realm.executeTransactionAsync(realm -> {
                     if (null == callDialog) return;
-                    CallHistory callHistory =
-                        new CallHistory(callDialog.buildPrimaryKey(),
-                            userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(),
-                            signalingInfo.getInvitation().getMediaType(), false, 0, isCallOut,
-                            System.currentTimeMillis(), 0);
+                    CallHistory callHistory = new CallHistory(callDialog.buildPrimaryKey(),
+                        userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(),
+                        signalingInfo.getInvitation().getMediaType(), false, 0, isCallOut,
+                        System.currentTimeMillis(), 0);
                     realm.insert(callHistory);
                 });
             }

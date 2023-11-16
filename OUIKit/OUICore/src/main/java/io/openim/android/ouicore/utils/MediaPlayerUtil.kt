@@ -1,18 +1,11 @@
 package io.openim.android.ouicore.utils
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Context.AUDIO_SERVICE
 import android.content.res.AssetFileDescriptor
-import android.media.AudioAttributes
-import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat.getSystemService
-import com.liulishuo.okdownload.OkDownloadProvider.context
-import io.openim.android.ouicore.base.BaseApp
 
 
 /**
@@ -62,8 +55,20 @@ object MediaPlayerUtil {
 //                .build()
 //        )
 
+    }
 
+    fun loopPlay() {
+        setMediaListener(object : MediaPlayerListener {
+            override fun finish() {
+                playMedia()
+            }
 
+            override fun onErr(what: Int) {}
+            override fun prepare() {
+                playMedia()
+            }
+        })
+        playMedia()
     }
 
     fun setMediaListener(listener: MediaPlayerListener) {
@@ -85,6 +90,7 @@ object MediaPlayerUtil {
     fun playMedia() {
         if (mPlayer != null && !mPlayer!!.isPlaying) {
             mPlayer!!.start()
+            isPlaying = true
         }
     }
 
@@ -111,6 +117,7 @@ object MediaPlayerUtil {
     fun resume() {
         if (mPlayer != null && isPause) {
             mPlayer!!.start()
+            isPlaying = true
             isPause = false
         }
     }
