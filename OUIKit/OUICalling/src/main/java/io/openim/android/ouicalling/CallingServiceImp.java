@@ -189,6 +189,8 @@ public class CallingServiceImp implements CallingService {
 
     private void cancelNotify() {
         isBeCalled = false;
+        //TODO
+        //未读消息sdk不能增加 所以我们这里只是发个通知
         NotificationUtil.cancelNotify(A_NOTIFY_ID);
         if (BaseApp.inst().isAppBackground.val()) IMUtil.sendNotice(A_NOTIFY_ID);
         MediaPlayerUtil.INSTANCE.pause();
