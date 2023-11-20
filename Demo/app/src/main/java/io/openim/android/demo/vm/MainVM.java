@@ -111,14 +111,12 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
             public void onSuccess(Map m) {
                 try {
                     HashMap<String, Object> map = (HashMap) m.get("config");
-                    int allowSendMsgNotFriend = Integer.valueOf((String) map.get(
-                        "allowSendMsgNotFriend"));
-                    BaseApp.inst().loginCertificate.allowSendMsgNotFriend =
-                        allowSendMsgNotFriend == 1;
-
+                    int allowSendMsgNotFriend = Integer.parseInt((String) map.get("allowSendMsgNotFriend"));
+                    BaseApp.inst().loginCertificate.allowSendMsgNotFriend = allowSendMsgNotFriend == 1;
                     BaseApp.inst().loginCertificate.cache(BaseApp.inst());
-                } catch (Exception ignored) {
-                }
+                    userLogic.discoverPageURL.setValue((String) map.get("discoverPageURL"));
+
+                } catch (Exception ignored) {}
             }
 
             @Override

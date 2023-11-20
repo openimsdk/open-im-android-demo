@@ -93,7 +93,7 @@ public class DemoApplication extends BaseApp {
         CrashReport.setAppChannel(this,Common.isApkDebug() ? "debug" : "release");
         CrashReport.initCrashReport(getApplicationContext(), "4d365d80d1", L.isDebug);
 
-        new UpdateApp().init(R.mipmap.ic_launcher).checkUpdate();
+        new UpdateApp().init(R.mipmap.ic_launcher).checkUpdate(BaseApp.inst());
     }
 
 

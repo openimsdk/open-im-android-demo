@@ -207,7 +207,10 @@ public class CallingServiceImp implements CallingService {
             else callDialog = new CallDialog(context, this, isCallOut);
             callDialog.bindData(signalingInfo);
             if (!callDialog.callingVM.isCallOut) {
-                callDialog.setOnDismissListener(dismissListener);
+                callDialog.setOnDismissListener(dialog -> {
+                    isBeCalled=false;
+                    dismissListener.onDismiss(dialog);
+                });
                 if (!Common.isScreenLocked() && Common.hasSystemAlertWindow()) {
                     callDialog.setOnShowListener(dialog -> ARouter.getInstance().build(Routes.Main.HOME).navigation());
                 }

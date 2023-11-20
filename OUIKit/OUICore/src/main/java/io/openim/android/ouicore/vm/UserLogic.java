@@ -37,7 +37,8 @@ public class UserLogic extends BaseVM {
     public State<LoginStatus> loginStatus = new State<>(LoginStatus.DEFAULT);
     public State<ConnectStatus> connectStatus = new State<>(ConnectStatus.DEFAULT);
     public State<UserInfo> info = new State<>();
-
+    //发现页
+    public State<String> discoverPageURL=new State<>("");
 
     public boolean isCacheUser() {
         return null!=LoginCertificate.getCache(BaseApp.inst());

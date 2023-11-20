@@ -1,14 +1,21 @@
 package io.openim.android.ouiapplet;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 
-public class AppletActivity extends AppCompatActivity {
+import androidx.lifecycle.Observer;
+
+import io.openim.android.ouiapplet.databinding.ActivityAppletBinding;
+import io.openim.android.ouicore.base.BasicActivity;
+import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.vm.UserLogic;
+
+public class AppletActivity extends BasicActivity<ActivityAppletBinding> {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_applet);
+        viewBinding(ActivityAppletBinding.inflate(getLayoutInflater()));
+        Easy.find(UserLogic.class).discoverPageURL.observe(this,
+            s -> view.webView.loadUrl(s));
     }
 }

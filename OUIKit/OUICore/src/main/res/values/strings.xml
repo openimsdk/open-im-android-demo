@@ -516,8 +516,10 @@
     <string name="not_be_added">禁止添加我为好友</string>
     <string name="a_person_at_you">有人@你</string>
     <string name="draft">草稿</string>
-    <string name="is_lastest">您的是最新的版本</string>
+    <string name="is_lastest">你当前的版本是最新的</string>
     <string name="open_permissions_tips">请先打开必要的权限</string>
     <string name="open_setting_permissions_tips">请先前往设置打开%1$s权限</string>
     <string name="receive_call_invite">你收到了通话邀请...</string>
+    <string name="upload_success">上传成功</string>
+    <string name="no_blacklist">暂无黑名单</string>
 </resources>

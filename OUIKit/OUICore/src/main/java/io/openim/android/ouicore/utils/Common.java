@@ -449,7 +449,12 @@ public class Common {
             badgeView.setBadgeNumber(badgeNumber);
             return;
         }
-        target.setTag(new QBadgeView(context).bindTarget(target).setGravityOffset(10, -2, true).setBadgeNumber(badgeNumber).setBadgeTextSize(8, true).setShowShadow(false));
+        target.setTag(new QBadgeView(context)
+            .bindTarget(target)
+            .setGravityOffset(10, -2, true)
+            .setBadgeNumber(badgeNumber)
+            .setBadgeTextSize(8, true)
+            .setShowShadow(false));
     }
 
     public static String containsLink(String text) {

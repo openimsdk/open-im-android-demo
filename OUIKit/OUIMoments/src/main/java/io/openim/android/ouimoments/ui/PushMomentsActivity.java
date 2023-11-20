@@ -39,6 +39,7 @@ import java.util.Map;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
@@ -49,6 +50,7 @@ import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
@@ -368,7 +370,20 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                                     photoUrls, position, null);
                             } else {
                                 try {
-                                    ARouter.getInstance().build(Routes.Conversation.PREVIEW).withString("media_url", vm.param.getValue().content.metas.get(0).original).withString("first_frame", vm.param.getValue().content.metas.get(0).thumb).navigation();
+                                   String original= vm.param.getValue()
+                                        .content.metas.get(0).original;
+                                    String thumb=vm.param.getValue()
+                                        .content.metas.get(0).thumb;
+                                    PreviewMediaVM mediaVM= Easy.installVM(PreviewMediaVM.class);
+                                    PreviewMediaVM.MediaData mediaData =new PreviewMediaVM
+                                        .MediaData(original);
+                                    mediaData.thumbnail=thumb;
+                                    mediaData.mediaUrl=original;
+                                    mediaData.isVideo=true;
+                                    mediaVM.previewSingle(mediaData);
+                                    ARouter.getInstance().build(Routes.Conversation.PREVIEW)
+                                        .navigation();
+
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }

@@ -1,5 +1,6 @@
 package io.openim.android.ouicore.update;
 
+import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -25,6 +26,7 @@ import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.widget.WaitDialog;
 import io.reactivex.functions.Function;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -52,7 +54,9 @@ public class UpdateApp  {
         return this;
     }
 
-    public UpdateApp checkUpdate() {
+    public UpdateApp checkUpdate(Context context) {
+        WaitDialog waitDialog=new WaitDialog(context);
+        waitDialog.show();
         N.API(NiService.class).post("https://www.pgyer" + ".com/apiv2/app/check",
             new Parameter().add("appKey", "8c728c547000546b886b6824369522bf").add("_api_key",
                 "6f43600074306e8bc506ed0cd3275e9e").buildFrom()).map(responseBody -> {
@@ -72,14 +76,16 @@ public class UpdateApp  {
                 return downloadInfo;
             }
             return null;
-        }).compose(N.IOMain()).subscribe(new NetObserver<DownloadInfo>("") {
+        }).compose(N.IOMain()).subscribe(new NetObserver<DownloadInfo>(context) {
             @Override
             public void onSuccess(DownloadInfo o) {
+                waitDialog.dismiss();
                 AppUpdateUtils.getInstance().checkUpdate(o);
             }
 
             @Override
             protected void onFailure(Throwable e) {
+                waitDialog.dismiss();
                 Toast.makeText(BaseApp.inst(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
