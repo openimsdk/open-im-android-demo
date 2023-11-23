@@ -154,27 +154,39 @@ class CallViewModel(
         mutablePrimarySpeaker.value = speaker
     }
 
-    suspend fun bindRemoteViewRenderer(viewRenderer: TextureViewRenderer, participant: Participant) {
+    suspend fun bindRemoteViewRenderer(
+        viewRenderer: TextureViewRenderer,
+        participant: Participant, scope: CoroutineScope) {
         // observe videoTracks changes.
         val videoTrackPubFlow = participant::videoTracks.flow.map { participant to it }.flatMapLatest { (participant, videoTracks) ->
             // Prioritize any screenshare streams.
-            val trackPublication = participant.getTrackPublication(Track.Source.SCREEN_SHARE) ?: participant.getTrackPublication(Track.Source.CAMERA)
+            val trackPublication = participant.getTrackPublication(Track.Source.SCREEN_SHARE)
+                ?: participant.getTrackPublication(Track.Source.CAMERA)
             ?: videoTracks.firstOrNull()?.first
             flowOf(trackPublication)
         }
-        videoTrackPubFlow.flatMapLatest { pub ->
-            if (pub != null) {
-                pub::track.flow
-            } else {
-                flowOf(null)
-            }
-        }.collectLatest1 { videoTrack ->
-            val videoTrack = videoTrack as? VideoTrack
-            if (null != viewRenderer.tag) {
-                val lastTrack = viewRenderer.tag as VideoTrack
-                lastTrack.removeRenderer(viewRenderer);
-            }
-            if (null != videoTrack) {
+        scope.launch {
+            videoTrackPubFlow.flatMapLatest { pub ->
+                if (pub != null) {
+                    pub::track.flow
+                } else {
+                    flowOf(null)
+                }
+            }.collectLatest1 { videoTrack ->
+                val videoTrack = videoTrack as? VideoTrack ?: return@collectLatest1
+
+//                if (null != viewRenderer.tag) {
+//                    val lastTrack = viewRenderer.tag as VideoTrack
+//                    lastTrack.removeRenderer(viewRenderer);
+//                }
+//                viewRenderer.tag = videoTrack
+//                videoTrack.addRenderer(viewRenderer)
+
+                if (null != viewRenderer.tag) {
+                    val lastTrack = viewRenderer.tag as VideoTrack
+                    if (videoTrack == lastTrack) return@collectLatest1
+                    lastTrack.removeRenderer(viewRenderer)
+                }
                 viewRenderer.tag = videoTrack
                 videoTrack.addRenderer(viewRenderer)
             }
@@ -218,11 +230,12 @@ class CallViewModel(
 
     override fun onCleared() {
         super.onCleared()
-       try {
-           scopes.forEach { it.cancel() }
-           scopes.clear()
-           room.disconnect()
-       }catch (_:Exception){}
+        try {
+            scopes.forEach { it.cancel() }
+            scopes.clear()
+            room.disconnect()
+        } catch (_: Exception) {
+        }
     }
 
     fun setMicEnabled(enabled: Boolean) {
@@ -261,7 +274,7 @@ class CallViewModel(
 
 
     fun buildScope(): CoroutineScope {
-        val scope = CoroutineScope(SupervisorJob()+ Dispatchers.Main);
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main);
         scopes.add(scope)
         return scope;
     }

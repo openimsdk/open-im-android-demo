@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
-import androidx.viewpager.widget.ViewPager;
 
 import java.util.Objects;
 
@@ -14,8 +13,6 @@ import io.livekit.android.events.ParticipantEvent;
 import io.livekit.android.room.participant.Participant;
 import io.openim.android.ouicore.base.LazyFragment;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouimeeting.vm.MeetingVM;
 import io.openim.android.ouimeeting.widget.SingleTextureView;
 import kotlinx.coroutines.CoroutineScope;
@@ -94,14 +91,14 @@ public class SingleTextureFragment extends LazyFragment {
     }
 
     private void bindLocalParticipant() {
-        singleTextureView.subscribeParticipant(vm,
+        singleTextureView.bindData(vm,
             vm.callViewModel.getRoom().getLocalParticipant());
     }
 
     private void subscribeParticipant(Participant activeSpeaker) {
         if (Objects.equals(activeSpeaker.getIdentity(), lastId)) return;
         lastId = activeSpeaker.getIdentity();
-        singleTextureView.subscribeParticipant(vm, activeSpeaker);
+        singleTextureView.bindData(vm, activeSpeaker);
         onAllSeeHeListener.onAllSeeHe();
     }
 

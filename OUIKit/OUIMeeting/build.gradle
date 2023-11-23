@@ -75,4 +75,7 @@ dependencies {
     implementation "io.livekit:livekit-android:1.5.1"
     implementation "com.google.protobuf:protobuf-javalite:${versions.protobuf}"
     //-------
+
+    implementation "com.github.lisawray.groupie:groupie:2.9.0"
+    implementation "com.github.lisawray.groupie:groupie-viewbinding:2.9.0"
 }

@@ -21,7 +21,6 @@ import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.widget.GridSpaceItemDecoration;
-import io.openim.android.ouimeeting.MeetingHomeActivity;
 import io.openim.android.ouimeeting.vm.MeetingVM;
 import io.openim.android.ouimeeting.widget.SingleTextureView;
 import kotlinx.coroutines.CoroutineScope;
@@ -67,7 +66,7 @@ public class MultipleTextureFragment extends LazyFragment {
             @Override
             public void onBindView(@NonNull UserStreamViewHolder holder, Participant data, int position) {
                 holder.setItemHeight(view.recyclerView.getHeight() / 2);
-                holder.view.subscribeParticipant(vm, data);
+                holder.view.bindData(vm, data);
             }
         });
         adapter.setItems(participants);
