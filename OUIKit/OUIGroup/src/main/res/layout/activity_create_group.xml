@@ -64,6 +64,8 @@
                 android:background="@android:color/transparent"
                 android:hint="@string/create_group_tips"
                 android:maxLines="1"
+                android:singleLine="true"
+                android:maxLength="15"
                 android:text="@={GroupVM.groupName}"
                 android:textColor="#ff999999"
                 android:textSize="16sp" />

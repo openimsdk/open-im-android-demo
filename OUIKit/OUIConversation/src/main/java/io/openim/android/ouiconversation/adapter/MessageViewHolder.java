@@ -119,7 +119,7 @@ public class MessageViewHolder {
         if (viewType == MessageType.VIDEO) return new VideoView(parent);
         if (viewType == MessageType.FILE) return new FileView(parent);
         if (viewType == MessageType.LOCATION) return new LocationView(parent);
-        if (viewType == MessageType.OA_NTF) return new NotificationItemHo(parent);
+        if (viewType == MessageType.OA_NTF) return new NotificationItemView(parent);
         if (viewType == MessageType.GROUP_ANNOUNCEMENT_NTF)
             return new GroupAnnouncementView(parent);
         if (viewType >= MessageType.NTF_BEGIN) return new NoticeView(parent);
@@ -194,7 +194,7 @@ public class MessageViewHolder {
                     }
                     bindLeft(itemView, message);
                 }
-                unite();
+                unifiedProcess(position);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -219,9 +219,9 @@ public class MessageViewHolder {
         /**
          * 统一处理
          */
-        private void unite() {
+        private void unifiedProcess(int position) {
             MsgExpand msgExpand = (MsgExpand) message.getExt();
-            hFirstItem();
+            hFirstItem(position);
 
             hAvatar();
             hName();
@@ -234,10 +234,9 @@ public class MessageViewHolder {
             hSendState();
         }
 
-        protected void hFirstItem() {
-            boolean onlyOne = messageAdapter.messages.size() == 1;
+        protected void hFirstItem(int position) {
             View root = itemView.findViewById(R.id.root);
-            root.setPadding(0, onlyOne ? Common.dp2px(10) : 0, 0, 0);
+            root.setPadding(0, position==0 ? Common.dp2px(15) : 0, 0, 0);
         }
 
         /**
@@ -621,7 +620,7 @@ public class MessageViewHolder {
         @SuppressLint({"SetTextI18n", "StringFormatInvalid"})
         @Override
         public void bindData(Message message, int position) {
-            hFirstItem();
+            hFirstItem(position);
             itemView.findViewById(R.id.unRead).setVisibility(View.GONE);
             TextView textView = itemView.findViewById(R.id.notice);
             textView.setVisibility(View.VISIBLE);
@@ -1280,10 +1279,10 @@ public class MessageViewHolder {
         }
     }
 
-    public static class NotificationItemHo extends MessageViewHolder.MsgViewHolder {
+    public static class NotificationItemView extends MessageViewHolder.MsgViewHolder {
 
 
-        public NotificationItemHo(ViewGroup itemView) {
+        public NotificationItemView(ViewGroup itemView) {
             super(itemView);
         }
 

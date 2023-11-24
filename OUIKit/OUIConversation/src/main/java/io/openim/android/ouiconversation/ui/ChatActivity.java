@@ -64,6 +64,7 @@ import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.Participant;
 import io.openim.android.sdk.models.SignalingInfo;
@@ -437,6 +438,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 if (data.isEmpty()) return;
                 vm.groupInfo.setValue(data.get(0));
             });
+//            if (conversationInfo.getConversationType()== ConversationType.NOTIFICATION){
+//                view.layoutInputCote.root.setVisibility(View.GONE);
+//                view.more.setVisibility(View.GONE);
+//            }
         });
 
         vm.roomCallingInfo.observe(this, roomCallingInfo -> {

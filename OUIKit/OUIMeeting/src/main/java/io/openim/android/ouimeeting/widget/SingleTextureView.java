@@ -123,7 +123,7 @@ public class SingleTextureView extends FrameLayout {
         boolean isShowSwitchCamera = data.isCameraEnabled() && Objects.equals(data.getIdentity(),
             BaseApp.inst().loginCertificate.userID);
         view.switchCamera.setVisibility(isShowSwitchCamera ? VISIBLE : GONE);
-        view.textureView.setVisibility(textureViewUse ? View.VISIBLE : View.GONE);
+        view.textureView.setVisibility(textureViewUse ? View.VISIBLE : View.INVISIBLE);
         view.avatar.setVisibility(textureViewUse ? View.GONE : View.VISIBLE);
         ParticipantMeta meta = GsonHel.fromJson(data.getMetadata(), ParticipantMeta.class);
         L.e(TAG,
@@ -158,7 +158,7 @@ public class SingleTextureView extends FrameLayout {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-       postDelayed(() -> bindRemoteViewRenderer(participant),3000);
+        bindRemoteViewRenderer(participant);
     }
 
 
