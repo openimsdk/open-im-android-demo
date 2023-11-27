@@ -1,7 +1,5 @@
 package io.openim.android.ouicore.services;
 
-
-import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;

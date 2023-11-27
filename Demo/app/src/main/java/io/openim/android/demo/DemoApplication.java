@@ -38,6 +38,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.sdk.listener.OnConnListener;
+import io.openim.android.sdk.listener.OnSignalingListener;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -83,10 +84,10 @@ public class DemoApplication extends BaseApp {
 
     private void initARouter() {
         ARouter.init(this);
-        if (L.isDebug){
-            ARouter.openLog();
-            ARouter.openDebug();
-        }
+//        if (L.isDebug){
+//            ARouter.openLog();
+//            ARouter.openDebug();
+//        }
     }
 
     private void initBugly() {
@@ -128,7 +129,7 @@ public class DemoApplication extends BaseApp {
             (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
         if (null != callingService) {
             callingService.initKeepAlive(getPackageName());
-            IMEvent.getInstance().addSignalingListener(callingService);
+            IMEvent.getInstance().addSignalingListener((OnSignalingListener) callingService);
         }
     }
 

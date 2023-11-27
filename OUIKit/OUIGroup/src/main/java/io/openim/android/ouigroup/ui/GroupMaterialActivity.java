@@ -1,6 +1,7 @@
 package io.openim.android.ouigroup.ui;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -223,69 +224,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
     }
 
-    private void periodicDeletionClick() {
-        view.periodicDeletionTime.setOnClickListener(new OnDedrepClickListener() {
-            @Override
-            public void click(View v) {
-                LayoutBurnAfterReadingBinding view =
-                    LayoutBurnAfterReadingBinding.inflate(getLayoutInflater());
-                CommonDialog commonDialog = new CommonDialog(GroupMaterialActivity.this);
-                commonDialog.setCustomCentral(view.getRoot());
-                view.title.setText(io.openim.android.ouicore.R.string.period_deletion_tips1);
-                view.description.setText(io.openim.android.ouicore.R.string.period_deletion_tips2);
-                List<String> numList = new ArrayList<>();
-                List<String> units = new ArrayList<>();
-                for (int i = 0; i < 6; i++) {
-                    numList.add(String.valueOf(i + 1));
-                }
-                units.add(getString(io.openim.android.ouicore.R.string.day));
-                units.add(getString(io.openim.android.ouicore.R.string.week));
-                units.add(getString(io.openim.android.ouicore.R.string.month));
-
-                view.roller.setAdapter(new ArrayWheelAdapter(numList));
-                view.roller.setCyclic(false);
-                view.roller.setCurrentItem(0);
-
-                view.roller2.setVisibility(View.VISIBLE);
-                view.roller2.setAdapter(new ArrayWheelAdapter(units));
-                view.roller2.setCyclic(false);
-                view.roller2.setCurrentItem(0);
-
-                commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
-                commonDialog.getMainView().confirm.setOnClickListener(v1 -> {
-                    commonDialog.dismiss();
-                    int position = view.roller.getCurrentItem();
-                    int unit = view.roller2.getCurrentItem();
-                    int num = Integer.parseInt(numList.get(position));
-                    long seconds;
-                    if (unit == 0) {
-                        seconds = num * (60 * 60 * 24);
-                    } else if (unit == 1) {
-                        seconds = num * (60 * 60 * 24 * 7);
-                    } else {
-                        seconds = num * (60 * 60 * 24 * 30);
-                    }
-                    OpenIMClient.getInstance().conversationManager.setConversationMsgDestructTime(new IMUtil.IMCallBack<String>() {
-                        @Override
-                        public void onSuccess(String data) {
-                            vm.conversationInfo.val().setMsgDestructTime(seconds);
-                            vm.conversationInfo.update();
-                        }
-                    }, conversationId, seconds);
-                });
-                commonDialog.show();
-            }
-        });
-        view.periodicDeletion.setOnSlideButtonClickListener(isChecked -> {
-            OpenIMClient.getInstance().conversationManager.setConversationIsMsgDestruct(new IMUtil.IMCallBack<String>() {
-                @Override
-                public void onSuccess(String data) {
-                    vm.conversationInfo.val().setMsgDestruct(isChecked);
-                    vm.conversationInfo.update();
-                }
-            }, conversationId, isChecked);
-        });
-    }
 
     @Override
     protected void fasterDestroy() {
@@ -463,15 +401,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             SelectTargetActivityV3.class));
     }
 
-    private void showPeriodicDeletionTime() {
-        view.periodicDeletion.setCheckedWithAnimation(vm.conversationInfo.val().isMsgDestruct());
-        view.periodicDeletionTime.setVisibility(vm.conversationInfo.val().isMsgDestruct() ?
-            View.VISIBLE : View.GONE);
-        long destructTime = vm.conversationInfo.val().getMsgDestructTime();
-        if (0 != destructTime) {
-            view.periodicDeletionStr.setText(convertToDaysWeeksMonths(destructTime));
-        }
-    }
 
     public String convertToDaysWeeksMonths(long seconds) {
         long days = seconds / (60 * 60 * 24);
