@@ -19,15 +19,6 @@ public class MsgStatusVM extends BaseVM {
      * @param filter 0已读 1未读
      */
     public void getGroupMessageReaderList(int filter) {
-        OpenIMClient.getInstance().messageManager.getGroupMessageReaderList(conversationId, msgId
-            , filter, offset, count, new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
-                @Override
-                public void onSuccess(List<GroupMembersInfo> data) {
-                    if (data.isEmpty()) return;
-                    offset += count;
-                    groupMembersInfoList.val().addAll(data);
-                    groupMembersInfoList.update();
-                }
-            });
+
     }
 }

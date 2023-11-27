@@ -199,21 +199,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     //获取在线状态
     public void getUserOnlineStatus(UserOnlineStatusListener userOnlineStatusListener) {
-        this.userOnlineStatusListener = userOnlineStatusListener;
-        List<String> uIds = new ArrayList<>();
-        uIds.add(userID);
-        OpenIMClient.getInstance().userInfoManager.subscribeUsersOnlineStatus(new OnBase<List<UsersOnlineStatus>>() {
-            @Override
-            public void onError(int code, String error) {
 
-            }
-
-            @Override
-            public void onSuccess(List<UsersOnlineStatus> data) {
-                if (null == data || data.isEmpty()) return;
-                userOnlineStatusListener.onResult(data.get(0));
-            }
-        }, uIds);
 
     }
 
@@ -633,8 +619,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         } else {
             if (isSingleChat) {
                 OpenIMClient.getInstance().messageManager.markMessagesAsReadByMsgID(conversationID, msgIDs, callBack);
-            } else {
-                OpenIMClient.getInstance().messageManager.sendGroupMessageReadReceipt(conversationID, msgIDs, callBack);
             }
 
             NotificationManager manager =
