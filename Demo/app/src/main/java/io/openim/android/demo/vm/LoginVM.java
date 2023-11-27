@@ -7,6 +7,8 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 
+import com.tencent.bugly.crashreport.CrashReport;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -93,7 +95,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     @NonNull
     private Parameter getParameter(String verificationCode, int usedFor) {
         Parameter parameter = new Parameter().add("password",
-            TextUtils.isEmpty(verificationCode) ? md5(pwd.getValue()) : null)
+                TextUtils.isEmpty(verificationCode) ? md5(pwd.getValue()) : null)
             .add("platform", 2).add("usedFor", usedFor)
             .add("operationID", System.currentTimeMillis() + "")
             .add("verifyCode", verificationCode);
@@ -236,7 +238,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
 
                 @Override
                 public void onSuccess(String o) {
-                  getIView().succ(o);
+                    getIView().succ(o);
                 }
 
                 @Override

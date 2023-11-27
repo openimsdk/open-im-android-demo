@@ -120,9 +120,6 @@ public class ShootActivity extends BaseActivity<BaseViewModel, ActivityShootBind
     private String saveToLocalFile(Bitmap bitmap) {
         try {
             String fName = UUID.randomUUID().toString();
-            File dir = new File(Constant.PICTURE_DIR);
-            if (!dir.exists())
-                dir.mkdirs();
             File file = new File(Constant.PICTURE_DIR + fName + ".jpg");
             file.createNewFile();
             FileOutputStream out = new FileOutputStream(file);

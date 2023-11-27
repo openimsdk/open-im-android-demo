@@ -333,7 +333,8 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
     @SuppressLint("WrongConstant")
     private void showMediaPicker() {
         hasStorage.safeGo(() -> Matisse.from(getActivity()).choose(MimeType.ofAll())
-            .countable(true).maxSelectable(9)
+            .countable(true)
+            .maxSelectable(9)
             .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
             .thumbnailScale(0.85f)
             .imageEngine(new GlideEngine()).forResult(captureLauncher));

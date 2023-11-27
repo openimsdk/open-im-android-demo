@@ -35,7 +35,7 @@ import io.openim.android.ouicore.vm.CounterVM;
 
 public class TouchVoiceDialogV3 extends BaseDialog {
     //和布局里保持一致
-    private static final float VOICE_HEIGHT = 70;
+    private static final float VOICE_HEIGHT = 72;
     private final Context context;
     private CounterVM counterVM;
 
@@ -145,6 +145,8 @@ public class TouchVoiceDialogV3 extends BaseDialog {
     public void show() {
         super.show();
         AudioRecordManager.getInstance(getContext()).startRecord();
+        code=0;
+        recordHandle();
     }
 
     @Override

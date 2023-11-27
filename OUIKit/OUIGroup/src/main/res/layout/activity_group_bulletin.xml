@@ -91,7 +91,6 @@
                 android:background="@null"
                 android:enabled="false"
                 android:gravity="top"
-                android:maxLength="250"
                 android:padding="22dp"
 
                 android:text="@={GroupVM.groupsInfo.notification}"

@@ -72,6 +72,7 @@ import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
+import io.openim.android.ouicore.utils.NotificationUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.TimeUtil;
@@ -835,30 +836,21 @@ public class IMUtil {
     }
 
     public static void sendNotice(int id) {
-        NotificationManager manager =
-            (NotificationManager) BaseApp.inst().getSystemService(Context.NOTIFICATION_SERVICE);
-
         Postcard postcard = ARouter.getInstance().build(Routes.Main.SPLASH);
         LogisticsCenter.completion(postcard);
         Intent hangIntent = new Intent(BaseApp.inst(), postcard.getDestination());
         PendingIntent hangPendingIntent = PendingIntent.getActivity(BaseApp.inst(), 1002,
             hangIntent, PendingIntent.FLAG_MUTABLE);
 
-        String CHANNEL_ID = Constant.NOTICE_TAG;
-        String CHANNEL_NAME = BaseApp.inst().getString(R.string.msg_notification);
-        Notification notification =
-            new NotificationCompat.Builder(BaseApp.inst(), CHANNEL_ID).setContentTitle(BaseApp.inst().getString(R.string.app_name)).setContentText(BaseApp.inst().getString(R.string.a_message_is_received)).setSmallIcon(R.mipmap.ic_logo).setContentIntent(hangPendingIntent).setAutoCancel(true).setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE).setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring)).build();
-
-        //Android 8.0 以上需包添加渠道
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID,
-                CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
-            AudioAttributes audioAttributes =
-                new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).setUsage(AudioAttributes.USAGE_NOTIFICATION).build();
-            notificationChannel.setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring), audioAttributes);
-            manager.createNotificationChannel(notificationChannel);
-        }
-        manager.notify(id, notification);
+        NotificationUtil.sendNotify(id, NotificationUtil.builder(NotificationUtil.MSG_NOTIFICATION)
+            .setContentTitle(BaseApp.inst().getString(R.string.app_name))
+            .setContentText(BaseApp.inst().getString(R.string.a_message_is_received))
+            .setSmallIcon(R.mipmap.ic_logo)
+            .setContentIntent(hangPendingIntent)
+            .setAutoCancel(true)
+            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
+            .setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring))
+            .build());
     }
 
     //播放提示音

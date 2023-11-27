@@ -57,6 +57,8 @@ buildscript {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
         classpath "io.realm:realm-gradle-plugin:10.11.1"
         classpath 'com.huawei.agconnect:agcp:1.6.0.300'
+        // r8 version
+        classpath 'com.android.tools:r8:8.2.16-dev'
     }
 }
 

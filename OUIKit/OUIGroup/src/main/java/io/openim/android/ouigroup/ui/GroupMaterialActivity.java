@@ -223,6 +223,70 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
     }
 
+    private void periodicDeletionClick() {
+        view.periodicDeletionTime.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                LayoutBurnAfterReadingBinding view =
+                    LayoutBurnAfterReadingBinding.inflate(getLayoutInflater());
+                CommonDialog commonDialog = new CommonDialog(GroupMaterialActivity.this);
+                commonDialog.setCustomCentral(view.getRoot());
+                view.title.setText(io.openim.android.ouicore.R.string.period_deletion_tips1);
+                view.description.setText(io.openim.android.ouicore.R.string.period_deletion_tips2);
+                List<String> numList = new ArrayList<>();
+                List<String> units = new ArrayList<>();
+                for (int i = 0; i < 6; i++) {
+                    numList.add(String.valueOf(i + 1));
+                }
+                units.add(getString(io.openim.android.ouicore.R.string.day));
+                units.add(getString(io.openim.android.ouicore.R.string.week));
+                units.add(getString(io.openim.android.ouicore.R.string.month));
+
+                view.roller.setAdapter(new ArrayWheelAdapter(numList));
+                view.roller.setCyclic(false);
+                view.roller.setCurrentItem(0);
+
+                view.roller2.setVisibility(View.VISIBLE);
+                view.roller2.setAdapter(new ArrayWheelAdapter(units));
+                view.roller2.setCyclic(false);
+                view.roller2.setCurrentItem(0);
+
+                commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
+                commonDialog.getMainView().confirm.setOnClickListener(v1 -> {
+                    commonDialog.dismiss();
+                    int position = view.roller.getCurrentItem();
+                    int unit = view.roller2.getCurrentItem();
+                    int num = Integer.parseInt(numList.get(position));
+                    long seconds;
+                    if (unit == 0) {
+                        seconds = num * (60 * 60 * 24);
+                    } else if (unit == 1) {
+                        seconds = num * (60 * 60 * 24 * 7);
+                    } else {
+                        seconds = num * (60 * 60 * 24 * 30);
+                    }
+                    OpenIMClient.getInstance().conversationManager.setConversationMsgDestructTime(new IMUtil.IMCallBack<String>() {
+                        @Override
+                        public void onSuccess(String data) {
+                            vm.conversationInfo.val().setMsgDestructTime(seconds);
+                            vm.conversationInfo.update();
+                        }
+                    }, conversationId, seconds);
+                });
+                commonDialog.show();
+            }
+        });
+        view.periodicDeletion.setOnSlideButtonClickListener(isChecked -> {
+            OpenIMClient.getInstance().conversationManager.setConversationIsMsgDestruct(new IMUtil.IMCallBack<String>() {
+                @Override
+                public void onSuccess(String data) {
+                    vm.conversationInfo.val().setMsgDestruct(isChecked);
+                    vm.conversationInfo.update();
+                }
+            }, conversationId, isChecked);
+        });
+    }
+
     @Override
     protected void fasterDestroy() {
         removeCacheVM();
@@ -293,29 +357,11 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     holder.view.getRoot().setOnClickListener(v -> {
                         boolean isAdd = reId == R.mipmap.ic_group_add;
                         if (isAdd) {
-                            SelectTargetVM sv = Easy.installVM(SelectTargetVM.class);
-                            sv.setIntention(SelectTargetVM.Intention.invite);
-                            ContactListVM ctv = BaseApp.inst().getVMByCache(ContactListVM.class);
-                            List<String> ids = new ArrayList<>();
-                            for (MsgConversation msgConversation : ctv.conversations.val()) {
-                                if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT) {
-                                    ids.add(msgConversation.conversationInfo.getUserID());
-                                }
-                            }
-                            sv.isInGroup(GroupMaterialActivity.this.vm.groupId, ids);
-                            sv.setOnFinishListener(() -> {
-                                List<String> selectIds = new ArrayList<>();
-                                for (MultipleChoice choice : sv.inviteList.val()) {
-                                    selectIds.add(choice.key);
-                                }
-                                vm.inviteUserToGroup(selectIds);
-                            });
+                            inviteIntoGroup(GroupMaterialActivity.this, vm);
+                        } else {
                             startActivity(new Intent(GroupMaterialActivity.this,
-                                SelectTargetActivityV3.class));
-                        }
-                        else {
-                            startActivity(new Intent(GroupMaterialActivity.this,
-                                InitiateGroupActivity.class).putExtra( Constant.IS_REMOVE_GROUP, true));
+                                InitiateGroupActivity.class).putExtra(Constant.IS_REMOVE_GROUP,
+                                true));
                         }
                     });
                 } else {
@@ -394,6 +440,52 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
     }
 
+
+    public static void inviteIntoGroup(Context ctx, GroupVM vm) {
+        SelectTargetVM sv = Easy.installVM(SelectTargetVM.class);
+        sv.setIntention(SelectTargetVM.Intention.invite);
+        ContactListVM ctv = BaseApp.inst().getVMByCache(ContactListVM.class);
+        List<String> ids = new ArrayList<>();
+        for (MsgConversation msgConversation : ctv.conversations.val()) {
+            if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT) {
+                ids.add(msgConversation.conversationInfo.getUserID());
+            }
+        }
+        sv.isInGroup(vm.groupId, ids);
+        sv.setOnFinishListener(() -> {
+            List<String> selectIds = new ArrayList<>();
+            for (MultipleChoice choice : sv.inviteList.val()) {
+                selectIds.add(choice.key);
+            }
+            vm.inviteUserToGroup(selectIds);
+        });
+        ctx.startActivity(new Intent(ctx,
+            SelectTargetActivityV3.class));
+    }
+
+    private void showPeriodicDeletionTime() {
+        view.periodicDeletion.setCheckedWithAnimation(vm.conversationInfo.val().isMsgDestruct());
+        view.periodicDeletionTime.setVisibility(vm.conversationInfo.val().isMsgDestruct() ?
+            View.VISIBLE : View.GONE);
+        long destructTime = vm.conversationInfo.val().getMsgDestructTime();
+        if (0 != destructTime) {
+            view.periodicDeletionStr.setText(convertToDaysWeeksMonths(destructTime));
+        }
+    }
+
+    public String convertToDaysWeeksMonths(long seconds) {
+        long days = seconds / (60 * 60 * 24);
+        long weeks = days / 7;
+        long months = weeks / 4;
+
+        if (days <= 6) {
+            return days + getString(io.openim.android.ouicore.R.string.day);
+        } else if (weeks <= 6 && (days % 7 == 0)) {
+            return weeks + getString(io.openim.android.ouicore.R.string.week);
+        } else {
+            return months + getString(io.openim.android.ouicore.R.string.month);
+        }
+    }
 
     private void gotoMemberList(boolean transferPermissions) {
         startActivity(new Intent(this,
