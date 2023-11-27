@@ -41,7 +41,7 @@ Demo is a set of UI components implemented based on the Open-IM SDK, which inclu
 minSdk     : 21
 targetSdk  : 32
 compileSdk : 32
-abiFilters : ['armeabi-v7a', 'x86']
+abiFilters : ['armeabi-v7a','arm64-v8a']
 ```
 ## Build 🚀
 1.git clone：
