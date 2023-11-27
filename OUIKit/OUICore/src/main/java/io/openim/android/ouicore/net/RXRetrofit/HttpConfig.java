@@ -11,8 +11,8 @@ import okhttp3.Interceptor;
 public class HttpConfig {
     static boolean isDebug = true;
     String baseUrl;
-    long writeTimeOut = 8;
-    long readTimeOut = 8;
+    long writeTimeOut = 10;
+    long readTimeOut = 10;
     long connectTimeOut = 15;
     List<Interceptor> interceptors;
 

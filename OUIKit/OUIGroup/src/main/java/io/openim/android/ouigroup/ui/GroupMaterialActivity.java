@@ -1,6 +1,7 @@
 package io.openim.android.ouigroup.ui;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -143,6 +144,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
     }
 
+
     @Override
     protected void fasterDestroy() {
         removeCacheVM();
@@ -211,29 +213,11 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     holder.view.getRoot().setOnClickListener(v -> {
                         boolean isAdd = reId == R.mipmap.ic_group_add;
                         if (isAdd) {
-                            SelectTargetVM sv = Easy.installVM(SelectTargetVM.class);
-                            sv.setIntention(SelectTargetVM.Intention.invite);
-                            ContactListVM ctv = BaseApp.inst().getVMByCache(ContactListVM.class);
-                            List<String> ids = new ArrayList<>();
-                            for (MsgConversation msgConversation : ctv.conversations.val()) {
-                                if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT) {
-                                    ids.add(msgConversation.conversationInfo.getUserID());
-                                }
-                            }
-                            sv.isInGroup(GroupMaterialActivity.this.vm.groupId, ids);
-                            sv.setOnFinishListener(() -> {
-                                List<String> selectIds = new ArrayList<>();
-                                for (MultipleChoice choice : sv.inviteList.val()) {
-                                    selectIds.add(choice.key);
-                                }
-                                vm.inviteUserToGroup(selectIds);
-                            });
+                            inviteIntoGroup(GroupMaterialActivity.this, vm);
+                        } else {
                             startActivity(new Intent(GroupMaterialActivity.this,
-                                SelectTargetActivityV3.class));
-                        }
-                        else {
-                            startActivity(new Intent(GroupMaterialActivity.this,
-                                InitiateGroupActivity.class).putExtra( Constant.IS_REMOVE_GROUP, true));
+                                InitiateGroupActivity.class).putExtra(Constant.IS_REMOVE_GROUP,
+                                true));
                         }
                     });
                 } else {
@@ -303,6 +287,43 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
     }
 
+
+    public static void inviteIntoGroup(Context ctx, GroupVM vm) {
+        SelectTargetVM sv = Easy.installVM(SelectTargetVM.class);
+        sv.setIntention(SelectTargetVM.Intention.invite);
+        ContactListVM ctv = BaseApp.inst().getVMByCache(ContactListVM.class);
+        List<String> ids = new ArrayList<>();
+        for (MsgConversation msgConversation : ctv.conversations.val()) {
+            if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT) {
+                ids.add(msgConversation.conversationInfo.getUserID());
+            }
+        }
+        sv.isInGroup(vm.groupId, ids);
+        sv.setOnFinishListener(() -> {
+            List<String> selectIds = new ArrayList<>();
+            for (MultipleChoice choice : sv.inviteList.val()) {
+                selectIds.add(choice.key);
+            }
+            vm.inviteUserToGroup(selectIds);
+        });
+        ctx.startActivity(new Intent(ctx,
+            SelectTargetActivityV3.class));
+    }
+
+
+    public String convertToDaysWeeksMonths(long seconds) {
+        long days = seconds / (60 * 60 * 24);
+        long weeks = days / 7;
+        long months = weeks / 4;
+
+        if (days <= 6) {
+            return days + getString(io.openim.android.ouicore.R.string.day);
+        } else if (weeks <= 6 && (days % 7 == 0)) {
+            return weeks + getString(io.openim.android.ouicore.R.string.week);
+        } else {
+            return months + getString(io.openim.android.ouicore.R.string.month);
+        }
+    }
 
     private void gotoMemberList(boolean transferPermissions) {
         startActivity(new Intent(this,

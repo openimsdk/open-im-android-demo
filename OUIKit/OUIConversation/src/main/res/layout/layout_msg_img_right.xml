@@ -6,21 +6,20 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
         <io.openim.android.ouicore.widget.AvatarImage
             android:id="@+id/avatar2"
             android:layout_width="42dp"
             android:layout_height="42dp"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:src="@mipmap/ic_my_friend" />
         <TextView
             android:id="@+id/readVanishNum2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginRight="8dp"
-            android:layout_toLeftOf="@id/sendState2"
+            android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@id/sendState2"
             android:textColor="#ff5496eb"
             android:textSize="12sp"
             android:visibility="gone" />
@@ -30,16 +29,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/contentGroup2" />
+            android:layout_toStartOf="@id/contentGroup2" />
 
         <LinearLayout
             android:id="@+id/contentGroup2"
-            android:layout_width="150dp"
-            android:layout_height="250dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:layout_toLeftOf="@id/avatar2"
-            android:gravity="right"
+            android:layout_toStartOf="@id/avatar2"
             android:orientation="vertical">
 
             <TextView
@@ -47,6 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="3dp"
+                android:layout_gravity="end"
                 android:textColor="#ff666666"
                 android:textSize="12sp"
                 android:visibility="gone" />
@@ -55,18 +54,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
-                <org.raphets.roundimageview.RoundImageView
+                <ImageView
                     android:id="@+id/content2"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    app:corner_radius="7dp"
-                    app:type="round" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter" />
 
                 <View
                     android:id="@+id/mask2"
-                    android:layout_width="150dp"
-                    android:layout_height="250dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:alpha="0.6"
                     android:background="@drawable/sty_radius_6_000000" />
 
@@ -74,8 +72,9 @@
                     android:id="@+id/videoPlay2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                   android:visibility="gone"
-                    android:layout_centerInParent="true">
+                    android:visibility="gone"
+                    android:layout_centerInParent="true"
+                    >
 
                     <io.openim.android.ouicore.widget.CirclePgBar
                         android:id="@+id/circleBar2"
@@ -90,7 +89,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_centerVertical="true"
-                        android:src="@mipmap/ic_file_download_pause"
+                        android:src="@mipmap/ic_video_pause"
                         android:visibility="visible" />
 
                     <TextView

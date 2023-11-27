@@ -175,6 +175,7 @@
                 app:water_mark_dx="50dp"
                 app:water_mark_dy="80dp"
                 app:water_mark_sync="true"
+                android:visibility="gone"
                 app:water_mark_textBold="false"
                 app:water_mark_textSize="20sp" />
 
@@ -326,7 +327,6 @@
             android:layout_marginLeft="-8dp"
             android:layout_marginRight="-8dp"
             android:visibility="gone"
-            app:hl_bottomShow="false"
             app:hl_shadowColor="#2a000000"
             app:hl_shadowLimit="8dp">
 

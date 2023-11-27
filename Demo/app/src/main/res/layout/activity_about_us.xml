@@ -67,10 +67,33 @@
                 android:paddingRight="22dp">
 
                 <TextView
+                    android:id="@+id/tips"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/check_the_new"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/ic_right" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/uploadLog"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:paddingLeft="22dp"
+                android:paddingRight="22dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/upload_err_log"
                     android:textColor="#ff333333"
                     android:textSize="18sp" />
 

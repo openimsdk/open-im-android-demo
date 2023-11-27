@@ -1,7 +1,5 @@
 package io.openim.android.ouicore.services;
 
-
-import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,6 +13,21 @@ public interface CallingService extends IProvider {
 
     Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener,
                            boolean isCallOut);
+
+    default Dialog buildCallDialog(Context context,
+                                   DialogInterface.OnDismissListener dismissListener,
+                                   boolean isCallOut) {
+        throw new RuntimeException();
+    }
+
+    /**
+     * 获取呼叫状态  true 正在呼叫
+     *
+     * @return
+     */
+    default boolean getCallStatus() {
+        return false;
+    }
 
     /**
      * 呼叫

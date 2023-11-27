@@ -6,6 +6,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -35,6 +36,7 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.bean.ZxingConfig;
@@ -62,6 +64,8 @@ import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.PictureElem;
 import io.openim.android.sdk.models.VideoElem;
 import io.reactivex.Observable;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import q.rorbin.badgeview.QBadgeView;
 
 public class Common {
@@ -70,16 +74,40 @@ public class Common {
      */
     public final static Handler UIHandler = new Handler(Looper.getMainLooper());
 
+    public static boolean hasSystemAlertWindow() {
+        return new HasPermissions(BaseApp.inst(), Permission.SYSTEM_ALERT_WINDOW)
+            .isAllGranted();
+    }
+
+    public static void addTypeSystemAlert(WindowManager.LayoutParams params) {
+        if (hasSystemAlertWindow()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+            } else {
+                params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+            }
+        }
+    }
+
+    public static boolean isApkDebug() {
+        try {
+            ApplicationInfo info = BaseApp.inst().getApplicationInfo();
+            return (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
 
 
     //目标项是否在最后一个可见项之后
-    public static  boolean mShouldScroll;
+    public static boolean mShouldScroll;
     //记录目标项位置
-    public  static int mToPosition;
+    public static int mToPosition;
+
     /**
      * 滑动到指定位置
      */
-    public static  void smoothMoveToPosition(RecyclerView mRecyclerView,  int position) {
+    public static void smoothMoveToPosition(RecyclerView mRecyclerView, int position) {
         // 第一个可见位置
         int firstItem = mRecyclerView.getChildLayoutPosition(mRecyclerView.getChildAt(0));
         // 最后一个可见位置
@@ -106,18 +134,19 @@ public class Common {
     }
 
 
-
     /**
-     *  finish routes
+     * finish routes
+     *
      * @param routes
      */
-    public static  void finishRoute(String... routes) {
+    public static void finishRoute(String... routes) {
         for (String route : routes) {
             Postcard postcard = ARouter.getInstance().build(route);
             LogisticsCenter.completion(postcard);
             ActivityManager.finishActivity(postcard.getDestination());
         }
     }
+
     public static void stringBindForegroundColorSpan(TextView textView, String data,
                                                      String target) {
         stringBindForegroundColorSpan(textView, data, target, R.color.theme);
@@ -146,17 +175,13 @@ public class Common {
         textView.setText(spannableString);
     }
 
-    public static String getAppVersionName(Context context) {
-        String versionName = "";
+    public static PackageInfo getAppPackageInfo() {
         try {
-            PackageManager pm = context.getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
-            versionName = pi.versionName;
-            if (TextUtils.isEmpty(versionName)) {
-                return "";
-            }
-        } catch (Exception ignored) {}
-        return versionName;
+            PackageManager pm = BaseApp.inst().getPackageManager();
+            return pm.getPackageInfo(BaseApp.inst().getPackageName(), 0);
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
     public static String md5(String content) {
@@ -359,7 +384,7 @@ public class Common {
             .putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord="
                 + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude()
                 + "&referer=" + WebViewActivity.mapAppKey)
-            .putExtra(WebViewActivity.TITLE,v.getContext().getString(R.string.location)));
+            .putExtra(WebViewActivity.TITLE, v.getContext().getString(R.string.location)));
     }
 
     /***
@@ -424,11 +449,16 @@ public class Common {
             badgeView.setBadgeNumber(badgeNumber);
             return;
         }
-        target.setTag(new QBadgeView(context).bindTarget(target).setGravityOffset(10, -2, true).setBadgeNumber(badgeNumber).setBadgeTextSize(8, true).setShowShadow(false));
+        target.setTag(new QBadgeView(context)
+            .bindTarget(target)
+            .setGravityOffset(10, -2, true)
+            .setBadgeNumber(badgeNumber)
+            .setBadgeTextSize(8, true)
+            .setShowShadow(false));
     }
 
     public static String containsLink(String text) {
-        StringBuilder links=new StringBuilder();
+        StringBuilder links = new StringBuilder();
         // 正则表达式模式匹配URL链接
         String pattern = "(http|https)://[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3}(/\\S*)?";
         Pattern regex = Pattern.compile(pattern);

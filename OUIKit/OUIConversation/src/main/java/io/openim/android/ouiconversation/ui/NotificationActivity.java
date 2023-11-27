@@ -36,7 +36,7 @@ public class NotificationActivity extends BaseActivity<ChatVM, ActivityNotificat
         initView();
         init();
         listener();
-        vm.markReadedByConID(vm.conversationID, null);
+        vm.markRead();
     }
 
     private void listener() {

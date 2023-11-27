@@ -10,7 +10,6 @@ public class Constant {
 //    public static final String DEFAULT_HOST = "test-web.rentsoft.cn";//43
 //    public static final String DEFAULT_HOST = "web.rentsoft.cn";//121
     public static final String DEFAULT_HOST = "14.29.213.197";
-//    public static final String DEFAULT_HOST = "203.56.175.233";
 
     //登录注册手机验 证服务器地址
     private static final String APP_AUTH_URL = "https://" + DEFAULT_HOST + "/chat/";
@@ -128,6 +127,8 @@ public class Constant {
     public static final String IS_SELECT_MEMBER = "isSelectMember";
     //群通话
     public static final String IS_GROUP_CALL = "isGroupCall";
+    //通话
+    public static final String IS_CALL = "isCall";
     //选择好友
     public static final String IS_SELECT_FRIEND = "isSelectFriend";
     //自定义消息类型
@@ -145,10 +146,6 @@ public class Constant {
         public static final int CUSTOMIZE_MEETING = 905;
 
     }
-
-    //超级群
-    public static final int SUPER_GROUP_LIMIT = 250;
-
     public static class MediaType {
         public static final String VIDEO = "video";
         public static final String AUDIO = "audio";

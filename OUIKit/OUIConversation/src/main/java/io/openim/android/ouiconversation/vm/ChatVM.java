@@ -612,6 +612,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
         }
         OnBase<String> callBack = new IMUtil.IMCallBack<String>() {
+
             @Override
             public void onSuccess(String data) {
                 if (null != msgList) {
