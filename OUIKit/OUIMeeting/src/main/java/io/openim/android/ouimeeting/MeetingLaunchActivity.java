@@ -73,7 +73,7 @@ public class MeetingLaunchActivity extends BaseActivity<MeetingVM, ActivityMeeti
                 //这里有可能被释放 所以需要重新放入
                 BaseApp.inst().putVM(vm);
                 shoot.safeGo(() -> startActivity(new Intent(MeetingLaunchActivity.this,
-                    TimingMeetingActivity.class)));
+                    JoinMeetingActivity.class)));
             }
         });
         vm.meetingInfoList.observe(this, meetingInfos -> {

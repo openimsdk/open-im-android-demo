@@ -15,6 +15,7 @@ import io.livekit.android.room.participant.LocalParticipant
 import io.livekit.android.room.participant.Participant
 import io.livekit.android.room.participant.RemoteParticipant
 import io.livekit.android.room.track.*
+import io.livekit.android.room.track.video.ViewVisibility
 import io.livekit.android.util.flow
 import io.openim.android.ouicore.utils.L
 import kotlinx.coroutines.*
@@ -188,7 +189,12 @@ class CallViewModel(
                     lastTrack.removeRenderer(viewRenderer)
                 }
                 viewRenderer.tag = videoTrack
-                videoTrack.addRenderer(viewRenderer)
+                if(videoTrack is RemoteVideoTrack){
+                    videoTrack.addRenderer(viewRenderer,
+                        ViewVisibility(viewRenderer.rootView))
+                }else{
+                    videoTrack.addRenderer(viewRenderer)
+                }
             }
         }
     }

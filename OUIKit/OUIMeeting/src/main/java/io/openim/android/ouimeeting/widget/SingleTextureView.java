@@ -16,6 +16,7 @@ import io.livekit.android.renderer.TextureViewRenderer;
 import io.livekit.android.room.participant.ConnectionQuality;
 import io.livekit.android.room.participant.Participant;
 import io.livekit.android.room.track.VideoTrack;
+import io.livekit.android.room.track.video.ViewVisibility;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.ParticipantMeta;
 import io.openim.android.ouicore.net.bage.GsonHel;
@@ -175,5 +176,4 @@ public class SingleTextureView extends FrameLayout {
         }
         removeRenderer(view.textureView);
     }
-
 }

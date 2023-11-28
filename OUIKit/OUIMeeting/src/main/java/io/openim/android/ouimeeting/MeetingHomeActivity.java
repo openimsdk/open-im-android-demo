@@ -101,7 +101,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     //恢复当前页面
     boolean isRecover = false;
     private HasPermissions hasSystemAlert;
-    private RecyclerViewAdapter  adapter2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -353,6 +352,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                         holder.view.mic.setVisibility(View.GONE);
                         holder.view.camera.setVisibility(View.GONE);
                         holder.view.more.setVisibility(View.GONE);
+                        holder.view.allSeeIv.setVisibility(View.GONE);
                     }
                     holder.view.angleMark.setVisibility(participantMeta.setTop ? View.VISIBLE :
                         View.GONE);
@@ -480,7 +480,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
     private void initView() {
         view.pager.setAdapter(adapter = new PageAdapter(getLayoutInflater(), vm,
-        gestureDetector));
+            gestureDetector));
 
         view.pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
@@ -502,74 +502,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
             }
         });
-
-//        LinearSnapHelper snapHelper = new LinearSnapHelper();
-//        //保证recyclerView滚动停止是，可以停在中间位置，类似于viewPager效果
-//        snapHelper.attachToRecyclerView(view.recyclerView);
-//        LinearLayoutManager layoutManager=new LinearLayoutManager(this);
-//        layoutManager.setOrientation(RecyclerView.HORIZONTAL);
-//        view.recyclerView.setLayoutManager(layoutManager);
-//        GridSpaceItemDecoration divItemDecoration = new GridSpaceItemDecoration(Common.dp2px(1));
-//        view.recyclerView.addItemDecoration(divItemDecoration);
-//        view.recyclerView.setAdapter(adapter2 = new RecyclerViewAdapter() {
-//
-//            @Override
-//            public int getItemViewType(int position) {
-//                if (getItems().get(position) instanceof Participant)
-//                    return -1; //首页
-//                return super.getItemViewType(position);
-//            }
-//
-//            @NonNull
-//            @Override
-//            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
-//                                                              int viewType) {
-//                if (viewType == -1)
-//                    return new PageAdapter.UserStreamViewHolder(parent);
-//
-//                return new ViewHol.RecyclerViewHolder(parent);
-//            }
-//
-//            @Override
-//            public void onBindView(@NonNull RecyclerView.ViewHolder holder, Object data,
-//                                   int position) {
-//                if (data instanceof Participant) {
-//                    PageAdapter.UserStreamViewHolder streamViewHolder =
-//                        (PageAdapter.UserStreamViewHolder) holder;
-//                    streamViewHolder.setItemSize(MeetingHomeActivity.this.getResources().getDisplayMetrics().widthPixels,
-//                       -1);
-//                    streamViewHolder.view.subscribeParticipant(vm, (Participant) data);
-//                }
-//                if (data instanceof List) {
-//                    ViewHol.RecyclerViewHolder view = (ViewHol.RecyclerViewHolder) holder;
-//                    List<Participant> participants = (List<Participant>) data;
-//                    view.viewBinding.recyclerView.setLayoutManager(new GridLayoutManager(MeetingHomeActivity.this,
-//                        2));
-//                    RecyclerViewAdapter<Participant, PageAdapter.UserStreamViewHolder> adapter;
-//                    GridSpaceItemDecoration divItemDecoration =
-//                        new GridSpaceItemDecoration(Common.dp2px(1));
-//                    view.viewBinding.recyclerView.addItemDecoration(divItemDecoration);
-//                    view.viewBinding.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<Participant,
-//                        PageAdapter.UserStreamViewHolder>(PageAdapter.UserStreamViewHolder.class) {
-//
-//                        @Override
-//                        public void onBindView(@NonNull PageAdapter.UserStreamViewHolder holder,
-//                                               Participant data
-//                            , int position) {
-//                            holder.setItemSize(-1,view.viewBinding.recyclerView.getHeight() / 2);
-//                            holder.view.subscribeParticipant(vm, data);
-//                        }
-//                    });
-//                    view.viewBinding.recyclerView.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
-//
-//                    adapter.setItems(participants);
-//                }
-//        }
-//    });
-//        view.recyclerView.setOnTouchListener((v,event)->gestureDetector.onTouchEvent(event));
-
-
-}
+    }
 
 
     void init() {
@@ -620,18 +553,16 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             }
             data.add(0, activeSpeaker);
             adapter.setList(data);
-//            adapter2.setItems(data);
 
             updateGuideView(0, data.size());
-//            view.pager.setCurrentItem(0);
             return null;
         });
 
 
         vm.callViewModel.subscribe(vm.callViewModel.getActiveSpeakersFlow(), (v) -> {
-//            if (v.isEmpty() || null != vm.allWatchedUser.val()) return null;
-//            showPageFirst(v.get(0));
-//            updateGuideView(0, adapter.getCount());
+            if (v.isEmpty() || null != vm.allWatchedUser.val()) return null;
+            showPageFirst(v.get(0),false);
+            updateGuideView(0, adapter.getCount());
             return null;
         });
 
@@ -681,8 +612,8 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
         vm.allWatchedUser.observe(this, v -> {
             if (null == v) return;
-//            showPageFirst(v);
-//            updateGuideView(0, adapter.getCount());
+            showPageFirst(v,true);
+            updateGuideView(0, adapter.getCount());
         });
         view.landscape.setOnClickListener(v -> {
             triggerLandscape = true;
@@ -811,15 +742,16 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
      *
      * @param first
      */
-    private void showPageFirst(Participant first) {
-//        if (null != activeSpeaker && Objects.equals(first.getIdentity(),
-//            activeSpeaker.getIdentity()))
-//            return;
-//        adapter.getList().remove(activeSpeaker);
-//        activeSpeaker = first;
-//        adapter.getList().add(0, activeSpeaker);
-//        adapter.notifyDataSetChanged();
-//        view.pager.setCurrentItem(0);
+    private void showPageFirst(Participant first, boolean isJump) {
+        if (null != activeSpeaker && Objects.equals(first.getIdentity(),
+            activeSpeaker.getIdentity()))
+            return;
+        adapter.getList().remove(activeSpeaker);
+        activeSpeaker = first;
+        adapter.getList().add(0, activeSpeaker);
+        adapter.notifyDataSetChanged();
+        if (isJump)
+            view.pager.setCurrentItem(0);
     }
 
     @Override
@@ -836,15 +768,15 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     }
 
 
-public static class MemberItemViewHolder extends RecyclerView.ViewHolder {
-    public final MeetingIietmMemberBinding view;
+    public static class MemberItemViewHolder extends RecyclerView.ViewHolder {
+        public final MeetingIietmMemberBinding view;
 
-    public MemberItemViewHolder(@NonNull View itemView) {
-        super(MeetingIietmMemberBinding.inflate(LayoutInflater.from(itemView.getContext()),
-            (ViewGroup) itemView, false).getRoot());
-        view = MeetingIietmMemberBinding.bind(this.itemView);
+        public MemberItemViewHolder(@NonNull View itemView) {
+            super(MeetingIietmMemberBinding.inflate(LayoutInflater.from(itemView.getContext()),
+                (ViewGroup) itemView, false).getRoot());
+            view = MeetingIietmMemberBinding.bind(this.itemView);
+        }
     }
-}
 
     @Override
     protected void onResume() {
@@ -895,112 +827,113 @@ public static class MemberItemViewHolder extends RecyclerView.ViewHolder {
         super.finish();
     }
 
-private static class PageAdapter extends PagerAdapter {
-    private final LayoutInflater inflater;
-    private List<Object> list = new ArrayList<>();
-    private final MeetingVM vm;
-    private final GestureDetector gestureDetector;
+    private static class PageAdapter extends PagerAdapter {
+        private final LayoutInflater inflater;
+        private List<Object> list = new ArrayList<>();
+        private final MeetingVM vm;
+        private final GestureDetector gestureDetector;
 
-    public PageAdapter(LayoutInflater inflater, MeetingVM vm, GestureDetector gestureDetector) {
-        this.inflater = inflater;
-        this.vm = vm;
-        this.gestureDetector = gestureDetector;
-    }
-
-    public List<Object> getList() {
-        return list;
-    }
-
-    public void setList(List list) {
-        this.list = list;
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public int getCount() {
-        return list.size();
-    }
-
-    @Override
-    public int getItemPosition(Object object) {
-        //  notifyDataSetChanged() 页面不刷新问题的方法
-        return POSITION_NONE;
-    }
-
-    @NonNull
-    @Override
-    public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        Object ob = list.get(position);
-        View view_ = null;
-        if (ob instanceof Participant) {
-            Participant participant = (Participant) ob;
-
-            SingleTextureView singleTextureView = new SingleTextureView(container.getContext());
-            singleTextureView.bindData(vm, participant);
-            view_ = singleTextureView;
+        public PageAdapter(LayoutInflater inflater, MeetingVM vm, GestureDetector gestureDetector) {
+            this.inflater = inflater;
+            this.vm = vm;
+            this.gestureDetector = gestureDetector;
         }
-        if (ob instanceof List) {
-            List<Participant> participants = (List<Participant>) ob;
-            ViewRecyclerViewBinding view = ViewRecyclerViewBinding.inflate(inflater);
-            view.recyclerView.setLayoutManager(new GridLayoutManager(container.getContext(),
-                2));
-            RecyclerViewAdapter<Participant, UserStreamViewHolder> adapter;
-            GridSpaceItemDecoration divItemDecoration =
-                new GridSpaceItemDecoration(Common.dp2px(1));
-            view.recyclerView.addItemDecoration(divItemDecoration);
-            view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<Participant,
-                UserStreamViewHolder>(UserStreamViewHolder.class) {
 
-                @Override
-                public void onBindView(@NonNull UserStreamViewHolder holder, Participant data
-                    , int position) {
-                    holder.setItemSize(-1,view.recyclerView.getHeight() / 2);
-                    holder.view.bindData(vm, data);
+        public List<Object> getList() {
+            return list;
+        }
+
+        public void setList(List list) {
+            this.list = list;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getCount() {
+            return list.size();
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            //  notifyDataSetChanged() 页面不刷新问题的方法
+            return POSITION_NONE;
+        }
+
+        @NonNull
+        @Override
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
+            Object ob = list.get(position);
+            View view_ = null;
+            if (ob instanceof Participant) {
+                Participant participant = (Participant) ob;
+
+                SingleTextureView singleTextureView = new SingleTextureView(container.getContext());
+                singleTextureView.bindData(vm, participant);
+                view_ = singleTextureView;
+            }
+            if (ob instanceof List) {
+                List<Participant> participants = (List<Participant>) ob;
+                ViewRecyclerViewBinding view = ViewRecyclerViewBinding.inflate(inflater);
+                view.recyclerView.setLayoutManager(new GridLayoutManager(container.getContext(),
+                    2));
+                RecyclerViewAdapter<Participant, UserStreamViewHolder> adapter;
+                GridSpaceItemDecoration divItemDecoration =
+                    new GridSpaceItemDecoration(Common.dp2px(1));
+                view.recyclerView.addItemDecoration(divItemDecoration);
+                view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<Participant,
+                    UserStreamViewHolder>(UserStreamViewHolder.class) {
+
+                    @Override
+                    public void onBindView(@NonNull UserStreamViewHolder holder, Participant data
+                        , int position) {
+                        holder.setItemSize(-1, view.recyclerView.getHeight() / 2);
+                        holder.view.bindData(vm, data);
+                    }
+                });
+                view.recyclerView.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
+
+                adapter.setItems(participants);
+                view_ = view.getRoot();
+            }
+            if (null != view_) {
+                container.addView(view_);
+                return view_;
+            }
+            return container;
+        }
+
+        @Override
+        public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
+            return view == object;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, @NonNull Object object) {
+            container.removeView((View) object);
+        }
+
+        public static class UserStreamViewHolder extends RecyclerView.ViewHolder {
+            public final SingleTextureView view;
+
+            public UserStreamViewHolder(@NonNull View itemView) {
+                super(new SingleTextureView(itemView.getContext()));
+                view = (SingleTextureView) this.itemView;
+            }
+
+            /**
+             * MATCH_PARENT -1 WRAP_CONTENT -2
+             *
+             * @param wh
+             */
+            public void setItemSize(int... wh) {
+                View childAt = view.getChildAt(0);
+                if (null != childAt) {
+                    ViewGroup.LayoutParams params = childAt.getLayoutParams();
+                    params.width = wh[0];
+                    params.height = wh[1];
                 }
-            });
-            view.recyclerView.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
-
-            adapter.setItems(participants);
-            view_ = view.getRoot();
-        }
-        if (null != view_) {
-            container.addView(view_);
-            return view_;
-        }
-        return container;
-    }
-
-    @Override
-    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-        return view == object;
-    }
-
-    @Override
-    public void destroyItem(ViewGroup container, int position, @NonNull Object object) {
-        container.removeView((View) object);
-    }
-
-    public static class UserStreamViewHolder extends RecyclerView.ViewHolder {
-        public final SingleTextureView view;
-
-        public UserStreamViewHolder(@NonNull View itemView) {
-            super(new SingleTextureView(itemView.getContext()));
-            view = (SingleTextureView) this.itemView;
-        }
-
-        /**
-         * MATCH_PARENT -1 WRAP_CONTENT -2
-         * @param wh
-         */
-        public void setItemSize(int... wh) {
-            View childAt = view.getChildAt(0);
-            if (null != childAt) {
-                ViewGroup.LayoutParams params = childAt.getLayoutParams();
-                params.width = wh[0];
-                params.height = wh[1];
             }
         }
     }
-}
 
 }
