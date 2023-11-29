@@ -83,10 +83,10 @@ public class DemoApplication extends BaseApp {
 
     private void initARouter() {
         ARouter.init(this);
-        if (L.isDebug){
-            ARouter.openLog();
-            ARouter.openDebug();
-        }
+//        if (L.isDebug){
+//            ARouter.openLog();
+//            ARouter.openDebug();
+//        }
     }
 
     private void initBugly() {

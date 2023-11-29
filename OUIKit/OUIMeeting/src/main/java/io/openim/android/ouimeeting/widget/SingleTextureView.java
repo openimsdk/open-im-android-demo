@@ -175,5 +175,6 @@ public class SingleTextureView extends FrameLayout {
             scope = null;
         }
         removeRenderer(view.textureView);
+        view.textureView.release();
     }
 }

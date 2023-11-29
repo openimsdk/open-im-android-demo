@@ -100,26 +100,37 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     private Observer<? super Boolean> isAppBackgroundListener;
     //恢复当前页面
     boolean isRecover = false;
-    private HasPermissions hasSystemAlert;
+    private HasPermissions shoot,hasSystemAlert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         vm = Easy.find(MeetingVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMeetingHomeBinding.inflate(getLayoutInflater()));
-        initView();
-
+        shoot = new HasPermissions(this, Permission.RECORD_AUDIO, Permission.CAMERA);
         hasSystemAlert = new HasPermissions(this, Permission.SYSTEM_ALERT_WINDOW);
 
-        if (vm.isInit) {
-            if (vm.isLandscape)
-                toast(getString(io.openim.android.ouicore.R.string.double_tap_tips));
-            connectRoomSuccess(vm.callViewModel.getVideoTrack(vm.callViewModel.getRoom().getLocalParticipant()));
-        } else init();
+        shoot.safeGo(new HasPermissions.OnGrantedListener() {
+            @Override
+            public void onGranted() {
+                initView();
+                if (vm.isInit) {
+                    if (vm.isLandscape)
+                        toast(getString(io.openim.android.ouicore.R.string.double_tap_tips));
+                    connectRoomSuccess(vm.callViewModel.getVideoTrack(vm.callViewModel.getRoom().getLocalParticipant()));
+                } else init();
 
-        bindVM();
-        listener();
-        registerHomeKey(this);
+                bindVM();
+                listener();
+                registerHomeKey(MeetingHomeActivity.this);
+            }
+
+            @Override
+            public void onDeniedPart(@NonNull List<String> permissions, boolean doNotAskAgain) {
+                HasPermissions.OnGrantedListener.super.onDeniedPart(permissions, doNotAskAgain);
+                finish();
+            }
+        });
     }
 
     //监听Home键
@@ -805,6 +816,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
     private void release() {
         if (isFinishing() && !triggerLandscape) {
+            if (null!=vm.audioManager)
             vm.audioManager.setSpeakerphoneOn(true);
             vm.onCleared();
             removeCacheVM();

@@ -72,8 +72,14 @@ dependencies {
     annotationProcessor 'com.alibaba:arouter-compiler:1.5.2'
 
     //liveKit
-    implementation "io.livekit:livekit-android:1.5.1"
+    implementation "io.livekit:livekit-android:1.5.2"
     implementation "com.google.protobuf:protobuf-javalite:${versions.protobuf}"
+//    api 'io.github.webrtc-sdk:android:114.5735.05'
+//    api 'com.github.davidliu:audioswitch:89582c47c9a04c62f90aa5e57251af4800a62c9a'
+//    implementation "com.google.dagger:dagger:${versions.dagger}"
+//    implementation 'com.vdurmont:semver4j:3.1.0'
+//    implementation 'javax.sip:android-jain-sip-ri:1.3.0-91'
+//    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.serialization}"
     //-------
 
     implementation "com.github.lisawray.groupie:groupie:2.9.0"
