@@ -14,6 +14,7 @@ import io.livekit.android.room.participant.ConnectionQuality
 import io.livekit.android.room.participant.LocalParticipant
 import io.livekit.android.room.participant.Participant
 import io.livekit.android.room.participant.RemoteParticipant
+import io.livekit.android.room.participant.VideoTrackPublishDefaults
 import io.livekit.android.room.track.*
 import io.livekit.android.room.track.video.ViewVisibility
 import io.livekit.android.util.flow
@@ -31,7 +32,12 @@ class CallViewModel(
 ) : AndroidViewModel(application) {
     val room = LiveKit.create(
         appContext = application,
-        options = RoomOptions(adaptiveStream = true, dynacast = true),
+        options = RoomOptions(
+            adaptiveStream = true, dynacast = true,
+            videoTrackPublishDefaults = VideoTrackPublishDefaults(
+                videoCodec = VideoCodec.VP9.codecName
+            )
+        ),
     )
 
     val allParticipants = room::remoteParticipants.flow.map { remoteParticipants ->
@@ -157,13 +163,14 @@ class CallViewModel(
 
     suspend fun bindRemoteViewRenderer(
         viewRenderer: TextureViewRenderer,
-        participant: Participant, scope: CoroutineScope) {
+        participant: Participant, scope: CoroutineScope
+    ) {
         // observe videoTracks changes.
         val videoTrackPubFlow = participant::videoTracks.flow.map { participant to it }.flatMapLatest { (participant, videoTracks) ->
             // Prioritize any screenshare streams.
             val trackPublication = participant.getTrackPublication(Track.Source.SCREEN_SHARE)
                 ?: participant.getTrackPublication(Track.Source.CAMERA)
-            ?: videoTracks.firstOrNull()?.first
+                ?: videoTracks.firstOrNull()?.first
             flowOf(trackPublication)
         }
         scope.launch {
@@ -189,10 +196,12 @@ class CallViewModel(
                     lastTrack.removeRenderer(viewRenderer)
                 }
                 viewRenderer.tag = videoTrack
-                if(videoTrack is RemoteVideoTrack){
-                    videoTrack.addRenderer(viewRenderer,
-                        ViewVisibility(viewRenderer.rootView))
-                }else{
+                if (videoTrack is RemoteVideoTrack) {
+                    videoTrack.addRenderer(
+                        viewRenderer,
+                        ViewVisibility(viewRenderer.rootView)
+                    )
+                } else {
                     videoTrack.addRenderer(viewRenderer)
                 }
             }
@@ -206,8 +215,6 @@ class CallViewModel(
 
     fun startScreenCapture(mediaProjectionPermissionResultData: Intent) {
         val localParticipant = room.localParticipant
-        localParticipant::connectionQuality.flow
-
         viewModelScope.launch {
             val screencastTrack = localParticipant.createScreencastTrack(mediaProjectionPermissionResultData = mediaProjectionPermissionResultData)
             localParticipant.publishVideoTrack(
@@ -246,15 +253,15 @@ class CallViewModel(
 
     fun setMicEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            mutableMicEnabled.postValue(enabled)
             room.localParticipant.setMicrophoneEnabled(enabled)
+            mutableMicEnabled.postValue(enabled)
         }
     }
 
     fun setCameraEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            mutableCameraEnabled.postValue(enabled)
             room.localParticipant.setCameraEnabled(enabled)
+            mutableCameraEnabled.postValue(enabled)
         }
     }
 
@@ -333,7 +340,7 @@ class CallViewModel(
         }
     }
 }
-
 private fun <T> LiveData<T>.hide(): LiveData<T> = this
 private fun <T> MutableStateFlow<T>.hide(): StateFlow<T> = this
 private fun <T> Flow<T>.hide(): Flow<T> = this
+

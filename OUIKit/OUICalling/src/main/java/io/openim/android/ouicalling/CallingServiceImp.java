@@ -1,5 +1,6 @@
 package io.openim.android.ouicalling;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -40,7 +41,7 @@ import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
-import io.openim.keepalive.Alive;
+import p3dn6v.h4wm1s.k2ro8t.G5qU0x;
 
 @Route(path = Routes.Service.CALLING)
 public class CallingServiceImp implements CallingService {
@@ -50,6 +51,7 @@ public class CallingServiceImp implements CallingService {
     public CallDialog callDialog;
     private SignalingInfo signalingInfo;
     public static final int A_NOTIFY_ID = 100;
+    //正在被呼叫状态
     private boolean isBeCalled;
 
 
@@ -59,12 +61,12 @@ public class CallingServiceImp implements CallingService {
 
     @Override
     public void startAudioVideoService(Context base) {
-//        Alive.restart(base);
+        G5qU0x.q7r8s9t0(base);
     }
 
     @Override
     public void stopAudioVideoService(Context base) {
-//        Alive.finishService(base);
+        G5qU0x.u1v2w3x4(base);
     }
 
     @Override
@@ -79,7 +81,7 @@ public class CallingServiceImp implements CallingService {
 
     @Override
     public void initKeepAlive(String precessName) {
-        Alive.init(context, precessName, AudioVideoService.class);
+        G5qU0x.j0k1l2(context, precessName, AudioVideoService.class);
     }
 
     @Override
@@ -204,12 +206,14 @@ public class CallingServiceImp implements CallingService {
             if (callDialog != null) return callDialog;
             if (signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT)
                 callDialog = new GroupCallDialog(context, this, isCallOut);
-            else callDialog = new CallDialog(context, this, isCallOut);
+            else
+                callDialog = new CallDialog(context, this, isCallOut);
             callDialog.bindData(signalingInfo);
             if (!callDialog.callingVM.isCallOut) {
                 callDialog.setOnDismissListener(dialog -> {
-                    isBeCalled=false;
-                    dismissListener.onDismiss(dialog);
+                    isBeCalled = false;
+                    if (null != dismissListener)
+                        dismissListener.onDismiss(dialog);
                 });
                 if (!Common.isScreenLocked() && Common.hasSystemAlertWindow()) {
                     callDialog.setOnShowListener(dialog -> ARouter.getInstance().build(Routes.Main.HOME).navigation());

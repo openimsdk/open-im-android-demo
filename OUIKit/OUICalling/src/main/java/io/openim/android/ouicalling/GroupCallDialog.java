@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import io.livekit.android.events.EventListenable;
@@ -65,7 +66,7 @@ public class GroupCallDialog extends CallDialog {
     private RecyclerViewAdapter<UserInfo, ViewHol.ImageTxtViewHolder> memberAdapter;
     private RecyclerViewAdapter<Participant, RendererViewHole> viewRenderersAdapter;
     private boolean isJoin = false;
-    private CoroutineScope scope = callingVM.callViewModel.buildScope();
+    private final CoroutineScope scope = callingVM.callViewModel.buildScope();
 
 
     public GroupCallDialog(@NonNull Context context, CallingService callingService,
@@ -75,7 +76,7 @@ public class GroupCallDialog extends CallDialog {
 
     @Override
     public void initRendererView() {
-        view.memberRecyclerView.setLayoutManager(new GridLayoutManager(context,5));
+        view.memberRecyclerView.setLayoutManager(new GridLayoutManager(context, 5));
         view.memberRecyclerView.setAdapter(memberAdapter = new RecyclerViewAdapter<UserInfo,
             ViewHol.ImageTxtViewHolder>(ViewHol.ImageTxtViewHolder.class) {
 
@@ -98,71 +99,75 @@ public class GroupCallDialog extends CallDialog {
                                    int position) {
                 Object speakerVideoViewTag = holder.view.remoteSpeakerVideoView.getTag();
                 if (speakerVideoViewTag instanceof VideoTrack) {
-                    ((VideoTrack) speakerVideoViewTag).removeRenderer(holder.view.remoteSpeakerVideoView);
+                    ((VideoTrack) speakerVideoViewTag)
+                        .removeRenderer(holder.view.remoteSpeakerVideoView);
                 }
                 try {
                     callingVM.initRemoteVideoRenderer(holder.view.remoteSpeakerVideoView);
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
                 try {
-                    showRemoteSpeakerVideoView(holder,false);
                     ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
-                            ParticipantMeta.class);
+                        ParticipantMeta.class);
                     String name = participantMeta.groupMemberInfo.getNickname();
                     if (TextUtils.isEmpty(name)) name = participantMeta.userInfo.getNickname();
                     holder.view.name.setText(name);
-                    holder.view.avatar.load(participantMeta.userInfo.getFaceURL());
+                    holder.view.avatar.load(participantMeta.userInfo.getFaceURL(), name);
 
                     callingVM.callViewModel.subscribe(data.getEvents().getEvents(), (v) -> {
-                        ParticipantMeta participantMeta2 =
-                                GsonHel.fromJson(v.getParticipant().getMetadata(),
-                                        ParticipantMeta.class);
-                        participantMeta.userInfo.getUserID().equals(participantMeta2);
-
                         holder.view.micOn.setImageResource(v.getParticipant().isMicrophoneEnabled() ?
                             R.mipmap.ic_mic_s_on : R.mipmap.ic_mic_s_off);
-                        holder.view.avatarRl.setVisibility(v.getParticipant().isCameraEnabled() ?
-                            View.GONE : View.VISIBLE);
+
+                        showRemoteSpeakerVideoView(holder, v.getParticipant()
+                            .isCameraEnabled());
                         return null;
-                    }, callingVM.callViewModel.buildScope());
+                    }, scope);
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 if (!callingVM.isVideoCalls) return;
                 if (data instanceof LocalParticipant) {
-                    if (callingVM.callViewModel.getCameraEnabled().getValue()) {
-                        showRemoteSpeakerVideoView(holder,true);
+                    boolean isCameraEnabled = callingVM.callViewModel.getCameraEnabled().getValue();
+                    showRemoteSpeakerVideoView(holder, isCameraEnabled);
+                    if (isCameraEnabled) {
                         VideoTrack localVideoTrack = callingVM.callViewModel.getVideoTrack(data);
                         if (null != localVideoTrack) {
                             localVideoTrack.addRenderer(holder.view.remoteSpeakerVideoView);
                             holder.view.remoteSpeakerVideoView.setTag(localVideoTrack);
                         }
-                    } else {
-                        showRemoteSpeakerVideoView(holder,false);
                     }
                 } else {
-                    callingVM.callViewModel.bindRemoteViewRenderer(holder.view.remoteSpeakerVideoView, data, new Continuation<Unit>() {
-                        @NonNull
-                        @Override
-                        public CoroutineContext getContext() {
-                            return EmptyCoroutineContext.INSTANCE;
-                        }
+                    callingVM.callViewModel.bindRemoteViewRenderer(holder.view.remoteSpeakerVideoView,
+                        data,
+                        scope,
+                        new Continuation<Unit>() {
+                            @NonNull
+                            @Override
+                            public CoroutineContext getContext() {
+                                return EmptyCoroutineContext.INSTANCE;
+                            }
 
-                        @Override
-                        public void resumeWith(@NonNull Object o) {
+                            @Override
+                            public void resumeWith(@NonNull Object o) {
 
-                        }
-                    });
+                            }
+                        });
                 }
 
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(@NonNull RendererViewHole holder) {
+                holder.view.remoteSpeakerVideoView.release();
+                super.onViewDetachedFromWindow(holder);
             }
         });
     }
 
-    private static void showRemoteSpeakerVideoView(@NonNull RendererViewHole holder,boolean isShow) {
-        holder.view.remoteSpeakerVideoView.setVisibility(isShow?View.VISIBLE:View.GONE);
-        holder.view.avatarRl.setVisibility(isShow?View.GONE:View.VISIBLE);
+    private static void showRemoteSpeakerVideoView(@NonNull RendererViewHole holder,
+                                                   boolean isShow) {
+        holder.view.remoteSpeakerVideoView.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        holder.view.avatarRl.setVisibility(isShow ? View.GONE : View.VISIBLE);
     }
 
 
@@ -178,12 +183,13 @@ public class GroupCallDialog extends CallDialog {
         callingVM.isGroup =
             signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT;
         callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
-        view.cameraControl.setVisibility(callingVM.isVideoCalls?View.VISIBLE:View.GONE);
+        view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.VISIBLE : View.GONE);
         if (callingVM.isCallOut) {
             view.ask.setVisibility(View.GONE);
             view.callingMenu.setVisibility(View.VISIBLE);
             view.headTips.setVisibility(View.GONE);
             callingVM.signalingInvite(signalingInfo);
+            timing();
         } else {
             view.ask.setVisibility(View.VISIBLE);
             view.headTips.setVisibility(View.VISIBLE);
@@ -216,14 +222,13 @@ public class GroupCallDialog extends CallDialog {
 
     @Override
     public void playRingtone() {
-        if (isJoin) return;
-        if (callingVM.isCallOut) Common.wakeUp(context);
+        if (callingVM.isCallOut || isJoin) Common.wakeUp(context);
         else super.playRingtone();
     }
 
     public void joinToShow() {
         isJoin = true;
-        signalingAccept(signalingInfo);
+     answerClick(signalingInfo);
         show();
     }
 
@@ -276,37 +281,54 @@ public class GroupCallDialog extends CallDialog {
         view.answer.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                signalingAccept(signalingInfo);
+                answerClick(signalingInfo);
             }
         });
         callingVM.setOnParticipantsChangeListener(participants -> {
+            removeHost(participants);
             viewRenderersAdapter.setItems(participants);
         });
         view.zoomOut.setOnClickListener(v -> {
-            shrink(true);
-        });
-        view.shrink.setOnClickListener(v -> {
-            shrink(false);
+           zoomOutClick();
         });
 
         callingVM.callViewModel.subscribe(callingVM.callViewModel.getActiveSpeakersFlow(), (v) -> {
             if (!v.isEmpty()) {
                 ParticipantMeta participantMeta = GsonHel.fromJson(v.get(0).getMetadata(),
                     ParticipantMeta.class);
-                String name = participantMeta.groupMemberInfo.getNickname();
-                if (TextUtils.isEmpty(name)) name = participantMeta.userInfo.getNickname();
-                view.sTips.setText(String.format(context.getString(io.openim.android.ouicore.R.string.who_talk), name));
-                view.sAvatar.load(participantMeta.userInfo.getFaceURL());
+//                String name = participantMeta.groupMemberInfo.getNickname();
+//                if (TextUtils.isEmpty(name)) name = participantMeta.userInfo.getNickname();
+//                view.sTips.setText(String.format(context.getString(io.openim.android.ouicore.R
+//                .string.who_talk), name));
+//                view.sAvatar.load(participantMeta.userInfo.getFaceURL());
+                floatViewBinding.sTips.setText(context.getString(io.openim.android.ouicore.R.string.meeting));
+                floatViewBinding.sAvatar.load(participantMeta.userInfo.getFaceURL(), true);
             }
             return null;
         }, scope);
     }
 
-    @Override
+    private void removeHost(List<Participant> participants) {
+        try {
+            Iterator<Participant> iterator = participants.iterator();
+            while (iterator.hasNext()) {
+                if (iterator.next().getIdentity().equals(signalingInfo.getInvitation().getGroupID()))
+                    iterator.remove();
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
     public void shrink(boolean isShrink) {
+        showFloatView();
         view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
         getWindow().setDimAmount(isShrink ? 0f : 1f);
-        view.shrink.setVisibility(isShrink ? View.VISIBLE : View.GONE);
+        if (isShrink) {
+            showFloatView();
+        } else if (null != easyWindow) {
+            easyWindow.cancel();
+        }
+
         WindowManager.LayoutParams params = getWindow().getAttributes();
         params.height = isShrink ? ViewGroup.LayoutParams.WRAP_CONTENT :
             ViewGroup.LayoutParams.MATCH_PARENT;
@@ -314,15 +336,11 @@ public class GroupCallDialog extends CallDialog {
             ViewGroup.LayoutParams.MATCH_PARENT;
         params.gravity = isShrink ? (Gravity.TOP | Gravity.END) : Gravity.CENTER;
         getWindow().setAttributes(params);
-
-        if (!callingVM.isStartCall){
-            view.sTips.setText(callingVM.isCallOut ?
-                context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
-                context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
-        }
     }
 
-    private void signalingAccept(SignalingInfo signalingInfo) {
+
+    public void signalingAccept(SignalingInfo signalingInfo) {
+
         callingVM.signalingAccept(signalingInfo, new OnBase() {
             @Override
             public void onError(int code, String error) {
@@ -342,8 +360,15 @@ public class GroupCallDialog extends CallDialog {
         view.headTips.setVisibility(View.GONE);
         view.ask.setVisibility(View.GONE);
         view.callingMenu.setVisibility(View.VISIBLE);
-        view.timeTv.setVisibility(View.VISIBLE);
+        timing();
 
+        if (callingVM.isVideoCalls)
+            view.cameraControl.setVisibility(View.VISIBLE);
+    }
+
+    private void timing() {
+        view.timeTv.setVisibility(View.VISIBLE);
+        callingVM.buildTimer();
     }
 
     @Override
@@ -362,8 +387,8 @@ public class GroupCallDialog extends CallDialog {
             public void onSuccess(List<UserInfo> data) {
                 if (data.isEmpty()) return;
                 UserInfo userInfo = data.get(0);
-                view.sTips.setText(String.format(context.getString(io.openim.android.ouicore.R.string.who_talk), userInfo.getNickname()));
-                view.sAvatar.load(userInfo.getFaceURL());
+                floatViewBinding.sTips.setText(context.getString(io.openim.android.ouicore.R.string.meeting));
+                floatViewBinding.sAvatar.load(userInfo.getFaceURL(), true);
                 view.avatar.load(userInfo.getFaceURL());
 
                 memberAdapter.setItems(data);

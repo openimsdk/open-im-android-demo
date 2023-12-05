@@ -43,6 +43,7 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.UserLogic;
+import io.openim.android.ouimeeting.MeetingHomeActivity;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
@@ -74,12 +75,13 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     public void onBackPressed() {
         super.onBackPressed();
         try {
-            Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
-            LogisticsCenter.completion(postcard);
-            ActivityManager.finishActivity(postcard.getDestination());
-            EasyWindow.cancelAll();
-        } catch (Exception ignore) {
-        }
+            if (ActivityManager.getActivityStack().peek() instanceof  MeetingHomeActivity){
+                Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
+                LogisticsCenter.completion(postcard);
+                ActivityManager.finishActivity(postcard.getDestination());
+                EasyWindow.cancelAll();
+            }
+        } catch (Exception ignore) {}
     }
 
 

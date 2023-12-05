@@ -1,6 +1,8 @@
 package io.openim.android.ouicalling;
 
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 
 import android.content.res.AssetFileDescriptor;
@@ -19,12 +21,14 @@ import androidx.lifecycle.Observer;
 
 
 import com.hjq.permissions.Permission;
+import com.hjq.window.EasyWindow;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import io.openim.android.ouicalling.databinding.DialogCallBinding;
+import io.openim.android.ouicalling.databinding.LayoutFloatViewBinding;
 import io.openim.android.ouicalling.service.AudioVideoService;
 import io.openim.android.ouicalling.vm.CallingVM;
 import io.openim.android.ouicore.base.BaseApp;
@@ -51,12 +55,14 @@ import io.openim.android.sdk.models.UserInfo;
 
 public class CallDialog extends BaseDialog {
 
-    private final HasPermissions hasShoot, hasRecord, hasSystemAlert;
+    protected final HasPermissions hasShoot, hasRecord, hasSystemAlert;
     protected Context context;
     private DialogCallBinding view;
     public CallingVM callingVM;
     protected SignalingInfo signalingInfo;
 
+    protected EasyWindow easyWindow;
+    protected LayoutFloatViewBinding floatViewBinding;
 
     public CallDialog(@NonNull Context context, CallingService callingService) {
         this(context, callingService, false);
@@ -88,10 +94,11 @@ public class CallDialog extends BaseDialog {
     public void initRendererView() {
         callingVM.initLocalSpeakerVideoView(view.localSpeakerVideoView);
         callingVM.initRemoteVideoRenderer(view.remoteSpeakerVideoView,
-            view.remoteSpeakerVideoView2);
+            view.remoteSpeakerVideoView2,floatViewBinding.shrinkRemoteSpeakerVideoView);
     }
 
     private void initView() {
+        floatViewBinding=LayoutFloatViewBinding.inflate(getLayoutInflater());
         Window window = getWindow();
         view = DialogCallBinding.inflate(getLayoutInflater());
         window.requestFeature(Window.FEATURE_NO_TITLE);
@@ -116,18 +123,20 @@ public class CallDialog extends BaseDialog {
     }
 
 
-    //收起/展开
+    //    收起/展开
     public void shrink(boolean isShrink) {
         view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
         getWindow().setDimAmount(isShrink ? 0f : 1f);
-        view.shrink.setVisibility(isShrink ? View.VISIBLE : View.GONE);
-
-        view.waiting.setVisibility(callingVM.isVideoCalls ? View.GONE : View.VISIBLE);
-        if (callingVM.isStartCall && !callingVM.isVideoCalls) {
-            view.sTips.setText(io.openim.android.ouicore.R.string.calling);
-        } else {
-            view.sTips.setText(callingVM.isCallOut ?
-                context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
+        if (isShrink){
+            showFloatView();
+        }else if (null!=easyWindow){
+            easyWindow.cancel();
+        }
+        if (callingVM.isStartCall){
+            floatViewBinding.sTips.setText(io.openim.android.ouicore.R.string.calling);
+        }else {
+            floatViewBinding. sTips.setText(callingVM.isCallOut ? context.getString(
+                io.openim.android.ouicore.R.string.waiting_tips2) :
                 context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
         }
         WindowManager.LayoutParams params = getWindow().getAttributes();
@@ -137,6 +146,24 @@ public class CallDialog extends BaseDialog {
             ViewGroup.LayoutParams.MATCH_PARENT;
         params.gravity = isShrink ? (Gravity.TOP | Gravity.END) : Gravity.CENTER;
         getWindow().setAttributes(params);
+    }
+
+    protected void showFloatView() {
+        // 传入 Activity 对象表示设置成局部的，不需要有悬浮窗权限
+        // 传入 Application 对象表示设置成全局的，但需要有悬浮窗权限
+        if (null == easyWindow) {
+            easyWindow =
+                new EasyWindow<>(BaseApp.inst())
+                    .setContentView(floatViewBinding.getRoot())
+                    .setGravity(Gravity.END | Gravity.TOP)
+                    // 设置成可拖拽的
+                    .setDraggable()
+                    .setOnClickListener(floatViewBinding.shrink.getId(), (window, view) -> {
+                        shrink(false);
+                    });
+        }
+        if (!easyWindow.isShowing())
+            easyWindow.show();
     }
 
     public void bindData(SignalingInfo signalingInfo) {
@@ -190,8 +217,9 @@ public class CallDialog extends BaseDialog {
                     if (data.isEmpty()) return;
                     UserInfo userInfo = data.get(0);
                     view.avatar.load(userInfo.getFaceURL());
-                    view.sAvatar.load(userInfo.getFaceURL());
+                    floatViewBinding.sAvatar.load(userInfo.getFaceURL(),userInfo.getNickname());
                     view.name.setText(userInfo.getNickname());
+
                     //audio call
                     view.avatar2.load(userInfo.getFaceURL());
                     view.name2.setText(userInfo.getNickname());
@@ -214,9 +242,11 @@ public class CallDialog extends BaseDialog {
     public void listener(SignalingInfo signalingInfo) {
         callingVM.timeStr.observeForever(bindTime);
         view.closeCamera.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            boolean isEnabled = !isChecked;
-            callingVM.callViewModel.setCameraEnabled(isEnabled);
-            view.localSpeakerVideoView.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
+            hasShoot.safeGo(() -> {
+                boolean isEnabled = !isChecked;
+                callingVM.callViewModel.setCameraEnabled(isEnabled);
+                view.localSpeakerVideoView.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
+            });
         });
         view.switchCamera.setOnClickListener(v -> {
             callingVM.callViewModel.flipCamera();
@@ -258,24 +288,30 @@ public class CallDialog extends BaseDialog {
         view.answer.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                if (callingVM.isVideoCalls) {
-                    hasShoot.safeGo(() -> signalingAccept(signalingInfo));
-                } else {
-                    hasRecord.safeGo(() -> signalingAccept(signalingInfo));
-                }
+                answerClick(signalingInfo);
             }
         });
         view.zoomOut.setOnClickListener(v -> {
-            hasSystemAlert.safeGo(() -> {
-                shrink(true);
-            });
+            zoomOutClick();
         });
         view.shrink.setOnClickListener(v -> {
             shrink(false);
         });
     }
 
-    private void signalingAccept(SignalingInfo signalingInfo) {
+    public void zoomOutClick() {
+        hasSystemAlert.safeGo(() -> shrink(true));
+    }
+
+    public void answerClick(SignalingInfo signalingInfo) {
+        if (callingVM.isVideoCalls) {
+            hasShoot.safeGo(() -> signalingAccept(signalingInfo));
+        } else {
+            hasRecord.safeGo(() -> signalingAccept(signalingInfo));
+        }
+    }
+
+    public void signalingAccept(SignalingInfo signalingInfo) {
         callingVM.signalingAccept(signalingInfo, new OnBase() {
             @Override
             public void onError(int code, String error) {
@@ -296,6 +332,9 @@ public class CallDialog extends BaseDialog {
         view.headTips.setVisibility(View.GONE);
         view.ask.setVisibility(View.GONE);
         view.callingMenu.setVisibility(View.VISIBLE);
+        view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.VISIBLE : View.GONE);
+
+        waitingHandle();
     }
 
 
@@ -322,6 +361,10 @@ public class CallDialog extends BaseDialog {
     @Override
     public void dismiss() {
         try {
+            videoViewRelease();
+            if (null!=easyWindow){
+                easyWindow.cancel();
+            }
             insertChatHistory();
             MediaPlayerUtil.INSTANCE.pause();
             MediaPlayerUtil.INSTANCE.release();
@@ -334,6 +377,13 @@ public class CallDialog extends BaseDialog {
             e.printStackTrace();
         }
 
+    }
+
+    public void videoViewRelease() {
+        view.localSpeakerVideoView.release();
+        view.remoteSpeakerVideoView.release();
+        view.remoteSpeakerVideoView2.release();
+        floatViewBinding.shrinkRemoteSpeakerVideoView.release();
     }
 
     private void insertChatHistory() {
@@ -372,9 +422,24 @@ public class CallDialog extends BaseDialog {
         view.headTips.setVisibility(View.GONE);
         MediaPlayerUtil.INSTANCE.pause();
         MediaPlayerUtil.INSTANCE.release();
+
+        waitingHandle();
     }
 
     public String buildPrimaryKey() {
-        return callingVM.buildPrimaryKey(signalingInfo);
+        return CallingVM.buildPrimaryKey(signalingInfo);
+    }
+
+    private void waitingHandle() {
+        if (callingVM.isVideoCalls)
+            floatViewBinding.waiting.setVisibility(View.GONE);
+
+        if (callingVM.isStartCall){
+            floatViewBinding.sTips.setText(io.openim.android.ouicore.R.string.calling);
+        }else {
+            floatViewBinding. sTips.setText(callingVM.isCallOut ?
+                context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
+                context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
+        }
     }
 }

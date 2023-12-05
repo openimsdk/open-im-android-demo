@@ -14,9 +14,10 @@ import io.livekit.android.room.participant.ConnectionQuality
 import io.livekit.android.room.participant.LocalParticipant
 import io.livekit.android.room.participant.Participant
 import io.livekit.android.room.participant.RemoteParticipant
+import io.livekit.android.room.participant.VideoTrackPublishDefaults
 import io.livekit.android.room.track.*
+import io.livekit.android.room.track.video.ViewVisibility
 import io.livekit.android.util.flow
-import io.openim.android.ouicore.utils.L
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import livekit.LivekitRtc
@@ -29,20 +30,27 @@ class CallViewModel(
 ) : AndroidViewModel(application) {
     val room = LiveKit.create(
         appContext = application,
-        options = RoomOptions(adaptiveStream = true, dynacast = true),
+        options = RoomOptions(
+            adaptiveStream = true, dynacast = true,
+            videoTrackPublishDefaults = VideoTrackPublishDefaults(
+                videoCodec = VideoCodec.VP9.codecName
+            )
+        ),
     )
 
-    val participants = room::remoteParticipants.flow.map { remoteParticipants ->
+    val allParticipants = room::remoteParticipants.flow.map { remoteParticipants ->
         listOf<Participant>(room.localParticipant) + remoteParticipants.keys.sortedBy { it }.mapNotNull { remoteParticipants[it] }
     }
 
+    private val scopes = mutableListOf<CoroutineScope>()
     private val mutableError = MutableStateFlow<Throwable?>(null)
     val error = mutableError.hide()
 
     private val mutablePrimarySpeaker = MutableStateFlow<Participant?>(null)
     val primarySpeaker: StateFlow<Participant?> = mutablePrimarySpeaker
 
-    val activeSpeakers = room::activeSpeakers.flow
+    private val activeSpeakers = room::activeSpeakers.flow
+    val roomMetadata = room::metadata.flow
 
     private var localScreencastTrack: LocalScreencastVideoTrack? = null
 
@@ -69,7 +77,7 @@ class CallViewModel(
     init {
         viewModelScope.launch {
             launch {
-                combine(participants, activeSpeakers) { participants, speakers -> participants to speakers }.collect { (participantsList, speakers) ->
+                combine(allParticipants, activeSpeakers) { participants, speakers -> participants to speakers }.collect { (participantsList, speakers) ->
                     handlePrimarySpeaker(
                         participantsList, speakers, room
                     )
@@ -85,6 +93,7 @@ class CallViewModel(
                             val message = it.data.toString(Charsets.UTF_8)
                             mutableDataReceived.emit("$identity: $message")
                         }
+
                         else -> {}
                     }
                 }
@@ -150,29 +159,49 @@ class CallViewModel(
         mutablePrimarySpeaker.value = speaker
     }
 
-    suspend fun bindRemoteViewRenderer(viewRenderer: TextureViewRenderer, participant: Participant) {
+    suspend fun bindRemoteViewRenderer(
+        viewRenderer: TextureViewRenderer,
+        participant: Participant, scope: CoroutineScope
+    ) {
         // observe videoTracks changes.
         val videoTrackPubFlow = participant::videoTracks.flow.map { participant to it }.flatMapLatest { (participant, videoTracks) ->
             // Prioritize any screenshare streams.
-            val trackPublication = participant.getTrackPublication(Track.Source.SCREEN_SHARE) ?: participant.getTrackPublication(Track.Source.CAMERA)
-            ?: videoTracks.firstOrNull()?.first
+            val trackPublication = participant.getTrackPublication(Track.Source.SCREEN_SHARE)
+                ?: participant.getTrackPublication(Track.Source.CAMERA)
+                ?: videoTracks.firstOrNull()?.first
             flowOf(trackPublication)
         }
-        videoTrackPubFlow.flatMapLatest { pub ->
-            if (pub != null) {
-                pub::track.flow
-            } else {
-                flowOf(null)
-            }
-        }.collectLatest1 { videoTrack ->
-            val videoTrack = videoTrack as? VideoTrack
-            if (null != viewRenderer.tag) {
-                val lastTrack = viewRenderer.tag as VideoTrack
-                lastTrack.removeRenderer(viewRenderer);
-            }
-            if (null != videoTrack) {
-                viewRenderer.tag = videoTrack;
-                videoTrack.addRenderer(viewRenderer);
+        scope.launch {
+            videoTrackPubFlow.flatMapLatest { pub ->
+                if (pub != null) {
+                    pub::track.flow
+                } else {
+                    flowOf(null)
+                }
+            }.collectLatest1 { videoTrack ->
+                val videoTrack = videoTrack as? VideoTrack ?: return@collectLatest1
+
+//                if (null != viewRenderer.tag) {
+//                    val lastTrack = viewRenderer.tag as VideoTrack
+//                    lastTrack.removeRenderer(viewRenderer);
+//                }
+//                viewRenderer.tag = videoTrack
+//                videoTrack.addRenderer(viewRenderer)
+
+                if (null != viewRenderer.tag) {
+                    val lastTrack = viewRenderer.tag as VideoTrack
+                    if (videoTrack == lastTrack) return@collectLatest1
+                    lastTrack.removeRenderer(viewRenderer)
+                }
+                viewRenderer.tag = videoTrack
+                if (videoTrack is RemoteVideoTrack) {
+                    videoTrack.addRenderer(
+                        viewRenderer,
+                        ViewVisibility(viewRenderer.rootView)
+                    )
+                } else {
+                    videoTrack.addRenderer(viewRenderer)
+                }
             }
         }
     }
@@ -212,9 +241,12 @@ class CallViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        room.disconnect()
-        scopes.forEach { it.cancel() }
-        scopes.clear()
+        try {
+            scopes.forEach { it.cancel() }
+            scopes.clear()
+            room.disconnect()
+        } catch (_: Exception) {
+        }
     }
 
     fun setMicEnabled(enabled: Boolean) {
@@ -242,6 +274,7 @@ class CallViewModel(
 
         videoTrack.restartTrack(newOptions)
     }
+
     fun getActiveSpeakersFlow(): StateFlow<List<Participant>> {
         return room::activeSpeakers.flow
     }
@@ -249,9 +282,10 @@ class CallViewModel(
     fun dismissError() {
         mutableError.value = null
     }
-    private val scopes = mutableListOf<CoroutineScope>()
+
+
     fun buildScope(): CoroutineScope {
-        val scope = CoroutineScope(Dispatchers.Main);
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main);
         scopes.add(scope)
         return scope;
     }
@@ -266,12 +300,19 @@ class CallViewModel(
         flow: Flow<T>, function: (T) -> Any,
         scope: CoroutineScope = viewModelScope,
     ) {
+        scopes.add(scope)
         scope.launch {
             flow.collect {
                 function.invoke(it)
             }
         }
     }
+
+
+    fun getConnectionFlow(p: Participant): StateFlow<ConnectionQuality> {
+        return p::connectionQuality.flow
+    }
+
     fun sendData(message: String) {
         viewModelScope.launch {
             room.localParticipant.publishData(message.toByteArray(Charsets.UTF_8))
@@ -285,9 +326,7 @@ class CallViewModel(
 
     fun simulateMigration() {
         room.sendSimulateScenario(
-            LivekitRtc.SimulateScenario.newBuilder()
-                .setMigration(true)
-                .build()
+            LivekitRtc.SimulateScenario.newBuilder().setMigration(true).build()
         )
     }
 
@@ -298,8 +337,6 @@ class CallViewModel(
             connectToRoom(url, token)
         }
     }
-
-
 }
 
 private fun <T> LiveData<T>.hide(): LiveData<T> = this

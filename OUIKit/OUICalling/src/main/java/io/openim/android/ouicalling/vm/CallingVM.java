@@ -35,8 +35,10 @@ import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
+import kotlinx.coroutines.CoroutineScope;
 
 public class CallingVM {
+    private final CoroutineScope scope;
     //通话时间
     private Timer timer;
     private int second = 0;
@@ -62,11 +64,13 @@ public class CallingVM {
     private List<TextureViewRenderer> remoteSpeakerVideoViews, localSpeakerVideoViews;
 
 
+
     public CallingVM(CallingService callingService, boolean isCallOut) {
         this.callingService = callingService;
         this.isCallOut = isCallOut;
 
         callViewModel = new CallViewModel(BaseApp.inst());
+        scope=callViewModel.buildScope();
         audioManager = (AudioManager) BaseApp.inst().getSystemService(Context.AUDIO_SERVICE);
     }
 
@@ -158,7 +162,7 @@ public class CallingVM {
                         localVideoTrack.addRenderer(localSpeakerVideoView);
                     }
                 }
-                callViewModel.subscribe(callViewModel.getParticipants(), (v) -> {
+                callViewModel.subscribe(callViewModel.getAllParticipants(), (v) -> {
                     if (v.isEmpty()) return null;
                     if (null != onParticipantsChangeListener) {
                         onParticipantsChangeListener.onChange(v);
@@ -169,7 +173,7 @@ public class CallingVM {
                                 for (TextureViewRenderer remoteSpeakerVideoView :
                                     remoteSpeakerVideoViews) {
                                     callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoView,
-                                        participant, new Continuation<Unit>() {
+                                        participant, scope,new Continuation<Unit>() {
                                             @NonNull
                                             @Override
                                             public CoroutineContext getContext() {
@@ -178,7 +182,6 @@ public class CallingVM {
 
                                             @Override
                                             public void resumeWith(@NonNull Object o) {
-                                                L.e("");
                                             }
                                         });
                                 }
@@ -187,7 +190,7 @@ public class CallingVM {
                     }
 
                     return null;
-                }, callViewModel.buildScope());
+                },scope );
             }
         });
     }

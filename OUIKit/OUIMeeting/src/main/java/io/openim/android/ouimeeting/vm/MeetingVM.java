@@ -228,13 +228,15 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
                 Common.UIHandler.post(() -> {
                     buildTimer();
                     fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
-                    VideoTrack localVideoTrack =
-                        callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
+                    try {
+                        VideoTrack localVideoTrack =
+                            callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
 
-                    //  callViewModel.setCameraEnabled(false);
-                    callViewModel.setCameraEnabled(!roomMetadata.getValue().joinDisableVideo);
-                    callViewModel.setMicEnabled(!roomMetadata.getValue().joinDisableMicrophone);
-                    getIView().connectRoomSuccess(localVideoTrack);
+                        //  callViewModel.setCameraEnabled(false);
+                        callViewModel.setCameraEnabled(!roomMetadata.val().joinDisableVideo);
+                        callViewModel.setMicEnabled(!roomMetadata.val().joinDisableMicrophone);
+                        getIView().connectRoomSuccess(localVideoTrack);
+                    }catch (Exception ignore){}
                 });
             }
         });

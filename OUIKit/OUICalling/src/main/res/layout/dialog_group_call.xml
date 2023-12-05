@@ -47,12 +47,13 @@
 
                     <CheckBox
                         android:id="@+id/closeCamera"
-                        android:layout_width="26dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="10dp"
                         android:background="@drawable/selector_camera"
                         android:button="@null"
-                        android:padding="5dp" />
+                        android:padding="5dp"
+                        />
 
                     <CheckBox
                         android:id="@+id/switchCamera"
