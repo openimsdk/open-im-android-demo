@@ -9,7 +9,7 @@ public class Constant {
 
 //    public static final String DEFAULT_HOST = "test-web.rentsoft.cn";//43
 //    public static final String DEFAULT_HOST = "web.rentsoft.cn";//121
-    public static final String DEFAULT_HOST = "14.29.213.197";
+    public static final String DEFAULT_HOST = "150.109.93.151";
 
     //登录注册手机验 证服务器地址
     private static final String APP_AUTH_URL = "https://" + DEFAULT_HOST + "/chat/";
