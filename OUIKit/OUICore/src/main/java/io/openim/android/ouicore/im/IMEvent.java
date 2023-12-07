@@ -259,7 +259,6 @@ public class IMEvent {
 
     //连接事件
     public OnConnListener connListener = new OnConnListener() {
-        private UserLogic userLogic = Easy.find(UserLogic.class);
 
         @Override
         public void onConnectFailed(long code, String error) {
@@ -458,15 +457,14 @@ public class IMEvent {
         });
     }
 
-    private void promptSoundOrNotification(Message msg) {
+    public void promptSoundOrNotification(Message msg) {
         if (BaseApp.inst().loginCertificate.globalRecvMsgOpt == 2
             || msg.getContentType() == MessageType.TYPING ||
             Objects.equals(msg.getSendID(), BaseApp.inst().loginCertificate.userID)) return;
         try {
             if (Easy.find(UserLogic.class).connectStatus.val()
                 == UserLogic.ConnectStatus.SYNCING) return;
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
 
         String sourceID = msg.getSessionType() == ConversationType.SINGLE_CHAT
             ? msg.getSendID() : msg.getGroupID();

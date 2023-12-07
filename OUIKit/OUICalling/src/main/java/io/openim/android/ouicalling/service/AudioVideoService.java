@@ -15,6 +15,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.LoginCertificate;
+import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.L;
@@ -22,6 +23,8 @@ import io.openim.android.ouicore.utils.NotificationUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.listener.OnListenerForService;
+import io.openim.android.sdk.models.Message;
 import p3dn6v.h4wm1s.k2ro8t.W3mI6o;
 
 public class AudioVideoService extends W3mI6o {
@@ -73,7 +76,13 @@ public class AudioVideoService extends W3mI6o {
         });
     }
     private void addListener() {
-        OpenIMClient.getInstance().signalingManager.setSignalingListener(callingService);
+        OpenIMClient.getInstance().signalingManager.setOnListenerForService(callingService);
+//        OpenIMClient.getInstance().setOnListenerForService(new OnListenerForService() {
+//            @Override
+//            public void onRecvNewMessage(Message msg) {
+//                IMEvent.getInstance().promptSoundOrNotification(msg);
+//            }
+//        });
     }
 
     public void loginOpenIM(OnBase<String> stringOnBase) {

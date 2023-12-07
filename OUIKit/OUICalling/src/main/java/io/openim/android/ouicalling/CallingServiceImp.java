@@ -183,7 +183,7 @@ public class CallingServiceImp implements CallingService {
 
                 NotificationUtil.sendNotify(A_NOTIFY_ID, notification);
             } else {
-                buildCallDialog(ActivityManager.getActivityStack().peek(), null,
+                buildCallDialog(BaseApp.inst(), null,
                     false).show();
             }
         }

@@ -29,7 +29,7 @@ public class BaseApp extends Application {
 
     private static BaseApp instance;
     public Realm realm;
-    public State<Boolean> isAppBackground = new State<>(false);
+    public State<Boolean> isAppBackground = new State<>(true);
     private int mActivityCount;
 
     public static BaseApp inst() {
