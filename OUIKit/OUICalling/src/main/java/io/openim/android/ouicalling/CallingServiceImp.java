@@ -176,6 +176,7 @@ public class CallingServiceImp implements CallingService {
                 Notification notification =
                     NotificationUtil.builder(NotificationUtil.CALL_CHANNEL_ID)
                         .setPriority(Notification.PRIORITY_MAX)
+                        .setCategory(Notification.CATEGORY_CALL)
                         .setContentTitle("OpenIM")
                         .setContentText(context.getString(io.openim.android.ouicore.R.string.receive_call_invite))
                         .setAutoCancel(true)

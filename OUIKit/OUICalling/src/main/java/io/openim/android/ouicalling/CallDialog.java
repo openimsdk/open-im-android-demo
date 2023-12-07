@@ -125,13 +125,14 @@ public class CallDialog extends BaseDialog {
 
     //    收起/展开
     public void shrink(boolean isShrink) {
-        view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
-        getWindow().setDimAmount(isShrink ? 0f : 1f);
         if (isShrink){
             showFloatView();
         }else if (null!=easyWindow){
             easyWindow.cancel();
         }
+        view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
+        getWindow().setDimAmount(isShrink ? 0f : 1f);
+
         if (callingVM.isStartCall){
             floatViewBinding.sTips.setText(io.openim.android.ouicore.R.string.calling);
         }else {
@@ -157,10 +158,8 @@ public class CallDialog extends BaseDialog {
                     .setContentView(floatViewBinding.getRoot())
                     .setGravity(Gravity.END | Gravity.TOP)
                     // 设置成可拖拽的
-                    .setDraggable()
-                    .setOnClickListener(floatViewBinding.shrink.getId(), (window, view) -> {
-                        shrink(false);
-                    });
+                    .setDraggable();
+            floatViewBinding.shrink.setOnClickListener(v -> shrink(false));
         }
         if (!easyWindow.isShowing())
             easyWindow.show();
