@@ -48,6 +48,7 @@ public class NotificationUtil {
         String CHANNEL_NAME = BaseApp.inst().getString(io.openim.android.ouicore.R.string.audio_video_service);
         NotificationChannel notificationChannel = new NotificationChannel(RESIDENT_SERVICE,
             CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
+        notificationChannel.setShowBadge(false);
         manager.createNotificationChannel(notificationChannel);
     }
 

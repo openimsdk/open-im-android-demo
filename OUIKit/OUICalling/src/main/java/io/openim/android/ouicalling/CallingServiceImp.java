@@ -164,13 +164,12 @@ public class CallingServiceImp implements CallingService {
                 Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
                 LogisticsCenter.completion(postcard);
                 hangIntent = new Intent(context, postcard.getDestination())
-                    .putExtra(Constant.IS_CALL, true)
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                 MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), R.raw.incoming_call_ring);
                 MediaPlayerUtil.INSTANCE.loopPlay();
 
-                PendingIntent hangPendingIntent = PendingIntent.getActivity(context, 1002,
+                PendingIntent hangPendingIntent = PendingIntent.getActivity(context, 1,
                     hangIntent
                     , PendingIntent.FLAG_MUTABLE);
 
@@ -179,11 +178,21 @@ public class CallingServiceImp implements CallingService {
                         .setPriority(Notification.PRIORITY_MAX)
                         .setContentTitle("OpenIM")
                         .setContentText(context.getString(io.openim.android.ouicore.R.string.receive_call_invite))
-                        .setAutoCancel(true).setOngoing(true).setContentIntent(hangPendingIntent).setCustomHeadsUpContentView(new RemoteViews(BaseApp.inst().getPackageName(), R.layout.layout_call_invite)).build();
+                        .setAutoCancel(true)
+                        .setOngoing(true)
+                        .setFullScreenIntent(hangPendingIntent, true)
+                        .setContentIntent(hangPendingIntent)
+                        .setCustomHeadsUpContentView(new RemoteViews(BaseApp.inst().getPackageName(),
+                            R.layout.layout_call_invite)).build();
 
                 NotificationUtil.sendNotify(A_NOTIFY_ID, notification);
             } else {
-                buildCallDialog(BaseApp.inst(), null,
+                Context ctx;
+                if (ActivityManager.getActivityStack().isEmpty())
+                    ctx = BaseApp.inst();
+                else
+                    ctx = ActivityManager.getActivityStack().peek();
+                buildCallDialog(ctx, null,
                     false).show();
             }
         }

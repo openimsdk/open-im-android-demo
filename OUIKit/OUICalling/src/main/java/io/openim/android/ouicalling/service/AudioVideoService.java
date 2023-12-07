@@ -44,6 +44,7 @@ public class AudioVideoService extends W3mI6o {
             .setContentTitle(getString(io.openim.android.ouicore.R.string.audio_video_service_tips1))
             .setContentText(getString(io.openim.android.ouicore.R.string.audio_video_service_tips2))
             .setSmallIcon(W3mI6o.mid)
+
             .setContentIntent(hangPendingIntent).build();
         startForeground(NOTIFY_ID, notification);
     }
