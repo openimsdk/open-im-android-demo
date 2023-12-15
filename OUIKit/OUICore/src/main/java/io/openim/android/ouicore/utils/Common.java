@@ -74,9 +74,9 @@ public class Common {
      */
     public final static Handler UIHandler = new Handler(Looper.getMainLooper());
 
+
     public static boolean hasSystemAlertWindow() {
-        return new HasPermissions(BaseApp.inst(), Permission.SYSTEM_ALERT_WINDOW)
-            .isAllGranted();
+        return new HasPermissions(BaseApp.inst(), Permission.SYSTEM_ALERT_WINDOW).isAllGranted();
     }
 
     public static void addTypeSystemAlert(WindowManager.LayoutParams params) {
@@ -380,11 +380,7 @@ public class Common {
      * @param v
      */
     public static void toMap(Message message, View v) {
-        v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class)
-            .putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord="
-                + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude()
-                + "&referer=" + WebViewActivity.mapAppKey)
-            .putExtra(WebViewActivity.TITLE, v.getContext().getString(R.string.location)));
+        v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord=" + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey).putExtra(WebViewActivity.TITLE, v.getContext().getString(R.string.location)));
     }
 
     /***
@@ -449,12 +445,7 @@ public class Common {
             badgeView.setBadgeNumber(badgeNumber);
             return;
         }
-        target.setTag(new QBadgeView(context)
-            .bindTarget(target)
-            .setGravityOffset(10, -2, true)
-            .setBadgeNumber(badgeNumber)
-            .setBadgeTextSize(8, true)
-            .setShowShadow(false));
+        target.setTag(new QBadgeView(context).bindTarget(target).setGravityOffset(10, -2, true).setBadgeNumber(badgeNumber).setBadgeTextSize(8, true).setShowShadow(false));
     }
 
     public static String containsLink(String text) {
