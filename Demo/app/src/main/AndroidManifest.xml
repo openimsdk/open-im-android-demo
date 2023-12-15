@@ -9,7 +9,7 @@
         </intent>
     </queries>
 
-    <!--hardwareAccelerated=false livekit 会出问题    android:hardwareAccelerated="false"-->
+    <!--hardwareAccelerated=false livekit 会出问题 -->
     <application
         android:name=".DemoApplication"
         android:allowBackup="true"

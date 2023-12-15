@@ -92,7 +92,7 @@ import io.openim.android.sdk.models.UsersOnlineStatus;
 import io.openim.android.sdk.models.VideoElem;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener,
-    OnGroupListener, OnConversationListener, java.util.Observer, OnSignalingListener,
+    OnGroupListener, OnConversationListener,  OnSignalingListener,
     OnUserListener {
 
     public static final String REEDIT_MSG = "reeditMsg";
@@ -290,44 +290,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     @Override
-    public void onGroupApplicationAccepted(GroupApplicationInfo info) {
-
-    }
-
-    @Override
-    public void onGroupApplicationAdded(GroupApplicationInfo info) {
-
-    }
-
-    @Override
-    public void onGroupApplicationDeleted(GroupApplicationInfo info) {
-
-    }
-
-    @Override
-    public void onGroupApplicationRejected(GroupApplicationInfo info) {
-
-    }
-
-    @Override
-    public void onGroupDismissed(GroupInfo info) {
-
-    }
-
-    @Override
     public void onGroupInfoChanged(GroupInfo info) {
         if (info.getGroupID().equals(groupID)) groupInfo.setValue(info);
     }
 
-    @Override
-    public void onGroupMemberAdded(GroupMembersInfo info) {
-
-    }
-
-    @Override
-    public void onGroupMemberDeleted(GroupMembersInfo info) {
-
-    }
 
     @Override
     public void onGroupMemberInfoChanged(GroupMembersInfo info) {
@@ -335,16 +301,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             isAdminOrCreator = info.getRoleLevel() != GroupRole.MEMBER;
             memberInfo.setValue(info);
         }
-    }
-
-    @Override
-    public void onJoinedGroupAdded(GroupInfo info) {
-
-    }
-
-    @Override
-    public void onJoinedGroupDeleted(GroupInfo info) {
-
     }
 
     @Override
@@ -356,31 +312,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
         } catch (Exception ignored) {
         }
-    }
-
-    @Override
-    public void onNewConversation(List<ConversationInfo> list) {
-
-    }
-
-    @Override
-    public void onSyncServerFailed() {
-
-    }
-
-    @Override
-    public void onSyncServerFinish() {
-
-    }
-
-    @Override
-    public void onSyncServerStart() {
-
-    }
-
-    @Override
-    public void onTotalUnreadMessageCountChanged(int i) {
-
     }
 
     /**
@@ -443,51 +374,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     @Override
-    public void update(Observable o, Object arg) {
-
-    }
-
-    @Override
-    public void onInvitationCancelled(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInvitationTimeout(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeAccepted(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeAcceptedByOtherDevice(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeRejected(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeRejectedByOtherDevice(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onReceiveNewInvitation(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onHangup(SignalingInfo s) {
-
-    }
-
-    @Override
     public void onRoomParticipantConnected(RoomCallingInfo s) {
         if (groupID.equals(s.getGroupID())) {
             roomCallingInfo.setValue(s);
@@ -501,20 +387,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }
     }
 
-    @Override
-    public void onMeetingStreamChanged(MeetingStreamEvent e) {
-
-    }
-
-    @Override
-    public void onReceiveCustomSignal(CustomSignalingInfo s) {
-
-    }
-
-    @Override
-    public void onStreamChange(String s) {
-
-    }
 
     public String getRoomCallingInfoRoomID() {
         String roomID = "";
@@ -534,10 +406,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         subject(REEDIT_MSG, content);
     }
 
-    @Override
-    public void onSelfInfoUpdated(UserInfo info) {
-
-    }
 
     @Override
     public void onUserStatusChanged(UsersOnlineStatus onlineStatus) {
@@ -545,7 +413,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             userOnlineStatusListener.onResult(onlineStatus);
         }
     }
-
 
     public interface UserOnlineStatusListener {
         void onResult(UsersOnlineStatus onlineStatus);
@@ -612,8 +479,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private void loadHistory() {
         //加载消息记录
-        if (fromChatHistory) loadHistoryMessageReverse();
-        else loadHistoryMessage();
+        if (fromChatHistory)
+            loadHistoryMessageReverse();
+        else
+            loadHistoryMessage();
     }
 
     @Override
@@ -944,32 +813,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
         } catch (Exception ignored) {
         }
-    }
-
-
-    @Override
-    public void onRecvMessageExtensionsChanged(String msgID, List<KeyValue> list) {
-
-    }
-
-    @Override
-    public void onRecvMessageExtensionsDeleted(String msgID, List<String> list) {
-
-    }
-
-    @Override
-    public void onRecvMessageExtensionsAdded(String msgID, List<KeyValue> list) {
-
-    }
-
-    @Override
-    public void onMsgDeleted(Message message) {
-
-    }
-
-    @Override
-    public void onRecvOfflineNewMessage(List<Message> msg) {
-
     }
 
 
