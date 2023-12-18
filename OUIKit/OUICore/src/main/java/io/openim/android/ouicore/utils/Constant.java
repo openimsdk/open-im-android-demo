@@ -9,8 +9,7 @@ public class Constant {
 
 //    public static final String DEFAULT_HOST = "test-web.rentsoft.cn";//43
 //    public static final String DEFAULT_HOST = "web.rentsoft.cn";//121
-    public static final String DEFAULT_HOST = "14.29.213.197";
-//    public static final String DEFAULT_HOST = "203.56.175.233";
+    public static final String DEFAULT_HOST = "150.109.93.151";
 
     //登录注册手机验 证服务器地址
     private static final String APP_AUTH_URL = "https://" + DEFAULT_HOST + "/chat/";
@@ -20,9 +19,9 @@ public class Constant {
     private static final String IM_WS_URL = "wss://" + DEFAULT_HOST + "/msg_gateway";
 
     //--------IP----------
-    private static final String APP_AUTH = "http://" + DEFAULT_HOST + ":50008/";
-    private static final String IM_API = "http://" + DEFAULT_HOST + ":50002";
-    private static final String IM_WS = "ws://" + DEFAULT_HOST + ":50001";
+    private static final String APP_AUTH = "http://" + DEFAULT_HOST + ":10008/";
+    private static final String IM_API = "http://" + DEFAULT_HOST + ":10002";
+    private static final String IM_WS = "ws://" + DEFAULT_HOST + ":10001";
     //--------------------
 
     public static boolean getIsIp() {
@@ -108,10 +107,10 @@ public class Constant {
     public static final String K_RESULT2 = "result2";
     public static final String K_FROM = "from";
     public static final String K_SIZE = "size";
-    public static final String NOTICE_TAG = "msg_notification";
     //语言
     public static final String K_LANGUAGE_SP = "language_sp";
-
+    //上一次登录类型 0手机号 1邮箱
+    public static final String K_LOGIN_TYPE = "k_login_type";
     //最大通话人数
     public static final int MAX_CALL_NUM = 9;
     //好友红点

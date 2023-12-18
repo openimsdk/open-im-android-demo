@@ -17,13 +17,11 @@ import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.hjq.permissions.Permission;
 import com.hjq.window.EasyWindow;
 import com.igexin.sdk.PushManager;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
-import io.openim.android.demo.ui.ServerConfigActivity;
 import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.demo.ui.user.PersonalFragment;
 import io.openim.android.demo.vm.LoginVM;
@@ -39,11 +37,8 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.UserLogic;
-import io.openim.android.ouimeeting.MeetingHomeActivity;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
@@ -75,9 +70,9 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     public void onBackPressed() {
         super.onBackPressed();
         try {
-            if (ActivityManager.getActivityStack().peek() instanceof  MeetingHomeActivity){
-                Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
-                LogisticsCenter.completion(postcard);
+            Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
+            LogisticsCenter.completion(postcard);
+            if (ActivityManager.getActivityStack().peek().getClass() == postcard.getDestination()){
                 ActivityManager.finishActivity(postcard.getDestination());
                 EasyWindow.cancelAll();
             }

@@ -6,6 +6,7 @@
         <variable
             name="loginVM"
             type="io.openim.android.demo.vm.LoginVM" />
+        <import type="android.view.View"/>
     </data>
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -25,8 +26,8 @@
                 android:background="@drawable/sty_radius_6_stroke_e6e6e6"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingLeft="10dp"
-                android:paddingRight="5dp">
+                android:paddingRight="5dp"
+                >
 
 
                 <com.hbb20.CountryCodePicker
@@ -36,14 +37,21 @@
                     android:textColor="#ff0c1c33"
                     android:textSize="17sp"
                     android:textStyle="bold"
+                    android:layout_marginLeft="10dp"
                     app:ccp_autoDetectCountry="true"
                     app:ccp_defaultNameCode="CN"
                     app:ccp_showFlag="false"
+                    android:visibility="@{loginVM.isPhone?View.VISIBLE:View.GONE}"
                     app:ccp_showFullName="false"
                     app:ccp_showNameCode="false" />
 
 
-                <include layout="@layout/view_dividing_line_verticle" />
+                <View xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/divider"
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:visibility="@{loginVM.isPhone?View.VISIBLE:View.GONE}"
+                    android:background="@color/txt_grey"/>
 
                 <EditText
                     android:id="@+id/edt1"
@@ -90,6 +98,7 @@
                     android:layout_width="0dp"
                     android:layout_height="45dp"
                     android:layout_weight="1"
+                    android:layout_marginLeft="5dp"
                     android:background="@android:color/transparent"
                     android:hint="@string/input_password"
                     android:inputType="textPassword"

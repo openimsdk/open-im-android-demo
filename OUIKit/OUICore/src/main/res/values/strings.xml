@@ -522,4 +522,12 @@
     <string name="receive_call_invite">你收到了通话邀请...</string>
     <string name="upload_success">上传成功</string>
     <string name="no_blacklist">暂无黑名单</string>
+    <string name="email_login">邮箱登录</string>
+    <string name="phone_login">手机号登录</string>
+    <string name="upload_err_log">上传错误日志</string>
+    <string name="soon_register">立即注册</string>
+    <string name="email_register">邮箱注册</string>
+    <string name="forgot_pasword_by_phone">通过手机号</string>
+    <string name="forgot_pasword_by_email">通过邮箱</string>
+
 </resources>
