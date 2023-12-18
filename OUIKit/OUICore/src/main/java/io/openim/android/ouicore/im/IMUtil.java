@@ -79,10 +79,12 @@ import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.enums.GroupAtType;
 import io.openim.android.sdk.enums.LoginStatus;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.AtUserInfo;
+import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotificationElem;
@@ -431,8 +433,8 @@ public class IMUtil {
                 choice.name = transferredGroupNotification.newGroupOwner.getNickname();
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(),
-                    transferredGroupNotification.opUser.getNickname(),
-                    transferredGroupNotification.opUser.getUserID(), txt),
+                        transferredGroupNotification.opUser.getNickname(),
+                        transferredGroupNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -472,8 +474,8 @@ public class IMUtil {
                 choice.name = memberNotification.mutedUser.getNickname();
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(),
-                    memberNotification.opUser.getNickname(),
-                    memberNotification.opUser.getUserID(), txt),
+                        memberNotification.opUser.getNickname(),
+                        memberNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -537,6 +539,7 @@ public class IMUtil {
         msgExpand.tips = tips;
     }
 
+
     public static CharSequence twoPeopleRevoker(Message msg, RevokedInfo revokedInfo, String txt) {
         List<MultipleChoice> choices = new ArrayList<>();
         MultipleChoice choice = new MultipleChoice(revokedInfo.getRevokerID());
@@ -564,11 +567,11 @@ public class IMUtil {
         for (MultipleChoice choice : choices) {
             buildClickAndColorSpannable((SpannableStringBuilder) sequence, choice.name,
                 new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    toPersonDetail(choice.key, choice.groupId);
-                }
-            });
+                    @Override
+                    public void onClick(@NonNull View widget) {
+                        toPersonDetail(choice.key, choice.groupId);
+                    }
+                });
         }
         return sequence;
     }
@@ -586,11 +589,11 @@ public class IMUtil {
                                                  String txt) {
         return buildClickAndColorSpannable(new SpannableStringBuilder(txt), nickName,
             new ClickableSpan() {
-            @Override
-            public void onClick(@NonNull View widget) {
-                toPersonDetail(uid, groupId);
-            }
-        });
+                @Override
+                public void onClick(@NonNull View widget) {
+                    toPersonDetail(uid, groupId);
+                }
+            });
     }
 
     private static void toPersonDetail(String uid, String groupId) {
@@ -641,10 +644,11 @@ public class IMUtil {
 
         return spannableString;
     }
+
     /**
      * 存储草稿
      */
-    public static  void cacheDraft(String inputMsg,String conversationID) {
+    public static void cacheDraft(String inputMsg, String conversationID) {
         String cacheKey = conversationID + "_draft";
         if (TextUtils.isEmpty(inputMsg)) {
             SharedPreferencesUtil.remove(BaseApp.inst(), cacheKey);
@@ -661,19 +665,23 @@ public class IMUtil {
         return SharedPreferencesUtil.get(BaseApp.inst()).getString(cacheKey);
     }
 
+    public static CharSequence getMsgParse(Message msg){
+        return getMsgParse(msg,false);
+    }
     /**
      * 解析消息内容
      *
      * @param msg
      * @return
      */
-    public static CharSequence getMsgParse(Message msg) {
+    public static CharSequence getMsgParse(Message msg,boolean isShowSenderNickname) {
         MsgExpand msgExpand = (MsgExpand) msg.getExt();
-        CharSequence lastMsg = msg.getSenderNickname() + ": ";
+        CharSequence lastMsg = isShowSenderNickname?msg.getSenderNickname() + ": ":"";
         try {
             switch (msg.getContentType()) {
                 default:
-                    if (!TextUtils.isEmpty(msgExpand.tips)) lastMsg = msgExpand.tips.toString();
+                    if (!TextUtils.isEmpty(msgExpand.tips))
+                        lastMsg = msgExpand.tips.toString();
                     break;
 
                 case MessageType.TEXT:
@@ -696,19 +704,10 @@ public class IMUtil {
                     break;
                 case MessageType.AT_TEXT:
                     String atTxt = msgExpand.atMsgInfo.text;
-                    String tar = "";
                     for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
-                        if (atUsersInfo.getAtUserID().equals(BaseApp.inst().loginCertificate.userID)) {
-                            tar = "[" + BaseApp.inst().getString(R.string.a_person_at_you) + "]";
-                        }
                         atTxt = atTxt.replace("@" + atUsersInfo.getAtUserID(), atSelf(atUsersInfo));
                     }
-                    if (!tar.isEmpty()) {
-                        atTxt = tar + atTxt;
-                        lastMsg =
-                            IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(atTxt),
-                                tar, R.color.theme, null);
-                    } else lastMsg += atTxt;
+                    lastMsg += atTxt;
                     break;
 
                 case MessageType.MERGER:
@@ -740,6 +739,35 @@ public class IMUtil {
                     lastMsg += "[" + BaseApp.inst().getString(R.string.video_meeting) + "]";
                     break;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lastMsg;
+    }
+
+    /// 会话前缀标签
+    public static CharSequence getPrefixTag(CharSequence lastMsg, ConversationInfo info) {
+        String prefix = "";
+        try {
+
+            switch (info.getGroupAtType()) {
+                case GroupAtType.AT_ALL:
+                    prefix = "[" + BaseApp.inst().getString(R.string.at_all) + "]";
+                    break;
+                case GroupAtType.AT_ALL_AT_ME:
+                    prefix = "[" + BaseApp.inst().getString(R.string.at_all_at_me) + "]";
+                    break;
+                case GroupAtType.AT_ME:
+                    prefix = "[" + BaseApp.inst().getString(R.string.a_person_at_you) + "]";
+                    break;
+                case GroupAtType.GROUP_NOTIFICATION:
+                    prefix = "[" + BaseApp.inst().getString(R.string.group_bulletin) + "]";
+                    break;
+            }
+            if (TextUtils.isEmpty(prefix)) return prefix;
+            lastMsg =
+                IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(prefix + lastMsg),
+                    prefix, R.color.theme, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -842,15 +870,8 @@ public class IMUtil {
         PendingIntent hangPendingIntent = PendingIntent.getActivity(BaseApp.inst(), 1002,
             hangIntent, PendingIntent.FLAG_MUTABLE);
 
-        NotificationUtil.sendNotify(id, NotificationUtil.builder(NotificationUtil.MSG_NOTIFICATION)
-            .setContentTitle(BaseApp.inst().getString(R.string.app_name))
-            .setContentText(BaseApp.inst().getString(R.string.a_message_is_received))
-            .setSmallIcon(R.mipmap.ic_logo)
-            .setContentIntent(hangPendingIntent)
-            .setAutoCancel(true)
-            .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
-            .setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring))
-            .build());
+        NotificationUtil.sendNotify(id,
+            NotificationUtil.builder(NotificationUtil.MSG_NOTIFICATION).setContentTitle(BaseApp.inst().getString(R.string.app_name)).setContentText(BaseApp.inst().getString(R.string.a_message_is_received)).setSmallIcon(R.mipmap.ic_logo).setContentIntent(hangPendingIntent).setAutoCancel(true).setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE).setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring)).build());
     }
 
     //播放提示音

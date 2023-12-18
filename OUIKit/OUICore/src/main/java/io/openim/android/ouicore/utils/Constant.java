@@ -9,7 +9,7 @@ public class Constant {
 
 //    public static final String DEFAULT_HOST = "test-web.rentsoft.cn";//43
 //    public static final String DEFAULT_HOST = "web.rentsoft.cn";//121
-    public static final String DEFAULT_HOST = "150.109.93.151";
+    public static final String DEFAULT_HOST = "14.29.213.197";
 
     //登录注册手机验 证服务器地址
     private static final String APP_AUTH_URL = "https://" + DEFAULT_HOST + "/chat/";
@@ -19,9 +19,9 @@ public class Constant {
     private static final String IM_WS_URL = "wss://" + DEFAULT_HOST + "/msg_gateway";
 
     //--------IP----------
-    private static final String APP_AUTH = "http://" + DEFAULT_HOST + ":10008/";
-    private static final String IM_API = "http://" + DEFAULT_HOST + ":10002";
-    private static final String IM_WS = "ws://" + DEFAULT_HOST + ":10001";
+    private static final String APP_AUTH = "http://" + DEFAULT_HOST + ":50008/";
+    private static final String IM_API = "http://" + DEFAULT_HOST + ":50002";
+    private static final String IM_WS = "ws://" + DEFAULT_HOST + ":50001";
     //--------------------
 
     public static boolean getIsIp() {

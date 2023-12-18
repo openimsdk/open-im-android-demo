@@ -363,7 +363,6 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
                         itemClickListener.onItemClick(v, index);
                 }
             });
-
             MsgConversation msgConversation = conversationInfos.get(position);
             boolean isGroup =
                 msgConversation.conversationInfo.getConversationType() != ConversationType.SINGLE_CHAT;

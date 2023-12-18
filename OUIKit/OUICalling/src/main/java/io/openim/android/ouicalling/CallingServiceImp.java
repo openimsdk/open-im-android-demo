@@ -61,12 +61,12 @@ public class CallingServiceImp implements CallingService {
 
     @Override
     public void startAudioVideoService(Context base) {
-        G5qU0x.q7r8s9t0(base);
+//        G5qU0x.q7r8s9t0(base);
     }
 
     @Override
     public void stopAudioVideoService(Context base) {
-        G5qU0x.u1v2w3x4(base);
+//        G5qU0x.u1v2w3x4(base);
     }
 
     @Override
