@@ -7,7 +7,6 @@ import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.entity.UserList;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
@@ -37,21 +37,21 @@ import io.openim.android.sdk.models.SearchResultItem;
 import io.openim.android.sdk.models.UserInfo;
 
 public class SearchVM extends BaseViewModel {
-    public MutableLiveData<List<SearchResultItem>> messageItems =
-        new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<List<SearchResultItem>> fileItems =
-        new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<List<GroupInfo>> groupsInfo = new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<List<UserInfo>> userInfo = new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<List<FriendshipInfo>> friendshipInfo =
-        new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<List<GroupMembersInfo>> groupMembersInfo =
-        new MutableLiveData<>(new ArrayList<>());
+    public State<List<SearchResultItem>> messageItems =
+        new State<>(new ArrayList<>());
+    public State<List<SearchResultItem>> fileItems =
+        new State<>(new ArrayList<>());
+    public State<List<GroupInfo>> groupsInfo = new State<>(new ArrayList<>());
+    public State<List<UserInfo>> userInfo = new State<>(new ArrayList<>());
+    public State<List<FriendshipInfo>> friendshipInfo =
+        new State<>(new ArrayList<>());
+    public State<List<GroupMembersInfo>> groupMembersInfo =
+        new State<>(new ArrayList<>());
 
-    public MutableLiveData<String> hail = new MutableLiveData<>();
-    public MutableLiveData<String> remark = new MutableLiveData<>();
+    public State<String> hail = new State<>();
+    public State<String> remark = new State<>();
     //用户 或群组id
-    public MutableLiveData<String> searchContent = new MutableLiveData<>("");
+    public State<String> searchContent = new State<>("");
 
     //true 搜索人 false 搜索群
     public boolean isPerson = false;
@@ -265,7 +265,7 @@ public class SearchVM extends BaseViewModel {
         } else {
             messageTypeLists = Arrays.asList(messageTypes);
         }
-        MutableLiveData<List<SearchResultItem>> items;
+        State<List<SearchResultItem>> items;
         List<Integer> type;
         if ((type = Arrays.asList(messageTypes)).size() == 1
             && type.get(0) == MessageType.FILE) {

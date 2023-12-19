@@ -82,6 +82,7 @@ public class Routes {
     //朋友圈
     public static class Moments {
         public static final String HOME = "/moments/MomentsActivity";
+        public static final String ToUserMoments = "/moments/ToUserMomentsActivity";
     }
 
     //会议

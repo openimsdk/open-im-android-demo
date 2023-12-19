@@ -79,6 +79,22 @@ public class Common {
         return new HasPermissions(BaseApp.inst(), Permission.SYSTEM_ALERT_WINDOW).isAllGranted();
     }
 
+    /**
+     * 判断路由是否存在
+     * @param path
+     * @return
+     */
+    public static Postcard routeExist(String path) {
+        Postcard postcard;
+        try {
+            postcard = ARouter.getInstance().build(path);
+            LogisticsCenter.completion(postcard);
+        } catch (Exception e) {
+            return null;
+        }
+        return postcard;
+    }
+
     public static void addTypeSystemAlert(WindowManager.LayoutParams params) {
         if (hasSystemAlertWindow()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

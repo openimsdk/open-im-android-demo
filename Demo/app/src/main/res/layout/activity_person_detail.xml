@@ -262,31 +262,61 @@
 
             </LinearLayout>
 
-
             <LinearLayout
-                android:id="@+id/userInfo"
+                android:id="@+id/userInfoLy"
                 android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:layout_marginTop="12dp"
-                android:background="@color/white"
-                android:gravity="center_vertical"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="22dp"
-                    android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:id="@+id/userInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@color/white"
                     android:gravity="center_vertical"
-                    android:text="@string/person_info"
-                    android:textColor="#ff333333"
-                    android:textSize="18sp" />
+                    android:visibility="visible">
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="22dp"
-                    android:src="@mipmap/ic_right" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="22dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="@string/person_info"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="22dp"
+                        android:src="@mipmap/ic_right" />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/moments"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:background="@color/white"
+                    android:gravity="center_vertical"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="22dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="@string/see_moments"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="22dp"
+                        android:src="@mipmap/ic_right" />
+                </LinearLayout>
 
             </LinearLayout>
 

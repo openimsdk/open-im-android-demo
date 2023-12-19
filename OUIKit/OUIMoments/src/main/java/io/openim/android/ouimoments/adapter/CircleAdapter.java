@@ -191,7 +191,8 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
 
             holder.headIv.load(headImg);
             if (!presenter.isSpecifiedUser()) holder.headIv.setOnClickListener(v -> {
-                context.startActivity(new Intent(context, ToUserMomentsActivity.class).putExtra(Constant.K_RESULT, circleItem.getUser()));
+                context.startActivity(new Intent(context, ToUserMomentsActivity.class)
+                    .putExtra(Constant.K_RESULT, circleItem.getUser()));
             });
             holder.nameTv.setText(name);
             holder.timeTv.setText(createTime);
