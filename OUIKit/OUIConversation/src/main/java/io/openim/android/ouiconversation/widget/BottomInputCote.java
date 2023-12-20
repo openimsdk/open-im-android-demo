@@ -200,14 +200,15 @@ public class BottomInputCote {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 try {
+                    if (count==0)return;
                     String content = s.toString().substring(s.length() - 1);
-                    if (!TextUtils.isEmpty(content) && null != onAtUserListener) {
+                    if (!TextUtils.isEmpty(content)
+                        && null != onAtUserListener) {
                         if (content.equals("@")) {
                             onAtUserListener.onAtUser();
                         }
                     }
-                } catch (Exception ignore) {
-                }
+                } catch (Exception ignore) {}
             }
 
             @Override

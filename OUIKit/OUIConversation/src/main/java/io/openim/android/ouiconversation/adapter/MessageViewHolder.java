@@ -236,7 +236,7 @@ public class MessageViewHolder {
 
         protected void hFirstItem(int position) {
             View root = itemView.findViewById(R.id.root);
-            root.setPadding(0, position==0 ? Common.dp2px(15) : 0, 0, 0);
+            root.setPadding(0, position == 0 ? Common.dp2px(15) : 0, 0, 0);
         }
 
         /**
@@ -444,7 +444,10 @@ public class MessageViewHolder {
                                         chatVM.replyMessage.setValue(message);
                                     }
                                     if (iconRes == R.mipmap.ic_c_copy) {
-                                        Common.copy(message.getTextElem().getContent());
+                                        TextView textView = view.findViewById(R.id.content);
+                                        if (null == textView)
+                                            textView = view.findViewById(R.id.content2);
+                                        Common.copy(textView.getText().toString());
                                         chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
                                     }
                                     if (iconRes == R.mipmap.ic_withdraw) {
@@ -472,7 +475,9 @@ public class MessageViewHolder {
                         };
                     view1.recyclerview.setAdapter(adapter);
                 }
-                if (message.getContentType() == MessageType.TEXT) {
+                if (message.getContentType() == MessageType.TEXT
+                    || message.getContentType() == MessageType.AT_TEXT
+                    || message.getContentType() == MessageType.QUOTE) {
                     menuIcons.add(R.mipmap.ic_c_copy);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.copy));
                 }
@@ -584,7 +589,7 @@ public class MessageViewHolder {
 //                if (message.getContentType() == MessageType.CUSTOM_FACE) {//TODO
 //                } else {
                     PreviewMediaVM previewMediaVM = Easy.installVM(PreviewMediaVM.class);
-                    if (isSingle||message.getContentType() == MessageType.CUSTOM_FACE) {
+                    if (isSingle || message.getContentType() == MessageType.CUSTOM_FACE) {
                         PreviewMediaVM.MediaData mediaData = new
                             PreviewMediaVM.MediaData(message.getClientMsgID());
                         mediaData.mediaUrl = url;
@@ -1032,8 +1037,9 @@ public class MessageViewHolder {
             String secondFormat = TimeUtil.getTime((int) videoElem.getDuration(),
                 TimeUtil.minuteTimeFormat);
             view.duration2.setText(secondFormat);
-            scale((View) view.content2.getParent(),videoElem.getSnapshotWidth(),videoElem.getSnapshotHeight());
-            scale(view.content2,videoElem.getSnapshotWidth(),videoElem.getSnapshotHeight());
+            scale((View) view.content2.getParent(), videoElem.getSnapshotWidth(),
+                videoElem.getSnapshotHeight());
+            scale(view.content2, videoElem.getSnapshotWidth(), videoElem.getSnapshotHeight());
             IMUtil.loadVideoSnapshot(message.getVideoElem()).fitCenter()
                 .transform(new RoundedCorners(15)).into(view.content2);
             preview(message, view.videoPlay2);

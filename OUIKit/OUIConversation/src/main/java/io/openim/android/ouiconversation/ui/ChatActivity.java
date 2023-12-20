@@ -147,6 +147,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private void release() {
         if (isFinishing()) {
+            vm.markRead();
             if (!vm.fromChatHistory) removeCacheVM();
 
             Easy.delete(CustomEmojiVM.class);
@@ -168,7 +169,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             if (contactListVM != null) {
                 contactListVM.updateConversation();
             }
-            vm.markRead();
         }
     }
 

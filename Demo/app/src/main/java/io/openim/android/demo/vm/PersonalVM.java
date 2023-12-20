@@ -169,7 +169,7 @@ public class PersonalVM extends BaseViewModel {
         setSelfInfo(new Parameter().add("allowVibration", allow));
     }
     public void setAllowAddFriend(boolean isOpen) {
-        int allow = isOpen ? AllowType.Allowed.value :AllowType.NotAllowed.value;
+        int allow = isOpen ? AllowType.NotAllowed.value :AllowType.Allowed.value;
         userInfo.val().setAllowAddFriend(allow);
         setSelfInfo(new Parameter().add("allowAddFriend", allow));
     }

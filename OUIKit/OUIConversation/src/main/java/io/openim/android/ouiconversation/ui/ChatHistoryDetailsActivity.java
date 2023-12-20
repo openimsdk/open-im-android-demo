@@ -45,10 +45,10 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, Acti
     private void initView() {
         view.recyclerview.setLayoutManager(new LinearLayoutManager(this));
         view.recyclerview.setAdapter(adapter = new RecyclerViewAdapter<Message,
-            ViewHol.ContactItemHolder>(ViewHol.ContactItemHolder.class) {
+            ViewHol.ChatHistoryItemHolder>(ViewHol.ChatHistoryItemHolder.class) {
 
             @Override
-            public void onBindView(@NonNull ViewHol.ContactItemHolder holder, Message data, int position) {
+            public void onBindView(@NonNull ViewHol.ChatHistoryItemHolder holder, Message data, int position) {
                 holder.viewBinding.avatar.load(data.getSenderFaceUrl());
                 holder.viewBinding.nickName.setText(data.getSenderNickname());
                 holder.viewBinding.time.setText(TimeUtil.getTimeString(data.getSendTime()));

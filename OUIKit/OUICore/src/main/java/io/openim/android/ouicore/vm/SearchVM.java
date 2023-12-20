@@ -69,7 +69,10 @@ public class SearchVM extends BaseViewModel {
             ids.add(searchContent.getValue());
         }
         Parameter parameter = new Parameter().add("userIDs", ids);
-        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OneselfService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
+        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody())
+            .map(OneselfService.turn(HashMap.class))
+            .compose(N.IOMain())
+            .subscribe(new NetObserver<HashMap>(getContext()) {
             @Override
             protected void onFailure(Throwable e) {
                 getIView().toast(e.getMessage());

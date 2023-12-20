@@ -188,15 +188,19 @@ public class CallingServiceImp implements CallingService {
 
                 NotificationUtil.sendNotify(A_NOTIFY_ID, notification);
             } else {
-                Context ctx;
-                if (ActivityManager.getActivityStack().isEmpty())
-                    ctx = BaseApp.inst();
-                else
-                    ctx = ActivityManager.getActivityStack().peek();
-                buildCallDialog(ctx, null,
+                buildCallDialog(getContext(), null,
                     false).show();
             }
         }
+    }
+
+    private  Context getContext() {
+        Context ctx;
+        if (ActivityManager.getActivityStack().isEmpty())
+            ctx = BaseApp.inst();
+        else
+            ctx = ActivityManager.getActivityStack().peek();
+        return ctx;
     }
 
     private void cancelNotify() {
@@ -246,7 +250,8 @@ public class CallingServiceImp implements CallingService {
     public void call(SignalingInfo signalingInfo) {
         if (isCalling()) return;
         setSignalingInfo(signalingInfo);
-        buildCallDialog(null, true);
+
+        buildCallDialog(getContext(),null, true);
 
         callDialog.show();
     }

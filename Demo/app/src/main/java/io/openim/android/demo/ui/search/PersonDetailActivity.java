@@ -212,7 +212,10 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             }
         });
         view.userInfo.setOnClickListener(v -> {
-            personDataActivityLauncher.launch(new Intent(this, PersonDataActivity.class).putExtra(Constant.K_ID, vm.userInfo.getValue().get(0).getUserID()));
+            personDataActivityLauncher.launch(new Intent(this,
+                PersonDataActivity.class)
+                .putExtra(Constant.K_ID, vm.userInfo.getValue().get(0)
+                    .getUserID()));
         });
 
         view.moments.setOnClickListener(v -> {
