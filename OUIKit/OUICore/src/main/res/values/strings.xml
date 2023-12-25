@@ -535,5 +535,6 @@
     <string name="password_valid_tips3">新密码和旧密码是相同的</string>
     <string name="valid_phone_num">手机号无效</string>
     <string name="empty_prompt">输入不能为空</string>
+    <string name="quote_delete_tips">引用的内容已被删除</string>
 
 </resources>

@@ -82,6 +82,7 @@ import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.PictureElem;
+import io.openim.android.sdk.models.QuoteElem;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SearchResult;
@@ -912,6 +913,15 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public void onRecvMessageRevokedV2(RevokedInfo info) {
         try {
             for (Message message : messages.val()) {
+                QuoteElem quoteElem =message.getQuoteElem();
+               Message quoteMessage ;
+                if (null!=quoteElem&& null!=(quoteMessage=quoteElem.getQuoteMessage())
+                    &&quoteMessage.getClientMsgID().equals(info.getClientMsgID())){
+                    //引用消息被删除
+                    quoteMessage.setContentType(MessageType.REVOKE_MESSAGE_NTF);
+                    messageAdapter.notifyItemChanged(
+                        messages.val().indexOf(message));
+                }
                 if (message.getClientMsgID().equals(info.getClientMsgID())) {
                     message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
                     //a 撤回了一条消息

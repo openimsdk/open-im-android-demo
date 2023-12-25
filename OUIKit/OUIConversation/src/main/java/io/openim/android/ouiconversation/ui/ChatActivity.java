@@ -609,6 +609,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     public static class LinearLayoutMg extends androidx.recyclerview.widget.LinearLayoutManager {
+        private boolean canScrollVertically=true;
+
         public LinearLayoutMg(Context context) {
             super(context);
         }
@@ -620,6 +622,16 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             } catch (IndexOutOfBoundsException e) {
                 e.printStackTrace();
             }
+        }
+
+
+        @Override
+        public boolean canScrollVertically() {
+            return canScrollVertically;
+        }
+
+        public void setCanScrollVertically(boolean canScrollVertically) {
+            this.canScrollVertically = canScrollVertically;
         }
     }
 }

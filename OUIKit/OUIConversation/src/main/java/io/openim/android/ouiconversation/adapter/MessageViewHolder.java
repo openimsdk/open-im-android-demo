@@ -68,6 +68,7 @@ import io.openim.android.ouiconversation.databinding.LayoutMsgMergeRightBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgNoticeLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtRightBinding;
+import io.openim.android.ouiconversation.ui.ChatActivity;
 import io.openim.android.ouiconversation.ui.ChatHistoryDetailsActivity;
 import io.openim.android.ouiconversation.ui.MsgReadStatusActivity;
 import io.openim.android.ouiconversation.ui.PreviewMediaActivity;
@@ -416,10 +417,13 @@ public class MessageViewHolder {
                     return true;
                 List<Integer> menuIcons = new ArrayList<>();
                 List<String> menuTitles = new ArrayList<>();
-
+                final ChatActivity.LinearLayoutMg linearLayoutManager
+                    = (ChatActivity.LinearLayoutMg) recyclerView.getLayoutManager();
                 if (null == popupWindow) {
                     popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
+                    if (null != linearLayoutManager)
+                        popupWindow.setOnDismissListener(() -> linearLayoutManager.setCanScrollVertically(true));
                     LayoutMsgExMenuBinding view1 =
                         LayoutMsgExMenuBinding.inflate(LayoutInflater.from(itemView.getContext()));
                     popupWindow.setContentView(view1.getRoot());
@@ -553,6 +557,8 @@ public class MessageViewHolder {
                 popupWindow.showAsDropDown(v,
                     -(popupWindow.getContentView().getMeasuredWidth() - v.getMeasuredWidth()) / 2
                     , y);
+                if (null != linearLayoutManager)
+                    linearLayoutManager.setCanScrollVertically(false);
                 return true;
             });
         }
@@ -1411,6 +1417,13 @@ public class MessageViewHolder {
 
             message = quoteElem.getQuoteMessage();
             int contentType = message.getContentType();
+            if (contentType == MessageType.REVOKE_MESSAGE_NTF) {
+                v.quoteContent1.setText(message.getSenderNickname() + ":" + BaseApp.inst()
+                    .getString(io.openim.android.ouicore.R.string.quote_delete_tips));
+                v.picture1.setVisibility(View.GONE);
+                v.picture1.setVisibility(View.GONE);
+                return;
+            }
             if (contentType == MessageType.TEXT
                 || contentType == MessageType.AT_TEXT) {
                 v.quoteContent1.setText(message.getSenderNickname() +
@@ -1428,7 +1441,7 @@ public class MessageViewHolder {
                 if (contentType == MessageType.VIDEO) {
                     v.playBtn1.setVisibility(View.VISIBLE);
                     v.quoteContent1.setText(message.getSenderNickname() + ":");
-                    IMUtil.loadVideoSnapshot(message.getVideoElem()).centerCrop().into(v.picture1);
+                    IMUtil.loadVideoSnapshot(message.getVideoElem()).centerInside().into(v.picture1);
                     previewVideo(v.quoteLy1, message);
                 }
                 if (contentType == MessageType.LOCATION) {
@@ -1454,8 +1467,16 @@ public class MessageViewHolder {
             QuoteElem quoteElem = message.getQuoteElem();
             if (!handleSequence(v.content2, message)) v.content2.setText(quoteElem.getText());
 
+
             message = quoteElem.getQuoteMessage();
             int contentType = message.getContentType();
+            if (contentType == MessageType.REVOKE_MESSAGE_NTF) {
+                v.quoteContent2.setText(message.getSenderNickname() + ":" + BaseApp.inst()
+                    .getString(io.openim.android.ouicore.R.string.quote_delete_tips));
+                v.picture2.setVisibility(View.GONE);
+                v.playBtn2.setVisibility(View.GONE);
+                return;
+            }
             if (contentType == MessageType.TEXT || contentType == MessageType.AT_TEXT) {
                 v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
                 v.picture2.setVisibility(View.GONE);
@@ -1464,7 +1485,7 @@ public class MessageViewHolder {
                 v.playBtn2.setVisibility(View.GONE);
                 if (contentType == MessageType.PICTURE) {
                     v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
-                    IMUtil.loadVideoSnapshot(message.getVideoElem()).centerCrop().into(v.picture2);
+                    IMUtil.loadPicture(message.getPictureElem()).centerCrop().into(v.picture2);
                     toPreview(v.quoteLy2, message.getPictureElem().getSourcePicture().getUrl(),
                         message.getPictureElem().getSnapshotPicture().getUrl(), true);
                 }
@@ -1472,7 +1493,6 @@ public class MessageViewHolder {
                     v.playBtn2.setVisibility(View.VISIBLE);
                     v.quoteContent2.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
                     IMUtil.loadVideoSnapshot(message.getVideoElem()).centerInside().into(v.picture2);
-
                     previewVideo(v.quoteLy2, message);
                 }
                 if (contentType == MessageType.LOCATION) {

@@ -24,6 +24,7 @@ import java.util.Observer;
 import io.openim.android.demo.databinding.ActivityPersonDetailBinding;
 import io.openim.android.demo.ui.user.PersonDataActivity;
 import io.openim.android.demo.vm.FriendVM;
+import io.openim.android.demo.vm.PersonalVM;
 import io.openim.android.ouiconversation.ui.PreviewMediaActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseApp;
@@ -96,7 +97,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         friendVM.setIView(this);
         waitDialog.show();
 
-        vm.searchPerson();
+        update();
 
         Postcard postcard = Common.routeExist(Routes.Moments.ToUserMoments);
         view.moments.setVisibility(null == postcard ? View.GONE : View.VISIBLE);
@@ -212,10 +213,13 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             }
         });
         view.userInfo.setOnClickListener(v -> {
+            String uid=vm.userInfo.getValue().get(0)
+                .getUserID();
+            Easy.installVM(PersonalVM.class)
+                .getUsersInfoWithCache(uid,groupId)
+                .uid=uid;
             personDataActivityLauncher.launch(new Intent(this,
-                PersonDataActivity.class)
-                .putExtra(Constant.K_ID, vm.userInfo.getValue().get(0)
-                    .getUserID()));
+                PersonDataActivity.class));
         });
 
         view.moments.setOnClickListener(v -> {
@@ -392,8 +396,13 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     public void update(Observable o, Object arg) {
         Obs.Message message = (Obs.Message) arg;
         if (message.tag == Constant.Event.USER_INFO_UPDATE) {
-            vm.searchPerson();
+            update();
         }
+    }
+
+    private void update() {
+        vm.getUsersInfoWithCache(vm.searchContent.val(),groupId);
+        vm.getExtendUserInfo(vm.searchContent.val());
     }
 
     @Override

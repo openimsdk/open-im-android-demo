@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,6 +35,7 @@ import io.openim.android.sdk.models.UserInfo;
 public class PersonalVM extends BaseViewModel {
     public WaitDialog waitDialog;
     public State<UserInfo> userInfo = new State<>();
+    public String uid;
 
     @Override
     protected void viewCreate() {
@@ -82,7 +84,10 @@ public class PersonalVM extends BaseViewModel {
         List<String> ids = new ArrayList<>();
         ids.add(uid);
         Parameter parameter = new Parameter().add("userIDs", ids);
-        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OpenIMService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
+        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody())
+            .map(OpenIMService.turn(HashMap.class))
+            .compose(N.IOMain())
+            .subscribe(new NetObserver<HashMap>(getContext()) {
             @Override
             protected void onFailure(Throwable e) {
                 getIView().toast(e.getMessage());
@@ -98,8 +103,7 @@ public class PersonalVM extends BaseViewModel {
 
                     UserInfo u = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
                         UserInfo.class);
-                    userInfo.setValue(u);
-
+                    userInfo.setValue(updateUserInfo(userInfo.val(), u));
                     updateConfig(userInfo.val());
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -109,9 +113,44 @@ public class PersonalVM extends BaseViewModel {
         });
     }
 
-    public void getUserInfo(String id) {
+    public PersonalVM getUserInfo(String id) {
         waitDialog.show();
         getExtendUserInfo(id);
+        return this;
+    }
+
+    public PersonalVM getUsersInfoWithCache(String id, String gid) {
+        OpenIMClient.getInstance().userInfoManager
+            .getUsersInfoWithCache(new OnBase<List<UserInfo>>() {
+                @Override
+                public void onSuccess(List<UserInfo> data) {
+                    if (!data.isEmpty()) {
+                        UserInfo u = data.get(0);
+                       userInfo.setValue(updateUserInfo(userInfo
+                           .val(), u));
+                    }
+                }
+            }, new ArrayList<>(Collections.singleton(id)), gid);
+        return this;
+    }
+
+    private UserInfo updateUserInfo(UserInfo origin, UserInfo update) {
+        try {
+            if (null == origin) {
+                return update;
+            }
+            String json = JSONObject.toJSONString(origin);
+            Map originMap = JSONObject.parseObject(json, Map.class);
+
+            String json2 = JSONObject.toJSONString(update);
+            Map updateMap = JSONObject.parseObject(json2, Map.class);
+
+            originMap.putAll(updateMap);
+            return JSONObject.parseObject(GsonHel.toJson(originMap),
+                UserInfo.class);
+        } catch (Exception ignored) {
+        }
+        return origin;
     }
 
     public void setSelfInfo(Parameter param) {
@@ -162,17 +201,19 @@ public class PersonalVM extends BaseViewModel {
     }
 
     public void setAllowBeep(boolean isOpen) {
-        int allow = isOpen ?  1:2;
+        int allow = isOpen ? 1 : 2;
         userInfo.val().setAllowBeep(allow);
         setSelfInfo(new Parameter().add("allowBeep", allow));
     }
+
     public void setAllowVibration(boolean isOpen) {
-        int allow = isOpen ?  1:2;
+        int allow = isOpen ? 1 : 2;
         userInfo.val().setAllowVibration(allow);
         setSelfInfo(new Parameter().add("allowVibration", allow));
     }
+
     public void setAllowAddFriend(boolean isOpen) {
-        int allow = isOpen ? AllowType.NotAllowed.value :AllowType.Allowed.value;
+        int allow = isOpen ? AllowType.NotAllowed.value : AllowType.Allowed.value;
         userInfo.val().setAllowAddFriend(allow);
         setSelfInfo(new Parameter().add("allowAddFriend", allow));
     }
