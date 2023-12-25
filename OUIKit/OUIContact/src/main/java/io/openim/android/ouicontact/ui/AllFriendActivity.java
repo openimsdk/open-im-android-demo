@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.graphics.PointF;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -28,25 +27,16 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.databinding.LayoutPopSelectedFriendsBinding;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.ex.MultipleChoice;
-import io.openim.android.ouicore.ex.User;
-import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.SocialityVM;
-import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.StickyDecoration;
-import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.listener.OnMsgSendCallback;
-import io.openim.android.sdk.models.CardElem;
 import io.openim.android.sdk.models.FriendInfo;
-import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.OfflinePushInfo;
 
 @Route(path = Routes.Contact.ALL_FRIEND)
 public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFriendBinding> {

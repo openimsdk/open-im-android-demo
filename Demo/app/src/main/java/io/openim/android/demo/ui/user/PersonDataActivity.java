@@ -14,16 +14,12 @@ import io.openim.android.demo.databinding.ActivityPersonInfoBinding;
 import io.openim.android.demo.ui.main.EditTextActivity;
 import io.openim.android.demo.vm.FriendVM;
 import io.openim.android.demo.vm.PersonalVM;
-import io.openim.android.ouicontact.ui.AllFriendActivity;
-import io.openim.android.ouiconversation.ui.ChatActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
-import io.openim.android.ouicore.ex.User;
-import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
@@ -35,7 +31,6 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.models.CardElem;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.UserInfo;
@@ -148,8 +143,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             String remark = "";
             try {
                 remark = vm.userInfo.val().getFriendInfo().getRemark();
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
             resultLauncher.launch(new Intent(this, EditTextActivity.class)
                 .putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.remark))
                     .putExtra(EditTextActivity.MAX_LENGTH,16)

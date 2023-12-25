@@ -38,6 +38,7 @@ import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.NotificationVM;
 import io.openim.android.ouicore.vm.UserLogic;
 
 @Route(path = Routes.Main.HOME)
@@ -106,16 +107,11 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
 
     private void bindDot() {
-        ContactVM contactVM = ((ContactFragment) contactFragment).getVM();
-        if (null == contactVM) return;
-        contactVM.friendDotNum.observe(this, integer -> {
-            view.badge.setVisibility((integer > 0 || contactVM.groupDotNum.val() > 0) ?
-                View.VISIBLE : View.GONE);
-        });
-        contactVM.groupDotNum.observe(this, integer -> {
-            view.badge.setVisibility((integer > 0 || contactVM.friendDotNum.val() > 0) ?
-                View.VISIBLE : View.GONE);
-        });
+        NotificationVM notificationVM=Easy.find(NotificationVM.class);
+        notificationVM.friendDot.observe(this, v -> view.badge.setVisibility((notificationVM.hasDot()) ?
+            View.VISIBLE : View.GONE));
+        notificationVM.groupDot.observe(this, v -> view.badge.setVisibility((notificationVM.hasDot()) ?
+            View.VISIBLE : View.GONE));
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {

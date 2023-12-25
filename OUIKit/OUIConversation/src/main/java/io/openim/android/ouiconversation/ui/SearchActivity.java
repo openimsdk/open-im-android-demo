@@ -179,7 +179,6 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
         });
         vm.messageItems.observe(this, searchResultItems -> {
             addNape(tabTitles[3], searchResultItems);
-
         });
         vm.fileItems.observe(this, searchResultItems -> {
             List<Message> fileMessages = new ArrayList<>();
@@ -204,7 +203,14 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
     }
 
     private void addNape(String title, List data) {
-        if (data.isEmpty()) return;
+        if (data.isEmpty() && !TextUtils.isEmpty(vm.searchContent.val())) {
+            view.notFind.setVisibility(View.VISIBLE);
+            view.recyclerview.setVisibility(View.GONE);
+            return;
+        }
+        if (data.isEmpty())return;
+        view.notFind.setVisibility(View.GONE);
+        view.recyclerview.setVisibility(View.VISIBLE);
         if (selectTabIndex != 0) {
             //没有选择综合tab 我们只渲染单一项
             addMoreNape(data);

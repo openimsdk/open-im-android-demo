@@ -25,6 +25,7 @@ import android.widget.TextView;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 
 import com.hjq.permissions.Permission;
 
@@ -351,7 +352,12 @@ public class BottomInputCote {
                 if (null == groupInfo) return;
                 setMute();
             });
+            vm.isJoinGroup.observe((LifecycleOwner) context, aBoolean -> {
+                editMute(!aBoolean);
+                view.notice.setText(io.openim.android.ouicore.R.string.quited_tips);
+            });
         }
+
         vm.replyMessage.observe((LifecycleOwner) context, message -> {
             if (null == message) {
                 view.replyLy.setVisibility(GONE);
@@ -368,12 +374,14 @@ public class BottomInputCote {
         if (null == groupInfo || null == mem) return;
         if (groupInfo.getStatus() == GroupStatus.GROUP_DISSOLVE) {
             editMute(true);
-            view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
+            view.notice.setText(BaseApp.inst().getString
+                (io.openim.android.ouicore.R.string.dissolve_tips2));
         } else if (groupInfo.getStatus() == GroupStatus.GROUP_BANNED) {
             editMute(true);
             view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.group_ban));
         } else {
-            if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED && mem.getRoleLevel() == GroupRole.MEMBER) {
+            if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED
+                && mem.getRoleLevel() == GroupRole.MEMBER) {
                 editMute(true);
                 view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.start_group_mute));
                 return;

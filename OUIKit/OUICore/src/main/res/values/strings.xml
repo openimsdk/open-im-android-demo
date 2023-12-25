@@ -137,7 +137,7 @@
     <string name="set_succ">设置成功</string>
     <string name="search_tips">搜索指定内容</string>
     <string name="view_chat_history">查看聊天记录</string>
-    <string name="not_find">没有找到</string>
+    <string name="not_find">没有找到相关信息</string>
     <string name="result">相关结果</string>
     <string name="in_week">本周内</string>
     <string name="in_month">本月内</string>
@@ -156,7 +156,7 @@
     <string name="transferred_group">%1$s 将群转让给了 %2$s</string>
     <string name="Muted_group">%1$s 被 %2$s 禁言%3$s</string>
     <string name="cancel_muted">%1$s 被 %2$s 取消了禁言</string>
-    <string name="start_muted">%1$s 开起了群禁言</string>
+    <string name="start_muted">%1$s 开启了群禁言</string>
     <string name="close_muted">%1$s 关闭了群禁言</string>
     <string name="edit_data">%1$s 编辑了自己的群成员资料</string>
     <string name="start_burn_after_read">已开启阅后即焚</string>
@@ -531,5 +531,9 @@
     <string name="forgot_pasword_by_email">通过邮箱找回</string>
     <string name="at_all">\@所有人</string>
     <string name="at_all_at_me">[@所有人 @你]</string>
+    <string name="quited_tips">无法在退出的群发送消息</string>
+    <string name="password_valid_tips3">新密码和旧密码是相同的</string>
+    <string name="valid_phone_num">手机号无效</string>
+    <string name="empty_prompt">输入不能为空</string>
 
 </resources>

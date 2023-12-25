@@ -23,6 +23,19 @@ public class RegexValid {
         // 返回匹配结果
         return matcher.matches();
     }
+    public static boolean isValidPhoneNumber(String phoneNumber) {
+        // 定义手机号码的正则表达式
+        String regex = "^1[3-9]\\d{9}$";
+
+        // 编译正则表达式
+        Pattern pattern = Pattern.compile(regex);
+
+        // 创建Matcher对象
+        Matcher matcher = pattern.matcher(phoneNumber);
+
+        // 进行匹配并返回结果
+        return matcher.matches();
+    }
 
     /**
      * 全为数字

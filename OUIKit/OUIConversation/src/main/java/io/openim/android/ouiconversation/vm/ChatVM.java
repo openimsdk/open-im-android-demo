@@ -128,6 +128,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     //开启多选
     public State<Boolean> enableMultipleSelect = new State<>();
+    //是否加入群
+    public State<Boolean> isJoinGroup = new State<>(true);
 
     private UserOnlineStatusListener userOnlineStatusListener;
 
@@ -423,6 +425,13 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             getOneConversation(null);
         } else {
             getGroupsInfo(groupID, null);
+            OpenIMClient.getInstance().groupManager.isJoinGroup(groupID,
+                new OnBase<Boolean>() {
+                @Override
+                public void onSuccess(Boolean data) {
+                    isJoinGroup.setValue(data);
+                }
+            });
         }
     }
 
@@ -1089,6 +1098,24 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
 
         }, conversationID, startMsg, count * 80);
+    }
+
+
+    @Override
+    public void onGroupMemberAdded(GroupMembersInfo info) {
+        if (info.getGroupID().equals(groupID)
+            &&info.getUserID().equals(BaseApp.inst().loginCertificate.userID)){
+            isJoinGroup.setValue(true);
+            getGroupsInfo(groupID,null);
+        }
+    }
+
+    @Override
+    public void onGroupMemberDeleted(GroupMembersInfo info) {
+        if (info.getGroupID().equals(groupID)
+            && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)){
+            isJoinGroup.setValue(false);
+        }
     }
 
     /**

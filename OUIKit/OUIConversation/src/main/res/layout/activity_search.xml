@@ -59,6 +59,16 @@
             android:id="@+id/recyclerview"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/notFind"
+            android:layout_width="wrap_content"
+            android:text="@string/not_find"
+            android:layout_marginTop="40dp"
+            android:layout_gravity="center"
+            android:textColor="@color/txt_shallow"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 </layout>
 

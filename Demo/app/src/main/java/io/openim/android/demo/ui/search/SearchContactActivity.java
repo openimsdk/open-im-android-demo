@@ -19,21 +19,16 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivitySearchPersonBinding;
 import io.openim.android.demo.databinding.LayoutSearchItemBinding;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.ex.CommEx;
 import io.openim.android.ouicore.ex.Title;
-import io.openim.android.ouicore.ex.User;
-import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.RegexValid;
 import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
-import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.UserInfo;
 

@@ -90,6 +90,8 @@
                     android:layout_height="45dp"
                     android:layout_marginLeft="15dp"
                     android:layout_weight="1"
+                    android:maxLines="1"
+                    android:singleLine="true"
                     android:background="@android:color/transparent"
                     android:hint="@string/input_phone"
                     android:text="@={LoginVM.account}"

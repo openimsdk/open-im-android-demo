@@ -77,7 +77,7 @@ public class AudioVideoService extends W3mI6o {
         });
     }
     private void addListener() {
-        OpenIMClient.getInstance().signalingManager.setOnListenerForService(callingService);
+//        OpenIMClient.getInstance().signalingManager.setOnListenerForService(callingService);
 //        OpenIMClient.getInstance().setOnListenerForService(new OnListenerForService() {
 //            @Override
 //            public void onRecvNewMessage(Message msg) {

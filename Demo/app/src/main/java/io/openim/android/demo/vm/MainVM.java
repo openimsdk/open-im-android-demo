@@ -85,9 +85,10 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     }
 
     private void initDate() {
-        initGlobalVM();
         BaseApp.inst().loginCertificate = LoginCertificate.getCache(context.get());
         CrashReport.setDeviceId(context.get(), BaseApp.inst().loginCertificate.userID);
+
+        initGlobalVM();
 
         if (null != callingService)
             callingService.startAudioVideoService(getContext());

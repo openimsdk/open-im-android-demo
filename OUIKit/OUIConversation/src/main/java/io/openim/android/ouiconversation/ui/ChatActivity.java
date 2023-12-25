@@ -29,6 +29,7 @@ import com.bumptech.glide.Glide;
 import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Observable;
@@ -244,7 +245,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
 
         String chatBg =
-            SharedPreferencesUtil.get(this).getString(Constant.K_SET_BACKGROUND + (vm.isSingleChat ? vm.userID : vm.groupID));
+            SharedPreferencesUtil.get(this)
+                .getString(Constant.K_SET_BACKGROUND + (vm.isSingleChat ? vm.userID : vm.groupID));
         if (!chatBg.isEmpty()) Glide.with(this).load(chatBg).into(view.chatBg);
 
 
@@ -352,8 +354,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.mergeForward.setOnClickListener(v -> {
 //            ARouter.getInstance().build(Routes.Contact.FORWARD).navigation(this,
 //                Constant.Event.FORWARD);
+            List<Message> msgList=getSelectMsg();
+            Collections.reverse(msgList);
             Easy.find(ForwardVM.class).createMergerMessage(vm.isSingleChat,
-                vm.conversationInfo.getValue().getShowName(), getSelectMsg());
+                vm.conversationInfo.getValue().getShowName(), msgList);
 
             Easy.installVM(SelectTargetVM.class);
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) this,
@@ -489,6 +493,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             MsgExpand msgExpand = (MsgExpand) message.getExt();
             if (null != msgExpand && msgExpand.isChoice) selectMsg.add(message);
         }
+
         return selectMsg;
     }
 

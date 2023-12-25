@@ -66,14 +66,43 @@
                     android:textColor="#ff999999"
                     android:textSize="12sp" />
 
-                <ImageView
-                    android:id="@+id/picture1"
+                <RelativeLayout
                     android:layout_width="@dimen/comm_title_high"
                     android:layout_height="@dimen/comm_title_high"
-                    android:layout_marginLeft="8dp"
-                    android:scaleType="center"
-                    android:visibility="gone" />
+                    android:layout_marginLeft="8dp">
+
+                    <ImageView
+                        android:id="@+id/picture1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:visibility="gone" />
+
+                    <RelativeLayout
+                        android:id="@+id/playBtn1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:visibility="gone"
+                        android:layout_centerVertical="true">
+
+                        <io.openim.android.ouicore.widget.CirclePgBar
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            app:strokeWidth="2dp" />
+
+                        <ImageView
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true"
+                            android:src="@mipmap/ic_video_pause" />
+                    </RelativeLayout>
+
+                </RelativeLayout>
             </LinearLayout>
+
+
 
         </LinearLayout>
 
