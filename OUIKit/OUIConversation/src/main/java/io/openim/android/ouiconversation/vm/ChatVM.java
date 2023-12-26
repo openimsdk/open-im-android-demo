@@ -368,6 +368,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     int getReadCountdown(Message message) {
         int burnDuration = message.getAttachedInfoElem().getBurnDuration();
         long hasReadTime = message.getAttachedInfoElem().getHasReadTime();
+        if (burnDuration==0)
+            burnDuration=30;
         if (hasReadTime > 0) {
             long end = hasReadTime + (burnDuration * 1000L);
             long diff = (end - System.currentTimeMillis()) / 1000;

@@ -201,6 +201,7 @@ public class BottomInputCote {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 try {
+                    if (vm.isSingleChat)return;
                     if (count==0)return;
                     String content = s.toString().substring(s.length() - 1);
                     if (!TextUtils.isEmpty(content)

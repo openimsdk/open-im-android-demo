@@ -23,6 +23,7 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutBurnAfterReadingBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
@@ -177,7 +178,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
                 public void onSuccess(String data) {
                     view.readVanish.setCheckedWithAnimation(isChecked);
                 }
-            }, vm.conversationInfo.getValue().getConversationID(), isChecked);
+            }, vm.conversationInfo.val().getConversationID(), isChecked);
         });
         view.topSlideButton.setOnSlideButtonClickListener(is -> {
             contactListVM.pinConversation(vm.conversationInfo.getValue(), is);
