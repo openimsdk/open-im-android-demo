@@ -99,6 +99,7 @@ import io.openim.android.sdk.models.VideoElem;
 public class IMUtil {
     //android PlatformID 2
     public static final int PLATFORM_ID = 2;
+    public static final String AT_ALL = "AtAllTag";
     private static final String TAG = "IMUtil";
 
     public static String getFastVideoPath(VideoElem elem) {
@@ -433,8 +434,8 @@ public class IMUtil {
                 choice.name = transferredGroupNotification.newGroupOwner.getNickname();
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(),
-                        transferredGroupNotification.opUser.getNickname(),
-                        transferredGroupNotification.opUser.getUserID(), txt),
+                    transferredGroupNotification.opUser.getNickname(),
+                    transferredGroupNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -474,8 +475,8 @@ public class IMUtil {
                 choice.name = memberNotification.mutedUser.getNickname();
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(),
-                        memberNotification.opUser.getNickname(),
-                        memberNotification.opUser.getUserID(), txt),
+                    memberNotification.opUser.getNickname(),
+                    memberNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -567,11 +568,11 @@ public class IMUtil {
         for (MultipleChoice choice : choices) {
             buildClickAndColorSpannable((SpannableStringBuilder) sequence, choice.name,
                 new ClickableSpan() {
-                    @Override
-                    public void onClick(@NonNull View widget) {
-                        toPersonDetail(choice.key, choice.groupId);
-                    }
-                });
+                @Override
+                public void onClick(@NonNull View widget) {
+                    toPersonDetail(choice.key, choice.groupId);
+                }
+            });
         }
         return sequence;
     }
@@ -589,11 +590,11 @@ public class IMUtil {
                                                  String txt) {
         return buildClickAndColorSpannable(new SpannableStringBuilder(txt), nickName,
             new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    toPersonDetail(uid, groupId);
-                }
-            });
+            @Override
+            public void onClick(@NonNull View widget) {
+                toPersonDetail(uid, groupId);
+            }
+        });
     }
 
     private static void toPersonDetail(String uid, String groupId) {
@@ -622,7 +623,8 @@ public class IMUtil {
             buildClickAndColorSpannable(spannableString, tag, new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                    toPersonDetail(atUsersInfo.getAtUserID(), gid);
+                    if (!atUsersInfo.getAtUserID().equals(IMUtil.AT_ALL))
+                        toPersonDetail(atUsersInfo.getAtUserID(), gid);
                 }
             });
         }
@@ -665,23 +667,23 @@ public class IMUtil {
         return SharedPreferencesUtil.get(BaseApp.inst()).getString(cacheKey);
     }
 
-    public static CharSequence getMsgParse(Message msg){
-        return getMsgParse(msg,false);
+    public static CharSequence getMsgParse(Message msg) {
+        return getMsgParse(msg, false);
     }
+
     /**
      * 解析消息内容
      *
      * @param msg
      * @return
      */
-    public static CharSequence getMsgParse(Message msg,boolean isShowSenderNickname) {
+    public static CharSequence getMsgParse(Message msg, boolean isShowSenderNickname) {
         MsgExpand msgExpand = (MsgExpand) msg.getExt();
-        CharSequence lastMsg = isShowSenderNickname?msg.getSenderNickname() + ": ":"";
+        CharSequence lastMsg = isShowSenderNickname ? msg.getSenderNickname() + ": " : "";
         try {
             switch (msg.getContentType()) {
                 default:
-                    if (!TextUtils.isEmpty(msgExpand.tips))
-                        lastMsg = msgExpand.tips.toString();
+                    if (!TextUtils.isEmpty(msgExpand.tips)) lastMsg = msgExpand.tips.toString();
                     break;
 
                 case MessageType.TEXT:

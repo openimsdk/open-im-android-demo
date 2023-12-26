@@ -304,7 +304,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             groupVM.groupId = vm.groupID;
             BaseApp.inst().putVM(groupVM);
             ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER).withInt(Constant.K_SIZE,
-                9).withBoolean(Constant.IS_SELECT_MEMBER, true).navigation(this,
+                9).withBoolean(Constant.IS_SELECT_MEMBER, true)
+                .withBoolean(Constant.IS_AT_MEMBER,true).navigation(this,
                 Constant.Event.AT_USER);
         });
         view.call.setOnClickListener(v -> {

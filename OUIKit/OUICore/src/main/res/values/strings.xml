@@ -530,6 +530,7 @@
     <string name="forgot_pasword_by_phone">通过手机号找回</string>
     <string name="forgot_pasword_by_email">通过邮箱找回</string>
     <string name="at_all">\@所有人</string>
+    <string name="all_person">所有人</string>
     <string name="at_all_at_me">[@所有人 @你]</string>
     <string name="quited_tips">无法在退出的群发送消息</string>
     <string name="password_valid_tips3">新密码和旧密码是相同的</string>
