@@ -66,7 +66,8 @@ public class SelectTargetActivityV3 extends BasicActivity<
         view.searchView.setOnClickListener(v -> {
             if (selectTargetVM.isShareCard()) {
                 ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS_GROUP)
-                    .withBoolean(Constant.IS_SELECT_FRIEND, true).navigation();
+                    .withBoolean(Constant.IS_SELECT_FRIEND, true)
+                    .navigation();
                 return;
             }
 
@@ -74,7 +75,8 @@ public class SelectTargetActivityV3 extends BasicActivity<
             LogisticsCenter.completion(postcard);
             launcher.launch(new Intent(this, postcard.getDestination())
                 .putExtra(Constant.K_RESULT, (Serializable) selectTargetVM.metaData.val())
-                .putExtra(Constant.IS_SELECT_FRIEND, selectTargetVM.isInvite()));
+                .putExtra(Constant.IS_SELECT_FRIEND, selectTargetVM.isInvite()
+                    || selectTargetVM.isSelectFriends()||selectTargetVM.isCreateGroup()));
         });
     }
 
@@ -86,7 +88,11 @@ public class SelectTargetActivityV3 extends BasicActivity<
     }
 
     private void initView() {
-        if (selectTargetVM.isShareCard()) {
+        if (selectTargetVM.isSelectFriends()) {
+            view.recentContact.setVisibility(View.GONE);
+            view.group.setVisibility(View.GONE);
+            view.myFriends.setVisibility(View.VISIBLE);
+        } else if (selectTargetVM.isShareCard()) {
             view.recentContact.setVisibility(View.GONE);
             view.group.setVisibility(View.GONE);
             view.myFriends.setVisibility(View.VISIBLE);

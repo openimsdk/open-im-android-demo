@@ -19,8 +19,10 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import io.openim.android.ouicontact.databinding.ActivityAllFriendBinding;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
@@ -45,6 +47,24 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
     private LinearLayoutManager mLayoutManager;
 
     private SelectTargetVM selectTargetVM;
+    private ActivityResultLauncher<Intent> launcher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), v -> {
+            if (v.getResultCode() != RESULT_OK) return;
+            Intent intent = v.getData();
+            Set<MultipleChoice> set =
+                (Set<MultipleChoice>) intent.getSerializableExtra(Constant.K_RESULT);
+            for (MultipleChoice data : set) {
+                if (data.isSelect) {
+                    if (!selectTargetVM.contains(data)) {
+                        selectTargetVM.metaData.val().add(data);
+                        selectTargetVM.metaData.update();
+                    }
+                } else {
+                    selectTargetVM.removeMetaData(data.key);
+                }
+            }
+        });
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +82,9 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
     void init() {
         try {
             selectTargetVM = Easy.find(SelectTargetVM.class);
-            view.bottom.getRoot().setVisibility(View.VISIBLE);
-            view.searchView.setVisibility(View.GONE);
+            view.searchView.setVisibility(View.VISIBLE);
             if (!selectTargetVM.isShareCard()) {
+                view.bottom.getRoot().setVisibility(View.VISIBLE);
                 selectTargetVM.bindDataToView(view.bottom);
                 selectTargetVM.showPopAllSelectFriends(view.bottom,
                     LayoutPopSelectedFriendsBinding.inflate(getLayoutInflater()));
@@ -178,11 +198,7 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
             position -> adapter.getItems().get(position).sortLetter));
     }
 
-    private void sendChatWindow(FriendInfo friendInfo) {
-        if (null != selectTargetVM) {
 
-        }
-    }
 
 
     @Override
@@ -193,32 +209,34 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
         }
     }
 
-    private ActivityResultLauncher<Intent> searchFriendLauncher =
-        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            try {
-                if (result.getResultCode() != RESULT_OK) return;
-
-                String uid = result.getData().getStringExtra(Constant.K_ID);
-                if (null != selectTargetVM) {
-                    for (ExUserInfo item : adapter.getItems()) {
-                        if (null != item.userInfo && item.userInfo.getUserID().equals(uid)) {
-                            sendChatWindow(item.userInfo.getFriendInfo());
-                            return;
-                        }
-                    }
-                }
-                ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                    .withString(Constant.K_ID, uid).navigation();
-            } catch (Exception ignored) {
-
-            }
-        });
+//    private ActivityResultLauncher<Intent> searchFriendLauncher =
+//        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+//            try {
+//                if (result.getResultCode() != RESULT_OK) return;
+//
+//                String uid = result.getData().getStringExtra(Constant.K_ID);
+//                if (null != selectTargetVM) {
+//                    for (ExUserInfo item : adapter.getItems()) {
+//                        if (null != item.userInfo && item.userInfo.getUserID().equals(uid)) {
+//                            sendChatWindow(item.userInfo.getFriendInfo());
+//                            return;
+//                        }
+//                    }
+//                }
+//                ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+//                    .withString(Constant.K_ID, uid).navigation();
+//            } catch (Exception ignored) {
+//
+//            }
+//        });
 
     private void listener() {
         view.searchView.setOnClickListener(v -> {
-            Postcard postcard = ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS);
+            Postcard postcard = ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS_GROUP);
             LogisticsCenter.completion(postcard);
-            searchFriendLauncher.launch(new Intent(this, postcard.getDestination()));
+            launcher.launch(new Intent(this, postcard.getDestination())
+                .putExtra(Constant.K_RESULT, (Serializable) selectTargetVM.metaData.val())
+                .putExtra(Constant.IS_SELECT_FRIEND, true));
         });
         vm.letters.observe(this, v -> {
             if (null == v || v.isEmpty()) return;

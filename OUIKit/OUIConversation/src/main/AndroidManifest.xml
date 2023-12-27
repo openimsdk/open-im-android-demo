@@ -11,7 +11,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application android:theme="@style/Theme.Main">
-
+        <activity
+            android:name=".ui.ChatHistoryRelationActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.NotificationActivity"
             android:exported="false" />

@@ -31,11 +31,13 @@ import java.util.List;
 import java.util.Locale;
 
 import io.openim.android.ouiconversation.databinding.ActivitySearchBinding;
+import io.openim.android.ouiconversation.vm.ChatHistoryRelationVM;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
@@ -55,13 +57,12 @@ import io.openim.android.sdk.models.UserInfo;
 
 @Route(path = Routes.Conversation.SEARCH)
 public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding> {
-    private final String[] tabTitles = new String[]{
-        BaseApp.inst().getString(io.openim.android.ouicore.R.string.synthesis),
-        BaseApp.inst().getString(io.openim.android.ouicore.R.string.contact),
-        BaseApp.inst().getString(io.openim.android.ouicore.R.string.group),
-        BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2),
-        BaseApp.inst().getString(io.openim.android.ouicore.R.string.file),
-    };
+    private final String[] tabTitles =
+        new String[]{BaseApp.inst().getString(io.openim.android.ouicore.R.string.synthesis),
+            BaseApp.inst().getString(io.openim.android.ouicore.R.string.contact),
+            BaseApp.inst().getString(io.openim.android.ouicore.R.string.group),
+            BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2),
+            BaseApp.inst().getString(io.openim.android.ouicore.R.string.file),};
     private final Handler handler = new Handler();
 
     //item type
@@ -122,8 +123,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.toString().isEmpty())
-                    vm.searchContent.setValue("");
+                if (s.toString().isEmpty()) vm.searchContent.setValue("");
             }
 
             @Override
@@ -149,10 +149,8 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                         return;
                     }
                     clearData();
-                    if (selectTabIndex == CONTACT_ITEM)
-                        vm.searchFriendV2();
-                    if (selectTabIndex == GROUP_ITEM)
-                        vm.searchGroupV2();
+                    if (selectTabIndex == CONTACT_ITEM) vm.searchFriendV2();
+                    if (selectTabIndex == GROUP_ITEM) vm.searchGroupV2();
                     if (selectTabIndex == CHAT_ITEM)
                         vm.searchLocalMessages(vm.searchContent.getValue());
                     if (selectTabIndex == FILE_ITEM)
@@ -208,7 +206,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
             view.recyclerview.setVisibility(View.GONE);
             return;
         }
-        if (data.isEmpty())return;
+        if (data.isEmpty()) return;
         view.notFind.setVisibility(View.GONE);
         view.recyclerview.setVisibility(View.VISIBLE);
         if (selectTabIndex != 0) {
@@ -238,16 +236,11 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
             @Override
             public int getItemViewType(int position) {
                 Object o = getItems().get(position);
-                if (o instanceof String)
-                    return TITLE;
-                if (o instanceof UserInfo)
-                    return CONTACT_ITEM;
-                if (o instanceof GroupInfo)
-                    return GROUP_ITEM;
-                if (o instanceof SearchResultItem)
-                    return CHAT_ITEM;
-                if (o instanceof Message)
-                    return FILE_ITEM;
+                if (o instanceof String) return TITLE;
+                if (o instanceof UserInfo) return CONTACT_ITEM;
+                if (o instanceof GroupInfo) return GROUP_ITEM;
+                if (o instanceof SearchResultItem) return CHAT_ITEM;
+                if (o instanceof Message) return FILE_ITEM;
 
                 //-1 表示分割线
                 return DIVISION;
@@ -257,12 +250,10 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
             @Override
             public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                               int viewType) {
-                if (viewType == TITLE)
-                    return new ViewHol.TitleViewHolder(parent);
+                if (viewType == TITLE) return new ViewHol.TitleViewHolder(parent);
                 if (viewType == CONTACT_ITEM || viewType == CHAT_ITEM || viewType == GROUP_ITEM)
                     return new ViewHol.ContactItemHolder(parent);
-                if (viewType == FILE_ITEM)
-                    return new ViewHol.FileItemViewHo(parent);
+                if (viewType == FILE_ITEM) return new ViewHol.FileItemViewHo(parent);
 
                 return new ViewHol.DivisionItemViewHo(parent, Common.dp2px(10));
             }
@@ -282,8 +273,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                             titleViewHolder.view.more.setOnClickListener(v -> {
                                 int index = getItemViewType(position + 1);
                                 TabLayout.Tab tab = view.tabLayout.getTabAt(index);
-                                if (null != tab)
-                                    view.tabLayout.selectTab(tab);
+                                if (null != tab) view.tabLayout.selectTab(tab);
                             });
                         } else {
                             titleViewHolder.view.more.setVisibility(View.GONE);
@@ -305,12 +295,10 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                             if (TextUtils.isEmpty(da.getRemark()))
                                 contactItemHolder.viewBinding.bottom.setVisibility(View.GONE);
                             else {
-                                contactItemHolder.viewBinding.lastMsg.setText(getString(io.openim.android.ouicore.R.string.remark) + ":"
-                                    + da.getRemark());
+                                contactItemHolder.viewBinding.lastMsg.setText(getString(io.openim.android.ouicore.R.string.remark) + ":" + da.getRemark());
                             }
                             contactItemHolder.viewBinding.getRoot().setOnClickListener(v -> {
-                                ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                                    .withString(Constant.K_ID, da.getUserID()).navigation(SearchActivity.this);
+                                ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, da.getUserID()).navigation(SearchActivity.this);
                             });
                         }
                         if (data instanceof SearchResultItem) {
@@ -318,36 +306,18 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                             SearchResultItem da = (SearchResultItem) data;
                             contactItemHolder.viewBinding.avatar.load(da.getFaceURL());
                             contactItemHolder.viewBinding.nickName.setText(da.getShowName());
-                            contactItemHolder.viewBinding.lastMsg.setText(
-                                String.format(getString(io.openim.android.ouicore.R.string.two_related_chats), da.getMessageCount() + ""));
+                            contactItemHolder.viewBinding.lastMsg.setText(String.format(getString(io.openim.android.ouicore.R.string.two_related_chats), da.getMessageCount() + ""));
 
                             contactItemHolder.viewBinding.getRoot().setOnClickListener(v -> {
-                                ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
-                                if (null == chatVM) {
-                                    chatVM = new ChatVM();
-                                    BaseApp.inst().putVM(chatVM);
-                                }
-                                Message message;
-                                chatVM.startMsg = message = da.getMessageList().get(0);
-                                chatVM.isSingleChat =
-                                    message.getSessionType() == ConversationType.SINGLE_CHAT;
-                                if (chatVM.isSingleChat) {
-                                    chatVM.userID = message.getRecvID();
-                                    if (message.getRecvID()
-                                        .equals(BaseApp.inst().loginCertificate.userID))
-                                        //表示是对方发送的消息
-                                        chatVM.userID = message.getSendID();
-                                } else
-                                    chatVM.groupID = message.getGroupID();
-                                NotificationElem notificationElem = message.getNotificationElem();
-                                if (null != notificationElem) {
-                                    NotificationMsg notificationMsg =
-                                        GsonHel.fromJson(notificationElem.getDetail(),
-                                            NotificationMsg.class);
-                                    chatVM.notificationMsg.setValue(notificationMsg);
-                                }
+                                Message message = da.getMessageList().get(0);
+
+                                ChatHistoryRelationVM relationVM =
+                                    Easy.installVM(ChatHistoryRelationVM.class);
+                                relationVM.gid = message.getGroupID();
+                                relationVM.searchContent = vm.searchContent.val();
+                                relationVM.searchResultItem.setValue(Common.copyObject(da));
                                 startActivity(new Intent(SearchActivity.this,
-                                    ChatActivity.class).putExtra(Constant.K_FROM, true));
+                                    ChatHistoryRelationActivity.class));
                             });
 
                         }
@@ -360,9 +330,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                             Common.stringBindForegroundColorSpan(contactItemHolder.viewBinding.nickName, groupInfo.getGroupName(), vm.searchContent.getValue());
                             contactItemHolder.viewBinding.getRoot().setOnClickListener(v -> {
                                 BaseApp.inst().removeCacheVM(ChatVM.class);
-                                startActivity(new Intent(SearchActivity.this,
-                                    ChatActivity.class).putExtra(Constant.K_GROUP_ID,
-                                    groupInfo.getGroupID()));
+                                startActivity(new Intent(SearchActivity.this, ChatActivity.class).putExtra(Constant.K_GROUP_ID, groupInfo.getGroupID()));
                             });
                         }
                         break;
@@ -373,8 +341,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                         Common.stringBindForegroundColorSpan(fileItemViewHo.view.title,
                             da.getFileElem().getFileName(), vm.searchContent.getValue());
                         fileItemViewHo.view.size.setText(getString(io.openim.android.ouicore.R.string.sender) + ":" + da.getSenderNickname());
-                        fileItemViewHo.view.getRoot().setOnClickListener(v ->
-                            GetFilePathFromUri.openFile(SearchActivity.this, da));
+                        fileItemViewHo.view.getRoot().setOnClickListener(v -> GetFilePathFromUri.openFile(SearchActivity.this, da));
                         break;
                 }
             }

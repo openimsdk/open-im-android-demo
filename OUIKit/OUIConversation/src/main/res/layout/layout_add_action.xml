@@ -8,21 +8,21 @@
     tools:ignore="MissingDefaultResource">
 
     <androidx.cardview.widget.CardView
-        android:layout_width="145dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:minHeight="100dp"
         app:cardCornerRadius="6dp"
         app:cardElevation="0dp">
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:orientation="vertical"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_height="wrap_content">
             <LinearLayout
                 android:id="@+id/scan"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="45dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -49,7 +49,7 @@
                 android:layout_height="1dp" />
             <LinearLayout
                 android:id="@+id/addFriend"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="45dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -86,7 +86,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="15dp"
+                    android:layout_marginRight="14dp"
                     android:src="@mipmap/ic_group" />
 
                 <TextView
@@ -103,7 +103,7 @@
                 android:layout_height="1dp" />
             <LinearLayout
                 android:id="@+id/createGroup"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="45dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -130,7 +130,7 @@
                 android:layout_height="1dp" />
             <LinearLayout
                 android:id="@+id/videoMeeting"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="45dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"

@@ -11,16 +11,23 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.alibaba.android.arouter.launcher.ARouter;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.ExUserInfo;
+import io.openim.android.ouicore.ex.MultipleChoice;
+import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
+import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.databinding.ActivityWhoSeeBinding;
@@ -46,15 +53,30 @@ public class WhoSeeActivity extends BaseActivity<PushMomentsVM, ActivityWhoSeeBi
 
     private ActivityResultLauncher<Intent> ruleDataLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() != RESULT_OK) return;
-        List<SelectDataActivity.RuleData> selectedRuleDataList =
-            (List<SelectDataActivity.RuleData>) result.getData().getSerializableExtra(Constant.K_RESULT);
+            if (result.getResultCode() != RESULT_OK) return;
+            List<SelectDataActivity.RuleData> selectedRuleDataList =
+                (List<SelectDataActivity.RuleData>) result.getData().getSerializableExtra(Constant.K_RESULT);
 
-        int permission = vm.param.getValue().permission;
+            int permission = vm.param.val().permission;
+            bindData(isGroup, selectedRuleDataList, permission);
+
+            vm.getRuleDataIDs(selectedRuleDataList, isGroup);
+        });
+
+    private void ruleDataLauncher(List<MultipleChoice> choices) {
+        List<SelectDataActivity.RuleData> selectedRuleDataList = new ArrayList<>();
+        for (MultipleChoice choice : choices) {
+            SelectDataActivity.RuleData ruleData = new SelectDataActivity.RuleData();
+            ruleData.id = choice.key;
+            ruleData.name = choice.name;
+            ruleData.icon = choice.icon;
+            selectedRuleDataList.add(ruleData);
+        }
+        int permission = vm.param.val().permission;
         bindData(isGroup, selectedRuleDataList, permission);
 
         vm.getRuleDataIDs(selectedRuleDataList, isGroup);
-    });
+    }
 
     private void bindData(boolean isGroup, List<SelectDataActivity.RuleData> selectedRuleDataList
         , int permission) {
@@ -119,14 +141,36 @@ public class WhoSeeActivity extends BaseActivity<PushMomentsVM, ActivityWhoSeeBi
 
     private void jumpSelectUser(List<ExUserInfo> exUserInfo) {
         if (exUserInfo.isEmpty()) return;
-        List<SelectDataActivity.RuleData> ruleDataList = vm.buildUserRuleData(exUserInfo,vm.selectedUserRuleDataList);
-        ruleDataLauncher.launch(new Intent(this, SelectDataActivity.class).putExtra(Constant.K_NAME, getString(io.openim.android.ouicore.R.string.select_user)).putExtra(Constant.K_RESULT, (Serializable) ruleDataList).putExtra(Constant.K_FROM, isGroup).putExtra(Constant.K_SIZE, 20));
+
+        SelectTargetVM targetVM = Easy.installVM(SelectTargetVM.class)
+            .setIntention(SelectTargetVM.Intention.selectFriends);
+        if ( null!=vm.selectedUserRuleDataList){
+            for (SelectDataActivity.RuleData ruleData : vm.selectedUserRuleDataList) {
+                MultipleChoice choice = new MultipleChoice(ruleData.id);
+                choice.isSelect = true;
+                choice.name = ruleData.name;
+                choice.icon = ruleData.icon;
+                if (!targetVM.contains(choice))
+                    targetVM.metaData.val().add(choice);
+            }
+        }
+        targetVM.metaData.update();
+        targetVM.setOnFinishListener(() -> {
+            Common.finishRoute(Routes.Group.SELECT_TARGET, Routes.Contact.ALL_FRIEND);
+            ruleDataLauncher(targetVM.metaData.val());
+        });
+        ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
     }
 
     private void jumpSelectGroup(List<GroupInfo> groupInfos) {
         if (groupInfos.isEmpty()) return;
         List<SelectDataActivity.RuleData> ruleDataList = vm.buildGroupRuleData(groupInfos);
-        ruleDataLauncher.launch(new Intent(this, SelectDataActivity.class).putExtra(Constant.K_NAME, getString(io.openim.android.ouicore.R.string.select_group)).putExtra(Constant.K_RESULT, (Serializable) ruleDataList).putExtra(Constant.K_FROM, isGroup).putExtra(Constant.K_SIZE, 5));
+        ruleDataLauncher.launch(new Intent(this, SelectDataActivity.class)
+            .putExtra(Constant.K_NAME, getString(io.openim.android.ouicore.R.string.select_group))
+            .putExtra(Constant.K_RESULT, (Serializable) ruleDataList)
+            .putExtra(Constant.K_FROM, isGroup)
+            .putExtra(Constant.K_SIZE, 5));
+
     }
 
     private void toGetData(boolean isGroup) {
@@ -140,7 +184,7 @@ public class WhoSeeActivity extends BaseActivity<PushMomentsVM, ActivityWhoSeeBi
         waitDialog = new WaitDialog(this);
         view.setPushMoments(vm);
 
-        lastPermission=vm.param.getValue().permission;
+        lastPermission = vm.param.getValue().permission;
         if (null != vm.selectedGroupRuleDataList)
             bindData(true, vm.selectedGroupRuleDataList, vm.param.getValue().permission);
         if (null != vm.selectedUserRuleDataList)

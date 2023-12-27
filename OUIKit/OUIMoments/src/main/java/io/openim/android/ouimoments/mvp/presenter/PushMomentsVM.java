@@ -135,21 +135,22 @@ public class PushMomentsVM extends BaseViewModel {
 
     public List<SelectDataActivity.RuleData> buildUserRuleData(List<ExUserInfo> exUserInfo,
                                                                List<SelectDataActivity.RuleData> selected) {
-        List<String> selectedIds = new ArrayList<>();
-        if (null != selected) {
-            for (SelectDataActivity.RuleData ruleData : selected) {
-                selectedIds.add(ruleData.id);
-            }
-        }
+//        List<String> selectedIds = new ArrayList<>();
+//        if (null != selected) {
+//            for (SelectDataActivity.RuleData ruleData : selected) {
+//                selectedIds.add(ruleData.id);
+//            }
+//        }
         List<SelectDataActivity.RuleData> ruleDataList = new ArrayList<>();
-        for (ExUserInfo userInfo : exUserInfo) {
-            SelectDataActivity.RuleData ruleData = new SelectDataActivity.RuleData();
-            ruleData.id = userInfo.userInfo.getUserID();
-            if (selectedIds.contains(ruleData.id)) ruleData.isSelect = true;
-            ruleData.name = userInfo.userInfo.getNickname();
-            ruleData.icon = userInfo.userInfo.getFaceURL();
-            ruleDataList.add(ruleData);
-        }
+//        for (ExUserInfo userInfo : exUserInfo) {
+//            SelectDataActivity.RuleData ruleData = new SelectDataActivity.RuleData();
+//            ruleData.id = userInfo.userInfo.getUserID();
+//            if (selectedIds.contains(ruleData.id))
+//                ruleData.isSelect = true;
+//            ruleData.name = userInfo.userInfo.getNickname();
+//            ruleData.icon = userInfo.userInfo.getFaceURL();
+//            ruleDataList.add(ruleData);
+//        }
         return ruleDataList;
     }
 
