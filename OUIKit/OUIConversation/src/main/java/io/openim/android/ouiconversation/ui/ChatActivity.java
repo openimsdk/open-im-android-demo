@@ -1,6 +1,8 @@
 package io.openim.android.ouiconversation.ui;
 
 
+import static android.view.View.GONE;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -220,7 +222,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.recyclerView.setOnTouchListener((v, event) -> {
             bottomInputCote.clearFocus();
             Common.hideKeyboard(this, v);
-            bottomInputCote.setExpandHide();
+            bottomInputCote.setExpandHide(true);
             return false;
         });
         view.recyclerView.addOnLayoutChangeListener((v, i, i1, i2, i3, i4, i5, i6, i7) -> {
@@ -290,7 +292,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 inputLayoutParams.bottomMargin = 0;
             } else {
                 //两次窗口高度相减，就是软键盘高度
-                inputLayoutParams.bottomMargin = mWindowHeight - height;
+                inputLayoutParams.bottomMargin = mWindowHeight
+                    - height-bottomInputCote.view.fragmentContainer.getHeight();
             }
             view.layoutInputCote.getRoot().setLayoutParams(inputLayoutParams);
         }

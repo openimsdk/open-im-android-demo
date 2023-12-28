@@ -7,6 +7,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -24,13 +25,10 @@ import io.openim.android.ouimoments.bean.ActionItem;
  */
 public class SnsPopupWindow extends PopupWindow implements OnClickListener{
 
-	private TextView digBtn;
+    private final View view;
+    private TextView digBtn;
 	private TextView commentBtn;
 
-	// 实例化一个矩形
-	private Rect mRect = new Rect();
-	// 坐标的位置（x、y）
-	private final int[] mLocation = new int[2];
 	// 弹窗子类项选中时的监听
 	private OnItemClickListener mItemClickListener;
 	// 定义弹窗子类项列表
@@ -48,15 +46,15 @@ public class SnsPopupWindow extends PopupWindow implements OnClickListener{
 
 
 	public SnsPopupWindow(Context context) {
-		View view = LayoutInflater.from(context).inflate(R.layout.social_sns_popupwindow, null);
+        view = LayoutInflater.from(context).inflate(R.layout.social_sns_popupwindow, null);
 		digBtn = (TextView) view.findViewById(R.id.digBtn);
 		commentBtn = (TextView) view.findViewById(R.id.commentBtn);
 		digBtn.setOnClickListener(this);
 		commentBtn.setOnClickListener(this);
 
 		this.setContentView(view);
-		this.setWidth(Common.dp2px(100));
-		this.setHeight(Common.dp2px( 30));
+		this.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+		this.setHeight(Common.dp2px(35));
 		this.setFocusable(true);
 		this.setOutsideTouchable(true);
 		this.update();
@@ -74,13 +72,14 @@ public class SnsPopupWindow extends PopupWindow implements OnClickListener{
 	}
 
 	public void showPopupWindow(View parent){
-		parent.getLocationOnScreen(mLocation);
 		// 设置矩形的大小
-		mRect.set(mLocation[0], mLocation[1], mLocation[0] + parent.getWidth(),mLocation[1] + parent.getHeight());
 		digBtn.setText(mActionItems.get(0).mTitle);
 		if(!this.isShowing()){
-			showAtLocation(parent, Gravity.NO_GRAVITY, mLocation[0] - this.getWidth()
-					, mLocation[1] - ((this.getHeight() - parent.getHeight()) / 2));
+            view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            int  mShowMorePopupWindowWidth = -view.getMeasuredWidth();
+            int  mShowMorePopupWindowHeight = -view.getMeasuredHeight();
+            showAsDropDown(parent,mShowMorePopupWindowWidth-
+                Common.dp2px(5),(mShowMorePopupWindowHeight- parent.getHeight())/2);
 		}else{
 			dismiss();
 		}

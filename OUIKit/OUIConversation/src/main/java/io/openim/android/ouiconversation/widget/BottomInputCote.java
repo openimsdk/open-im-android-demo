@@ -150,7 +150,8 @@ public class BottomInputCote {
             clearFocus();
             view.inputLy.setVisibility(isChecked ? GONE : VISIBLE);
             view.touchSay.setVisibility(isChecked ? VISIBLE : GONE);
-            setExpandHide();
+            Common.hideKeyboard(BaseApp.inst(), v);
+            setExpandHide(true);
         });
         view.touchSay.setOnLongClickListener(v -> {
             if (null == touchVoiceDialog) {
@@ -181,7 +182,7 @@ public class BottomInputCote {
         });
 
         view.chatInput.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) setExpandHide();
+            if (hasFocus) setExpandHide(false);
         });
 
         view.emoji.setOnClickListener(v -> {
@@ -412,8 +413,9 @@ public class BottomInputCote {
     }
 
     //设置扩展菜单隐藏
-    public void setExpandHide() {
-        view.fragmentContainer.setVisibility(GONE);
+    public void setExpandHide(boolean isGone) {
+        view.fragmentContainer.setVisibility(
+            isGone? View.GONE:View.INVISIBLE);
     }
 
     private int mCurrentTabIndex;

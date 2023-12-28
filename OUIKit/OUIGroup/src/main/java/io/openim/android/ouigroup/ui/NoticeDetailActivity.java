@@ -35,7 +35,7 @@ public class NoticeDetailActivity extends BaseActivity<GroupVM, ActivityNoticeDe
                 if (null==exGroupMemberInfo)return;
                 view.avatar.load(exGroupMemberInfo.groupMembersInfo.getFaceURL());
                 view.name.setText(exGroupMemberInfo.groupMembersInfo.getNickname());
-                view.time.setText(TimeUtil.getTime(notificationMsg.group.createTime* 1000L, TimeUtil.yearTimeFormat));
+                view.time.setText(TimeUtil.getTime(notificationMsg.group.createTime, TimeUtil.yearTimeFormat));
                 view.content.setText(notificationMsg.group.notification);
             }
         });

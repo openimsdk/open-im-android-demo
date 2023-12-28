@@ -321,9 +321,9 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
             String curUserFavortId =
                 circleItem.getCurUserFavortId(BaseApp.inst().loginCertificate.userID);
             if (!TextUtils.isEmpty(curUserFavortId)) {
-                snsPopupWindow.getmActionItems().get(0).mTitle = "取消";
+                snsPopupWindow.getmActionItems().get(0).mTitle = context.getString(io.openim.android.ouicore.R.string.cancel);
             } else {
-                snsPopupWindow.getmActionItems().get(0).mTitle = "赞";
+                snsPopupWindow.getmActionItems().get(0).mTitle = context.getString(io.openim.android.ouicore.R.string.star);
             }
             snsPopupWindow.update();
             snsPopupWindow.setmItemClickListener(new PopupItemClickListener(circlePosition,
@@ -540,7 +540,8 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                         return;
                     mLasttime = System.currentTimeMillis();
                     if (presenter != null) {
-                        if (BaseApp.inst().getString(io.openim.android.ouicore.R.string.star).equals(actionitem.mTitle.toString())) {
+                        if (BaseApp.inst().getString(io.openim.android.ouicore.R.string.star)
+                            .equals(actionitem.mTitle.toString())) {
                             presenter.addFavort(mCirclePosition, momentID);
                         } else {//取消点赞
                             presenter.deleteFavort(mCirclePosition, momentID);
