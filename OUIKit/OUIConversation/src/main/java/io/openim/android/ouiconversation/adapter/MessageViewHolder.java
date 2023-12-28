@@ -283,7 +283,9 @@ public class MessageViewHolder {
             if (null == unRead) return;
             unRead.setVisibility(View.INVISIBLE);
             int viewType = message.getContentType();
-            if (isOwn && message.getStatus() == MessageStatus.SUCCEEDED && viewType < MessageType.NTF_BEGIN && viewType != Constant.MsgType.LOCAL_CALL_HISTORY) {
+            if (isOwn && message.getStatus() == MessageStatus.SUCCEEDED
+                && viewType < MessageType.NTF_BEGIN
+                && viewType != Constant.MsgType.LOCAL_CALL_HISTORY) {
                 unRead.setVisibility(View.VISIBLE);
                 if (chatVM.isSingleChat) {
                     String unread =
@@ -303,6 +305,8 @@ public class MessageViewHolder {
                                 message.getClientMsgID()).putExtra(Constant.K_RESULT2,
                                 message.getAttachedInfoElem().getGroupHasReadInfo()));
                         });
+                    }else {
+                        unRead.setVisibility(View.INVISIBLE);
                     }
                 }
             }
