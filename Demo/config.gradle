@@ -10,8 +10,8 @@ ext {
             minSdk     : 21,
             targetSdk  : 32,
             compileSdk : 33,
-            versionCode: 65,
-            versionName: "IM-NCER v3.5.0 SDK v3.5.0-rc.0-e-v1.1.4",
+            versionCode: 66,
+            versionName: "IM-NCER 3.5.0+1 SDK 3.5.0-rc.0-e-v1.1.4",
             abiFilters : ['armeabi-v7a','arm64-v8a']
     ]
 
