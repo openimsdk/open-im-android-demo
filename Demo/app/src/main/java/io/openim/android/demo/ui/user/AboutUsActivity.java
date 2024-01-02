@@ -20,6 +20,7 @@ import io.openim.android.ouicore.update.UpdateApp;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
+import open_im_sdk_callback.UploadLogProgress;
 
 public class AboutUsActivity extends BaseActivity<BaseViewModel, ActivityAboutUsBinding> {
     private final UpdateApp updateApp=new UpdateApp();
@@ -44,13 +45,15 @@ public class AboutUsActivity extends BaseActivity<BaseViewModel, ActivityAboutUs
         view.uploadLog.setOnClickListener(v -> {
             WaitDialog waitDialog=new WaitDialog(this);
             waitDialog.show();
-            OpenIMClient.getInstance().uploadLogs(new IMUtil.IMCallBack<String>(){
+            OpenIMClient.getInstance().uploadLogs(new IMUtil.IMCallBack<String>() {
                 @Override
                 public void onSuccess(String data) {
                     waitDialog.dismiss();
                     toast(getString(io.openim.android.ouicore.R.string.upload_success));
                 }
-            }, new ArrayList<>());
+            }, new ArrayList<>(), (l, l1) -> {
+
+            });
         });
     }
 

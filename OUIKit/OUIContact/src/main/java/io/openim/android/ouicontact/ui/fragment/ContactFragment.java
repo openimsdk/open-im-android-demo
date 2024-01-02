@@ -56,14 +56,15 @@ import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 @Route(path = Routes.Contact.HOME)
-public class ContactFragment extends BaseFragment<ContactVM> implements Observer {
+public class ContactFragment extends BaseFragment<ContactVM>  {
     private FragmentContactMainBinding view;
     private ViewContactHeaderBinding header;
+    private NotificationVM notificationVM;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         bindVM(ContactVM.class);
-        Obs.inst().addObserver(this);
+         notificationVM=Easy.find(NotificationVM.class);
         super.onCreate(savedInstanceState);
     }
 
@@ -98,15 +99,14 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
         view.search.setOnClickListener(view1 -> {
             ARouter.getInstance().build(Routes.Conversation.SEARCH).navigation();
         });
+
         header.groupNotice.setOnClickListener(v -> {
-            vm.groupDotNum.setValue(0);
-            SharedPreferencesUtil.remove(getContext(), Constant.K_GROUP_NUM);
+            notificationVM.clearDot(notificationVM.groupDot);
             startActivity(new Intent(getActivity(), GroupNoticeListActivity.class));
         });
 
         header.newFriendNotice.setOnClickListener(v -> {
-            vm.friendDotNum.setValue(0);
-            SharedPreferencesUtil.remove(getContext(), Constant.K_FRIEND_NUM);
+            notificationVM.clearDot(notificationVM.friendDot);
             startActivity(new Intent(getActivity(), NewFriendActivity.class));
         });
 
@@ -124,28 +124,23 @@ public class ContactFragment extends BaseFragment<ContactVM> implements Observer
 
 
     private void initView() {
-        vm.groupDotNum.observe(getActivity(), v -> {
-            header.badge.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE);
-            header.badge.badge.setText(v + "");
+        notificationVM.groupDot.observe(getActivity(), v -> {
+            header.badge.badge.setVisibility(v.size()==0 ? View.GONE : View.VISIBLE);
+            header.badge.badge.setText(v.size() + "");
         });
-        vm.friendDotNum.observe(getActivity(), v -> {
-            header.newFriendNoticeBadge.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE);
-            header.newFriendNoticeBadge.badge.setText(v + "");
+        notificationVM.friendDot.observe(getActivity(), v -> {
+            header.newFriendNoticeBadge.badge.setVisibility(v.size()==0 ? View.GONE : View.VISIBLE);
+            header.newFriendNoticeBadge.badge.setText(v.size() + "");
         });
 
-        Easy.find(NotificationVM.class).momentsUnread.observe(getActivity(),v->
+      notificationVM.momentsUnread.observe(getActivity(),v->
             header.newMomentsMsg.badge.setVisibility(v == 0 ? View.GONE : View.VISIBLE));
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Obs.inst().deleteObserver(this);
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        Obs.Message message = (Obs.Message) arg;
 
-    }
 }

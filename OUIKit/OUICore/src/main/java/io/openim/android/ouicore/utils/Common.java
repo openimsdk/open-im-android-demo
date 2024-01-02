@@ -59,9 +59,11 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.api.OneselfService;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.PictureElem;
+import io.openim.android.sdk.models.SearchResultItem;
 import io.openim.android.sdk.models.VideoElem;
 import io.reactivex.Observable;
 import okhttp3.MediaType;
@@ -77,6 +79,22 @@ public class Common {
 
     public static boolean hasSystemAlertWindow() {
         return new HasPermissions(BaseApp.inst(), Permission.SYSTEM_ALERT_WINDOW).isAllGranted();
+    }
+
+    /**
+     * 判断路由是否存在
+     * @param path
+     * @return
+     */
+    public static Postcard routeExist(String path) {
+        Postcard postcard;
+        try {
+            postcard = ARouter.getInstance().build(path);
+            LogisticsCenter.completion(postcard);
+        } catch (Exception e) {
+            return null;
+        }
+        return postcard;
     }
 
     public static void addTypeSystemAlert(WindowManager.LayoutParams params) {
@@ -486,5 +504,9 @@ public class Common {
     }
 
 
+    public static <T> T copyObject(T t) {
+      return (T) GsonHel.fromJson(GsonHel.toJson(t),
+            t.getClass());
+    }
 }
 

@@ -125,6 +125,8 @@ public class Constant {
     public static final String IS_REMOVE_GROUP = "isRemoveGroup";
     //选择群成员
     public static final String IS_SELECT_MEMBER = "isSelectMember";
+    //@成员
+    public static final String IS_AT_MEMBER  = "isAtMember";
     //群通话
     public static final String IS_GROUP_CALL = "isGroupCall";
     //选择好友

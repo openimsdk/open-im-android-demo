@@ -10,11 +10,13 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -22,6 +24,7 @@ import java.util.Observer;
 import io.openim.android.demo.databinding.ActivityPersonDetailBinding;
 import io.openim.android.demo.ui.user.PersonDataActivity;
 import io.openim.android.demo.vm.FriendVM;
+import io.openim.android.demo.vm.PersonalVM;
 import io.openim.android.ouiconversation.ui.PreviewMediaActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseApp;
@@ -94,7 +97,10 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         friendVM.setIView(this);
         waitDialog.show();
 
-        vm.searchPerson();
+        update();
+
+        Postcard postcard = Common.routeExist(Routes.Moments.ToUserMoments);
+        view.moments.setVisibility(null == postcard ? View.GONE : View.VISIBLE);
     }
 
     private ActivityResultLauncher<Intent> jumpCallBack =
@@ -192,8 +198,9 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         view.avatar.setOnClickListener(v -> {
             UserInfo userInfo = vm.userInfo.getValue().get(0);
             PreviewMediaVM mediaVM = Easy.installVM(PreviewMediaVM.class);
-            PreviewMediaVM .MediaData mediaData =new PreviewMediaVM.MediaData(userInfo.getNickname());
-            mediaData.mediaUrl=userInfo.getFaceURL();
+            PreviewMediaVM.MediaData mediaData =
+                new PreviewMediaVM.MediaData(userInfo.getNickname());
+            mediaData.mediaUrl = userInfo.getFaceURL();
             mediaVM.previewSingle(mediaData);
             v.getContext().startActivity(
                 new Intent(v.getContext(), PreviewMediaActivity.class));
@@ -206,7 +213,23 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             }
         });
         view.userInfo.setOnClickListener(v -> {
-            personDataActivityLauncher.launch(new Intent(this, PersonDataActivity.class).putExtra(Constant.K_ID, vm.userInfo.getValue().get(0).getUserID()));
+            String uid=vm.userInfo.getValue().get(0)
+                .getUserID();
+            Easy.installVM(PersonalVM.class)
+                .getUsersInfoWithCache(uid,groupId)
+                .uid=uid;
+            personDataActivityLauncher.launch(new Intent(this,
+                PersonDataActivity.class));
+        });
+
+        view.moments.setOnClickListener(v -> {
+            UserInfo userInfo=vm.userInfo.val().get(0);
+            HashMap<String, String> map = new HashMap<>();
+            map.put("id",userInfo.getUserID());
+            map.put("name",userInfo.getNickname());
+            map.put("headUrl",userInfo.getFaceURL());
+            ARouter.getInstance().build(Routes.Moments.ToUserMoments)
+                .withSerializable(Constant.K_RESULT,map).navigation();
         });
         view.sendMsg.setOnClickListener(v -> {
             if (!formChat) {
@@ -250,7 +273,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     private boolean isHideAdd() {
         List<UserInfo> userInfoList = vm.userInfo.getValue();
         boolean notAllowed = false;
-        if (null != userInfoList&&!userInfoList.isEmpty())
+        if (null != userInfoList && !userInfoList.isEmpty())
             notAllowed = userInfoList.get(0).getAllowAddFriend() == AllowType.NotAllowed.value;
         return applyMemberFriend || isFriend || oneself() || notAllowed;
     }
@@ -262,17 +285,17 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             GroupInfo groupInfo = groupInfos.get(0);
             // 不允许查看群成员资料
             if (groupInfo.getLookMemberInfo() == 1) {
-                view.userInfo.setVisibility(View.GONE);
+                view.userInfoLy.setVisibility(View.GONE);
                 view.userId.setVisibility(View.GONE);
             } else {
                 view.userId.setVisibility(View.VISIBLE);
-                if (!oneself() && isFriend) view.userInfo
+                if (!oneself() && isFriend) view.userInfoLy
                     .setVisibility(View.VISIBLE);
             }
             // 不允许添加组成员为好友
             applyMemberFriend = groupInfo.getApplyMemberFriend() == 1;
 
-            view.addFriend.setVisibility(isHideAdd()? View.GONE :
+            view.addFriend.setVisibility(isHideAdd() ? View.GONE :
                 View.VISIBLE);
             view.userId.setVisibility(applyMemberFriend ? View.GONE : View.VISIBLE);
 
@@ -290,11 +313,11 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             if (null != friendshipInfo) {
                 if (friendshipInfo.getResult() == 1 || isCon) {
                     //是好友或在黑名单
-                    view.userInfo.setVisibility(View.VISIBLE);
+                    view.userInfoLy.setVisibility(View.VISIBLE);
                     view.addFriend.setVisibility(View.GONE);
                     isFriend = friendshipInfo.getResult() == 1;
                 } else {
-                    view.userInfo.setVisibility(View.GONE);
+                    view.userInfoLy.setVisibility(View.GONE);
                     view.addFriend.setVisibility(isHideAdd()
                         ? View.GONE : View.VISIBLE);
                 }
@@ -360,8 +383,13 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     public void update(Observable o, Object arg) {
         Obs.Message message = (Obs.Message) arg;
         if (message.tag == Constant.Event.USER_INFO_UPDATE) {
-            vm.searchPerson();
+            update();
         }
+    }
+
+    private void update() {
+        vm.getUsersInfoWithCache(vm.searchContent.val(),groupId);
+        vm.getExtendUserInfo(vm.searchContent.val());
     }
 
     @Override

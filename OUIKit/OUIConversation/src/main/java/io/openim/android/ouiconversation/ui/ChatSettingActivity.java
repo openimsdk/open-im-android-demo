@@ -7,24 +7,15 @@ import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.lifecycle.Observer;
 
 import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bigkoo.pickerview.adapter.ArrayWheelAdapter;
-import com.bigkoo.pickerview.builder.OptionsPickerBuilder;
-import com.bigkoo.pickerview.builder.TimePickerBuilder;
-import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
-import com.bigkoo.pickerview.listener.OnTimeSelectListener;
-import com.bigkoo.pickerview.view.OptionsPickerView;
-import com.bigkoo.pickerview.view.TimePickerView;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.ActivityChatSettingBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseApp;
@@ -32,7 +23,6 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutBurnAfterReadingBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
-import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
@@ -40,13 +30,10 @@ import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
-import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouicore.widget.SlideButton;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.UserInfo;
 
@@ -75,6 +62,68 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
         });
 
     private void click() {
+        view.periodicDeletionTime.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                LayoutBurnAfterReadingBinding view =
+                    LayoutBurnAfterReadingBinding.inflate(getLayoutInflater());
+                CommonDialog commonDialog = new CommonDialog(ChatSettingActivity.this);
+                commonDialog.setCustomCentral(view.getRoot());
+                view.title.setText(io.openim.android.ouicore.R.string.period_deletion_tips1);
+                view.description.setText(io.openim.android.ouicore.R.string.period_deletion_tips2);
+                List<String> numList = new ArrayList<>();
+                List<String> units = new ArrayList<>();
+                for (int i = 0; i < 6; i++) {
+                    numList.add(String.valueOf(i + 1));
+                }
+                units.add(getString(io.openim.android.ouicore.R.string.day));
+                units.add(getString(io.openim.android.ouicore.R.string.week));
+                units.add(getString(io.openim.android.ouicore.R.string.month));
+
+                view.roller.setAdapter(new ArrayWheelAdapter(numList));
+                view.roller.setCyclic(false);
+                view.roller.setCurrentItem(0);
+
+                view.roller2.setVisibility(View.VISIBLE);
+                view.roller2.setAdapter(new ArrayWheelAdapter(units));
+                view.roller2.setCyclic(false);
+                view.roller2.setCurrentItem(0);
+
+                commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
+                commonDialog.getMainView().confirm.setOnClickListener(v1 -> {
+                    commonDialog.dismiss();
+                    int position = view.roller.getCurrentItem();
+                    int unit = view.roller2.getCurrentItem();
+                    int num = Integer.parseInt(numList.get(position));
+                    long seconds;
+                    if (unit == 0) {
+                        seconds = num * (60 * 60 * 24);
+                    } else if (unit == 1) {
+                        seconds = num * (60 * 60 * 24 * 7);
+                    } else {
+                        seconds = num * (60 * 60 * 24 * 30);
+                    }
+                    OpenIMClient.getInstance().conversationManager.setConversationMsgDestructTime(new IMUtil.IMCallBack<String>() {
+                        @Override
+                        public void onSuccess(String data) {
+                            vm.conversationInfo.val().setMsgDestructTime(seconds);
+                            vm.conversationInfo.update();
+                        }
+                    }, vm.conversationID, seconds);
+                });
+                commonDialog.show();
+            }
+        });
+        view.periodicDeletion.setOnSlideButtonClickListener(isChecked -> {
+            OpenIMClient.getInstance().conversationManager.setConversationIsMsgDestruct(new IMUtil.IMCallBack<String>() {
+                @Override
+                public void onSuccess(String data) {
+                    vm.conversationInfo.val().setMsgDestruct(isChecked);
+                    vm.conversationInfo.update();
+                }
+            }, vm.conversationID, isChecked);
+        });
+
         view.addChat.setOnClickListener(v -> {
             SelectTargetVM choiceVM = Easy.installVM(SelectTargetVM.class);
             choiceVM.setIntention(SelectTargetVM.Intention.invite);
@@ -128,7 +177,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
                 public void onSuccess(String data) {
                     view.readVanish.setCheckedWithAnimation(isChecked);
                 }
-            }, vm.conversationInfo.getValue().getConversationID(), isChecked);
+            }, vm.conversationInfo.val().getConversationID(), isChecked);
         });
         view.topSlideButton.setOnSlideButtonClickListener(is -> {
             contactListVM.pinConversation(vm.conversationInfo.getValue(), is);
@@ -174,10 +223,8 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
                 view.roller.setAdapter(new ArrayWheelAdapter(strings));
                 int duration = vm.conversationInfo.val().getBurnDuration();
                 int currentItem = 0;
-                if (duration == 300)
-                    currentItem = 1;
-                if (duration >= 3600)
-                    currentItem = 2;
+                if (duration == 300) currentItem = 1;
+                if (duration >= 3600) currentItem = 2;
                 view.roller.setCurrentItem(currentItem);
                 view.roller.setCyclic(false);
                 commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
@@ -210,7 +257,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
         if (days <= 6) {
             return days + getString(io.openim.android.ouicore.R.string.day);
-        } else if (weeks <= 6 &&(days % 7==0)) {
+        } else if (weeks <= 6 && (days % 7 == 0)) {
             return weeks + getString(io.openim.android.ouicore.R.string.week);
         } else {
             return months + getString(io.openim.android.ouicore.R.string.month);
@@ -223,6 +270,8 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             view.noDisturb.post(() -> view.noDisturb.setCheckedWithAnimation(integer == 2));
         });
         vm.conversationInfo.observe(this, conversationInfo -> {
+            showPeriodicDeletionTime();
+
             view.topSlideButton.post(() -> view.topSlideButton.setCheckedWithAnimation(conversationInfo.isPinned()));
             view.readVanishTime.setVisibility(conversationInfo.isPrivateChat() ? View.VISIBLE :
                 View.GONE);
@@ -252,8 +301,18 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
             }
         }, uid);
+
     }
 
+    private void showPeriodicDeletionTime() {
+        view.periodicDeletion.setCheckedWithAnimation(vm.conversationInfo.val().isMsgDestruct());
+        view.periodicDeletionTime.setVisibility(vm.conversationInfo.val().isMsgDestruct() ?
+            View.VISIBLE : View.GONE);
+        long destructTime = vm.conversationInfo.val().getMsgDestructTime();
+        if (0 != destructTime) {
+            view.periodicDeletionStr.setText(convertToDaysWeeksMonths(destructTime));
+        }
+    }
 
     @Override
     public void scrollToPosition(int position) {

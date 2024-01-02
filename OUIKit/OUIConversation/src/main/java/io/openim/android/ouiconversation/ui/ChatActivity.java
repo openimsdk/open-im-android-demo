@@ -1,6 +1,8 @@
 package io.openim.android.ouiconversation.ui;
 
 
+import static android.view.View.GONE;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -29,6 +31,7 @@ import com.bumptech.glide.Glide;
 import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Observable;
@@ -147,6 +150,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     private void release() {
         if (isFinishing()) {
+            vm.markRead();
             if (!vm.fromChatHistory) removeCacheVM();
 
             Easy.delete(CustomEmojiVM.class);
@@ -168,7 +172,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             if (contactListVM != null) {
                 contactListVM.updateConversation();
             }
-            vm.markRead();
         }
     }
 
@@ -219,7 +222,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.recyclerView.setOnTouchListener((v, event) -> {
             bottomInputCote.clearFocus();
             Common.hideKeyboard(this, v);
-            bottomInputCote.setExpandHide();
+            bottomInputCote.setExpandHide(true);
             return false;
         });
         view.recyclerView.addOnLayoutChangeListener((v, i, i1, i2, i3, i4, i5, i6, i7) -> {
@@ -244,7 +247,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
 
         String chatBg =
-            SharedPreferencesUtil.get(this).getString(Constant.K_SET_BACKGROUND + (vm.isSingleChat ? vm.userID : vm.groupID));
+            SharedPreferencesUtil.get(this)
+                .getString(Constant.K_SET_BACKGROUND + (vm.isSingleChat ? vm.userID : vm.groupID));
         if (!chatBg.isEmpty()) Glide.with(this).load(chatBg).into(view.chatBg);
 
 
@@ -288,7 +292,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 inputLayoutParams.bottomMargin = 0;
             } else {
                 //两次窗口高度相减，就是软键盘高度
-                inputLayoutParams.bottomMargin = mWindowHeight - height;
+                inputLayoutParams.bottomMargin = mWindowHeight
+                    - height-bottomInputCote.view.fragmentContainer.getHeight();
             }
             view.layoutInputCote.getRoot().setLayoutParams(inputLayoutParams);
         }
@@ -302,7 +307,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             groupVM.groupId = vm.groupID;
             BaseApp.inst().putVM(groupVM);
             ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER).withInt(Constant.K_SIZE,
-                9).withBoolean(Constant.IS_SELECT_MEMBER, true).navigation(this,
+                9).withBoolean(Constant.IS_SELECT_MEMBER, true)
+                .withBoolean(Constant.IS_AT_MEMBER,true).navigation(this,
                 Constant.Event.AT_USER);
         });
         view.call.setOnClickListener(v -> {
@@ -350,8 +356,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.mergeForward.setOnClickListener(v -> {
 //            ARouter.getInstance().build(Routes.Contact.FORWARD).navigation(this,
 //                Constant.Event.FORWARD);
+            List<Message> msgList=getSelectMsg();
+            Collections.reverse(msgList);
             Easy.find(ForwardVM.class).createMergerMessage(vm.isSingleChat,
-                vm.conversationInfo.getValue().getShowName(), getSelectMsg());
+                vm.conversationInfo.getValue().getShowName(), msgList);
 
             Easy.installVM(SelectTargetVM.class);
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) this,
@@ -487,6 +495,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             MsgExpand msgExpand = (MsgExpand) message.getExt();
             if (null != msgExpand && msgExpand.isChoice) selectMsg.add(message);
         }
+
         return selectMsg;
     }
 
@@ -602,6 +611,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     public static class LinearLayoutMg extends androidx.recyclerview.widget.LinearLayoutManager {
+        private boolean canScrollVertically=true;
+
         public LinearLayoutMg(Context context) {
             super(context);
         }
@@ -613,6 +624,16 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             } catch (IndexOutOfBoundsException e) {
                 e.printStackTrace();
             }
+        }
+
+
+        @Override
+        public boolean canScrollVertically() {
+            return canScrollVertically;
+        }
+
+        public void setCanScrollVertically(boolean canScrollVertically) {
+            this.canScrollVertically = canScrollVertically;
         }
     }
 }

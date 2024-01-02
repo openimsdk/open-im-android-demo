@@ -200,8 +200,8 @@
                         android:paddingRight="15dp">
 
                         <TextView
-                            android:layout_width="56dp"
-                            android:layout_height="20dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:text="聊天内容"
                             android:textColor="#ff8e9ab0"
                             android:textSize="14sp" />

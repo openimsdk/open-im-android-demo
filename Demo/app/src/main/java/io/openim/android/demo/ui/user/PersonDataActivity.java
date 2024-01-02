@@ -14,16 +14,12 @@ import io.openim.android.demo.databinding.ActivityPersonInfoBinding;
 import io.openim.android.demo.ui.main.EditTextActivity;
 import io.openim.android.demo.vm.FriendVM;
 import io.openim.android.demo.vm.PersonalVM;
-import io.openim.android.ouicontact.ui.AllFriendActivity;
-import io.openim.android.ouiconversation.ui.ChatActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
-import io.openim.android.ouicore.ex.User;
-import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
@@ -35,32 +31,26 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.models.CardElem;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonInfoBinding> {
 
-    private ChatVM chatVM;
     private FriendVM friendVM = new FriendVM();
     private WaitDialog waitDialog;
-    private String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        bindVM(PersonalVM.class, true);
+        vm=Easy.find(PersonalVM.class);
+        vm.setContext(this);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityPersonInfoBinding.inflate(getLayoutInflater()));
         sink();
         init();
         listener();
-        uid = getIntent().getStringExtra(Constant.K_ID);
-        if (TextUtils.isEmpty(uid)) {
-            chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
-            uid = chatVM.userID;
-        }
-        vm.getUserInfo(uid);
+
+        vm.getUserInfo(vm.uid);
     }
 
     @Override
@@ -80,7 +70,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
     @Override
     public void onSuccess(Object body) {
         super.onSuccess(body);
-        final String cid = "single_" + uid;
+        final String cid = "single_" + vm.uid;
         BaseApp.inst().getVMByCache(ContactListVM.class).deleteConversationAndDeleteAllMsg(cid);
         setResult(RESULT_OK);
         finish();
@@ -95,7 +85,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
             mainView.confirm.setOnClickListener(v1 -> {
                 commonDialog.dismiss();
-                friendVM.deleteFriend(uid);
+                friendVM.deleteFriend(vm.uid);
             });
         });
         view.recommend.setOnClickListener(v -> {
@@ -144,21 +134,15 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             startActivity(new Intent(this, MoreDataActivity.class));
         });
         view.remark.setOnClickListener(view -> {
-            if (null == vm.userInfo.getValue()) return;
-            String remark = "";
-            try {
-                remark = vm.userInfo.val().getFriendInfo().getRemark();
-            } catch (Exception e) {
-            }
             resultLauncher.launch(new Intent(this, EditTextActivity.class)
                 .putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.remark))
                     .putExtra(EditTextActivity.MAX_LENGTH,16)
-                .putExtra(EditTextActivity.INIT_TXT, remark));
+                .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.val().getRemark()));
         });
         friendVM.blackListUser.observe(this, userInfos -> {
             boolean isCon = false;
             for (UserInfo userInfo : userInfos) {
-                if (userInfo.getUserID().equals(uid)) {
+                if (userInfo.getUserID().equals(vm.uid)) {
                     isCon = true;
                     break;
                 }
@@ -167,14 +151,14 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
             view.slideButton.post(() -> view.slideButton.setCheckedWithAnimation(finalIsCon));
         });
         view.joinBlackList.setOnClickListener(v -> {
-            if (view.slideButton.isChecked()) friendVM.removeBlacklist(uid);
+            if (view.slideButton.isChecked()) friendVM.removeBlacklist(vm.uid);
             else {
                 addBlackList();
             }
         });
         view.slideButton.setOnSlideButtonClickListener(isChecked -> {
             if (isChecked) addBlackList();
-            else friendVM.removeBlacklist(uid);
+            else friendVM.removeBlacklist(vm.uid);
         });
     }
 
@@ -189,7 +173,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         });
         commonDialog.getMainView().confirm.setOnClickListener(v -> {
             commonDialog.dismiss();
-            friendVM.addBlacklist(uid);
+            friendVM.addBlacklist(vm.uid);
         });
         commonDialog.show();
     }
@@ -213,6 +197,12 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
                     vm.userInfo.val().setRemark(resultStr);
                     Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
                 }
-            }, uid, resultStr);
+            }, vm.uid, resultStr);
         });
+
+    @Override
+    protected void fasterDestroy() {
+        super.fasterDestroy();
+        Easy.delete(PersonalVM.class);
+    }
 }

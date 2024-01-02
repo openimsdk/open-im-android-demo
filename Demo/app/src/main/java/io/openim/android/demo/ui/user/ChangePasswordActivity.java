@@ -47,6 +47,10 @@ public class ChangePasswordActivity extends BaseActivity<LoginVM, ActivityChange
                toast(getString(io.openim.android.ouicore.R.string.password_valid_tips2));
                return;
            }
+            if (newPassword.equals(oldPassword)){
+                toast(getString(io.openim.android.ouicore.R.string.password_valid_tips3));
+                return;
+            }
            loginVM.changePassword(oldPassword,newPassword);
         }
     });

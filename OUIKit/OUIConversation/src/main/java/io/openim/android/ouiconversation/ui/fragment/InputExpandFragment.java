@@ -176,20 +176,16 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                 GroupVM groupVM = new GroupVM();
                 groupVM.groupId = vm.groupID;
                 BaseApp.inst().putVM(groupVM);
+
                 ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
-                    .withBoolean(Constant.IS_SELECT_MEMBER, true)
-                    .withBoolean(Constant.IS_GROUP_CALL, true)
                     .withInt(Constant.K_SIZE, 9)
-                    .navigation(getActivity(), Constant.Event.CALLING_REQUEST_CODE);
+                    .withBoolean(Constant.IS_GROUP_CALL, true)
+                    .navigation(getActivity(),
+                        Constant.Event.CALLING_REQUEST_CODE);
             }
             return false;
         });
     }
-
-    public void toSelectMember() {
-
-    }
-
 
     private void sendCardMessage(MultipleChoice multipleChoice) {
         CardElem cardElem = new CardElem();

@@ -82,6 +82,7 @@ import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.PictureElem;
+import io.openim.android.sdk.models.QuoteElem;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SearchResult;
@@ -128,6 +129,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     //开启多选
     public State<Boolean> enableMultipleSelect = new State<>();
+    //是否加入群
+    public State<Boolean> isJoinGroup = new State<>(true);
 
     private UserOnlineStatusListener userOnlineStatusListener;
 
@@ -365,6 +368,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     int getReadCountdown(Message message) {
         int burnDuration = message.getAttachedInfoElem().getBurnDuration();
         long hasReadTime = message.getAttachedInfoElem().getHasReadTime();
+        if (burnDuration==0)
+            burnDuration=30;
         if (hasReadTime > 0) {
             long end = hasReadTime + (burnDuration * 1000L);
             long diff = (end - System.currentTimeMillis()) / 1000;
@@ -423,6 +428,13 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             getOneConversation(null);
         } else {
             getGroupsInfo(groupID, null);
+            OpenIMClient.getInstance().groupManager.isJoinGroup(groupID,
+                new OnBase<Boolean>() {
+                @Override
+                public void onSuccess(Boolean data) {
+                    isJoinGroup.setValue(data);
+                }
+            });
         }
     }
 
@@ -903,6 +915,15 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public void onRecvMessageRevokedV2(RevokedInfo info) {
         try {
             for (Message message : messages.val()) {
+                QuoteElem quoteElem =message.getQuoteElem();
+               Message quoteMessage ;
+                if (null!=quoteElem&& null!=(quoteMessage=quoteElem.getQuoteMessage())
+                    &&quoteMessage.getClientMsgID().equals(info.getClientMsgID())){
+                    //引用消息被删除
+                    quoteMessage.setContentType(MessageType.REVOKE_MESSAGE_NTF);
+                    messageAdapter.notifyItemChanged(
+                        messages.val().indexOf(message));
+                }
                 if (message.getClientMsgID().equals(info.getClientMsgID())) {
                     message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
                     //a 撤回了一条消息
@@ -1089,6 +1110,24 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
 
         }, conversationID, startMsg, count * 80);
+    }
+
+
+    @Override
+    public void onGroupMemberAdded(GroupMembersInfo info) {
+        if (info.getGroupID().equals(groupID)
+            &&info.getUserID().equals(BaseApp.inst().loginCertificate.userID)){
+            isJoinGroup.setValue(true);
+            getGroupsInfo(groupID,null);
+        }
+    }
+
+    @Override
+    public void onGroupMemberDeleted(GroupMembersInfo info) {
+        if (info.getGroupID().equals(groupID)
+            && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)){
+            isJoinGroup.setValue(false);
+        }
     }
 
     /**
