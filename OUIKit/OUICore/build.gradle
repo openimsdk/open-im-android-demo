@@ -100,6 +100,6 @@ dependencies {
     api 'com.github.MZCretin:AutoUpdateProject:latest.release'
 
     //openIM sdk
-    api 'io.openim:android-sdk:3.4.1@aar'
+    api 'io.openim:android-sdk:3.5.0-rc1@aar'
     api 'io.openim:core-sdk:3.5.0-rc1@aar'
 }
