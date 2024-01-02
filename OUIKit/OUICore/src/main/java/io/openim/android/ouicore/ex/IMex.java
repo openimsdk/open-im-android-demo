@@ -2,8 +2,8 @@ package io.openim.android.ouicore.ex;
 
 import java.io.Serializable;
 
-public class User extends Ex implements Serializable {
-    public User(String key) {
+public class IMex extends Ex implements Serializable {
+    public IMex(String key) {
         super(key);
     }
     public String name;

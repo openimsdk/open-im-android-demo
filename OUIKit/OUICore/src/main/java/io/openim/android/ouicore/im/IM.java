@@ -24,6 +24,7 @@ public class IM {
         InitConfig initConfig = new InitConfig(Constant.getImApiUrl(),
             Constant.getImWsUrl(), getStorageDir());
         initConfig.isLogStandardOutput = true;
+        initConfig.logLevel=5;
 
         ///IM 初始化
         OpenIMClient.getInstance().initSDK(app,

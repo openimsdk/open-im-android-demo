@@ -6,6 +6,7 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -48,6 +49,8 @@ import io.openim.android.ouiconversation.ui.NotificationActivity;
 import io.openim.android.ouiconversation.ui.SearchActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.ex.MultipleChoice;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
@@ -61,11 +64,13 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.FriendInfo;
 
 @Route(path = Routes.Conversation.CONTACT_LIST)
 public class ConversationListFragment extends BaseFragment<ContactListVM> implements ContactListVM.ViewAction, Observer {
@@ -258,8 +263,8 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
     }
 
     private void initHeader() {
-        user.info.observe(getActivity(),v-> {
-            view.avatar.load(v.getFaceURL(),v.getNickname());
+        user.info.observe(getActivity(), v -> {
+            view.avatar.load(v.getFaceURL(), v.getNickname());
             view.name.setText(v.getNickname());
         });
         view.addFriend.setOnClickListener(this::showPopupWindow);
@@ -293,8 +298,25 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
         view.createGroup.setOnClickListener(c -> {
             popupWindow.dismiss();
 
-            Easy.installVM(SelectTargetVM.class)
+            SelectTargetVM targetVM = Easy.installVM(SelectTargetVM.class)
                 .setIntention(SelectTargetVM.Intention.isCreateGroup);
+            targetVM.setOnFinishListener(() -> {
+                GroupVM groupVM = BaseApp.inst().getVMByCache(GroupVM.class);
+                if (null == groupVM)
+                    groupVM = new GroupVM();
+                groupVM.selectedFriendInfo.getValue().clear();
+                List<MultipleChoice> multipleChoices = targetVM.metaData.getValue();
+                for (int i = 0; i < multipleChoices.size(); i++) {
+                    MultipleChoice us = multipleChoices.get(i);
+                    FriendInfo friendInfo = new FriendInfo();
+                    friendInfo.setUserID(us.key);
+                    friendInfo.setNickname(us.name);
+                    friendInfo.setFaceURL(us.icon);
+                    groupVM.selectedFriendInfo.getValue().add(friendInfo);
+                }
+                BaseApp.inst().putVM(groupVM);
+                ARouter.getInstance().build(Routes.Group.CREATE_GROUP2).navigation();
+            });
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
         });
         view.videoMeeting.setOnClickListener(c -> {
@@ -322,11 +344,11 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
     }
 
     public void clickSlideSet() {
-        if (slideSet.isEmpty())return;
-        if (slideNum>slideSet.size()-1)
-            slideNum=0;
+        if (slideSet.isEmpty()) return;
+        if (slideNum > slideSet.size() - 1)
+            slideNum = 0;
         Common.smoothMoveToPosition(view.recyclerView,
-            (int)slideSet.toArray()[slideNum++]);
+            (int) slideSet.toArray()[slideNum++]);
     }
 
     @Override
@@ -363,7 +385,6 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
                         itemClickListener.onItemClick(v, index);
                 }
             });
-
             MsgConversation msgConversation = conversationInfos.get(position);
             boolean isGroup =
                 msgConversation.conversationInfo.getConversationType() != ConversationType.SINGLE_CHAT;

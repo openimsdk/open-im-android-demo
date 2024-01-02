@@ -7,7 +7,8 @@ import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.lifecycle.MutableLiveData;
+
+import com.alibaba.fastjson2.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.openim.android.ouicore.base.BaseViewModel;
+import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.entity.UserList;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
@@ -37,21 +39,20 @@ import io.openim.android.sdk.models.SearchResultItem;
 import io.openim.android.sdk.models.UserInfo;
 
 public class SearchVM extends BaseViewModel {
-    public MutableLiveData<List<SearchResultItem>> messageItems =
-        new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<List<SearchResultItem>> fileItems =
-        new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<List<GroupInfo>> groupsInfo = new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<List<UserInfo>> userInfo = new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<List<FriendshipInfo>> friendshipInfo =
-        new MutableLiveData<>(new ArrayList<>());
-    public MutableLiveData<List<GroupMembersInfo>> groupMembersInfo =
-        new MutableLiveData<>(new ArrayList<>());
+    public State<List<SearchResultItem>> messageItems =
+        new State<>(new ArrayList<>());
+    public State<List<SearchResultItem>> fileItems =
+        new State<>(new ArrayList<>());
+    public State<List<GroupInfo>> groupsInfo = new State<>(new ArrayList<>());
+    public State<List<UserInfo>> userInfo = new State<>(new ArrayList<>());
+    public State<List<FriendshipInfo>> friendshipInfo =
+        new State<>(new ArrayList<>());
+    public State<List<GroupMembersInfo>> groupMembersInfo =
+        new State<>(new ArrayList<>());
 
-    public MutableLiveData<String> hail = new MutableLiveData<>();
-    public MutableLiveData<String> remark = new MutableLiveData<>();
+    public State<String> hail = new State<>();
     //用户 或群组id
-    public MutableLiveData<String> searchContent = new MutableLiveData<>("");
+    public State<String> searchContent = new State<>("");
 
     //true 搜索人 false 搜索群
     public boolean isPerson = false;
@@ -59,37 +60,71 @@ public class SearchVM extends BaseViewModel {
     public int pageSize=50;
     private final Handler handler = new Handler();
 
-    public void searchPerson() {
-        searchPerson(null);
-    }
-
-    public void searchPerson(List<String> ids) {
-        if (null == ids) {
-            ids = new ArrayList<>(); // 用户ID集合
-            ids.add(searchContent.getValue());
-        }
+    public void getExtendUserInfo(String uid) {
+        List<String> ids = new ArrayList<>();
+        ids.add(uid);
         Parameter parameter = new Parameter().add("userIDs", ids);
-        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OneselfService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
-            @Override
-            protected void onFailure(Throwable e) {
-                getIView().toast(e.getMessage());
-            }
-
-            @Override
-            public void onSuccess(HashMap map) {
-                try {
-                    List arrayList = (List) map.get("users");
-                    if (null == arrayList || arrayList.isEmpty()) return;
-
-                    UserInfo u = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
-                        UserInfo.class);
-                    userInfo.setValue(new ArrayList<>(Collections.singleton(u)));
-                } catch (Exception e) {
-                    e.printStackTrace();
+        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody())
+            .map(OneselfService.turn(HashMap.class))
+            .compose(N.IOMain())
+            .subscribe(new NetObserver<HashMap>(getContext()) {
+                @Override
+                protected void onFailure(Throwable e) {
+                    getIView().toast(e.getMessage());
                 }
 
+                @Override
+                public void onSuccess(HashMap map) {
+                    try {
+                        ArrayList arrayList = (ArrayList) map.get("users");
+                        if (null == arrayList || arrayList.isEmpty()) return;
+
+                        UserInfo u = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
+                            UserInfo.class);
+                        userInfo.setValue(new ArrayList<>(Collections.
+                            singleton(updateUserInfo(
+                                userInfo.val().isEmpty()?null:
+                                userInfo.val().get(0), u))));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+    }
+    private UserInfo updateUserInfo(UserInfo origin, UserInfo update) {
+        try {
+            if (null == origin) {
+                return update;
             }
-        });
+            String json = JSONObject.toJSONString(origin);
+            Map originMap = JSONObject.parseObject(json, Map.class);
+
+            String json2 = JSONObject.toJSONString(update);
+            Map updateMap = JSONObject.parseObject(json2, Map.class);
+
+            originMap.putAll(updateMap);
+            return JSONObject.parseObject(GsonHel.toJson(originMap),
+                UserInfo.class);
+        } catch (Exception ignored) {
+        }
+        return origin;
+    }
+    public SearchVM getUsersInfoWithCache(String id, String gid) {
+        OpenIMClient.getInstance().userInfoManager
+            .getUsersInfoWithCache(new OnBase<List<UserInfo>>() {
+                @Override
+                public void onSuccess(List<UserInfo> data) {
+                    if (!data.isEmpty()) {
+                        UserInfo u = data.get(0);
+                        userInfo.setValue(new ArrayList<>(Collections.
+                            singleton(updateUserInfo(
+                                userInfo.val().isEmpty()?null:
+                                userInfo.val().get(0), u))));
+                    }
+                }
+            }, new ArrayList<>(Collections.singleton(id)), gid);
+        return this;
     }
 
 
@@ -190,11 +225,6 @@ public class SearchVM extends BaseViewModel {
                 hail.getValue(), 2);
     }
 
-    public void search() {
-        if (isPerson) searchPerson();
-        else searchGroup(searchContent.getValue());
-    }
-
     public void searchGroup(String gid) {
         List<String> groupIds = new ArrayList<>(); // 群ID集合
         groupIds.add(gid);
@@ -265,7 +295,7 @@ public class SearchVM extends BaseViewModel {
         } else {
             messageTypeLists = Arrays.asList(messageTypes);
         }
-        MutableLiveData<List<SearchResultItem>> items;
+        State<List<SearchResultItem>> items;
         List<Integer> type;
         if ((type = Arrays.asList(messageTypes)).size() == 1
             && type.get(0) == MessageType.FILE) {

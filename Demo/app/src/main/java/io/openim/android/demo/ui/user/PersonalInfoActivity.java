@@ -116,7 +116,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
         });
         view.email.setOnClickListener(v -> {
             emailLauncher.launch(new Intent(this, EditTextActivity.class)
-                .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.val().getEmail())
+                .putExtra(EditTextActivity.INIT_TXT, "")
                 .putExtra(EditTextActivity.TITLE,
                     getString(io.openim.android.ouicore.R.string.mail)));
         });

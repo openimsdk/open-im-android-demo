@@ -11,6 +11,7 @@ import android.widget.PopupWindow;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +22,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
@@ -30,8 +32,10 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.ex.MultipleChoice;
+import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouigroup.databinding.ActivitySuperGroupMemberBinding;
@@ -48,7 +52,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
     //选择成员进行群通话
     private boolean groupCall;
     //选择群成员
-    private boolean isSelectMember;
+    private boolean isSelectMember, isAtMember;
     private int maxNum;
     private int selectNum = 0;
 
@@ -105,17 +109,32 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
             if (exGroupMemberInfo.isSelect) selectNum++;
         }
         view.bottomLayout.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectNum));
-        view.bottomLayout.submit.setEnabled(selectNum>0);
+        view.bottomLayout.submit.setEnabled(selectNum > 0);
     }
 
     void init() {
         isTransferPermission = getIntent().getBooleanExtra(Constant.K_FROM, false);
         groupCall = getIntent().getBooleanExtra(Constant.IS_GROUP_CALL, false);
         isSelectMember = getIntent().getBooleanExtra(Constant.IS_SELECT_MEMBER, false);
+        isAtMember = getIntent().getBooleanExtra(Constant.IS_AT_MEMBER, false);
         maxNum = getIntent().getIntExtra(Constant.K_SIZE, 9);
+
+     vm.getMyMemberInfo();
     }
 
     private void listener() {
+        view.atAll.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                List<MultipleChoice> members = new ArrayList<>();
+                MultipleChoice multipleChoice = new MultipleChoice(IMUtil.AT_ALL);
+                multipleChoice.name = getString(io.openim.android.ouicore.R.string.all_person);
+                members.add(multipleChoice);
+                setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
+                    (Serializable) members));
+                finishRemoveVM();
+            }
+        });
         view.bottomLayout.submit.setOnClickListener(v -> {
             ArrayList<String> ids = new ArrayList<>();
             List<MultipleChoice> members = new ArrayList<>();
@@ -140,15 +159,14 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
                 setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
                     (Serializable) members));
             }
-            finish();
-            BaseApp.inst().removeCacheVM(GroupVM.class);
+            finishRemoveVM();
         });
         view.searchView.setOnClickListener(v -> {
             Postcard postcard = ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS);
             LogisticsCenter.completion(postcard);
             searchFriendLauncher.launch(new Intent(this, postcard.getDestination()).putExtra(Constant.K_GROUP_ID, vm.groupId));
         });
-        adapter.setOnLoadMoreListener(view.recyclerview,vm.pageSize,()->{
+        adapter.setOnLoadMoreListener(view.recyclerview, vm.pageSize, () -> {
             vm.page++;
             loadMember();
         });
@@ -159,7 +177,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
             LayoutMemberActionBinding view = LayoutMemberActionBinding.inflate(getLayoutInflater());
             view.deleteFriend.setVisibility(vm.isOwner.val() ? View.VISIBLE : View.GONE);
             view.addFriend.setOnClickListener(v1 -> {
-                GroupMaterialActivity.inviteIntoGroup(this,vm);
+                GroupMaterialActivity.inviteIntoGroup(this, vm);
                 popupWindow.dismiss();
             });
             view.deleteFriend.setOnClickListener(v1 -> {
@@ -182,6 +200,7 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
 
         vm.superGroupMembers.observe(this, v -> {
             if (v.isEmpty()) return;
+            removeSelf(v);
             if (groupCall) {
                 vm.buildOwnSelect();
             }
@@ -190,11 +209,31 @@ public class SuperGroupMemberActivity extends BaseActivity<GroupVM,
         });
     }
 
+    private void finishRemoveVM() {
+        finish();
+        BaseApp.inst().removeCacheVM(GroupVM.class);
+    }
+
+    private void removeSelf(List<ExGroupMemberInfo> v) {
+        Iterator<ExGroupMemberInfo> iterator = v.iterator();
+        while (iterator.hasNext()) {
+            ExGroupMemberInfo memberInfo = iterator.next();
+            if (memberInfo.groupMembersInfo.getUserID()
+                .equals(BaseApp.inst().loginCertificate.userID)) {
+                iterator.remove();
+                break;
+            }
+        }
+    }
+
     private void loadMember() {
         vm.getSuperGroupMemberList();
     }
 
     private void initView() {
+        vm.isOwnerOrAdmin.observe(this, aBoolean -> {
+            view.atAll.setVisibility(isAtMember && aBoolean ? View.VISIBLE : View.GONE);
+        });
         view.more.setVisibility(isTransferPermission ? View.GONE : View.VISIBLE);
         view.bottomLayout.getRoot().setVisibility(groupCall || isSelectMember ? View.VISIBLE :
             View.GONE);

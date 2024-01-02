@@ -17,13 +17,11 @@ import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.hjq.permissions.Permission;
 import com.hjq.window.EasyWindow;
 import com.igexin.sdk.PushManager;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
-import io.openim.android.demo.ui.ServerConfigActivity;
 import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.demo.ui.user.PersonalFragment;
 import io.openim.android.demo.vm.LoginVM;
@@ -39,9 +37,8 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.NotificationVM;
 import io.openim.android.ouicore.vm.UserLogic;
 
 @Route(path = Routes.Main.HOME)
@@ -76,10 +73,11 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         try {
             Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
             LogisticsCenter.completion(postcard);
-            ActivityManager.finishActivity(postcard.getDestination());
-            EasyWindow.cancelAll();
-        } catch (Exception ignore) {
-        }
+            if (ActivityManager.getActivityStack().peek().getClass() == postcard.getDestination()){
+                ActivityManager.finishActivity(postcard.getDestination());
+                EasyWindow.cancelAll();
+            }
+        } catch (Exception ignore) {}
     }
 
 
@@ -109,16 +107,11 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
 
     private void bindDot() {
-        ContactVM contactVM = ((ContactFragment) contactFragment).getVM();
-        if (null == contactVM) return;
-        contactVM.friendDotNum.observe(this, integer -> {
-            view.badge.setVisibility((integer > 0 || contactVM.groupDotNum.val() > 0) ?
-                View.VISIBLE : View.GONE);
-        });
-        contactVM.groupDotNum.observe(this, integer -> {
-            view.badge.setVisibility((integer > 0 || contactVM.friendDotNum.val() > 0) ?
-                View.VISIBLE : View.GONE);
-        });
+        NotificationVM notificationVM=Easy.find(NotificationVM.class);
+        notificationVM.friendDot.observe(this, v -> view.badge.setVisibility((notificationVM.hasDot()) ?
+            View.VISIBLE : View.GONE));
+        notificationVM.groupDot.observe(this, v -> view.badge.setVisibility((notificationVM.hasDot()) ?
+            View.VISIBLE : View.GONE));
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {

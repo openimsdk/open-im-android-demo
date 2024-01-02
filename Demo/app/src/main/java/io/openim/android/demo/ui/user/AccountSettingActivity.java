@@ -45,7 +45,7 @@ public class AccountSettingActivity extends BaseActivity<PersonalVM, ActivityAcc
             view.slideButton.setCheckedWithAnimation(extendUserInfo.getGlobalRecvMsgOpt() == 2);
             view.messageTone.setCheckedWithAnimation(extendUserInfo.getAllowBeep() == 1);
             view.vibration.setCheckedWithAnimation(extendUserInfo.getAllowVibration() == 1);
-            view.notAdd.setCheckedWithAnimation(extendUserInfo.getAllowAddFriend() == AllowType.Allowed.value);
+            view.notAdd.setCheckedWithAnimation(extendUserInfo.getAllowAddFriend() == AllowType.NotAllowed.value);
         });
         view.slideButton.setOnSlideButtonClickListener(isChecked -> vm.setGlobalRecvMessageOpt(isChecked));
         view.messageTone.setOnSlideButtonClickListener(isChecked -> vm.setAllowBeep(isChecked));

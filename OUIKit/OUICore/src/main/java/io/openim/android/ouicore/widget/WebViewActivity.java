@@ -46,7 +46,8 @@ public class WebViewActivity extends BaseActivity<BaseViewModel, ActivityWebView
 
     //h5 腾讯地图
     private String mapThumbnailUrl;
-    public static String mapAppKey = "TMNBZ-3CGC6-C6SSL-EJA3B-E2P5Q-V7F6Q",
+//    public static String mapAppKey = "7FBBZ-LQMCZ-OTHXF-7UUOK-L7BZQ-BOFNH",
+    public static String mapAppKey = "IBFBZ-BLAKC-USA2Y-AVP4F-IZVNV-2JFFI",
         mapThumbnailSize = "1200*600",
         mapBackUrl = "http://callback";
 
@@ -182,7 +183,7 @@ public class WebViewActivity extends BaseActivity<BaseViewModel, ActivityWebView
 
     private void buildLocation() {
         loadUrl =
-            "https://apis.map.qq.com/tools/locpicker?search=1&type=0&backurl=" + mapBackUrl + "&key=" + mapAppKey + "&referer=myapp&policy=1";
+            "https://apis.map.qq.com/tools/locpicker?search=1&type=0&backurl=" + mapBackUrl + "&key=" + mapAppKey + "&referer=OpenIM&policy=1";
         mapThumbnailUrl =
             "https://apis.map.qq.com/ws/staticmap/v2/?center=%s&zoom=18&size=" + mapThumbnailSize + "&maptype=roadmap&markers=size:large|color:0xFFCCFF|label:k|%s&key=" + mapAppKey;
 

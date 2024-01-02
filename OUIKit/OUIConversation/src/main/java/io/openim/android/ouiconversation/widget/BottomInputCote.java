@@ -147,7 +147,7 @@ public class BottomInputCote {
         });
 
         view.chatInput.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) setExpandHide();
+            if (hasFocus) setExpandHide(false);
         });
 
         view.emoji.setOnClickListener(v -> {
@@ -163,14 +163,16 @@ public class BottomInputCote {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 try {
+                    if (vm.isSingleChat)return;
+                    if (count==0)return;
                     String content = s.toString().substring(s.length() - 1);
-                    if (!TextUtils.isEmpty(content) && null != onAtUserListener) {
+                    if (!TextUtils.isEmpty(content)
+                        && null != onAtUserListener) {
                         if (content.equals("@")) {
                             onAtUserListener.onAtUser();
                         }
                     }
-                } catch (Exception ignore) {
-                }
+                } catch (Exception ignore) {}
             }
 
             @Override
@@ -292,7 +294,12 @@ public class BottomInputCote {
                 if (null == groupInfo) return;
                 setMute();
             });
+            vm.isJoinGroup.observe((LifecycleOwner) context, aBoolean -> {
+                editMute(!aBoolean);
+                view.notice.setText(io.openim.android.ouicore.R.string.quited_tips);
+            });
         }
+
         vm.replyMessage.observe((LifecycleOwner) context, message -> {
             if (null == message) {
                 view.replyLy.setVisibility(GONE);
@@ -309,12 +316,14 @@ public class BottomInputCote {
         if (null == groupInfo || null == mem) return;
         if (groupInfo.getStatus() == GroupStatus.GROUP_DISSOLVE) {
             editMute(true);
-            view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
+            view.notice.setText(BaseApp.inst().getString
+                (io.openim.android.ouicore.R.string.dissolve_tips2));
         } else if (groupInfo.getStatus() == GroupStatus.GROUP_BANNED) {
             editMute(true);
             view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.group_ban));
         } else {
-            if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED && mem.getRoleLevel() == GroupRole.MEMBER) {
+            if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED
+                && mem.getRoleLevel() == GroupRole.MEMBER) {
                 editMute(true);
                 view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.start_group_mute));
                 return;
@@ -344,8 +353,9 @@ public class BottomInputCote {
     }
 
     //设置扩展菜单隐藏
-    public void setExpandHide() {
-        view.fragmentContainer.setVisibility(GONE);
+    public void setExpandHide(boolean isGone) {
+        view.fragmentContainer.setVisibility(
+            isGone? View.GONE:View.INVISIBLE);
     }
 
     private int mCurrentTabIndex;

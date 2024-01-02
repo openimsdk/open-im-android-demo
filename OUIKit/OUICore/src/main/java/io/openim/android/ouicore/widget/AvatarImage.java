@@ -23,6 +23,7 @@ import com.bumptech.glide.request.transition.Transition;
 import org.raphets.roundimageview.RoundImageView;
 
 import io.openim.android.ouicore.R;
+import io.openim.android.ouicore.base.BaseApp;
 
 public class AvatarImage extends FrameLayout {
     private ImageView roundImageView;
@@ -97,30 +98,12 @@ public class AvatarImage extends FrameLayout {
         } else {
             roundImageView.setVisibility(VISIBLE);
 
-            Glide.with(getContext())
+            Glide.with(BaseApp.inst())
                 .load(url)
                 .error(resId)
                 .centerInside()
-                .transform(new RoundedCorners(8))
+                .transform(new RoundedCorners(12))
                 .into(roundImageView);
-//                .into(new CustomTarget<Drawable>() {
-//                    @Override
-//                    public void onLoadStarted(@Nullable Drawable placeholder) {
-//                        roundImageView.setImageResource(resId);
-//                    }
-//
-//                    @Override
-//                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<
-//                        ? super Drawable> transition) {
-//                        roundImageView.setImageDrawable(resource);
-//                    }
-//
-//                    @Override
-//                    public void onLoadCleared(@Nullable Drawable placeholder) {
-//                        roundImageView.setImageDrawable(null);
-//                    }
-//                });
-
         }
     }
 }

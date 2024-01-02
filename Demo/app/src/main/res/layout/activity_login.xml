@@ -3,6 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="loginVM"
+            type="io.openim.android.demo.vm.LoginVM" />
+        <import type="io.openim.android.ouicore.base.BaseApp" />
+
+        <import type="io.openim.android.demo.R" />
+
+        <import type="android.view.View" />
+    </data>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -18,7 +30,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:paddingLeft="30dp"
@@ -91,10 +103,10 @@
                 </LinearLayout>
 
                 <TextView
-                    android:layout_width="56dp"
-                    android:layout_height="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginBottom="6dp"
-                    android:text="@string/phone_num"
+                    android:text="@{loginVM.isPhone?BaseApp.inst().getString(io.openim.android.ouicore.R.string.phone_login):BaseApp.inst().getString(io.openim.android.ouicore.R.string.email_login)}"
                     android:textColor="#ff171a1d"
                     android:textSize="14sp" />
 
@@ -109,13 +121,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/button_height"
                 android:layout_marginLeft="32dp"
-                android:layout_marginTop="40dp"
                 android:layout_marginRight="32dp"
-                android:layout_marginBottom="30dp"
+                android:layout_marginBottom="15dp"
                 android:enabled="false"
                 android:text="@string/login"
                 android:textSize="18sp"
                 android:textStyle="bold" />
+
+            <include layout="@layout/view_dividing_line" />
+
+            <TextView
+                android:id="@+id/changeLoginType"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="32dp"
+                android:background="@drawable/sty_radius_4_f0f6ff"
+                android:gravity="center"
+                android:text="@{loginVM.isPhone?BaseApp.inst().getString(io.openim.android.ouicore.R.string.email_login):BaseApp.inst().getString(io.openim.android.ouicore.R.string.phone_login)}"
+                android:textColor="#ff0089ff"
+                android:textSize="17sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -153,14 +179,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
                 android:textColor="#ff8e9ab0"
                 android:textSize="12sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.1"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="80dp"
+                android:layout_marginBottom="50dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
@@ -177,7 +205,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
-                    android:text="@string/phone_register"
+                    android:text="@string/soon_register"
                     android:textColor="#ff0089ff"
                     android:textSize="12sp" />
 

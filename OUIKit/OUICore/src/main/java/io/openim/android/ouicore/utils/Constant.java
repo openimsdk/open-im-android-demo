@@ -9,7 +9,7 @@ public class Constant {
 
 //    public static final String DEFAULT_HOST = "test-web.rentsoft.cn";//43
 //    public static final String DEFAULT_HOST = "web.rentsoft.cn";//121
-    public static final String DEFAULT_HOST = "150.109.93.151";
+    public static final String DEFAULT_HOST = "14.29.168.56";
 
     //登录注册手机验 证服务器地址
     private static final String APP_AUTH_URL = "https://" + DEFAULT_HOST + "/chat/";
@@ -107,10 +107,10 @@ public class Constant {
     public static final String K_RESULT2 = "result2";
     public static final String K_FROM = "from";
     public static final String K_SIZE = "size";
-    public static final String NOTICE_TAG = "msg_notification";
     //语言
     public static final String K_LANGUAGE_SP = "language_sp";
-
+    //上一次登录类型 0手机号 1邮箱
+    public static final String K_LOGIN_TYPE = "k_login_type";
     //最大通话人数
     public static final int MAX_CALL_NUM = 9;
     //好友红点
@@ -125,10 +125,10 @@ public class Constant {
     public static final String IS_REMOVE_GROUP = "isRemoveGroup";
     //选择群成员
     public static final String IS_SELECT_MEMBER = "isSelectMember";
+    //@成员
+    public static final String IS_AT_MEMBER  = "isAtMember";
     //群通话
     public static final String IS_GROUP_CALL = "isGroupCall";
-    //通话
-    public static final String IS_CALL = "isCall";
     //选择好友
     public static final String IS_SELECT_FRIEND = "isSelectFriend";
     //自定义消息类型

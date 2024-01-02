@@ -82,6 +82,7 @@ import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.PictureElem;
+import io.openim.android.sdk.models.QuoteElem;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SearchResult;
@@ -92,7 +93,7 @@ import io.openim.android.sdk.models.UsersOnlineStatus;
 import io.openim.android.sdk.models.VideoElem;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener,
-    OnGroupListener, OnConversationListener, java.util.Observer, OnSignalingListener,
+    OnGroupListener, OnConversationListener,  OnSignalingListener,
     OnUserListener {
 
     public static final String REEDIT_MSG = "reeditMsg";
@@ -128,6 +129,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     //开启多选
     public State<Boolean> enableMultipleSelect = new State<>();
+    //是否加入群
+    public State<Boolean> isJoinGroup = new State<>(true);
 
     private UserOnlineStatusListener userOnlineStatusListener;
 
@@ -240,44 +243,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     @Override
-    public void onGroupApplicationAccepted(GroupApplicationInfo info) {
-
-    }
-
-    @Override
-    public void onGroupApplicationAdded(GroupApplicationInfo info) {
-
-    }
-
-    @Override
-    public void onGroupApplicationDeleted(GroupApplicationInfo info) {
-
-    }
-
-    @Override
-    public void onGroupApplicationRejected(GroupApplicationInfo info) {
-
-    }
-
-    @Override
-    public void onGroupDismissed(GroupInfo info) {
-
-    }
-
-    @Override
     public void onGroupInfoChanged(GroupInfo info) {
         if (info.getGroupID().equals(groupID)) groupInfo.setValue(info);
     }
 
-    @Override
-    public void onGroupMemberAdded(GroupMembersInfo info) {
-
-    }
-
-    @Override
-    public void onGroupMemberDeleted(GroupMembersInfo info) {
-
-    }
 
     @Override
     public void onGroupMemberInfoChanged(GroupMembersInfo info) {
@@ -285,16 +254,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             isAdminOrCreator = info.getRoleLevel() != GroupRole.MEMBER;
             memberInfo.setValue(info);
         }
-    }
-
-    @Override
-    public void onJoinedGroupAdded(GroupInfo info) {
-
-    }
-
-    @Override
-    public void onJoinedGroupDeleted(GroupInfo info) {
-
     }
 
     @Override
@@ -306,31 +265,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
         } catch (Exception ignored) {
         }
-    }
-
-    @Override
-    public void onNewConversation(List<ConversationInfo> list) {
-
-    }
-
-    @Override
-    public void onSyncServerFailed() {
-
-    }
-
-    @Override
-    public void onSyncServerFinish() {
-
-    }
-
-    @Override
-    public void onSyncServerStart() {
-
-    }
-
-    @Override
-    public void onTotalUnreadMessageCountChanged(int i) {
-
     }
 
     /**
@@ -384,57 +318,14 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     int getReadCountdown(Message message) {
         int burnDuration = message.getAttachedInfoElem().getBurnDuration();
         long hasReadTime = message.getAttachedInfoElem().getHasReadTime();
+        if (burnDuration==0)
+            burnDuration=30;
         if (hasReadTime > 0) {
             long end = hasReadTime + (burnDuration * 1000L);
             long diff = (end - System.currentTimeMillis()) / 1000;
             return diff < 0 ? 0 : (int) diff;
         }
         return 0;
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-
-    }
-
-    @Override
-    public void onInvitationCancelled(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInvitationTimeout(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeAccepted(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeAcceptedByOtherDevice(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeRejected(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeRejectedByOtherDevice(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onReceiveNewInvitation(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onHangup(SignalingInfo s) {
-
     }
 
     @Override
@@ -451,20 +342,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }
     }
 
-    @Override
-    public void onMeetingStreamChanged(MeetingStreamEvent e) {
-
-    }
-
-    @Override
-    public void onReceiveCustomSignal(CustomSignalingInfo s) {
-
-    }
-
-    @Override
-    public void onStreamChange(String s) {
-
-    }
 
     public String getRoomCallingInfoRoomID() {
         String roomID = "";
@@ -484,10 +361,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         subject(REEDIT_MSG, content);
     }
 
-    @Override
-    public void onSelfInfoUpdated(UserInfo info) {
-
-    }
 
     @Override
     public void onUserStatusChanged(UsersOnlineStatus onlineStatus) {
@@ -495,7 +368,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             userOnlineStatusListener.onResult(onlineStatus);
         }
     }
-
 
     public interface UserOnlineStatusListener {
         void onResult(UsersOnlineStatus onlineStatus);
@@ -506,6 +378,13 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             getOneConversation(null);
         } else {
             getGroupsInfo(groupID, null);
+            OpenIMClient.getInstance().groupManager.isJoinGroup(groupID,
+                new OnBase<Boolean>() {
+                @Override
+                public void onSuccess(Boolean data) {
+                    isJoinGroup.setValue(data);
+                }
+            });
         }
     }
 
@@ -562,8 +441,10 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private void loadHistory() {
         //加载消息记录
-        if (fromChatHistory) loadHistoryMessageReverse();
-        else loadHistoryMessage();
+        if (fromChatHistory)
+            loadHistoryMessageReverse();
+        else
+            loadHistoryMessage();
     }
 
     @Override
@@ -894,32 +775,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
 
-    @Override
-    public void onRecvMessageExtensionsChanged(String msgID, List<KeyValue> list) {
-
-    }
-
-    @Override
-    public void onRecvMessageExtensionsDeleted(String msgID, List<String> list) {
-
-    }
-
-    @Override
-    public void onRecvMessageExtensionsAdded(String msgID, List<KeyValue> list) {
-
-    }
-
-    @Override
-    public void onMsgDeleted(Message message) {
-
-    }
-
-    @Override
-    public void onRecvOfflineNewMessage(List<Message> msg) {
-
-    }
-
-
     public void sendMsg(Message msg) {
         msg.setStatus(MessageStatus.SENDING);
         if (messages.val().contains(msg)) {
@@ -1007,6 +862,15 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public void onRecvMessageRevokedV2(RevokedInfo info) {
         try {
             for (Message message : messages.val()) {
+                QuoteElem quoteElem =message.getQuoteElem();
+               Message quoteMessage ;
+                if (null!=quoteElem&& null!=(quoteMessage=quoteElem.getQuoteMessage())
+                    &&quoteMessage.getClientMsgID().equals(info.getClientMsgID())){
+                    //引用消息被删除
+                    quoteMessage.setContentType(MessageType.REVOKE_MESSAGE_NTF);
+                    messageAdapter.notifyItemChanged(
+                        messages.val().indexOf(message));
+                }
                 if (message.getClientMsgID().equals(info.getClientMsgID())) {
                     message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
                     //a 撤回了一条消息
@@ -1193,6 +1057,24 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
 
         }, conversationID, startMsg, count * 80);
+    }
+
+
+    @Override
+    public void onGroupMemberAdded(GroupMembersInfo info) {
+        if (info.getGroupID().equals(groupID)
+            &&info.getUserID().equals(BaseApp.inst().loginCertificate.userID)){
+            isJoinGroup.setValue(true);
+            getGroupsInfo(groupID,null);
+        }
+    }
+
+    @Override
+    public void onGroupMemberDeleted(GroupMembersInfo info) {
+        if (info.getGroupID().equals(groupID)
+            && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)){
+            isJoinGroup.setValue(false);
+        }
     }
 
     /**

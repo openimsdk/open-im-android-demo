@@ -17,7 +17,7 @@ public class MsgExpand {
     public boolean isShowTime;
     //地址信息（发送位置才有）
     public LocationInfo locationInfo;
-    //at消息（at别人才有）
+    //at消息（at人才有）
     public AtMsgInfo atMsgInfo;
     //用于在消息输入框监听删除键时 判断删除对应@的人
     public int spanHashCode;

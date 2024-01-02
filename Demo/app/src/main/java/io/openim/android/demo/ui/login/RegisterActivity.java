@@ -24,6 +24,7 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.LanguageUtil;
+import io.openim.android.ouicore.utils.RegexValid;
 import io.openim.android.ouicore.utils.SinkHelper;
 import okhttp3.ResponseBody;
 
@@ -51,6 +52,12 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
         view.clear.setOnClickListener(v -> view.edt1.setText(""));
 
         view.submit.setOnClickListener(v -> {
+            if (vm.isPhone.val()){
+               if ( !RegexValid.isValidPhoneNumber(vm.account.val())){
+                   toast(getString(io.openim.android.ouicore.R.string.valid_phone_num));
+                   return;
+               }
+            }
             vm.areaCode.setValue("+"+view.countryCode.getSelectedCountryCode());
             vm.getVerificationCode(vm.isFindPassword?2:1);
         });
