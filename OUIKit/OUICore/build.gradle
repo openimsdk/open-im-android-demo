@@ -101,5 +101,5 @@ dependencies {
 
     //openIM sdk
     api 'io.openim:android-sdk:3.4.1@aar'
-    api 'io.openim:core-sdk:3.4.1-alpha.4@aar'
+    api 'io.openim:core-sdk:3.5.0-rc1@aar'
 }
