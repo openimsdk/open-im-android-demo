@@ -53,18 +53,21 @@ public class NotificationVM extends BaseVM implements OnCustomBusinessListener, 
     }
 
     private void initDot() {
-        String friendRequest = SharedPreferencesUtil.get(BaseApp.inst()).getString(K_friendRequest);
-        String groupRequest = SharedPreferencesUtil.get(BaseApp.inst()).getString(K_groupRequest);
-        Type type = new TypeToken<Set<IMex>>() {
-        }.getType();
-        if (!TextUtils.isEmpty(friendRequest)) {
-            List<IMex> mexList = JSON.parseObject(friendRequest, type);
-            friendDot.setValue(mexList);
-        }
-        if (!TextUtils.isEmpty(groupRequest)) {
-            List<IMex> mexList = JSON.parseObject(groupRequest, type);
-            groupDot.setValue(mexList);
-        }
+      try {
+          String friendRequest = SharedPreferencesUtil.get(BaseApp.inst()).getString(K_friendRequest);
+          String groupRequest = SharedPreferencesUtil.get(BaseApp.inst()).getString(K_groupRequest);
+          Type type = new TypeToken<Set<IMex>>() {}.getType();
+          if (!TextUtils.isEmpty(friendRequest)) {
+              List<IMex> mexList = JSON.parseObject(friendRequest, type);
+              friendDot.setValue(mexList);
+          }
+          if (!TextUtils.isEmpty(groupRequest)) {
+              List<IMex> mexList = JSON.parseObject(groupRequest, type);
+              groupDot.setValue(mexList);
+          }
+      }catch (Exception e){
+          e.printStackTrace();
+      }
     }
 
     @Override
