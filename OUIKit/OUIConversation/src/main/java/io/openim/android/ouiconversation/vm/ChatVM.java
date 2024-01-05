@@ -927,18 +927,20 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 if (message.getClientMsgID().equals(info.getClientMsgID())) {
                     message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
                     //a 撤回了一条消息
-                    String txt;
+                    String txt,target;
                     CharSequence tips;
                     if (info.getRevokerID().equals(info.getSourceMessageSendID())) {
                         txt =
-                            String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips), info.getRevokerNickname());
+                            String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips),target=IMUtil.getSelfName(info.getRevokerID(),info.getRevokerNickname()));
                         if (message.getSendID().equals(BaseApp.inst().loginCertificate.userID)) {
                             //只有是自己发的文本才支持重新编辑
                             String reedit =
                                 BaseApp.inst().getString(io.openim.android.ouicore.R.string.re_edit);
                             txt += "\t" + reedit;
                             tips =
-                                IMUtil.buildClickAndColorSpannable((SpannableStringBuilder) IMUtil.getSingleSequence(message.getGroupID(), message.getSenderNickname(), message.getSendID(), txt), reedit, new ClickableSpan() {
+                                IMUtil.buildClickAndColorSpannable((SpannableStringBuilder)
+                                    IMUtil.getSingleSequence(message.getGroupID(), target,
+                                        message.getSendID(), txt), reedit, new ClickableSpan() {
                                     @Override
                                     public void onClick(@NonNull View widget) {
                                         TextElem txt = message.getTextElem();
@@ -949,7 +951,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                                 });
                         } else {
                             tips = IMUtil.getSingleSequence(message.getGroupID(),
-                                info.getRevokerNickname(), info.getRevokerID(), txt);
+                                target, info.getRevokerID(), txt);
                         }
                     } else {
                         txt =

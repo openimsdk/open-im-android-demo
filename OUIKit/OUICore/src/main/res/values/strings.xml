@@ -3,8 +3,9 @@
 
     <string name="app_name">OpenIM</string>
     <string name="group_bulletin">群公告</string>
-    <string name="search_by_id">通过手机号/ID号/搜索添加</string>
+    <string name="search_by_id">通过手机号/ID号/昵称搜索添加</string>
     <string name="send_succ">发送成功</string>
+    <string name="see_moments">查看动态</string>
 
     <string name="sunday">星期日</string>
     <string name="monday">星期一</string>
@@ -32,7 +33,7 @@
     <string name="accept">接受</string>
     <string name="hil">打招呼</string>
     <string name="create_group">发起群聊</string>
-    <string name="create_group_tips">取个群名称方便后续搜索</string>
+    <string name="create_group_tips">创建群聊，全面使用OpenIM</string>
     <string name="location">位置</string>
     <string name="sure">确定</string>
     <string name="my_location">我的位置</string>
@@ -59,7 +60,7 @@
     <string name="copy_group_id">复制团队ID</string>
     <string name="copy_succ">复制成功</string>
     <string name="share_group_tips1">搜索群聊ID号，立刻加入该群。</string>
-    <string name="share_group_tips2">扫一扫群二维码，立刻加入该群。</string>
+    <string name="share_group_tips2">扫一扫下面的二维码，立刻加入该群聊</string>
     <string name="my_good_friend">我的好友</string>
     <string name="delete_friend">已删除此好友</string>
     <string name="delete_friend_tips">确定删除此好友吗</string>
@@ -92,7 +93,7 @@
     <string name="speaker_off">扬声器已关闭</string>
     <string name="voice_calls">语音通话</string>
     <string name="video_calls">视频通话</string>
-    <string name="waiting_tips">正在等待对方接受邀请</string>
+    <string name="waiting_tips">正在等待对方接听</string>
     <string name="Invite_a_audio_call">邀请你进行语音通话</string>
     <string name="selete_member">选择成员</string>
     <string name="invite_audio_call">邀请你语音通话</string>
@@ -156,11 +157,13 @@
     <string name="transferred_group">%1$s 将群转让给了 %2$s</string>
     <string name="Muted_group">%1$s 被 %2$s 禁言%3$s</string>
     <string name="cancel_muted">%1$s 被 %2$s 取消了禁言</string>
-    <string name="start_muted">%1$s 开启了群禁言</string>
-    <string name="close_muted">%1$s 关闭了群禁言</string>
+    <string name="start_muted">%1$s 开启了全体禁言</string>
+    <string name="close_muted">%1$s 关闭了全体禁言</string>
     <string name="edit_data">%1$s 编辑了自己的群成员资料</string>
     <string name="start_burn_after_read">已开启阅后即焚</string>
     <string name="stop_burn_after_read">已关闭阅后即焚</string>
+
+
     <string name="readed">已读 %1$s</string>
     <string name="unread">未读 %1$s</string>
     <string name="offline">离线</string>
@@ -201,7 +204,7 @@
     <string name="recommend_to_friend">把他推荐给朋友</string>
     <string name="recommend_who">确定推荐给%1$s吗？</string>
     <string name="send_card_confirm">确定将该名片发送到本聊天？</string>
-    <string name="bulletin_edit_tips">只有群主或管理员可以编辑</string>
+    <string name="bulletin_edit_tips">只有群主及管理员可以编辑</string>
     <string name="mark_read">标记已读</string>
     <string name="start_download">开始下载</string>
     <string name="save_succ">保存成功</string>
@@ -244,6 +247,8 @@
     <string name="ot_refuses">对方已拒绝</string>
     <string name="cancelled">已取消</string>
     <string name="label">标签</string>
+
+
     <string name="remove">移除</string>
     <string name="cretate_label">新建标签</string>
     <string name="label_name">标签名字</string>
@@ -321,6 +326,8 @@
     <string name="start_time">开始时间</string>
     <string name="meeting_duration">会议时长</string>
     <string name="hour">小时</string>
+
+
     <string name="msg_tap_tips">点击此消息可直接加入会议</string>
     <string name="meeting_has_ended">会议已结束或房间不存在</string>
     <string name="cancle_all_mute">取消全员禁音</string>
@@ -365,9 +372,10 @@
     <string name="account">账号</string>
     <string name="please_input_account">请输入账号</string>
     <string name="organizational_structure">组织架构</string>
-
     <string name="who_talk">%1$s讲话中...</string>
     <string name="meeting">会议中...</string>
+
+
     <string name="syncing">同步中...</string>
     <string name="connecting">连接中...</string>
     <string name="sync_err">同步失败</string>
@@ -391,7 +399,7 @@
     <string name="send_who">发送给：</string>
     <string name="multiple_send">分别发送给：</string>
     <string name="media_call">音视频通话</string>
-    <string name="edit_group_name">%1$s 修改了群名称</string>
+    <string name="edit_group_name">%1$s 修改了群名称为 %2$s</string>
     <string name="view_all_member">查看全部群成员(%1$d)</string>
     <string name="group_manage">群管理</string>
     <string name="re_edit">重新编辑</string>
@@ -400,13 +408,14 @@
     <string name="audio_calling">语音通话中...</string>
     <string name="now_calling">当前正在通话中...</string>
 
-    <string name="set_top" >置顶该成员</string>
-    <string name="all_see_the" >全部看他</string>
+    <string name="set_top">置顶该成员</string>
+    <string name="all_see_the">全部看他</string>
     <string name="time_set">时间设置</string>
     <string name="read_vanish_tips">在此之后发送的消息，好友已读后会在 选择的时间之后自动删除</string>
     <string name="seconds">秒</string>
     <string name="minute">分钟</string>
-    <string name="password_valid_tips">密码请输入6-20位包含数字与字母</string>
+    <string name="password_valid_tips">6-20位，至少包含数字、字母</string>
+    <string name="invalid_password">密码格式错误</string>
     <string name="periodic_deletion">定期删除消息记录</string>
     <string name="week">周</string>
     <string name="month">月</string>
@@ -417,7 +426,6 @@
     <string name="chinese">简体中文</string>
     <string name="english">英语</string>
     <string name="switch_language_tips">确定切换为</string>
-
 
 
     <string name="read">我已阅读并同意：</string>
@@ -490,7 +498,7 @@
     <string name="sure_password2">确认密码</string>
     <string name="please_input_complete">请填写完整</string>
     <string name="password_valid_tips2">新密码与确认密码不匹配</string>
-    <string name="do_not_account">还没有账号？</string>
+    <string name="do_not_account">还没有注册？</string>
     <string name="next">下一步</string>
     <string name="setting_info">设置信息</string>
     <string name="sure_password_tips">请再次确认您的密码</string>
@@ -498,13 +506,15 @@
     <string name="declined">已拒绝</string>
     <string name="timing_meeting_tips">不能选择已过去的时间</string>
     <string name="cancle_see_he">取消看他</string>
-    <string name="recover">" 回复 "</string>
+    <string name="recover">" 回复了 "</string>
     <string name="edit_group_name2">修改群聊名称</string>
     <string name="edit_group_name_tips">修改群聊名称后，将在群内通知其他成员。</string>
     <string name="in_group_name_tips">昵称修改后，只会在此群内显示，群内成员都可以看见。</string>
     <string name="create_group_tips2">创建群聊，全面使用OpenIM</string>
     <string name="add_group_tips">向管理员或群聊成员询问ID</string>
     <string name="delete_conversiton">删除会话</string>
+
+
     <string name="android">Android</string>
     <string name="ios">ios</string>
     <string name="start_group_mute">已开启群禁言</string>
@@ -537,5 +547,20 @@
     <string name="valid_phone_num">手机号无效</string>
     <string name="empty_prompt">输入不能为空</string>
     <string name="quote_delete_tips">引用的内容已被删除</string>
+    <string name="account_not_exist">账号不存在</string>
+    <string name="wrong_password">密码错误</string>
+    <string name="phone_num_registered">手机号已经注册</string>
+    <string name="account_registered">账号已经注册</string>
+    <string name="get_codes_frequently">频繁获取验证码</string>
+    <string name="vq_err">验证码错误</string>
+    <string name="vq_expired">验证码过期</string>
+    <string name="vq_failed_num_too_many">" 验证码失败次数过多"</string>
+    <string name="vq_used">" 验证码已经使用"</string>
+    <string name="invite_used">" 邀请码已经使用"</string>
+    <string name="invite_not_exist">" 邀请码不存在"</string>
+    <string name="restrict_login_registration">" 限制登录注册"</string>
+    <string name="decline_add">" 拒绝添加好友"</string>
+    <string name="emil_registered">" 邮箱已注册"</string>
+    <string name="count">条</string>
 
 </resources>
