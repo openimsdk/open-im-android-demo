@@ -44,8 +44,7 @@ public class MsgDetailVM extends BaseViewModel {
 
                 try {
                     JSONArray json = (JSONArray) obj.get("workMoments");
-                    Type type = new TypeToken<List<WorkMoments>>() {
-                    }.getType();
+                    Type type = new TypeToken<List<WorkMoments>>() {}.getType();
                     List<WorkMoments> data = JSONObject.parseObject(json.toString(), type);
                     workMomentsInfo.setValue(data);
                 } catch (Exception e) {

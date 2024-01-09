@@ -53,6 +53,7 @@ import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
@@ -530,6 +531,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall, false, ids,
                 vm.groupID);
             if (null == callingService) return;
+            ActivityManager.push(this);
             callingService.call(signalingInfo);
         }
         if (requestCode == Constant.Event.AT_USER) {

@@ -120,7 +120,7 @@ public class CirclePresenter implements CircleContract.Presenter {
                         view.update2loadData(loadType, circleData);
                     }
                 } catch (Exception ignored) {
-
+                    view.setRefreshing(false);
                 }
             }
 

@@ -6,4 +6,5 @@ public class MomentsUser implements Serializable {
     public String userID;
     public String faceURL;
     public String nickname;
+    public long likeTime;
 }

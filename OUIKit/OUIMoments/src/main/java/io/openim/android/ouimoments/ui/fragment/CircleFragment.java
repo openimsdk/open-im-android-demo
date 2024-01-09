@@ -214,8 +214,8 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
                 super.onScrolled(recyclerView, dx, dy);
                 Rect rect = new Rect();
                 recyclerView.getWindowVisibleDisplayFrame(rect);
-                boolean visible = rect.bottom - rect.top <= 0;
-                L.e("visible----" + visible + "==rect.bottom=" + rect.bottom + "==rect.top==" + rect.top);
+//                boolean visible = rect.bottom - rect.top <= 0;
+//                L.e("visible----" + visible + "==rect.bottom=" + rect.bottom + "==rect.top==" + rect.top);
                 int alpha = getScrolledYDistance();
                 if (alpha >= 255) {
                     alpha = 255;
@@ -340,9 +340,9 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
                 r.top = statusBarH;
             }
             int keyboardH = screenH - (r.bottom - r.top);
-            Log.d(TAG,
-                "screenH＝ " + screenH + " &keyboardH = " + keyboardH + " &r.bottom=" + r.bottom + " &top=" + r.top + " &statusBarH=" + statusBarH);
-
+//            Log.d(TAG,
+//                "screenH＝ " + screenH + " &keyboardH = " + keyboardH + " &r.bottom=" + r.bottom + " &top=" + r.top + " &statusBarH=" + statusBarH);
+//
             if (keyboardH == currentKeyboardH) {//有变化时才处理，否则会陷入死循环
                 return;
             }
@@ -464,6 +464,9 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
             circleAdapter.getDatas().addAll(datas);
         }
         circleAdapter.notifyDataSetChanged();
+        //重置
+        circleAdapter.lastYear=null;
+        circleAdapter.lastMd=null;
 
         if (datas.size() < CirclePresenter.pageSize) {
             recyclerView.removeMoreListener();

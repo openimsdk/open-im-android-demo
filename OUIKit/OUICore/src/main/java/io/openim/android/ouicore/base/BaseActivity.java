@@ -160,6 +160,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     @Override
     protected void onResume() {
+        ActivityManager.push(this);
         super.onResume();
         bind();
         if (null != vm)
@@ -193,8 +194,8 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     @Override
     protected void onDestroy() {
-        fasterDestroy();
         ActivityManager.remove(this);
+        fasterDestroy();
         N.clearDispose(this);
         releaseRes();
         super.onDestroy();

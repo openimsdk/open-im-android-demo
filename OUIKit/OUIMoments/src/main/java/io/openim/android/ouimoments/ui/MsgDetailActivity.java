@@ -88,6 +88,7 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
                             + targetUser + ":" + comment.content);
                     }
                 }
+
                 holder.view.time.setText(TimeUtil.getTime(data.createTime,
                     TimeUtil.monthTimeFormat));
                 if (data.type == MsgDetailVM.WorkMomentLogTypeLike) {
@@ -99,6 +100,8 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
                     String tips =
                         getString(io.openim.android.ouicore.R.string.star_tips) + data.nickname;
                     holder.view.action.setText(tips);
+                    holder.view.time.setText(TimeUtil.getTime(user.likeTime,
+                        TimeUtil.monthTimeFormat));
                 }
                 if (data.type == MsgDetailVM.WorkMomentLogTypeAt) {
                     nickName = data.nickname;

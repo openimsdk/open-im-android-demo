@@ -201,7 +201,7 @@ public class IMUtil {
         List<String> summaryList = new ArrayList<>();
         for (Message message : list) {
             summaryList.add(message.getSenderNickname() + ":" + getMsgParse(message));
-            if (summaryList.size() >= 2) break;
+            if (summaryList.size() >= 4) break;
         }
 
         return OpenIMClient.getInstance().messageManager.createMergerMessage(list, title,
