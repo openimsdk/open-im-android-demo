@@ -380,11 +380,11 @@ public class IMUtil {
                 StringBuilder stringBuffer = new StringBuilder();
                 List<MultipleChoice> choices = new ArrayList<>();
                 for (GroupMembersInfo groupMembersInfo : invitedUserList.invitedUserList) {
-                    stringBuffer.append(groupMembersInfo.getNickname()).append(",");
                     MultipleChoice choice = new MultipleChoice();
                     choice.name = getSelfName(groupMembersInfo.getUserID(),groupMembersInfo.getNickname());
                     choice.key = groupMembersInfo.getUserID();
                     choices.add(choice);
+                    stringBuffer.append(choice.name).append(",");
                 }
                 String a = stringBuffer.substring(0, stringBuffer.length() - 1);
                 String txt = String.format(ctx.getString(R.string.invited_tips),
@@ -405,11 +405,11 @@ public class IMUtil {
                 StringBuilder stringBuffer = new StringBuilder();
                 List<MultipleChoice> choices = new ArrayList<>();
                 for (GroupMembersInfo groupMembersInfo : invitedUserList.kickedUserList) {
-                    stringBuffer.append(groupMembersInfo.getNickname()).append(",");
                     MultipleChoice choice = new MultipleChoice();
                     choice.name = getSelfName(groupMembersInfo.getUserID(),groupMembersInfo.getNickname());
                     choice.key = groupMembersInfo.getUserID();
                     choices.add(choice);
+                    stringBuffer.append(choice.name).append(",");
                 }
                 String a = stringBuffer.substring(0, stringBuffer.length() - 1);
                 String txt = String.format(ctx.getString(R.string.kicked_group_tips), a,
@@ -895,14 +895,21 @@ public class IMUtil {
             hangIntent, PendingIntent.FLAG_MUTABLE);
 
         NotificationUtil.sendNotify(id,
-            NotificationUtil.builder(NotificationUtil.MSG_NOTIFICATION).setContentTitle(BaseApp.inst().getString(R.string.app_name)).setContentText(BaseApp.inst().getString(R.string.a_message_is_received)).setSmallIcon(R.mipmap.ic_logo).setContentIntent(hangPendingIntent).setAutoCancel(true).setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE).setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring)).build());
+            NotificationUtil.builder(NotificationUtil.MSG_NOTIFICATION)
+                .setContentTitle(BaseApp.inst().getString(R.string.app_name))
+                .setContentText(BaseApp.inst().getString(R.string.a_message_is_received))
+                .setSmallIcon(R.mipmap.ic_logo)
+                .setContentIntent(hangPendingIntent)
+                .setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
+                .setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring))
+                .build());
     }
 
     //播放提示音
     public static void playPrompt() {
         MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), R.raw.message_ring);
         MediaPlayerUtil.INSTANCE.playMedia();
-        vibrate(200);
     }
 
     //震动milliseconds毫秒
