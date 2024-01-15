@@ -932,7 +932,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     if (info.getRevokerID().equals(info.getSourceMessageSendID())) {
                         txt =
                             String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips),target=IMUtil.getSelfName(info.getRevokerID(),info.getRevokerNickname()));
-                        if (message.getSendID().equals(BaseApp.inst().loginCertificate.userID)) {
+                        if (message.getSendID().
+                            equals(BaseApp.inst().loginCertificate.userID)&&
+                            null==message.getSoundElem()) {
                             //只有是自己发的文本才支持重新编辑
                             String reedit =
                                 BaseApp.inst().getString(io.openim.android.ouicore.R.string.re_edit);
