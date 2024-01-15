@@ -42,14 +42,11 @@ import io.openim.android.ouicore.utils.SinkHelper;
 @Deprecated
 public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> extends AppCompatActivity implements IView {
     //是否释放资源
-    private boolean isRelease = true;
-    //已经释放资源
-    private boolean released = false;
+    private boolean isRecycle = false;
 
     protected T vm;
     protected A view;
     private String vmCanonicalName;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,6 +64,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         //多语言适配
         super.attachBaseContext(LanguageUtil.getNewLocalContext(newBase));
     }
+
     @Override
     public void applyOverrideConfiguration(Configuration overrideConfiguration) {
         // 兼容androidX在部分手机切换语言失败问题
@@ -124,8 +122,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
     }
 
@@ -143,16 +140,18 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     @Deprecated
     public void bindVMByCache(Class<T> vm) {
         try {
-            this.vm=Easy.find(vm);
-            isRelease = false;
+            this.vm = Easy.find(vm);
+            isRecycle = false;
             bind();
-        }catch (Exception ignore){}
+        } catch (Exception ignore) {
+        }
     }
 
     @Deprecated
     public void removeCacheVM() {
-        if (null!=vm){
+        if (null != vm) {
             vm.context.clear();
+            vm.IView.clear();
             vm.releaseRes();
             BaseApp.inst().removeCacheVM(vm.getClass());
         }
@@ -163,42 +162,37 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         ActivityManager.push(this);
         super.onResume();
         bind();
-        if (null != vm)
-            vm.viewResume();
+        if (null != vm) vm.viewResume();
     }
 
-
-    @Override
-    protected void onPause() {
-        if (isFinishing()) {
-            fasterDestroy();
-        }
-        if (null != vm) {
-            vm.viewPause();
-            releaseRes();
-        }
-        super.onPause();
-    }
 
     protected void fasterDestroy() {
 
     }
 
-    private void releaseRes() {
-        if (vm == null) return;
-        if (isFinishing() && isRelease && !released) {
-            released = true;
-            vm.releaseRes();
-        }
+    @Override
+    protected void onPause() {
+        if (null != vm)
+            vm.viewPause();
+        recycle();
+        super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        ActivityManager.remove(this);
-        fasterDestroy();
-        N.clearDispose(this);
-        releaseRes();
+        recycle();
         super.onDestroy();
+    }
+
+    void recycle() {
+        if (isFinishing() && !isRecycle) {
+            isRecycle = true;
+            ActivityManager.remove(this);
+            N.clearDispose(this);
+            if (null != view) view.unbind();
+            removeCacheVM();
+            fasterDestroy();
+        }
     }
 
 

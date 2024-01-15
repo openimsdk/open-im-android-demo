@@ -57,12 +57,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/sty_radius_4_white"
-                        android:maxHeight="80dp"
-                        android:imeOptions="actionSend"
-
+                        android:maxHeight="90dp"
                         android:minHeight="36dp"
                         android:paddingStart="3dp"
-                        android:singleLine="true"
+                        android:imeOptions="actionSend"
                         android:text="@={ChatVM.inputMsg}"
                         android:visibility="visible" />
 

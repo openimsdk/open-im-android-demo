@@ -672,7 +672,7 @@ public class IMUtil {
     /**
      * 存储草稿
      */
-    public static void cacheDraft(String inputMsg, String conversationID) {
+    public static void cacheDraft( String inputMsg, String conversationID) {
         String cacheKey = conversationID + "_draft";
         if (TextUtils.isEmpty(inputMsg)) {
             SharedPreferencesUtil.remove(BaseApp.inst(), cacheKey);

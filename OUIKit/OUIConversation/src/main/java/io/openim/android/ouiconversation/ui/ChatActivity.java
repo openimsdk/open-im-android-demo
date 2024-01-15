@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -138,42 +139,38 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        release();
-    }
+    protected void fasterDestroy() {
+        cacheDraft();
+        vm.markRead();
+        if (!vm.fromChatHistory)
+            removeCacheVM();
+        Easy.delete(CustomEmojiVM.class);
+        Easy.delete(ForwardVM.class);
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        release();
-    }
+        BaseApp.inst().removeCacheVM(GroupVM.class);
+        N.clearDispose(this);
+        view.waterMark.onDestroy();
+        Obs.inst().deleteObserver(this);
+        getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
+        try {
+            SPlayer.instance().stop();
+        } catch (Exception ignore) {}
 
-    private void release() {
-        if (isFinishing()) {
-            vm.markRead();
-            if (!vm.fromChatHistory) removeCacheVM();
 
-            Easy.delete(CustomEmojiVM.class);
-            Easy.delete(ForwardVM.class);
-
-            BaseApp.inst().removeCacheVM(GroupVM.class);
-            N.clearDispose(this);
-            view.waterMark.onDestroy();
-            Obs.inst().deleteObserver(this);
-            getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
-            try {
-                SPlayer.instance().stop();
-            } catch (Exception ignore) {
-            }
-           IMUtil.cacheDraft(Objects.requireNonNull(view.layoutInputCote.chatInput.getText())
-               .toString(),vm.conversationID);
-
-            ContactListVM contactListVM=BaseApp.inst().getVMByCache(ContactListVM.class);
-            if (contactListVM != null) {
-                contactListVM.updateConversation();
-            }
+        ContactListVM contactListVM=BaseApp.inst().getVMByCache(ContactListVM.class);
+        if (contactListVM != null) {
+            contactListVM.updateConversation();
         }
+    }
+
+    private void cacheDraft() {
+        Editable editable =view.layoutInputCote.chatInput.getText();
+        String draft;
+        if (null==editable)
+            draft="";
+        else
+            draft=editable.toString();
+        IMUtil.cacheDraft(draft,vm.conversationID);
     }
 
     @Override

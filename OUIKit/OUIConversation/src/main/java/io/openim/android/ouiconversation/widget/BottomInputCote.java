@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -219,8 +220,6 @@ public class BottomInputCote {
                 String content = s.toString();
                 boolean isSend = !TextUtils.isEmpty(content) && !Common.isBlank(content);
                 setSendButton(isSend);
-
-
             }
         });
         view.chatInput.setOnEditorActionListener((v, actionId, event) -> {
@@ -236,6 +235,10 @@ public class BottomInputCote {
     private void initView(LayoutInputCoteBinding view) {
         view.root.setIntercept(false);
         initFragment();
+
+        view.chatInput.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        view.chatInput.setSingleLine(false);
+        view.chatInput.setMaxLines(4);
     }
 
     private void bindDraft() {
