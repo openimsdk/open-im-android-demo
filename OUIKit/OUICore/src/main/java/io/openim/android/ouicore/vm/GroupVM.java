@@ -300,7 +300,6 @@ public class GroupVM extends SocialityVM {
      * 获取群成员信息
      */
     public void getGroupMemberList(int count) {
-        if (!superGroupMembers.getValue().isEmpty()) return; //表示走了超级大群逻辑
 
         exGroupMembers.getValue().clear();
         exGroupManagement.getValue().clear();
@@ -385,11 +384,7 @@ public class GroupVM extends SocialityVM {
     /**
      * 踢出群
      */
-    public void kickGroupMember(List<FriendInfo> friendInfos) {
-        List<String> userIds = new ArrayList<>();
-        for (FriendInfo friendInfo : friendInfos) {
-            userIds.add(friendInfo.getUserID());
-        }
+    public void kickGroupMember(List<String> uids) {
         OpenIMClient.getInstance().groupManager.kickGroupMember(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -404,7 +399,7 @@ public class GroupVM extends SocialityVM {
 
                 Obs.newMessage(Constant.Event.UPDATE_GROUP_INFO, groupName);
             }
-        }, groupId, userIds, "");
+        }, groupId, uids, "");
     }
 
     /**

@@ -63,6 +63,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.vm.ForwardVM;
+import io.openim.android.ouicore.vm.GroupMemberVM;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.voice.SPlayer;
@@ -154,23 +155,24 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(mGlobalLayoutListener);
         try {
             SPlayer.instance().stop();
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
 
 
-        ContactListVM contactListVM=BaseApp.inst().getVMByCache(ContactListVM.class);
+        ContactListVM contactListVM = BaseApp.inst().getVMByCache(ContactListVM.class);
         if (contactListVM != null) {
             contactListVM.updateConversation();
         }
     }
 
     private void cacheDraft() {
-        Editable editable =view.layoutInputCote.chatInput.getText();
+        Editable editable = view.layoutInputCote.chatInput.getText();
         String draft;
-        if (null==editable)
-            draft="";
+        if (null == editable)
+            draft = "";
         else
-            draft=editable.toString();
-        IMUtil.cacheDraft(draft,vm.conversationID);
+            draft = editable.toString();
+        IMUtil.cacheDraft(draft, vm.conversationID);
     }
 
     @Override
@@ -291,23 +293,83 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             } else {
                 //两次窗口高度相减，就是软键盘高度
                 inputLayoutParams.bottomMargin = mWindowHeight
-                    - height-bottomInputCote.view.fragmentContainer.getHeight();
+                    - height - bottomInputCote.view.fragmentContainer.getHeight();
             }
             view.layoutInputCote.getRoot().setLayoutParams(inputLayoutParams);
         }
     };
 
+    private void gotoMemberList() {
+        GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class);
+        memberVM.groupId = vm.groupID;
+        memberVM.maxNum = 9;
+        memberVM.setIntention(GroupMemberVM.Intention.SELECT_MULTIPLE);
+        MultipleChoice choice = new MultipleChoice(BaseApp.inst().loginCertificate.userID);
+        choice.isEnabled = false;
+        choice.name = BaseApp.inst().loginCertificate.nickname;
+        choice.icon = BaseApp.inst().loginCertificate.faceURL;
+        memberVM.addChoice(choice);
+
+        memberVM.setOnFinishListener(activity -> {
+            activity.finish();
+            //邀请列表中移除自己
+            memberVM.removeChoice(BaseApp.inst().loginCertificate.userID);
+            List<String> ids = new ArrayList<>();
+            for (MultipleChoice multipleChoice : memberVM.choiceList.val()) {
+                ids.add(multipleChoice.key);
+            }
+            SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
+                false, ids,
+                vm.groupID);
+            if (null == callingService) return;
+            ActivityManager.push(this);
+            callingService.call(signalingInfo);
+        });
+        ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER).navigation();
+    }
+
     private void listener() {
         Obs.inst().addObserver(this);
 
         bottomInputCote.setOnAtUserListener(() -> {
-            GroupVM groupVM = new GroupVM();
-            groupVM.groupId = vm.groupID;
-            BaseApp.inst().putVM(groupVM);
-            ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER).withInt(Constant.K_SIZE,
-                9).withBoolean(Constant.IS_SELECT_MEMBER, true)
-                .withBoolean(Constant.IS_AT_MEMBER,true).navigation(this,
-                Constant.Event.AT_USER);
+            GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class);
+            memberVM.groupId = vm.groupID;
+            memberVM.maxNum = 10;
+            memberVM.isOwnerOrAdmin = vm.isAdminOrCreator;
+            memberVM.setIntention(GroupMemberVM.Intention.AT);
+            memberVM.setOnFinishListener(activity -> {
+                try {
+                    Editable editable = bottomInputCote.view.chatInput.getText();
+                    if (!TextUtils.isEmpty(editable)) {
+                        CharSequence finallyStr = editable.subSequence(editable.length() - 1,
+                            editable.length());
+                        if (finallyStr.toString().equals("@")) {
+                            editable.replace(editable.length() - 1, editable.length(),
+                                new SpannableStringBuilder(""));
+                        }
+                    }
+                } catch (Exception ignore) {
+                }
+
+                Common.UIHandler.postDelayed(() -> {
+                    List<Message> atMessages = vm.atMessages.getValue();
+                    t:
+                    for (MultipleChoice multipleChoice : memberVM.choiceList.val()) {
+                        for (Message atMessage : atMessages) {
+                            if (multipleChoice.key.equals(atMessage.getSendID())) {
+                                continue t;
+                            }
+                        }
+                        Message message = new Message();
+                        message.setSendID(multipleChoice.key);
+                        message.setSenderNickname(multipleChoice.name);
+                        atMessages.add(message);
+                        vm.atMessages.setValue(atMessages);
+                    }
+                }, 150);
+
+            });
+            ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER).navigation();
         });
         view.call.setOnClickListener(v -> {
             if (null == callingService) return;
@@ -325,26 +387,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 });
                 return;
             }
-            IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
-                vm.isVideoCall = keyCode != 1;
-                if (vm.isSingleChat) {
-                    List<String> ids = new ArrayList<>();
-                    ids.add(vm.userID);
-                    SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
-                        vm.isSingleChat, ids, null);
-                    callingService.call(signalingInfo);
-                } else {
-                    GroupVM groupVM = new GroupVM();
-                    groupVM.groupId = vm.groupID;
-                    BaseApp.inst().putVM(groupVM);
-                    ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
-                        .withInt(Constant.K_SIZE, 9)
-                        .withBoolean(Constant.IS_GROUP_CALL, true)
-                        .navigation(this,
-                            Constant.Event.CALLING_REQUEST_CODE);
-                }
-                return false;
-            });
+            goToCall();
         });
         view.join.setOnClickListener(v -> vm.signalingGetTokenByRoomID(vm.getRoomCallingInfoRoomID()));
         view.delete.setOnClickListener(v -> {
@@ -356,7 +399,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.mergeForward.setOnClickListener(v -> {
 //            ARouter.getInstance().build(Routes.Contact.FORWARD).navigation(this,
 //                Constant.Event.FORWARD);
-            List<Message> msgList=getSelectMsg();
+            List<Message> msgList = getSelectMsg();
             Collections.reverse(msgList);
             Easy.find(ForwardVM.class).createMergerMessage(vm.isSingleChat,
                 vm.conversationInfo.getValue().getShowName(), msgList);
@@ -477,6 +520,22 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
     }
 
+    public   void goToCall() {
+        IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
+            vm.isVideoCall = keyCode != 1;
+            if (vm.isSingleChat) {
+                List<String> ids = new ArrayList<>();
+                ids.add(vm.userID);
+                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
+                    vm.isSingleChat, ids, null);
+                callingService.call(signalingInfo);
+            } else {
+                gotoMemberList();
+            }
+            return false;
+        });
+    }
+
 
     private void bindShowName() {
         try {
@@ -518,51 +577,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != RESULT_OK || null == data) return;
-
-        if (requestCode == Constant.Event.CALLING_REQUEST_CODE) {
-            //发起群通话
-            List<String> ids = data.getStringArrayListExtra(Constant.K_RESULT);
-            //邀请列表中移除自己
-            ids.remove(BaseApp.inst().loginCertificate.userID);
-            SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall, false, ids,
-                vm.groupID);
-            if (null == callingService) return;
-            ActivityManager.push(this);
-            callingService.call(signalingInfo);
-        }
-        if (requestCode == Constant.Event.AT_USER) {
-            try {
-                Editable editable = bottomInputCote.view.chatInput.getText();
-                if (!TextUtils.isEmpty(editable)) {
-                    CharSequence finallyStr = editable.subSequence(editable.length() - 1,
-                        editable.length());
-                    if (finallyStr.toString().equals("@")) {
-                        editable.replace(editable.length() - 1, editable.length(),
-                            new SpannableStringBuilder(""));
-                    }
-                }
-            } catch (Exception ignore) {
-            }
-
-            Common.UIHandler.postDelayed(() -> {
-                List<MultipleChoice> extra =
-                    (List<MultipleChoice>) data.getSerializableExtra(Constant.K_RESULT);
-                List<Message> atMessages = vm.atMessages.getValue();
-                t:
-                for (MultipleChoice multipleChoice : extra) {
-                    for (Message atMessage : atMessages) {
-                        if (multipleChoice.key.equals(atMessage.getSendID())) {
-                            continue t;
-                        }
-                    }
-                    Message message = new Message();
-                    message.setSendID(multipleChoice.key);
-                    message.setSenderNickname(multipleChoice.name);
-                    atMessages.add(message);
-                    vm.atMessages.setValue(atMessages);
-                }
-            }, 150);
+        if (resultCode != RESULT_OK || null == data) {
         }
     }
 
@@ -612,7 +627,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     public static class LinearLayoutMg extends androidx.recyclerview.widget.LinearLayoutManager {
-        private boolean canScrollVertically=true;
+        private boolean canScrollVertically = true;
 
         public LinearLayoutMg(Context context) {
             super(context);

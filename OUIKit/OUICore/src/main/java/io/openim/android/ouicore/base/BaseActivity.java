@@ -42,11 +42,15 @@ import io.openim.android.ouicore.utils.SinkHelper;
 @Deprecated
 public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> extends AppCompatActivity implements IView {
     //是否释放资源
-    private boolean isRecycle = false;
+    private boolean isRelease = true;
+    //已经释放资源
+    private boolean released = false;
+    private boolean isFaster = false;
 
     protected T vm;
     protected A view;
     private String vmCanonicalName;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -122,7 +126,8 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
     }
 
@@ -141,7 +146,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     public void bindVMByCache(Class<T> vm) {
         try {
             this.vm = Easy.find(vm);
-            isRecycle = false;
+            isRelease = false;
             bind();
         } catch (Exception ignore) {
         }
@@ -151,7 +156,6 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     public void removeCacheVM() {
         if (null != vm) {
             vm.context.clear();
-            vm.IView.clear();
             vm.releaseRes();
             BaseApp.inst().removeCacheVM(vm.getClass());
         }
@@ -162,35 +166,45 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         ActivityManager.push(this);
         super.onResume();
         bind();
-        if (null != vm) vm.viewResume();
+        if (null != vm)
+            vm.viewResume();
     }
 
+
+    @Override
+    protected void onPause() {
+        exeFaster();
+        if (null != vm) {
+            vm.viewPause();
+            releaseRes();
+        }
+        super.onPause();
+    }
 
     protected void fasterDestroy() {
 
     }
 
-    @Override
-    protected void onPause() {
-        if (null != vm)
-            vm.viewPause();
-        recycle();
-        super.onPause();
+    private void releaseRes() {
+        if (vm == null) return;
+        if (isFinishing() && isRelease && !released) {
+            released = true;
+            vm.releaseRes();
+        }
     }
 
     @Override
     protected void onDestroy() {
-        recycle();
+        ActivityManager.remove(this);
+        exeFaster();
+        N.clearDispose(this);
+        releaseRes();
         super.onDestroy();
     }
 
-    void recycle() {
-        if (isFinishing() && !isRecycle) {
-            isRecycle = true;
-            ActivityManager.remove(this);
-            N.clearDispose(this);
-            if (null != view) view.unbind();
-            removeCacheVM();
+    private void exeFaster() {
+        if (isFinishing() && !isFaster) {
+            isFaster = true;
             fasterDestroy();
         }
     }
