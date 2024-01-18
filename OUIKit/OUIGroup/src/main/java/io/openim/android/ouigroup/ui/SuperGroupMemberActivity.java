@@ -24,12 +24,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BasicActivity;
+import io.openim.android.ouicore.base.vm.ISubscribe;
+import io.openim.android.ouicore.base.vm.Subject;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
@@ -49,10 +52,13 @@ import io.openim.android.sdk.models.GroupMembersInfo;
 public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMemberBinding> {
     private RecyclerViewAdapter adapter;
     private GroupMemberVM vm;
+    private GroupVM groupVM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        vm = Easy.find(GroupMemberVM.class);
+        String tag=getIntent().getStringExtra(Constant.K_RESULT);
+        vm = Easy.find(GroupMemberVM.class,tag);
+         groupVM = Easy.find(GroupVM.class);
         super.onCreate(savedInstanceState);
         viewBinding(ActivitySuperGroupMemberBinding.inflate(getLayoutInflater()));
 
@@ -62,6 +68,12 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
 
 
     private void listener() {
+        groupVM.subscribe(this, subject -> {
+            if (Objects.equals(subject.key,
+                Constant.Event.UPDATE_GROUP_INFO + "")) {
+                update();
+            }
+        });
         view.atAll.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
@@ -94,8 +106,21 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
                 popupWindow.dismiss();
             });
             view.deleteFriend.setOnClickListener(v1 -> {
+                String tag="SuperGroupMemberActivity&deleteFriend";
+                GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class,
+                    tag);
+                memberVM.groupId = vm.groupId;
+                memberVM.setIntention(GroupMemberVM.Intention.AT);
+                memberVM.setOnFinishListener(activity -> {
+                    List<String> ids = new ArrayList<>();
+                    for (MultipleChoice choice : memberVM.choiceList.val()) {
+                        ids.add(choice.key);
+                    }
+                    groupVM.kickGroupMember(ids);
+                    activity.finish();
+                });
+                startActivity(new Intent(this, SuperGroupMemberActivity.class).putExtra(Constant.K_RESULT,tag));
                 popupWindow.dismiss();
-                startActivity(new Intent(this, InitiateGroupActivity.class).putExtra(Constant.IS_REMOVE_GROUP, true));
             });
             //设置PopupWindow的视图内容
             popupWindow.setContentView(view.getRoot());
@@ -175,11 +200,10 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
                     vm.choiceList.val().indexOf(new MultipleChoice(data.groupMembersInfo.getUserID()));
                 boolean isChecked = index != -1;
                 itemViewHo.view.select.setChecked(isChecked);
-                boolean isEnabled=true;
-                if (isChecked)
-                    isEnabled= vm.choiceList.val().get(index).isEnabled;
+                boolean isEnabled = true;
+                if (isChecked) isEnabled = vm.choiceList.val().get(index).isEnabled;
                 itemViewHo.view.getRoot().setIntercept(!isEnabled);
-                itemViewHo.view.getRoot().setAlpha(isEnabled  ? 1f : 0.3f);
+                itemViewHo.view.getRoot().setAlpha(isEnabled ? 1f : 0.3f);
 
                 itemViewHo.view.avatar.load(data.groupMembersInfo.getFaceURL());
                 itemViewHo.view.nickName.setText(data.groupMembersInfo.getNickname());
@@ -227,6 +251,10 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
         };
         view.recyclerview.setAdapter(adapter);
 
+        update();
+    }
+
+    private void update() {
         vm.page = 0;
         vm.superGroupMembers.getValue().clear();
         loadMember();

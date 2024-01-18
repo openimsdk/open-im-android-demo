@@ -377,6 +377,7 @@ public class GroupVM extends SocialityVM {
                     getIView().onSuccess(null);
 
                     Obs.newMessage(Constant.Event.UPDATE_GROUP_INFO, groupName);
+                    postSubject(Constant.Event.UPDATE_GROUP_INFO+"");
                 }
             }, groupId, userIds, "welcome");
     }
@@ -398,6 +399,7 @@ public class GroupVM extends SocialityVM {
                 getIView().onSuccess(null);
 
                 Obs.newMessage(Constant.Event.UPDATE_GROUP_INFO, groupName);
+                postSubject(Constant.Event.UPDATE_GROUP_INFO+"");
             }
         }, groupId, uids, "");
     }

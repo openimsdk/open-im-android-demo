@@ -510,6 +510,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     private void gotoMemberList() {
         GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class);
         memberVM.groupId = vm.groupId;
+        memberVM.isOwnerOrAdmin = vm.isOwnerOrAdmin.val();
         memberVM.setIntention(GroupMemberVM.Intention.CHECK);
         memberVM.setOnFinishListener(activity -> {
             ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID,
