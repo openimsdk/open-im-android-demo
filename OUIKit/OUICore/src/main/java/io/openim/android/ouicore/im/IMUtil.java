@@ -8,11 +8,13 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Vibrator;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
@@ -29,14 +31,17 @@ import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,6 +49,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import io.openim.android.ouicore.R;
@@ -65,7 +71,9 @@ import io.openim.android.ouicore.entity.MuteMemberNotification;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.entity.OANotification;
 import io.openim.android.ouicore.entity.QuitGroupNotification;
+import io.openim.android.ouicore.ex.AtUser;
 import io.openim.android.ouicore.ex.MultipleChoice;
+import io.openim.android.ouicore.ex.UserEx;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
@@ -92,6 +100,7 @@ import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotificationElem;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.PictureElem;
+import io.openim.android.sdk.models.QuoteElem;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.SignalingInvitationInfo;
@@ -273,6 +282,15 @@ public class IMUtil {
                 atMsgInfo.text = msg.getAtTextElem().getText();
                 msgExpand.atMsgInfo = atMsgInfo;
                 handleAt(msgExpand, msg.getGroupID());
+
+                Message quoteMessage = msg.getAtTextElem().getQuoteMessage();
+                if (null != quoteMessage) {
+                    buildExpandInfo(quoteMessage);
+                    QuoteElem quoteElem = new QuoteElem();
+                    quoteElem.setText(atMsgInfo.text);
+                    quoteElem.setQuoteMessage(quoteMessage);
+                    msg.setQuoteElem(quoteElem);
+                }
             }
             handleNotification(msg);
         } catch (Exception e) {
@@ -289,8 +307,7 @@ public class IMUtil {
      * @return
      */
     public static String getSelfName(String uid, String nickName) {
-        if (uid.equals(BaseApp.inst()
-            .loginCertificate.userID))
+        if (uid.equals(BaseApp.inst().loginCertificate.userID))
             return BaseApp.inst().getString(R.string.you);
         return nickName.trim();
     }
@@ -304,7 +321,7 @@ public class IMUtil {
         MsgExpand msgExpand = (MsgExpand) msg.getExt();
         String detail = notificationElem.getDetail();
         CharSequence tips = "";
-        String target="",target2="";
+        String target = "", target2 = "";
         Context ctx = BaseApp.inst();
         switch (msg.getContentType()) {
             case MessageType.REVOKE_MESSAGE_NTF: {
@@ -312,16 +329,14 @@ public class IMUtil {
                 String txt;
                 //a 撤回了一条消息
                 if (revokedInfo.getRevokerID().equals(revokedInfo.getSourceMessageSendID())) {
-                    txt = String.format(ctx.getString(R.string.revoke_tips),
-                        target=getSelfName(revokedInfo.getRevokerID(),
-                            revokedInfo.getRevokerNickname()));
-                    tips = getSingleSequence(msg.getGroupID(), target,
-                        revokedInfo.getRevokerID(), txt);
+                    txt = String.format(ctx.getString(R.string.revoke_tips), target =
+                        getSelfName(revokedInfo.getRevokerID(), revokedInfo.getRevokerNickname()));
+                    tips = getSingleSequence(msg.getGroupID(), target, revokedInfo.getRevokerID()
+                        , txt);
                 } else {
                     txt = String.format(ctx.getString(R.string.revoke_tips2),
-                        getSelfName(revokedInfo.getRevokerID(),
-                            revokedInfo.getRevokerNickname()),
-                        getSelfName(revokedInfo.getSourceMessageSendID(),
+                        getSelfName(revokedInfo.getRevokerID(), revokedInfo.getRevokerNickname())
+                        , getSelfName(revokedInfo.getSourceMessageSendID(),
                             revokedInfo.getSourceMessageSenderNickname()));
 
                     tips = twoPeopleRevoker(msg, revokedInfo, txt);
@@ -333,12 +348,12 @@ public class IMUtil {
                 GroupNotification groupNotification = GsonHel.fromJson(detail,
                     GroupNotification.class);
                 //a 创建了群聊
-                String txt = String.format(ctx.getString(R.string.created_group),
-                    target=getSelfName(groupNotification.opUser.getUserID()
-                        ,groupNotification.opUser.getNickname()));
+                String txt = String.format(ctx.getString(R.string.created_group), target =
+                    getSelfName(groupNotification.opUser.getUserID(),
+                        groupNotification.opUser.getNickname()));
 
-                tips = getSingleSequence(msg.getGroupID(),target
-                    , groupNotification.opUser.getUserID(), txt);
+                tips = getSingleSequence(msg.getGroupID(), target,
+                    groupNotification.opUser.getUserID(), txt);
                 break;
             }
             case MessageType.GROUP_INFO_SET_NTF: {
@@ -346,11 +361,11 @@ public class IMUtil {
                     GroupNotification.class);
 
                 // a 修改了群资料
-                String txt = String.format(ctx.getString(R.string.change_group_data),
-                    target=getSelfName(groupNotification.opUser.getUserID()
-                        ,groupNotification.opUser.getNickname()));
-                tips = getSingleSequence(msg.getGroupID(), target
-                    , groupNotification.opUser.getUserID(), txt);
+                String txt = String.format(ctx.getString(R.string.change_group_data), target =
+                    getSelfName(groupNotification.opUser.getUserID(),
+                        groupNotification.opUser.getNickname()));
+                tips = getSingleSequence(msg.getGroupID(), target,
+                    groupNotification.opUser.getUserID(), txt);
                 break;
             }
             case MessageType.GROUP_NAME_CHANGED_NTF: {
@@ -358,11 +373,12 @@ public class IMUtil {
                     GroupNotification.class);
 
                 // a 修改了群名字
-                String txt = String.format(ctx.getString(R.string.edit_group_name),
-                    target=getSelfName(groupNotification.opUser.getUserID()
-                        ,groupNotification.opUser.getNickname()), groupNotification.group.getGroupName());
-                tips = getSingleSequence(msg.getGroupID(), target
-                    , groupNotification.opUser.getUserID(), txt);
+                String txt = String.format(ctx.getString(R.string.edit_group_name), target =
+                        getSelfName(groupNotification.opUser.getUserID(),
+                            groupNotification.opUser.getNickname()),
+                    groupNotification.group.getGroupName());
+                tips = getSingleSequence(msg.getGroupID(), target,
+                    groupNotification.opUser.getUserID(), txt);
                 break;
             }
             case MessageType.MEMBER_QUIT_NTF: {
@@ -370,7 +386,7 @@ public class IMUtil {
                     QuitGroupNotification.class);
                 // a 退出了群聊
                 tips = String.format(ctx.getString(R.string.quit_group2),
-                    getSelfName(quitUser.quitUser.getUserID(),quitUser.quitUser.getNickname()));
+                    getSelfName(quitUser.quitUser.getUserID(), quitUser.quitUser.getNickname()));
                 break;
             }
             case MessageType.MEMBER_INVITED_NTF: {
@@ -381,14 +397,16 @@ public class IMUtil {
                 List<MultipleChoice> choices = new ArrayList<>();
                 for (GroupMembersInfo groupMembersInfo : invitedUserList.invitedUserList) {
                     MultipleChoice choice = new MultipleChoice();
-                    choice.name = getSelfName(groupMembersInfo.getUserID(),groupMembersInfo.getNickname());
+                    choice.name = getSelfName(groupMembersInfo.getUserID(),
+                        groupMembersInfo.getNickname());
                     choice.key = groupMembersInfo.getUserID();
                     choices.add(choice);
                     stringBuffer.append(choice.name).append(",");
                 }
                 String a = stringBuffer.substring(0, stringBuffer.length() - 1);
-                String txt = String.format(ctx.getString(R.string.invited_tips),
-                    target=getSelfName( invitedUserList.opUser.getUserID(), invitedUserList.opUser.getNickname()), a);
+                String txt = String.format(ctx.getString(R.string.invited_tips), target =
+                    getSelfName(invitedUserList.opUser.getUserID(),
+                        invitedUserList.opUser.getNickname()), a);
 
                 MultipleChoice choice = new MultipleChoice(invitedUserList.opUser.getUserID());
                 choice.name = target;
@@ -406,14 +424,16 @@ public class IMUtil {
                 List<MultipleChoice> choices = new ArrayList<>();
                 for (GroupMembersInfo groupMembersInfo : invitedUserList.kickedUserList) {
                     MultipleChoice choice = new MultipleChoice();
-                    choice.name = getSelfName(groupMembersInfo.getUserID(),groupMembersInfo.getNickname());
+                    choice.name = getSelfName(groupMembersInfo.getUserID(),
+                        groupMembersInfo.getNickname());
                     choice.key = groupMembersInfo.getUserID();
                     choices.add(choice);
                     stringBuffer.append(choice.name).append(",");
                 }
                 String a = stringBuffer.substring(0, stringBuffer.length() - 1);
-                String txt = String.format(ctx.getString(R.string.kicked_group_tips), a,
-                    target=getSelfName( invitedUserList.opUser.getUserID(), invitedUserList.opUser.getNickname()));
+                String txt = String.format(ctx.getString(R.string.kicked_group_tips), a, target =
+                    getSelfName(invitedUserList.opUser.getUserID(),
+                        invitedUserList.opUser.getNickname()));
 
                 MultipleChoice choice = new MultipleChoice(invitedUserList.opUser.getUserID());
                 choice.name = target;
@@ -427,8 +447,9 @@ public class IMUtil {
                 EnterGroupNotification entrantUser = GsonHel.fromJson(detail,
                     EnterGroupNotification.class);
                 // a 加入了群聊
-                String txt = String.format(ctx.getString(R.string.join_group2),
-                   target=getSelfName(entrantUser.entrantUser.getUserID(),entrantUser.entrantUser.getNickname()));
+                String txt = String.format(ctx.getString(R.string.join_group2), target =
+                    getSelfName(entrantUser.entrantUser.getUserID(),
+                        entrantUser.entrantUser.getNickname()));
 
                 tips = getSingleSequence(msg.getGroupID(), target,
                     entrantUser.entrantUser.getUserID(), txt);
@@ -439,23 +460,25 @@ public class IMUtil {
                     GroupNotification.class);
                 // a 解散了群聊
                 tips = String.format(ctx.getString(R.string.dismiss_group),
-                    getSelfName(groupNotification.opUser.getUserID(),groupNotification.opUser.getNickname()) );
+                    getSelfName(groupNotification.opUser.getUserID(),
+                        groupNotification.opUser.getNickname()));
                 break;
             }
             case MessageType.GROUP_OWNER_TRANSFERRED_NTF: {
                 GroupRightsTransferNotification transferredGroupNotification =
                     GsonHel.fromJson(detail, GroupRightsTransferNotification.class);
                 // a 将群转让给了 b
-                String txt = String.format(ctx.getString(R.string.transferred_group),
-                    target=getSelfName( transferredGroupNotification.opUser.getUserID(), transferredGroupNotification.opUser.getNickname()),
-                    target2=getSelfName(transferredGroupNotification.newGroupOwner.getUserID(),transferredGroupNotification.newGroupOwner.getNickname()));
+                String txt = String.format(ctx.getString(R.string.transferred_group), target =
+                    getSelfName(transferredGroupNotification.opUser.getUserID(),
+                        transferredGroupNotification.opUser.getNickname()), target2 =
+                    getSelfName(transferredGroupNotification.newGroupOwner.getUserID(),
+                        transferredGroupNotification.newGroupOwner.getNickname()));
 
                 MultipleChoice choice =
                     new MultipleChoice(transferredGroupNotification.newGroupOwner.getUserID());
                 choice.name = target2;
                 choice.groupId = msg.getGroupID();
-                tips = getMultipleSequence(getSingleSequence(msg.getGroupID(),
-                        target,
+                tips = getMultipleSequence(getSingleSequence(msg.getGroupID(), target,
                         transferredGroupNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
@@ -464,9 +487,11 @@ public class IMUtil {
                 MuteMemberNotification memberNotification = GsonHel.fromJson(detail,
                     MuteMemberNotification.class);
                 // b 被 a 禁言
-                String txt = String.format(ctx.getString(R.string.Muted_group),
-                   target=getSelfName(memberNotification.mutedUser.getUserID(),memberNotification.mutedUser.getNickname()),
-                    target2=getSelfName(memberNotification.opUser.getUserID(),memberNotification.opUser.getNickname()),
+                String txt = String.format(ctx.getString(R.string.Muted_group), target =
+                        getSelfName(memberNotification.mutedUser.getUserID(),
+                            memberNotification.mutedUser.getNickname()), target2 =
+                        getSelfName(memberNotification.opUser.getUserID(),
+                            memberNotification.opUser.getNickname()),
                     TimeUtil.secondFormat(memberNotification.mutedSeconds));
 
                 List<MultipleChoice> choices = new ArrayList<>();
@@ -487,16 +512,17 @@ public class IMUtil {
                 MuteMemberNotification memberNotification = GsonHel.fromJson(detail,
                     MuteMemberNotification.class);
                 // b 被 a 取消了禁言
-                String txt = String.format(ctx.getString(R.string.cancel_muted),
-                    target=getSelfName(memberNotification.mutedUser.getUserID(),memberNotification.mutedUser.getNickname()),
-                    target2=getSelfName(memberNotification.opUser.getUserID(),memberNotification.opUser.getNickname()));
+                String txt = String.format(ctx.getString(R.string.cancel_muted), target =
+                    getSelfName(memberNotification.mutedUser.getUserID(),
+                        memberNotification.mutedUser.getNickname()), target2 =
+                    getSelfName(memberNotification.opUser.getUserID(),
+                        memberNotification.opUser.getNickname()));
 
                 MultipleChoice choice =
                     new MultipleChoice(memberNotification.mutedUser.getUserID());
                 choice.name = target;
                 choice.groupId = msg.getGroupID();
-                tips = getMultipleSequence(getSingleSequence(msg.getGroupID(),
-                        target2,
+                tips = getMultipleSequence(getSingleSequence(msg.getGroupID(), target2,
                         memberNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
@@ -505,11 +531,11 @@ public class IMUtil {
                 MuteMemberNotification memberNotification = GsonHel.fromJson(detail,
                     MuteMemberNotification.class);
                 // a 开起了群禁言
-                String txt = String.format(ctx.getString(R.string.start_muted),
-                    target=getSelfName(memberNotification.opUser.getUserID(),memberNotification.opUser.getNickname()));
+                String txt = String.format(ctx.getString(R.string.start_muted), target =
+                    getSelfName(memberNotification.opUser.getUserID(),
+                        memberNotification.opUser.getNickname()));
 
-                tips = getSingleSequence(msg.getGroupID(),
-                    target,
+                tips = getSingleSequence(msg.getGroupID(), target,
                     memberNotification.opUser.getUserID(), txt);
                 break;
             }
@@ -517,10 +543,10 @@ public class IMUtil {
                 MuteMemberNotification memberNotification = GsonHel.fromJson(detail,
                     MuteMemberNotification.class);
                 // a 关闭了群禁言
-                String txt = String.format(ctx.getString(R.string.close_muted),
-                    target=getSelfName(memberNotification.opUser.getUserID(),memberNotification.opUser.getNickname()));
-                tips = getSingleSequence(msg.getGroupID(),
-                    target,
+                String txt = String.format(ctx.getString(R.string.close_muted), target =
+                    getSelfName(memberNotification.opUser.getUserID(),
+                        memberNotification.opUser.getNickname()));
+                tips = getSingleSequence(msg.getGroupID(), target,
                     memberNotification.opUser.getUserID(), txt);
                 break;
             }
@@ -537,11 +563,11 @@ public class IMUtil {
             case MessageType.GROUP_MEMBER_INFO_CHANGED_NTF: {
                 GroupNotification groupNotification = GsonHel.fromJson(detail,
                     GroupNotification.class);
-                String txt = String.format(ctx.getString(R.string.edit_data),
-                   target=getSelfName(groupNotification.opUser.getUserID(),groupNotification.opUser.getNickname()));
-                tips = getSingleSequence(msg.getGroupID(),
-                    target
-                    , groupNotification.opUser.getUserID(), txt);
+                String txt = String.format(ctx.getString(R.string.edit_data), target =
+                    getSelfName(groupNotification.opUser.getUserID(),
+                        groupNotification.opUser.getNickname()));
+                tips = getSingleSequence(msg.getGroupID(), target,
+                    groupNotification.opUser.getUserID(), txt);
                 break;
             }
             case MessageType.GROUP_ANNOUNCEMENT_NTF:
@@ -566,12 +592,14 @@ public class IMUtil {
     public static CharSequence twoPeopleRevoker(Message msg, RevokedInfo revokedInfo, String txt) {
         List<MultipleChoice> choices = new ArrayList<>();
         MultipleChoice choice = new MultipleChoice(revokedInfo.getRevokerID());
-        choice.name = IMUtil.getSelfName(revokedInfo.getRevokerID(),revokedInfo.getRevokerNickname());
+        choice.name = IMUtil.getSelfName(revokedInfo.getRevokerID(),
+            revokedInfo.getRevokerNickname());
         choice.groupId = msg.getGroupID();
         choices.add(choice);
 
         MultipleChoice choice2 = new MultipleChoice(revokedInfo.getSourceMessageSendID());
-        choice2.name = IMUtil.getSelfName(revokedInfo.getSourceMessageSendID(),revokedInfo.getSourceMessageSenderNickname());
+        choice2.name = IMUtil.getSelfName(revokedInfo.getSourceMessageSendID(),
+            revokedInfo.getSourceMessageSenderNickname());
         choice2.groupId = msg.getGroupID();
         choices.add(choice2);
 
@@ -658,35 +686,63 @@ public class IMUtil {
     }
 
     public static CharSequence buildClickAndColorSpannable(@NotNull SpannableStringBuilder spannableString, String tag, @ColorRes int colorId, ClickableSpan clickableSpan) {
-        ForegroundColorSpan colorSpan =
-            new ForegroundColorSpan(BaseApp.inst().getResources().getColor(colorId));
-        int start = spannableString.toString().indexOf(tag);
-        int end = spannableString.toString().indexOf(tag) + tag.length();
-        if (null != clickableSpan)
-            spannableString.setSpan(clickableSpan, start, end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-        spannableString.setSpan(colorSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
+        try {
+            ForegroundColorSpan colorSpan =
+                new ForegroundColorSpan(BaseApp.inst().getResources().getColor(colorId));
+            int start = spannableString.toString().indexOf(tag);
+            int end = spannableString.toString().indexOf(tag) + tag.length();
+            if (null != clickableSpan)
+                spannableString.setSpan(clickableSpan, start, end,
+                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+            spannableString.setSpan(colorSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        } catch (Exception ignore) {
+        }
         return spannableString;
     }
 
-    /**
-     * 存储草稿
-     */
-    public static void cacheDraft( String inputMsg, String conversationID) {
-        String cacheKey = conversationID + "_draft";
-        if (TextUtils.isEmpty(inputMsg)) {
-            SharedPreferencesUtil.remove(BaseApp.inst(), cacheKey);
-        } else if (!Common.isBlank(inputMsg)) {
-            SharedPreferencesUtil.get(BaseApp.inst()).setCache(cacheKey, inputMsg);
-        }
-    }
 
     /**
      * 获取草稿
+     * [0] CharSequence草稿
+     * [1] atUsers
      */
-    public static String getDraft(String conversationID) {
+    public static Object[] getDraft(String conversationID) {
         String cacheKey = conversationID + "_draft";
-        return SharedPreferencesUtil.get(BaseApp.inst()).getString(cacheKey);
+        String atKey = cacheKey + "_at";
+        String atJson = SharedPreferencesUtil.get(BaseApp.inst()).getString(atKey);
+        String draft = SharedPreferencesUtil.get(BaseApp.inst()).getString(cacheKey);
+        List<AtUser> atUsers = new ArrayList<>();
+        if (!TextUtils.isEmpty(atJson)) {
+            Type type = new TypeToken<List<AtUser>>() {
+            }.getType();
+            atUsers = GsonHel.getGson().fromJson(atJson, type);
+            for (AtUser atUser : atUsers) {
+
+                String spHashCode = IMUtil.atD(atUser.key);
+                String tag = IMUtil.atD(atUser.name);
+                draft = draft.replace(spHashCode.trim(), tag.trim());
+            }
+            SpannableStringBuilder spannableString = null;
+            try {
+                for (AtUser atUser : atUsers) {
+                    if (null == spannableString)
+                        spannableString = new SpannableStringBuilder(draft);
+                    else spannableString = new SpannableStringBuilder(spannableString);
+                    String tag = IMUtil.atD(atUser.name);
+
+                    int start = spannableString.toString().indexOf(tag);
+                    int end = spannableString.toString().indexOf(tag) + tag.length();
+                    ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor(
+                        "#009ad6"));
+                    spannableString.setSpan(colorSpan, start, end,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    atUser.spanHashCode = colorSpan.hashCode();
+                }
+            } catch (Exception ignore) {
+            }
+            return new Object[]{spannableString, atUsers};
+        }
+        return new Object[]{draft, atUsers};
     }
 
     public static CharSequence getMsgParse(Message msg) {
@@ -895,15 +951,7 @@ public class IMUtil {
             hangIntent, PendingIntent.FLAG_MUTABLE);
 
         NotificationUtil.sendNotify(id,
-            NotificationUtil.builder(NotificationUtil.MSG_NOTIFICATION)
-                .setContentTitle(BaseApp.inst().getString(R.string.app_name))
-                .setContentText(BaseApp.inst().getString(R.string.a_message_is_received))
-                .setSmallIcon(R.mipmap.ic_logo)
-                .setContentIntent(hangPendingIntent)
-                .setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
-                .setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring))
-                .build());
+            NotificationUtil.builder(NotificationUtil.MSG_NOTIFICATION).setContentTitle(BaseApp.inst().getString(R.string.app_name)).setContentText(BaseApp.inst().getString(R.string.a_message_is_received)).setSmallIcon(R.mipmap.ic_logo).setContentIntent(hangPendingIntent).setAutoCancel(true).setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE).setSound(Uri.parse("android.resource://" + BaseApp.inst().getPackageName() + "/" + R.raw.message_ring)).build());
     }
 
     //播放提示音
@@ -918,6 +966,9 @@ public class IMUtil {
         vib.vibrate(milliseconds);
     }
 
+    public static String atD(String str) {
+        return "@" + str + "\t";
+    }
 
     /**
      * 成功监听

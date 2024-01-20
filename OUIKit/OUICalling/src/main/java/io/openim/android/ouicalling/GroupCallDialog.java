@@ -72,6 +72,16 @@ public class GroupCallDialog extends CallDialog {
     public GroupCallDialog(@NonNull Context context, CallingService callingService,
                            boolean isCallOut) {
         super(context, callingService, isCallOut);
+
+
+        callingVM.callViewModel.subscribe(callingVM.callViewModel
+            .getRoom().getEvents().getEvents(), (v)->{
+        if ( v.getRoom().getRemoteParticipants().size()==0){
+            //当只有1个人时关闭会议
+            dismiss();
+        }
+           return null;
+        }, scope);
     }
 
     @Override
@@ -285,6 +295,7 @@ public class GroupCallDialog extends CallDialog {
             }
         });
         callingVM.setOnParticipantsChangeListener(participants -> {
+
             removeHost(participants);
             viewRenderersAdapter.setItems(participants);
         });

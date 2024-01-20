@@ -19,8 +19,7 @@ public class MsgExpand {
     public LocationInfo locationInfo;
     //at消息（at人才有）
     public AtMsgInfo atMsgInfo;
-    //用于在消息输入框监听删除键时 判断删除对应@的人
-    public int spanHashCode;
+
     //富文本（at 消息、表情）
     public transient SpannableStringBuilder sequence;
     //oa 通知

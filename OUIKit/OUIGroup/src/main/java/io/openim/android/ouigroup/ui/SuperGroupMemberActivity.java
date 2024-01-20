@@ -53,12 +53,16 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
     private RecyclerViewAdapter adapter;
     private GroupMemberVM vm;
     private GroupVM groupVM;
+    private String vmTag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        String tag=getIntent().getStringExtra(Constant.K_RESULT);
-        vm = Easy.find(GroupMemberVM.class,tag);
-         groupVM = Easy.find(GroupVM.class);
+        vmTag = getIntent().getStringExtra(Constant.K_RESULT);
+        vm = Easy.find(GroupMemberVM.class, vmTag);
+        try {
+            groupVM = Easy.find(GroupVM.class);
+        } catch (Exception ignore) {
+        }
         super.onCreate(savedInstanceState);
         viewBinding(ActivitySuperGroupMemberBinding.inflate(getLayoutInflater()));
 
@@ -68,18 +72,21 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
 
 
     private void listener() {
-        groupVM.subscribe(this, subject -> {
-            if (Objects.equals(subject.key,
-                Constant.Event.UPDATE_GROUP_INFO + "")) {
-                update();
-            }
-        });
+        if (null != groupVM) {
+            groupVM.subscribe(this, subject -> {
+                if (Objects.equals(subject.key,
+                    Constant.Event.UPDATE_GROUP_INFO + "")) {
+                    update();
+                }
+            });
+        }
         view.atAll.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
                 MultipleChoice multipleChoice = new MultipleChoice(IMUtil.AT_ALL);
                 multipleChoice.name = getString(io.openim.android.ouicore.R.string.all_person);
                 vm.addChoice(multipleChoice);
+                vm.onFinish(SuperGroupMemberActivity.this);
                 finish();
             }
         });
@@ -106,7 +113,7 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
                 popupWindow.dismiss();
             });
             view.deleteFriend.setOnClickListener(v1 -> {
-                String tag="SuperGroupMemberActivity&deleteFriend";
+                String tag = "SuperGroupMemberActivity&deleteFriend";
                 GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class,
                     tag);
                 memberVM.groupId = vm.groupId;
@@ -116,10 +123,11 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
                     for (MultipleChoice choice : memberVM.choiceList.val()) {
                         ids.add(choice.key);
                     }
-                    groupVM.kickGroupMember(ids);
+                    if (null != groupVM)
+                        groupVM.kickGroupMember(ids);
                     activity.finish();
                 });
-                startActivity(new Intent(this, SuperGroupMemberActivity.class).putExtra(Constant.K_RESULT,tag));
+                startActivity(new Intent(this, SuperGroupMemberActivity.class).putExtra(Constant.K_RESULT, tag));
                 popupWindow.dismiss();
             });
             //设置PopupWindow的视图内容
@@ -262,6 +270,6 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
 
     @Override
     protected void recycle() {
-        Easy.delete(GroupMemberVM.class);
+        Easy.delete(GroupMemberVM.class, vmTag);
     }
 }

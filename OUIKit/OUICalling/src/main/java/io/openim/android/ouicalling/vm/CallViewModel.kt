@@ -93,7 +93,6 @@ class CallViewModel(
                             val message = it.data.toString(Charsets.UTF_8)
                             mutableDataReceived.emit("$identity: $message")
                         }
-
                         else -> {}
                     }
                 }
@@ -180,13 +179,6 @@ class CallViewModel(
                 }
             }.collectLatest1 { videoTrack ->
                 val videoTrack = videoTrack as? VideoTrack ?: return@collectLatest1
-
-//                if (null != viewRenderer.tag) {
-//                    val lastTrack = viewRenderer.tag as VideoTrack
-//                    lastTrack.removeRenderer(viewRenderer);
-//                }
-//                viewRenderer.tag = videoTrack
-//                videoTrack.addRenderer(viewRenderer)
 
                 if (null != viewRenderer.tag) {
                     val lastTrack = viewRenderer.tag as VideoTrack

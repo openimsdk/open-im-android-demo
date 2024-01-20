@@ -8,14 +8,13 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.base.vm.injection.BaseVM;
-import io.openim.android.ouicore.ex.IMex;
+import io.openim.android.ouicore.ex.UserEx;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
@@ -35,9 +34,9 @@ public class NotificationVM extends BaseVM implements OnCustomBusinessListener, 
     OnFriendshipListener {
 
     //群红点数量
-    public State<List<IMex>> groupDot = new State<>(new ArrayList<>());
+    public State<List<UserEx>> groupDot = new State<>(new ArrayList<>());
     //好友通知红点
-    public State<List<IMex>> friendDot = new State<>(new ArrayList<>());
+    public State<List<UserEx>> friendDot = new State<>(new ArrayList<>());
 
     public State<String> customBusinessMessage = new State<>();
     public State<Integer> momentsUnread = new State<>();
@@ -56,13 +55,13 @@ public class NotificationVM extends BaseVM implements OnCustomBusinessListener, 
       try {
           String friendRequest = SharedPreferencesUtil.get(BaseApp.inst()).getString(K_friendRequest);
           String groupRequest = SharedPreferencesUtil.get(BaseApp.inst()).getString(K_groupRequest);
-          Type type = new TypeToken<Set<IMex>>() {}.getType();
+          Type type = new TypeToken<Set<UserEx>>() {}.getType();
           if (!TextUtils.isEmpty(friendRequest)) {
-              List<IMex> mexList = JSON.parseObject(friendRequest, type);
+              List<UserEx> mexList = JSON.parseObject(friendRequest, type);
               friendDot.setValue(mexList);
           }
           if (!TextUtils.isEmpty(groupRequest)) {
-              List<IMex> mexList = JSON.parseObject(groupRequest, type);
+              List<UserEx> mexList = JSON.parseObject(groupRequest, type);
               groupDot.setValue(mexList);
           }
       }catch (Exception e){
@@ -115,9 +114,9 @@ public class NotificationVM extends BaseVM implements OnCustomBusinessListener, 
 
     private void cacheGroupDot(GroupApplicationInfo info) {
         if (info.getHandleResult() == 0 && !info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
-            IMex iMex = new IMex(info.getGroupID());
-            if (!groupDot.val().contains(iMex)) {
-                groupDot.val().add(iMex);
+            UserEx userEx = new UserEx(info.getGroupID());
+            if (!groupDot.val().contains(userEx)) {
+                groupDot.val().add(userEx);
                 groupDot.update();
                 SharedPreferencesUtil.get(BaseApp.inst()).setCache(K_groupRequest,
                     GsonHel.toJson(groupDot.val()));
@@ -127,9 +126,9 @@ public class NotificationVM extends BaseVM implements OnCustomBusinessListener, 
 
     private void cacheFriendDot(FriendApplicationInfo u) {
         if (u.getHandleResult() == 0 && !u.getFromUserID().equals(BaseApp.inst().loginCertificate.userID)) {
-            IMex iMex = new IMex(u.getFromUserID());
-            if (!friendDot.val().contains(iMex)) {
-                friendDot.val().add(iMex);
+            UserEx userEx = new UserEx(u.getFromUserID());
+            if (!friendDot.val().contains(userEx)) {
+                friendDot.val().add(userEx);
                 friendDot.update();
                 SharedPreferencesUtil.get(BaseApp.inst()).setCache(K_friendRequest,
                     GsonHel.toJson(friendDot.val()));
@@ -153,7 +152,7 @@ public class NotificationVM extends BaseVM implements OnCustomBusinessListener, 
         cacheFriendDot(u);
     }
 
-    public void clearDot(State<List<IMex>> state) {
+    public void clearDot(State<List<UserEx>> state) {
         state.val().clear();
         state.update();
         SharedPreferencesUtil.remove(BaseApp.inst(), state == friendDot ? K_friendRequest :

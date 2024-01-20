@@ -86,6 +86,7 @@ import io.openim.android.ouicore.databinding.ViewDividingLineBinding;
 import io.openim.android.ouicore.entity.CallHistory;
 import io.openim.android.ouicore.entity.MeetingInfo;
 import io.openim.android.ouicore.entity.MsgExpand;
+import io.openim.android.ouicore.ex.AtUser;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.IMeetingBridge;
@@ -142,7 +143,7 @@ public class MessageViewHolder {
         protected RecyclerView recyclerView;
         protected MessageAdapter messageAdapter;
 
-        private PopupWindow popupWindow;
+        protected PopupWindow popupWindow;
         protected Message message;
         private RecyclerViewAdapter adapter;
         protected ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
@@ -341,12 +342,14 @@ public class MessageViewHolder {
                 avatarImage.setOnLongClickListener(v -> {
                     if (chatVM.isSingleChat) return false;
                     isLongClick.set(true);
-                    List<Message> atMessages = chatVM.atMessages.getValue();
-                    for (Message atMessage : atMessages) {
-                        if (atMessage.getSendID().equals(message.getSendID())) return false;
+                    List<AtUser> atUsers = chatVM.atUsers.val();
+                    AtUser atUser = new AtUser(message.getSendID());
+                    if (atUsers.contains(atUser)) {
+                        return false;
                     }
-                    atMessages.add(message);
-                    chatVM.atMessages.setValue(atMessages);
+                    atUser.name = message.getSenderNickname();
+                    chatVM.atUsers.val().add(atUser);
+                    chatVM.atUsers.update();
                     return false;
                 });
                 avatarImage.setOnClickListener(v -> {
@@ -430,52 +433,52 @@ public class MessageViewHolder {
                     adapter =
                         new RecyclerViewAdapter<Object, InputExpandFragment.ExpandHolder>(InputExpandFragment.ExpandHolder.class) {
 
-                        @Override
-                        public void onBindView(@NonNull InputExpandFragment.ExpandHolder holder,
-                                               Object data, int position) {
-                            int iconRes = (int) getItems().get(position);
-                            List<String> menuTitles =
-                                (List<String>) popupWindow.getContentView().getTag();
+                            @Override
+                            public void onBindView(@NonNull InputExpandFragment.ExpandHolder holder,
+                                                   Object data, int position) {
+                                int iconRes = (int) getItems().get(position);
+                                List<String> menuTitles =
+                                    (List<String>) popupWindow.getContentView().getTag();
 
-                            holder.v.menu.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
-                                v.getContext().getDrawable(iconRes), null, null);
-                            holder.v.menu.setText(menuTitles.get(position));
-                            holder.v.menu.setTextColor(Color.WHITE);
-                            holder.v.menu.setOnClickListener(v1 -> {
-                                popupWindow.dismiss();
-                                if (iconRes == R.mipmap.ic_reply) {
-                                    chatVM.replyMessage.setValue(message);
-                                }
-                                if (iconRes == R.mipmap.ic_c_copy) {
-                                    TextView textView = view.findViewById(R.id.content);
-                                    if (null == textView)
-                                        textView = view.findViewById(R.id.content2);
-                                    Common.copy(textView.getText().toString());
-                                    chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
-                                }
-                                if (iconRes == R.mipmap.ic_withdraw) {
-                                    chatVM.revokeMessage(message);
-                                }
-                                if (iconRes == R.mipmap.ic_add_emoji) {
-                                    Easy.find(CustomEmojiVM.class).insertEmojiDb(message);
-                                }
-                                if (iconRes == R.mipmap.ic_delete) {
-                                    chatVM.deleteMessageFromLocalAndSvr(message);
-                                }
-                                if (iconRes == R.mipmap.ic_forward) {
-                                    Easy.find(ForwardVM.class).createForwardMessage(message);
+                                holder.v.menu.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
+                                    v.getContext().getDrawable(iconRes), null, null);
+                                holder.v.menu.setText(menuTitles.get(position));
+                                holder.v.menu.setTextColor(Color.WHITE);
+                                holder.v.menu.setOnClickListener(v1 -> {
+                                    popupWindow.dismiss();
+                                    if (iconRes == R.mipmap.ic_reply) {
+                                        chatVM.replyMessage.setValue(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_c_copy) {
+                                        TextView textView = view.findViewById(R.id.content);
+                                        if (null == textView)
+                                            textView = view.findViewById(R.id.content2);
+                                        Common.copy(textView.getText().toString());
+                                        chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
+                                    }
+                                    if (iconRes == R.mipmap.ic_withdraw) {
+                                        chatVM.revokeMessage(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_add_emoji) {
+                                        Easy.find(CustomEmojiVM.class).insertEmojiDb(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_delete) {
+                                        chatVM.deleteMessageFromLocalAndSvr(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_forward) {
+                                        Easy.find(ForwardVM.class).createForwardMessage(message);
 
-                                    Easy.installVM(SelectTargetVM.class);
-                                    ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
-                                }
-                                if (iconRes == R.mipmap.ic_multiple_choice) {
-                                    ((MsgExpand) message.getExt()).isChoice = true;
-                                    chatVM.enableMultipleSelect.setValue(true);
-                                    messageAdapter.notifyDataSetChanged();
-                                }
-                            });
-                        }
-                    };
+                                        Easy.installVM(SelectTargetVM.class);
+                                        ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
+                                    }
+                                    if (iconRes == R.mipmap.ic_multiple_choice) {
+                                        ((MsgExpand) message.getExt()).isChoice = true;
+                                        chatVM.enableMultipleSelect.setValue(true);
+                                        messageAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                        };
                     view1.recyclerview.setAdapter(adapter);
                 }
                 if (message.getContentType() == MessageType.TEXT || message.getContentType() == MessageType.AT_TEXT || message.getContentType() == MessageType.QUOTE) {
@@ -787,7 +790,8 @@ public class MessageViewHolder {
                 emojiTextView.setText(IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(content), link, new ClickableSpan() {
                     @Override
                     public void onClick(@NonNull View widget) {
-                        emojiTextView.getContext().startActivity(new Intent(emojiTextView.getContext(), WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, link));
+                        if (null != popupWindow && !popupWindow.isShowing())
+                            emojiTextView.getContext().startActivity(new Intent(emojiTextView.getContext(), WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, link));
                     }
                 }));
                 emojiTextView.setMovementMethod(LinkMovementMethod.getInstance());
@@ -1426,7 +1430,8 @@ public class MessageViewHolder {
                 v.picture1.setVisibility(View.GONE);
                 return;
             }
-            if (contentType == MessageType.TEXT || contentType == MessageType.AT_TEXT) {
+            if (contentType == MessageType.TEXT
+                || contentType == MessageType.AT_TEXT) {
                 v.quoteContent1.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
                 v.picture1.setVisibility(View.GONE);
             } else {
@@ -1465,8 +1470,8 @@ public class MessageViewHolder {
             v.quoteLy2.setVisibility(View.VISIBLE);
             v.sendState2.setSendState(message.getStatus());
             QuoteElem quoteElem = message.getQuoteElem();
-            if (!handleSequence(v.content2, message)) v.content2.setText(quoteElem.getText());
-
+            if (!handleSequence(v.content2, message))
+                v.content2.setText(quoteElem.getText());
 
             message = quoteElem.getQuoteMessage();
             int contentType = message.getContentType();

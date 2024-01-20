@@ -38,6 +38,7 @@ import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.LayoutInputCoteBinding;
 import io.openim.android.ouiconversation.ui.fragment.EmojiFragment;
 import io.openim.android.ouiconversation.ui.fragment.InputExpandFragment;
+import io.openim.android.ouicore.ex.AtUser;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.EmojiUtil;
@@ -75,6 +76,8 @@ public class BottomInputCote {
     TouchVoiceDialogV3 touchVoiceDialog;
     //是否可发送内容
     private boolean isSend;
+    //是否已绑定草稿
+    boolean isBindDraft = false;
 
     private OnDedrepClickListener chatMoreOrSendClick;
 
@@ -99,38 +102,31 @@ public class BottomInputCote {
                     return;
                 }
 
-                List<Message> atMessages = vm.atMessages.getValue();
+                List<AtUser> atUsers = vm.atUsers.getValue();
                 final Message msg;
-                if (null != vm.replyMessage.getValue()) {
-                    msg =
-                        OpenIMClient.getInstance().messageManager.createQuoteMessage(vm.inputMsg.val(), vm.replyMessage.getValue());
-                } else if (atMessages.isEmpty())
-                    msg =
-                        OpenIMClient.getInstance().messageManager.createTextMessage(vm.inputMsg.val());
-                else {
+                if (!atUsers.isEmpty()) {
                     List<String> atUserIDList = new ArrayList<>();
                     List<AtUserInfo> atUserInfoList = new ArrayList<>();
 
                     Editable msgEdit = view.chatInput.getText();
                     final ForegroundColorSpan spans[] = view.chatInput.getText().getSpans(0,
                         view.chatInput.getText().length(), ForegroundColorSpan.class);
-                    for (Message atMessage : atMessages) {
-                        atUserIDList.add(atMessage.getSendID());
+                    for (AtUser atUser : atUsers) {
+                        atUserIDList.add(atUser.key);
                         AtUserInfo atUserInfo = new AtUserInfo();
-                        atUserInfo.setAtUserID(atMessage.getSendID());
-                        atUserInfo.setGroupNickname(atMessage.getSenderNickname());
+                        atUserInfo.setAtUserID(atUser.key);
+                        atUserInfo.setGroupNickname(atUser.name);
                         atUserInfoList.add(atUserInfo);
 
                         try {
                             for (ForegroundColorSpan span : spans) {
                                 if (span == null) continue;
-                                MsgExpand msgExpand = (MsgExpand) atMessage.getExt();
-                                if (msgExpand.spanHashCode == span.hashCode()) {
+                                if (atUser.spanHashCode == span.hashCode()) {
                                     final int spanStart =
                                         view.chatInput.getText().getSpanStart(span);
                                     final int spanEnd = view.chatInput.getText().getSpanEnd(span);
                                     msgEdit.replace(spanStart, spanEnd,
-                                        " @" + atMessage.getSendID() + " ");
+                                        IMUtil.atD(atUser.key));
                                 }
                             }
                         } catch (Exception e) {
@@ -138,10 +134,15 @@ public class BottomInputCote {
                         }
                     }
                     msg =
-                        OpenIMClient.getInstance().messageManager.createTextAtMessage(msgEdit.toString(), atUserIDList, atUserInfoList, null);
+                        OpenIMClient.getInstance().messageManager.createTextAtMessage(msgEdit.toString(), atUserIDList, atUserInfoList, vm.replyMessage.val());
+                } else if (null != vm.replyMessage.getValue()) {
+                    msg =
+                        OpenIMClient.getInstance().messageManager.createQuoteMessage(vm.inputMsg.val().toString(), vm.replyMessage.getValue());
+                } else {
+                    msg =
+                        OpenIMClient.getInstance().messageManager.createTextMessage(vm.inputMsg.val().toString());
                 }
                 if (null != msg) {
-                    IMUtil.cacheDraft(null,vm.conversationID);
                     vm.sendMsg(msg);
                     reset();
                 }
@@ -203,16 +204,16 @@ public class BottomInputCote {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 try {
-                    if (vm.isSingleChat)return;
-                    if (count==0)return;
+                    if (vm.isSingleChat) return;
+                    if (count == 0) return;
                     String content = s.toString().substring(s.length() - 1);
-                    if (!TextUtils.isEmpty(content)
-                        && null != onAtUserListener) {
+                    if (!TextUtils.isEmpty(content) && null != onAtUserListener) {
                         if (content.equals("@")) {
                             onAtUserListener.onAtUser();
                         }
                     }
-                } catch (Exception ignore) {}
+                } catch (Exception ignore) {
+                }
             }
 
             @Override
@@ -242,10 +243,15 @@ public class BottomInputCote {
     }
 
     private void bindDraft() {
-        String draft =IMUtil.getDraft(vm.conversationID);
-        if (!TextUtils.isEmpty(draft)){
-            vm.inputMsg.setValue(draft);
+        if (isBindDraft) return;
+        Object[] draft = IMUtil.getDraft(vm.conversationID);
+        CharSequence sequence = (CharSequence) draft[0];
+        List<AtUser> atUsers = (List<AtUser>) draft[1];
+        if (!TextUtils.isEmpty(sequence)) {
+            vm.inputMsg.setValue(sequence);
         }
+        vm.atUsers.val().addAll(atUsers);
+        isBindDraft = true;
     }
 
     public void setOnAtUserListener(OnAtUserListener onAtUserListener) {
@@ -277,10 +283,9 @@ public class BottomInputCote {
     private void reset() {
         vm.inputMsg.setValue("");
         view.chatInput.setText("");
-        vm.atMessages.getValue().clear();
+        vm.atUsers.getValue().clear();
         vm.emojiMessages.getValue().clear();
         vm.replyMessage.setValue(null);
-
     }
 
     private void initFragment() {
@@ -313,19 +318,16 @@ public class BottomInputCote {
     @SuppressLint("SetTextI18n")
     private void vmListener() {
         vm.conversationInfo.observe((LifecycleOwner) context, conversationInfo -> bindDraft());
-        vm.atMessages.observe((LifecycleOwner) context, messages -> {
-            if (messages.isEmpty()) return;
-            SpannableString spannableString =
-                new SpannableString("@" + messages.get(messages.size() - 1).getSenderNickname() + "\t");
+        vm.atUsers.observe((LifecycleOwner) context, atUsers -> {
+            if (atUsers.isEmpty()) return;
+            AtUser atUser;
+            SpannableString spannableString = new SpannableString(
+                IMUtil.atD((atUser =
+                    atUsers.get(atUsers.size() - 1)).name));
             ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
             spannableString.setSpan(colorSpan, 0, spannableString.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            Message lastMsg = messages.get(messages.size() - 1);
-            if (null == lastMsg.getExt()) {
-                lastMsg.setExt(new MsgExpand());
-            }
-            MsgExpand msgExpand = (MsgExpand) lastMsg.getExt();
-            msgExpand.spanHashCode = colorSpan.hashCode();
+            atUser.spanHashCode = colorSpan.hashCode();
             view.chatInput.append(spannableString);
         });
         vm.emojiMessages.observe((LifecycleOwner) context, messages -> {
@@ -379,14 +381,12 @@ public class BottomInputCote {
         if (null == groupInfo || null == mem) return;
         if (groupInfo.getStatus() == GroupStatus.GROUP_DISSOLVE) {
             editMute(true);
-            view.notice.setText(BaseApp.inst().getString
-                (io.openim.android.ouicore.R.string.dissolve_tips2));
+            view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
         } else if (groupInfo.getStatus() == GroupStatus.GROUP_BANNED) {
             editMute(true);
             view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.group_ban));
         } else {
-            if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED
-                && mem.getRoleLevel() == GroupRole.MEMBER) {
+            if (groupInfo.getStatus() == GroupStatus.GROUP_MUTED && mem.getRoleLevel() == GroupRole.MEMBER) {
                 editMute(true);
                 view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.start_group_mute));
                 return;
@@ -417,8 +417,7 @@ public class BottomInputCote {
 
     //设置扩展菜单隐藏
     public void setExpandHide(boolean isGone) {
-        view.fragmentContainer.setVisibility(
-            isGone? View.GONE:View.INVISIBLE);
+        view.fragmentContainer.setVisibility(isGone ? View.GONE : View.INVISIBLE);
     }
 
     private int mCurrentTabIndex;

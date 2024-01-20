@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -50,6 +51,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
+import io.openim.android.ouicore.ex.AtUser;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
@@ -143,8 +145,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     protected void fasterDestroy() {
         cacheDraft();
         vm.markRead();
-        if (!vm.fromChatHistory)
-            removeCacheVM();
+
+        if (!vm.fromChatHistory) removeCacheVM();
         Easy.delete(CustomEmojiVM.class);
         Easy.delete(ForwardVM.class);
 
@@ -166,14 +168,31 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     private void cacheDraft() {
-        Editable editable = view.layoutInputCote.chatInput.getText();
-        String draft;
-        if (null == editable)
-            draft = "";
-        else
-            draft = editable.toString();
-        IMUtil.cacheDraft(draft, vm.conversationID);
+        EditText copy=new EditText(this); //copy一个才不影响渲染
+        copy.setText(view.layoutInputCote.chatInput.getText());
+        String draft = copy.getText().toString();
+        if (TextUtils.isEmpty(draft)) {
+            vm.cacheDraft(null, vm.conversationID);
+            return;
+        }
+        try {
+            final ForegroundColorSpan[] spans = copy.getText().getSpans(0,
+                copy.getText().length(), ForegroundColorSpan.class);
+            for (ForegroundColorSpan span : spans) {
+                final int spanStart = copy.getText().getSpanStart(span);
+                final int spanEnd = copy.getText().getSpanEnd(span);
+                for (AtUser atUser : vm.atUsers.val()) {
+                    if (span.hashCode() == atUser.spanHashCode) {
+                        copy.getText().replace(spanStart,
+                            spanEnd,IMUtil.atD(atUser.key));
+                    }
+                }
+            }
+        } catch (Exception ignore) {}
+        draft = copy.getText().toString();
+        vm.cacheDraft(draft, vm.conversationID);
     }
+
 
     @Override
     protected void onResume() {
@@ -247,8 +266,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
 
         String chatBg =
-            SharedPreferencesUtil.get(this)
-                .getString(Constant.K_SET_BACKGROUND + (vm.isSingleChat ? vm.userID : vm.groupID));
+            SharedPreferencesUtil.get(this).getString(Constant.K_SET_BACKGROUND + (vm.isSingleChat ? vm.userID : vm.groupID));
         if (!chatBg.isEmpty()) Glide.with(this).load(chatBg).into(view.chatBg);
 
 
@@ -266,8 +284,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.leftBg.setVisibility(View.VISIBLE);
         if (isOnline) {
             view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_max_10cc64);
-            view.onlineStatus.setText(String.format(getString(io.openim.android.ouicore.R.string.online),
-                vm.handlePlatformCode(onlineStatus.platformIDs)));
+            view.onlineStatus.setText(String.format(getString(io.openim.android.ouicore.R.string.online), vm.handlePlatformCode(onlineStatus.platformIDs)));
         } else {
             view.leftBg.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_max_ff999999);
             view.onlineStatus.setText(io.openim.android.ouicore.R.string.offline);
@@ -292,8 +309,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 inputLayoutParams.bottomMargin = 0;
             } else {
                 //两次窗口高度相减，就是软键盘高度
-                inputLayoutParams.bottomMargin = mWindowHeight
-                    - height - bottomInputCote.view.fragmentContainer.getHeight();
+                inputLayoutParams.bottomMargin =
+                    mWindowHeight - height - bottomInputCote.view.fragmentContainer.getHeight();
             }
             view.layoutInputCote.getRoot().setLayoutParams(inputLayoutParams);
         }
@@ -318,8 +335,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             for (MultipleChoice multipleChoice : memberVM.choiceList.val()) {
                 ids.add(multipleChoice.key);
             }
-            SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
-                false, ids,
+            SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall, false, ids,
                 vm.groupID);
             if (null == callingService) return;
             ActivityManager.push(this);
@@ -348,23 +364,18 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                                 new SpannableStringBuilder(""));
                         }
                     }
-                } catch (Exception ignore) {
-                }
+                } catch (Exception ignore) {}
 
                 Common.UIHandler.postDelayed(() -> {
-                    List<Message> atMessages = vm.atMessages.getValue();
-                    t:
+                    List<AtUser> atUsers = vm.atUsers.val();
                     for (MultipleChoice multipleChoice : memberVM.choiceList.val()) {
-                        for (Message atMessage : atMessages) {
-                            if (multipleChoice.key.equals(atMessage.getSendID())) {
-                                continue t;
-                            }
+                        AtUser atUser = new AtUser(multipleChoice.key);
+                        if (atUsers.contains(atUser)) {
+                            continue;
                         }
-                        Message message = new Message();
-                        message.setSendID(multipleChoice.key);
-                        message.setSenderNickname(multipleChoice.name);
-                        atMessages.add(message);
-                        vm.atMessages.setValue(atMessages);
+                        atUser.name = multipleChoice.name;
+                        vm.atUsers.val().add(atUser);
+                        vm.atUsers.update();
                     }
                 }, 150);
 
@@ -520,7 +531,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
     }
 
-    public   void goToCall() {
+    public void goToCall() {
         IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
             vm.isVideoCall = keyCode != 1;
             if (vm.isSingleChat) {

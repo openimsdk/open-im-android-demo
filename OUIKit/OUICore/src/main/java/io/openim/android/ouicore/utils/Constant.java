@@ -7,7 +7,7 @@ import io.openim.android.ouicore.im.IM;
 
 public class Constant {
 
-//    public static final String DEFAULT_HOST = "test-web.rentsoft.cn";//43
+    //    public static final String DEFAULT_HOST = "test-web.rentsoft.cn";//43
 //    public static final String DEFAULT_HOST = "web.rentsoft.cn";//121
     public static final String DEFAULT_HOST = "14.29.213.197";
 
@@ -25,7 +25,7 @@ public class Constant {
     //--------------------
 
     public static boolean getIsIp() {
-        return SharedPreferencesUtil.get(BaseApp.inst()).getBoolean("IS_IP",true);
+        return SharedPreferencesUtil.get(BaseApp.inst()).getBoolean("IS_IP", true);
     }
 
     public static String getHost() {
@@ -126,7 +126,7 @@ public class Constant {
     //选择群成员
     public static final String IS_SELECT_MEMBER = "isSelectMember";
     //@成员
-    public static final String IS_AT_MEMBER  = "isAtMember";
+    public static final String IS_AT_MEMBER = "isAtMember";
     //群通话
     public static final String IS_GROUP_CALL = "isGroupCall";
     //选择好友
@@ -141,11 +141,10 @@ public class Constant {
     public static class MsgType {
         //本地呼叫记录
         public static final int LOCAL_CALL_HISTORY = -110;
-
         //会议邀请
         public static final int CUSTOMIZE_MEETING = 905;
-
     }
+
     public static class MediaType {
         public static final String VIDEO = "video";
         public static final String AUDIO = "audio";
