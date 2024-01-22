@@ -2,6 +2,7 @@ package io.openim.android.ouicalling;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -38,7 +39,7 @@ public class LockPushActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD //解锁
             | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON //保持屏幕不息屏
             | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);//点亮屏幕
-       Common.addTypeSystemAlert(getWindow().getAttributes());
+        Common.addTypeSystemAlert(getWindow().getAttributes());
         if (Build.VERSION.SDK_INT > 27) {
             setShowWhenLocked(true);
         } else {
@@ -49,14 +50,16 @@ public class LockPushActivity extends AppCompatActivity {
         CallingService callingService =
             (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
 
-        callingService.buildCallDialog(this, dialog -> {
+        Dialog callDialog = callingService.buildCallDialog(this, dialog -> {
             finish();
             overridePendingTransition(0, 0);
             if (Common.isScreenLocked()) {
                 Common.UIHandler.postDelayed(() -> ARouter.getInstance()
                     .build(Routes.Main.HOME).navigation(), 300);
             }
-        }, false).show();
+        }, false);
+        if (null != callDialog)
+            callDialog.show();
 
         super.onCreate(savedInstanceState);
     }

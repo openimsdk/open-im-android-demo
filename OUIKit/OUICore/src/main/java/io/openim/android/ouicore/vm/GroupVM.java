@@ -441,6 +441,7 @@ public class GroupVM extends SocialityVM {
             @Override
             public void onSuccess(String data) {
                 getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
+                Obs.newMessage(Constant.Event.DISSOLVE_GROUP);
                 close(commonDialog);
             }
         }, groupId));

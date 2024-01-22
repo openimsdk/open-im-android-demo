@@ -384,9 +384,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         vm.groupsInfo.observe(this, groupInfo -> {
             view.avatar.load(groupInfo.getFaceURL(), true);
             vm.getGroupMemberList(spanCount * 2);
-            view.quitGroup.setText(getString(vm.isOwner.val() ?
-                io.openim.android.ouicore.R.string.dissolve_group :
-                io.openim.android.ouicore.R.string.quit_group));
 
             view.all.setText(String.format(getResources().getString(io.openim.android.ouicore.R.string.view_all_member), groupInfo.getMemberCount()));
             if (groupInfo.getMemberCount() == 0) {
@@ -407,6 +404,11 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     }
                 });
             }
+        });
+        vm.isOwner.observe(this,v->{
+            view.quitGroup.setText(getString(vm.isOwner.val() ?
+                io.openim.android.ouicore.R.string.dissolve_group :
+                io.openim.android.ouicore.R.string.quit_group));
         });
 
         vm.groupMembers.observe(this, groupMembersInfos -> {
@@ -451,6 +453,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class);
         memberVM.groupId = vm.groupId;
         memberVM.setIntention(GroupMemberVM.Intention.AT);
+        memberVM.isSearchSingle=true;
         memberVM.setOnFinishListener(activity -> {
             List<String> ids = new ArrayList<>();
             for (MultipleChoice choice : memberVM.choiceList.val()) {

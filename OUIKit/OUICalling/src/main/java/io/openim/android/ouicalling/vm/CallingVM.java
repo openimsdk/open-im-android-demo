@@ -38,7 +38,7 @@ import kotlin.coroutines.EmptyCoroutineContext;
 import kotlinx.coroutines.CoroutineScope;
 
 public class CallingVM {
-    private final CoroutineScope scope;
+    public final CoroutineScope scope;
     //通话时间
     private Timer timer;
     private int second = 0;

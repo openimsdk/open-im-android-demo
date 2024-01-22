@@ -160,7 +160,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         } catch (Exception ignore) {
         }
 
-
         ContactListVM contactListVM = BaseApp.inst().getVMByCache(ContactListVM.class);
         if (contactListVM != null) {
             contactListVM.updateConversation();

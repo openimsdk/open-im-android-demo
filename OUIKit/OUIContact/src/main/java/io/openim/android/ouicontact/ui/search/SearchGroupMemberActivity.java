@@ -49,9 +49,10 @@ public class SearchGroupMemberActivity extends BaseActivity<SearchVM, ActivityOf
             @Override
             public void onBindView(@NonNull ViewHol.ItemViewHo holder, GroupMembersInfo data,
                                    int position) {
-                holder.view.select.setVisibility(memberVM.isAt() || memberVM.isMultiple()
+                holder.view.select.setVisibility(memberVM.isSearchSingle?View.GONE
+                    :(memberVM.isAt() || memberVM.isMultiple()
                     ? View.VISIBLE
-                    : View.GONE);
+                    : View.GONE));
 
                 int index =
                     memberVM.choiceList.val().indexOf(new MultipleChoice(data.getUserID()));
@@ -68,14 +69,22 @@ public class SearchGroupMemberActivity extends BaseActivity<SearchVM, ActivityOf
                     vm.searchContent.getValue());
 
                 holder.view.item.setOnClickListener(v -> {
-                    if (memberVM.isCheck() || memberVM.isSingle()) {
+                   boolean isSingle= memberVM.isSingle();
+                    if (memberVM.isSearchSingle)
+                        isSingle=true;
+
+                    if (memberVM.isCheck() || isSingle) {
                         MultipleChoice choice =
                             new MultipleChoice(data.getUserID());
                         choice.name = data.getNickname();
                         choice.icon = data.getFaceURL();
                         memberVM.addChoice(choice);
-                        memberVM.choiceList.update();
-                        finish();
+                        if (memberVM.isCheck()){
+                            memberVM.onFinish(SearchGroupMemberActivity.this);
+                        }else {
+                            memberVM.choiceList.update();
+                            finish();
+                        }
                         return;
                     }
                     boolean isSelect = !isChecked;

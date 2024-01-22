@@ -264,7 +264,6 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
 
     private void update() {
         vm.page = 0;
-        vm.superGroupMembers.getValue().clear();
         loadMember();
     }
 

@@ -26,7 +26,7 @@ public class GroupMemberVM extends BaseVM {
          */
         CHECK,
         /**
-         * @人员/移除群成员  显示勾选按钮、显示@所有人、隐藏右上角菜单
+         * @人员/移除群成员 显示勾选按钮、根据条件显示@所有人、隐藏右上角菜单
          */
         AT,
         /**
@@ -79,7 +79,10 @@ public class GroupMemberVM extends BaseVM {
 
     public int maxNum = 9;
     public boolean isOwnerOrAdmin = false;
+    //搜索出的用户是否单选
+    public boolean isSearchSingle = false;
     public String groupId;
+
 
     public State<List<MultipleChoice>> choiceList = new State<>(new ArrayList<>());
     public State<List<GroupMembersInfo>> superGroupMembers = new State<>(new ArrayList<>());
@@ -97,13 +100,17 @@ public class GroupMemberVM extends BaseVM {
     }
 
     public void getSuperGroupMemberList() {
-        int start = page * pageSize;
+        final int finalPage = page;
+        int start = finalPage * pageSize;
         OpenIMClient.getInstance().groupManager
             .getGroupMemberList(new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
                 @Override
                 public void onSuccess(List<GroupMembersInfo> data) {
                     if (data.isEmpty()) return;
-                    superGroupMembers.val().addAll(data);
+                    if (finalPage == 0)
+                        superGroupMembers.setValue(data);
+                    else
+                        superGroupMembers.val().addAll(data);
                     superGroupMembers.update();
                 }
             }, groupId, 0, start, pageSize);

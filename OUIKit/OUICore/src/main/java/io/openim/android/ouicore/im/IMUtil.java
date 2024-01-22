@@ -374,8 +374,8 @@ public class IMUtil {
 
                 // a 修改了群名字
                 String txt = String.format(ctx.getString(R.string.edit_group_name), target =
-                        getSelfName(groupNotification.opUser.getUserID(),
-                            groupNotification.opUser.getNickname()),
+                    getSelfName(groupNotification.opUser.getUserID(),
+                        groupNotification.opUser.getNickname()),
                     groupNotification.group.getGroupName());
                 tips = getSingleSequence(msg.getGroupID(), target,
                     groupNotification.opUser.getUserID(), txt);
@@ -479,7 +479,7 @@ public class IMUtil {
                 choice.name = target2;
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(), target,
-                        transferredGroupNotification.opUser.getUserID(), txt),
+                    transferredGroupNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -488,10 +488,10 @@ public class IMUtil {
                     MuteMemberNotification.class);
                 // b 被 a 禁言
                 String txt = String.format(ctx.getString(R.string.Muted_group), target =
-                        getSelfName(memberNotification.mutedUser.getUserID(),
-                            memberNotification.mutedUser.getNickname()), target2 =
-                        getSelfName(memberNotification.opUser.getUserID(),
-                            memberNotification.opUser.getNickname()),
+                    getSelfName(memberNotification.mutedUser.getUserID(),
+                        memberNotification.mutedUser.getNickname()), target2 =
+                    getSelfName(memberNotification.opUser.getUserID(),
+                        memberNotification.opUser.getNickname()),
                     TimeUtil.secondFormat(memberNotification.mutedSeconds));
 
                 List<MultipleChoice> choices = new ArrayList<>();
@@ -523,7 +523,7 @@ public class IMUtil {
                 choice.name = target;
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(), target2,
-                        memberNotification.opUser.getUserID(), txt),
+                    memberNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -618,11 +618,11 @@ public class IMUtil {
         for (MultipleChoice choice : choices) {
             buildClickAndColorSpannable((SpannableStringBuilder) sequence, choice.name,
                 new ClickableSpan() {
-                    @Override
-                    public void onClick(@NonNull View widget) {
-                        toPersonDetail(choice.key, choice.groupId);
-                    }
-                });
+                @Override
+                public void onClick(@NonNull View widget) {
+                    toPersonDetail(choice.key, choice.groupId);
+                }
+            });
         }
         return sequence;
     }
@@ -640,11 +640,11 @@ public class IMUtil {
                                                  String txt) {
         return buildClickAndColorSpannable(new SpannableStringBuilder(txt), nickName,
             new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    toPersonDetail(uid, groupId);
-                }
-            });
+            @Override
+            public void onClick(@NonNull View widget) {
+                toPersonDetail(uid, groupId);
+            }
+        });
     }
 
     private static void toPersonDetail(String uid, String groupId) {
@@ -664,19 +664,26 @@ public class IMUtil {
     private static void handleAt(MsgExpand msgExpand, String gid) {
         if (null == msgExpand.atMsgInfo) return;
         String atTxt = msgExpand.atMsgInfo.text;
+        SpannableStringBuilder spannableString = null;
         for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
-            atTxt = atTxt.replace("@" + atUsersInfo.getAtUserID(), atSelf(atUsersInfo));
-        }
-        SpannableStringBuilder spannableString = new SpannableStringBuilder(atTxt);
-        for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
+            String atUid = "@" + atUsersInfo.getAtUserID();
             String tag = atSelf(atUsersInfo);
-            buildClickAndColorSpannable(spannableString, tag, new ClickableSpan() {
+
+            if (null == spannableString) spannableString = new SpannableStringBuilder(atTxt);
+            else spannableString = new SpannableStringBuilder(spannableString);
+            atTxt = spannableString.toString();
+            int start = atTxt.indexOf(atUid);
+            int end = start + atUid.length();
+            SpannableStringBuilder tagSpannable =
+                (SpannableStringBuilder) buildClickAndColorSpannable
+                    (new SpannableStringBuilder(tag), tag, new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
                     if (!atUsersInfo.getAtUserID().equals(IMUtil.AT_ALL))
                         toPersonDetail(atUsersInfo.getAtUserID(), gid);
                 }
             });
+            spannableString.replace(start, end, tagSpannable);
         }
         msgExpand.sequence = spannableString;
     }
@@ -712,36 +719,31 @@ public class IMUtil {
         String atJson = SharedPreferencesUtil.get(BaseApp.inst()).getString(atKey);
         String draft = SharedPreferencesUtil.get(BaseApp.inst()).getString(cacheKey);
         List<AtUser> atUsers = new ArrayList<>();
-        if (!TextUtils.isEmpty(atJson)) {
-            Type type = new TypeToken<List<AtUser>>() {
-            }.getType();
-            atUsers = GsonHel.getGson().fromJson(atJson, type);
-            for (AtUser atUser : atUsers) {
-
-                String spHashCode = IMUtil.atD(atUser.key);
-                String tag = IMUtil.atD(atUser.name);
-                draft = draft.replace(spHashCode.trim(), tag.trim());
-            }
-            SpannableStringBuilder spannableString = null;
-            try {
+        try {
+            if (!TextUtils.isEmpty(atJson)) {
+                Type type = new TypeToken<List<AtUser>>() {}.getType();
+                atUsers = GsonHel.getGson().fromJson(atJson, type);
+                SpannableStringBuilder spannableString = null;
                 for (AtUser atUser : atUsers) {
-                    if (null == spannableString)
-                        spannableString = new SpannableStringBuilder(draft);
-                    else spannableString = new SpannableStringBuilder(spannableString);
+                    String atUid = IMUtil.atD(atUser.key);
                     String tag = IMUtil.atD(atUser.name);
 
-                    int start = spannableString.toString().indexOf(tag);
-                    int end = spannableString.toString().indexOf(tag) + tag.length();
-                    ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor(
-                        "#009ad6"));
-                    spannableString.setSpan(colorSpan, start, end,
+                    if (null == spannableString) spannableString = new SpannableStringBuilder(draft);
+                    else spannableString = new SpannableStringBuilder(spannableString);
+                    draft = spannableString.toString();
+                    int start = draft.indexOf(atUid);
+                    int end = start + atUid.length();
+
+                    SpannableStringBuilder tagSpannable = new SpannableStringBuilder(tag);
+                    ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
+                    tagSpannable.setSpan(colorSpan, 0, tag.length(),
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     atUser.spanHashCode = colorSpan.hashCode();
+                    spannableString.replace(start, end, tagSpannable);
                 }
-            } catch (Exception ignore) {
+                return new Object[]{spannableString, atUsers};
             }
-            return new Object[]{spannableString, atUsers};
-        }
+        }catch (Exception ignore){}
         return new Object[]{draft, atUsers};
     }
 

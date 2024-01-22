@@ -93,8 +93,8 @@ public class Constant {
         public static final int SET_GROUP_NOTIFICATION = 10007;
         //插入了消息到本地
         public static final int INSERT_MSG = 10008;
-        //@用户
-        public static final int AT_USER = 10009;
+        //群解散了
+        public static final int DISSOLVE_GROUP =10009 ;
     }
 
     public static final String K_ID = "Id";

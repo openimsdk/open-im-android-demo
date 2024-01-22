@@ -248,7 +248,7 @@ public class MessageViewHolder {
                 sendStateView.setOnClickListener(new OnDedrepClickListener() {
                     @Override
                     public void click(View v) {
-                        chatVM.sendMsg(message);
+                        chatVM.sendMsg(message,true);
                     }
                 });
             }

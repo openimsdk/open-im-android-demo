@@ -861,8 +861,18 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }
     }
 
-
     public void sendMsg(Message msg) {
+        sendMsg(msg, false);
+    }
+
+    public void sendMsg(Message msg, boolean isResend) {
+        if (isResend) {
+            int orIndex = messages.val().indexOf(msg);
+            messages.val().remove(orIndex);
+            messageAdapter.notifyItemRemoved(orIndex);
+            messages.val().add(0, msg);
+            messageAdapter.notifyItemInserted(0);
+        }
         //这里最好不要改变msg其他的变量
         msg.setStatus(MessageStatus.SENDING);
         if (messages.val().contains(msg)) {

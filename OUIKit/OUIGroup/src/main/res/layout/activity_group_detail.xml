@@ -67,12 +67,12 @@
             android:paddingLeft="22dp"
             android:paddingTop="12dp"
             android:paddingRight="22dp"
+            android:visibility="gone"
             android:paddingBottom="12dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 android:orientation="horizontal">
 
                 <TextView

@@ -41,6 +41,7 @@ class CallViewModel(
     val allParticipants = room::remoteParticipants.flow.map { remoteParticipants ->
         listOf<Participant>(room.localParticipant) + remoteParticipants.keys.sortedBy { it }.mapNotNull { remoteParticipants[it] }
     }
+    val  remoteParticipants=room::remoteParticipants.flow
 
     private val scopes = mutableListOf<CoroutineScope>()
     private val mutableError = MutableStateFlow<Throwable?>(null)
