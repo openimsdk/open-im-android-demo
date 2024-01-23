@@ -183,7 +183,10 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                     GroupRole.MEMBER);
             });
             view.mute.setOnClickListener(v -> {
-                jumpCallBack.launch(new Intent(this, SetMuteActivity.class).putExtra(Constant.K_ID, vm.searchContent.getValue()));
+                Easy.installVM(GroupVM.class)
+                    .groupId=groupId;
+                jumpCallBack.launch(new Intent(this,
+                    SetMuteActivity.class).putExtra(Constant.K_ID, vm.searchContent.getValue()));
             });
 
         });

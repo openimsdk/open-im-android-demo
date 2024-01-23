@@ -107,6 +107,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
     //阅后即焚Timers
     HashMap<String, Timer> readVanishTimers = new HashMap<>();
+    //禁言timer
+    private Timer banTimer;
+
     //搜索的本地消息
     public State<List<Message>> searchMessageItems = new State<>(new ArrayList<>());
     public State<List<Message>> addSearchMessageItems = new State<>(new ArrayList<>());
@@ -222,10 +225,16 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             @Override
             public void onSuccess(List<GroupMembersInfo> data) {
                 if (data.isEmpty()) return;
-                isAdminOrCreator = data.get(0).getRoleLevel() != GroupRole.MEMBER;
-                memberInfo.setValue(data.get(0));
+                GroupMembersInfo membersInfo=data.get(0);
+                isAdminOrCreator = membersInfo.getRoleLevel() != GroupRole.MEMBER;
+                ban(getMuteEndTime(membersInfo));
+                memberInfo.setValue(membersInfo);
             }
         }, groupID, uid);
+    }
+    public long getMuteEndTime(GroupMembersInfo membersInfo){
+        return membersInfo.getMuteEndTime();
+//        return 1705999140000L;
     }
 
     @Override
@@ -303,11 +312,36 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onGroupMemberInfoChanged(GroupMembersInfo info) {
-        if (info.getGroupID().equals(groupID) && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+        if (info.getGroupID().equals(groupID)
+            && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
             isAdminOrCreator = info.getRoleLevel() != GroupRole.MEMBER;
             memberInfo.setValue(info);
+            ban(getMuteEndTime(info));
         }
         updateMemberInfo(info);
+    }
+
+    //禁言或取消禁言
+    private void ban(long muteEndTime) {
+        long endTime = muteEndTime - System.currentTimeMillis();
+        cancelBanTimer();
+        if (endTime > 0) {
+            banTimer=new Timer();
+            banTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    cancelBanTimer();
+                    memberInfo.postValue(memberInfo.val());
+                }
+            },endTime);
+        }
+    }
+
+    private void cancelBanTimer() {
+        if (null != banTimer) {
+            banTimer.cancel();
+            banTimer = null;
+        }
     }
 
     private void updateMemberInfo(GroupMembersInfo info) {
@@ -541,6 +575,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         IMEvent.getInstance().removeUserListener(this);
         inputMsg.removeObserver(inputObserver);
 
+        cancelBanTimer();
         for (Timer value : readVanishTimers.values()) {
             value.cancel();
         }

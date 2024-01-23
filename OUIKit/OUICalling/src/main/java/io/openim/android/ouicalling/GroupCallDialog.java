@@ -23,6 +23,7 @@ import java.util.List;
 
 import io.livekit.android.events.EventListenable;
 import io.livekit.android.events.ParticipantEvent;
+import io.livekit.android.events.RoomEvent;
 import io.livekit.android.room.participant.LocalParticipant;
 import io.livekit.android.room.participant.Participant;
 import io.livekit.android.room.participant.RemoteParticipant;
@@ -73,10 +74,10 @@ public class GroupCallDialog extends CallDialog {
                            boolean isCallOut) {
         super(context, callingService, isCallOut);
 
-
         callingVM.callViewModel.subscribe(callingVM.callViewModel
             .getRoom().getEvents().getEvents(), (v)->{
-        if ( v.getRoom().getRemoteParticipants().size()==0){
+        if ( v instanceof RoomEvent.ParticipantDisconnected
+            && v.getRoom().getRemoteParticipants().size()==0){
             //当只有1个人时关闭会议
             dismiss();
         }

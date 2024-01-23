@@ -555,11 +555,11 @@ public class GroupVM extends SocialityVM {
             seconds);
     }
 
-    public void setMemberMute(IMBack<String> imBack, String uid, long seconds) {
+    public long setMemberMute(IMBack<String> imBack, String uid, long seconds) {
         int status = muteStatus.getValue();
         if (status == -1 || (status == 0 && seconds == 0)) {
             getIView().toast(BaseApp.inst().getString(R.string.mute_tips));
-            return;
+            return 0;
         }
         if (status == 1) {
             seconds = 60 * 10;
@@ -577,6 +577,7 @@ public class GroupVM extends SocialityVM {
             seconds = 0;
         }
         changeGroupMemberMute(imBack, uid, seconds);
+        return seconds;
     }
 
 

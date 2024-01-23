@@ -391,7 +391,8 @@ public class BottomInputCote {
                 view.notice.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.start_group_mute));
                 return;
             }
-            if (mem.getMuteEndTime() > 0) {
+            long endTime = vm.getMuteEndTime(mem) - System.currentTimeMillis();
+            if (endTime > 0) {
                 editMute(true);
                 view.notice.setText(io.openim.android.ouicore.R.string.you_mute);
                 return;
