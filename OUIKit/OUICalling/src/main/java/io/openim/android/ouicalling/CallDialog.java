@@ -31,7 +31,10 @@ import java.util.List;
 import java.util.Objects;
 
 import io.livekit.android.events.RoomEvent;
+import io.livekit.android.room.participant.LocalParticipant;
+import io.livekit.android.room.participant.Participant;
 import io.livekit.android.room.participant.RemoteParticipant;
+import io.livekit.android.room.track.RemoteVideoTrack;
 import io.openim.android.ouicalling.databinding.DialogCallBinding;
 import io.openim.android.ouicalling.databinding.LayoutFloatViewBinding;
 import io.openim.android.ouicalling.service.AudioVideoService;
@@ -57,6 +60,9 @@ import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.SignalingInvitationInfo;
 import io.openim.android.sdk.models.UserInfo;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
+import kotlin.coroutines.CoroutineContext;
 
 
 public class CallDialog extends BaseDialog {
@@ -85,8 +91,7 @@ public class CallDialog extends BaseDialog {
     public CallDialog(@NonNull Context context, CallingService callingService, boolean isCallOut) {
         super(context);
         this.context = context;
-        hasShoot = new HasPermissions(context, Permission.CAMERA,
-            Permission.RECORD_AUDIO);
+        hasShoot = new HasPermissions(context, Permission.CAMERA, Permission.RECORD_AUDIO);
         hasRecord = new HasPermissions(context, Permission.RECORD_AUDIO);
         hasSystemAlert = new HasPermissions(context, Permission.SYSTEM_ALERT_WINDOW);
 
@@ -143,8 +148,8 @@ public class CallDialog extends BaseDialog {
         if (callingVM.isStartCall) {
             floatViewBinding.sTips.setText(io.openim.android.ouicore.R.string.calling);
         } else {
-            floatViewBinding.sTips.setText(callingVM.isCallOut ? context.getString(
-                io.openim.android.ouicore.R.string.waiting_tips2) :
+            floatViewBinding.sTips.setText(callingVM.isCallOut ?
+                context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
                 context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
         }
         WindowManager.LayoutParams params = getWindow().getAttributes();
@@ -161,15 +166,12 @@ public class CallDialog extends BaseDialog {
         // 传入 Application 对象表示设置成全局的，但需要有悬浮窗权限
         if (null == easyWindow) {
             easyWindow =
-                new EasyWindow<>(BaseApp.inst())
-                    .setContentView(floatViewBinding.getRoot())
-                    .setGravity(Gravity.END | Gravity.TOP)
+                new EasyWindow<>(BaseApp.inst()).setContentView(floatViewBinding.getRoot()).setGravity(Gravity.END | Gravity.TOP)
                     // 设置成可拖拽的
                     .setDraggable();
             floatViewBinding.shrink.setOnClickListener(v -> shrink(false));
         }
-        if (!easyWindow.isShowing())
-            easyWindow.show();
+        if (!easyWindow.isShowing()) easyWindow.show();
     }
 
     public void bindData(SignalingInfo signalingInfo) {
@@ -248,12 +250,11 @@ public class CallDialog extends BaseDialog {
     public void listener(SignalingInfo signalingInfo) {
         callingVM.callViewModel.subscribe(callingVM.callViewModel.getRemoteParticipants(), (v) -> {
             if (isSubscribe) return null;
-           Object[] toArray= v.values().toArray();
+            Object[] toArray = v.values().toArray();
             if (toArray.length == 0) return null;
-            callingVM.callViewModel.subscribe(((RemoteParticipant)toArray[0]).getEvents().getEvents(), (event) -> {
+            callingVM.callViewModel.subscribe(((RemoteParticipant) toArray[0]).getEvents().getEvents(), (event) -> {
                 isSubscribe = true;
-                view.remoteSpeakerVideoView.setVisibility(event.getParticipant().isCameraEnabled()
-                    ? View.VISIBLE : View.GONE);
+                view.remoteSpeakerVideoView.setVisibility(event.getParticipant().isCameraEnabled() ? View.VISIBLE : View.GONE);
                 return null;
             }, callingVM.scope);
             return null;
@@ -267,8 +268,11 @@ public class CallDialog extends BaseDialog {
                 view.localSpeakerVideoView.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
             });
         });
-        view.switchCamera.setOnClickListener(v -> {
-            callingVM.callViewModel.flipCamera();
+        view.switchCamera.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                callingVM.callViewModel.flipCamera();
+            }
         });
         view.micIsOn.setOnClickListener(new OnDedrepClickListener(1000) {
             @Override
@@ -315,6 +319,50 @@ public class CallDialog extends BaseDialog {
         });
         view.shrink.setOnClickListener(v -> {
             shrink(false);
+        });
+        view.localSpeakerVideoView.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                Object object = view.remoteSpeakerVideoView.getTag();
+                if ( null != object) {
+                    Participant participant = object instanceof RemoteVideoTrack
+                        ? (Participant) callingVM.callViewModel.getRoom().getLocalParticipant()
+                        : (Participant) callingVM.callViewModel.getSingleRemotePar();
+                    Participant participant2 = object instanceof RemoteVideoTrack
+                        ? (Participant)  callingVM.callViewModel.getSingleRemotePar()
+                        : (Participant) callingVM.callViewModel.getRoom().getLocalParticipant();
+                       if (null==participant2)return;
+
+                    callingVM.callViewModel.bindRemoteViewRenderer(view.localSpeakerVideoView,
+                        participant2, callingVM.scope, new Continuation<Unit>() {
+                            @NonNull
+                            @Override
+                            public CoroutineContext getContext() {
+                                return null;
+                            }
+
+                            @Override
+                            public void resumeWith(@NonNull Object o) {
+
+                            }
+                        });
+                    callingVM.callViewModel.bindRemoteViewRenderer(view.remoteSpeakerVideoView,
+                        participant, callingVM.scope, new Continuation<Unit>() {
+                            @NonNull
+                            @Override
+                            public CoroutineContext getContext() {
+                                return null;
+                            }
+
+                            @Override
+                            public void resumeWith(@NonNull Object o) {
+
+                            }
+                        });
+
+                }
+
+            }
         });
     }
 
@@ -450,8 +498,7 @@ public class CallDialog extends BaseDialog {
     }
 
     private void waitingHandle() {
-        if (callingVM.isVideoCalls)
-            floatViewBinding.waiting.setVisibility(View.GONE);
+        if (callingVM.isVideoCalls) floatViewBinding.waiting.setVisibility(View.GONE);
 
         if (callingVM.isStartCall) {
             floatViewBinding.sTips.setText(io.openim.android.ouicore.R.string.calling);

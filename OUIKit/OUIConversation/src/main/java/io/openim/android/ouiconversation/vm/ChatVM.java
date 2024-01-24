@@ -225,14 +225,15 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             @Override
             public void onSuccess(List<GroupMembersInfo> data) {
                 if (data.isEmpty()) return;
-                GroupMembersInfo membersInfo=data.get(0);
+                GroupMembersInfo membersInfo = data.get(0);
                 isAdminOrCreator = membersInfo.getRoleLevel() != GroupRole.MEMBER;
                 ban(getMuteEndTime(membersInfo));
                 memberInfo.setValue(membersInfo);
             }
         }, groupID, uid);
     }
-    public long getMuteEndTime(GroupMembersInfo membersInfo){
+
+    public long getMuteEndTime(GroupMembersInfo membersInfo) {
         return membersInfo.getMuteEndTime();
 //        return 1705999140000L;
     }
@@ -312,8 +313,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     @Override
     public void onGroupMemberInfoChanged(GroupMembersInfo info) {
-        if (info.getGroupID().equals(groupID)
-            && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+        if (info.getGroupID().equals(groupID) && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
             isAdminOrCreator = info.getRoleLevel() != GroupRole.MEMBER;
             memberInfo.setValue(info);
             ban(getMuteEndTime(info));
@@ -326,14 +326,14 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         long endTime = muteEndTime - System.currentTimeMillis();
         cancelBanTimer();
         if (endTime > 0) {
-            banTimer=new Timer();
+            banTimer = new Timer();
             banTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     cancelBanTimer();
                     memberInfo.postValue(memberInfo.val());
                 }
-            },endTime);
+            }, endTime);
         }
     }
 
@@ -346,13 +346,17 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     private void updateMemberInfo(GroupMembersInfo info) {
         for (Message message : messages.val()) {
-            if (message.getSendID().equals(info.getUserID())) {
-                message.setSenderNickname(info.getNickname());
-                message.setSenderFaceUrl(info.getFaceURL());
-                int index;
-                if ((index = messages.val().indexOf(message)) != -1) {
-                    messageAdapter.notifyItemChanged(index);
+            try {
+                if (message.getContentType() >= MessageType.NTF_BEGIN) continue;
+                if (message.getSendID().equals(info.getUserID())) {
+                    message.setSenderNickname(info.getNickname());
+                    message.setSenderFaceUrl(info.getFaceURL());
+                    int index;
+                    if ((index = messages.val().indexOf(message)) != -1) {
+                        messageAdapter.notifyItemChanged(index);
+                    }
                 }
+            } catch (Exception ignore) {
             }
         }
     }

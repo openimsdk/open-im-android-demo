@@ -157,9 +157,11 @@ public class CallingVM {
 
                 localVideoTrack =
                     callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
-                if (null != localVideoTrack && null != localSpeakerVideoViews && !localSpeakerVideoViews.isEmpty()) {
+                if (null != localVideoTrack && null != localSpeakerVideoViews
+                    && !localSpeakerVideoViews.isEmpty()) {
                     for (TextureViewRenderer localSpeakerVideoView : localSpeakerVideoViews) {
                         localVideoTrack.addRenderer(localSpeakerVideoView);
+                        localSpeakerVideoView.setTag(localVideoTrack);
                     }
                 }
                 callViewModel.subscribe(callViewModel.getAllParticipants(), (v) -> {
