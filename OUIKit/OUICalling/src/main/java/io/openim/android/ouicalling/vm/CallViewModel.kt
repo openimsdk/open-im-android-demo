@@ -59,7 +59,7 @@ class CallViewModel(
     private val mutableMicEnabled = MutableLiveData(true)
     val micEnabled = mutableMicEnabled.hide()
 
-    private val mutableCameraEnabled = MutableLiveData(true)
+     private val mutableCameraEnabled = MutableLiveData(true)
     val cameraEnabled = mutableCameraEnabled.hide()
 
     private val mutableFlipVideoButtonEnabled = MutableLiveData(true)
@@ -349,6 +349,6 @@ class CallViewModel(
     }
 }
 
-private fun <T> LiveData<T>.hide(): LiveData<T> = this
-private fun <T> MutableStateFlow<T>.hide(): StateFlow<T> = this
-private fun <T> Flow<T>.hide(): Flow<T> = this
+public fun <T> LiveData<T>.hide(): LiveData<T> = this
+public fun <T> MutableStateFlow<T>.hide(): StateFlow<T> = this
+public fun <T> Flow<T>.hide(): Flow<T> = this

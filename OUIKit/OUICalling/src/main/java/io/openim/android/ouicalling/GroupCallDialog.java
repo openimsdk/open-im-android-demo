@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.CheckBox;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -222,11 +223,21 @@ public class GroupCallDialog extends CallDialog {
         if (TextUtils.isEmpty(s)) return;
         view.timeTv.setText(s);
     };
+    public final Observer<Boolean> cameraEnabled = isChecked -> {
+        view.closeCamera.setChecked(!isChecked);
+        view.closeCamera.setOnClickListener(v -> {
+            boolean isEnabled = !((CheckBox)v).isChecked();
+            callingVM.callViewModel.setCameraEnabled(isEnabled);
+            Common.UIHandler.postDelayed(() ->
+                viewRenderersAdapter.notifyItemChanged(0), 100);
+        });
+    };
 
     @Override
     public void dismiss() {
         callingVM.callViewModel.scopeCancel(scope);
         callingVM.timeStr.removeObserver(bindTime);
+        callingVM.callViewModel.getCameraEnabled().removeObserver(cameraEnabled);
         super.dismiss();
     }
 
@@ -246,18 +257,14 @@ public class GroupCallDialog extends CallDialog {
     @Override
     public void listener(SignalingInfo signalingInfo) {
         callingVM.timeStr.observeForever(bindTime);
-
-        view.closeCamera.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            boolean isEnabled = !isChecked;
-            callingVM.callViewModel.setCameraEnabled(isEnabled);
-            Common.UIHandler.postDelayed(() -> viewRenderersAdapter.notifyItemChanged(0), 100);
-        });
+        callingVM.callViewModel.getCameraEnabled().observeForever(cameraEnabled);
         view.switchCamera.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
                 callingVM.callViewModel.flipCamera();
             }
         });
+
         view.micIsOn.setOnClickListener(new OnDedrepClickListener(1000) {
             @Override
             public void click(View v) {
