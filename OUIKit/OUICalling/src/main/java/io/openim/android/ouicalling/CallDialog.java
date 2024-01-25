@@ -5,11 +5,13 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
+import android.content.DialogInterface;
 import android.content.res.AssetFileDescriptor;
 import android.os.Build;
 
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -17,6 +19,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 
 
@@ -81,6 +84,7 @@ public class CallDialog extends BaseDialog {
         this(context, callingService, false);
     }
 
+
     /**
      * 弹出通话界面
      *
@@ -101,6 +105,9 @@ public class CallDialog extends BaseDialog {
         });
         initView();
         initRendererView();
+
+        setOnKeyListener((dialog, keyCode, event)
+            -> keyCode == KeyEvent.KEYCODE_BACK);
     }
 
     public void initRendererView() {
@@ -331,7 +338,7 @@ public class CallDialog extends BaseDialog {
                     Participant participant2 = object instanceof RemoteVideoTrack
                         ? (Participant)  callingVM.callViewModel.getSingleRemotePar()
                         : (Participant) callingVM.callViewModel.getRoom().getLocalParticipant();
-                       if (null==participant2)return;
+                       if (null==participant2||null==participant)return;
 
                     callingVM.callViewModel.bindRemoteViewRenderer(view.localSpeakerVideoView,
                         participant2, callingVM.scope, new Continuation<Unit>() {

@@ -150,8 +150,8 @@ public class CallingServiceImp implements CallingService {
         setSignalingInfo(signalingInfo);
         isBeCalled = true;
 
-        boolean isSystemAlert =
-            new HasPermissions(BaseApp.inst(), Permission.SYSTEM_ALERT_WINDOW).isAllGranted();
+        boolean isSystemAlert = new HasPermissions(BaseApp.inst(),
+            Permission.SYSTEM_ALERT_WINDOW).isAllGranted();
         Intent hangIntent;
         boolean backgroundStart =
             BackgroundStartPermissions.INSTANCE.isBackgroundStartAllowed(context);
@@ -163,43 +163,32 @@ public class CallingServiceImp implements CallingService {
             if (BaseApp.inst().isAppBackground.val()) {
                 Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
                 LogisticsCenter.completion(postcard);
-                hangIntent = new Intent(context, postcard.getDestination())
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                hangIntent =
+                    new Intent(context, postcard.getDestination()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                 MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), R.raw.incoming_call_ring);
                 MediaPlayerUtil.INSTANCE.loopPlay();
 
                 PendingIntent hangPendingIntent = PendingIntent.getActivity(context, 1,
-                    hangIntent
-                    , PendingIntent.FLAG_MUTABLE);
+                    hangIntent, PendingIntent.FLAG_MUTABLE);
 
                 Notification notification =
-                    NotificationUtil.builder(NotificationUtil.CALL_CHANNEL_ID)
-                        .setPriority(Notification.PRIORITY_MAX)
-                        .setCategory(Notification.CATEGORY_CALL)
-                        .setContentTitle("OpenIM")
-                        .setContentText(context.getString(io.openim.android.ouicore.R.string.receive_call_invite))
-                        .setAutoCancel(true)
-                        .setOngoing(true)
-                        .setFullScreenIntent(hangPendingIntent, true)
-                        .setContentIntent(hangPendingIntent)
-                        .setCustomHeadsUpContentView(new RemoteViews(BaseApp.inst().getPackageName(),
-                            R.layout.layout_call_invite)).build();
+                    NotificationUtil.builder(NotificationUtil.CALL_CHANNEL_ID).setPriority(Notification.PRIORITY_MAX).setCategory(Notification.CATEGORY_CALL).setContentTitle("OpenIM").setContentText(context.getString(io.openim.android.ouicore.R.string.receive_call_invite)).setAutoCancel(true).setOngoing(true).setFullScreenIntent(hangPendingIntent, true).setContentIntent(hangPendingIntent).setCustomHeadsUpContentView(new RemoteViews(BaseApp.inst().getPackageName(), R.layout.layout_call_invite)).build();
 
                 NotificationUtil.sendNotify(A_NOTIFY_ID, notification);
             } else {
-                buildCallDialog(getContext(), null,
-                    false).show();
+                buildCallDialog(getContext(), null, false).show();
             }
         }
     }
 
-    private  Context getContext() {
+    private Context getContext() {
         Context ctx;
         if (ActivityManager.getActivityStack().isEmpty())
             ctx = BaseApp.inst();
-        else
+        else {
             ctx = ActivityManager.getActivityStack().peek();
+        }
         return ctx;
     }
 
@@ -220,14 +209,12 @@ public class CallingServiceImp implements CallingService {
             if (callDialog != null) return callDialog;
             if (signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT)
                 callDialog = new GroupCallDialog(context, this, isCallOut);
-            else
-                callDialog = new CallDialog(context, this, isCallOut);
+            else callDialog = new CallDialog(context, this, isCallOut);
             callDialog.bindData(signalingInfo);
             if (!callDialog.callingVM.isCallOut) {
                 callDialog.setOnDismissListener(dialog -> {
                     isBeCalled = false;
-                    if (null != dismissListener)
-                        dismissListener.onDismiss(dialog);
+                    if (null != dismissListener) dismissListener.onDismiss(dialog);
                 });
                 if (!Common.isScreenLocked() && Common.hasSystemAlertWindow()) {
                     callDialog.setOnShowListener(dialog -> ARouter.getInstance().build(Routes.Main.HOME).navigation());
@@ -243,35 +230,40 @@ public class CallingServiceImp implements CallingService {
     @Override
     public Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener,
                                   boolean isCallOut) {
-        return buildCallDialog(context, dismissListener, isCallOut);
+        return buildCallDialog(getContext(), dismissListener, isCallOut);
     }
 
     @Override
     public void call(SignalingInfo signalingInfo) {
-        if (isCalling()) return;
+        if (isCallingTips()) return;
         setSignalingInfo(signalingInfo);
 
-        buildCallDialog(getContext(),null, true);
+        buildCallDialog(getContext(), null, true);
 
         callDialog.show();
     }
 
     @Override
     public void join(SignalingInfo signalingInfo) {
-        if (isCalling()) return;
+        if (isCallingTips()) return;
         setSignalingInfo(signalingInfo);
-        GroupCallDialog callDialog = (GroupCallDialog) buildCallDialog(null, false);
+        GroupCallDialog callDialog = (GroupCallDialog) buildCallDialog(getContext(), null, false);
         callDialog.changeView();
         callDialog.joinToShow();
     }
 
-    private boolean isCalling() {
-        if (null != callDialog) {
-            Toast.makeText(context, io.openim.android.ouicore.R.string.now_calling,
+    public boolean isCallingTips() {
+        boolean is = isCalling();
+        if (is) {
+            Toast.makeText(getContext(), io.openim.android.ouicore.R.string.now_calling,
                 Toast.LENGTH_SHORT).show();
-            return true;
         }
-        return false;
+        return is;
+    }
+
+    public boolean isCalling() {
+        return null != callDialog
+            && callDialog.isShowing();
     }
 
 

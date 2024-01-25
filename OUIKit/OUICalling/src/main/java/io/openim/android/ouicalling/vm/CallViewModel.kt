@@ -188,20 +188,27 @@ class CallViewModel(
             }.collectLatest1 { videoTrack ->
                 val videoTrack = videoTrack as? VideoTrack ?: return@collectLatest1
 
-                if (null != viewRenderer.tag) {
-                    val lastTrack = viewRenderer.tag as VideoTrack
-                    if (videoTrack == lastTrack) return@collectLatest1
-                    lastTrack.removeRenderer(viewRenderer)
-                }
-                viewRenderer.tag = videoTrack
-                if (videoTrack is RemoteVideoTrack) {
-                    videoTrack.addRenderer(
-                        viewRenderer, ViewVisibility(viewRenderer.rootView)
-                    )
-                } else {
-                    videoTrack.addRenderer(viewRenderer)
-                }
+                bindVideoTrack(viewRenderer, videoTrack)
             }
+        }
+    }
+
+     fun bindVideoTrack(
+        viewRenderer: TextureViewRenderer,
+        videoTrack: VideoTrack
+    ) {
+        if (null != viewRenderer.tag) {
+            val lastTrack = viewRenderer.tag as VideoTrack
+//            if (videoTrack == lastTrack) return
+            lastTrack.removeRenderer(viewRenderer)
+        }
+        viewRenderer.tag = videoTrack
+        if (videoTrack is RemoteVideoTrack) {
+            videoTrack.addRenderer(
+                viewRenderer, ViewVisibility(viewRenderer.rootView)
+            )
+        } else {
+            videoTrack.addRenderer(viewRenderer)
         }
     }
 

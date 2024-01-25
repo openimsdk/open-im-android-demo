@@ -3,6 +3,7 @@ package io.openim.android.ouicore.base;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -29,8 +30,10 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import java.util.List;
 
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 
+import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.LanguageUtil;
@@ -126,8 +129,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
     }
 
@@ -166,8 +168,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         ActivityManager.push(this);
         super.onResume();
         bind();
-        if (null != vm)
-            vm.viewResume();
+        if (null != vm) vm.viewResume();
     }
 
 
@@ -264,4 +265,12 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         finish();
     }
 
+
+    @Override
+    public void onBackPressed() {
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null != callingService && callingService.isCalling()) return;
+        super.onBackPressed();
+    }
 }
