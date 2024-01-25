@@ -454,6 +454,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         memberVM.groupId = vm.groupId;
         memberVM.setIntention(GroupMemberVM.Intention.AT);
         memberVM.isSearchSingle=true;
+        memberVM.isRemoveOwnerAndAdmin=true;
         memberVM.setOnFinishListener(activity -> {
             List<String> ids = new ArrayList<>();
             for (MultipleChoice choice : memberVM.choiceList.val()) {

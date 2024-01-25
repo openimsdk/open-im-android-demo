@@ -118,6 +118,9 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
                     tag);
                 memberVM.groupId = vm.groupId;
                 memberVM.setIntention(GroupMemberVM.Intention.AT);
+                memberVM.isRemoveOwnerAndAdmin=true;
+                memberVM.isSearchSingle=true;
+
                 memberVM.setOnFinishListener(activity -> {
                     List<String> ids = new ArrayList<>();
                     for (MultipleChoice choice : memberVM.choiceList.val()) {
@@ -180,8 +183,9 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
             view.bottomLayout.more2.setVisibility(View.VISIBLE);
             view.bottomLayout.selectLy.setOnClickListener(v1 -> {
                 if (vm.choiceList.val().size() > 0) {
+
                     startActivity(new Intent(SuperGroupMemberActivity.this,
-                        SelectedMemberActivity.class));
+                        SelectedMemberActivity.class).putExtra(Constant.K_RESULT,vmTag));
                 }
             });
         } else view.bottomLayout.getRoot().setVisibility(View.GONE);

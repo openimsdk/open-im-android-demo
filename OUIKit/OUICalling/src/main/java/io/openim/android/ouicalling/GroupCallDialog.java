@@ -252,20 +252,12 @@ public class GroupCallDialog extends CallDialog {
             callingVM.callViewModel.setCameraEnabled(isEnabled);
             Common.UIHandler.postDelayed(() -> viewRenderersAdapter.notifyItemChanged(0), 100);
         });
-//        view.switchCamera.setOnClickListener(new OnDedrepClickListener() {
-//            @Override
-//            public void click(View v) {
-//                callingVM.callViewModel.flipCamera();
-//            }
-//        });
-        view.switchCamera.setOnClickListener(new View.OnClickListener() {
+        view.switchCamera.setOnClickListener(new OnDedrepClickListener() {
             @Override
-            public void onClick(View v) {
+            public void click(View v) {
                 callingVM.callViewModel.flipCamera();
             }
         });
-
-
         view.micIsOn.setOnClickListener(new OnDedrepClickListener(1000) {
             @Override
             public void click(View v) {

@@ -20,6 +20,7 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.vm.GroupMemberVM;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouigroup.R;
@@ -30,10 +31,12 @@ public class SelectedMemberActivity extends BasicActivity<ActivitySelectedMember
     private RecyclerViewAdapter<MultipleChoice, ViewHol.ItemViewHo> adapter;
     private GroupMemberVM vm;
     private boolean isUpdate = false;
+    private String vmTag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        vm = Easy.find(GroupMemberVM.class);
+        vmTag = getIntent().getStringExtra(Constant.K_RESULT);
+        vm = Easy.find(GroupMemberVM.class,vmTag);
         super.onCreate(savedInstanceState);
         viewBinding(ActivitySelectedMemberBinding.inflate(getLayoutInflater()));
         initView();

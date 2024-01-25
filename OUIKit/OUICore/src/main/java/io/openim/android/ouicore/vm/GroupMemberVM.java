@@ -13,6 +13,7 @@ import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class GroupMemberVM extends BaseVM {
@@ -26,7 +27,8 @@ public class GroupMemberVM extends BaseVM {
          */
         CHECK,
         /**
-         * @人员/移除群成员 显示勾选按钮、根据条件显示@所有人、隐藏右上角菜单
+         * @人员/移除群成员 显示勾选按钮、
+         * 根据条件显示@所有人、隐藏右上角菜单
          */
         AT,
         /**
@@ -81,6 +83,8 @@ public class GroupMemberVM extends BaseVM {
     public boolean isOwnerOrAdmin = false;
     //搜索出的用户是否单选
     public boolean isSearchSingle = false;
+    //结果中是否移除管理员或群主
+    public boolean isRemoveOwnerAndAdmin = false;
     public String groupId;
 
 
@@ -107,6 +111,10 @@ public class GroupMemberVM extends BaseVM {
                 @Override
                 public void onSuccess(List<GroupMembersInfo> data) {
                     if (data.isEmpty()) return;
+                    if (isRemoveOwnerAndAdmin) {
+                        removeOwnerAndAdmin(data);
+                    }
+
                     if (finalPage == 0)
                         superGroupMembers.setValue(data);
                     else
@@ -114,6 +122,15 @@ public class GroupMemberVM extends BaseVM {
                     superGroupMembers.update();
                 }
             }, groupId, 0, start, pageSize);
+    }
+
+    public   void removeOwnerAndAdmin(List<GroupMembersInfo> data) {
+        Iterator<GroupMembersInfo> iterator = data.iterator();
+        while (iterator.hasNext()) {
+            GroupMembersInfo info = iterator.next();
+            if (info.getRoleLevel() != GroupRole.MEMBER)
+                iterator.remove();
+        }
     }
 
     public boolean removeSelf(List<GroupMembersInfo> v) {

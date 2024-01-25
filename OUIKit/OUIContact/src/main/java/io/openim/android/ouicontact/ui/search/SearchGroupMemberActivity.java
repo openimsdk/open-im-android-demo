@@ -114,6 +114,9 @@ public class SearchGroupMemberActivity extends BaseActivity<SearchVM, ActivityOf
         vm.groupMembersInfo.observe(this, groupMembersInfos->{
             if (memberVM.isAt())
                 memberVM.removeSelf(groupMembersInfos);
+            if (memberVM.isRemoveOwnerAndAdmin)
+                memberVM.removeOwnerAndAdmin(groupMembersInfos);
+
             adapter.notifyDataSetChanged();
         });
         vm.userInfo.observe(this, friendInfos -> adapter.notifyDataSetChanged());
