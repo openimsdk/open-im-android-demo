@@ -275,12 +275,19 @@ public class CallDialog extends BaseDialog {
                 view.localSpeakerVideoView.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
             });
         });
-        view.switchCamera.setOnClickListener(new OnDedrepClickListener() {
+//        view.switchCamera.setOnClickListener(new OnDedrepClickListener() {
+//            @Override
+//            public void click(View v) {
+//                callingVM.callViewModel.flipCamera();
+//            }
+//        });
+        view.switchCamera.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void click(View v) {
+            public void onClick(View v) {
                 callingVM.callViewModel.flipCamera();
             }
         });
+
         view.micIsOn.setOnClickListener(new OnDedrepClickListener(1000) {
             @Override
             public void click(View v) {
