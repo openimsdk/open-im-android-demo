@@ -258,7 +258,7 @@ public class GroupCallDialog extends CallDialog {
     public void listener(SignalingInfo signalingInfo) {
         callingVM.timeStr.observeForever(bindTime);
         callingVM.callViewModel.getCameraEnabled().observeForever(cameraEnabled);
-        view.switchCamera.setOnClickListener(new OnDedrepClickListener() {
+        view.switchCamera.setOnClickListener(new OnDedrepClickListener(1000) {
             @Override
             public void click(View v) {
                 callingVM.callViewModel.flipCamera();

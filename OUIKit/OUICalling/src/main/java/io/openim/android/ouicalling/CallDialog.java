@@ -105,9 +105,6 @@ public class CallDialog extends BaseDialog {
         });
         initView();
         initRendererView();
-
-        setOnKeyListener((dialog, keyCode, event)
-            -> keyCode == KeyEvent.KEYCODE_BACK);
     }
 
     public void initRendererView() {
@@ -275,7 +272,7 @@ public class CallDialog extends BaseDialog {
                 view.localSpeakerVideoView.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
             });
         });
-        view.switchCamera.setOnClickListener(new OnDedrepClickListener() {
+        view.switchCamera.setOnClickListener(new OnDedrepClickListener(1000) {
             @Override
             public void click(View v) {
                 callingVM.callViewModel.flipCamera();
