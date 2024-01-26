@@ -379,9 +379,15 @@ public class GroupCallDialog extends CallDialog {
         view.headTips.setVisibility(View.GONE);
         view.ask.setVisibility(View.GONE);
         view.callingMenu.setVisibility(View.VISIBLE);
-        timing();
+
 
         if (callingVM.isVideoCalls) view.cameraControl.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void show() {
+        super.show();
+        timing();
     }
 
     private void timing() {
