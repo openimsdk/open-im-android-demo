@@ -257,7 +257,10 @@ public class CallingVM {
         OpenIMClient.getInstance().signalingManager.signalingAccept(new OnBase<SignalingCertificate>() {
             @Override
             public void onError(int code, String error) {
+                Toast.makeText(BaseApp.inst(),"加入会议失败,服务器错误("+code+")",
+                    Toast.LENGTH_LONG).show();
                 L.e(CallingServiceImp.TAG, error + code);
+                dismissUI();
             }
 
             @Override

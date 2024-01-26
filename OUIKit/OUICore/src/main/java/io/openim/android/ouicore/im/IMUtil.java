@@ -869,6 +869,7 @@ public class IMUtil {
                                                    List<String> inviteeUserIDs, String groupID) {
         boolean isGroupChat = !TextUtils.isEmpty(groupID);
         if (!isGroupChat) groupID = UUID.randomUUID().toString(); //单聊Id自动生成
+        groupID=groupID.replaceAll("\u200B", "");
 
         SignalingInfo signalingInfo = new SignalingInfo();
         String inId = BaseApp.inst().loginCertificate.userID;
