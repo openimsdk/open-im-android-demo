@@ -562,5 +562,7 @@
     <string name="decline_add">" 拒绝添加好友"</string>
     <string name="emil_registered">" 邮箱已注册"</string>
     <string name="count">条</string>
+    <string name="reset_success_tips">点击确认后跳转回登录页面。</string>
+    <string name="delete_tips">确定删除?</string>
 
 </resources>

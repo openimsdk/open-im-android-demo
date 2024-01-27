@@ -19,6 +19,7 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
@@ -54,6 +55,7 @@ import java.util.UUID;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.databinding.LayoutBottompopV3Binding;
 import io.openim.android.ouicore.entity.AtMsgInfo;
 import io.openim.android.ouicore.entity.BurnAfterReadingNotification;
 import io.openim.android.ouicore.entity.CallHistory;
@@ -900,19 +902,18 @@ public class IMUtil {
         HasPermissions hasPermissions = new HasPermissions(context, Permission.CAMERA,
             Permission.RECORD_AUDIO);
 
-        BottomPopDialog dialog = new BottomPopDialog(context);
+        LayoutBottompopV3Binding v3Binding=LayoutBottompopV3Binding.inflate(LayoutInflater.from(context));
+        BottomPopDialog dialog = new BottomPopDialog(context, v3Binding.getRoot());
         dialog.show();
-        dialog.getMainView().menu3.setOnClickListener(v1 -> dialog.dismiss());
-        dialog.getMainView().menu1.setText(io.openim.android.ouicore.R.string.voice_calls);
-        dialog.getMainView().menu2.setText(io.openim.android.ouicore.R.string.video_calls);
+        v3Binding.cancel.setOnClickListener(v1 -> dialog.dismiss());
 
-        dialog.getMainView().menu1.setOnClickListener(v1 -> {
+        v3Binding.voiceCall.setOnClickListener(v1 -> {
             hasPermissions.safeGo(() -> {
                 v.onKey(v1, 1, null);
                 dialog.dismiss();
             });
         });
-        dialog.getMainView().menu2.setOnClickListener(v1 -> {
+        v3Binding.videoCall.setOnClickListener(v1 -> {
             hasPermissions.safeGo(() -> {
                 v.onKey(v1, 2, null);
                 dialog.dismiss();

@@ -551,4 +551,6 @@
     <string name="decline_add">" Declined to add friend"</string>
     <string name="emil_registered">" Email already registered"</string>
     <string name="count">items</string>
+    <string name="reset_success_tips">点击确认后跳转回登录页面。</string>
+    <string name="delete_tips">确定删除?</string>
 </resources>

@@ -110,6 +110,9 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, Acti
         try {
             Type listType = new GsonHel.ParameterizedTypeImpl(List.class, new Class[]{Message.class});
             List<Message> messages = GsonHel.getGson().fromJson(extra, listType);
+            for (Message message : messages) {
+                IMUtil.buildExpandInfo(message);
+            }
             adapter.setItems(messages);
         } catch (Exception e) {
             e.printStackTrace();
