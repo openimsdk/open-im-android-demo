@@ -272,14 +272,14 @@ class CallViewModel(
     fun flipCamera() {
         val videoTrack = room.localParticipant.getTrackPublication(Track.Source.CAMERA)?.track as? LocalVideoTrack ?: return
 
-        val newOptions = when (videoTrack.options.position) {
-            CameraPosition.FRONT -> LocalVideoTrackOptions(position = CameraPosition.BACK)
-            CameraPosition.BACK -> LocalVideoTrackOptions(position = CameraPosition.FRONT)
-            else -> LocalVideoTrackOptions()
+        val newPosition = when (videoTrack.options.position) {
+            CameraPosition.FRONT -> CameraPosition.BACK
+            CameraPosition.BACK -> CameraPosition.FRONT
+            else -> null
         }
 
         try {
-            videoTrack.restartTrack(newOptions)
+            videoTrack.switchCamera(position = newPosition)
         } catch (e: Exception) {
             e.printStackTrace()
         }
