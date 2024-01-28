@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -53,6 +54,8 @@ public class CallingServiceImp implements CallingService {
     public static final int A_NOTIFY_ID = 100;
     //正在被呼叫状态
     private boolean isBeCalled;
+
+    private Handler mHandler = new Handler();
 
 
     public void setSignalingInfo(SignalingInfo signalingInfo) {
@@ -101,7 +104,9 @@ public class CallingServiceImp implements CallingService {
         if (null == callDialog) return;
         callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(),
             (realm, callHistory) -> callHistory.setFailedState(1));
-        callDialog.dismiss();
+        mHandler.post(() -> {
+            callDialog.dismiss();
+        });
     }
 
     @Override
@@ -131,8 +136,9 @@ public class CallingServiceImp implements CallingService {
             callHistory.setSuccess(false);
             callHistory.setFailedState(2);
         });
-        callDialog.dismiss();
-
+        mHandler.post(() -> {
+            callDialog.dismiss();
+        });
     }
 
     @Override
@@ -239,17 +245,20 @@ public class CallingServiceImp implements CallingService {
         setSignalingInfo(signalingInfo);
 
         buildCallDialog(getContext(), null, true);
-
-        callDialog.show();
+        mHandler.post(() -> {
+            callDialog.show();
+        });
     }
 
     @Override
     public void join(SignalingInfo signalingInfo) {
         if (isCallingTips()) return;
         setSignalingInfo(signalingInfo);
-        GroupCallDialog callDialog = (GroupCallDialog) buildCallDialog(getContext(), null, false);
-        callDialog.changeView();
-        callDialog.joinToShow();
+        mHandler.post(() -> {
+            GroupCallDialog callDialog = (GroupCallDialog) buildCallDialog(getContext(), null, false);
+            callDialog.changeView();
+            callDialog.joinToShow();
+        });
     }
 
     public boolean isCallingTips() {
@@ -273,7 +282,9 @@ public class CallingServiceImp implements CallingService {
         if (null == callDialog || callDialog.callingVM.isGroup) return;
         callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(),
             (realm, callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
-        callDialog.dismiss();
+        mHandler.post(() -> {
+            callDialog.dismiss();
+        });
     }
 
     @Override
