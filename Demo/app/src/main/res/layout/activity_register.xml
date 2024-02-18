@@ -102,23 +102,25 @@
                     android:id="@+id/clear"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
-                    android:padding="8dp"
-                    android:src="@mipmap/ic_close" />
+                    android:padding="4dp"
+                    android:src="@mipmap/ic_close3" />
             </LinearLayout>
 
         </LinearLayout>
 
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/submit"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="@dimen/avatar_size"
             android:layout_marginLeft="32dp"
             android:layout_marginRight="32dp"
             android:layout_marginBottom="80dp"
             android:enabled="false"
             android:text="@string/next"
             android:textSize="18sp"
+            android:textColor="@color/white"
+            android:background="@drawable/selector_btn_theme"
             android:textStyle="bold" />
 
         <LinearLayout

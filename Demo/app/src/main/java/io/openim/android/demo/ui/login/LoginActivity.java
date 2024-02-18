@@ -137,6 +137,7 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
         });
 
         view.loginContent.clear.setOnClickListener(v -> view.loginContent.edt1.setText(""));
+        view.loginContent.clearPwd.setOnClickListener(v -> view.loginContent.edt2.setText(""));
         view.loginContent.eyes.setOnCheckedChangeListener((buttonView, isChecked) -> view.loginContent.edt2.setTransformationMethod(isChecked ? HideReturnsTransformationMethod.getInstance() : PasswordTransformationMethod.getInstance()));
         view.protocol.setOnCheckedChangeListener((buttonView, isChecked) -> submitEnabled());
         view.registerTv.setOnClickListener(new OnDedrepClickListener() {

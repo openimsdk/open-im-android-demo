@@ -24,10 +24,10 @@
 
             <include
                 layout="@layout/view_back"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="14dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="14dp"
+                android:layout_marginTop="20dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -40,19 +40,49 @@
                 android:paddingRight="22dp">
 
                 <io.openim.android.ouicore.widget.AvatarImage
-                    android:layout_width="48dp"
                     android:id="@+id/avatar"
-                    android:layout_height="48dp"
-                    />
+                    android:layout_width="48dp"
+                    android:layout_height="48dp" />
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:text="@{GroupVM.groupsInfo.groupName}"
-                    android:textColor="#ff333333"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="@{GroupVM.groupsInfo.groupName}"
+                        android:textColor="#ff333333"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginEnd="5dp"
+                            android:src="@mipmap/ic_g_time" />
+
+                        <TextView
+                            android:id="@+id/createDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#ff8e9ab0"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
 
             </LinearLayout>
 
@@ -67,8 +97,8 @@
             android:paddingLeft="22dp"
             android:paddingTop="12dp"
             android:paddingRight="22dp"
-            android:visibility="gone"
-            android:paddingBottom="12dp">
+            android:paddingBottom="12dp"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -131,21 +161,26 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <TextView
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="102dp"
             android:background="@color/white"
-            android:gravity="center"
-            android:id="@+id/joinGroup"
-            android:text="@string/apply_join"
-            android:textColor="#ff1d6bed"
-            android:textSize="14sp" />
+            android:paddingLeft="16dp"
+            android:paddingTop="12dp"
+            android:paddingRight="16dp">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/joinGroup"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_h"
+                android:background="@drawable/selector_btn_theme"
+                android:gravity="center"
+                android:text="@string/apply_join"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </RelativeLayout>
 
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
     </LinearLayout>
 
 </layout>

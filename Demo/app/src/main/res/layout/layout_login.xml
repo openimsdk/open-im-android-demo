@@ -69,8 +69,8 @@
                     android:id="@+id/clear"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
-                    android:padding="8dp"
-                    android:src="@mipmap/ic_close" />
+                    android:padding="4dp"
+                    android:src="@mipmap/ic_close3" />
             </LinearLayout>
 
 
@@ -105,6 +105,14 @@
                     android:text="@={loginVM.pwd}"
                     android:textColor="#ff333333"
                     android:textSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/clearPwd"
+                    android:layout_width="35dp"
+                    android:padding="4dp"
+                    android:layout_height="35dp"
+                    android:layout_marginRight="5dp"
+                    android:src="@mipmap/ic_close3"/>
 
                 <CheckBox
                     android:id="@+id/eyes"

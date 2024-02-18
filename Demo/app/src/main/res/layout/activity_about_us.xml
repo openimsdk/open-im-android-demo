@@ -36,72 +36,84 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FFF8F8F8"
+            android:background="@color/theme_bg"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="74dp"
-                android:layout_height="74dp"
-                android:layout_marginTop="24dp"
-                android:src="@mipmap/ic_logo" />
-
-            <TextView
-                android:id="@+id/version"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:gravity="center"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:textColor="#ff333333"
-                android:textSize="18sp" />
-
-
-            <LinearLayout
-                android:id="@+id/update"
-                android:layout_width="match_parent"
-                android:layout_height="58dp"
-                android:layout_marginTop="24dp"
-                android:background="@color/white"
-                android:gravity="center_vertical"
-                android:paddingLeft="22dp"
-                android:paddingRight="22dp">
-
-                <TextView
-                    android:id="@+id/tips"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/check_the_new"
-                    android:textColor="#ff333333"
-                    android:textSize="18sp" />
+                android:layout_margin="10dp"
+                android:paddingBottom="5dp"
+                android:background="@drawable/sty_radius_6_white"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@mipmap/ic_right" />
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/uploadLog"
-                android:layout_width="match_parent"
-                android:layout_height="58dp"
-                android:background="@color/white"
-                android:gravity="center_vertical"
-                android:paddingLeft="22dp"
-                android:paddingRight="22dp">
+                    android:layout_width="74dp"
+                    android:layout_height="74dp"
+                    android:layout_marginTop="24dp"
+                    android:src="@mipmap/ic_logo" />
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:id="@+id/version"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/upload_err_log"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
                     android:textColor="#ff333333"
+                    android:layout_marginBottom="20dp"
                     android:textSize="18sp" />
+                <include layout="@layout/view_dividing_line"/>
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@mipmap/ic_right" />
+                <LinearLayout
+                    android:id="@+id/update"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:background="@color/white"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="22dp"
+                    android:paddingRight="22dp">
+
+                    <TextView
+                        android:id="@+id/tips"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/check_the_new"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@mipmap/ic_right" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/uploadLog"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:background="@color/white"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="22dp"
+                    android:paddingRight="22dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/upload_err_log"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@mipmap/ic_right" />
+                </LinearLayout>
             </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 </layout>

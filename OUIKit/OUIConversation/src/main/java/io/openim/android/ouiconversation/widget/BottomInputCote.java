@@ -359,9 +359,10 @@ public class BottomInputCote {
                 if (null == groupInfo) return;
                 setMute();
             });
-            vm.isJoinGroup.observe((LifecycleOwner) context, aBoolean -> {
-                editMute(!aBoolean);
-                view.notice.setText(io.openim.android.ouicore.R.string.quited_tips);
+            vm.isJoinGroup.observe((LifecycleOwner) context, isJoin -> {
+                String tips=!isJoin?((Context) context)
+                    .getString(io.openim.android.ouicore.R.string.quited_tips):null;
+                setHighTips(tips);
             });
         }
 
@@ -373,6 +374,18 @@ public class BottomInputCote {
                 view.replyContent.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
             }
         });
+    }
+
+    private void setHighTips(String tips) {
+        if (TextUtils.isEmpty(tips)) {
+            view.main.setVisibility(VISIBLE);
+            view.highTips.setVisibility(GONE);
+        } else {
+            view.main.setVisibility(GONE);
+            view.highTips.setVisibility(VISIBLE);
+            view.tips.setText(tips);
+        }
+
     }
 
     private void setMute() {
