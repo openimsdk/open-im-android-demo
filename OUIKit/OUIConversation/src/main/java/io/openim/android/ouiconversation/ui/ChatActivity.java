@@ -1,8 +1,6 @@
 package io.openim.android.ouiconversation.ui;
 
 
-import static android.view.View.GONE;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -35,7 +33,6 @@ import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -71,8 +68,6 @@ import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
-import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.Participant;
 import io.openim.android.sdk.models.SignalingInfo;
@@ -531,7 +526,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     }
 
     public void goToCall() {
-        IMUtil.showBottomPopMenu(this, (v1, keyCode, event) -> {
+        IMUtil.showBottomCallsPopMenu(this, (v1, keyCode, event) -> {
             vm.isVideoCall = keyCode != 1;
             if (vm.isSingleChat) {
                 List<String> ids = new ArrayList<>();

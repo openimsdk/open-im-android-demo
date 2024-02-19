@@ -1,44 +1,34 @@
 package io.openim.android.ouicore.im;
 
-import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.AudioAttributes;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Vibrator;
 import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 
 import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.hjq.permissions.Permission;
-import com.hjq.permissions.XXPermissions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -49,8 +39,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 import io.openim.android.ouicore.R;
@@ -75,10 +63,8 @@ import io.openim.android.ouicore.entity.OANotification;
 import io.openim.android.ouicore.entity.QuitGroupNotification;
 import io.openim.android.ouicore.ex.AtUser;
 import io.openim.android.ouicore.ex.MultipleChoice;
-import io.openim.android.ouicore.ex.UserEx;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
-import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.HasPermissions;
@@ -106,7 +92,6 @@ import io.openim.android.sdk.models.QuoteElem;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.SignalingInvitationInfo;
-import io.openim.android.sdk.models.SoundElem;
 import io.openim.android.sdk.models.VideoElem;
 
 public class IMUtil {
@@ -898,7 +883,7 @@ public class IMUtil {
     /**
      * 弹出底部菜单选择 音视通话
      */
-    public static void showBottomPopMenu(Context context, View.OnKeyListener v) {
+    public static void showBottomCallsPopMenu(Context context, View.OnKeyListener v) {
         HasPermissions hasPermissions = new HasPermissions(context, Permission.CAMERA,
             Permission.RECORD_AUDIO);
 
