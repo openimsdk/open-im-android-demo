@@ -94,6 +94,7 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
@@ -183,7 +184,7 @@ public class MessageViewHolder {
         public void bindData(Message message, int position) {
             this.message = message;
             try {
-                isOwn = message.getSendID().equals(BaseApp.inst().loginCertificate.userID);
+                isOwn = getSendWay(message);
                 if (isOwn) {
                     if (leftIsInflated) left.setVisibility(View.GONE);
                     if (rightIsInflated) right.setVisibility(View.VISIBLE);
@@ -207,6 +208,10 @@ public class MessageViewHolder {
             }
         }
 
+        protected boolean getSendWay(Message message) {
+            return message.getSendID().equals(BaseApp.inst().loginCertificate.userID);
+        }
+
         int getNeedReadCount() {
             try {
                 return message.getAttachedInfoElem().getGroupHasReadInfo().getUnreadCount();
@@ -218,7 +223,7 @@ public class MessageViewHolder {
         /**
          * 统一处理
          */
-        private void unifiedProcess(int position) {
+        protected void unifiedProcess(int position) {
             MsgExpand msgExpand = (MsgExpand) message.getExt();
             hFirstItem(position);
 
@@ -233,7 +238,7 @@ public class MessageViewHolder {
             hSendState();
         }
 
-        protected void hFirstItem(int position) {
+        public void hFirstItem(int position) {
             View root = itemView.findViewById(R.id.root);
             root.setPadding(0, position == 0 ? Common.dp2px(15) : 0, 0, 0);
         }
@@ -311,7 +316,7 @@ public class MessageViewHolder {
          * 处理名字
          */
         @SuppressLint("SetTextI18n")
-        private void hName() {
+        public void hName() {
             TextView nickName;
             if (isOwn) nickName = itemView.findViewById(R.id.nickName2);
             else nickName = itemView.findViewById(R.id.nickName);
@@ -333,7 +338,7 @@ public class MessageViewHolder {
         /**
          * 处理头像
          */
-        private void hAvatar() {
+        public void hAvatar() {
             AvatarImage avatarImage = itemView.findViewById(R.id.avatar);
             AvatarImage avatarImage2 = itemView.findViewById(R.id.avatar2);
             if (null != avatarImage) {
@@ -433,52 +438,52 @@ public class MessageViewHolder {
                     adapter =
                         new RecyclerViewAdapter<Object, InputExpandFragment.ExpandHolder>(InputExpandFragment.ExpandHolder.class) {
 
-                        @Override
-                        public void onBindView(@NonNull InputExpandFragment.ExpandHolder holder,
-                                               Object data, int position) {
-                            int iconRes = (int) getItems().get(position);
-                            List<String> menuTitles =
-                                (List<String>) popupWindow.getContentView().getTag();
+                            @Override
+                            public void onBindView(@NonNull InputExpandFragment.ExpandHolder holder,
+                                                   Object data, int position) {
+                                int iconRes = (int) getItems().get(position);
+                                List<String> menuTitles =
+                                    (List<String>) popupWindow.getContentView().getTag();
 
-                            holder.v.menu.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
-                                v.getContext().getDrawable(iconRes), null, null);
-                            holder.v.menu.setText(menuTitles.get(position));
-                            holder.v.menu.setTextColor(Color.WHITE);
-                            holder.v.menu.setOnClickListener(v1 -> {
-                                popupWindow.dismiss();
-                                if (iconRes == R.mipmap.ic_reply) {
-                                    chatVM.replyMessage.setValue(message);
-                                }
-                                if (iconRes == R.mipmap.ic_c_copy) {
-                                    TextView textView = view.findViewById(R.id.content);
-                                    if (null == textView)
-                                        textView = view.findViewById(R.id.content2);
-                                    Common.copy(textView.getText().toString());
-                                    chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
-                                }
-                                if (iconRes == R.mipmap.ic_withdraw) {
-                                    chatVM.revokeMessage(message);
-                                }
-                                if (iconRes == R.mipmap.ic_add_emoji) {
-                                    Easy.find(CustomEmojiVM.class).insertEmojiDb(message);
-                                }
-                                if (iconRes == R.mipmap.ic_delete) {
-                                    chatVM.deleteMessageFromLocalAndSvr(message);
-                                }
-                                if (iconRes == R.mipmap.ic_forward) {
-                                    Easy.find(ForwardVM.class).createForwardMessage(message);
+                                holder.v.menu.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
+                                    v.getContext().getDrawable(iconRes), null, null);
+                                holder.v.menu.setText(menuTitles.get(position));
+                                holder.v.menu.setTextColor(Color.WHITE);
+                                holder.v.menu.setOnClickListener(v1 -> {
+                                    popupWindow.dismiss();
+                                    if (iconRes == R.mipmap.ic_reply) {
+                                        chatVM.replyMessage.setValue(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_c_copy) {
+                                        TextView textView = view.findViewById(R.id.content);
+                                        if (null == textView)
+                                            textView = view.findViewById(R.id.content2);
+                                        Common.copy(textView.getText().toString());
+                                        chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
+                                    }
+                                    if (iconRes == R.mipmap.ic_withdraw) {
+                                        chatVM.revokeMessage(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_add_emoji) {
+                                        Easy.find(CustomEmojiVM.class).insertEmojiDb(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_delete) {
+                                        chatVM.deleteMessageFromLocalAndSvr(message);
+                                    }
+                                    if (iconRes == R.mipmap.ic_forward) {
+                                        Easy.find(ForwardVM.class).createForwardMessage(message);
 
-                                    Easy.installVM(SelectTargetVM.class);
-                                    ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
-                                }
-                                if (iconRes == R.mipmap.ic_multiple_choice) {
-                                    ((MsgExpand) message.getExt()).isChoice = true;
-                                    chatVM.enableMultipleSelect.setValue(true);
-                                    messageAdapter.notifyDataSetChanged();
-                                }
-                            });
-                        }
-                    };
+                                        Easy.installVM(SelectTargetVM.class);
+                                        ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
+                                    }
+                                    if (iconRes == R.mipmap.ic_multiple_choice) {
+                                        ((MsgExpand) message.getExt()).isChoice = true;
+                                        chatVM.enableMultipleSelect.setValue(true);
+                                        messageAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                        };
                     view1.recyclerview.setAdapter(adapter);
                 }
                 if (message.getContentType() == MessageType.TEXT || message.getContentType() == MessageType.AT_TEXT || message.getContentType() == MessageType.QUOTE) {
@@ -605,6 +610,7 @@ public class MessageViewHolder {
                     PreviewMediaVM.MediaData mediaData =
                         new PreviewMediaVM.MediaData(message.getClientMsgID());
                     mediaData.mediaUrl = url;
+                    mediaData.isVideo=MediaFileUtil.isVideoType(url);
                     mediaData.thumbnail = firstFrameUrl;
                     previewMediaVM.previewSingle(mediaData);
                 } else
@@ -950,7 +956,7 @@ public class MessageViewHolder {
         }
 
 
-        private void clickPlay(Message message, LottieAnimationView lottieView) {
+        public void clickPlay(Message message, LottieAnimationView lottieView) {
             String sourceUrl = message.getSoundElem().getSourceUrl();
             if (TextUtils.isEmpty(sourceUrl)) return;
             SPlayer.instance().getMediaPlayer();
