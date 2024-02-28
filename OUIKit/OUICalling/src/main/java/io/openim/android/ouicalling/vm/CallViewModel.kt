@@ -2,6 +2,7 @@ package io.openim.android.ouicalling.vm
 
 import android.app.Application
 import android.content.Intent
+import android.os.Build
 import androidx.lifecycle.*
 import io.livekit.android.LiveKit
 import io.livekit.android.RoomOptions
@@ -20,7 +21,8 @@ import io.livekit.android.room.track.video.ViewVisibility
 import io.livekit.android.util.flow
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.collectLatest
+import com.github.ajalt.timberkt.Timber
+import io.openim.android.ouicore.services.ForegroundService
 import livekit.LivekitRtc
 import kotlinx.coroutines.flow.collectLatest as collectLatest1
 
@@ -38,8 +40,10 @@ class CallViewModel(
         ),
     )
 
+    val audioHandler = room.audioHandler as AudioSwitchHandler
+
     val allParticipants = room::remoteParticipants.flow.map { remoteParticipants ->
-        listOf<Participant>(room.localParticipant) + remoteParticipants.keys.sortedBy { it }.mapNotNull { remoteParticipants[it] }
+        listOf<Participant>(room.localParticipant) + remoteParticipants.keys.sortedBy { it.value }.mapNotNull { remoteParticipants[it] }
     }
     val remoteParticipants = room::remoteParticipants.flow
     var singleRemotePar: RemoteParticipant? = null
@@ -59,7 +63,7 @@ class CallViewModel(
     private val mutableMicEnabled = MutableLiveData(true)
     val micEnabled = mutableMicEnabled.hide()
 
-     private val mutableCameraEnabled = MutableLiveData(true)
+    private val mutableCameraEnabled = MutableLiveData(true)
     val cameraEnabled = mutableCameraEnabled.hide()
 
     private val mutableFlipVideoButtonEnabled = MutableLiveData(true)
@@ -74,14 +78,21 @@ class CallViewModel(
     private val mutablePermissionAllowed = MutableStateFlow(true)
     val permissionAllowed = mutablePermissionAllowed.hide()
 
-    val audioHandler = AudioSwitchHandler(application)
 
     init {
         viewModelScope.launch {
+            // Collect any errors.
+            launch {
+                error.collect { Timber.e(it) }
+            }
+
+            // Handle any changes in speakers.
             launch {
                 combine(allParticipants, activeSpeakers) { participants, speakers -> participants to speakers }.collect { (participantsList, speakers) ->
                     handlePrimarySpeaker(
-                        participantsList, speakers, room
+                        participantsList,
+                        speakers,
+                        room,
                     )
                 }
             }
@@ -91,21 +102,41 @@ class CallViewModel(
                     when (it) {
                         is RoomEvent.FailedToConnect -> mutableError.value = it.error
                         is RoomEvent.DataReceived -> {
-                            val identity = it.participant?.identity ?: ""
+                            val identity = it.participant?.identity ?: "server"
                             val message = it.data.toString(Charsets.UTF_8)
                             mutableDataReceived.emit("$identity: $message")
                         }
 
-                        else -> {}
+                        else -> {
+                            Timber.e { "Room event: $it" }
+                        }
                     }
                 }
             }
-            remoteParticipants.map {
-                if(it.values.isEmpty())
-                    return@map null
-                it.values.last()
-            }.collectLatest {
-                singleRemotePar=it
+
+        }
+
+        // Start a foreground service to keep the call from being interrupted if the
+        // app goes into the background.
+        val foregroundServiceIntent = Intent(application, ForegroundService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            application.startForegroundService(foregroundServiceIntent)
+        } else {
+            application.startService(foregroundServiceIntent)
+        }
+    }
+
+    private suspend fun collectTrackStats(event: RoomEvent.TrackSubscribed) {
+        val pub = event.publication
+        while (true) {
+            delay(10000)
+            if (pub.subscribed) {
+                val statsReport = pub.track?.getRTCStats() ?: continue
+                Timber.e { "stats for ${pub.sid}:" }
+
+                for (entry in statsReport.statsMap) {
+                    Timber.e { "${entry.key} = ${entry.value}" }
+                }
             }
         }
     }
@@ -121,7 +152,7 @@ class CallViewModel(
                 token = token,
             )
             // Create and publish audio/video tracks
-            var localParticipant = room.localParticipant
+            val localParticipant = room.localParticipant
             localParticipant.setMicrophoneEnabled(true)
             mutableMicEnabled.postValue(localParticipant.isMicrophoneEnabled())
 
@@ -136,7 +167,6 @@ class CallViewModel(
     }
 
     private fun handlePrimarySpeaker(participantsList: List<Participant>, speakers: List<Participant>, room: Room?) {
-
         var speaker = mutablePrimarySpeaker.value
 
         // If speaker is local participant (due to defaults),
@@ -172,7 +202,7 @@ class CallViewModel(
         viewRenderer: TextureViewRenderer, participant: Participant, scope: CoroutineScope
     ) {
         // observe videoTracks changes.
-        val videoTrackPubFlow = participant::videoTracks.flow.map { participant to it }.flatMapLatest { (participant, videoTracks) ->
+        val videoTrackPubFlow = participant::videoTrackPublications.flow.map { participant to it }.flatMapLatest { (participant, videoTracks) ->
             // Prioritize any screenshare streams.
             val trackPublication = participant.getTrackPublication(Track.Source.SCREEN_SHARE) ?: participant.getTrackPublication(Track.Source.CAMERA)
             ?: videoTracks.firstOrNull()?.first
@@ -193,9 +223,8 @@ class CallViewModel(
         }
     }
 
-     fun bindVideoTrack(
-        viewRenderer: TextureViewRenderer,
-        videoTrack: VideoTrack
+    fun bindVideoTrack(
+        viewRenderer: TextureViewRenderer, videoTrack: VideoTrack
     ) {
         if (null != viewRenderer.tag) {
             val lastTrack = viewRenderer.tag as VideoTrack
@@ -247,10 +276,20 @@ class CallViewModel(
 
     override fun onCleared() {
         super.onCleared()
+        release()
+    }
+
+    fun release() {
         try {
             scopes.forEach { it.cancel() }
             scopes.clear()
             room.disconnect()
+            room.release()
+
+            // Clean up foreground service
+            val application = getApplication<Application>()
+            val foregroundServiceIntent = Intent(application, ForegroundService::class.java)
+            application.stopService(foregroundServiceIntent)
         } catch (_: Exception) {
         }
     }
@@ -347,8 +386,16 @@ class CallViewModel(
             connectToRoom(url, token)
         }
     }
+
+
 }
 
 public fun <T> LiveData<T>.hide(): LiveData<T> = this
 public fun <T> MutableStateFlow<T>.hide(): StateFlow<T> = this
 public fun <T> Flow<T>.hide(): Flow<T> = this
+ fun Participant.getIdentity(): String {
+    if (null != this.identity)
+        return this.identity!!.value
+    return ""
+}
+

@@ -1,5 +1,7 @@
 package io.openim.android.ouimeeting.widget;
 
+import static io.openim.android.ouimeeting.vm.CallViewModelKt.getIdentity;
+
 import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
@@ -121,7 +123,7 @@ public class SingleTextureView extends FrameLayout {
 
     private void handleCenter(Participant data) {
         boolean textureViewUse = data.isCameraEnabled() || data.isScreenShareEnabled();
-        boolean isShowSwitchCamera = data.isCameraEnabled() && Objects.equals(data.getIdentity(),
+        boolean isShowSwitchCamera = data.isCameraEnabled() && Objects.equals(getIdentity(data),
             BaseApp.inst().loginCertificate.userID);
         view.switchCamera.setVisibility(isShowSwitchCamera ? VISIBLE : GONE);
         view.textureView.setVisibility(textureViewUse ? View.VISIBLE : View.INVISIBLE);

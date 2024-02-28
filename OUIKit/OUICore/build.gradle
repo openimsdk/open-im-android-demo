@@ -101,4 +101,5 @@ dependencies {
 
     api 'com.tencent.bugly:crashreport:latest.release'
     api 'com.github.MZCretin:AutoUpdateProject:latest.release'
+    api 'com.github.ajalt:timberkt:1.5.1'
 }

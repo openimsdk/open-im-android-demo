@@ -1,5 +1,7 @@
 package io.openim.android.ouimeeting.vm;
 
+import static io.openim.android.ouimeeting.vm.CallViewModelKt.getIdentity;
+
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -51,8 +53,6 @@ import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
 
 public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
-
-
     //预约上传的参数
     public static class TimingParameter {
         public State<String> meetingTheme = new State<>("");
@@ -64,9 +64,8 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     public TimingParameter timingParameter = new TimingParameter();
 
-    //是否初始化、是否横屏，用于横竖屏切换
-    public boolean isInit, isLandscape;
-    public int selectCenterIndex = 0;
+    //是否初始化、是否横屏，用于横竖屏切换、是否已开启分享屏幕
+    public boolean isInit, isLandscape,isShareScreen;
     //获取音频服务
     public AudioManager audioManager;
     //上次摄像头开关、上次麦克风开关、是否有开启权限
@@ -138,7 +137,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
                 ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
                     ParticipantMeta.class);
                 participantMeta.setTop = null!= roomMetadata.val().pinedUserIDList&&
-                    roomMetadata.val().pinedUserIDList.contains(data.getIdentity());
+                    roomMetadata.val().pinedUserIDList.contains(getIdentity(data));
                 data.setMetadata$livekit_android_sdk_release(GsonHel.toJson(participantMeta));
             }
         } catch (Exception ignored) {}
@@ -198,7 +197,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     public boolean isAllSeeHe(Participant data) {
         if (null == allWatchedUser.val()) return false;
-        return Objects.equals(allWatchedUser.val().getIdentity(), data.getIdentity());
+        return Objects.equals(getIdentity(allWatchedUser.val()), getIdentity(data));
     }
 
     public void joinMeeting(String roomID) {
@@ -278,12 +277,12 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
             } else {
                 String id = meta.beWatchedUserIDList.get(0);
                 Participant localParticipant = callViewModel.getRoom().getLocalParticipant();
-                if (Objects.equals(localParticipant.getIdentity(), id)) {
+                if (Objects.equals(getIdentity(localParticipant), id)) {
                     allWatchedUser.setValue(localParticipant);
                 } else {
                     for (Participant value :
                         callViewModel.getRoom().getRemoteParticipants().values()) {
-                        if (Objects.equals(value.getIdentity(), id)) {
+                        if (Objects.equals(getIdentity(value), id)) {
                             allWatchedUser.setValue(value);
                         }
                     }
@@ -309,13 +308,14 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     public boolean isHostUser(Participant participant) {
         if (null == roomMetadata.getValue()) return false;
-        return null != participant.getIdentity() && participant.getIdentity().equals(roomMetadata.getValue().hostUserID);
+        return  getIdentity(participant).equals(roomMetadata.getValue().hostUserID);
     }
 
 
     public void startShareScreen(Intent data) {
+        isShareScreen=true;
         lastCameraEnabled = callViewModel.getRoom().getLocalParticipant().isCameraEnabled();
-        lastIsMuteAllVideo = cameraPermission.getValue();
+        lastIsMuteAllVideo = cameraPermission.val();
 
         callViewModel.setCameraEnabled(false);
         cameraPermission.setValue(false);
@@ -324,6 +324,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     }
 
     public void stopShareScreen() {
+        isShareScreen=false;
         callViewModel.stopScreenCapture();
         callViewModel.setCameraEnabled(lastCameraEnabled);
         cameraPermission.setValue(lastIsMuteAllVideo);

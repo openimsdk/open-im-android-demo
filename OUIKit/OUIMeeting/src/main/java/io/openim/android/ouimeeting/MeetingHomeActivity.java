@@ -1,5 +1,7 @@
 package io.openim.android.ouimeeting;
 
+import static io.openim.android.ouimeeting.vm.CallViewModelKt.getIdentity;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -100,7 +102,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     private Observer<? super Boolean> isAppBackgroundListener;
     //恢复当前页面
     boolean isRecover = false;
-    private HasPermissions shoot,hasSystemAlert;
+    private HasPermissions shoot, hasSystemAlert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,14 +173,14 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     //分享屏幕
     private ActivityResultLauncher<Intent> screenCaptureIntentLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            int resultCode = result.getResultCode();
-            Intent data = result.getData();
-            if (resultCode != Activity.RESULT_OK || data == null) {
-                return;
-            }
-            vm.startShareScreen(data);
-            toast(getString(io.openim.android.ouicore.R.string.share_screen));
-        });
+        int resultCode = result.getResultCode();
+        Intent data = result.getData();
+        if (resultCode != Activity.RESULT_OK || data == null) {
+            return;
+        }
+        vm.startShareScreen(data);
+        toast(getString(io.openim.android.ouicore.R.string.share_screen));
+    });
 
 
     private static void moveTaskToFront(int taskId) {
@@ -197,17 +199,16 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                 ViewMeetingFloatBinding.inflate(getLayoutInflater());
             easyWindow =
                 new EasyWindow<>(BaseApp.inst()).setContentView(floatView.getRoot()).setWidth(Common.dp2px(107)).setHeight(Common.dp2px(160)).setGravity(Gravity.RIGHT | Gravity.TOP)
-                    // 设置成可拖拽的
-                    .setDraggable().setOnClickListener(floatView.getRoot().getId(), (window,
-                                                                                     view) -> {
-                        Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
-                        LogisticsCenter.completion(postcard);
-                        Activity activity = ActivityManager.isExist(postcard.getDestination());
-                        if (null != activity) {
-                            moveTaskToFront(activity.getTaskId());
-                            easyWindow.cancel();
-                        }
-                    });
+                // 设置成可拖拽的
+                .setDraggable().setOnClickListener(floatView.getRoot().getId(), (window, view) -> {
+                    Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
+                    LogisticsCenter.completion(postcard);
+                    Activity activity = ActivityManager.isExist(postcard.getDestination());
+                    if (null != activity) {
+                        moveTaskToFront(activity.getTaskId());
+                        easyWindow.cancel();
+                    }
+                });
         }
         if (!easyWindow.isShowing()) easyWindow.show();
     }
@@ -348,13 +349,13 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                         holder.view.mic.setOnClickListener(new OnDedrepClickListener() {
                             @Override
                             public void click(View v) {
-                                vm.muteMic(data.getIdentity(), !holder.view.mic.isChecked());
+                                vm.muteMic(getIdentity(data), !holder.view.mic.isChecked());
                             }
                         });
                         holder.view.camera.setOnClickListener(new OnDedrepClickListener() {
                             @Override
                             public void click(View v) {
-                                vm.muteCamera(data.getIdentity(), !holder.view.camera.isChecked());
+                                vm.muteCamera(getIdentity(data), !holder.view.camera.isChecked());
                             }
                         });
                         holder.view.more.setOnClickListener(v -> showPopupWindow(v, data,
@@ -385,7 +386,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                 view.setTop.setOnClickListener(v1 -> {
                     Map<String, Object> map = new HashMap<>();
                     List<String> ids = new ArrayList<>();
-                    ids.add(data.getIdentity());
+                    ids.add(getIdentity(data));
                     map.put("roomID", vm.signalingCertificate.getRoomID());
                     if (meta.setTop) map.put("reducePinedUserIDList", ids);
                     else map.put("addPinedUserIDList", ids);
@@ -410,7 +411,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                     map.put("roomID", vm.signalingCertificate.getRoomID());
                     List<String> ids = new ArrayList<>();
                     if (!vm.isAllSeeHe(data)) {
-                        ids.add(data.getIdentity());
+                        ids.add(getIdentity(data));
                     }
                     map.put("beWatchedUserIDList", ids);
 
@@ -490,8 +491,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     }
 
     private void initView() {
-        view.pager.setAdapter(adapter = new PageAdapter(getLayoutInflater(), vm,
-            gestureDetector));
+        view.pager.setAdapter(adapter = new PageAdapter(getLayoutInflater(), vm, gestureDetector));
 
         view.pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
@@ -557,8 +557,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             else {
                 boolean isExist = false;
                 for (Participant participant : v) {
-                    isExist = Objects.equals(participant.getIdentity(),
-                        activeSpeaker.getIdentity());
+                    isExist = Objects.equals(getIdentity(participant), getIdentity(activeSpeaker));
                 }
                 if (!isExist) activeSpeaker = v.get(0);
             }
@@ -572,7 +571,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
         vm.callViewModel.subscribe(vm.callViewModel.getActiveSpeakersFlow(), (v) -> {
             if (v.isEmpty() || null != vm.allWatchedUser.val()) return null;
-            showPageFirst(v.get(0),false);
+            showPageFirst(v.get(0), false);
             updateGuideView(0, adapter.getCount());
             return null;
         });
@@ -592,19 +591,19 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
     private final GestureDetector gestureDetector = new GestureDetector(BaseApp.inst(),
         new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                Object obj = view.pager.getTag();
-                boolean fixScreen = false;
-                if (obj instanceof Boolean) fixScreen = (Boolean) obj;
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            Object obj = view.pager.getTag();
+            boolean fixScreen = false;
+            if (obj instanceof Boolean) fixScreen = (Boolean) obj;
 
-                view.bottomMenu.setVisibility(fixScreen ? View.VISIBLE : View.GONE);
-                view.topTitle.setVisibility(fixScreen ? View.VISIBLE : View.GONE);
+            view.bottomMenu.setVisibility(fixScreen ? View.VISIBLE : View.GONE);
+            view.topTitle.setVisibility(fixScreen ? View.VISIBLE : View.GONE);
 
-                view.pager.setTag(!fixScreen);
-                return super.onDoubleTap(e);
-            }
-        });
+            view.pager.setTag(!fixScreen);
+            return super.onDoubleTap(e);
+        }
+    });
 
     private void listener() {
         view.pager.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
@@ -623,7 +622,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
         vm.allWatchedUser.observe(this, v -> {
             if (null == v) return;
-            showPageFirst(v,true);
+            showPageFirst(v, true);
             updateGuideView(0, adapter.getCount());
         });
         view.landscape.setOnClickListener(v -> {
@@ -666,7 +665,9 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         view.camera.setOnClickListener(v -> vm.callViewModel.setCameraEnabled(view.camera.isChecked()));
         view.shareScreen.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                requestMediaProjection();
+                if (!vm.isShareScreen) {
+                    requestMediaProjection();
+                }
             } else {
                 vm.stopShareScreen();
             }
@@ -754,15 +755,13 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
      * @param first
      */
     private void showPageFirst(Participant first, boolean isJump) {
-        if (null != activeSpeaker && Objects.equals(first.getIdentity(),
-            activeSpeaker.getIdentity()))
+        if (null != activeSpeaker && Objects.equals(getIdentity(first), getIdentity(activeSpeaker)))
             return;
         adapter.getList().remove(activeSpeaker);
         activeSpeaker = first;
         adapter.getList().add(0, activeSpeaker);
         adapter.notifyDataSetChanged();
-        if (isJump)
-            view.pager.setCurrentItem(0);
+        if (isJump) view.pager.setCurrentItem(0);
     }
 
     @Override
@@ -816,8 +815,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
     private void release() {
         if (isFinishing() && !triggerLandscape) {
-            if (null!=vm.audioManager)
-            vm.audioManager.setSpeakerphoneOn(true);
+            if (null != vm.audioManager) vm.audioManager.setSpeakerphoneOn(true);
             vm.onCleared();
             removeCacheVM();
             if (null != easyWindow) {

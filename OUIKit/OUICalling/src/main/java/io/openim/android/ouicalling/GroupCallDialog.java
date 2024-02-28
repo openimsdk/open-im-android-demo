@@ -1,5 +1,7 @@
 package io.openim.android.ouicalling;
 
+import static io.openim.android.ouicalling.vm.CallViewModelKt.getIdentity;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
@@ -34,6 +36,7 @@ import io.livekit.android.room.track.TrackPublication;
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicalling.databinding.DialogGroupCallBinding;
 import io.openim.android.ouicalling.databinding.ItemMemberRendererBinding;
+import io.openim.android.ouicalling.vm.CallViewModel;
 import io.openim.android.ouicalling.vm.CallingVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
@@ -132,8 +135,9 @@ public class GroupCallDialog extends CallDialog {
                     callingVM.callViewModel.subscribe(data.getEvents().getEvents(), (v) -> {
                         holder.view.micOn.setImageResource(v.getParticipant().isMicrophoneEnabled() ? R.mipmap.ic_mic_s_on : R.mipmap.ic_mic_s_off);
 
+
                         boolean isCameraEnabled = v.getParticipant().isCameraEnabled();
-                        L.e(v.getParticipant().getIdentity()+"---isCameraEnabled--"+isCameraEnabled);
+                        L.e(  getIdentity(v.getParticipant())+"---isCameraEnabled--"+isCameraEnabled);
                         showRemoteSpeakerVideoView(holder, isCameraEnabled);
                         return null;
                     }, coroutineScope);
@@ -331,7 +335,7 @@ public class GroupCallDialog extends CallDialog {
         try {
             Iterator<Participant> iterator = participants.iterator();
             while (iterator.hasNext()) {
-                if (iterator.next().getIdentity().equals(signalingInfo.getInvitation().getGroupID()))
+                if (getIdentity(iterator.next()).equals(signalingInfo.getInvitation().getGroupID()))
                     iterator.remove();
             }
         } catch (Exception ignored) {

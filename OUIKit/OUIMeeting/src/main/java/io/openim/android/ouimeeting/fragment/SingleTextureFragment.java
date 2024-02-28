@@ -1,5 +1,7 @@
 package io.openim.android.ouimeeting.fragment;
 
+import static io.openim.android.ouimeeting.vm.CallViewModelKt.getIdentity;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -96,8 +98,8 @@ public class SingleTextureFragment extends LazyFragment {
     }
 
     private void subscribeParticipant(Participant activeSpeaker) {
-        if (Objects.equals(activeSpeaker.getIdentity(), lastId)) return;
-        lastId = activeSpeaker.getIdentity();
+        if (Objects.equals(getIdentity(activeSpeaker), lastId)) return;
+        lastId =getIdentity(activeSpeaker);
         singleTextureView.bindData(vm, activeSpeaker);
         onAllSeeHeListener.onAllSeeHe();
     }
