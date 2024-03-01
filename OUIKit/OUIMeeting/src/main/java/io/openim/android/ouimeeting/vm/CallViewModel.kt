@@ -1,4 +1,4 @@
-package io.openim.android.ouimeeting.vm;
+package io.openim.android.ouimeeting.vm
 
 import android.app.Application
 import android.content.Intent
@@ -15,7 +15,6 @@ import io.livekit.android.room.participant.ConnectionQuality
 import io.livekit.android.room.participant.LocalParticipant
 import io.livekit.android.room.participant.Participant
 import io.livekit.android.room.participant.RemoteParticipant
-import io.livekit.android.room.participant.VideoTrackPublishDefaults
 import io.livekit.android.room.track.*
 import io.livekit.android.room.track.video.ViewVisibility
 import io.livekit.android.util.flow
@@ -34,9 +33,10 @@ class CallViewModel(
     val room = LiveKit.create(
         appContext = application,
         options = RoomOptions(
-            adaptiveStream = true, dynacast = true, videoTrackPublishDefaults = VideoTrackPublishDefaults(
-                videoCodec = VideoCodec.VP9.codecName
-            )
+            adaptiveStream = true, dynacast = true,
+//            videoTrackPublishDefaults = VideoTrackPublishDefaults(
+//                videoCodec = VideoCodec.VP9.codecName
+//            )
         ),
     )
 
@@ -249,10 +249,9 @@ class CallViewModel(
     fun startScreenCapture(mediaProjectionPermissionResultData: Intent) {
         val localParticipant = room.localParticipant
         viewModelScope.launch {
-            val screencastTrack =
-                localParticipant.createScreencastTrack(mediaProjectionPermissionResultData = mediaProjectionPermissionResultData)
+            val screencastTrack = localParticipant.createScreencastTrack(mediaProjectionPermissionResultData = mediaProjectionPermissionResultData)
             localParticipant.publishVideoTrack(
-                screencastTrack,
+                screencastTrack
             )
 
             // Must start the foreground prior to startCapture.
@@ -387,12 +386,16 @@ class CallViewModel(
             connectToRoom(url, token)
         }
     }
+
+
 }
 
 public fun <T> LiveData<T>.hide(): LiveData<T> = this
 public fun <T> MutableStateFlow<T>.hide(): StateFlow<T> = this
 public fun <T> Flow<T>.hide(): Flow<T> = this
 fun Participant.getIdentity(): String {
-    if (null != this.identity) return this.identity!!.value
+    if (null != this.identity)
+        return this.identity!!.value
     return ""
 }
+

@@ -36,6 +36,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouicore.widget.AvatarImage;
+import io.openim.android.ouicore.widget.SpacesItemDecoration;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.Message;
 
@@ -57,6 +58,13 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel,
     private void initView() {
         view.recyclerview.setLayoutManager(new LinearLayoutManager(this));
         view.recyclerview.setBackgroundColor(getResources().getColor(io.openim.android.ouicore.R.color.theme_bg));
+        SpacesItemDecoration divItemDecoration = new SpacesItemDecoration();
+        divItemDecoration.setColor(getResources()
+            .getColor(io.openim.android.ouicore.R.color.txt_grey));
+        divItemDecoration.setMargin(7,50,0);
+        divItemDecoration.setDividerHeight(2);
+        divItemDecoration.addNotDrawIndex(1);
+        view.recyclerview.addItemDecoration(divItemDecoration);
         view.recyclerview.setAdapter(adapter = new RecyclerViewAdapter<Message,
             MessageViewHolder.MsgViewHolder>() {
 

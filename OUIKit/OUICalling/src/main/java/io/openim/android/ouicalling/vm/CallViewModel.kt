@@ -34,9 +34,10 @@ class CallViewModel(
     val room = LiveKit.create(
         appContext = application,
         options = RoomOptions(
-            adaptiveStream = true, dynacast = true, videoTrackPublishDefaults = VideoTrackPublishDefaults(
-                videoCodec = VideoCodec.VP9.codecName
-            )
+            adaptiveStream = true, dynacast = true,
+//            videoTrackPublishDefaults = VideoTrackPublishDefaults(
+//                videoCodec = VideoCodec.VP9.codecName
+//            )
         ),
     )
 

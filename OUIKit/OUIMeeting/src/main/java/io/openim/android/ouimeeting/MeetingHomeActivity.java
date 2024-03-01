@@ -9,9 +9,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ImageSpan;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,6 +31,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -70,6 +76,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.CommonDialog;
+import io.openim.android.ouicore.widget.CustomPositionDrawableSpan;
 import io.openim.android.ouicore.widget.GridSpaceItemDecoration;
 import io.openim.android.ouimeeting.databinding.ActivityMeetingHomeBinding;
 import io.openim.android.ouimeeting.databinding.LayoutMeetingInfoDialogBinding;
@@ -263,7 +270,30 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                     (BigDecimal.valueOf(roomMetadata.endTime - roomMetadata.startTime).divide(BigDecimal.valueOf(3600), 1, BigDecimal.ROUND_HALF_DOWN));
                 String durationStr =
                     bigDecimal.toString() + BaseApp.inst().getString(io.openim.android.ouicore.R.string.hour);
-                v.description.setText(getString(io.openim.android.ouicore.R.string.meeting_num) + "：" + roomMetadata.roomID + "\n" + getString(io.openim.android.ouicore.R.string.emcee) + "：" + data.get(0).getNickname() + "\n" + getString(io.openim.android.ouicore.R.string.start_time) + "：" + TimeUtil.getTime(roomMetadata.startTime * 1000, TimeUtil.yearMonthDayFormat) + "\t\t" + TimeUtil.getTime(roomMetadata.startTime * 1000, TimeUtil.hourTimeFormat) + "\n" + getString(io.openim.android.ouicore.R.string.meeting_duration) + "：" + durationStr);
+
+                String meetingNum=getString(io.openim.android.ouicore.R.string.meeting_num) + "：" + roomMetadata.roomID + "\t";
+                String main="\n" + getString(io.openim.android.ouicore.R.string.emcee)
+                    + "：" + data.get(0).getNickname()
+                    + "\n" + getString(io.openim.android.ouicore.R.string.start_time)
+                    + "：" + TimeUtil.getTime(roomMetadata.startTime * 1000, TimeUtil.yearMonthDayFormat)
+                    + "\t\t" + TimeUtil.getTime(roomMetadata.startTime * 1000, TimeUtil.hourTimeFormat)
+                    + "\n" + getString(io.openim.android.ouicore.R.string.meeting_duration) + "：" + durationStr;
+                SpannableStringBuilder spannableString = new SpannableStringBuilder(meetingNum+main);
+                Drawable drawable = ResourcesCompat.getDrawable(getResources(),io.openim.android.ouicore.R.mipmap.ic__copy,null);
+                CustomPositionDrawableSpan imageSpan =
+                    new CustomPositionDrawableSpan(drawable,Common.dp2px(10),-Common.dp2px(10));
+                spannableString.setSpan(imageSpan,meetingNum.length()-1,meetingNum.length(),
+                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+                v.description.setText(spannableString);
+
+                v.description.setOnClickListener(new OnDedrepClickListener() {
+                    @Override
+                    public void click(View v) {
+                        Common.copy(roomMetadata.roomID);
+                        toast(getString(io.openim.android.ouicore.R.string.copy_succ));
+                    }
+                });
+
             }
         }, ids);
         return v.getRoot();
