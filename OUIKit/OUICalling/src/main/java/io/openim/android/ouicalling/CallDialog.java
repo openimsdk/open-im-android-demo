@@ -104,7 +104,8 @@ public class CallDialog extends BaseDialog {
             dismiss();
         });
         callingVM.callViewModel.subscribe(callingVM.callViewModel.getRoom().getEvents().getEvents(), (v) -> {
-            if (v instanceof RoomEvent.ParticipantDisconnected && v.getRoom().getRemoteParticipants().size() == 0) {
+            if (v instanceof RoomEvent.ParticipantDisconnected
+                && v.getRoom().getRemoteParticipants().size() == 0) {
                 //当只有1个人时关闭会议
                 dismiss();
             }

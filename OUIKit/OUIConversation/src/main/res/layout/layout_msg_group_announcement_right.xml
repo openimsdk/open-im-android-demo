@@ -13,7 +13,7 @@
             android:id="@+id/avatar2"
             android:layout_width="42dp"
             android:layout_height="42dp"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             />
 
         <LinearLayout

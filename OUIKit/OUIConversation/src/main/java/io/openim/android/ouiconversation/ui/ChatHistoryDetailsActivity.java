@@ -63,7 +63,6 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel,
             .getColor(io.openim.android.ouicore.R.color.txt_grey));
         divItemDecoration.setMargin(7,50,0);
         divItemDecoration.setDividerHeight(2);
-        divItemDecoration.addNotDrawIndex(1);
         view.recyclerview.addItemDecoration(divItemDecoration);
         view.recyclerview.setAdapter(adapter = new RecyclerViewAdapter<Message,
             MessageViewHolder.MsgViewHolder>() {

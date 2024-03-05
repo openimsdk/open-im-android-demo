@@ -354,6 +354,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     private View buildPopView() {
         LayoutMemberDialogBinding v = LayoutMemberDialogBinding.inflate(getLayoutInflater());
         v.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        v.close.setOnClickListener(v1 -> bottomPopDialog.dismiss());
         v.recyclerView.setAdapter(memberAdapter = new RecyclerViewAdapter<Participant,
             MemberItemViewHolder>(MemberItemViewHolder.class) {
 
@@ -634,7 +635,6 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             return super.onDoubleTap(e);
         }
     });
-
     private void listener() {
         view.pager.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
 
@@ -695,7 +695,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         view.camera.setOnClickListener(v -> vm.callViewModel.setCameraEnabled(view.camera.isChecked()));
         view.shareScreen.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                if (!vm.isShareScreen) {
+                if (Boolean.FALSE.equals(vm.callViewModel.getScreenshareEnabled().getValue())) {
                     requestMediaProjection();
                 }
             } else {
@@ -828,6 +828,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     protected void onPause() {
         super.onPause();
         unregisterHomeKey();
+        isRecover=true;
         release();
     }
 

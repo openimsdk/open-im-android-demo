@@ -64,8 +64,8 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     public TimingParameter timingParameter = new TimingParameter();
 
-    //是否初始化、是否横屏，用于横竖屏切换、是否已开启分享屏幕
-    public boolean isInit, isLandscape,isShareScreen;
+    //是否初始化、是否横屏，用于横竖屏切换
+    public boolean isInit, isLandscape;
     //获取音频服务
     public AudioManager audioManager;
     //上次摄像头开关、上次麦克风开关、是否有开启权限
@@ -313,7 +313,6 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
 
     public void startShareScreen(Intent data) {
-        isShareScreen=true;
         lastCameraEnabled = callViewModel.getRoom().getLocalParticipant().isCameraEnabled();
         lastIsMuteAllVideo = cameraPermission.val();
 
@@ -324,7 +323,6 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
     }
 
     public void stopShareScreen() {
-        isShareScreen=false;
         callViewModel.stopScreenCapture();
         callViewModel.setCameraEnabled(lastCameraEnabled);
         cameraPermission.setValue(lastIsMuteAllVideo);

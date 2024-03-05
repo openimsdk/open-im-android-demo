@@ -564,5 +564,7 @@
     <string name="count">条</string>
     <string name="reset_success_tips">点击确认后跳转回登录页面。</string>
     <string name="delete_tips">确定删除?</string>
+    <string name="other_accepted">已在其他端接受</string>
+    <string name="other_rejected">已在其他端拒绝</string>
 
 </resources>

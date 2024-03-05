@@ -438,55 +438,62 @@ public class MessageViewHolder {
                     adapter =
                         new RecyclerViewAdapter<Object, InputExpandFragment.ExpandHolder>(InputExpandFragment.ExpandHolder.class) {
 
-                            @Override
-                            public void onBindView(@NonNull InputExpandFragment.ExpandHolder holder,
-                                                   Object data, int position) {
-                                int iconRes = (int) getItems().get(position);
-                                List<String> menuTitles =
-                                    (List<String>) popupWindow.getContentView().getTag();
+                        @Override
+                        public void onBindView(@NonNull InputExpandFragment.ExpandHolder holder,
+                                               Object data, int position) {
+                            int iconRes = (int) getItems().get(position);
+                            List<String> menuTitles =
+                                (List<String>) popupWindow.getContentView().getTag();
 
-                                holder.v.menu.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
-                                    v.getContext().getDrawable(iconRes), null, null);
-                                holder.v.menu.setText(menuTitles.get(position));
-                                holder.v.menu.setTextColor(Color.WHITE);
-                                holder.v.menu.setOnClickListener(v1 -> {
-                                    popupWindow.dismiss();
-                                    if (iconRes == R.mipmap.ic_reply) {
-                                        chatVM.replyMessage.setValue(message);
-                                    }
-                                    if (iconRes == R.mipmap.ic_c_copy) {
-                                        TextView textView = view.findViewById(R.id.content);
+                            holder.v.menu.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
+                                v.getContext().getDrawable(iconRes), null, null);
+                            holder.v.menu.setText(menuTitles.get(position));
+                            holder.v.menu.setTextColor(Color.WHITE);
+                            holder.v.menu.setOnClickListener(v1 -> {
+                                popupWindow.dismiss();
+                                if (iconRes == R.mipmap.ic_reply) {
+                                    chatVM.replyMessage.setValue(message);
+                                }
+                                if (iconRes == R.mipmap.ic_c_copy) {
+                                    TextView textView;
+                                    if (message.getContentType() == MessageType.GROUP_ANNOUNCEMENT_NTF) {
+                                        textView = view.findViewById(R.id.detail);
+                                        if (null == textView)
+                                            textView = view.findViewById(R.id.detail2);
+                                    } else {
+                                        textView = view.findViewById(R.id.content);
                                         if (null == textView)
                                             textView = view.findViewById(R.id.content2);
-                                        Common.copy(textView.getText().toString());
-                                        chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
                                     }
-                                    if (iconRes == R.mipmap.ic_withdraw) {
-                                        chatVM.revokeMessage(message);
-                                    }
-                                    if (iconRes == R.mipmap.ic_add_emoji) {
-                                        Easy.find(CustomEmojiVM.class).insertEmojiDb(message);
-                                    }
-                                    if (iconRes == R.mipmap.ic_delete) {
-                                        chatVM.deleteMessageFromLocalAndSvr(message);
-                                    }
-                                    if (iconRes == R.mipmap.ic_forward) {
-                                        Easy.find(ForwardVM.class).createForwardMessage(message);
+                                    Common.copy(textView.getText().toString());
+                                    chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
+                                }
+                                if (iconRes == R.mipmap.ic_withdraw) {
+                                    chatVM.revokeMessage(message);
+                                }
+                                if (iconRes == R.mipmap.ic_add_emoji) {
+                                    Easy.find(CustomEmojiVM.class).insertEmojiDb(message);
+                                }
+                                if (iconRes == R.mipmap.ic_delete) {
+                                    chatVM.deleteMessageFromLocalAndSvr(message);
+                                }
+                                if (iconRes == R.mipmap.ic_forward) {
+                                    Easy.find(ForwardVM.class).createForwardMessage(message);
 
-                                        Easy.installVM(SelectTargetVM.class);
-                                        ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
-                                    }
-                                    if (iconRes == R.mipmap.ic_multiple_choice) {
-                                        ((MsgExpand) message.getExt()).isChoice = true;
-                                        chatVM.enableMultipleSelect.setValue(true);
-                                        messageAdapter.notifyDataSetChanged();
-                                    }
-                                });
-                            }
-                        };
+                                    Easy.installVM(SelectTargetVM.class);
+                                    ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
+                                }
+                                if (iconRes == R.mipmap.ic_multiple_choice) {
+                                    ((MsgExpand) message.getExt()).isChoice = true;
+                                    chatVM.enableMultipleSelect.setValue(true);
+                                    messageAdapter.notifyDataSetChanged();
+                                }
+                            });
+                        }
+                    };
                     view1.recyclerview.setAdapter(adapter);
                 }
-                if (message.getContentType() == MessageType.TEXT || message.getContentType() == MessageType.AT_TEXT || message.getContentType() == MessageType.QUOTE) {
+                if (message.getContentType() == MessageType.TEXT || message.getContentType() == MessageType.AT_TEXT || message.getContentType() == MessageType.GROUP_ANNOUNCEMENT_NTF || message.getContentType() == MessageType.QUOTE) {
                     menuIcons.add(R.mipmap.ic_c_copy);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.copy));
                 }
@@ -610,7 +617,7 @@ public class MessageViewHolder {
                     PreviewMediaVM.MediaData mediaData =
                         new PreviewMediaVM.MediaData(message.getClientMsgID());
                     mediaData.mediaUrl = url;
-                    mediaData.isVideo=MediaFileUtil.isVideoType(url);
+                    mediaData.isVideo = MediaFileUtil.isVideoType(url);
                     mediaData.thumbnail = firstFrameUrl;
                     previewMediaVM.previewSingle(mediaData);
                 } else

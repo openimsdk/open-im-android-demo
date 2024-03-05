@@ -104,9 +104,7 @@ public class CallingServiceImp implements CallingService {
         if (null == callDialog) return;
         callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(),
             (realm, callHistory) -> callHistory.setFailedState(1));
-        mHandler.post(() -> {
-            callDialog.dismiss();
-        });
+       dismissDialog();
     }
 
     @Override
@@ -126,6 +124,9 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onInviteeAcceptedByOtherDevice(SignalingInfo s) {
         L.e(TAG, "----onInviteeAcceptedByOtherDevice-----");
+        Toast.makeText(getContext(), io.openim.android.ouicore.R.string.other_accepted,
+            Toast.LENGTH_SHORT).show();
+        dismissDialog();
     }
 
     @Override
@@ -136,14 +137,19 @@ public class CallingServiceImp implements CallingService {
             callHistory.setSuccess(false);
             callHistory.setFailedState(2);
         });
-        mHandler.post(() -> {
-            callDialog.dismiss();
-        });
+        dismissDialog();
+    }
+
+    private void dismissDialog() {
+        mHandler.post(() -> callDialog.dismiss());
     }
 
     @Override
     public void onInviteeRejectedByOtherDevice(SignalingInfo s) {
         L.e(TAG, "----onInviteeRejectedByOtherDevice-----");
+        Toast.makeText(getContext(), io.openim.android.ouicore.R.string.other_rejected,
+            Toast.LENGTH_SHORT).show();
+        dismissDialog();
         cancelNotify();
     }
 
@@ -203,7 +209,8 @@ public class CallingServiceImp implements CallingService {
         //TODO
         //未读消息sdk不能增加 所以我们这里只是发个通知
         NotificationUtil.cancelNotify(A_NOTIFY_ID);
-        if (BaseApp.inst().isAppBackground.val()) IMUtil.sendNotice(A_NOTIFY_ID);
+        if (BaseApp.inst().isAppBackground.val())
+            IMUtil.sendNotice(A_NOTIFY_ID);
         MediaPlayerUtil.INSTANCE.pause();
         MediaPlayerUtil.INSTANCE.release();
     }
@@ -282,9 +289,7 @@ public class CallingServiceImp implements CallingService {
         if (null == callDialog || callDialog.callingVM.isGroup) return;
         callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(),
             (realm, callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
-        mHandler.post(() -> {
-            callDialog.dismiss();
-        });
+      dismissDialog();
     }
 
     @Override
