@@ -51,7 +51,7 @@ public class AboutUsActivity extends BaseActivity<BaseViewModel, ActivityAboutUs
                     waitDialog.dismiss();
                     toast(getString(io.openim.android.ouicore.R.string.upload_success));
                 }
-            }, new ArrayList<>(), (l, l1) -> {
+            }, new ArrayList<>(), "", (l, l1) -> {
 
             });
         });
