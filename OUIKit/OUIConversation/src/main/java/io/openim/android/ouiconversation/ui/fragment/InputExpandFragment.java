@@ -161,30 +161,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
     }
 
     private void goToCall() {
-        CallingService callingService =
-            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-        if (null == callingService) return;
-        IMUtil.showBottomPopMenu(getContext(), (v1, keyCode, event) -> {
-            vm.isVideoCall = keyCode != 1;
-            if (vm.isSingleChat) {
-                List<String> ids = new ArrayList<>();
-                ids.add(vm.userID);
-                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
-                    vm.isSingleChat, ids, null);
-                callingService.call(signalingInfo);
-            } else {
-                GroupVM groupVM = new GroupVM();
-                groupVM.groupId = vm.groupID;
-                BaseApp.inst().putVM(groupVM);
 
-                ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER)
-                    .withInt(Constant.K_SIZE, 9)
-                    .withBoolean(Constant.IS_GROUP_CALL, true)
-                    .navigation(getActivity(),
-                        Constant.Event.CALLING_REQUEST_CODE);
-            }
-            return false;
-        });
     }
 
     private void sendCardMessage(MultipleChoice multipleChoice) {

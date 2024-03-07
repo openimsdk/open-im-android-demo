@@ -342,6 +342,69 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/sty_radius_6_white"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingLeft="22dp"
+            android:animateLayoutChanges="true"
+            android:paddingRight="22dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/periodic_deletion"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
+
+                <io.openim.android.ouicore.widget.SlideButton
+                    android:id="@+id/periodicDeletion"
+                    android:layout_width="38dp"
+                    android:layout_height="23dp" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/periodicDeletionTime"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/time_set"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/periodicDeletionStr"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/ic_right" />
+            </LinearLayout>
+
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/chatbg"
