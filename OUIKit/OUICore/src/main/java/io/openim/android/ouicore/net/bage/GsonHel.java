@@ -40,7 +40,7 @@ public class GsonHel {
 
     public static <T> T fromJson(String json, Class<T> aClass) {
         get();
-        return JSONObject.parseObject(json, aClass);
+        return mGson.fromJson(json, aClass);
     }
 
     /**

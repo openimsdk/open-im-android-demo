@@ -19,7 +19,7 @@
             android:name=".ui.LabelActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.search.SearchFriendsActivity"
+            android:name=".ui.search.SearchGroupMemberActivity"
             android:exported="false" />
         <activity
             android:name=".ui.MyGroupActivity"

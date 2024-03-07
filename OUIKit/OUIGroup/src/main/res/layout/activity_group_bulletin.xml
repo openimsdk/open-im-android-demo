@@ -85,11 +85,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"
-                    android:enabled="false"
                     android:gravity="top"
                     android:minHeight="250dp"
                     android:maxLength="250"
                     android:padding="22dp"
+                    android:textIsSelectable="true"
                     android:text="@={GroupVM.groupsInfo.notification}"
                     android:textColor="#ff333333"
                     android:textSize="16sp" />

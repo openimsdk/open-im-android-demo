@@ -12,10 +12,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import io.openim.android.ouicore.utils.Common;
+
 public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
     private float mDividerHeight = 1; //线的高度
     private Paint mPaint;           //画笔将自己做出来的分割线矩形画出颜色
-    private float margin = 0;       //左右偏移量
+    private float top = 0,  left = 0, right = 0;        //左右偏移量
     private List<Integer> notDrawIndex = new ArrayList<>();
 
     public SpacesItemDecoration() {
@@ -25,10 +27,11 @@ public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
         notDrawIndex.add(0); //第一个ItemView不需要绘制
     }
 
-    //通过建造者模式来设置三个属性
-    //设置左右偏移(默认是设置的一样的，若需要自己更改)
-    public SpacesItemDecoration setMargin(float margin) {
-        this.margin = margin;
+    //设置上下左右偏移
+    public SpacesItemDecoration setMargin(float top,  float left, float right) {
+        this.top = Common.dp2px(top);
+        this.left = Common.dp2px(left);
+        this.right = Common.dp2px(right);
         return this;
     }
 
@@ -75,10 +78,10 @@ public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
             if (notDrawIndex.contains(index)) {
                 continue;//跳过本次循环体中尚未执行的语句，立即进行下一次的循环条件判断
             }
-            float dividerTop = view.getTop() - mDividerHeight;
-            float dividerLeft = parent.getPaddingLeft() + margin;
-            float dividerBottom = view.getTop();
-            float dividerRight = parent.getWidth() - parent.getPaddingRight() - margin;
+            float dividerTop = view.getTop() - mDividerHeight-top;
+            float dividerLeft = parent.getPaddingLeft() + left;
+            float dividerBottom = view.getTop()-top;
+            float dividerRight = parent.getWidth() - parent.getPaddingRight() + right;
             c.drawRect(dividerLeft, dividerTop, dividerRight, dividerBottom, mPaint);
         }
     }

@@ -2,73 +2,77 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/sty_top_radius_30_white"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="10dp">
 
-    <TextView
-        android:id="@+id/menu1"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingTop="18dp"
-        android:paddingBottom="18dp"
-        android:text="@string/album"
-        android:textColor="#ff000000"
-        android:textSize="16sp" />
+        android:background="@drawable/sty_radius_4_white"
+        android:orientation="vertical">
 
-    <include layout="@layout/view_dividing_line" />
+        <TextView
+            android:id="@+id/menu1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="18dp"
+            android:paddingBottom="18dp"
+            android:text="@string/album"
+            android:textColor="#ff000000"
+            android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/menu2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingTop="18dp"
-        android:paddingBottom="18dp"
-        android:text="@string/shoot"
-        android:textColor="#ff000000"
-        android:textSize="16sp" />
+        <include layout="@layout/view_dividing_line" />
 
-    <include layout="@layout/view_dividing_line" />
+        <TextView
+            android:id="@+id/menu2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="18dp"
+            android:paddingBottom="18dp"
+            android:text="@string/shoot"
+            android:textColor="#ff000000"
+            android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/menu4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingTop="18dp"
-        android:paddingBottom="18dp"
-        android:text="@string/album"
-        android:textColor="#ff000000"
-        android:textSize="16sp"
-        android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/menu5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingTop="18dp"
-        android:paddingBottom="18dp"
-        android:text="@string/album"
-        android:textColor="#ff000000"
-        android:textSize="16sp"
-        android:visibility="gone" />
+        <TextView
+            android:id="@+id/menu4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="18dp"
+            android:paddingBottom="18dp"
+            android:text="@string/album"
+            android:textColor="#ff000000"
+            android:textSize="16sp"
+            android:visibility="gone" />
 
-    <include
-        layout="@layout/view_dividing_line"
-        android:layout_width="match_parent"
-        android:layout_height="7dp" />
+        <TextView
+            android:id="@+id/menu5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="18dp"
+            android:paddingBottom="18dp"
+            android:text="@string/album"
+            android:textColor="#ff000000"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/menu3"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="34dp"
+        android:background="@drawable/sty_radius_4_white"
         android:gravity="center"
-        android:paddingTop="18dp"
-        android:paddingBottom="18dp"
         android:text="@string/cancel"
-        android:textColor="#ff000000"
-        android:textSize="16sp" />
+        android:textColor="#ff171a1d"
+        android:textSize="17sp" />
 
 </LinearLayout>

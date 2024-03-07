@@ -17,9 +17,10 @@ import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.vanniktech.ui.Color;
+import com.bigkoo.pickerview.adapter.ArrayWheelAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.databinding.LayoutBurnAfterReadingBinding;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.ex.MultipleChoice;
@@ -37,13 +39,16 @@ import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
+import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
 import io.openim.android.ouicore.widget.SingleInfoModifyActivity;
+import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityGroupMaterialBinding;
 
@@ -52,10 +57,9 @@ import io.openim.android.ouigroup.ui.v3.GroupManageActivity;
 import io.openim.android.ouigroup.ui.v3.SelectTargetActivityV3;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
-import io.openim.android.sdk.enums.GroupVerification;
+import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.listener.OnGroupListener;
-import io.openim.android.sdk.listener.OnPutFileListener;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
@@ -102,6 +106,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                 });
     }
 
+
     void init() {
         iConversationBridge =
             (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();
@@ -114,18 +119,20 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
     private void click() {
         view.groupMember.setOnClickListener(v -> {
-            gotoMemberList(false);
+            gotoMemberList();
         });
         view.groupName.setOnClickListener(v -> {
-            if (vm.isOwner.val()) {
+            try {
                 infoModifyType = 1;
                 SingleInfoModifyActivity.SingleInfoModifyData modifyData =
                     new SingleInfoModifyActivity.SingleInfoModifyData();
-                modifyData.title = "修改群聊名称";
-                modifyData.description = "修改群聊名称后，将在群内通知其他成员。";
+                modifyData.title = getString(io.openim.android.ouicore.R.string.edit_group_name2);
+                modifyData.description =
+                    getString(io.openim.android.ouicore.R.string.edit_group_name_tips);
                 modifyData.avatarUrl = vm.groupsInfo.getValue().getFaceURL();
                 modifyData.editT = vm.groupsInfo.getValue().getGroupName();
                 infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
+            } catch (Exception ignored) {
             }
         });
         view.qrCode.setOnClickListener(v -> startActivity(new Intent(this,
@@ -149,6 +156,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     protected void fasterDestroy() {
         removeCacheVM();
         Easy.delete(GroupVM.class);
+        IMEvent.getInstance().removeGroupListener(this);
     }
 
     @Override
@@ -158,7 +166,9 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     private void initView() {
-        if (vm.isOwner.val()) view.quitGroup.setText(io.openim.android.ouicore.R.string.dissolve_group);
+        if (vm.isOwner.val())
+            view.quitGroup.setText(io.openim.android.ouicore.R.string.dissolve_group);
+
         albumDialog = new PhotographAlbumDialog(this);
         albumDialog.setOnSelectResultListener(path -> {
             PutArgs putArgs = new PutArgs(path[0]);
@@ -215,9 +225,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                         if (isAdd) {
                             inviteIntoGroup(GroupMaterialActivity.this, vm);
                         } else {
-                            startActivity(new Intent(GroupMaterialActivity.this,
-                                InitiateGroupActivity.class).putExtra(Constant.IS_REMOVE_GROUP,
-                                true));
+                            gotoMemberListByRemove();
                         }
                     });
                 } else {
@@ -234,9 +242,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         vm.groupsInfo.observe(this, groupInfo -> {
             view.avatar.load(groupInfo.getFaceURL(), true);
             vm.getGroupMemberList(spanCount * 2);
-            view.quitGroup.setText(getString(vm.isOwner.val() ?
-                io.openim.android.ouicore.R.string.dissolve_group :
-                io.openim.android.ouicore.R.string.quit_group));
 
             view.all.setText(String.format(getResources().getString(io.openim.android.ouicore.R.string.view_all_member), groupInfo.getMemberCount()));
             if (groupInfo.getMemberCount() == 0) {
@@ -257,6 +262,11 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     }
                 });
             }
+        });
+        vm.isOwner.observe(this,v->{
+            view.quitGroup.setText(getString(vm.isOwner.val() ?
+                io.openim.android.ouicore.R.string.dissolve_group :
+                io.openim.android.ouicore.R.string.quit_group));
         });
 
         vm.groupMembers.observe(this, groupMembersInfos -> {
@@ -288,6 +298,23 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
 
+    private void gotoMemberListByRemove() {
+        GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class);
+        memberVM.groupId = vm.groupId;
+        memberVM.setIntention(GroupMemberVM.Intention.AT);
+        memberVM.isSearchSingle=true;
+        memberVM.isRemoveOwnerAndAdmin=true;
+        memberVM.setOnFinishListener(activity -> {
+            List<String> ids = new ArrayList<>();
+            for (MultipleChoice choice : memberVM.choiceList.val()) {
+                ids.add(choice.key);
+            }
+            vm.kickGroupMember(ids);
+            activity.finish();
+        });
+        startActivity(new Intent(this, SuperGroupMemberActivity.class));
+    }
+
     public static void inviteIntoGroup(Context ctx, GroupVM vm) {
         SelectTargetVM sv = Easy.installVM(SelectTargetVM.class);
         sv.setIntention(SelectTargetVM.Intention.invite);
@@ -306,8 +333,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             }
             vm.inviteUserToGroup(selectIds);
         });
-        ctx.startActivity(new Intent(ctx,
-            SelectTargetActivityV3.class));
+        ctx.startActivity(new Intent(ctx, SelectTargetActivityV3.class));
     }
 
 
@@ -325,10 +351,16 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         }
     }
 
-    private void gotoMemberList(boolean transferPermissions) {
-        startActivity(new Intent(this,
-            SuperGroupMemberActivity.class).putExtra(Constant.K_FROM,
-            transferPermissions));
+    private void gotoMemberList() {
+        GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class);
+        memberVM.groupId = vm.groupId;
+        memberVM.isOwnerOrAdmin = vm.isOwnerOrAdmin.val();
+        memberVM.setIntention(GroupMemberVM.Intention.CHECK);
+        memberVM.setOnFinishListener(activity -> {
+            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID,
+                memberVM.choiceList.val().get(0).key).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
+        });
+        startActivity(new Intent(this, SuperGroupMemberActivity.class));
     }
 
     @Override
@@ -358,6 +390,9 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
     @Override
     public void onGroupInfoChanged(GroupInfo info) {
+        if (info.getGroupID().equals(vm.groupId)) {
+            vm.groupsInfo.setValue(info);
+        }
     }
 
     @Override
@@ -372,9 +407,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
     @Override
     public void onGroupMemberInfoChanged(GroupMembersInfo info) {
-        if (info.getGroupID().equals(vm.groupId) &&
-            info.getUserID().
-                equals(BaseApp.inst().loginCertificate.userID)) {
+        if (info.getGroupID().equals(vm.groupId) && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
             vm.updateRole(info);
             vm.getGroupsInfo();
         }
@@ -388,10 +421,5 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     @Override
     public void onJoinedGroupDeleted(GroupInfo info) {
 
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-        super.onPointerCaptureChanged(hasCapture);
     }
 }

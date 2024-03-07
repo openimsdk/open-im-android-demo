@@ -1,5 +1,9 @@
 pluginManagement {
     repositories {
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+
         maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/google' }
@@ -15,14 +19,15 @@ pluginManagement {
             // r8 maven
             url = uri("https://storage.googleapis.com/r8-releases/raw")
         }
-        mavenCentral()
-        google()
-        gradlePluginPortal()
     }
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+        
         maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/google' }
@@ -38,10 +43,6 @@ dependencyResolutionManagement {
             // r8 maven
             url = uri("https://storage.googleapis.com/r8-releases/raw")
         }
-
-        mavenCentral()
-        google()
-        gradlePluginPortal()
     }
 }
 rootProject.name = "Demo"

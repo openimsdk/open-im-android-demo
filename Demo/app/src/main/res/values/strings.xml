@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">OpenIM</string>
-    <string name="upload_err_log">上传出错日志</string>
 </resources>

@@ -300,7 +300,6 @@ public class GroupVM extends SocialityVM {
      * 获取群成员信息
      */
     public void getGroupMemberList(int count) {
-        if (!superGroupMembers.getValue().isEmpty()) return; //表示走了超级大群逻辑
 
         exGroupMembers.getValue().clear();
         exGroupManagement.getValue().clear();
@@ -378,6 +377,7 @@ public class GroupVM extends SocialityVM {
                     getIView().onSuccess(null);
 
                     Obs.newMessage(Constant.Event.UPDATE_GROUP_INFO, groupName);
+                    postSubject(Constant.Event.UPDATE_GROUP_INFO+"");
                 }
             }, groupId, userIds, "welcome");
     }
@@ -385,11 +385,7 @@ public class GroupVM extends SocialityVM {
     /**
      * 踢出群
      */
-    public void kickGroupMember(List<FriendInfo> friendInfos) {
-        List<String> userIds = new ArrayList<>();
-        for (FriendInfo friendInfo : friendInfos) {
-            userIds.add(friendInfo.getUserID());
-        }
+    public void kickGroupMember(List<String> uids) {
         OpenIMClient.getInstance().groupManager.kickGroupMember(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
@@ -403,8 +399,9 @@ public class GroupVM extends SocialityVM {
                 getIView().onSuccess(null);
 
                 Obs.newMessage(Constant.Event.UPDATE_GROUP_INFO, groupName);
+                postSubject(Constant.Event.UPDATE_GROUP_INFO+"");
             }
-        }, groupId, userIds, "");
+        }, groupId, uids, "");
     }
 
     /**
@@ -444,6 +441,7 @@ public class GroupVM extends SocialityVM {
             @Override
             public void onSuccess(String data) {
                 getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
+                Obs.newMessage(Constant.Event.DISSOLVE_GROUP);
                 close(commonDialog);
             }
         }, groupId));
@@ -557,11 +555,11 @@ public class GroupVM extends SocialityVM {
             seconds);
     }
 
-    public void setMemberMute(IMBack<String> imBack, String uid, long seconds) {
+    public long setMemberMute(IMBack<String> imBack, String uid, long seconds) {
         int status = muteStatus.getValue();
         if (status == -1 || (status == 0 && seconds == 0)) {
             getIView().toast(BaseApp.inst().getString(R.string.mute_tips));
-            return;
+            return 0;
         }
         if (status == 1) {
             seconds = 60 * 10;
@@ -579,6 +577,7 @@ public class GroupVM extends SocialityVM {
             seconds = 0;
         }
         changeGroupMemberMute(imBack, uid, seconds);
+        return seconds;
     }
 
 

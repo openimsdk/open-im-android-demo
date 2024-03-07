@@ -1,19 +1,19 @@
 package io.openim.android.ouigroup.ui.v3;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.ex.MultipleChoice;
+import io.openim.android.ouicore.vm.GroupMemberVM;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.widget.BottomPopDialog;
-import io.openim.android.ouigroup.R;
+import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouigroup.databinding.ActivityGroupManageBinding;
-import io.openim.android.ouigroup.ui.GroupMaterialActivity;
 import io.openim.android.ouigroup.ui.MemberPermissionActivity;
 import io.openim.android.ouigroup.ui.SuperGroupMemberActivity;
 import io.openim.android.sdk.enums.GroupStatus;
@@ -24,19 +24,21 @@ public class GroupManageActivity extends BaseActivity<GroupVM, ActivityGroupMana
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        vm= Easy.find(GroupVM.class);
+        vm = Easy.find(GroupVM.class);
         bindViewDataBinding(ActivityGroupManageBinding.inflate(getLayoutInflater()));
         view.setGroupVM(vm);
 
         click();
         listener();
     }
+
     private void listener() {
         vm.groupsInfo.observe(this, groupInfo -> {
             view.totalSilence.setCheckedWithAnimation(groupInfo.getStatus() == GroupStatus.GROUP_MUTED);
             view.describe.setText(getJoinGroupOption(groupInfo.getNeedVerification()));
         });
     }
+
     String getJoinGroupOption(int value) {
         if (value == GroupVerification.ALL_NEED_VERIFICATION) {
             return getString(io.openim.android.ouicore.R.string.needVerification);
@@ -45,6 +47,7 @@ public class GroupManageActivity extends BaseActivity<GroupVM, ActivityGroupMana
         }
         return getString(io.openim.android.ouicore.R.string.inviteNotVerification);
     }
+
     private void click() {
         view.memberPermissions.setOnClickListener(v -> {
             startActivity(new Intent(this, MemberPermissionActivity.class));
@@ -67,10 +70,11 @@ public class GroupManageActivity extends BaseActivity<GroupVM, ActivityGroupMana
             });
             dialog.getMainView().menu2.setOnClickListener(v1 -> {
                 dialog.dismiss();
-                vm.setGroupVerification(GroupVerification.APPLY_NEED_VERIFICATION_INVITE_DIRECTLY, data -> {
-                    vm.groupsInfo.getValue().setNeedVerification(GroupVerification.APPLY_NEED_VERIFICATION_INVITE_DIRECTLY);
-                    vm.groupsInfo.setValue(vm.groupsInfo.getValue());
-                });
+                vm.setGroupVerification(GroupVerification.APPLY_NEED_VERIFICATION_INVITE_DIRECTLY
+                    , data -> {
+                        vm.groupsInfo.getValue().setNeedVerification(GroupVerification.APPLY_NEED_VERIFICATION_INVITE_DIRECTLY);
+                        vm.groupsInfo.setValue(vm.groupsInfo.getValue());
+                    });
             });
             dialog.getMainView().menu4.setOnClickListener(v1 -> {
                 dialog.dismiss();
@@ -87,16 +91,31 @@ public class GroupManageActivity extends BaseActivity<GroupVM, ActivityGroupMana
         });
 
         view.transferPermissions.setOnClickListener(v -> {
-            gotoMemberList(true);
+            gotoMemberList();
         });
     }
 
-    private void gotoMemberList(boolean transferPermissions) {
-//        if (vm.groupMembers.getValue().isEmpty()) return;
-//        if (vm.groupMembers.getValue().size() > Constant.SUPER_GROUP_LIMIT)
-        startActivity(new Intent(GroupManageActivity.this, SuperGroupMemberActivity.class).putExtra(Constant.K_FROM, transferPermissions));
-//        else
-//            startActivity(new Intent(GroupMaterialActivity.this, GroupMemberActivity.class)
-//            .putExtra(Constant.K_FROM, transferPermissions));
+    private void gotoMemberList() {
+        GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class);
+        memberVM.groupId = vm.groupId;
+        memberVM.setIntention(GroupMemberVM.Intention.SELECT_SINGLE);
+        memberVM.setOnFinishListener(activity -> {
+            MultipleChoice choice = memberVM.choiceList.val().get(0);
+            CommonDialog commonDialog = new CommonDialog(activity);
+            commonDialog.getMainView().tips.setText(String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.transfer_permission), choice.name));
+            commonDialog.getMainView().cancel.setOnClickListener(v2 -> {
+                commonDialog.dismiss();
+            });
+            commonDialog.getMainView().confirm.setOnClickListener(v2 -> {
+                commonDialog.dismiss();
+                vm.transferGroupOwner(choice.key, data1 -> {
+                    toast(getString(io.openim.android.ouicore.R.string.transfer_succ));
+                    activity.finish();
+                    finish();
+                });
+            });
+            commonDialog.show();
+        });
+        startActivity(new Intent(this, SuperGroupMemberActivity.class));
     }
 }

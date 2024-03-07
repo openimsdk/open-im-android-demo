@@ -23,7 +23,9 @@ import io.openim.android.ouicontact.databinding.ItemGroupNoticeBinding;
 import io.openim.android.ouicontact.vm.ContactVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.GroupApplicationInfo;
 
 public class GroupNoticeListActivity extends BaseActivity<ContactVM, ActivityGroupNoticeListBinding> {
@@ -36,6 +38,7 @@ public class GroupNoticeListActivity extends BaseActivity<ContactVM, ActivityGro
         sink();
 
         initView();
+        IMEvent.getInstance().addGroupListener(vm);
         vm.getRecvGroupApplicationList();
     }
 
@@ -85,10 +88,10 @@ public class GroupNoticeListActivity extends BaseActivity<ContactVM, ActivityGro
             v = ItemGroupNoticeBinding.bind(itemView);
         }
     }
-
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void fasterDestroy() {
+        super.fasterDestroy();
+        IMEvent.getInstance().removeGroupListener(vm);
         removeCacheVM();
     }
 }

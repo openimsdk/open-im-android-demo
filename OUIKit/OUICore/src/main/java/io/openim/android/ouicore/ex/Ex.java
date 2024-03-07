@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Ex implements Serializable {
+
     public String key; //Id
 
     public Ex(String key) {

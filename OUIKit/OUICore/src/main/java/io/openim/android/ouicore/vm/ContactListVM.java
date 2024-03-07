@@ -92,7 +92,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
     }
 
     private CharSequence buildDraftMsg(ConversationInfo datum) {
-        String draft=IMUtil.getDraft(datum.getConversationID());
+        CharSequence draft= (CharSequence) IMUtil.getDraft(datum.getConversationID())[0];
         if (!TextUtils.isEmpty(draft)){
             String target =
                 "[" + BaseApp.inst().getString(R.string.draft) + "]";

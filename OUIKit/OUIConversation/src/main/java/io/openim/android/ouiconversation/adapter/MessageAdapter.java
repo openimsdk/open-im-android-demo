@@ -11,6 +11,7 @@ import java.util.List;
 
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.Message;
 
 public class MessageAdapter extends RecyclerView.Adapter {
@@ -19,7 +20,8 @@ public class MessageAdapter extends RecyclerView.Adapter {
 
     List<Message> messages;
 
-    public MessageAdapter() {}
+    public MessageAdapter() {
+    }
 
     public void setMessages(List<Message> messages) {
         this.messages = messages;
@@ -27,7 +29,11 @@ public class MessageAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemViewType(int position) {
-        return messages.get(position).getContentType();
+        Message message = messages.get(position);
+        if (null != message.getAtTextElem()
+            && null != message.getAtTextElem().getQuoteMessage())
+            return MessageType.QUOTE; //这里兼容下 at+qt都是用qt的视图类型
+        return message.getContentType();
     }
 
     @NonNull
@@ -41,7 +47,8 @@ public class MessageAdapter extends RecyclerView.Adapter {
         Message message = messages.get(position);
 
         if (getItemViewType(position) != Constant.LOADING) {
-            MessageViewHolder.MsgViewHolder msgViewHolder = (MessageViewHolder.MsgViewHolder) holder;
+            MessageViewHolder.MsgViewHolder msgViewHolder =
+                (MessageViewHolder.MsgViewHolder) holder;
             msgViewHolder.setMessageAdapter(this);
             msgViewHolder.bindData(message, position);
             if (null != recyclerView)

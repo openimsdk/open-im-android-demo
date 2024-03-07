@@ -1,7 +1,6 @@
 package io.openim.android.ouicontact.vm;
 
-import androidx.lifecycle.MutableLiveData;
-
+import java.util.Iterator;
 import java.util.List;
 
 import io.openim.android.ouicore.base.BaseApp;
@@ -26,15 +25,15 @@ import io.openim.android.sdk.models.UserInfo;
 public class ContactVM extends BaseViewModel implements OnGroupListener, OnFriendshipListener {
 
     //申请列表
-    public MutableLiveData<List<GroupApplicationInfo>> groupApply = new MutableLiveData<>();
+    public State<List<GroupApplicationInfo>> groupApply = new State<>();
     //好友申请列表
-    public MutableLiveData<List<FriendApplicationInfo>> friendApply = new MutableLiveData<>();
+    public State<List<FriendApplicationInfo>> friendApply = new State<>();
     //申请详情
-    public MutableLiveData<GroupApplicationInfo> groupDetail = new MutableLiveData<>();
+    public State<GroupApplicationInfo> groupDetail = new State<>();
     //好友申请详情
     public State<FriendApplicationInfo> friendDetail = new State<>();
     //常联系的好友
-    public MutableLiveData<UserInfo> frequentContacts = new MutableLiveData<>();
+    public State<UserInfo> frequentContacts = new State<>();
 
 
     //个人申请列表
@@ -63,7 +62,6 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
 
             @Override
             public void onSuccess(List<GroupApplicationInfo> data) {
-                L.e("");
                 if (!data.isEmpty())
                     groupApply.setValue(data);
             }
@@ -108,5 +106,13 @@ public class ContactVM extends BaseViewModel implements OnGroupListener, OnFrien
             groupDetail.getValue().getGroupID(), groupDetail.getValue().getUserID(), "");
     }
 
+    @Override
+    public void onGroupApplicationAccepted(GroupApplicationInfo info) {
+        getRecvGroupApplicationList();
+    }
 
+    @Override
+    public void onGroupApplicationRejected(GroupApplicationInfo info) {
+        getRecvGroupApplicationList();
+    }
 }

@@ -169,7 +169,7 @@ public class PhotographAlbumDialog extends BaseDialog {
      * 裁剪照片
      */
     private void goCrop(Uri sourceUri) {
-        fileUri = Uri.fromFile(buildTemporaryFile());
+         fileUri = Uri.fromFile(new File(compatActivity.getExternalCacheDir(), System.currentTimeMillis() + ".jpg"));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             File file = uriToFileApiQ(sourceUri, BaseApp.inst());
             fileUri = FileProvider.getUriForFile(BaseApp.inst(),

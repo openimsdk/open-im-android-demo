@@ -98,6 +98,7 @@ dependencies {
 
     api 'com.tencent.bugly:crashreport:latest.release'
     api 'com.github.MZCretin:AutoUpdateProject:latest.release'
+    api 'com.github.ajalt:timberkt:1.5.1'
 
     //openIM sdk
     api 'io.openim:android-sdk:3.5.0-rc1@aar'
