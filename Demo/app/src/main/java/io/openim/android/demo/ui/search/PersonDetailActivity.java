@@ -172,6 +172,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 OpenIMClient.getInstance().groupManager.setGroupMemberRoleLevel(new IMBack<String>() {
                     @Override
                     public void onSuccess(String data) {
+                        toast(getString(io.openim.android.ouicore.R.string.set_succ));
                         GroupVM groupVM = BaseApp.inst().getVMByCache(GroupVM.class);
                         if (null != groupVM) {
                             groupVM.superGroupMembers.val().clear();
@@ -183,7 +184,10 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                     GroupRole.MEMBER);
             });
             view.mute.setOnClickListener(v -> {
-                jumpCallBack.launch(new Intent(this, SetMuteActivity.class).putExtra(Constant.K_ID, vm.searchContent.getValue()));
+                Easy.installVM(GroupVM.class)
+                    .groupId=groupId;
+                jumpCallBack.launch(new Intent(this,
+                    SetMuteActivity.class).putExtra(Constant.K_ID, vm.searchContent.getValue()));
             });
 
         });

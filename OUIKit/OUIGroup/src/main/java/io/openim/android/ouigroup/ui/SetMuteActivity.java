@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMBack;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.vm.GroupVM;
@@ -20,6 +21,9 @@ public class SetMuteActivity extends BaseActivity<GroupVM,ActivitySetMuteBinding
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         bindVMByCache(GroupVM.class);
+        if (null==vm){
+            vm=Easy.find(GroupVM.class);
+        }
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivitySetMuteBinding.inflate(getLayoutInflater()));
         uid=getIntent().getStringExtra(Constant.K_ID);
@@ -61,5 +65,11 @@ public class SetMuteActivity extends BaseActivity<GroupVM,ActivitySetMuteBinding
                 }
             },uid,seconds);
         });
+    }
+
+    @Override
+    protected void fasterDestroy() {
+        super.fasterDestroy();
+        Easy.delete(GroupVM.class);
     }
 }

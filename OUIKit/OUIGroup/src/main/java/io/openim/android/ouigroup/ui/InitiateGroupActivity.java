@@ -363,10 +363,6 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
 //                        vm.inviteUserToGroup(vm.selectedFriendInfoV3);
                         return;
                     }
-                    if (isRemoveGroup) {
-                        vm.kickGroupMember(vm.selectedFriendInfo.getValue());
-                        return;
-                    }
                     if (isSelectMember) {
                         ArrayList<String> ids = new ArrayList<>();
                         for (FriendInfo friendInfo : vm.selectedFriendInfo.getValue()) {

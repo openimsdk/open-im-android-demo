@@ -62,7 +62,6 @@ public class PersonalFragment extends BaseFragment implements Observer {
         user.info.observe(getActivity(),v-> {
             view.avatar.load(v.getFaceURL(),v.getNickname());
             view.name.setText(v.getNickname());
-
         });
         view.userId.setText("ID：" + BaseApp.inst().loginCertificate.userID);
     }
@@ -132,7 +131,7 @@ public class PersonalFragment extends BaseFragment implements Observer {
     public void update(Observable observable, Object o) {
         Obs.Message message = (Obs.Message) o;
         if (message.tag == Constant.Event.USER_INFO_UPDATE) {
-            view.avatar.load(BaseApp.inst().loginCertificate.faceURL);
+            view.avatar.load(BaseApp.inst().loginCertificate.faceURL,BaseApp.inst().loginCertificate.nickname);
             view.name.setText(BaseApp.inst().loginCertificate.nickname);
         }
     }

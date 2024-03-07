@@ -23,6 +23,7 @@ import java.util.List;
 
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.entity.MsgExpand;
+import io.openim.android.ouicore.ex.AtUser;
 import io.openim.android.sdk.models.Message;
 
 public class TailInputEditText extends EmojiEditText {
@@ -60,20 +61,22 @@ public class TailInputEditText extends EmojiEditText {
          */
         @Override
         public boolean deleteSurroundingText(int beforeLength, int afterLength) {
-            spansDelete(TailInputEditText.this,chatVM);
+            spansDelete(TailInputEditText.this, chatVM);
             return super.deleteSurroundingText(beforeLength, afterLength);
         }
 
     }
 
     /**
-     *  监听删除操作，找到最靠近删除的一个Span，然后整体删除
+     * 监听删除操作，找到最靠近删除的一个Span，然后整体删除
      */
-    public static  void spansDelete(TailInputEditText tailInputEditText,ChatVM chatVM) {
+    public static void spansDelete(TailInputEditText tailInputEditText, ChatVM chatVM) {
         final int selectionStart = Selection.getSelectionStart(tailInputEditText.getText());
         final int selectionEnd = Selection.getSelectionEnd(tailInputEditText.getText());
 
-        final CharacterStyle characterStyles[] = tailInputEditText.getText().getSpans(selectionStart, selectionEnd, CharacterStyle.class);
+        final CharacterStyle characterStyles[] =
+                tailInputEditText.getText().getSpans(selectionStart, selectionEnd,
+                        CharacterStyle.class);
         for (CharacterStyle characterStyle : characterStyles) {
             if (characterStyle == null) {
                 continue;
@@ -86,13 +89,11 @@ public class TailInputEditText extends EmojiEditText {
             }
             if (characterStyle instanceof ForegroundColorSpan) {
                 //表示@消息
-                List<Message> atMessages = chatVM.atMessages.getValue();
-                Iterator iterator = atMessages.iterator();
+                Iterator<AtUser> iterator = chatVM.atUsers.val().iterator();
                 while (iterator.hasNext()) {
-                    Message message = (Message) iterator.next();
+                    AtUser atUser = iterator.next();
                     try {
-                        MsgExpand msgExpand = (MsgExpand) message.getExt();
-                        if (msgExpand.spanHashCode == characterStyle.hashCode()) {
+                        if (atUser.spanHashCode == characterStyle.hashCode()) {
                             iterator.remove();
                         }
                     } catch (Exception e) {

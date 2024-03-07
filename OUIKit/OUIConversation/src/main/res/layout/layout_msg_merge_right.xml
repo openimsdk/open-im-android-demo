@@ -8,6 +8,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="40dp"
         android:orientation="horizontal">
 
         <TextView
@@ -71,12 +72,15 @@
 
                 <include layout="@layout/view_dividing_line" />
 
+
                 <TextView
                     android:id="@+id/history21"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:textColor="#ff8e9ab0"
+                    android:maxLines="3"
+                    android:ellipsize="end"
                     android:textSize="14sp" />
 
                 <TextView
@@ -86,6 +90,30 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
                     android:textColor="#ff8e9ab0"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:textSize="14sp" />
+                <TextView
+                    android:id="@+id/history23"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:textColor="#ff8e9ab0"
+                    android:maxLines="3"
+                    android:visibility="gone"
+                    android:ellipsize="end"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/history24"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:textColor="#ff8e9ab0"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:visibility="gone"
                     android:textSize="14sp" />
 
             </LinearLayout>

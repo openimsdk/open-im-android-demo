@@ -466,6 +466,11 @@ public class Common {
         target.setTag(new QBadgeView(context).bindTarget(target).setGravityOffset(10, -2, true).setBadgeNumber(badgeNumber).setBadgeTextSize(8, true).setShowShadow(false));
     }
 
+    /**
+     * 正则表达式模式匹配URL链接
+     * @param text
+     * @return
+     */
     public static String containsLink(String text) {
         StringBuilder links = new StringBuilder();
         // 正则表达式模式匹配URL链接

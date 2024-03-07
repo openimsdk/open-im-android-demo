@@ -13,7 +13,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.ViewDataBinding;
 
+import com.alibaba.android.arouter.launcher.ARouter;
+
+import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
+import io.openim.android.ouicore.utils.Routes;
 
 public class BasicActivity<T extends ViewDataBinding> extends AppCompatActivity {
     boolean isRecycle;
@@ -82,5 +86,13 @@ public class BasicActivity<T extends ViewDataBinding> extends AppCompatActivity 
 
     public void toBack(View view) {
         finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null != callingService && callingService.isCalling()) return;
+        super.onBackPressed();
     }
 }

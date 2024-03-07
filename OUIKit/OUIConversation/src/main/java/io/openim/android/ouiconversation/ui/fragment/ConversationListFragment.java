@@ -69,6 +69,7 @@ import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.FriendInfo;
 
@@ -392,7 +393,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
                 isGroup, isGroup ? null : msgConversation.conversationInfo.getShowName());
             viewHolder.viewBinding.nickName.setText(msgConversation.conversationInfo.getShowName());
 
-            if (msgConversation.conversationInfo.getRecvMsgOpt() != 0) {
+            if (msgConversation.conversationInfo.getRecvMsgOpt() != Opt.NORMAL) {
                 viewHolder.viewBinding.noDisturbTips
                     .setVisibility(msgConversation.conversationInfo.getUnreadCount() > 0 ?
                         View.VISIBLE : View.GONE);

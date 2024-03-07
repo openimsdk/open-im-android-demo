@@ -1,6 +1,5 @@
 package io.openim.android.ouicore.base.vm;
 
-import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 public class State<T> extends MutableLiveData<T> {

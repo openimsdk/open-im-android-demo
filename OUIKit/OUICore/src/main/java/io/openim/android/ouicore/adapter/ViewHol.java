@@ -54,6 +54,7 @@ public class ViewHol {
         public ItemViewHo(@NonNull View itemView) {
             super(ItemPsrsonSelectBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
             view = ItemPsrsonSelectBinding.bind(this.itemView);
+            view.getRoot().setIntercept(false);
         }
     }
 

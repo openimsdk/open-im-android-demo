@@ -47,6 +47,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import io.openim.android.ouiconversation.R;
 
 
+import io.openim.android.ouiconversation.databinding.ItemHistoryMergeBinding;
 import io.openim.android.ouiconversation.databinding.LayoutLoadingSmallBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgAudioLeftBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgAudioRightBinding;
@@ -77,11 +78,15 @@ import io.openim.android.ouiconversation.widget.SendStateView;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouiconversation.ui.fragment.InputExpandFragment;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
+import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.databinding.ItemPsrsonSelectBinding;
+import io.openim.android.ouicore.databinding.ViewDividingLineBinding;
 import io.openim.android.ouicore.entity.CallHistory;
 import io.openim.android.ouicore.entity.MeetingInfo;
 import io.openim.android.ouicore.entity.MsgExpand;
+import io.openim.android.ouicore.ex.AtUser;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.IMeetingBridge;
@@ -89,6 +94,7 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.ByteUtil;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
@@ -138,7 +144,7 @@ public class MessageViewHolder {
         protected RecyclerView recyclerView;
         protected MessageAdapter messageAdapter;
 
-        private PopupWindow popupWindow;
+        protected PopupWindow popupWindow;
         protected Message message;
         private RecyclerViewAdapter adapter;
         protected ChatVM chatVM = BaseApp.inst().getVMByCache(ChatVM.class);
@@ -178,7 +184,7 @@ public class MessageViewHolder {
         public void bindData(Message message, int position) {
             this.message = message;
             try {
-                isOwn = message.getSendID().equals(BaseApp.inst().loginCertificate.userID);
+                isOwn = getSendWay(message);
                 if (isOwn) {
                     if (leftIsInflated) left.setVisibility(View.GONE);
                     if (rightIsInflated) right.setVisibility(View.VISIBLE);
@@ -202,12 +208,8 @@ public class MessageViewHolder {
             }
         }
 
-        int getHaveReadCount() {
-            try {
-                return message.getAttachedInfoElem().getGroupHasReadInfo().getHasReadCount();
-            } catch (Exception ignored) {
-            }
-            return 0;
+        protected boolean getSendWay(Message message) {
+            return message.getSendID().equals(BaseApp.inst().loginCertificate.userID);
         }
 
         int getNeedReadCount() {
@@ -221,7 +223,7 @@ public class MessageViewHolder {
         /**
          * 统一处理
          */
-        private void unifiedProcess(int position) {
+        protected void unifiedProcess(int position) {
             MsgExpand msgExpand = (MsgExpand) message.getExt();
             hFirstItem(position);
 
@@ -236,7 +238,7 @@ public class MessageViewHolder {
             hSendState();
         }
 
-        protected void hFirstItem(int position) {
+        public void hFirstItem(int position) {
             View root = itemView.findViewById(R.id.root);
             root.setPadding(0, position == 0 ? Common.dp2px(15) : 0, 0, 0);
         }
@@ -251,7 +253,7 @@ public class MessageViewHolder {
                 sendStateView.setOnClickListener(new OnDedrepClickListener() {
                     @Override
                     public void click(View v) {
-                        chatVM.sendMsg(message);
+                        chatVM.sendMsg(message, true);
                     }
                 });
             }
@@ -283,9 +285,7 @@ public class MessageViewHolder {
             if (null == unRead) return;
             unRead.setVisibility(View.INVISIBLE);
             int viewType = message.getContentType();
-            if (isOwn && message.getStatus() == MessageStatus.SUCCEEDED
-                && viewType < MessageType.NTF_BEGIN
-                && viewType != Constant.MsgType.LOCAL_CALL_HISTORY) {
+            if (isOwn && message.getStatus() == MessageStatus.SUCCEEDED && viewType < MessageType.NTF_BEGIN && viewType != Constant.MsgType.LOCAL_CALL_HISTORY) {
                 unRead.setVisibility(View.VISIBLE);
                 if (chatVM.isSingleChat) {
                     String unread =
@@ -305,7 +305,7 @@ public class MessageViewHolder {
                                 message.getClientMsgID()).putExtra(Constant.K_RESULT2,
                                 message.getAttachedInfoElem().getGroupHasReadInfo()));
                         });
-                    }else {
+                    } else {
                         unRead.setVisibility(View.INVISIBLE);
                     }
                 }
@@ -316,7 +316,7 @@ public class MessageViewHolder {
          * 处理名字
          */
         @SuppressLint("SetTextI18n")
-        private void hName() {
+        public void hName() {
             TextView nickName;
             if (isOwn) nickName = itemView.findViewById(R.id.nickName2);
             else nickName = itemView.findViewById(R.id.nickName);
@@ -338,7 +338,7 @@ public class MessageViewHolder {
         /**
          * 处理头像
          */
-        private void hAvatar() {
+        public void hAvatar() {
             AvatarImage avatarImage = itemView.findViewById(R.id.avatar);
             AvatarImage avatarImage2 = itemView.findViewById(R.id.avatar2);
             if (null != avatarImage) {
@@ -347,12 +347,14 @@ public class MessageViewHolder {
                 avatarImage.setOnLongClickListener(v -> {
                     if (chatVM.isSingleChat) return false;
                     isLongClick.set(true);
-                    List<Message> atMessages = chatVM.atMessages.getValue();
-                    for (Message atMessage : atMessages) {
-                        if (atMessage.getSendID().equals(message.getSendID())) return false;
+                    List<AtUser> atUsers = chatVM.atUsers.val();
+                    AtUser atUser = new AtUser(message.getSendID());
+                    if (atUsers.contains(atUser)) {
+                        return false;
                     }
-                    atMessages.add(message);
-                    chatVM.atMessages.setValue(atMessages);
+                    atUser.name = message.getSenderNickname();
+                    chatVM.atUsers.val().add(atUser);
+                    chatVM.atUsers.update();
                     return false;
                 });
                 avatarImage.setOnClickListener(v -> {
@@ -421,8 +423,8 @@ public class MessageViewHolder {
                     return true;
                 List<Integer> menuIcons = new ArrayList<>();
                 List<String> menuTitles = new ArrayList<>();
-                final ChatActivity.LinearLayoutMg linearLayoutManager
-                    = (ChatActivity.LinearLayoutMg) recyclerView.getLayoutManager();
+                final ChatActivity.LinearLayoutMg linearLayoutManager =
+                    (ChatActivity.LinearLayoutMg) recyclerView.getLayoutManager();
                 if (null == popupWindow) {
                     popupWindow = new PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -436,55 +438,62 @@ public class MessageViewHolder {
                     adapter =
                         new RecyclerViewAdapter<Object, InputExpandFragment.ExpandHolder>(InputExpandFragment.ExpandHolder.class) {
 
-                            @Override
-                            public void onBindView(@NonNull InputExpandFragment.ExpandHolder holder,
-                                                   Object data, int position) {
-                                int iconRes = (int) getItems().get(position);
-                                List<String> menuTitles =
-                                    (List<String>) popupWindow.getContentView().getTag();
+                        @Override
+                        public void onBindView(@NonNull InputExpandFragment.ExpandHolder holder,
+                                               Object data, int position) {
+                            int iconRes = (int) getItems().get(position);
+                            List<String> menuTitles =
+                                (List<String>) popupWindow.getContentView().getTag();
 
-                                holder.v.menu.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
-                                    v.getContext().getDrawable(iconRes), null, null);
-                                holder.v.menu.setText(menuTitles.get(position));
-                                holder.v.menu.setTextColor(Color.WHITE);
-                                holder.v.menu.setOnClickListener(v1 -> {
-                                    popupWindow.dismiss();
-                                    if (iconRes == R.mipmap.ic_reply) {
-                                        chatVM.replyMessage.setValue(message);
-                                    }
-                                    if (iconRes == R.mipmap.ic_c_copy) {
-                                        TextView textView = view.findViewById(R.id.content);
+                            holder.v.menu.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
+                                v.getContext().getDrawable(iconRes), null, null);
+                            holder.v.menu.setText(menuTitles.get(position));
+                            holder.v.menu.setTextColor(Color.WHITE);
+                            holder.v.menu.setOnClickListener(v1 -> {
+                                popupWindow.dismiss();
+                                if (iconRes == R.mipmap.ic_reply) {
+                                    chatVM.replyMessage.setValue(message);
+                                }
+                                if (iconRes == R.mipmap.ic_c_copy) {
+                                    TextView textView;
+                                    if (message.getContentType() == MessageType.GROUP_ANNOUNCEMENT_NTF) {
+                                        textView = view.findViewById(R.id.detail);
+                                        if (null == textView)
+                                            textView = view.findViewById(R.id.detail2);
+                                    } else {
+                                        textView = view.findViewById(R.id.content);
                                         if (null == textView)
                                             textView = view.findViewById(R.id.content2);
-                                        Common.copy(textView.getText().toString());
-                                        chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
                                     }
-                                    if (iconRes == R.mipmap.ic_withdraw) {
-                                        chatVM.revokeMessage(message);
-                                    }
-                                    if (iconRes == R.mipmap.ic_add_emoji) {
-                                        Easy.find(CustomEmojiVM.class).insertEmojiDb(message);
-                                    }
-                                    if (iconRes == R.mipmap.ic_delete) {
-                                        chatVM.deleteMessageFromLocalAndSvr(message);
-                                    }
-                                    if (iconRes == R.mipmap.ic_forward) {
-                                        Easy.find(ForwardVM.class).createForwardMessage(message);
+                                    Common.copy(textView.getText().toString());
+                                    chatVM.toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.copy_succ));
+                                }
+                                if (iconRes == R.mipmap.ic_withdraw) {
+                                    chatVM.revokeMessage(message);
+                                }
+                                if (iconRes == R.mipmap.ic_add_emoji) {
+                                    Easy.find(CustomEmojiVM.class).insertEmojiDb(message);
+                                }
+                                if (iconRes == R.mipmap.ic_delete) {
+                                    chatVM.deleteMessageFromLocalAndSvr(message);
+                                }
+                                if (iconRes == R.mipmap.ic_forward) {
+                                    Easy.find(ForwardVM.class).createForwardMessage(message);
 
-                                        Easy.installVM(SelectTargetVM.class);
-                                        ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
-                                    }
-                                    if (iconRes == R.mipmap.ic_multiple_choice) {
-                                        ((MsgExpand) message.getExt()).isChoice = true;
-                                        chatVM.enableMultipleSelect.setValue(true);
-                                        messageAdapter.notifyDataSetChanged();
-                                    }
-                                });
-                            }
-                        };
+                                    Easy.installVM(SelectTargetVM.class);
+                                    ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) view.getContext(), Constant.Event.FORWARD);
+                                }
+                                if (iconRes == R.mipmap.ic_multiple_choice) {
+                                    ((MsgExpand) message.getExt()).isChoice = true;
+                                    chatVM.enableMultipleSelect.setValue(true);
+                                    messageAdapter.notifyDataSetChanged();
+                                }
+                            });
+                        }
+                    };
                     view1.recyclerview.setAdapter(adapter);
                 }
-                if (message.getContentType() == MessageType.TEXT || message.getContentType() == MessageType.AT_TEXT || message.getContentType() == MessageType.QUOTE) {
+                if (message.getContentType() == MessageType.TEXT || message.getContentType() == MessageType.AT_TEXT || message.getContentType() == MessageType.GROUP_ANNOUNCEMENT_NTF || message.getContentType() == MessageType.QUOTE) {
                     menuIcons.add(R.mipmap.ic_c_copy);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.copy));
                 }
@@ -510,20 +519,16 @@ public class MessageViewHolder {
                         menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.withdraw));
                     }
                 }
-                if (message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING
-                    && message.getContentType() < MessageType.NTF_BEGIN) {
+                if (message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING && message.getContentType() < MessageType.NTF_BEGIN) {
                     menuIcons.add(R.mipmap.ic_forward);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.forward));
                 }
 
-                if (message.getContentType() != MessageType.VOICE
-                    && message.getContentType() != MessageType.MERGER
-                    && message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING) {
+                if (message.getContentType() != MessageType.VOICE && message.getContentType() != MessageType.MERGER && message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING) {
                     menuIcons.add(R.mipmap.ic_reply);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.reply));
                 }
-                if (message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING
-                    && message.getContentType() < MessageType.NTF_BEGIN) {
+                if (message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING && message.getContentType() < MessageType.NTF_BEGIN) {
                     menuIcons.add(R.mipmap.ic_multiple_choice);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.multiple_choice));
                 }
@@ -562,8 +567,7 @@ public class MessageViewHolder {
                 popupWindow.showAsDropDown(v,
                     -(popupWindow.getContentView().getMeasuredWidth() - v.getMeasuredWidth()) / 2
                     , y);
-                if (null != linearLayoutManager)
-                    linearLayoutManager.setCanScrollVertically(false);
+                if (null != linearLayoutManager) linearLayoutManager.setCanScrollVertically(false);
                 return true;
             });
         }
@@ -614,6 +618,7 @@ public class MessageViewHolder {
                     PreviewMediaVM.MediaData mediaData =
                         new PreviewMediaVM.MediaData(message.getClientMsgID());
                     mediaData.mediaUrl = url;
+                    mediaData.isVideo = MediaFileUtil.isVideoType(url);
                     mediaData.thumbnail = firstFrameUrl;
                     previewMediaVM.previewSingle(mediaData);
                 } else
@@ -799,7 +804,8 @@ public class MessageViewHolder {
                 emojiTextView.setText(IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(content), link, new ClickableSpan() {
                     @Override
                     public void onClick(@NonNull View widget) {
-                        emojiTextView.getContext().startActivity(new Intent(emojiTextView.getContext(), WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, link));
+                        if (null != popupWindow && !popupWindow.isShowing())
+                            emojiTextView.getContext().startActivity(new Intent(emojiTextView.getContext(), WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, link));
                     }
                 }));
                 emojiTextView.setMovementMethod(LinkMovementMethod.getInstance());
@@ -958,7 +964,7 @@ public class MessageViewHolder {
         }
 
 
-        private void clickPlay(Message message, LottieAnimationView lottieView) {
+        public void clickPlay(Message message, LottieAnimationView lottieView) {
             String sourceUrl = message.getSoundElem().getSourceUrl();
             if (TextUtils.isEmpty(sourceUrl)) return;
             SPlayer.instance().getMediaPlayer();
@@ -1129,14 +1135,32 @@ public class MessageViewHolder {
 
             view.sendState2.setSendState(message.getStatus());
 
+            String path = message.getFileElem().getFilePath();
+            boolean isLocal = GetFilePathFromUri.fileIsExists(path);
+            if (!isLocal) path = message.getFileElem().getSourceUrl();
+            if (isLocal) {
+                view.downloadView.setVisibility(View.GONE);
+                view.fileUploadView.setVisibility(View.VISIBLE);
+                view.fileUploadView.setRes(path);
+                MsgExpand msgExpand = (MsgExpand) message.getExt();
+                view.fileUploadView.setProgress((int) msgExpand.sendProgress);
+                view.fileUploadView.setForegroundVisibility(message.getStatus() == MessageStatus.SUCCEEDED);
+            } else {
+                view.downloadView.setVisibility(View.VISIBLE);
+                view.fileUploadView.setVisibility(View.GONE);
+                view.downloadView.setRes(path);
+            }
+
             view.content2.setOnClickListener(v -> {
+                if (!isLocal) {
+                    if (!view.downloadView.completed) {
+                        chatVM.toast(v.getContext().getString(io.openim.android.ouicore.R.string.file_download));
+                        return;
+                    }
+                }
                 GetFilePathFromUri.openFile(v.getContext(), message);
             });
-            String path = message.getFileElem().getFilePath();
-            view.fileUploadView.setRes(path);
-            MsgExpand msgExpand = (MsgExpand) message.getExt();
-            view.fileUploadView.setProgress((int) msgExpand.sendProgress);
-            view.fileUploadView.setForegroundVisibility(message.getStatus() == MessageStatus.SUCCEEDED);
+
         }
     }
 
@@ -1213,8 +1237,8 @@ public class MessageViewHolder {
             MergeElem mergeElem = message.getMergeElem();
             view.title.setText(mergeElem.getTitle());
             try {
-                view.history1.setText(mergeElem.getAbstractList().get(0));
-                view.history2.setText(mergeElem.getAbstractList().get(1));
+                bindContent(new View[]{view.history1, view.history2, view.history3,
+                    view.history4}, mergeElem.getAbstractList());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1229,12 +1253,23 @@ public class MessageViewHolder {
             MergeElem mergeElem = message.getMergeElem();
             view.title2.setText(mergeElem.getTitle());
             try {
-                view.history21.setText(mergeElem.getAbstractList().get(0));
-                view.history22.setText(mergeElem.getAbstractList().get(1));
+                bindContent(new View[]{view.history21, view.history22, view.history23,
+                    view.history24}, mergeElem.getAbstractList());
             } catch (Exception e) {
                 e.printStackTrace();
             }
             view.content2.setOnClickListener(new ClickJumpDetail(mergeElem));
+        }
+
+        private static void bindContent(View[] views, List<String> contents) {
+            for (View view : views) {
+                view.setVisibility(View.GONE);
+            }
+            for (int i = 0; i < contents.size(); i++) {
+                if (i > views.length - 1) return;
+                views[i].setVisibility(View.VISIBLE);
+                ((TextView) views[i]).setText(contents.get(i));
+            }
         }
 
         private static class ClickJumpDetail implements View.OnClickListener {
@@ -1251,7 +1286,6 @@ public class MessageViewHolder {
                     GsonHel.toJson(mergeElem.getMultiMessage())));
             }
         }
-
     }
 
     public static class BusinessCardView extends MessageViewHolder.MsgViewHolder {
@@ -1423,16 +1457,13 @@ public class MessageViewHolder {
             message = quoteElem.getQuoteMessage();
             int contentType = message.getContentType();
             if (contentType == MessageType.REVOKE_MESSAGE_NTF) {
-                v.quoteContent1.setText(message.getSenderNickname() + ":" + BaseApp.inst()
-                    .getString(io.openim.android.ouicore.R.string.quote_delete_tips));
+                v.quoteContent1.setText(message.getSenderNickname() + ":" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.quote_delete_tips));
                 v.picture1.setVisibility(View.GONE);
                 v.picture1.setVisibility(View.GONE);
                 return;
             }
-            if (contentType == MessageType.TEXT
-                || contentType == MessageType.AT_TEXT) {
-                v.quoteContent1.setText(message.getSenderNickname() +
-                    ":" + IMUtil.getMsgParse(message));
+            if (contentType == MessageType.TEXT || contentType == MessageType.AT_TEXT) {
+                v.quoteContent1.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
                 v.picture1.setVisibility(View.GONE);
             } else {
                 v.picture1.setVisibility(View.VISIBLE);
@@ -1472,12 +1503,10 @@ public class MessageViewHolder {
             QuoteElem quoteElem = message.getQuoteElem();
             if (!handleSequence(v.content2, message)) v.content2.setText(quoteElem.getText());
 
-
             message = quoteElem.getQuoteMessage();
             int contentType = message.getContentType();
             if (contentType == MessageType.REVOKE_MESSAGE_NTF) {
-                v.quoteContent2.setText(message.getSenderNickname() + ":" + BaseApp.inst()
-                    .getString(io.openim.android.ouicore.R.string.quote_delete_tips));
+                v.quoteContent2.setText(message.getSenderNickname() + ":" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.quote_delete_tips));
                 v.picture2.setVisibility(View.GONE);
                 v.playBtn2.setVisibility(View.GONE);
                 return;

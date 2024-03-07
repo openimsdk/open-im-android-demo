@@ -18,6 +18,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
+import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouigroup.databinding.ActivityGroupDetailBinding;
 import io.openim.android.ouicore.vm.GroupVM;
@@ -50,6 +51,7 @@ public class GroupDetailActivity extends BaseActivity<GroupVM, ActivityGroupDeta
     private void listener() {
         vm.groupsInfo.observe(this, groupInfo -> {
             view.avatar.load(groupInfo.getFaceURL(),true);
+            view.createDate.setText(TimeUtil.getTime(groupInfo.getCreateTime(),TimeUtil.yearMonthDayFormat));
             if (groupInfo.getNeedVerification() == GroupVerification.DIRECTLY) {
                 startChat();
             } else {

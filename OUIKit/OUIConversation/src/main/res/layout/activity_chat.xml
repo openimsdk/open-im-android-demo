@@ -82,12 +82,12 @@
                             android:visibility="visible" />
 
                         <TextView
-                            android:textColor="@color/txt_black"
-                            android:textSize="@dimen/main_body"
-                            android:textStyle="bold"
                             android:id="@+id/groupMenberNum"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/txt_black"
+                            android:textSize="@dimen/main_body"
+                            android:textStyle="bold" />
                     </LinearLayout>
 
 
@@ -137,7 +137,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:layout_marginRight="18dp"
+                    android:layout_marginRight="10dp"
                     android:layout_toStartOf="@id/more"
                     android:visibility="invisible"
                     android:src="@mipmap/ic_phone" />
@@ -148,7 +148,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerInParent="true"
-                    android:layout_marginRight="18dp"
+                    android:layout_marginRight="10dp"
                     android:src="@mipmap/ic_more" />
             </RelativeLayout>
         </androidx.cardview.widget.CardView>

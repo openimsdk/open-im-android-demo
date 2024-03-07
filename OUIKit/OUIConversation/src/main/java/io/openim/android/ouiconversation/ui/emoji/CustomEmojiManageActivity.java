@@ -54,6 +54,7 @@ import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.GridSpaceItemDecoration;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
@@ -112,7 +113,16 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
             view.deleteCount.setVisibility(isEdit ? View.VISIBLE : View.GONE);
         });
 
-        view.deleteCount.setOnClickListener(v -> customEmojiVM.toDelete());
+        view.deleteCount.setOnClickListener(v -> {
+            CommonDialog commonDialog = new CommonDialog(this);
+            commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.delete_tips);
+            commonDialog.getMainView().cancel.setOnClickListener(view1 -> commonDialog.dismiss());
+            commonDialog.getMainView().confirm.setOnClickListener(view1 -> {
+                commonDialog.dismiss();
+                customEmojiVM.toDelete();
+            });
+            commonDialog.show();
+        });
     }
 
     void init() {
@@ -162,7 +172,7 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
         albumDialog.show();
         albumDialog.setOnSelectResultListener(path -> {
             waitDialog.show();
-            PutArgs putArgs=new PutArgs(path[0]);
+            PutArgs putArgs = new PutArgs(path[0]);
 
             OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
                 @Override
@@ -173,13 +183,14 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
                 }
 
                 @Override
-                public void onProgress(long progress) {}
+                public void onProgress(long progress) {
+                }
 
                 @Override
                 public void onSuccess(String s) {
                     CustomEmoji customEmoji = new CustomEmoji();
                     customEmoji.setUserID(BaseApp.inst().loginCertificate.userID);
-                    Map<String,String> hashMap=GsonHel.fromJson(s,HashMap.class);
+                    Map<String, String> hashMap = GsonHel.fromJson(s, HashMap.class);
                     customEmoji.setSourceUrl(hashMap.get("url"));
 
                     Glide.with(CustomEmojiManageActivity.this)
@@ -189,10 +200,12 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
                                 super.onLoadFailed(errorDrawable);
                                 waitDialog.dismiss();
                             }
+
                             @Override
                             public void onLoadCleared(@Nullable Drawable placeholder) {
                                 waitDialog.dismiss();
                             }
+
                             @Override
                             public void onResourceReady(@NonNull Bitmap resource,
                                                         @Nullable Transition<? super Bitmap> transition) {
@@ -204,7 +217,7 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
                         });
 
                 }
-            },null, putArgs);
+            }, null, putArgs);
 
         });
     }

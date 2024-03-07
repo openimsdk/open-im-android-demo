@@ -136,9 +136,9 @@ public class SlideButton extends View {
         mMargin = typedArray.getDimension(R.styleable.SlideButton_sMargin,
             dip2px(getContext(), 2));
         mBgColorOn = typedArray.getColor(R.styleable.SlideButton_sBackgroundColorOn,
-            Color.GREEN);
+            getResources().getColor(R.color.theme));
         mBgColorOff = typedArray.getColor(R.styleable.SlideButton_sBackgroundColorOff,
-            Color.GRAY);
+            getResources().getColor(R.color.txt_shallow));
         mButtonColor = typedArray.getColor(R.styleable.SlideButton_sButtonColor,
             Color.WHITE);
         typedArray.recycle();

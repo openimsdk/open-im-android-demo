@@ -146,7 +146,7 @@
             android:layout_height="55dp"
             android:gravity="center"
             android:text="@string/Fail"
-            android:textColor="#ff999999"
+            android:textColor="@color/txt_black"
             android:onClick="@{(v)->ContactVM.refuse()}"
             android:textSize="18sp" />
         <include

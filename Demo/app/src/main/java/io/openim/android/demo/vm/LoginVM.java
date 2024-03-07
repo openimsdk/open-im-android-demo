@@ -51,7 +51,8 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     public boolean isFindPassword = false;
 
     public void login(String verificationCode, int usedFor) {
-        SharedPreferencesUtil.get(BaseApp.inst()).setCache(Constant.K_LOGIN_TYPE,isPhone.val()?0:1);
+        SharedPreferencesUtil.get(BaseApp.inst()).setCache(Constant.K_LOGIN_TYPE, isPhone.val() ?
+            0 : 1);
         Parameter parameter = getParameter(verificationCode, usedFor);
         N.API(OpenIMService.class)
             .login(parameter.buildJsonBody())
@@ -267,10 +268,11 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
         user.put("password", md5(pwdValue));
         user.put("nickname", nickName.getValue());
         user.put("areaCode", areaCode.val());
-        if (isPhone.val())
-        user.put("phoneNumber", account.getValue());
-        else
-        user.put("email", account.getValue());
+        if (isPhone.val()) {
+            user.put("phoneNumber", account.getValue());
+        } else {
+            user.put("email", account.getValue());
+        }
         parameter.add("user", user);
 
         WaitDialog waitDialog = showWait();

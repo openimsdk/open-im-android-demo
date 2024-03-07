@@ -15,6 +15,8 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowNoTitle">true</item>
         <!-- Customize your theme here. -->
+        <item name="colorButtonNormal">@color/txt_warning</item>
+
     </style>
     <style name="ImageTranslucentTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowTranslucentNavigation">true</item>

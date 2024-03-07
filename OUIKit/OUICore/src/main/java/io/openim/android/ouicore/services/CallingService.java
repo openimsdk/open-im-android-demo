@@ -11,8 +11,7 @@ import open_im_sdk_callback.OnSignalingListener;
 
 public interface CallingService extends IProvider, OnSignalingListener {
 
-    Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener,
-                           boolean isCallOut);
+    Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener, boolean isCallOut);
 
     default Dialog buildCallDialog(Context context,
                                    DialogInterface.OnDismissListener dismissListener,
@@ -26,6 +25,9 @@ public interface CallingService extends IProvider, OnSignalingListener {
      * @return
      */
     default boolean getCallStatus() {
+        return false;
+    }
+    default boolean isCalling(){
         return false;
     }
 
