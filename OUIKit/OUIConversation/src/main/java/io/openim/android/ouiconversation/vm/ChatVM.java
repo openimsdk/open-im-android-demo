@@ -68,7 +68,6 @@ import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.listener.OnGroupListener;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
-import io.openim.android.sdk.listener.OnSignalingListener;
 import io.openim.android.sdk.listener.OnUserListener;
 import io.openim.android.sdk.models.AdvancedMessage;
 import io.openim.android.sdk.models.C2CReadReceiptInfo;
@@ -97,7 +96,7 @@ import io.openim.android.sdk.models.UsersOnlineStatus;
 import io.openim.android.sdk.models.VideoElem;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener,
-    OnGroupListener, OnConversationListener, OnSignalingListener, OnUserListener {
+    OnGroupListener, OnConversationListener, OnUserListener {
 
     public static final String REEDIT_MSG = "reeditMsg";
     //图片、视频消息 用于预览
@@ -403,14 +402,12 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         return 0;
     }
 
-    @Override
     public void onRoomParticipantConnected(RoomCallingInfo s) {
         if (groupID.equals(s.getGroupID())) {
             roomCallingInfo.setValue(s);
         }
     }
 
-    @Override
     public void onRoomParticipantDisconnected(RoomCallingInfo s) {
         if (groupID.equals(s.getGroupID())) {
             roomCallingInfo.setValue(s);

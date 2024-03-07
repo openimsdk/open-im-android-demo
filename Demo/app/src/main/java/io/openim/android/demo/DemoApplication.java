@@ -38,7 +38,6 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.sdk.listener.OnConnListener;
-import io.openim.android.sdk.listener.OnSignalingListener;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

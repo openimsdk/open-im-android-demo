@@ -43,6 +43,7 @@ import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ContactListVM;
+import io.openim.android.ouicore.vm.GroupMemberVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
