@@ -217,6 +217,18 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 vm.searchContent.getValue()));
         });
 
+
+        view.call.setOnClickListener(v -> {
+            if (null == callingService) return;
+            IMUtil.showBottomCallsPopMenu(this, (v1, keyCode, event) -> {
+                List<String> ids = new ArrayList<>();
+                ids.add(vm.searchContent.getValue());
+                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1, true, ids,
+                    null);
+                callingService.call(signalingInfo);
+                return false;
+            });
+        });
     }
 
     @Override
