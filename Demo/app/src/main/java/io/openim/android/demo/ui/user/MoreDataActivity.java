@@ -18,7 +18,15 @@ public class MoreDataActivity extends BaseActivity<PersonalVM, ActivityMoreDataB
         bindVMByCache(PersonalVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMoreDataBinding.inflate(getLayoutInflater()));
-        init();
+        vm.getUserInfo(vm.uid);
+        listener();
+    }
+
+    private void listener() {
+        vm.userInfo.observe(this,v->{
+            if (v==null)return;
+            init();
+        });
     }
 
     void init() {
@@ -34,4 +42,5 @@ public class MoreDataActivity extends BaseActivity<PersonalVM, ActivityMoreDataB
         view.phoneTv.setText(vm.userInfo.val().getPhoneNumber());
         view.mailTv.setText(vm.userInfo.val().getEmail());
     }
+    
 }

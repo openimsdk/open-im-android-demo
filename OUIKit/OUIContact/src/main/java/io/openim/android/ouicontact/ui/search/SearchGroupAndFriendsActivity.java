@@ -211,11 +211,11 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
                     multipleChoice.key = id;
                     MultipleChoice target = null;
                     itemViewHo.view.select.setChecked(false);
-                    if (isMultipleSelect()){
+                    if (isMultipleSelect()) {
                         int index = choices.indexOf(new MultipleChoice(id));
                         if (index != -1) {
                             itemViewHo.view.select.setChecked(true);
-                            target =choices.get(index);
+                            target = choices.get(index);
                             itemViewHo.view.select.setEnabled(target.isEnabled);
                             itemViewHo.view.select.setAlpha(target.isEnabled ? 1f : 0.5f);
                         }
@@ -242,7 +242,10 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
                             if (null != selectTargetVM) {
                                 selectTargetVM.addMetaData(multipleChoice.key,
                                     multipleChoice.name, multipleChoice.icon);
-                                selectTargetVM.finishIntention();
+                                if (selectTargetVM.isSingleSelect())
+                                    selectTargetVM.toFinish();
+                                else
+                                    selectTargetVM.finishIntention();
                             }
                             return;
                         } catch (Exception ignore) {

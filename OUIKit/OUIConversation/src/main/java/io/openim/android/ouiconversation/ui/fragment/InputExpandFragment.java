@@ -137,8 +137,10 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                             break;
                         case 5:
                             SelectTargetVM selectTargetVM = Easy.installVM(SelectTargetVM.class);
-                            selectTargetVM.setIntention(SelectTargetVM.Intention.isShareCard);
+                            selectTargetVM.setIntention(SelectTargetVM.Intention.singleSelect);
                             selectTargetVM.setOnFinishListener(() -> {
+                                Common.finishRoute(Routes.Group.SELECT_TARGET,
+                                    Routes.Contact.ALL_FRIEND);
                                 Activity activity = ActivityManager.isExist(ChatActivity.class);
                                 if (null == activity) return;
                                 CommonDialog commonDialog = new CommonDialog(activity);

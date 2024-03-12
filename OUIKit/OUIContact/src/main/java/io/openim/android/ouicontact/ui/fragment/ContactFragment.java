@@ -1,5 +1,7 @@
 package io.openim.android.ouicontact.ui.fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -42,7 +44,9 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.ItemPsrsonSelectBinding;
 import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
 import io.openim.android.ouicore.databinding.ViewSwipeRecyclerViewBinding;
+import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.services.MomentsBridge;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Obs;
@@ -51,6 +55,7 @@ import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.vm.NotificationVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.UserInfo;
@@ -111,6 +116,17 @@ public class ContactFragment extends BaseFragment<ContactVM>  {
         });
 
         header.myGoodFriend.setOnClickListener(v -> {
+            SelectTargetVM vm=Easy.installVM(SelectTargetVM.class)
+                .setIntention(SelectTargetVM.Intention.singleSelect);
+            vm.setOnFinishListener(() -> {
+                    Activity activity =ActivityManager.isExist(AllFriendActivity.class);
+                    MultipleChoice target = vm.metaData.val().get(0);
+
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                        .withString(Constant.K_ID, target.key)
+                        .navigation(activity, 1001);
+
+                });
             startActivity(new Intent(getActivity(), AllFriendActivity.class));
         });
 

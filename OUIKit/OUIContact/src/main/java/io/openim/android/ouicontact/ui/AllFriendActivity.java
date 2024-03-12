@@ -14,12 +14,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.alibaba.android.arouter.core.LogisticsCenter;
-import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -83,7 +80,7 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
         try {
             selectTargetVM = Easy.find(SelectTargetVM.class);
             view.searchView.setVisibility(View.VISIBLE);
-            if (!selectTargetVM.isShareCard()) {
+            if (!selectTargetVM.isSingleSelect()) {
                 view.bottom.getRoot().setVisibility(View.VISIBLE);
                 selectTargetVM.bindDataToView(view.bottom);
                 selectTargetVM.showPopAllSelectFriends(view.bottom,
@@ -147,7 +144,7 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
                 itemViewHo.view.nickName.setText(friendInfo.getNickname());
 
                 MultipleChoice target = null;
-                if (null!=selectTargetVM && !selectTargetVM.isShareCard()){
+                if (null!=selectTargetVM && !selectTargetVM.isSingleSelect()){
                     itemViewHo.view.select.setVisibility(View.VISIBLE);
                     itemViewHo.view.select.setChecked(selectTargetVM
                         .contains(new MultipleChoice(friendInfo.getUserID())));
@@ -163,12 +160,11 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
                 MultipleChoice finalTarget = target;
                 itemViewHo.view.getRoot().setOnClickListener(v -> {
                     if (null != selectTargetVM) {
-                        if (selectTargetVM.isShareCard()){
-                            selectTargetVM.addMetaData(friendInfo.getUserID(), friendInfo.getNickname(),
+                        if (selectTargetVM.isSingleSelect()){
+                            selectTargetVM.addMetaData(friendInfo.getUserID(),
+                                friendInfo.getNickname(),
                                 friendInfo.getFaceURL());
 
-                            finish();
-                            Common.finishRoute(Routes.Group.SELECT_TARGET);
                             selectTargetVM.toFinish();
                             return;
                         }
@@ -186,7 +182,6 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
                         }
                         return;
                     }
-
                     ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
                         .withString(Constant.K_ID, friendInfo.getUserID())
                         .navigation(AllFriendActivity.this, 1001);
@@ -232,11 +227,9 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
 
     private void listener() {
         view.searchView.setOnClickListener(v -> {
-            Postcard postcard = ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS_GROUP);
-            LogisticsCenter.completion(postcard);
-            launcher.launch(new Intent(this, postcard.getDestination())
-                .putExtra(Constant.K_RESULT, (Serializable) selectTargetVM.metaData.val())
-                .putExtra(Constant.IS_SELECT_FRIEND, true));
+            ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS_GROUP)
+                .withBoolean(Constant.IS_SELECT_FRIEND, true)
+                .navigation();
         });
         vm.letters.observe(this, v -> {
             if (null == v || v.isEmpty()) return;

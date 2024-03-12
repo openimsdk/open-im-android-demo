@@ -493,7 +493,10 @@ public class MessageViewHolder {
                     };
                     view1.recyclerview.setAdapter(adapter);
                 }
-                if (message.getContentType() == MessageType.TEXT || message.getContentType() == MessageType.AT_TEXT || message.getContentType() == MessageType.GROUP_ANNOUNCEMENT_NTF || message.getContentType() == MessageType.QUOTE) {
+                if (message.getContentType() == MessageType.TEXT
+                    || message.getContentType() == MessageType.AT_TEXT
+                    || message.getContentType() == MessageType.GROUP_ANNOUNCEMENT_NTF
+                    || message.getContentType() == MessageType.QUOTE) {
                     menuIcons.add(R.mipmap.ic_c_copy);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.copy));
                 }
@@ -505,25 +508,33 @@ public class MessageViewHolder {
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.add));
                 }
 
-                if (chatVM.isAdminOrCreator) {
-                    //群
-                    if (isOwn || !message.getSendID().equals(chatVM.groupInfo.val().getOwnerUserID())) {
-                        menuIcons.add(R.mipmap.ic_withdraw);
-                        menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.withdraw));
-                    }
-                } else if (isOwn) {
-                    //5分钟内可以撤回
-                    if (System.currentTimeMillis() - message.getSendTime() < (1000 * 60 * 5)) {
-                        menuIcons.add(R.mipmap.ic_withdraw);
-                        menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.withdraw));
+              boolean  canWithdraw=message.getContentType()
+                  != MessageType.GROUP_ANNOUNCEMENT_NTF;
+                if (canWithdraw){
+                    if (chatVM.isAdminOrCreator) {
+                        //群
+                        if (isOwn || !message.getSendID().equals(chatVM.groupInfo.val().getOwnerUserID())) {
+                            menuIcons.add(R.mipmap.ic_withdraw);
+                            menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.withdraw));
+                        }
+                    } else if (isOwn) {
+                        //5分钟内可以撤回
+                        if (System.currentTimeMillis() - message.getSendTime() < (1000 * 60 * 5)) {
+                            menuIcons.add(R.mipmap.ic_withdraw);
+                            menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.withdraw));
+                        }
                     }
                 }
+
                 if (message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING && message.getContentType() < MessageType.NTF_BEGIN) {
                     menuIcons.add(R.mipmap.ic_forward);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.forward));
                 }
 
-                if (message.getContentType() != MessageType.VOICE && message.getContentType() != MessageType.MERGER && message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING) {
+                if (message.getContentType() != MessageType.VOICE
+                    && message.getContentType() != MessageType.MERGER
+                    && message.getContentType() != MessageType.GROUP_ANNOUNCEMENT_NTF
+                    && message.getContentType() != Constant.MsgType.CUSTOMIZE_MEETING) {
                     menuIcons.add(R.mipmap.ic_reply);
                     menuTitles.add(v.getContext().getString(io.openim.android.ouicore.R.string.reply));
                 }

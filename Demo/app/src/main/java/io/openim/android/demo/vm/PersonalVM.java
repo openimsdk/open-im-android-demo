@@ -103,6 +103,7 @@ public class PersonalVM extends BaseViewModel {
 
                     UserInfo u = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
                         UserInfo.class);
+                    userInfo.val().setFriendInfo(null);
                     userInfo.setValue(updateUserInfo(userInfo.val(), u));
                     updateConfig(userInfo.val());
                 } catch (Exception e) {

@@ -74,8 +74,7 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
     private void listener() {
         if (null != groupVM) {
             groupVM.subscribe(this, subject -> {
-                if (Objects.equals(subject.key,
-                    Constant.Event.UPDATE_GROUP_INFO + "")) {
+                if (Objects.equals(subject.key, Constant.Event.UPDATE_GROUP_INFO + "")) {
                     update();
                 }
             });
@@ -114,20 +113,18 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
             });
             view.deleteFriend.setOnClickListener(v1 -> {
                 String tag = "SuperGroupMemberActivity&deleteFriend";
-                GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class,
-                    tag);
+                GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class, tag);
                 memberVM.groupId = vm.groupId;
                 memberVM.setIntention(GroupMemberVM.Intention.AT);
-                memberVM.isRemoveOwnerAndAdmin=true;
-                memberVM.isSearchSingle=true;
+                memberVM.isRemoveOwnerAndAdmin = true;
+                memberVM.isSearchSingle = true;
 
                 memberVM.setOnFinishListener(activity -> {
                     List<String> ids = new ArrayList<>();
                     for (MultipleChoice choice : memberVM.choiceList.val()) {
                         ids.add(choice.key);
                     }
-                    if (null != groupVM)
-                        groupVM.kickGroupMember(ids);
+                    if (null != groupVM) groupVM.kickGroupMember(ids);
                     activity.finish();
                 });
                 startActivity(new Intent(this, SuperGroupMemberActivity.class).putExtra(Constant.K_RESULT, tag));
@@ -185,7 +182,7 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
                 if (vm.choiceList.val().size() > 0) {
 
                     startActivity(new Intent(SuperGroupMemberActivity.this,
-                        SelectedMemberActivity.class).putExtra(Constant.K_RESULT,vmTag));
+                        SelectedMemberActivity.class).putExtra(Constant.K_RESULT, vmTag));
                 }
             });
         } else view.bottomLayout.getRoot().setVisibility(View.GONE);
@@ -221,14 +218,10 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
                 itemViewHo.view.nickName.setText(data.groupMembersInfo.getNickname());
                 if (data.groupMembersInfo.getRoleLevel() == GroupRole.OWNER) {
                     itemViewHo.view.identity.setVisibility(View.VISIBLE);
-                    itemViewHo.view.identity.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_8_fddfa1);
                     itemViewHo.view.identity.setText(io.openim.android.ouicore.R.string.lord);
-                    itemViewHo.view.identity.setTextColor(Color.parseColor("#ffff8c00"));
                 } else if (data.groupMembersInfo.getRoleLevel() == GroupRole.ADMIN) {
                     itemViewHo.view.identity.setVisibility(View.VISIBLE);
-                    itemViewHo.view.identity.setBackgroundResource(io.openim.android.ouicore.R.drawable.sty_radius_8_a2c9f8);
                     itemViewHo.view.identity.setText(io.openim.android.ouicore.R.string.administrator);
-                    itemViewHo.view.identity.setTextColor(Color.parseColor("#2691ED"));
                 } else itemViewHo.view.identity.setVisibility(View.GONE);
 
 

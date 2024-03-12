@@ -64,7 +64,7 @@ public class SelectTargetActivityV3 extends BasicActivity<
             startActivity(new Intent(this, AllGroupActivity.class));
         });
         view.searchView.setOnClickListener(v -> {
-            if (selectTargetVM.isShareCard()) {
+            if (selectTargetVM.isSingleSelect()) {
                 ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS_GROUP)
                     .withBoolean(Constant.IS_SELECT_FRIEND, true)
                     .navigation();
@@ -76,7 +76,7 @@ public class SelectTargetActivityV3 extends BasicActivity<
             launcher.launch(new Intent(this, postcard.getDestination())
                 .putExtra(Constant.K_RESULT, (Serializable) selectTargetVM.metaData.val())
                 .putExtra(Constant.IS_SELECT_FRIEND, selectTargetVM.isInvite()
-                    || selectTargetVM.isSelectFriends()||selectTargetVM.isCreateGroup()));
+                    || selectTargetVM.isMultipleSelectFriends()||selectTargetVM.isCreateGroup()));
         });
     }
 
@@ -88,11 +88,11 @@ public class SelectTargetActivityV3 extends BasicActivity<
     }
 
     private void initView() {
-        if (selectTargetVM.isSelectFriends()) {
+        if (selectTargetVM.isMultipleSelectFriends()) {
             view.recentContact.setVisibility(View.GONE);
             view.group.setVisibility(View.GONE);
             view.myFriends.setVisibility(View.VISIBLE);
-        } else if (selectTargetVM.isShareCard()) {
+        } else if (selectTargetVM.isSingleSelect()) {
             view.recentContact.setVisibility(View.GONE);
             view.group.setVisibility(View.GONE);
             view.myFriends.setVisibility(View.VISIBLE);

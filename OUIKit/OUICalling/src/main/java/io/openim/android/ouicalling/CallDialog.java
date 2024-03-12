@@ -441,7 +441,6 @@ public class CallDialog extends BaseDialog {
     @Override
     public void dismiss() {
         try {
-            videoViewRelease();
             if (null != easyWindow) {
                 easyWindow.cancel();
             }
@@ -450,6 +449,7 @@ public class CallDialog extends BaseDialog {
             MediaPlayerUtil.INSTANCE.release();
             callingVM.audioManager.setSpeakerphoneOn(true);
             callingVM.timeStr.removeObserver(bindTime);
+            videoViewRelease();
             callingVM.unBindView();
             super.dismiss();
             ((CallingServiceImp) callingVM.callingService).callDialog = null;

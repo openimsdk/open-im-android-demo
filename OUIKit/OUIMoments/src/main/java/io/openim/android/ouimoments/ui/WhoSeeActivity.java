@@ -143,7 +143,7 @@ public class WhoSeeActivity extends BaseActivity<PushMomentsVM, ActivityWhoSeeBi
         if (exUserInfo.isEmpty()) return;
 
         SelectTargetVM targetVM = Easy.installVM(SelectTargetVM.class)
-            .setIntention(SelectTargetVM.Intention.selectFriends);
+            .setIntention(SelectTargetVM.Intention.multipleSelect);
         if ( null!=vm.selectedUserRuleDataList){
             for (SelectDataActivity.RuleData ruleData : vm.selectedUserRuleDataList) {
                 MultipleChoice choice = new MultipleChoice(ruleData.id);

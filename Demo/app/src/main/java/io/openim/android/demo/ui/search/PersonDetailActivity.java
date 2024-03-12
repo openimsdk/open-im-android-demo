@@ -22,6 +22,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import io.openim.android.demo.databinding.ActivityPersonDetailBinding;
+import io.openim.android.demo.ui.user.MoreDataActivity;
 import io.openim.android.demo.ui.user.PersonDataActivity;
 import io.openim.android.demo.vm.FriendVM;
 import io.openim.android.demo.vm.PersonalVM;
@@ -185,7 +186,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             });
             view.mute.setOnClickListener(v -> {
                 Easy.installVM(GroupVM.class)
-                    .groupId=groupId;
+                    .groupId = groupId;
                 jumpCallBack.launch(new Intent(this,
                     SetMuteActivity.class).putExtra(Constant.K_ID, vm.searchContent.getValue()));
             });
@@ -217,23 +218,31 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             }
         });
         view.userInfo.setOnClickListener(v -> {
-            String uid=vm.userInfo.getValue().get(0)
+            String uid = vm.userInfo.val().get(0)
                 .getUserID();
             Easy.installVM(PersonalVM.class)
-                .getUsersInfoWithCache(uid,groupId)
-                .uid=uid;
+                .getUsersInfoWithCache(uid, groupId)
+                .uid = uid;
+            startActivity(new Intent(this, MoreDataActivity.class));
+        });
+        view.more.setOnClickListener(v -> {
+            String uid = vm.userInfo.val().get(0)
+                .getUserID();
+            Easy.installVM(PersonalVM.class)
+                .getUsersInfoWithCache(uid, groupId)
+                .uid = uid;
             personDataActivityLauncher.launch(new Intent(this,
                 PersonDataActivity.class));
         });
 
         view.moments.setOnClickListener(v -> {
-            UserInfo userInfo=vm.userInfo.val().get(0);
+            UserInfo userInfo = vm.userInfo.val().get(0);
             HashMap<String, String> map = new HashMap<>();
-            map.put("id",userInfo.getUserID());
-            map.put("name",userInfo.getNickname());
-            map.put("headUrl",userInfo.getFaceURL());
+            map.put("id", userInfo.getUserID());
+            map.put("name", userInfo.getNickname());
+            map.put("headUrl", userInfo.getFaceURL());
             ARouter.getInstance().build(Routes.Moments.ToUserMoments)
-                .withSerializable(Constant.K_RESULT,map).navigation();
+                .withSerializable(Constant.K_RESULT, map).navigation();
         });
         view.sendMsg.setOnClickListener(v -> {
             if (!formChat) {
@@ -405,7 +414,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     }
 
     private void update() {
-        vm.getUsersInfoWithCache(vm.searchContent.val(),groupId);
+        vm.getUsersInfoWithCache(vm.searchContent.val(), groupId);
         vm.getExtendUserInfo(vm.searchContent.val());
     }
 
@@ -413,5 +422,6 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     protected void onDestroy() {
         super.onDestroy();
         Obs.inst().deleteObserver(this);
+        Easy.delete(PersonalVM.class);
     }
 }

@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Vibrator;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
@@ -669,7 +670,12 @@ public class IMUtil {
                     if (!atUsersInfo.getAtUserID().equals(IMUtil.AT_ALL))
                         toPersonDetail(atUsersInfo.getAtUserID(), gid);
                 }
-            });
+
+                        @Override
+                        public void updateDrawState(@NonNull TextPaint ds) {
+                            ds.setUnderlineText(false);
+                        }
+                    });
             spannableString.replace(start, end, tagSpannable);
         }
         msgExpand.sequence = spannableString;

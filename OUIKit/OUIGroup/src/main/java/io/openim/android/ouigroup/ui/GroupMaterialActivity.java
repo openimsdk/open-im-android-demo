@@ -222,6 +222,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             CommonDialog commonDialog = new CommonDialog(this);
             commonDialog.show();
             commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.clear_chat_tips);
+            commonDialog.getMainView().confirm.setTextColor(getResources().getColor(io.openim.android.ouicore.R.color.theme));
             commonDialog.getMainView().cancel.setOnClickListener(view1 -> commonDialog.dismiss());
             commonDialog.getMainView().confirm.setOnClickListener(view1 -> {
                 commonDialog.dismiss();

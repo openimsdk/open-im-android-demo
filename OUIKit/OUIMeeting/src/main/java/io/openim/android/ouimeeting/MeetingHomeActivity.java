@@ -9,14 +9,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.style.ImageSpan;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -470,34 +468,36 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             ARouter.getInstance().build(Routes.Contact.FORWARD).navigation(this,
                 Constant.Event.FORWARD);
         });
-        boolean isMuteAllMicrophone = vm.roomMetadata.getValue().isMuteAllMicrophone;
-
         v.allMute.setVisibility(vm.isSelfHostUser.getValue() ? View.VISIBLE : View.GONE);
-        v.allMute.setText(isMuteAllMicrophone ?
-            io.openim.android.ouicore.R.string.cancle_all_mute :
-            io.openim.android.ouicore.R.string.all_mute);
-        v.allMute.setTag(isMuteAllMicrophone);
+        v.unAllMute.setVisibility(vm.isSelfHostUser.getValue() ? View.VISIBLE : View.GONE);
+//        v.allMute.setText(isMuteAllMicrophone ?
+//            io.openim.android.ouicore.R.string.cancel_all_mute :
+//            io.openim.android.ouicore.R.string.all_mute);
+
         v.allMute.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v1) {
-                Object isAllMute = v1.getTag();
-                final boolean isAll = !(boolean) isAllMute;
-                Map<String, Object> map = new HashMap<>();
-                map.put("roomID", vm.signalingCertificate.getRoomID());
-                map.put("isMuteAllMicrophone", isAll);
-
-                vm.updateMeetingInfo(map, data -> {
-                    ((TextView) v1).setText(isAll ?
-                        io.openim.android.ouicore.R.string.cancle_all_mute :
-                        io.openim.android.ouicore.R.string.all_mute);
-                    v1.setTag(isAll);
-                    vm.roomMetadata.getValue().isMuteAllMicrophone = isAll;
-
-                    bottomPopDialog.dismiss();
-                });
+                allMute(true);
+            }
+        });
+        v.unAllMute.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v1) {
+                allMute(false);
             }
         });
         return v.getRoot();
+    }
+
+    private void allMute(boolean isMute) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("roomID", vm.signalingCertificate.getRoomID());
+        map.put("isMuteAllMicrophone", isMute);
+
+        vm.updateMeetingInfo(map, data -> {
+            vm.roomMetadata.val().isMuteAllMicrophone = isMute;
+            bottomPopDialog.dismiss();
+        });
     }
 
     private void requestMediaProjection() {

@@ -269,7 +269,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
     private void jumpSelectUser(List<ExUserInfo> exUserInfo) {
         if (exUserInfo.isEmpty()) return;
         SelectTargetVM targetVM = Easy.installVM(SelectTargetVM.class)
-            .setIntention(SelectTargetVM.Intention.selectFriends);
+            .setIntention(SelectTargetVM.Intention.multipleSelect);
         if ( null!=selectedAtList){
             for (SelectDataActivity.RuleData ruleData : selectedAtList) {
                 MultipleChoice choice = new MultipleChoice(ruleData.id);

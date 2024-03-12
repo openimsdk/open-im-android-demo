@@ -55,8 +55,6 @@ public class CallingServiceImp implements CallingService {
     //正在被呼叫状态
     private boolean isBeCalled;
 
-    private Handler mHandler = new Handler();
-
 
     public void setSignalingInfo(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
@@ -141,7 +139,7 @@ public class CallingServiceImp implements CallingService {
     }
 
     private void dismissDialog() {
-        mHandler.post(() -> callDialog.dismiss());
+        Common.UIHandler.post(() -> callDialog.dismiss());
     }
 
     @Override
@@ -252,7 +250,7 @@ public class CallingServiceImp implements CallingService {
         setSignalingInfo(signalingInfo);
 
         buildCallDialog(getContext(), null, true);
-        mHandler.post(() -> {
+        Common.UIHandler.post(() -> {
             callDialog.show();
         });
     }
@@ -261,7 +259,7 @@ public class CallingServiceImp implements CallingService {
     public void join(SignalingInfo signalingInfo) {
         if (isCallingTips()) return;
         setSignalingInfo(signalingInfo);
-        mHandler.post(() -> {
+        Common.UIHandler.post(() -> {
             GroupCallDialog callDialog = (GroupCallDialog) buildCallDialog(getContext(), null, false);
             callDialog.changeView();
             callDialog.joinToShow();

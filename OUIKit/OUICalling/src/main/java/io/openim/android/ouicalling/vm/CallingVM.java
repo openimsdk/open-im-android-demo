@@ -279,21 +279,23 @@ public class CallingVM {
 
     public void unBindView() {
         try {
-            callViewModel.onCleared();
             cancelTimer();
             if (null != localVideoTrack) {
                 if (null != localSpeakerVideoViews) {
                     for (TextureViewRenderer localSpeakerVideoView : localSpeakerVideoViews) {
+                        localSpeakerVideoView.release();
                         localVideoTrack.removeRenderer(localSpeakerVideoView);
                     }
                 }
             }
             for (TextureViewRenderer textureViewRenderer : remoteSpeakerVideoViews) {
+                textureViewRenderer.release();
                 Object videoTask = textureViewRenderer.getTag();
                 if (null != videoTask) {
                     ((VideoTrack) videoTask).removeRenderer(textureViewRenderer);
                 }
             }
+            callViewModel.onCleared();
             L.e("unBindView");
         } catch (Exception e) {
             e.printStackTrace();

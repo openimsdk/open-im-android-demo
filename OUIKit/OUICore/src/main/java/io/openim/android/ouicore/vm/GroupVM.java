@@ -124,7 +124,7 @@ public class GroupVM extends SocialityVM {
     /**
      * 创建群组
      */
-    public void createGroup(boolean isWordGroup) {
+    public void createGroup(String faceURL) {
         WaitDialog waitDialog = new WaitDialog(getContext());
         waitDialog.setNotDismiss();
         waitDialog.show();
@@ -137,6 +137,7 @@ public class GroupVM extends SocialityVM {
             }
         }
         GroupInfo groupInfo = new GroupInfo();
+        groupInfo.setFaceURL(faceURL);
         groupInfo.setGroupName(groupName.getValue());
         groupInfo.setGroupType(GroupType.WORK);
         OpenIMClient.getInstance().groupManager.createGroup(memberUserIDs, null, groupInfo,
@@ -431,6 +432,7 @@ public class GroupVM extends SocialityVM {
         CommonDialog commonDialog = new CommonDialog(getContext());
         commonDialog.show();
         commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.dissolve_tips);
+        commonDialog.getMainView().confirm.setTextColor(getContext().getResources().getColor(R.color.theme));
         commonDialog.getMainView().cancel.setOnClickListener(v -> commonDialog.dismiss());
         commonDialog.getMainView().confirm.setOnClickListener(v -> OpenIMClient.getInstance().groupManager.dismissGroup(new OnBase<String>() {
             @Override
@@ -453,6 +455,7 @@ public class GroupVM extends SocialityVM {
         commonDialog.show();
         commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.quit_group_tips);
         commonDialog.getMainView().cancel.setOnClickListener(v -> commonDialog.dismiss());
+        commonDialog.getMainView().confirm.setTextColor(getContext().getResources().getColor(R.color.theme));
         commonDialog.getMainView().confirm.setOnClickListener(v -> OpenIMClient.getInstance().groupManager.quitGroup(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
