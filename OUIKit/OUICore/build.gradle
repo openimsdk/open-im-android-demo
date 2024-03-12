@@ -101,6 +101,6 @@ dependencies {
     api 'com.github.ajalt:timberkt:1.5.1'
 
     //openIM sdk
-    api 'io.openim:android-sdk:3.5.1@aar'
+    api 'io.openim:android-sdk:3.5.1-beta1@aar'
     api 'io.openim:core-sdk:3.5.1@aar'
 }

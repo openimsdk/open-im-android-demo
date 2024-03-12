@@ -7,10 +7,12 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.alibaba.fastjson.JSONArray;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -441,7 +443,10 @@ public class IMEvent {
         OpenIMClient.getInstance().messageManager.setAdvancedMsgListener(new OnAdvanceMsgListener() {
             @Override
             public void onRecvNewMessage(Message msg) {
-                promptSoundOrNotification(msg);
+                if (!IMUtil.isSignalingMsg(msg)){
+                    promptSoundOrNotification(msg);
+                }
+
                 // 收到新消息，界面添加新消息
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
                     onAdvanceMsgListener.onRecvNewMessage(msg);

@@ -310,33 +310,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         }
     };
 
-    private void gotoMemberList() {
-        GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class);
-        memberVM.groupId = vm.groupID;
-        memberVM.maxNum = 9;
-        memberVM.setIntention(GroupMemberVM.Intention.SELECT_MULTIPLE);
-        MultipleChoice choice = new MultipleChoice(BaseApp.inst().loginCertificate.userID);
-        choice.isEnabled = false;
-        choice.name = BaseApp.inst().loginCertificate.nickname;
-        choice.icon = BaseApp.inst().loginCertificate.faceURL;
-        memberVM.addChoice(choice);
-
-        memberVM.setOnFinishListener(activity -> {
-            activity.finish();
-            //邀请列表中移除自己
-            memberVM.removeChoice(BaseApp.inst().loginCertificate.userID);
-            List<String> ids = new ArrayList<>();
-            for (MultipleChoice multipleChoice : memberVM.choiceList.val()) {
-                ids.add(multipleChoice.key);
-            }
-            SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall, false, ids,
-                vm.groupID);
-            if (null == callingService) return;
-            ActivityManager.push(this);
-            callingService.call(signalingInfo);
-        });
-        ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER).navigation();
-    }
 
     private void listener() {
         Obs.inst().addObserver(this);
@@ -378,19 +351,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
         view.call.setOnClickListener(v -> {
             if (null == callingService) return;
-            if (null != vm.roomCallingInfo.getValue() && null != vm.roomCallingInfo.getValue().getParticipant() && !vm.roomCallingInfo.getValue().getParticipant().isEmpty()) {
-                CommonDialog commonDialog = new CommonDialog(this).atShow();
-                commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.group_calling_tips);
-                commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
-                commonDialog.getMainView().confirm.setText(io.openim.android.ouicore.R.string.join);
-                commonDialog.getMainView().confirm.setOnClickListener(v2 -> {
-                    if (vm.roomCallingInfo.getValue().getParticipant().size() >= Constant.MAX_CALL_NUM) {
-                        toast(getString(io.openim.android.ouicore.R.string.group_calling_tips2));
-                        return;
-                    }
-                });
-                return;
-            }
             goToCall();
         });
         view.delete.setOnClickListener(v -> {
@@ -532,8 +492,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
                     vm.isSingleChat, ids, null);
                 callingService.call(signalingInfo);
-            } else {
-                gotoMemberList();
             }
             return false;
         });

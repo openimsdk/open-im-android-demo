@@ -202,6 +202,25 @@ public class IMUtil {
 
         return OpenIMClient.getInstance().messageManager.createMergerMessage(list, title,
             summaryList);
+
+
+    }
+
+    /**
+     * 是信令消息
+     * @param msg
+     * @return
+     */
+    public static boolean isSignalingMsg(Message msg) {
+        if (msg.getContentType() == MessageType.CUSTOM) {
+            Map map = JSONArray.parseObject(msg.getCustomElem().getData(), Map.class);
+            if (map.containsKey(Constant.K_CUSTOM_TYPE)) {
+                int customType = (int) map.get(Constant.K_CUSTOM_TYPE);
+                return customType >= Constant.MsgType.callingInvite
+                    && customType <= Constant.MsgType.callingHungup;
+            }
+        }
+        return false;
     }
 
     /**
@@ -361,8 +380,8 @@ public class IMUtil {
 
                 // a 修改了群名字
                 String txt = String.format(ctx.getString(R.string.edit_group_name), target =
-                    getSelfName(groupNotification.opUser.getUserID(),
-                        groupNotification.opUser.getNickname()),
+                        getSelfName(groupNotification.opUser.getUserID(),
+                            groupNotification.opUser.getNickname()),
                     groupNotification.group.getGroupName());
                 tips = getSingleSequence(msg.getGroupID(), target,
                     groupNotification.opUser.getUserID(), txt);
@@ -466,7 +485,7 @@ public class IMUtil {
                 choice.name = target2;
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(), target,
-                    transferredGroupNotification.opUser.getUserID(), txt),
+                        transferredGroupNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -475,10 +494,10 @@ public class IMUtil {
                     MuteMemberNotification.class);
                 // b 被 a 禁言
                 String txt = String.format(ctx.getString(R.string.Muted_group), target =
-                    getSelfName(memberNotification.mutedUser.getUserID(),
-                        memberNotification.mutedUser.getNickname()), target2 =
-                    getSelfName(memberNotification.opUser.getUserID(),
-                        memberNotification.opUser.getNickname()),
+                        getSelfName(memberNotification.mutedUser.getUserID(),
+                            memberNotification.mutedUser.getNickname()), target2 =
+                        getSelfName(memberNotification.opUser.getUserID(),
+                            memberNotification.opUser.getNickname()),
                     TimeUtil.secondFormat(memberNotification.mutedSeconds));
 
                 List<MultipleChoice> choices = new ArrayList<>();
@@ -510,7 +529,7 @@ public class IMUtil {
                 choice.name = target;
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(), target2,
-                    memberNotification.opUser.getUserID(), txt),
+                        memberNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -605,11 +624,11 @@ public class IMUtil {
         for (MultipleChoice choice : choices) {
             buildClickAndColorSpannable((SpannableStringBuilder) sequence, choice.name,
                 new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    toPersonDetail(choice.key, choice.groupId);
-                }
-            });
+                    @Override
+                    public void onClick(@NonNull View widget) {
+                        toPersonDetail(choice.key, choice.groupId);
+                    }
+                });
         }
         return sequence;
     }
@@ -627,11 +646,11 @@ public class IMUtil {
                                                  String txt) {
         return buildClickAndColorSpannable(new SpannableStringBuilder(txt), nickName,
             new ClickableSpan() {
-            @Override
-            public void onClick(@NonNull View widget) {
-                toPersonDetail(uid, groupId);
-            }
-        });
+                @Override
+                public void onClick(@NonNull View widget) {
+                    toPersonDetail(uid, groupId);
+                }
+            });
     }
 
     private static void toPersonDetail(String uid, String groupId) {
@@ -664,12 +683,12 @@ public class IMUtil {
             SpannableStringBuilder tagSpannable =
                 (SpannableStringBuilder) buildClickAndColorSpannable
                     (new SpannableStringBuilder(tag), tag, new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    if (!atUsersInfo.getAtUserID().equals(IMUtil.AT_ALL))
-                        toPersonDetail(atUsersInfo.getAtUserID(), gid);
-                }
-            });
+                        @Override
+                        public void onClick(@NonNull View widget) {
+                            if (!atUsersInfo.getAtUserID().equals(IMUtil.AT_ALL))
+                                toPersonDetail(atUsersInfo.getAtUserID(), gid);
+                        }
+                    });
             spannableString.replace(start, end, tagSpannable);
         }
         msgExpand.sequence = spannableString;
@@ -708,21 +727,24 @@ public class IMUtil {
         List<AtUser> atUsers = new ArrayList<>();
         try {
             if (!TextUtils.isEmpty(atJson)) {
-                Type type = new TypeToken<List<AtUser>>() {}.getType();
+                Type type = new TypeToken<List<AtUser>>() {
+                }.getType();
                 atUsers = GsonHel.getGson().fromJson(atJson, type);
                 SpannableStringBuilder spannableString = null;
                 for (AtUser atUser : atUsers) {
                     String atUid = IMUtil.atD(atUser.key);
                     String tag = IMUtil.atD(atUser.name);
 
-                    if (null == spannableString) spannableString = new SpannableStringBuilder(draft);
+                    if (null == spannableString)
+                        spannableString = new SpannableStringBuilder(draft);
                     else spannableString = new SpannableStringBuilder(spannableString);
                     draft = spannableString.toString();
                     int start = draft.indexOf(atUid);
                     int end = start + atUid.length();
 
                     SpannableStringBuilder tagSpannable = new SpannableStringBuilder(tag);
-                    ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#009ad6"));
+                    ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor(
+                        "#009ad6"));
                     tagSpannable.setSpan(colorSpan, 0, tag.length(),
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     atUser.spanHashCode = colorSpan.hashCode();
@@ -730,7 +752,8 @@ public class IMUtil {
                 }
                 return new Object[]{spannableString, atUsers};
             }
-        }catch (Exception ignore){}
+        } catch (Exception ignore) {
+        }
         return new Object[]{draft, atUsers};
     }
 
@@ -856,7 +879,7 @@ public class IMUtil {
                                                    List<String> inviteeUserIDs, String groupID) {
         boolean isGroupChat = !TextUtils.isEmpty(groupID);
         if (!isGroupChat) groupID = UUID.randomUUID().toString(); //单聊Id自动生成
-        groupID=groupID.replaceAll("\u200B", "");
+        groupID = groupID.replaceAll("\u200B", "");
 
         SignalingInfo signalingInfo = new SignalingInfo();
         String inId = BaseApp.inst().loginCertificate.userID;
@@ -887,7 +910,8 @@ public class IMUtil {
         HasPermissions hasPermissions = new HasPermissions(context, Permission.CAMERA,
             Permission.RECORD_AUDIO);
 
-        LayoutBottompopV3Binding v3Binding=LayoutBottompopV3Binding.inflate(LayoutInflater.from(context));
+        LayoutBottompopV3Binding v3Binding =
+            LayoutBottompopV3Binding.inflate(LayoutInflater.from(context));
         BottomPopDialog dialog = new BottomPopDialog(context, v3Binding.getRoot());
         dialog.show();
         v3Binding.cancel.setOnClickListener(v1 -> dialog.dismiss());

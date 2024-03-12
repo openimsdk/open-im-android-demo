@@ -6,10 +6,10 @@ import android.content.DialogInterface;
 
 import com.alibaba.android.arouter.facade.template.IProvider;
 
+import io.openim.android.sdk.listener.OnSignalingListener;
 import io.openim.android.sdk.models.SignalingInfo;
-import open_im_sdk_callback.OnSignalingListener;
 
-public interface CallingService extends IProvider {
+public interface CallingService extends IProvider, OnSignalingListener {
 
     Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener, boolean isCallOut);
 
@@ -50,6 +50,7 @@ public interface CallingService extends IProvider {
     void setOnServicePriorLoginCallBack(OnServicePriorLoginCallBack onServicePriorLoginCallBack);
 
     OnServicePriorLoginCallBack getOnServicePriorLoginCallBack();
+
 
     interface OnServicePriorLoginCallBack {
         void onLogin();

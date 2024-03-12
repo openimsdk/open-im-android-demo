@@ -173,6 +173,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             IMEvent.getInstance().addGroupListener(this);
         }
     }
+
     /**
      * 获取自己在这个群的权限
      */
@@ -639,9 +640,15 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     private void handleMessage(List<Message> data, boolean isReverse) {
-        for (Message datum : data) {
-            IMUtil.buildExpandInfo(datum);
+        Iterator<Message> iterator = data.iterator();
+        while (iterator.hasNext()) {
+            Message message = iterator.next();
+            if (IMUtil.isSignalingMsg(message))
+                iterator.remove();
+            else
+                IMUtil.buildExpandInfo(message);
         }
+
         List<Message> list = messages.val();
         if (data.isEmpty()) {
             if (!messages.val().isEmpty()) {
@@ -761,7 +768,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
      */
     @Override
     public void onRecvNewMessage(Message msg) {
-        if (!isCurrentChat(msg)) return;
+        if (!isCurrentChat(msg) || IMUtil.isSignalingMsg(msg)) return;
         boolean isTyp = msg.getContentType() == MessageType.TYPING;
         if (isSingleChat) {
             if (msg.getSendID().equals(userID)) {

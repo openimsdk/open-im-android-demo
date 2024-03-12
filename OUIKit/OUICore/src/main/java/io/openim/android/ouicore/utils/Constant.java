@@ -9,7 +9,7 @@ public class Constant {
 
     //    public static final String DEFAULT_HOST = "test-web.rentsoft.cn";//43
 //    public static final String DEFAULT_HOST = "web.rentsoft.cn";//121
-    public static final String DEFAULT_HOST = "14.29.168.56";
+    public static final String DEFAULT_HOST = "43.128.72.19";
 
     //登录注册手机验 证服务器地址
     private static final String APP_AUTH_URL = "https://" + DEFAULT_HOST + "/chat/";
@@ -143,6 +143,12 @@ public class Constant {
         public static final int LOCAL_CALL_HISTORY = -110;
         //会议邀请
         public static final int CUSTOMIZE_MEETING = 905;
+
+        public static final int callingInvite = 200;
+        public static final int callingAccept = 201;
+        public static final int callingReject = 202;
+        public static final int callingCancel = 203;
+        public static final int callingHungup = 204;
     }
 
     public static class MediaType {

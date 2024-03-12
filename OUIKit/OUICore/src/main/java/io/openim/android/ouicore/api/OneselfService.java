@@ -53,6 +53,8 @@ public interface OneselfService {
     @POST("user/update")
     Observable<ResponseBody> updateUserInfo(@Body RequestBody requestBody);
 
+    @POST("user/rtc/get_token")
+    Observable<ResponseBody> getTokenForRTC(@Body RequestBody requestBody);
     @POST("friend/search")
     Observable<ResponseBody> searchFriends(@Body RequestBody requestBody);
 
