@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
 /**
- * Created by 王德惠
  * Description :手势管理类
  */
 

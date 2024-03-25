@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.GestureDetector;
 
 /**
- * Created by 王德惠.
  * Description :滑动手势的管理类
  */
 

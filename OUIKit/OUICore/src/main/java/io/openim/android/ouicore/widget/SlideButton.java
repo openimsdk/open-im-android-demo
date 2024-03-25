@@ -26,8 +26,6 @@ import io.openim.android.ouicore.R;
  * 使用:
  * 直接将SlideButton放在布局里
  * 设置按钮的点击监听接口 setOnSlideButtonClickListener
- * <p>
- * Created by bear on 2017/3/17.
  */
 
 public class SlideButton extends View {

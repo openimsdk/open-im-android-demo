@@ -303,7 +303,7 @@ public class CallDialog extends BaseDialog {
                 context.getString(io.openim.android.ouicore.R.string.speaker_on) :
                 context.getString(io.openim.android.ouicore.R.string.speaker_off));
             // 打开扬声器
-            callingVM.audioManager.setSpeakerphoneOn(isChecked);
+            callingVM.setSpeakerphoneOn(isChecked);
         });
 
         view.hangUp.setOnClickListener(new OnDedrepClickListener() {
@@ -447,7 +447,7 @@ public class CallDialog extends BaseDialog {
             insertChatHistory();
             MediaPlayerUtil.INSTANCE.pause();
             MediaPlayerUtil.INSTANCE.release();
-            callingVM.audioManager.setSpeakerphoneOn(true);
+            callingVM.setSpeakerphoneOn(true);
             callingVM.timeStr.removeObserver(bindTime);
             videoViewRelease();
             callingVM.unBindView();

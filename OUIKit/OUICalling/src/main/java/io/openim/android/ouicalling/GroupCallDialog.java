@@ -285,7 +285,7 @@ public class GroupCallDialog extends CallDialog {
                 context.getString(io.openim.android.ouicore.R.string.speaker_on) :
                 context.getString(io.openim.android.ouicore.R.string.speaker_off));
             // 打开扬声器
-            callingVM.audioManager.setSpeakerphoneOn(isChecked);
+            callingVM.setSpeakerphoneOn(isChecked);
         });
 
         view.hangUp.setOnClickListener(new OnDedrepClickListener() {
