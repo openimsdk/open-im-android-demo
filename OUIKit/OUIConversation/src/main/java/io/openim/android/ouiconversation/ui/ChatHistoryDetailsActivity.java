@@ -82,6 +82,21 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel,
             @Override
             public MessageViewHolder.MsgViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                                       int viewType) {
+                if (viewType==MessageType.QUOTE){
+                    return new MessageViewHolder.QuoteTXTView(parent){
+                        protected boolean getSendWay(Message message) {
+                            return false;
+                        }
+
+                        @Override
+                        protected void bindLeft(View itemView, Message message) {
+                            super.bindLeft(itemView, message);
+                            LayoutMsgTxtLeftBinding v = LayoutMsgTxtLeftBinding.bind(itemView);
+                            v.content.setBackground(getDrawable(R.drawable.sty_radius_unleft_30_blue));
+                            v.quoteLy1.setBackground(getDrawable(R.drawable.sty_radius_unleft_30));
+                        }
+                    };
+                }
                 if (viewType == Constant.MsgType.CUSTOMIZE_MEETING)
                     return new MessageViewHolder.MeetingInviteView(parent){
                         @Override

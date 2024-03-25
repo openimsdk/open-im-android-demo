@@ -215,7 +215,7 @@ public class IMUtil {
         if (null == msgExpand) msgExpand = new MsgExpand();
         msg.setExt(msgExpand);
         try {
-            if (msg.getContentType() == MessageType.CUSTOM) {
+            if (msg.getContentType() == MessageType.CUSTOM || null!=msg.getCustomElem()) {
                 Map map = JSONArray.parseObject(msg.getCustomElem().getData(), Map.class);
                 if (map.containsKey(Constant.K_CUSTOM_TYPE)) {
                     int customType = (int) map.get(Constant.K_CUSTOM_TYPE);

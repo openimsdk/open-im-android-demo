@@ -19,6 +19,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="@null"
+        android:ellipsize = "end"
         android:imeOptions="actionSearch"
         android:singleLine="true" />
 
