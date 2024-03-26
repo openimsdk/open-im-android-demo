@@ -3,8 +3,6 @@ package io.openim.android.ouicore.vm;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 
-import androidx.lifecycle.MutableLiveData;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -15,19 +13,11 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.base.vm.State;
-import io.openim.android.ouicore.base.vm.Subject;
 import io.openim.android.ouicore.entity.MsgConversation;
-import io.openim.android.ouicore.im.IM;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouicore.utils.Obs;
-import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConversationListener;
@@ -37,7 +27,6 @@ import io.openim.android.sdk.models.GroupMessageReceipt;
 import io.openim.android.sdk.models.KeyValue;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.RevokedInfo;
-import io.openim.android.sdk.models.UserInfo;
 
 public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> implements OnConversationListener, OnAdvanceMsgListener {
     public State<List<MsgConversation>> conversations = new State<>(new ArrayList<>());
@@ -144,7 +133,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 //    private void insertDBContact(List<ConversationInfo> data) {
 //        RealmList<UserInfoDB> uList = new RealmList<>();
 //        for (ConversationInfo datum : data) {
-//            if (datum.getConversationType() == Constant.SessionType.SINGLE_CHAT) {
+//            if (datum.getConversationType() == Constants.SessionType.SINGLE_CHAT) {
 //                UserInfoDB u = new UserInfoDB();
 //                u.setUserID(datum.getUserID());
 //                u.setNickname(datum.getShowName());

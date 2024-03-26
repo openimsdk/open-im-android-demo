@@ -6,12 +6,8 @@ import io.openim.android.demo.ui.ServerConfigActivity;
 import io.openim.android.demo.ui.main.MainActivity;
 
 import android.content.res.Configuration;
-import android.database.DatabaseUtils;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.view.GestureDetector;
@@ -24,20 +20,16 @@ import androidx.annotation.NonNull;
 
 import com.hbb20.CountryCodePicker;
 
-import org.intellij.lang.annotations.Language;
-
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityLoginBinding;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
@@ -80,7 +72,7 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
         view.loginContent.countryCode.changeDefaultLanguage(language);
 
         view.version.setText(Common.getAppPackageInfo().versionName);
-        vm.isPhone.setValue(SharedPreferencesUtil.get(this).getInteger(Constant.K_LOGIN_TYPE)==0);
+        vm.isPhone.setValue(SharedPreferencesUtil.get(this).getInteger(Constants.K_LOGIN_TYPE)==0);
     }
 
     public static CountryCodePicker.Language buildDefaultLanguage() {

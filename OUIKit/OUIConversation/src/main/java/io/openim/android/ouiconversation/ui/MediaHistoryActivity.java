@@ -22,7 +22,7 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.PreviewMediaVM;
@@ -43,7 +43,7 @@ public class MediaHistoryActivity extends BaseActivity<ChatVM, ActivityMediaHist
         bindViewDataBinding(ActivityMediaHistoryBinding.inflate(getLayoutInflater()));
         sink();
         vm.addSearchMessageItems.getValue().clear();
-        isPicture = getIntent().getBooleanExtra(Constant.K_RESULT, false);
+        isPicture = getIntent().getBooleanExtra(Constants.K_RESULT, false);
         initView();
         listener();
 

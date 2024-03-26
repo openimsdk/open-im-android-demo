@@ -4,7 +4,6 @@ import android.view.View;
 
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -21,7 +20,6 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.im.IMEvent;
-import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
@@ -29,15 +27,12 @@ import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.api.NiService;
 import io.openim.android.ouicore.api.OneselfService;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.NotificationVM;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.widget.WaitDialog;
-import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConnListener;
 import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.models.ConversationInfo;
@@ -105,7 +100,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     }
 
     private void getClientConfig() {
-        N.API(NiService.class).CommNI(Constant.getAppAuthUrl() + "client_config/get",
+        N.API(NiService.class).CommNI(Constants.getAppAuthUrl() + "client_config/get",
             BaseApp.inst().loginCertificate.chatToken,
             NiService.buildParameter().buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Map.class)).subscribe(new NetObserver<Map>(getContext()) {
             @Override
@@ -165,7 +160,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
                             UserInfo.class);
                         updateConfig(us);
                         userLogic.info.setValue(us);
-                        Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
+                        Obs.newMessage(Constants.Event.USER_INFO_UPDATE);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

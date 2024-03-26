@@ -2,10 +2,6 @@ package io.openim.android.ouimoments.ui;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,14 +18,12 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.WaitDialog;
-import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.databinding.ActivityWhoSeeBinding;
 import io.openim.android.ouimoments.mvp.presenter.PushMomentsVM;
 import io.openim.android.sdk.models.GroupInfo;
@@ -55,7 +49,7 @@ public class WhoSeeActivity extends BaseActivity<PushMomentsVM, ActivityWhoSeeBi
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() != RESULT_OK) return;
             List<SelectDataActivity.RuleData> selectedRuleDataList =
-                (List<SelectDataActivity.RuleData>) result.getData().getSerializableExtra(Constant.K_RESULT);
+                (List<SelectDataActivity.RuleData>) result.getData().getSerializableExtra(Constants.K_RESULT);
 
             int permission = vm.param.val().permission;
             bindData(isGroup, selectedRuleDataList, permission);
@@ -166,10 +160,10 @@ public class WhoSeeActivity extends BaseActivity<PushMomentsVM, ActivityWhoSeeBi
         if (groupInfos.isEmpty()) return;
         List<SelectDataActivity.RuleData> ruleDataList = vm.buildGroupRuleData(groupInfos);
         ruleDataLauncher.launch(new Intent(this, SelectDataActivity.class)
-            .putExtra(Constant.K_NAME, getString(io.openim.android.ouicore.R.string.select_group))
-            .putExtra(Constant.K_RESULT, (Serializable) ruleDataList)
-            .putExtra(Constant.K_FROM, isGroup)
-            .putExtra(Constant.K_SIZE, 5));
+            .putExtra(Constants.K_NAME, getString(io.openim.android.ouicore.R.string.select_group))
+            .putExtra(Constants.K_RESULT, (Serializable) ruleDataList)
+            .putExtra(Constants.K_FROM, isGroup)
+            .putExtra(Constants.K_SIZE, 5));
 
     }
 

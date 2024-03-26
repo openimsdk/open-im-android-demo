@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.databinding.ActivityMomentsDetailBinding;
 import io.openim.android.ouimoments.ui.fragment.MomentsDetailFragment;
@@ -22,7 +22,7 @@ public class MomentsDetailActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMomentsDetailBinding.inflate(getLayoutInflater()));
         sink();
-        momentsID = getIntent().getStringExtra(Constant.K_ID);
+        momentsID = getIntent().getStringExtra(Constants.K_ID);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         fragment = MomentsDetailFragment.newInstance(momentsID);

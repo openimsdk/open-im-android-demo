@@ -1,7 +1,5 @@
 package io.openim.android.ouicore.widget;
 
-import static android.os.Environment.DIRECTORY_PICTURES;
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -12,7 +10,6 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.view.Gravity;
@@ -28,7 +25,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import com.hjq.permissions.Permission;
-import com.hjq.permissions.XXPermissions;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
@@ -37,23 +33,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicReference;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.databinding.DialogPhotographAlbumBinding;
-import io.openim.android.ouicore.im.IM;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.HasPermissions;
-import io.openim.android.ouicore.utils.L;
-import io.openim.android.sdk.OpenIMClient;
 
 public class PhotographAlbumDialog extends BaseDialog {
     private AppCompatActivity compatActivity;
@@ -218,7 +207,7 @@ public class PhotographAlbumDialog extends BaseDialog {
 //                .DISPLAY_NAME));}
             try {
                 InputStream is = contentResolver.openInputStream(uri);
-                File cache = new File(Constant.PICTURE_DIR, displayName);
+                File cache = new File(Constants.PICTURE_DIR, displayName);
                 cache.createNewFile();
 
                 FileOutputStream fos = new FileOutputStream(cache);
@@ -253,7 +242,7 @@ public class PhotographAlbumDialog extends BaseDialog {
     }
 
     public File buildTemporaryFile() {
-        return new File(Constant.PICTURE_DIR, System.currentTimeMillis() + ".jpg");
+        return new File(Constants.PICTURE_DIR, System.currentTimeMillis() + ".jpg");
     }
 
     private void goTakePhoto() {

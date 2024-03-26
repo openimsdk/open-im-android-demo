@@ -1,34 +1,27 @@
 package io.openim.android.ouimeeting;
 
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.bigkoo.pickerview.builder.TimePickerBuilder;
 import com.bigkoo.pickerview.view.TimePickerView;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
 
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.ouimeeting.databinding.ActivityTimingMeetingBinding;
 import io.openim.android.ouimeeting.vm.MeetingVM;
-import io.openim.android.sdk.OpenIMClient;
 
 //预约/修改 会议
 public class TimingMeetingActivity extends BaseActivity<MeetingVM, ActivityTimingMeetingBinding> implements MeetingVM.Interaction {
@@ -66,7 +59,7 @@ public class TimingMeetingActivity extends BaseActivity<MeetingVM, ActivityTimin
         vm = Easy.find(MeetingVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityTimingMeetingBinding.inflate(getLayoutInflater()));
-        isUpdateInfo = getIntent().getBooleanExtra(Constant.K_RESULT, false);
+        isUpdateInfo = getIntent().getBooleanExtra(Constants.K_RESULT, false);
         init();
         initView();
         listener();

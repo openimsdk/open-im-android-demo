@@ -30,7 +30,6 @@ import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,13 +37,12 @@ import java.util.Map;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.ExUserInfo;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
@@ -98,7 +96,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
     }
 
     private void vmInit() {
-        vm.isPhoto = getIntent().getBooleanExtra(Constant.K_RESULT, true);
+        vm.isPhoto = getIntent().getBooleanExtra(Constants.K_RESULT, true);
         vm.init();
     }
 
@@ -299,7 +297,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                 @Override
                 public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<?
                     super Bitmap> transition) {
-                    String firstFame = MediaFileUtil.saveBitmap(resource, Constant.PICTURE_DIR,
+                    String firstFame = MediaFileUtil.saveBitmap(resource, Constants.PICTURE_DIR,
                         false);
                     addParamMetas(path, firstFame);
                     vm.addRes(firstFame);
@@ -345,7 +343,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                     Postcard postcard = ARouter.getInstance().build(Routes.Conversation.SHOOT);
                     LogisticsCenter.completion(postcard);
                     shootLauncher.launch(new Intent(PushMomentsActivity.this,
-                        postcard.getDestination()).putExtra(Constant.K_RESULT, 0x102));
+                        postcard.getDestination()).putExtra(Constants.K_RESULT, 0x102));
                 });
             });
         }

@@ -1,29 +1,18 @@
 package io.openim.android.ouigroup.ui;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
-import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BasicActivity;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.ex.MultipleChoice;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.vm.GroupMemberVM;
-import io.openim.android.ouicore.vm.GroupVM;
-import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivitySelectedMemberBinding;
 
 public class SelectedMemberActivity extends BasicActivity<ActivitySelectedMemberBinding> {
@@ -35,7 +24,7 @@ public class SelectedMemberActivity extends BasicActivity<ActivitySelectedMember
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        vmTag = getIntent().getStringExtra(Constant.K_RESULT);
+        vmTag = getIntent().getStringExtra(Constants.K_RESULT);
         vm = Easy.find(GroupMemberVM.class,vmTag);
         super.onCreate(savedInstanceState);
         viewBinding(ActivitySelectedMemberBinding.inflate(getLayoutInflater()));

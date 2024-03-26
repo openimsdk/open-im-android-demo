@@ -23,7 +23,7 @@ import java.math.BigDecimal;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
@@ -78,7 +78,7 @@ public class FileDownloadView extends RelativeLayout {
             @Override
             public void click(View v) {
                 if (isCompleted()) {
-                    OpenFileUtil.openFile(getContext(), Constant.File_DIR + fileName);
+                    OpenFileUtil.openFile(getContext(), Constants.File_DIR + fileName);
                 } else {
                     if (getStatus() == StatusUtil.Status.RUNNING) {
                         task.cancel();
@@ -92,7 +92,7 @@ public class FileDownloadView extends RelativeLayout {
 
     private void buildTask() {
         task =
-            new DownloadTask.Builder(targetUrl, new File(Constant.File_DIR))
+            new DownloadTask.Builder(targetUrl, new File(Constants.File_DIR))
                 .setFilename(fileName)
                 // the minimal interval millisecond for callback progress
                 .setMinIntervalMillisCallbackProcess(30).build();
@@ -155,7 +155,7 @@ public class FileDownloadView extends RelativeLayout {
     }
 
     StatusUtil.Status getStatus() {
-        return StatusUtil.getStatus(targetUrl, Constant.File_DIR, fileName);
+        return StatusUtil.getStatus(targetUrl, Constants.File_DIR, fileName);
     }
 
 

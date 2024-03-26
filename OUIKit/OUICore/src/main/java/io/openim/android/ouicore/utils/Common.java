@@ -19,25 +19,19 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.bumptech.glide.Glide;
-import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.Permission;
-import com.hjq.permissions.XXPermissions;
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.bean.ZxingConfig;
 
@@ -49,25 +43,18 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.PictureElem;
-import io.openim.android.sdk.models.SearchResultItem;
-import io.openim.android.sdk.models.VideoElem;
 import io.reactivex.Observable;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 import q.rorbin.badgeview.QBadgeView;
 
 public class Common {
@@ -423,15 +410,15 @@ public class Common {
             String content =
                 result.getData().getStringExtra(com.yzq.zxinglibrary.common.Constant.CODED_CONTENT);
 
-            if (content.contains(Constant.QR.QR_ADD_FRIEND)) {
+            if (content.contains(Constants.QR.QR_ADD_FRIEND)) {
                 String userId = content.substring(content.lastIndexOf("/") + 1);
                 if (!TextUtils.isEmpty(userId))
-                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, userId).navigation();
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constants.K_ID, userId).navigation();
 
-            } else if (content.contains(Constant.QR.QR_JOIN_GROUP)) {
+            } else if (content.contains(Constants.QR.QR_JOIN_GROUP)) {
                 String groupId = content.substring(content.lastIndexOf("/") + 1);
                 if (!TextUtils.isEmpty(groupId))
-                    ARouter.getInstance().build(Routes.Group.DETAIL).withString(io.openim.android.ouicore.utils.Constant.K_GROUP_ID, groupId).navigation();
+                    ARouter.getInstance().build(Routes.Group.DETAIL).withString(Constants.K_GROUP_ID, groupId).navigation();
             }
         });
     }

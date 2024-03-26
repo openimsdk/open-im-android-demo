@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -66,7 +65,7 @@ import io.openim.android.ouicore.entity.ParticipantMeta;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
@@ -466,7 +465,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
         v.invite.setVisibility(vm.memberPermission.getValue() ? View.VISIBLE : View.GONE);
         v.invite.setOnClickListener(v1 -> {
             ARouter.getInstance().build(Routes.Contact.FORWARD).navigation(this,
-                Constant.Event.FORWARD);
+                Constants.Event.FORWARD);
         });
         v.allMute.setVisibility(vm.isSelfHostUser.getValue() ? View.VISIBLE : View.GONE);
         v.unAllMute.setVisibility(vm.isSelfHostUser.getValue() ? View.VISIBLE : View.GONE);
@@ -798,11 +797,11 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != RESULT_OK) return;
-        if (requestCode == Constant.Event.FORWARD && null != data) {
+        if (requestCode == Constants.Event.FORWARD && null != data) {
             //在这里转发
-            String id = data.getStringExtra(Constant.K_ID);
-            String otherSideNickName = data.getStringExtra(Constant.K_NAME);
-            String groupId = data.getStringExtra(Constant.K_GROUP_ID);
+            String id = data.getStringExtra(Constants.K_ID);
+            String otherSideNickName = data.getStringExtra(Constants.K_NAME);
+            String groupId = data.getStringExtra(Constants.K_GROUP_ID);
             vm.inviterUser(id, groupId);
         }
     }

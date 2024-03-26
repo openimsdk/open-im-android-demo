@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -21,18 +20,14 @@ import com.bumptech.glide.Glide;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.entity.CustomEmoji;
-import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.AvatarImage;
@@ -65,8 +60,6 @@ import io.openim.android.ouimoments.widgets.MultiImageView;
 import io.openim.android.ouimoments.widgets.PraiseListView;
 import io.openim.android.ouimoments.widgets.SnsPopupWindow;
 import io.openim.android.ouimoments.widgets.dialog.CommentDialog;
-import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.models.Message;
 
 public class CircleAdapter extends BaseRecycleViewAdapter {
 
@@ -153,7 +146,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                     holder.headIv.load(BaseApp.inst().loginCertificate.faceURL);
                     holder.nameTv.setText(BaseApp.inst().loginCertificate.nickname);
                     holder.headIv.setOnClickListener(v -> {
-                        context.startActivity(new Intent(context, ToUserMomentsActivity.class).putExtra(Constant.K_RESULT, DatasUtil.curUser));
+                        context.startActivity(new Intent(context, ToUserMomentsActivity.class).putExtra(Constants.K_RESULT, DatasUtil.curUser));
                     });
 
                     holder.newMsgTips.setVisibility(TextUtils.isEmpty(presenter.unReadCount) ?
@@ -193,7 +186,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
 
             holder.headIv.load(headImg);
             if (!presenter.isSpecifiedUser()) holder.headIv.setOnClickListener(v -> {
-                context.startActivity(new Intent(context, ToUserMomentsActivity.class).putExtra(Constant.K_RESULT, circleItem.getUser()));
+                context.startActivity(new Intent(context, ToUserMomentsActivity.class).putExtra(Constants.K_RESULT, circleItem.getUser()));
             });
             holder.nameTv.setText(name);
             holder.timeTv.setText(createTime);
@@ -224,7 +217,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                     holder.authorityIv.setImageResource(R.mipmap.ic_m_friends);
                     holder.authorityTv.setText(io.openim.android.ouicore.R.string.part_see_tips2);
                     holder.authorityLy.setOnClickListener(v -> {
-                        context.startActivity(new Intent(context, PartSeeActivity.class).putExtra(Constant.K_NAME, circleItem.getPermission() == 2 ? this.context.getString(io.openim.android.ouicore.R.string.part_see_tips2) : this.context.getString(io.openim.android.ouicore.R.string.who_invisible)).putExtra(Constant.K_RESULT, (Serializable) circleItem.getPermissionUsers()));
+                        context.startActivity(new Intent(context, PartSeeActivity.class).putExtra(Constants.K_NAME, circleItem.getPermission() == 2 ? this.context.getString(io.openim.android.ouicore.R.string.part_see_tips2) : this.context.getString(io.openim.android.ouicore.R.string.who_invisible)).putExtra(Constants.K_RESULT, (Serializable) circleItem.getPermissionUsers()));
                     });
                 }
             } else {
@@ -255,7 +248,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                             String userName = favortDatas.get(position).getUser().getName();
                             String userId = favortDatas.get(position).getUser().getId();
 
-                            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, userId).navigation();
+                            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constants.K_ID, userId).navigation();
                         }
                     });
                     holder.praiseListView.setDatas(favortDatas);
@@ -400,7 +393,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
     private void bindTargetMomentsView(TargetMomentsViewHolder holder, int circlePosition,
                                        CircleItem circleItem) {
         holder.view.getRoot().setOnClickListener(v -> {
-            context.startActivity(new Intent(context, MomentsDetailActivity.class).putExtra(Constant.K_ID, circleItem.getId()));
+            context.startActivity(new Intent(context, MomentsDetailActivity.class).putExtra(Constants.K_ID, circleItem.getId()));
         });
 
         int index = circlePosition - 1;

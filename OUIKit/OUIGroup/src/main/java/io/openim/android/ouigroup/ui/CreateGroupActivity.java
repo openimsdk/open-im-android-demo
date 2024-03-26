@@ -12,8 +12,6 @@ import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 
 import java.util.Map;
 
@@ -23,7 +21,7 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.ActivityManager;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
@@ -134,8 +132,8 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
         GroupInfo groupInfo = (GroupInfo) body;
 
         Postcard postcard1=ARouter.getInstance().build(Routes.Conversation.CHAT);
-        postcard1.withString(Constant.K_GROUP_ID, groupInfo.getGroupID())
-            .withString(io.openim.android.ouicore.utils.Constant.K_NAME,
+        postcard1.withString(Constants.K_GROUP_ID, groupInfo.getGroupID())
+            .withString(Constants.K_NAME,
                 groupInfo.getGroupName()).navigation();
 
         setResult(RESULT_OK);

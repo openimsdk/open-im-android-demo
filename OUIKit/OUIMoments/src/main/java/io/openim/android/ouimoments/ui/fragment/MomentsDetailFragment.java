@@ -10,8 +10,7 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouimoments.R;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouimoments.adapter.CircleAdapter;
 import io.openim.android.ouimoments.adapter.viewholder.CircleViewHolder;
 import io.openim.android.ouimoments.bean.CircleItem;
@@ -22,7 +21,7 @@ public class MomentsDetailFragment extends CircleFragment {
 
     public static MomentsDetailFragment newInstance(String mID) {
         Bundle args = new Bundle();
-        args.putString(Constant.K_ID, mID);
+        args.putString(Constants.K_ID, mID);
         MomentsDetailFragment fragment = new MomentsDetailFragment();
         fragment.setArguments(args);
         return fragment;
@@ -39,7 +38,7 @@ public class MomentsDetailFragment extends CircleFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        momentID = getArguments().getString(Constant.K_ID);
+        momentID = getArguments().getString(Constants.K_ID);
         super.onCreate(savedInstanceState);
     }
 

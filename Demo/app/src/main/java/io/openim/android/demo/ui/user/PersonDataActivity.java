@@ -6,7 +6,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
@@ -14,14 +13,13 @@ import io.openim.android.demo.databinding.ActivityPersonInfoBinding;
 import io.openim.android.demo.ui.main.EditTextActivity;
 import io.openim.android.demo.vm.FriendVM;
 import io.openim.android.demo.vm.PersonalVM;
-import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ContactListVM;
@@ -185,7 +183,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
     private ActivityResultLauncher<Intent> resultLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() != Activity.RESULT_OK) return;
-            String resultStr = result.getData().getStringExtra(Constant.K_RESULT);
+            String resultStr = result.getData().getStringExtra(Constants.K_RESULT);
 
             waitDialog.show();
             OpenIMClient.getInstance().friendshipManager.setFriendRemark(new OnBase<String>() {
@@ -199,7 +197,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
                 public void onSuccess(String data) {
                     waitDialog.dismiss();
                     vm.userInfo.val().setRemark(resultStr);
-                    Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
+                    Obs.newMessage(Constants.Event.USER_INFO_UPDATE);
                 }
             }, vm.uid, resultStr);
         });

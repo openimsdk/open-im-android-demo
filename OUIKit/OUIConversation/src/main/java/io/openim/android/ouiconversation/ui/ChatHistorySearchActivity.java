@@ -1,9 +1,7 @@
 package io.openim.android.ouiconversation.ui;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,35 +12,22 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.ActivityChatHistorySearchBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseViewModel;
-import io.openim.android.ouicore.entity.ExGroupMemberInfo;
-import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.im.IMUtil;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
-import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.SearchResultItem;
 
 @Route(path = Routes.Conversation.CHAT_HISTORY)
 public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChatHistorySearchBinding> implements ChatVM.ViewAction {
@@ -64,7 +49,7 @@ public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChat
 
     private void listener() {
         view.picture.setOnClickListener(v -> startActivity(new Intent(this,
-            MediaHistoryActivity.class).putExtra(Constant.K_RESULT, true)));
+            MediaHistoryActivity.class).putExtra(Constants.K_RESULT, true)));
         view.video.setOnClickListener(v -> startActivity(new Intent(this,
             MediaHistoryActivity.class)));
         view.file.setOnClickListener(v -> startActivity(new Intent(this,
@@ -119,7 +104,7 @@ public class ChatHistorySearchActivity extends BaseActivity<ChatVM, ActivityChat
                 holder.viewBinding.getRoot().setOnClickListener(v -> {
                     vm.startMsg = data;
                     startActivity(new Intent(ChatHistorySearchActivity.this,
-                        ChatActivity.class).putExtra(Constant.K_FROM, true));
+                        ChatActivity.class).putExtra(Constants.K_FROM, true));
                 });
             }
         };

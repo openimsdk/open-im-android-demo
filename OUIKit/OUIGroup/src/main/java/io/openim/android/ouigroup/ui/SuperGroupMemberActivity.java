@@ -1,45 +1,32 @@
 package io.openim.android.ouigroup.ui;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.alibaba.android.arouter.core.LogisticsCenter;
-import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
-import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BasicActivity;
-import io.openim.android.ouicore.base.vm.ISubscribe;
-import io.openim.android.ouicore.base.vm.Subject;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutMemberActionBinding;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
-import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.GroupMemberVM;
@@ -57,7 +44,7 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        vmTag = getIntent().getStringExtra(Constant.K_RESULT);
+        vmTag = getIntent().getStringExtra(Constants.K_RESULT);
         vm = Easy.find(GroupMemberVM.class, vmTag);
         try {
             groupVM = Easy.find(GroupVM.class);
@@ -74,7 +61,7 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
     private void listener() {
         if (null != groupVM) {
             groupVM.subscribe(this, subject -> {
-                if (Objects.equals(subject.key, Constant.Event.UPDATE_GROUP_INFO + "")) {
+                if (Objects.equals(subject.key, Constants.Event.UPDATE_GROUP_INFO + "")) {
                     update();
                 }
             });
@@ -127,7 +114,7 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
                     if (null != groupVM) groupVM.kickGroupMember(ids);
                     activity.finish();
                 });
-                startActivity(new Intent(this, SuperGroupMemberActivity.class).putExtra(Constant.K_RESULT, tag));
+                startActivity(new Intent(this, SuperGroupMemberActivity.class).putExtra(Constants.K_RESULT, tag));
                 popupWindow.dismiss();
             });
             //设置PopupWindow的视图内容
@@ -182,7 +169,7 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
                 if (vm.choiceList.val().size() > 0) {
 
                     startActivity(new Intent(SuperGroupMemberActivity.this,
-                        SelectedMemberActivity.class).putExtra(Constant.K_RESULT, vmTag));
+                        SelectedMemberActivity.class).putExtra(Constants.K_RESULT, vmTag));
                 }
             });
         } else view.bottomLayout.getRoot().setVisibility(View.GONE);

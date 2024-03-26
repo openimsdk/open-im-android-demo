@@ -26,11 +26,10 @@ import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.ex.MultipleChoice;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.SearchVM;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.UserInfo;
 
@@ -75,7 +74,7 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
 
     private void setResult() {
         if (!result.isEmpty()) {
-            setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT, (Serializable) result));
+            setResult(RESULT_OK, new Intent().putExtra(Constants.K_RESULT, (Serializable) result));
 
         }
     }
@@ -190,8 +189,8 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
                         itemViewHo.view.avatar.load(da.getFaceURL());
                         itemViewHo.view.nickName.setText(da.getNickname());
 
-                        intent.putExtra(Constant.K_ID, id = da.getUserID());
-                        intent.putExtra(Constant.K_NAME, da.getNickname());
+                        intent.putExtra(Constants.K_ID, id = da.getUserID());
+                        intent.putExtra(Constants.K_NAME, da.getNickname());
                         multipleChoice.isGroup = false;
                         multipleChoice.name = da.getNickname();
                         multipleChoice.icon = da.getFaceURL();
@@ -202,8 +201,8 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
                         itemViewHo.view.avatar.load(groupInfo.getFaceURL(), true);
                         itemViewHo.view.nickName.setText(groupInfo.getGroupName());
 
-                        intent.putExtra(Constant.K_GROUP_ID, id = groupInfo.getGroupID());
-                        intent.putExtra(Constant.K_NAME, groupInfo.getGroupName());
+                        intent.putExtra(Constants.K_GROUP_ID, id = groupInfo.getGroupID());
+                        intent.putExtra(Constants.K_NAME, groupInfo.getGroupName());
                         multipleChoice.isGroup = true;
                         multipleChoice.name = groupInfo.getGroupName();
                         multipleChoice.icon = groupInfo.getFaceURL();
@@ -263,7 +262,7 @@ public class SearchGroupAndFriendsActivity extends BaseActivity<SearchVM,
     }
 
     void init() {
-        choices = (List<MultipleChoice>) getIntent().getSerializableExtra(Constant.K_RESULT);
-        isOnlyFriend = getIntent().getBooleanExtra(Constant.IS_SELECT_FRIEND, false);
+        choices = (List<MultipleChoice>) getIntent().getSerializableExtra(Constants.K_RESULT);
+        isOnlyFriend = getIntent().getBooleanExtra(Constants.IS_SELECT_FRIEND, false);
     }
 }

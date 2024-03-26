@@ -1,30 +1,22 @@
 package io.openim.android.demo.ui.user;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 
 import java.util.Locale;
 
-import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityLanguageSettingBinding;
 import io.openim.android.demo.ui.main.MainActivity;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouicore.widget.WaitDialog;
 
 public class LanguageSettingActivity extends BaseActivity<BaseViewModel,
     ActivityLanguageSettingBinding> {
@@ -43,7 +35,7 @@ public class LanguageSettingActivity extends BaseActivity<BaseViewModel,
     }
 
     private void initView() {
-        String lang = SharedPreferencesUtil.get(this).getString(Constant.K_LANGUAGE_SP);
+        String lang = SharedPreferencesUtil.get(this).getString(Constants.K_LANGUAGE_SP);
         if (TextUtils.isEmpty(lang)) {
             selectTab(view.withSystem);
         } else if (lang.equals(Locale.CHINA.getLanguage())) {

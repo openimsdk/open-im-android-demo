@@ -1,14 +1,10 @@
 package io.openim.android.demo.vm;
 
-import androidx.lifecycle.MutableLiveData;
-
 import com.alibaba.fastjson2.JSONObject;
-import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,14 +13,12 @@ import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.vm.State;
-import io.openim.android.ouicore.entity.ExtendUserInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
-import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
@@ -56,7 +50,7 @@ public class PersonalVM extends BaseViewModel {
             userInfo.update();
 
             updateConfig(userInfo.val());
-            Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
+            Obs.newMessage(Constants.Event.USER_INFO_UPDATE);
         }
     };
 

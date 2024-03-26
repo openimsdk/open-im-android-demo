@@ -3,19 +3,13 @@ package io.openim.android.ouiconversation.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.style.ForegroundColorSpan;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,7 +22,6 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import io.openim.android.ouiconversation.databinding.ActivitySearchBinding;
 import io.openim.android.ouiconversation.vm.ChatHistoryRelationVM;
@@ -38,20 +31,14 @@ import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.entity.NotificationMsg;
-import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
-import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SearchVM;
-import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.MessageType;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.NotificationElem;
 import io.openim.android.sdk.models.SearchResultItem;
 import io.openim.android.sdk.models.UserInfo;
 
@@ -298,7 +285,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                                 contactItemHolder.viewBinding.lastMsg.setText(getString(io.openim.android.ouicore.R.string.remark) + ":" + da.getRemark());
                             }
                             contactItemHolder.viewBinding.getRoot().setOnClickListener(v -> {
-                                ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, da.getUserID()).navigation(SearchActivity.this);
+                                ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constants.K_ID, da.getUserID()).navigation(SearchActivity.this);
                             });
                         }
                         if (data instanceof SearchResultItem) {
@@ -330,7 +317,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
                             Common.stringBindForegroundColorSpan(contactItemHolder.viewBinding.nickName, groupInfo.getGroupName(), vm.searchContent.getValue());
                             contactItemHolder.viewBinding.getRoot().setOnClickListener(v -> {
                                 BaseApp.inst().removeCacheVM(ChatVM.class);
-                                startActivity(new Intent(SearchActivity.this, ChatActivity.class).putExtra(Constant.K_GROUP_ID, groupInfo.getGroupID()));
+                                startActivity(new Intent(SearchActivity.this, ChatActivity.class).putExtra(Constants.K_GROUP_ID, groupInfo.getGroupID()));
                             });
                         }
                         break;

@@ -7,15 +7,12 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 
-import com.tencent.bugly.crashreport.CrashReport;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 
-import io.openim.android.demo.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.entity.LoginCertificate;
@@ -27,7 +24,7 @@ import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.RegexValid;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.widget.WaitDialog;
@@ -51,7 +48,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     public boolean isFindPassword = false;
 
     public void login(String verificationCode, int usedFor) {
-        SharedPreferencesUtil.get(BaseApp.inst()).setCache(Constant.K_LOGIN_TYPE, isPhone.val() ?
+        SharedPreferencesUtil.get(BaseApp.inst()).setCache(Constants.K_LOGIN_TYPE, isPhone.val() ?
             0 : 1);
         Parameter parameter = getParameter(verificationCode, usedFor);
         N.API(OpenIMService.class)

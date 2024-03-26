@@ -27,13 +27,12 @@ import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.base.vm.State;
-import io.openim.android.ouicore.entity.MeetingInfoAttach;
 import io.openim.android.ouicore.entity.ParticipantMeta;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouimeeting.MeetingHomeActivity;
@@ -410,8 +409,8 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
         }
 
         HashMap<String, Object> map = new HashMap<>();
-        map.put(Constant.K_CUSTOM_TYPE, Constant.MsgType.CUSTOMIZE_MEETING);
-        map.put(Constant.K_DATA, meetingInfo);
+        map.put(Constants.K_CUSTOM_TYPE, Constants.MsgType.CUSTOMIZE_MEETING);
+        map.put(Constants.K_DATA, meetingInfo);
 
         Message msg =
             OpenIMClient.getInstance().messageManager.createCustomMessage(GsonHel.toJson(map),

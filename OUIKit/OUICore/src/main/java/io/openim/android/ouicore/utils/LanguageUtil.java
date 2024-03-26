@@ -15,8 +15,6 @@ import android.view.ContextThemeWrapper;
 
 import androidx.annotation.RequiresApi;
 
-import org.intellij.lang.annotations.Language;
-
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -45,7 +43,7 @@ public class LanguageUtil {
      * @return context
      */
     public static Context attachBaseContext(Context context) {
-        String language=SharedPreferencesUtil.get(context).getString(Constant.K_LANGUAGE_SP);
+        String language=SharedPreferencesUtil.get(context).getString(Constants.K_LANGUAGE_SP);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             return createConfigurationContext(context, language);
         } else {
@@ -96,7 +94,7 @@ public class LanguageUtil {
      * @return Locale
      */
     public static Locale getCurrentLocale(Context context) {
-        String language=SharedPreferencesUtil.get(context).getString(Constant.K_LANGUAGE_SP);
+        String language=SharedPreferencesUtil.get(context).getString(Constants.K_LANGUAGE_SP);
         if (supportLanguage.containsKey(language)) {
             return supportLanguage.get(language);
         } else {
@@ -186,7 +184,7 @@ public class LanguageUtil {
      * @param cls      跳转的界面
      */
     public static void switchLanguage(String language, Activity activity, Class<?> cls, Bundle bundle) {
-        SharedPreferencesUtil.get(activity).setCache(Constant.K_LANGUAGE_SP,language);
+        SharedPreferencesUtil.get(activity).setCache(Constants.K_LANGUAGE_SP,language);
         Intent intent = new Intent(activity, cls);
         if (bundle != null) {
             intent.putExtras(bundle);

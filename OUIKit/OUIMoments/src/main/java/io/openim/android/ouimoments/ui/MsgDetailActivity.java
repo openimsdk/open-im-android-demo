@@ -13,8 +13,7 @@ import com.bumptech.glide.Glide;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouimoments.adapter.viewholder.MsgDetailViewHolder;
@@ -70,7 +69,7 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
                                    int position) {
                 holder.view.getRoot().setOnClickListener(v -> {
                     startActivity(new Intent(MsgDetailActivity.this, MomentsDetailActivity.class)
-                        .putExtra(Constant.K_ID,
+                        .putExtra(Constants.K_ID,
                             data.workMomentID));
                 });
                 holder.view.star.setVisibility(View.GONE);

@@ -11,9 +11,8 @@ import com.yzq.zxinglibrary.encode.CodeCreator;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityGroupQrCodeBinding;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.models.GroupInfo;
@@ -36,7 +35,7 @@ public class ShareQrcodeActivity extends BaseActivity<GroupVM, ActivityGroupQrCo
             //这里表示个人二维码分享 个人信息复制给群信息用于显示
             bindVM(GroupVM.class);
             LoginCertificate loginCertificate = LoginCertificate.getCache(this);
-            shareContent = Constant.QR.QR_ADD_FRIEND + "/" + loginCertificate.userID;
+            shareContent = Constants.QR.QR_ADD_FRIEND + "/" + loginCertificate.userID;
             GroupInfo groupInfo = new GroupInfo();
             groupInfo.setGroupName(loginCertificate.nickname);
             groupInfo.setFaceURL(loginCertificate.faceURL);
@@ -44,7 +43,7 @@ public class ShareQrcodeActivity extends BaseActivity<GroupVM, ActivityGroupQrCo
             tips = getString(io.openim.android.ouicore.R.string.qr_tips2);
             view.title.setText(io.openim.android.ouicore.R.string.qr_code);
         } else {
-            shareContent = Constant.QR.QR_JOIN_GROUP + "/" + vm.groupId;
+            shareContent = Constants.QR.QR_JOIN_GROUP + "/" + vm.groupId;
             if (isQrcode) {
                 view.title.setText(io.openim.android.ouicore.R.string.group_qrcode);
                 tips = getString(io.openim.android.ouicore.R.string.share_group_tips2);

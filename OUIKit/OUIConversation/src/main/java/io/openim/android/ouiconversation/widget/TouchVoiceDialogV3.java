@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
@@ -18,17 +17,13 @@ import com.lqr.audio.AudioRecordManager;
 import com.lqr.audio.IAudioRecordListener;
 
 import java.io.File;
-import java.util.Timer;
 
-import io.openim.android.ouiconversation.R;
-import io.openim.android.ouiconversation.databinding.LayoutTouchVoiceBinding;
 import io.openim.android.ouiconversation.databinding.LayoutTouchVoiceV3Binding;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.NavigationBarUtil;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.CounterVM;
@@ -83,7 +78,7 @@ public class TouchVoiceDialogV3 extends BaseDialog {
         //默认时长秒
         AudioRecordManager.getInstance(getContext()).setMaxVoiceDuration(60 * 5);
         //该库内不对文件夹是否存在进行判断，所以请在你的项目中自行判断
-        File mAudioDir = new File(Constant.AUDIO_DIR);
+        File mAudioDir = new File(Constants.AUDIO_DIR);
         if (!mAudioDir.exists()) {
             mAudioDir.mkdirs();
         }

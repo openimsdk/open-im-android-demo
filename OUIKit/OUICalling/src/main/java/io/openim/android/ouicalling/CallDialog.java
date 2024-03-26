@@ -1,17 +1,10 @@
 package io.openim.android.ouicalling;
 
 
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
-
-import android.content.DialogInterface;
-import android.content.res.AssetFileDescriptor;
-import android.os.Build;
 
 import android.text.TextUtils;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -19,7 +12,6 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 
 
@@ -27,14 +19,10 @@ import com.hjq.permissions.Permission;
 import com.hjq.window.EasyWindow;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 import io.livekit.android.events.RoomEvent;
-import io.livekit.android.room.participant.LocalParticipant;
 import io.livekit.android.room.participant.Participant;
 import io.livekit.android.room.participant.RemoteParticipant;
 import io.livekit.android.room.track.RemoteVideoTrack;
@@ -48,10 +36,8 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.HasPermissions;
-import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouicore.utils.MediaPlayerListener;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.NotificationUtil;
 import io.openim.android.ouicore.utils.Obs;
@@ -61,7 +47,6 @@ import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
-import io.openim.android.sdk.models.SignalingInvitationInfo;
 import io.openim.android.sdk.models.UserInfo;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
@@ -191,7 +176,7 @@ public class CallDialog extends BaseDialog {
         this.signalingInfo = signalingInfo;
         callingVM.isGroup =
             signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT;
-        callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
+        callingVM.setVideoCalls(Constants.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
         view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.VISIBLE : View.GONE);
         if (!callingVM.isVideoCalls) {
             callingVM.callViewModel.setCameraEnabled(false);
@@ -479,8 +464,8 @@ public class CallDialog extends BaseDialog {
             callHistory = realm.copyFromRealm(callHistory);
 
             HashMap<String, Object> map = new HashMap<>();
-            map.put(Constant.K_CUSTOM_TYPE, Constant.MsgType.LOCAL_CALL_HISTORY);
-            map.put(Constant.K_DATA, callHistory);
+            map.put(Constants.K_CUSTOM_TYPE, Constants.MsgType.LOCAL_CALL_HISTORY);
+            map.put(Constants.K_DATA, callHistory);
 
             String data = GsonHel.toJson(map);
             Message message = OpenIMClient.getInstance().messageManager.createCustomMessage(data,
@@ -489,7 +474,7 @@ public class CallDialog extends BaseDialog {
             OpenIMClient.getInstance().messageManager.insertSingleMessageToLocalStorage(new IMUtil.IMCallBack<String>() {
                 @Override
                 public void onSuccess(String data) {
-                    Obs.newMessage(Constant.Event.INSERT_MSG);
+                    Obs.newMessage(Constants.Event.INSERT_MSG);
                 }
             }, message, receiver, senderID);
         });

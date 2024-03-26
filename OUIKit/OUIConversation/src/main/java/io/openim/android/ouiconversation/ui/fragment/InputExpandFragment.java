@@ -33,7 +33,6 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,24 +48,21 @@ import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
-import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.CardElem;
 import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.SignalingInfo;
 
 
 public class InputExpandFragment extends BaseFragment<ChatVM> {
@@ -241,7 +237,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                             public void onResourceReady(@NonNull Bitmap resource,
                                                         @Nullable Transition<? super Bitmap> transition) {
                                 String firstFame = MediaFileUtil.saveBitmap(resource,
-                                    Constant.PICTURE_DIR, false);
+                                    Constants.PICTURE_DIR, false);
                                 long duration = MediaFileUtil.getDuration(filePath);
                                 Message msg =
                                     OpenIMClient.getInstance().messageManager.createVideoMessageFromFullPath(filePath, MediaFileUtil.getFileType(filePath).mimeType, duration, firstFame);
@@ -275,7 +271,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                         public void onResourceReady(@NonNull Bitmap resource,
                                                     @Nullable Transition<? super Bitmap> transition) {
                             String firstFame = MediaFileUtil.saveBitmap(resource,
-                                Constant.PICTURE_DIR, false);
+                                Constants.PICTURE_DIR, false);
                             long duration = MediaFileUtil.getDuration(file);
                             Message msg =
                                 OpenIMClient.getInstance().messageManager.createVideoMessageFromFullPath(file, MediaFileUtil.getFileType(file).mimeType, duration, firstFame);

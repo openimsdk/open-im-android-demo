@@ -9,8 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.Message;
 
@@ -46,7 +45,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Message message = messages.get(position);
 
-        if (getItemViewType(position) != Constant.LOADING) {
+        if (getItemViewType(position) != Constants.LOADING) {
             MessageViewHolder.MsgViewHolder msgViewHolder =
                 (MessageViewHolder.MsgViewHolder) holder;
             msgViewHolder.setMessageAdapter(this);

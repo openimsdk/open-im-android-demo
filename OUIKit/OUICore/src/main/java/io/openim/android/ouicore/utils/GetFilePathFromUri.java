@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -14,7 +13,6 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -44,7 +42,7 @@ public class GetFilePathFromUri {
         String path = message.getFileElem().getFilePath();
         if (TextUtils.isEmpty(path) || !fileIsExists(path)) {
             path = message.getFileElem().getSourceUrl();
-            path = Constant.File_DIR + Common
+            path = Constants.File_DIR + Common
                 .md5(path)+ "." + getFileSuffix(path);
         }
         openFile(context, path);
