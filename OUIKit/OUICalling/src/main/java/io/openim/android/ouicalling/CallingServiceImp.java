@@ -99,7 +99,7 @@ public class CallingServiceImp implements CallingService {
         if (null == callDialog) return;
         callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(),
             (realm, callHistory) -> callHistory.setFailedState(1));
-       dismissDialog();
+        dismissDialog();
     }
 
     @Override
@@ -136,7 +136,9 @@ public class CallingServiceImp implements CallingService {
     }
 
     private void dismissDialog() {
-        Common.UIHandler.post(() -> callDialog.dismiss());
+        Common.UIHandler.post(() -> {
+            if (null != callDialog) callDialog.dismiss();
+        });
     }
 
     @Override
@@ -191,8 +193,7 @@ public class CallingServiceImp implements CallingService {
 
     private Context getContext() {
         Context ctx;
-        if (ActivityManager.getActivityStack().isEmpty())
-            ctx = BaseApp.inst();
+        if (ActivityManager.getActivityStack().isEmpty()) ctx = BaseApp.inst();
         else {
             ctx = ActivityManager.getActivityStack().peek();
         }
@@ -204,8 +205,7 @@ public class CallingServiceImp implements CallingService {
         //TODO
         //未读消息sdk不能增加 所以我们这里只是发个通知
         NotificationUtil.cancelNotify(A_NOTIFY_ID);
-        if (BaseApp.inst().isAppBackground.val())
-            IMUtil.sendNotice(A_NOTIFY_ID);
+        if (BaseApp.inst().isAppBackground.val()) IMUtil.sendNotice(A_NOTIFY_ID);
         MediaPlayerUtil.INSTANCE.pause();
         MediaPlayerUtil.INSTANCE.release();
     }
@@ -257,7 +257,8 @@ public class CallingServiceImp implements CallingService {
         if (isCallingTips()) return;
         setSignalingInfo(signalingInfo);
         Common.UIHandler.post(() -> {
-            GroupCallDialog callDialog = (GroupCallDialog) buildCallDialog(getContext(), null, false);
+            GroupCallDialog callDialog = (GroupCallDialog) buildCallDialog(getContext(), null,
+                false);
             callDialog.changeView();
             callDialog.joinToShow();
         });
@@ -273,18 +274,21 @@ public class CallingServiceImp implements CallingService {
     }
 
     public boolean isCalling() {
-        return null != callDialog
-            && callDialog.isShowing();
+        return null != callDialog && callDialog.isShowing();
     }
 
 
     @Override
     public void onHangup(SignalingInfo signalingInfo) {
         L.e(TAG, "----onHangup-----");
+        L.e(TAG, "----callDialog-----"+callDialog);
         if (null == callDialog || callDialog.callingVM.isGroup) return;
-        callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(),
-            (realm, callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
-      dismissDialog();
+        L.e(TAG, "----buildPrimaryKey-----"+callDialog.buildPrimaryKey());
+        callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(), (realm, callHistory) -> {
+            L.e(TAG,"---getDate:"+callHistory.getDate());
+            callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate()));
+        });
+        dismissDialog();
     }
 
     @Override
@@ -332,6 +336,7 @@ public class CallingServiceImp implements CallingService {
                 UserInfo userInfo = data.get(0);
                 BaseApp.inst().realm.executeTransactionAsync(realm -> {
                     if (null == callDialog) return;
+                    L.e(TAG, "----insetDB-----");
                     CallHistory callHistory = new CallHistory(callDialog.buildPrimaryKey(),
                         userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(),
                         signalingInfo.getInvitation().getMediaType(), false, 0, isCallOut,

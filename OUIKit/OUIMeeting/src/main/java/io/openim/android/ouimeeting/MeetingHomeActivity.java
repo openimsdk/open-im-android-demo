@@ -741,7 +741,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
             vm.isReceiver.setValue(!isHorn);
         });
         vm.isReceiver.observe(this, aBoolean -> {
-            vm.audioManager.setSpeakerphoneOn(!aBoolean);
+            vm.setSpeakerphoneOn(aBoolean);
             view.horn.setImageResource(aBoolean ? R.mipmap.ic_m_horn : R.mipmap.ic_m_receiver);
         });
         view.zoomOut.setOnClickListener(v -> {
@@ -845,7 +845,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
 
     private void release() {
         if (isFinishing() && !triggerLandscape) {
-            if (null != vm.audioManager) vm.audioManager.setSpeakerphoneOn(true);
+            vm.setSpeakerphoneOn(true);
             vm.onCleared();
             removeCacheVM();
             if (null != easyWindow) {

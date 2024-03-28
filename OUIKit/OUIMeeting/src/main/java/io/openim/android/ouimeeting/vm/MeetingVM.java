@@ -65,6 +65,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     //是否初始化、是否横屏，用于横竖屏切换
     public boolean isInit, isLandscape;
+    public int selectCenterIndex = 0;
     //获取音频服务
     public AudioManager audioManager;
     //上次摄像头开关、上次麦克风开关、是否有开启权限
@@ -76,8 +77,8 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     private List<TextureViewRenderer> textureViews;
 
-    //是否听筒模式
-    public State<Boolean> isReceiver = new State<>(false);
+    //是否喇叭模式
+    public State<Boolean> isReceiver = new State<>(true);
 
     public SignalingCertificate signalingCertificate;
     public CallViewModel callViewModel;
@@ -126,6 +127,14 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
             fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
             return null;
         });
+    }
+
+    public void setSpeakerphoneOn(boolean isChecked) {
+        if (null==textureViews)
+            Common.UIHandler.postDelayed(()
+                    -> audioManager.setSpeakerphoneOn(isChecked), 400);
+        else
+            audioManager.setSpeakerphoneOn(isChecked);
     }
 
     public void buildMetaData(List<Participant> v) {

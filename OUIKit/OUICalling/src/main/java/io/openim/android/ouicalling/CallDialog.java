@@ -89,8 +89,7 @@ public class CallDialog extends BaseDialog {
             dismiss();
         });
         callingVM.callViewModel.subscribe(callingVM.callViewModel.getRoom().getEvents().getEvents(), (v) -> {
-            if (v instanceof RoomEvent.ParticipantDisconnected
-                && v.getRoom().getRemoteParticipants().size() == 0) {
+            if (v instanceof RoomEvent.ParticipantDisconnected && v.getRoom().getRemoteParticipants().size() == 0) {
                 //当只有1个人时关闭会议
                 dismiss();
             }
@@ -165,8 +164,8 @@ public class CallDialog extends BaseDialog {
         if (null == easyWindow) {
             easyWindow =
                 new EasyWindow<>(BaseApp.inst()).setContentView(floatViewBinding.getRoot()).setGravity(Gravity.END | Gravity.TOP)
-                    // 设置成可拖拽的
-                    .setDraggable();
+                // 设置成可拖拽的
+                .setDraggable();
             floatViewBinding.shrink.setOnClickListener(v -> shrink(false));
         }
         if (!easyWindow.isShowing()) easyWindow.show();
@@ -322,41 +321,41 @@ public class CallDialog extends BaseDialog {
             @Override
             public void click(View v) {
                 Object object = view.remoteSpeakerVideoView.getTag();
-                if ( null != object) {
-                    Participant participant = object instanceof RemoteVideoTrack
-                        ? (Participant) callingVM.callViewModel.getRoom().getLocalParticipant()
-                        : (Participant) callingVM.callViewModel.getSingleRemotePar();
-                    Participant participant2 = object instanceof RemoteVideoTrack
-                        ? (Participant)  callingVM.callViewModel.getSingleRemotePar()
-                        : (Participant) callingVM.callViewModel.getRoom().getLocalParticipant();
-                       if (null==participant2||null==participant)return;
+                if (null != object) {
+                    Participant participant = object instanceof RemoteVideoTrack ?
+                        (Participant) callingVM.callViewModel.getRoom().getLocalParticipant() :
+                        (Participant) callingVM.callViewModel.getSingleRemotePar();
+                    Participant participant2 = object instanceof RemoteVideoTrack ?
+                        (Participant) callingVM.callViewModel.getSingleRemotePar() :
+                        (Participant) callingVM.callViewModel.getRoom().getLocalParticipant();
+                    if (null == participant2 || null == participant) return;
 
                     callingVM.callViewModel.bindRemoteViewRenderer(view.localSpeakerVideoView,
                         participant2, callingVM.scope, new Continuation<Unit>() {
-                            @NonNull
-                            @Override
-                            public CoroutineContext getContext() {
-                                return null;
-                            }
+                        @NonNull
+                        @Override
+                        public CoroutineContext getContext() {
+                            return null;
+                        }
 
-                            @Override
-                            public void resumeWith(@NonNull Object o) {
+                        @Override
+                        public void resumeWith(@NonNull Object o) {
 
-                            }
-                        });
+                        }
+                    });
                     callingVM.callViewModel.bindRemoteViewRenderer(view.remoteSpeakerVideoView,
                         participant, callingVM.scope, new Continuation<Unit>() {
-                            @NonNull
-                            @Override
-                            public CoroutineContext getContext() {
-                                return null;
-                            }
+                        @NonNull
+                        @Override
+                        public CoroutineContext getContext() {
+                            return null;
+                        }
 
-                            @Override
-                            public void resumeWith(@NonNull Object o) {
+                        @Override
+                        public void resumeWith(@NonNull Object o) {
 
-                            }
-                        });
+                        }
+                    });
 
                 }
 
@@ -426,6 +425,7 @@ public class CallDialog extends BaseDialog {
     @Override
     public void dismiss() {
         try {
+            Common.UIHandler.removeCallbacksAndMessages(0);
             if (null != easyWindow) {
                 easyWindow.cancel();
             }
