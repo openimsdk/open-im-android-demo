@@ -425,7 +425,7 @@ public class CallDialog extends BaseDialog {
     @Override
     public void dismiss() {
         try {
-            Common.UIHandler.removeCallbacksAndMessages(0);
+            Common.UIHandler.removeCallbacksAndMessages(null);
             if (null != easyWindow) {
                 easyWindow.cancel();
             }
