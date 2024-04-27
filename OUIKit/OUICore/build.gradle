@@ -73,7 +73,7 @@ dependencies {
     api 'com.github.getActivity:XXPermissions:18.5'
 
     api 'com.github.yuzhiqiang1993:zxing:2.2.9'
-    api 'com.github.lihangleo2:ShadowLayout:2.0.1'
+    api 'com.github.lihangleo2:ShadowLayout:3.4.0'
     api 'com.github.maogedadada:SortLetter-Master:1.0.9'
     api 'com.google.android.material:material:1.5.0'
 
