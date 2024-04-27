@@ -25,14 +25,12 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 import io.openim.android.ouiconversation.databinding.ActivityShootBinding;
-import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
-import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
 
 @Route(path = Routes.Conversation.SHOOT)
@@ -44,8 +42,8 @@ public class ShootActivity extends BaseActivity<BaseViewModel, ActivityShootBind
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityShootBinding.inflate(getLayoutInflater()));
         Common.setFullScreen(this);
-        int status = getIntent().getIntExtra(Constant.K_RESULT, JCameraView.BUTTON_STATE_BOTH);
-        view.cameraView.setSaveVideoPath(Constant.VIDEO_DIR.substring(0,Constant.VIDEO_DIR.length()-1));
+        int status = getIntent().getIntExtra(Constants.K_RESULT, JCameraView.BUTTON_STATE_BOTH);
+        view.cameraView.setSaveVideoPath(Constants.VIDEO_DIR.substring(0, Constants.VIDEO_DIR.length()-1));
         view.cameraView.setFeatures(status);
         view.cameraView.setErrorLisenter(new ErrorListener() {
             @Override
@@ -120,10 +118,7 @@ public class ShootActivity extends BaseActivity<BaseViewModel, ActivityShootBind
     private String saveToLocalFile(Bitmap bitmap) {
         try {
             String fName = UUID.randomUUID().toString();
-            File dir = new File(Constant.PICTURE_DIR);
-            if (!dir.exists())
-                dir.mkdirs();
-            File file = new File(Constant.PICTURE_DIR + fName + ".jpg");
+            File file = new File(Constants.PICTURE_DIR + fName + ".jpg");
             file.createNewFile();
             FileOutputStream out = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);

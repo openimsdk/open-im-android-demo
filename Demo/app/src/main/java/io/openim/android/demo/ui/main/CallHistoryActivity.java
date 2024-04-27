@@ -1,14 +1,11 @@
 package io.openim.android.demo.ui.main;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.telecom.Call;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,16 +13,12 @@ import android.view.ViewGroup;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityCallHistoryActicityBinding;
 import io.openim.android.demo.databinding.ItemCallHistoryBinding;
-import io.openim.android.ouiconversation.databinding.ItemExpandMenuBinding;
-import io.openim.android.ouiconversation.ui.ChatActivity;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
@@ -33,12 +26,10 @@ import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.entity.CallHistory;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.CallingService;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.models.SignalingInfo;
-import io.realm.Realm;
 import io.realm.RealmResults;
 
 @Route(path = Routes.Main.CALL_HISTORY)
@@ -145,7 +136,7 @@ public class CallHistoryActivity extends BaseActivity<BaseViewModel,
 
                 holder.v.avatar.load(data.getFaceURL());
                 holder.v.nickName.setText(data.getNickname());
-                holder.v.action.setText("[" + (data.getType().equals(Constant.MediaType.VIDEO)
+                holder.v.action.setText("[" + (data.getType().equals(Constants.MediaType.VIDEO)
                     ? getString(io.openim.android.ouicore.R.string.voice)
                     : getString(io.openim.android.ouicore.R.string.video))
                     + "] " + TimeUtil.getTime(data.getDate(), TimeUtil.yearTimeFormat));
@@ -160,7 +151,7 @@ public class CallHistoryActivity extends BaseActivity<BaseViewModel,
 
                 holder.v.getRoot().setOnClickListener(view1 -> {
                     if (null == callingService) return;
-                    IMUtil.showBottomPopMenu(CallHistoryActivity.this, (v1, keyCode, event) -> {
+                    IMUtil.showBottomCallsPopMenu(CallHistoryActivity.this, (v1, keyCode, event) -> {
                         List<String> ids = new ArrayList<>();
                         ids.add(data.getUserID());
                         SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(keyCode != 1,

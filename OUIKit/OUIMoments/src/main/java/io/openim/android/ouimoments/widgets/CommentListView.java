@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -21,8 +20,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouimoments.R;
 import io.openim.android.ouimoments.bean.CommentItem;
@@ -179,7 +177,7 @@ public class CommentListView extends LinearLayout {
                                     public void onClick(View widget) {
 //                                        Toast.makeText(BaseApp.inst(), textStr + " &id = " + id, Toast.LENGTH_SHORT).show();
                                         ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                                            .withString(Constant.K_ID, id)
+                                            .withString(Constants.K_ID, id)
                                             .navigation();
                                     }
                                 }, 0, subjectSpanText.length(),

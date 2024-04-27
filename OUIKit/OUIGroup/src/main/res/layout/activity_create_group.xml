@@ -51,10 +51,10 @@
             android:paddingLeft="22dp"
             android:paddingRight="22dp">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@mipmap/ic_my_group" />
+            <io.openim.android.ouicore.widget.AvatarImage
+                android:id="@+id/avatarEdit"
+                android:layout_width="@dimen/avatar_size"
+                android:layout_height="@dimen/avatar_size" />
 
             <EditText
                 android:id="@+id/groupName"
@@ -64,6 +64,8 @@
                 android:background="@android:color/transparent"
                 android:hint="@string/create_group_tips"
                 android:maxLines="1"
+                android:singleLine="true"
+                android:maxLength="15"
                 android:text="@={GroupVM.groupName}"
                 android:textColor="#ff999999"
                 android:textSize="16sp" />

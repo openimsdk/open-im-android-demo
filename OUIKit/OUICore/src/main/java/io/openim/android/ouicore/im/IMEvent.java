@@ -1,32 +1,18 @@
 package io.openim.android.ouicore.im;
 
 
-import android.content.res.AssetFileDescriptor;
-import android.os.Build;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.alibaba.android.arouter.launcher.ARouter;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 
-import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.services.CallingService;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouicore.utils.MediaPlayerListener;
-import io.openim.android.ouicore.utils.MediaPlayerUtil;
-import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.UserLogic;
-import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.MessageType;
@@ -259,7 +245,6 @@ public class IMEvent {
 
     //连接事件
     public OnConnListener connListener = new OnConnListener() {
-        private UserLogic userLogic = Easy.find(UserLogic.class);
 
         @Override
         public void onConnectFailed(long code, String error) {
@@ -458,15 +443,14 @@ public class IMEvent {
         });
     }
 
-    private void promptSoundOrNotification(Message msg) {
+    public void promptSoundOrNotification(Message msg) {
         if (BaseApp.inst().loginCertificate.globalRecvMsgOpt == 2
             || msg.getContentType() == MessageType.TYPING ||
             Objects.equals(msg.getSendID(), BaseApp.inst().loginCertificate.userID)) return;
         try {
             if (Easy.find(UserLogic.class).connectStatus.val()
                 == UserLogic.ConnectStatus.SYNCING) return;
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
 
         String sourceID = msg.getSessionType() == ConversationType.SINGLE_CHAT
             ? msg.getSendID() : msg.getGroupID();

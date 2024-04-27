@@ -18,7 +18,6 @@ import java.util.List;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.base.vm.injection.BaseVM;
 import io.openim.android.ouicore.databinding.LayoutPopSelectedFriendsBinding;
@@ -26,15 +25,10 @@ import io.openim.android.ouicore.databinding.LayoutSelectedFriendsBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.ActivityManager;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.ForwardDialog;
 import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class SelectTargetVM extends BaseVM {
@@ -42,8 +36,13 @@ public class SelectTargetVM extends BaseVM {
 
     public enum Intention {
         /**
+         * 转发-默认
+         * 显示最近会话、显示群，显示好友、多选
+         */
+        Forward,
+        /**
          * 发起群聊
-         * 隐藏最近会话、隐藏群，只显示好友、多选
+         * 显示最近会话、隐藏群，只显示好友、多选
          */
         isCreateGroup,
         /**
@@ -52,25 +51,36 @@ public class SelectTargetVM extends BaseVM {
          */
         invite,
         /**
-         * 分享名片
+         * 单选好友
          * 隐藏最近会话、隐藏群、隐藏底部菜单、只显示好友、单选
          */
-        isShareCard
+        singleSelect,
+
+        /**
+         * 多选好友
+         * 隐藏最近会话、隐藏群、显示底部菜单、显示好友、多选
+         */
+        multipleSelect
     }
 
     private OnFinishListener onFinishListener;
-    private Intention intention;
+    private Intention intention = Intention.Forward;
 
-    public void setIntention(Intention intention) {
+    public SelectTargetVM setIntention(Intention intention) {
         this.intention = intention;
+        return this;
     }
 
-    public boolean isShareCard() {
-        return intention == Intention.isShareCard;
+    public boolean isSingleSelect() {
+        return intention == Intention.singleSelect;
     }
 
     public boolean isInvite() {
         return intention == Intention.invite;
+    }
+
+    public boolean isMultipleSelectFriends() {
+        return intention == Intention.multipleSelect;
     }
 
     public boolean isCreateGroup() {
@@ -222,28 +232,16 @@ public class SelectTargetVM extends BaseVM {
 
     public void submitTap(Button button) {
         button.setOnClickListener(v -> {
-            if (isCreateGroup()) {
-                GroupVM groupVM = BaseApp.inst().getVMByCache(GroupVM.class);
-                if (null == groupVM) groupVM = new GroupVM();
-                groupVM.selectedFriendInfo.getValue().clear();
-                List<MultipleChoice> multipleChoices = this.metaData.getValue();
-                for (int i = 0; i < multipleChoices.size(); i++) {
-                    MultipleChoice us = multipleChoices.get(i);
-                    FriendInfo friendInfo = new FriendInfo();
-                    friendInfo.setUserID(us.key);
-                    friendInfo.setNickname(us.name);
-                    friendInfo.setFaceURL(us.icon);
-                    groupVM.selectedFriendInfo.getValue().add(friendInfo);
-                }
-                BaseApp.inst().putVM(groupVM);
-                ARouter.getInstance().build(Routes.Group.CREATE_GROUP2).navigation();
+            if (isMultipleSelectFriends()) {
+                toFinish();
                 return;
             }
-            if (isInvite()) {
+            if (intention != Intention.Forward) {
                 finishIntention();
                 return;
             }
 
+            //转发
             showConfirmDialog(v.getContext());
         });
     }
@@ -259,6 +257,7 @@ public class SelectTargetVM extends BaseVM {
     }
 
     public interface OnFinishListener {
-        void onFinish();
+          void onFinish();
+
     }
 }

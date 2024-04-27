@@ -3,6 +3,7 @@ package io.openim.android.ouicore.net.bage;
 import com.alibaba.fastjson2.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -39,7 +40,7 @@ public class GsonHel {
 
     public static <T> T fromJson(String json, Class<T> aClass) {
         get();
-        return JSONObject.parseObject(json, aClass);
+        return mGson.fromJson(json, aClass);
     }
 
     /**

@@ -26,8 +26,6 @@ import io.openim.android.ouicore.R;
  * 使用:
  * 直接将SlideButton放在布局里
  * 设置按钮的点击监听接口 setOnSlideButtonClickListener
- * <p>
- * Created by bear on 2017/3/17.
  */
 
 public class SlideButton extends View {
@@ -136,9 +134,9 @@ public class SlideButton extends View {
         mMargin = typedArray.getDimension(R.styleable.SlideButton_sMargin,
             dip2px(getContext(), 2));
         mBgColorOn = typedArray.getColor(R.styleable.SlideButton_sBackgroundColorOn,
-            Color.GREEN);
+            getResources().getColor(R.color.theme));
         mBgColorOff = typedArray.getColor(R.styleable.SlideButton_sBackgroundColorOff,
-            Color.GRAY);
+            getResources().getColor(R.color.txt_shallow));
         mButtonColor = typedArray.getColor(R.styleable.SlideButton_sButtonColor,
             Color.WHITE);
         typedArray.recycle();

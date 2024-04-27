@@ -1,43 +1,35 @@
 package io.openim.android.ouicontact.ui;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.alibaba.android.arouter.core.LogisticsCenter;
-import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
-import io.openim.android.ouicontact.R;
 import io.openim.android.ouicontact.databinding.ActivityMyGroupBinding;
 import io.openim.android.ouicontact.ui.search.SearchGroupActivity;
-import io.openim.android.ouicontact.vm.SearchGroup;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SocialityVM;
-import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.sdk.models.GroupInfo;
 
-public class MyGroupActivity extends BaseActivity<SocialityVM, ActivityMyGroupBinding> {
+public class MyGroupActivity extends BaseActivity<SocialityVM, ActivityMyGroupBinding> implements Observer {
 
     private RecyclerViewAdapter<GroupInfo, ViewHol.GroupViewHo> joinedAdapter, createAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         bindVM(SocialityVM.class);
+        Obs.inst().addObserver(this);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMyGroupBinding.inflate(getLayoutInflater()));
         sink();
@@ -59,7 +51,7 @@ public class MyGroupActivity extends BaseActivity<SocialityVM, ActivityMyGroupBi
 
     private void listener() {
         view.searchView.setOnClickListener(v -> {
-            SearchGroupActivity.jumpThis(this,vm.groups.getValue());
+            SearchGroupActivity.jumpThis(this, vm.groups.getValue());
         });
 
         vm.groups.observe(this, groupInfos -> {
@@ -85,6 +77,16 @@ public class MyGroupActivity extends BaseActivity<SocialityVM, ActivityMyGroupBi
         });
     }
 
+    @Override
+    public void update(Observable o, Object arg) {
+        Obs.Message message = (Obs.Message) arg;
+        if (message.tag == Constants.Event.DISSOLVE_GROUP) {
+            vm.groups.getValue().clear();
+            vm.ownGroups.getValue().clear();
+            vm.getAllGroup();
+        }
+    }
+
     public static class ContentAdapter extends RecyclerViewAdapter<GroupInfo, ViewHol.GroupViewHo> {
 
         public ContentAdapter(Class<ViewHol.GroupViewHo> viewHolder) {
@@ -93,13 +95,19 @@ public class MyGroupActivity extends BaseActivity<SocialityVM, ActivityMyGroupBi
 
         @Override
         public void onBindView(@NonNull ViewHol.GroupViewHo holder, GroupInfo data, int position) {
-            holder.view.avatar.load(data.getFaceURL(),true);
+            holder.view.avatar.load(data.getFaceURL(), true);
             holder.view.title.setText(data.getGroupName());
             holder.view.description.setText(data.getMemberCount() + "人");
 
             holder.view.getRoot().setOnClickListener(v -> {
-                ARouter.getInstance().build(Routes.Conversation.CHAT).withString(Constant.K_GROUP_ID, data.getGroupID()).withString(io.openim.android.ouicore.utils.Constant.K_NAME, data.getGroupName()).navigation();
+                ARouter.getInstance().build(Routes.Conversation.CHAT).withString(Constants.K_GROUP_ID, data.getGroupID()).withString(Constants.K_NAME, data.getGroupName()).navigation();
             });
         }
+    }
+
+    @Override
+    protected void fasterDestroy() {
+        super.fasterDestroy();
+        Obs.inst().deleteObserver(this);
     }
 }

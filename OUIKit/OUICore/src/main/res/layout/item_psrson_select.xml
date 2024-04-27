@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<io.openim.android.ouicore.widget.InterceptLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -40,7 +40,8 @@
 
             <TextView
                 android:id="@+id/nickName"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:maxWidth="220dp"
                 android:layout_marginLeft="16dp"
@@ -49,20 +50,16 @@
                 android:textColor="#ff333333"
                 android:textSize="16sp" />
 
+
             <TextView
                 android:id="@+id/identity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:background="@drawable/sty_radius_8_fddfa1"
-                android:paddingLeft="10dp"
-                android:paddingTop="2dp"
-                android:paddingRight="10dp"
-                android:paddingBottom="2dp"
                 android:text="群主"
-                android:textColor="#ffff8c00"
-                android:textSize="10sp"
-                android:visibility="gone" />
+                android:textColor="#ff8e9ab0"
+                android:textSize="17sp"
+                android:visibility="gone"
+                />
 
         </LinearLayout>
 
@@ -81,4 +78,4 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="60dp" />
-</LinearLayout>
+</io.openim.android.ouicore.widget.InterceptLinearLayout>

@@ -15,7 +15,7 @@
         android:id="@+id/avatarRl"
         android:layout_width="match_parent"
         android:layout_height="162dp"
-        android:visibility="gone"
+        android:visibility="visible"
         android:background="@color/white">
 
         <io.openim.android.ouicore.widget.AvatarImage
@@ -25,6 +25,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:src="@mipmap/ic_my_friend" />
+
     </RelativeLayout>
 
 
@@ -37,7 +38,7 @@
         android:paddingTop="6dp"
         android:paddingRight="10dp"
         android:paddingBottom="6dp"
-        tools:ignore="RtlHardcoded">
+        >
 
         <TextView
             android:id="@+id/name"

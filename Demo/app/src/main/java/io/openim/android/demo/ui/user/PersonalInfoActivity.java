@@ -4,43 +4,29 @@ package io.openim.android.demo.ui.user;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.lifecycle.Observer;
 
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.bigkoo.pickerview.builder.TimePickerBuilder;
-import com.bigkoo.pickerview.listener.OnTimeSelectListener;
 import com.bigkoo.pickerview.view.TimePickerView;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
-import io.openim.android.demo.R;
-import io.openim.android.demo.databinding.ActivityMainBinding;
 import io.openim.android.demo.databinding.ActivityPersonalInfoBinding;
 import io.openim.android.demo.ui.main.EditTextActivity;
 import io.openim.android.demo.vm.PersonalVM;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
-import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
-import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.PutArgs;
-import io.openim.android.sdk.models.UserInfo;
 
 public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPersonalInfoBinding> {
 
@@ -116,7 +102,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
         });
         view.email.setOnClickListener(v -> {
             emailLauncher.launch(new Intent(this, EditTextActivity.class)
-                .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.val().getEmail())
+                .putExtra(EditTextActivity.INIT_TXT, "")
                 .putExtra(EditTextActivity.TITLE,
                     getString(io.openim.android.ouicore.R.string.mail)));
         });
@@ -125,13 +111,13 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
     private final ActivityResultLauncher<Intent> nicknameLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() != Activity.RESULT_OK) return;
-            String resultStr = result.getData().getStringExtra(Constant.K_RESULT);
+            String resultStr = result.getData().getStringExtra(Constants.K_RESULT);
             vm.setNickname(resultStr);
         });
     private final ActivityResultLauncher<Intent> emailLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() != Activity.RESULT_OK) return;
-            String resultStr = result.getData().getStringExtra(Constant.K_RESULT);
+            String resultStr = result.getData().getStringExtra(Constants.K_RESULT);
             vm.setEmail(resultStr);
         });
 

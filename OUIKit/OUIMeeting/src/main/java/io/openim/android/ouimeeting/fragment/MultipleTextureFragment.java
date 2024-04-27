@@ -19,9 +19,8 @@ import io.openim.android.ouicore.base.LazyFragment;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.ViewRecyclerViewBinding;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.widget.GridSpaceItemDecoration;
-import io.openim.android.ouimeeting.MeetingHomeActivity;
 import io.openim.android.ouimeeting.vm.MeetingVM;
 import io.openim.android.ouimeeting.widget.SingleTextureView;
 import kotlinx.coroutines.CoroutineScope;
@@ -36,7 +35,7 @@ public class MultipleTextureFragment extends LazyFragment {
     public static MultipleTextureFragment newInstance(List<Participant> participants) {
 
         Bundle args = new Bundle();
-        args.putSerializable(Constant.K_RESULT, (Serializable) participants);
+        args.putSerializable(Constants.K_RESULT, (Serializable) participants);
         MultipleTextureFragment fragment = new MultipleTextureFragment();
         fragment.setArguments(args);
         return fragment;
@@ -45,7 +44,7 @@ public class MultipleTextureFragment extends LazyFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        participants = (List<Participant>) getArguments().getSerializable(Constant.K_RESULT);
+        participants = (List<Participant>) getArguments().getSerializable(Constants.K_RESULT);
         vm = Easy.find(MeetingVM.class);
         scope = vm.callViewModel.buildScope();
     }
@@ -67,7 +66,7 @@ public class MultipleTextureFragment extends LazyFragment {
             @Override
             public void onBindView(@NonNull UserStreamViewHolder holder, Participant data, int position) {
                 holder.setItemHeight(view.recyclerView.getHeight() / 2);
-                holder.view.subscribeParticipant(vm, data);
+                holder.view.bindData(vm, data);
             }
         });
         adapter.setItems(participants);

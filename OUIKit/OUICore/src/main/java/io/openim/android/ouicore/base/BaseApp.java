@@ -29,7 +29,7 @@ public class BaseApp extends Application {
 
     private static BaseApp instance;
     public Realm realm;
-    public State<Boolean> isAppBackground = new State<>(false);
+    public State<Boolean> isAppBackground = new State<>(true);
     private int mActivityCount;
 
     public static BaseApp inst() {
@@ -61,7 +61,8 @@ public class BaseApp extends Application {
     private void realmInit() {
         Realm.init(this);
         String realmName = "open_im_db";
-        RealmConfiguration config = new RealmConfiguration.Builder().name(realmName).build();
+        RealmConfiguration config = new RealmConfiguration.Builder()
+            .name(realmName).build();
         realm = Realm.getInstance(config);
     }
 

@@ -27,7 +27,7 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutPopSelectedFriendsBinding;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.ex.MultipleChoice;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
@@ -56,16 +56,6 @@ public class SelectTargetActivityV3 extends BasicActivity<
 
     private void click() {
         view.myFriends.setOnClickListener(v -> {
-//            if (selectTargetVM.isShareCard()) {
-//                ARouter.getInstance().build(Routes.Contact.ALL_FRIEND)
-//                    .withBoolean("formChat", true).navigation();
-//            } else {
-//                ARouter.getInstance().build(Routes.Group.CREATE_GROUP)
-//                    .withBoolean(Constant.IS_SELECT_FRIEND, true)
-//                    .withString(Constant.K_NAME,
-//                        getString(io.openim.android.ouicore.R.string.my_good_friend))
-//                    .navigation();
-//            }
             ARouter.getInstance().build(Routes.Contact.ALL_FRIEND)
                 .withBoolean("formChat", true).navigation();
         });
@@ -74,17 +64,19 @@ public class SelectTargetActivityV3 extends BasicActivity<
             startActivity(new Intent(this, AllGroupActivity.class));
         });
         view.searchView.setOnClickListener(v -> {
-            if (selectTargetVM.isShareCard()) {
+            if (selectTargetVM.isSingleSelect()) {
                 ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS_GROUP)
-                    .withBoolean(Constant.IS_SELECT_FRIEND, true).navigation();
+                    .withBoolean(Constants.IS_SELECT_FRIEND, true)
+                    .navigation();
                 return;
             }
 
             Postcard postcard = ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS_GROUP);
             LogisticsCenter.completion(postcard);
             launcher.launch(new Intent(this, postcard.getDestination())
-                .putExtra(Constant.K_RESULT, (Serializable) selectTargetVM.metaData.val())
-                .putExtra(Constant.IS_SELECT_FRIEND, selectTargetVM.isCreateGroup()));
+                .putExtra(Constants.K_RESULT, (Serializable) selectTargetVM.metaData.val())
+                .putExtra(Constants.IS_SELECT_FRIEND, selectTargetVM.isInvite()
+                    || selectTargetVM.isMultipleSelectFriends()||selectTargetVM.isCreateGroup()));
         });
     }
 
@@ -96,7 +88,11 @@ public class SelectTargetActivityV3 extends BasicActivity<
     }
 
     private void initView() {
-        if (selectTargetVM.isShareCard()) {
+        if (selectTargetVM.isMultipleSelectFriends()) {
+            view.recentContact.setVisibility(View.GONE);
+            view.group.setVisibility(View.GONE);
+            view.myFriends.setVisibility(View.VISIBLE);
+        } else if (selectTargetVM.isSingleSelect()) {
             view.recentContact.setVisibility(View.GONE);
             view.group.setVisibility(View.GONE);
             view.myFriends.setVisibility(View.VISIBLE);
@@ -174,7 +170,7 @@ public class SelectTargetActivityV3 extends BasicActivity<
             if (v.getResultCode() != RESULT_OK) return;
             Intent intent = v.getData();
             Set<MultipleChoice> set =
-                (Set<MultipleChoice>) intent.getSerializableExtra(Constant.K_RESULT);
+                (Set<MultipleChoice>) intent.getSerializableExtra(Constants.K_RESULT);
             for (MultipleChoice data : set) {
                 if (data.isSelect) {
                     if (!selectTargetVM.contains(data)) {

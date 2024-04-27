@@ -1,24 +1,14 @@
 package io.openim.android.demo.ui.user;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
-import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityAccountSettingBinding;
 import io.openim.android.demo.vm.PersonalVM;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.entity.ExtendUserInfo;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouicore.widget.SlideButton;
-import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.enums.AllowType;
 
 public class AccountSettingActivity extends BaseActivity<PersonalVM, ActivityAccountSettingBinding> {
 
@@ -44,12 +34,12 @@ public class AccountSettingActivity extends BaseActivity<PersonalVM, ActivityAcc
             view.slideButton.setCheckedWithAnimation(extendUserInfo.getGlobalRecvMsgOpt() == 2);
             view.messageTone.setCheckedWithAnimation(extendUserInfo.getAllowBeep() == 1);
             view.vibration.setCheckedWithAnimation(extendUserInfo.getAllowVibration() == 1);
-            view.notAdd.setCheckedWithAnimation(extendUserInfo.getAllowAddFriend() != 1);
+            view.notAdd.setCheckedWithAnimation(extendUserInfo.getAllowAddFriend() == AllowType.NotAllowed.value);
         });
         view.slideButton.setOnSlideButtonClickListener(isChecked -> vm.setGlobalRecvMessageOpt(isChecked));
         view.messageTone.setOnSlideButtonClickListener(isChecked -> vm.setAllowBeep(isChecked));
         view.vibration.setOnSlideButtonClickListener(isChecked -> vm.setAllowVibration(isChecked));
-        view.notAdd.setOnSlideButtonClickListener(isChecked -> vm.setAllowAddFriend(!isChecked));
+        view.notAdd.setOnSlideButtonClickListener(isChecked -> vm.setAllowAddFriend(isChecked));
 
         view.clearRecord.setOnClickListener(v -> {
             CommonDialog commonDialog = new CommonDialog(this);

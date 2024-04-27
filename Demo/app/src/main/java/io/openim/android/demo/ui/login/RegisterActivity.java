@@ -2,30 +2,15 @@ package io.openim.android.demo.ui.login;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.databinding.ViewDataBinding;
-
-import com.hbb20.CountryCodePicker;
-
-import java.io.IOException;
-import java.util.Locale;
-
-import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityRegisterBinding;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouicore.utils.LanguageUtil;
-import io.openim.android.ouicore.utils.SinkHelper;
-import okhttp3.ResponseBody;
+import io.openim.android.ouicore.utils.RegexValid;
 
 public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBinding> implements LoginVM.ViewAction, TextWatcher {
 
@@ -51,6 +36,12 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
         view.clear.setOnClickListener(v -> view.edt1.setText(""));
 
         view.submit.setOnClickListener(v -> {
+            if (vm.isPhone.val()){
+               if ( !RegexValid.isValidPhoneNumber(vm.account.val())){
+                   toast(getString(io.openim.android.ouicore.R.string.valid_phone_num));
+                   return;
+               }
+            }
             vm.areaCode.setValue("+"+view.countryCode.getSelectedCountryCode());
             vm.getVerificationCode(vm.isFindPassword?2:1);
         });

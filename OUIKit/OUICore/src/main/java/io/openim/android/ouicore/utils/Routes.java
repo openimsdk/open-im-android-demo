@@ -75,13 +75,14 @@ public class Routes {
         public final static String HOME = "/contact/ContactFragment";
         public final static String FORWARD = "/contact/ForwardToActivity";
         public static final String ALL_FRIEND = "/contact/AllFriendActivity";
-        public static final String SEARCH_FRIENDS = "/contact/SearchFriendsActivity";
+        public static final String SEARCH_GROUP_MEMBER = "/contact/SearchGroupMember";
         public static final String SEARCH_FRIENDS_GROUP = "/contact/SearchGroupAndFriendsActivity";
     }
 
     //朋友圈
     public static class Moments {
         public static final String HOME = "/moments/MomentsActivity";
+        public static final String ToUserMoments = "/moments/ToUserMomentsActivity";
     }
 
     //会议

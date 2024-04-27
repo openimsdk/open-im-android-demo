@@ -22,10 +22,10 @@
         tools:context=".MeetingHomeActivity">
 
         <LinearLayout
+            android:id="@+id/home"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:animateLayoutChanges="true"
-            android:id="@+id/home"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -119,6 +119,13 @@
                 <androidx.viewpager.widget.ViewPager
                     android:id="@+id/pager"
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
                 <LinearLayout
@@ -144,6 +151,7 @@
 
 
             <LinearLayout
+                android:id="@+id/bottomMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"

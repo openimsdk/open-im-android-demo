@@ -1,5 +1,7 @@
 package io.openim.android.ouimeeting.vm;
 
+import static io.openim.android.ouimeeting.vm.CallViewModelKt.getIdentity;
+
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -25,13 +27,12 @@ import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.base.vm.State;
-import io.openim.android.ouicore.entity.MeetingInfoAttach;
 import io.openim.android.ouicore.entity.ParticipantMeta;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouimeeting.MeetingHomeActivity;
@@ -51,8 +52,6 @@ import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
 
 public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
-
-
     //预约上传的参数
     public static class TimingParameter {
         public State<String> meetingTheme = new State<>("");
@@ -78,8 +77,8 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     private List<TextureViewRenderer> textureViews;
 
-    //是否听筒模式
-    public State<Boolean> isReceiver = new State<>(false);
+    //是否喇叭模式
+    public State<Boolean> isReceiver = new State<>(true);
 
     public SignalingCertificate signalingCertificate;
     public CallViewModel callViewModel;
@@ -130,6 +129,14 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
         });
     }
 
+    public void setSpeakerphoneOn(boolean isChecked) {
+        if (null==textureViews)
+            Common.UIHandler.postDelayed(()
+                    -> audioManager.setSpeakerphoneOn(isChecked), 400);
+        else
+            audioManager.setSpeakerphoneOn(isChecked);
+    }
+
     public void buildMetaData(List<Participant> v) {
         try {
 
@@ -138,7 +145,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
                 ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
                     ParticipantMeta.class);
                 participantMeta.setTop = null!= roomMetadata.val().pinedUserIDList&&
-                    roomMetadata.val().pinedUserIDList.contains(data.getIdentity());
+                    roomMetadata.val().pinedUserIDList.contains(getIdentity(data));
                 data.setMetadata$livekit_android_sdk_release(GsonHel.toJson(participantMeta));
             }
         } catch (Exception ignored) {}
@@ -198,7 +205,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     public boolean isAllSeeHe(Participant data) {
         if (null == allWatchedUser.val()) return false;
-        return Objects.equals(allWatchedUser.val().getIdentity(), data.getIdentity());
+        return Objects.equals(getIdentity(allWatchedUser.val()), getIdentity(data));
     }
 
     public void joinMeeting(String roomID) {
@@ -228,13 +235,15 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
                 Common.UIHandler.post(() -> {
                     buildTimer();
                     fJsonRoomMetadata(callViewModel.getRoom().getMetadata());
-                    VideoTrack localVideoTrack =
-                        callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
+                    try {
+                        VideoTrack localVideoTrack =
+                            callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
 
-                    //  callViewModel.setCameraEnabled(false);
-                    callViewModel.setCameraEnabled(!roomMetadata.getValue().joinDisableVideo);
-                    callViewModel.setMicEnabled(!roomMetadata.getValue().joinDisableMicrophone);
-                    getIView().connectRoomSuccess(localVideoTrack);
+                        //  callViewModel.setCameraEnabled(false);
+                        callViewModel.setCameraEnabled(!roomMetadata.val().joinDisableVideo);
+                        callViewModel.setMicEnabled(!roomMetadata.val().joinDisableMicrophone);
+                        getIView().connectRoomSuccess(localVideoTrack);
+                    }catch (Exception ignore){}
                 });
             }
         });
@@ -276,12 +285,12 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
             } else {
                 String id = meta.beWatchedUserIDList.get(0);
                 Participant localParticipant = callViewModel.getRoom().getLocalParticipant();
-                if (Objects.equals(localParticipant.getIdentity(), id)) {
+                if (Objects.equals(getIdentity(localParticipant), id)) {
                     allWatchedUser.setValue(localParticipant);
                 } else {
                     for (Participant value :
                         callViewModel.getRoom().getRemoteParticipants().values()) {
-                        if (Objects.equals(value.getIdentity(), id)) {
+                        if (Objects.equals(getIdentity(value), id)) {
                             allWatchedUser.setValue(value);
                         }
                     }
@@ -307,13 +316,13 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
 
     public boolean isHostUser(Participant participant) {
         if (null == roomMetadata.getValue()) return false;
-        return null != participant.getIdentity() && participant.getIdentity().equals(roomMetadata.getValue().hostUserID);
+        return  getIdentity(participant).equals(roomMetadata.getValue().hostUserID);
     }
 
 
     public void startShareScreen(Intent data) {
         lastCameraEnabled = callViewModel.getRoom().getLocalParticipant().isCameraEnabled();
-        lastIsMuteAllVideo = cameraPermission.getValue();
+        lastIsMuteAllVideo = cameraPermission.val();
 
         callViewModel.setCameraEnabled(false);
         cameraPermission.setValue(false);
@@ -409,8 +418,8 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
         }
 
         HashMap<String, Object> map = new HashMap<>();
-        map.put(Constant.K_CUSTOM_TYPE, Constant.MsgType.CUSTOMIZE_MEETING);
-        map.put(Constant.K_DATA, meetingInfo);
+        map.put(Constants.K_CUSTOM_TYPE, Constants.MsgType.CUSTOMIZE_MEETING);
+        map.put(Constants.K_DATA, meetingInfo);
 
         Message msg =
             OpenIMClient.getInstance().messageManager.createCustomMessage(GsonHel.toJson(map),

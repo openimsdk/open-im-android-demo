@@ -41,6 +41,8 @@ public class CustomEmojiVM extends BaseVM {
             realm.where(CustomEmoji.class).equalTo("userID",
                 BaseApp.inst().loginCertificate.userID).in("sourceUrl",
                 deletedEmojiUrl.val().toArray(new String[]{})).findAll().deleteAllFromRealm();
+            deletedEmojiUrl.val().clear();
+            deletedEmojiUrl.postValue(deletedEmojiUrl.val());
             UIHandler.post(this::loadCustomEmoji);
         });
     }
@@ -64,8 +66,9 @@ public class CustomEmojiVM extends BaseVM {
         BaseApp.inst().realm.executeTransactionAsync(realm -> {
             realm.insertOrUpdate(customEmojis);
             UIHandler.post(() -> {
-                toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.add_success));
                 loadCustomEmoji();
+                toast(BaseApp.inst().getString(io.openim.android
+                    .ouicore.R.string.add_success));
             });
         });
     }

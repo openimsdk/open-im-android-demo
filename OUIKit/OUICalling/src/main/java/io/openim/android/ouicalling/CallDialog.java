@@ -3,9 +3,6 @@ package io.openim.android.ouicalling;
 
 import android.content.Context;
 
-import android.content.res.AssetFileDescriptor;
-import android.os.Build;
-
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -18,11 +15,20 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
 
 
+import com.hjq.permissions.Permission;
+import com.hjq.window.EasyWindow;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import io.livekit.android.events.RoomEvent;
+import io.livekit.android.room.participant.Participant;
+import io.livekit.android.room.participant.RemoteParticipant;
+import io.livekit.android.room.track.RemoteVideoTrack;
 import io.openim.android.ouicalling.databinding.DialogCallBinding;
+import io.openim.android.ouicalling.databinding.LayoutFloatViewBinding;
+import io.openim.android.ouicalling.service.AudioVideoService;
 import io.openim.android.ouicalling.vm.CallingVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseDialog;
@@ -30,9 +36,10 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.MediaPlayerListener;
+import io.openim.android.ouicore.utils.Constants;
+import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
+import io.openim.android.ouicore.utils.NotificationUtil;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.sdk.OpenIMClient;
@@ -40,21 +47,28 @@ import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
-import io.openim.android.sdk.models.SignalingInvitationInfo;
 import io.openim.android.sdk.models.UserInfo;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
+import kotlin.coroutines.CoroutineContext;
 
 
 public class CallDialog extends BaseDialog {
 
+    protected final HasPermissions hasShoot, hasRecord, hasSystemAlert;
     protected Context context;
     private DialogCallBinding view;
     public CallingVM callingVM;
     protected SignalingInfo signalingInfo;
 
+    protected EasyWindow easyWindow;
+    protected LayoutFloatViewBinding floatViewBinding;
+    private boolean isSubscribe;
 
     public CallDialog(@NonNull Context context, CallingService callingService) {
         this(context, callingService, false);
     }
+
 
     /**
      * 弹出通话界面
@@ -66,10 +80,22 @@ public class CallDialog extends BaseDialog {
     public CallDialog(@NonNull Context context, CallingService callingService, boolean isCallOut) {
         super(context);
         this.context = context;
+        hasShoot = new HasPermissions(context, Permission.CAMERA, Permission.RECORD_AUDIO);
+        hasRecord = new HasPermissions(context, Permission.RECORD_AUDIO);
+        hasSystemAlert = new HasPermissions(context, Permission.SYSTEM_ALERT_WINDOW);
+
         callingVM = new CallingVM(callingService, isCallOut);
         callingVM.setDismissListener(v -> {
             dismiss();
         });
+        callingVM.callViewModel.subscribe(callingVM.callViewModel.getRoom().getEvents().getEvents(), (v) -> {
+            if (v instanceof RoomEvent.ParticipantDisconnected && v.getRoom().getRemoteParticipants().size() == 0) {
+                //当只有1个人时关闭会议
+                dismiss();
+            }
+            return null;
+        }, callingVM.scope);
+
         initView();
         initRendererView();
     }
@@ -77,10 +103,11 @@ public class CallDialog extends BaseDialog {
     public void initRendererView() {
         callingVM.initLocalSpeakerVideoView(view.localSpeakerVideoView);
         callingVM.initRemoteVideoRenderer(view.remoteSpeakerVideoView,
-            view.remoteSpeakerVideoView2);
+            view.remoteSpeakerVideoView2, floatViewBinding.shrinkRemoteSpeakerVideoView);
     }
 
     private void initView() {
+        floatViewBinding = LayoutFloatViewBinding.inflate(getLayoutInflater());
         Window window = getWindow();
         view = DialogCallBinding.inflate(getLayoutInflater());
         window.requestFeature(Window.FEATURE_NO_TITLE);
@@ -94,30 +121,31 @@ public class CallDialog extends BaseDialog {
         setCancelable(false);
         setCanceledOnTouchOutside(false);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-            params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-        }
+        Common.addTypeSystemAlert(params);
         window.setAttributes(params);
 
         window.setBackgroundDrawableResource(android.R.color.transparent);
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+
+        view.zoomOut.setVisibility(Common.isScreenLocked() ? View.GONE : View.VISIBLE);
     }
 
-    //收起/展开
+
+    //    收起/展开
     public void shrink(boolean isShrink) {
+        if (isShrink) {
+            showFloatView();
+        } else if (null != easyWindow) {
+            easyWindow.cancel();
+        }
         view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
         getWindow().setDimAmount(isShrink ? 0f : 1f);
-        view.shrink.setVisibility(isShrink ? View.VISIBLE : View.GONE);
 
-        view.waiting.setVisibility(callingVM.isVideoCalls
-            ? View.GONE : View.VISIBLE);
-        if (callingVM.isStartCall && !callingVM.isVideoCalls) {
-            view.sTips.setText(io.openim.android.ouicore.R.string.calling);
+        if (callingVM.isStartCall) {
+            floatViewBinding.sTips.setText(io.openim.android.ouicore.R.string.calling);
         } else {
-            view.sTips.setText(callingVM.isCallOut ?
+            floatViewBinding.sTips.setText(callingVM.isCallOut ?
                 context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
                 context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
         }
@@ -130,11 +158,24 @@ public class CallDialog extends BaseDialog {
         getWindow().setAttributes(params);
     }
 
+    protected void showFloatView() {
+        // 传入 Activity 对象表示设置成局部的，不需要有悬浮窗权限
+        // 传入 Application 对象表示设置成全局的，但需要有悬浮窗权限
+        if (null == easyWindow) {
+            easyWindow =
+                new EasyWindow<>(BaseApp.inst()).setContentView(floatViewBinding.getRoot()).setGravity(Gravity.END | Gravity.TOP)
+                // 设置成可拖拽的
+                .setDraggable();
+            floatViewBinding.shrink.setOnClickListener(v -> shrink(false));
+        }
+        if (!easyWindow.isShowing()) easyWindow.show();
+    }
+
     public void bindData(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
         callingVM.isGroup =
             signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT;
-        callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
+        callingVM.setVideoCalls(Constants.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
         view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.VISIBLE : View.GONE);
         if (!callingVM.isVideoCalls) {
             callingVM.callViewModel.setCameraEnabled(false);
@@ -181,8 +222,9 @@ public class CallDialog extends BaseDialog {
                     if (data.isEmpty()) return;
                     UserInfo userInfo = data.get(0);
                     view.avatar.load(userInfo.getFaceURL());
-                    view.sAvatar.load(userInfo.getFaceURL());
+                    floatViewBinding.sAvatar.load(userInfo.getFaceURL(), userInfo.getNickname());
                     view.name.setText(userInfo.getNickname());
+
                     //audio call
                     view.avatar2.load(userInfo.getFaceURL());
                     view.name2.setText(userInfo.getNickname());
@@ -203,14 +245,31 @@ public class CallDialog extends BaseDialog {
     };
 
     public void listener(SignalingInfo signalingInfo) {
+        callingVM.callViewModel.subscribe(callingVM.callViewModel.getRemoteParticipants(), (v) -> {
+            if (isSubscribe) return null;
+            Object[] toArray = v.values().toArray();
+            if (toArray.length == 0) return null;
+            callingVM.callViewModel.subscribe(((RemoteParticipant) toArray[0]).getEvents().getEvents(), (event) -> {
+                isSubscribe = true;
+                view.remoteSpeakerVideoView.setVisibility(event.getParticipant().isCameraEnabled() ? View.VISIBLE : View.GONE);
+                return null;
+            }, callingVM.scope);
+            return null;
+        }, callingVM.scope);
+
         callingVM.timeStr.observeForever(bindTime);
         view.closeCamera.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            boolean isEnabled = !isChecked;
-            callingVM.callViewModel.setCameraEnabled(isEnabled);
-            view.localSpeakerVideoView.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
+            hasShoot.safeGo(() -> {
+                boolean isEnabled = !isChecked;
+                callingVM.callViewModel.setCameraEnabled(isEnabled);
+                view.localSpeakerVideoView.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
+            });
         });
-        view.switchCamera.setOnClickListener(v -> {
-            callingVM.callViewModel.flipCamera();
+        view.switchCamera.setOnClickListener(new OnDedrepClickListener(1000) {
+            @Override
+            public void click(View v) {
+                callingVM.callViewModel.flipCamera();
+            }
         });
         view.micIsOn.setOnClickListener(new OnDedrepClickListener(1000) {
             @Override
@@ -228,14 +287,14 @@ public class CallDialog extends BaseDialog {
                 context.getString(io.openim.android.ouicore.R.string.speaker_on) :
                 context.getString(io.openim.android.ouicore.R.string.speaker_off));
             // 打开扬声器
-            callingVM.audioManager.setSpeakerphoneOn(isChecked);
+            callingVM.setSpeakerphoneOn(isChecked);
         });
 
         view.hangUp.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                callingVM.renewalDB(callingVM.buildPrimaryKey(signalingInfo),
-                    (realm, callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
+                callingVM.renewalDB(callingVM.buildPrimaryKey(signalingInfo), (realm,
+                                                                               callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
 
                 callingVM.signalingHungUp(signalingInfo);
             }
@@ -249,27 +308,86 @@ public class CallDialog extends BaseDialog {
         view.answer.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                callingVM.signalingAccept(signalingInfo, new OnBase() {
-                    @Override
-                    public void onError(int code, String error) {
-
-                    }
-
-                    @Override
-                    public void onSuccess(Object data) {
-                        changeView();
-
-                        callingVM.renewalDB(callingVM.buildPrimaryKey(signalingInfo), (realm
-                            , v) -> v.setSuccess(true));
-                    }
-                });
+                answerClick(signalingInfo);
             }
         });
         view.zoomOut.setOnClickListener(v -> {
-            shrink(true);
+            zoomOutClick();
         });
         view.shrink.setOnClickListener(v -> {
             shrink(false);
+        });
+        view.localSpeakerVideoView.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                Object object = view.remoteSpeakerVideoView.getTag();
+                if (null != object) {
+                    Participant participant = object instanceof RemoteVideoTrack ?
+                        (Participant) callingVM.callViewModel.getRoom().getLocalParticipant() :
+                        (Participant) callingVM.callViewModel.getSingleRemotePar();
+                    Participant participant2 = object instanceof RemoteVideoTrack ?
+                        (Participant) callingVM.callViewModel.getSingleRemotePar() :
+                        (Participant) callingVM.callViewModel.getRoom().getLocalParticipant();
+                    if (null == participant2 || null == participant) return;
+
+                    callingVM.callViewModel.bindRemoteViewRenderer(view.localSpeakerVideoView,
+                        participant2, callingVM.scope, new Continuation<Unit>() {
+                        @NonNull
+                        @Override
+                        public CoroutineContext getContext() {
+                            return null;
+                        }
+
+                        @Override
+                        public void resumeWith(@NonNull Object o) {
+
+                        }
+                    });
+                    callingVM.callViewModel.bindRemoteViewRenderer(view.remoteSpeakerVideoView,
+                        participant, callingVM.scope, new Continuation<Unit>() {
+                        @NonNull
+                        @Override
+                        public CoroutineContext getContext() {
+                            return null;
+                        }
+
+                        @Override
+                        public void resumeWith(@NonNull Object o) {
+
+                        }
+                    });
+
+                }
+
+            }
+        });
+    }
+
+    public void zoomOutClick() {
+        hasSystemAlert.safeGo(() -> shrink(true));
+    }
+
+    public void answerClick(SignalingInfo signalingInfo) {
+        if (callingVM.isVideoCalls) {
+            hasShoot.safeGo(() -> signalingAccept(signalingInfo));
+        } else {
+            hasRecord.safeGo(() -> signalingAccept(signalingInfo));
+        }
+    }
+
+    public void signalingAccept(SignalingInfo signalingInfo) {
+        callingVM.signalingAccept(signalingInfo, new OnBase() {
+            @Override
+            public void onError(int code, String error) {
+            }
+
+            @Override
+            public void onSuccess(Object data) {
+                changeView();
+
+                callingVM.renewalDB(CallingVM.buildPrimaryKey(signalingInfo),
+                    (realm, v1) -> v1.setSuccess(true));
+            }
         });
     }
 
@@ -278,6 +396,9 @@ public class CallDialog extends BaseDialog {
         view.headTips.setVisibility(View.GONE);
         view.ask.setVisibility(View.GONE);
         view.callingMenu.setVisibility(View.VISIBLE);
+        view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.VISIBLE : View.GONE);
+
+        waitingHandle();
     }
 
 
@@ -290,31 +411,12 @@ public class CallDialog extends BaseDialog {
     public void playRingtone() {
         try {
             Common.wakeUp(context);
+            NotificationUtil.cancelNotify(AudioVideoService.NOTIFY_ID);
 //           Ringtone铃声
-            AssetFileDescriptor assetFileDescriptor = BaseApp.inst().getAssets().openFd(
-                "incoming_call_ring.mp3");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), assetFileDescriptor);
+            if (!MediaPlayerUtil.INSTANCE.isPlaying()) {
+                MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), R.raw.incoming_call_ring);
+                MediaPlayerUtil.INSTANCE.loopPlay();
             }
-            MediaPlayerUtil.INSTANCE.prepare();
-            MediaPlayerUtil.INSTANCE.setMediaListener(new MediaPlayerListener() {
-                @Override
-                public void finish() {
-                    MediaPlayerUtil.INSTANCE.playMedia();
-                }
-
-                @Override
-                public void onErr(int what) {
-
-                }
-
-                @Override
-                public void prepare() {
-                    MediaPlayerUtil.INSTANCE.playMedia();
-                }
-            });
-            MediaPlayerUtil.INSTANCE.playMedia();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -323,11 +425,16 @@ public class CallDialog extends BaseDialog {
     @Override
     public void dismiss() {
         try {
+            Common.UIHandler.removeCallbacksAndMessages(null);
+            if (null != easyWindow) {
+                easyWindow.cancel();
+            }
             insertChatHistory();
             MediaPlayerUtil.INSTANCE.pause();
             MediaPlayerUtil.INSTANCE.release();
-            callingVM.audioManager.setSpeakerphoneOn(true);
+            callingVM.setSpeakerphoneOn(true);
             callingVM.timeStr.removeObserver(bindTime);
+            videoViewRelease();
             callingVM.unBindView();
             super.dismiss();
             ((CallingServiceImp) callingVM.callingService).callDialog = null;
@@ -337,12 +444,16 @@ public class CallDialog extends BaseDialog {
 
     }
 
+    public void videoViewRelease() {
+        view.localSpeakerVideoView.release();
+        view.remoteSpeakerVideoView.release();
+        view.remoteSpeakerVideoView2.release();
+        floatViewBinding.shrinkRemoteSpeakerVideoView.release();
+    }
+
     private void insertChatHistory() {
         boolean isGroup = callingVM.isGroup;
-        if (!isShowing()
-            || isGroup
-            || (null != signalingInfo
-            && TextUtils.isEmpty(callingVM.buildPrimaryKey(signalingInfo))))
+        if (!isShowing() || isGroup || (null != signalingInfo && TextUtils.isEmpty(callingVM.buildPrimaryKey(signalingInfo))))
             return;
         String id = callingVM.buildPrimaryKey(signalingInfo);
         String senderID = isGroup ? BaseApp.inst().loginCertificate.userID :
@@ -353,8 +464,8 @@ public class CallDialog extends BaseDialog {
             callHistory = realm.copyFromRealm(callHistory);
 
             HashMap<String, Object> map = new HashMap<>();
-            map.put(Constant.K_CUSTOM_TYPE, Constant.MsgType.LOCAL_CALL_HISTORY);
-            map.put(Constant.K_DATA, callHistory);
+            map.put(Constants.K_CUSTOM_TYPE, Constants.MsgType.LOCAL_CALL_HISTORY);
+            map.put(Constants.K_DATA, callHistory);
 
             String data = GsonHel.toJson(map);
             Message message = OpenIMClient.getInstance().messageManager.createCustomMessage(data,
@@ -363,7 +474,7 @@ public class CallDialog extends BaseDialog {
             OpenIMClient.getInstance().messageManager.insertSingleMessageToLocalStorage(new IMUtil.IMCallBack<String>() {
                 @Override
                 public void onSuccess(String data) {
-                    Obs.newMessage(Constant.Event.INSERT_MSG);
+                    Obs.newMessage(Constants.Event.INSERT_MSG);
                 }
             }, message, receiver, senderID);
         });
@@ -376,9 +487,23 @@ public class CallDialog extends BaseDialog {
         view.headTips.setVisibility(View.GONE);
         MediaPlayerUtil.INSTANCE.pause();
         MediaPlayerUtil.INSTANCE.release();
+
+        waitingHandle();
     }
 
     public String buildPrimaryKey() {
-        return callingVM.buildPrimaryKey(signalingInfo);
+        return CallingVM.buildPrimaryKey(signalingInfo);
+    }
+
+    private void waitingHandle() {
+        if (callingVM.isVideoCalls) floatViewBinding.waiting.setVisibility(View.GONE);
+
+        if (callingVM.isStartCall) {
+            floatViewBinding.sTips.setText(io.openim.android.ouicore.R.string.calling);
+        } else {
+            floatViewBinding.sTips.setText(callingVM.isCallOut ?
+                context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
+                context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
+        }
     }
 }

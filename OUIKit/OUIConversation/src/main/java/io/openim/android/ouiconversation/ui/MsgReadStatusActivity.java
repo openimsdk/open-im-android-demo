@@ -1,42 +1,26 @@
 package io.openim.android.ouiconversation.ui;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.ActivityMsgReadStatusBinding;
-import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouiconversation.vm.MsgStatusVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
-import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BasicActivity;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.entity.CallHistory;
-import io.openim.android.ouicore.entity.ExGroupMemberInfo;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.vm.GroupVM;
-import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.sdk.models.GroupHasReadInfo;
-import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class MsgReadStatusActivity extends BasicActivity<ActivityMsgReadStatusBinding> {
 
-    private boolean isRead = true;
+    private boolean isRead = false;
     private RecyclerViewAdapter<GroupMembersInfo, RecyclerView.ViewHolder> adapter;
 
     private MsgStatusVM vm;
@@ -54,16 +38,17 @@ public class MsgReadStatusActivity extends BasicActivity<ActivityMsgReadStatusBi
 
     void init() {
         vm= Easy.installVM(this, MsgStatusVM.class);
-        vm.conversationId = getIntent().getStringExtra(Constant.K_ID);
-        vm.msgId = getIntent().getStringExtra(Constant.K_RESULT);
-         groupHasReadInfo = (GroupHasReadInfo) getIntent().getSerializableExtra(Constant.K_RESULT2);
+        vm.conversationId = getIntent().getStringExtra(Constants.K_ID);
+        vm.msgId = getIntent().getStringExtra(Constants.K_RESULT);
+         groupHasReadInfo = (GroupHasReadInfo) getIntent().getSerializableExtra(Constants.K_RESULT2);
     }
 
     private void initView() {
-        view.title1.setText(String.format(getString(io.openim.android.ouicore.R.string.readed),
-            groupHasReadInfo.getHasReadCount() + ""));
-        view.title2.setText(String.format(getString(io.openim.android.ouicore.R.string.unread),
+        view.title1.setText(String.format(getString(io.openim.android.ouicore.R.string.unread),
             groupHasReadInfo.getUnreadCount() + ""));
+        view.title2.setText(String.format(getString(io.openim.android.ouicore.R.string.readed),
+            groupHasReadInfo.getHasReadCount() + ""));
+
         view.recyclerview.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecyclerViewAdapter<GroupMembersInfo, RecyclerView.ViewHolder>() {
 
@@ -90,11 +75,11 @@ public class MsgReadStatusActivity extends BasicActivity<ActivityMsgReadStatusBi
 
     private void listener() {
         view.menu1.setOnClickListener(view1 -> {
-            isRead = true;
+            isRead = false;
             menuChange();
         });
         view.menu2.setOnClickListener(view1 -> {
-            isRead = false;
+            isRead = true;
             menuChange();
         });
 
@@ -118,11 +103,11 @@ public class MsgReadStatusActivity extends BasicActivity<ActivityMsgReadStatusBi
 
     private void menuChange() {
         if (isRead) {
-            view.menu1bg.setVisibility(View.VISIBLE);
-            view.menu2bg.setVisibility(View.GONE);
-        } else {
             view.menu1bg.setVisibility(View.GONE);
             view.menu2bg.setVisibility(View.VISIBLE);
+        } else {
+            view.menu1bg.setVisibility(View.VISIBLE);
+            view.menu2bg.setVisibility(View.GONE);
         }
         refreshMembersInfo();
     }

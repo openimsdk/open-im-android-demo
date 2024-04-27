@@ -1,5 +1,9 @@
 pluginManagement {
     repositories {
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+
         maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/google' }
@@ -11,15 +15,19 @@ pluginManagement {
         maven { url 'https://jitpack.io' }
         maven {url "https://mvn.getui.com/nexus/content/repositories/releases/"}
         maven {url 'https://developer.huawei.com/repo/'}
-
-        mavenCentral()
-        google()
-        gradlePluginPortal()
+        maven {
+            // r8 maven
+            url = uri("https://storage.googleapis.com/r8-releases/raw")
+        }
     }
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+        
         maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/google' }
@@ -31,10 +39,10 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
         maven {url "https://mvn.getui.com/nexus/content/repositories/releases/"}
         maven {url 'https://developer.huawei.com/repo/'}
-
-        mavenCentral()
-        google()
-        gradlePluginPortal()
+        maven {
+            // r8 maven
+            url = uri("https://storage.googleapis.com/r8-releases/raw")
+        }
     }
 }
 rootProject.name = "Demo"

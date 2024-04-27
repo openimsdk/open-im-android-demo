@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * 
-* @ClassName: User 
+* @ClassName: UserEx
 * @Description: TODO(这里用一句话描述这个类的作用) 
 * 
 * @date 2015-12-28 下午3:45:04 

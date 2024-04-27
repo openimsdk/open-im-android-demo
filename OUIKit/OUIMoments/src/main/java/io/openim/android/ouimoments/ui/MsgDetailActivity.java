@@ -13,8 +13,7 @@ import com.bumptech.glide.Glide;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouimoments.adapter.viewholder.MsgDetailViewHolder;
@@ -70,7 +69,7 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
                                    int position) {
                 holder.view.getRoot().setOnClickListener(v -> {
                     startActivity(new Intent(MsgDetailActivity.this, MomentsDetailActivity.class)
-                        .putExtra(Constant.K_ID,
+                        .putExtra(Constants.K_ID,
                             data.workMomentID));
                 });
                 holder.view.star.setVisibility(View.GONE);
@@ -88,6 +87,7 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
                             + targetUser + ":" + comment.content);
                     }
                 }
+
                 holder.view.time.setText(TimeUtil.getTime(data.createTime,
                     TimeUtil.monthTimeFormat));
                 if (data.type == MsgDetailVM.WorkMomentLogTypeLike) {
@@ -99,10 +99,14 @@ public class MsgDetailActivity extends BaseActivity<MsgDetailVM, ActivityMsgDeta
                     String tips =
                         getString(io.openim.android.ouicore.R.string.star_tips) + data.nickname;
                     holder.view.action.setText(tips);
+                    holder.view.time.setText(TimeUtil.getTime(user.likeTime,
+                        TimeUtil.monthTimeFormat));
                 }
                 if (data.type == MsgDetailVM.WorkMomentLogTypeAt) {
+                    nickName = data.nickname;
+                    faceURL = data.faceURL;
                     holder.view.action.setText(getString(io.openim.android.ouicore.R.string.about_you)
-                        + DatasUtil.curUser);
+                        + DatasUtil.curUser.getName());
                 }
                 holder.view.avatar.load(faceURL);
                 holder.view.nickName.setText(nickName);

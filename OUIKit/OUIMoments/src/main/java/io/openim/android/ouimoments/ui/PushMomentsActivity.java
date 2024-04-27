@@ -30,7 +30,6 @@ import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,17 +37,20 @@ import java.util.Map;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.ExUserInfo;
+import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.ouicore.vm.PreviewMediaVM;
+import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
@@ -94,24 +96,29 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
     }
 
     private void vmInit() {
-        vm.isPhoto = getIntent().getBooleanExtra(Constant.K_RESULT, true);
+        vm.isPhoto = getIntent().getBooleanExtra(Constants.K_RESULT, true);
         vm.init();
     }
 
     private List<SelectDataActivity.RuleData> selectedAtList;
-    private ActivityResultLauncher<Intent> ruleDataLauncher =
-        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() != RESULT_OK) return;
-            selectedAtList =
-                (List<SelectDataActivity.RuleData>) result.getData().getSerializableExtra(Constant.K_RESULT);
-            view.reminderWho.setText(vm.getRuleDataNames(selectedAtList));
 
-            List<String> ids = new ArrayList<>();
-            for (SelectDataActivity.RuleData ruleData : selectedAtList) {
-                ids.add(ruleData.id);
-            }
-            vm.param.val().atUserIDs = ids;
-        });
+    private void ruleDataLauncher(List<MultipleChoice> choices) {
+        selectedAtList = new ArrayList<>();
+        for (MultipleChoice choice : choices) {
+            SelectDataActivity.RuleData ruleData = new SelectDataActivity.RuleData();
+            ruleData.id = choice.key;
+            ruleData.name = choice.name;
+            ruleData.icon = choice.icon;
+            selectedAtList.add(ruleData);
+        }
+        view.reminderWho.setText(vm.getRuleDataNames(selectedAtList));
+        List<String> ids = new ArrayList<>();
+        for (SelectDataActivity.RuleData ruleData : selectedAtList) {
+            ids.add(ruleData.id);
+        }
+        vm.param.val().atUserIDs = ids;
+    }
+
     private ActivityResultLauncher<Intent> resultLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == RESULT_OK) {
@@ -259,9 +266,25 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
 
     private void jumpSelectUser(List<ExUserInfo> exUserInfo) {
         if (exUserInfo.isEmpty()) return;
-        List<SelectDataActivity.RuleData> ruleDataList = vm.buildUserRuleData(exUserInfo,
-            selectedAtList);
-        ruleDataLauncher.launch(new Intent(this, SelectDataActivity.class).putExtra(Constant.K_NAME, getString(io.openim.android.ouicore.R.string.select_user)).putExtra(Constant.K_RESULT, (Serializable) ruleDataList).putExtra(Constant.K_FROM, false).putExtra(Constant.K_SIZE, 20));
+        SelectTargetVM targetVM = Easy.installVM(SelectTargetVM.class)
+            .setIntention(SelectTargetVM.Intention.multipleSelect);
+        if ( null!=selectedAtList){
+            for (SelectDataActivity.RuleData ruleData : selectedAtList) {
+                MultipleChoice choice = new MultipleChoice(ruleData.id);
+                choice.isSelect = true;
+                choice.name = ruleData.name;
+                choice.icon = ruleData.icon;
+                if (!targetVM.contains(choice))
+                    targetVM.metaData.val().add(choice);
+            }
+        }
+        targetVM.metaData.update();
+        targetVM.setOnFinishListener(() -> {
+            Common.finishRoute(Routes.Group.SELECT_TARGET, Routes.Contact.ALL_FRIEND);
+            ruleDataLauncher(targetVM.metaData.val());
+        });
+        ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
+
     }
 
     private ActivityResultLauncher<Intent> videoLauncher =
@@ -274,7 +297,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                 @Override
                 public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<?
                     super Bitmap> transition) {
-                    String firstFame = MediaFileUtil.saveBitmap(resource, Constant.PICTURE_DIR,
+                    String firstFame = MediaFileUtil.saveBitmap(resource, Constants.PICTURE_DIR,
                         false);
                     addParamMetas(path, firstFame);
                     vm.addRes(firstFame);
@@ -320,7 +343,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                     Postcard postcard = ARouter.getInstance().build(Routes.Conversation.SHOOT);
                     LogisticsCenter.completion(postcard);
                     shootLauncher.launch(new Intent(PushMomentsActivity.this,
-                        postcard.getDestination()).putExtra(Constant.K_RESULT, 0x102));
+                        postcard.getDestination()).putExtra(Constants.K_RESULT, 0x102));
                 });
             });
         }
@@ -368,7 +391,20 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
                                     photoUrls, position, null);
                             } else {
                                 try {
-                                    ARouter.getInstance().build(Routes.Conversation.PREVIEW).withString("media_url", vm.param.getValue().content.metas.get(0).original).withString("first_frame", vm.param.getValue().content.metas.get(0).thumb).navigation();
+                                   String original= vm.param.getValue()
+                                        .content.metas.get(0).original;
+                                    String thumb=vm.param.getValue()
+                                        .content.metas.get(0).thumb;
+                                    PreviewMediaVM mediaVM= Easy.installVM(PreviewMediaVM.class);
+                                    PreviewMediaVM.MediaData mediaData =new PreviewMediaVM
+                                        .MediaData(original);
+                                    mediaData.thumbnail=thumb;
+                                    mediaData.mediaUrl=original;
+                                    mediaData.isVideo=true;
+                                    mediaVM.previewSingle(mediaData);
+                                    ARouter.getInstance().build(Routes.Conversation.PREVIEW)
+                                        .navigation();
+
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }

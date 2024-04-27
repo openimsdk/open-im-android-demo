@@ -13,7 +13,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.ViewDataBinding;
 
+import com.alibaba.android.arouter.launcher.ARouter;
+
+import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
+import io.openim.android.ouicore.utils.Routes;
 
 public class BasicActivity<T extends ViewDataBinding> extends AppCompatActivity {
     boolean isRecycle;
@@ -75,11 +79,20 @@ public class BasicActivity<T extends ViewDataBinding> extends AppCompatActivity 
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
     }
 
     public void toBack(View view) {
         finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null != callingService && callingService.isCalling()) return;
+        super.onBackPressed();
     }
 }

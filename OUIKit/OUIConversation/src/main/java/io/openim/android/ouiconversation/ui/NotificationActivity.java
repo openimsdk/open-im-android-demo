@@ -1,26 +1,15 @@
 package io.openim.android.ouiconversation.ui;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
-import io.openim.android.ouiconversation.adapter.MessageViewHolder;
 import io.openim.android.ouiconversation.databinding.ActivityNotificationBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
-import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.sdk.models.Message;
+import io.openim.android.ouicore.utils.Constants;
 
 public class NotificationActivity extends BaseActivity<ChatVM, ActivityNotificationBinding> implements ChatVM.ViewAction {
 
@@ -36,7 +25,7 @@ public class NotificationActivity extends BaseActivity<ChatVM, ActivityNotificat
         initView();
         init();
         listener();
-        vm.markReadedByConID(vm.conversationID, null);
+        vm.markRead();
     }
 
     private void listener() {
@@ -59,8 +48,8 @@ public class NotificationActivity extends BaseActivity<ChatVM, ActivityNotificat
     }
 
     void init() {
-        String name = getIntent().getStringExtra(Constant.K_NAME);
-        String id = getIntent().getStringExtra(Constant.K_ID);
+        String name = getIntent().getStringExtra(Constants.K_NAME);
+        String id = getIntent().getStringExtra(Constants.K_ID);
         view.title.setText(name);
         vm.conversationID = id;
         vm.loadHistoryMessage();

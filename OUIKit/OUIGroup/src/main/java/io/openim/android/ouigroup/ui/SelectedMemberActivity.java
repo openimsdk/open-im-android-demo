@@ -1,78 +1,67 @@
 package io.openim.android.ouigroup.ui;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
-import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.entity.ExGroupMemberInfo;
-import io.openim.android.ouicore.vm.GroupVM;
-import io.openim.android.ouigroup.R;
+import io.openim.android.ouicore.base.BasicActivity;
+import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.ex.MultipleChoice;
+import io.openim.android.ouicore.utils.Constants;
+import io.openim.android.ouicore.vm.GroupMemberVM;
 import io.openim.android.ouigroup.databinding.ActivitySelectedMemberBinding;
 
-public class SelectedMemberActivity extends BaseActivity<GroupVM, ActivitySelectedMemberBinding> {
+public class SelectedMemberActivity extends BasicActivity<ActivitySelectedMemberBinding> {
 
-    private RecyclerViewAdapter<ExGroupMemberInfo, ViewHol.ItemViewHo> adapter;
+    private RecyclerViewAdapter<MultipleChoice, ViewHol.ItemViewHo> adapter;
+    private GroupMemberVM vm;
+    private boolean isUpdate = false;
+    private String vmTag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        bindVMByCache(GroupVM.class);
+        vmTag = getIntent().getStringExtra(Constants.K_RESULT);
+        vm = Easy.find(GroupMemberVM.class,vmTag);
         super.onCreate(savedInstanceState);
-        bindViewDataBinding(ActivitySelectedMemberBinding.inflate(getLayoutInflater()));
-        sink();
+        viewBinding(ActivitySelectedMemberBinding.inflate(getLayoutInflater()));
         initView();
     }
 
-    @Override
-    public void onBackPressed() {
-        setResult(RESULT_OK);
-        super.onBackPressed();
-    }
 
     private void initView() {
         view.submit.setOnClickListener(v -> {
-            setResult(RESULT_OK);
+            if (isUpdate)
+                vm.choiceList.update();
             finish();
         });
         view.recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<ExGroupMemberInfo, ViewHol.ItemViewHo>(ViewHol.ItemViewHo.class) {
+        view.recyclerView.setAdapter(adapter = new RecyclerViewAdapter<MultipleChoice,
+            ViewHol.ItemViewHo>(ViewHol.ItemViewHo.class) {
 
             @Override
-            public void onBindView(@NonNull ViewHol.ItemViewHo holder, ExGroupMemberInfo data, int position) {
-                holder.view.avatar.load(data.groupMembersInfo.getFaceURL());
+            public void onBindView(@NonNull ViewHol.ItemViewHo holder, MultipleChoice data,
+                                   int position) {
+                holder.view.getRoot().setIntercept(!data.isEnabled);
+                holder.view.getRoot().setAlpha(data.isEnabled?1f:0.3f);
+                holder.view.avatar.load(data.icon);
                 holder.view.select.setVisibility(View.GONE);
-                holder.view.nickName.setText(data.groupMembersInfo.getNickname());
+                holder.view.nickName.setText(data.name);
                 holder.view.menu.setVisibility(View.VISIBLE);
                 holder.view.menu.setText(io.openim.android.ouicore.R.string.delete);
-                holder.view.menu.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                holder.view.menu.setTextColor(getResources()
+                    .getColor(android.R.color.holo_red_dark));
                 holder.view.menu.setOnClickListener(v -> {
-                    if (!data.isEnabled){
-                        toast(getString(io.openim.android.ouicore.R.string.group_call_tips));
-                        return;
-                    }
-                    int index = vm.superGroupMembers.getValue().indexOf(data);
-                    vm.superGroupMembers.getValue().get(index).isSelect = false;
-                    adapter.getItems().remove(data);
-                    adapter.notifyItemRemoved(position);
+                    isUpdate=true;
+                    vm.removeChoice(data.key);
+                    adapter.notifyDataSetChanged();
                 });
 
             }
         });
-        List<ExGroupMemberInfo> exGroupMemberInfos = new ArrayList<>();
-        for (ExGroupMemberInfo exGroupMemberInfo : vm.superGroupMembers.getValue()) {
-            if (exGroupMemberInfo.isSelect) exGroupMemberInfos.add(exGroupMemberInfo);
-        }
-        adapter.setItems(exGroupMemberInfos);
+       runOnUiThread(() -> adapter.setItems(vm.choiceList.val()));
     }
-
 }

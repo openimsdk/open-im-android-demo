@@ -13,7 +13,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-import io.openim.android.demo.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.entity.LoginCertificate;
@@ -25,7 +24,9 @@ import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.RegexValid;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.Platform;
@@ -34,10 +35,10 @@ import io.openim.android.sdk.listener.OnBase;
 public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     public static final int MAX_COUNTDOWN = 60;
 
+    public State<Boolean> isPhone = new State<>(true);
     public State<String> account = new State<>("");
     //密码或验证码
     public State<String> pwd = new State<>("");
-    public State<Boolean> isPhone = new State<>(true);
     public State<Integer> countdown = new State<>(MAX_COUNTDOWN);
     public State<String> nickName = new State<>("");
     public State<String> areaCode = new State<>("+86");
@@ -47,6 +48,8 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     public boolean isFindPassword = false;
 
     public void login(String verificationCode, int usedFor) {
+        SharedPreferencesUtil.get(BaseApp.inst()).setCache(Constants.K_LOGIN_TYPE, isPhone.val() ?
+            0 : 1);
         Parameter parameter = getParameter(verificationCode, usedFor);
         N.API(OpenIMService.class)
             .login(parameter.buildJsonBody())
@@ -93,11 +96,11 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     @NonNull
     private Parameter getParameter(String verificationCode, int usedFor) {
         Parameter parameter = new Parameter().add("password",
-            TextUtils.isEmpty(verificationCode) ? md5(pwd.getValue()) : null)
+                TextUtils.isEmpty(verificationCode) ? md5(pwd.val()) : null)
             .add("platform", 2).add("usedFor", usedFor)
             .add("operationID", System.currentTimeMillis() + "")
             .add("verifyCode", verificationCode);
-        if (isPhone.getValue()) {
+        if (isPhone.val()) {
             parameter.add("phoneNumber", account.getValue());
             parameter.add("areaCode", areaCode.val());
         } else
@@ -236,7 +239,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
 
                 @Override
                 public void onSuccess(String o) {
-                  getIView().succ(o);
+                    getIView().succ(o);
                 }
 
                 @Override
@@ -262,7 +265,11 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
         user.put("password", md5(pwdValue));
         user.put("nickname", nickName.getValue());
         user.put("areaCode", areaCode.val());
-        user.put("phoneNumber", account.getValue());
+        if (isPhone.val()) {
+            user.put("phoneNumber", account.getValue());
+        } else {
+            user.put("email", account.getValue());
+        }
         parameter.add("user", user);
 
         WaitDialog waitDialog = showWait();

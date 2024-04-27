@@ -37,6 +37,20 @@
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+        <CheckBox
+            android:id="@+id/empty"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_gravity="center"
+            android:button="@null"
+            android:drawableTop="@mipmap/ic_apple_null"
+            android:drawablePadding="22dp"
+            android:gravity="center"
+            android:text="@string/no_blacklist"
+            android:textColor="@color/txt_shallow"
+            android:textSize="16sp" />
     </LinearLayout>
 </layout>
 

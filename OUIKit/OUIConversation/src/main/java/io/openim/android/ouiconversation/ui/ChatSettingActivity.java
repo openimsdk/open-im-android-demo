@@ -26,7 +26,7 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
@@ -156,7 +156,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
         });
         view.picture.setOnClickListener(v -> {
-            startActivity(new Intent(this, MediaHistoryActivity.class).putExtra(Constant.K_RESULT
+            startActivity(new Intent(this, MediaHistoryActivity.class).putExtra(Constants.K_RESULT
                 , true));
         });
         view.video.setOnClickListener(v -> {
@@ -177,7 +177,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
                 public void onSuccess(String data) {
                     view.readVanish.setCheckedWithAnimation(isChecked);
                 }
-            }, vm.conversationInfo.getValue().getConversationID(), isChecked);
+            }, vm.conversationInfo.val().getConversationID(), isChecked);
         });
         view.topSlideButton.setOnSlideButtonClickListener(is -> {
             contactListVM.pinConversation(vm.conversationInfo.getValue(), is);
@@ -196,7 +196,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
         view.user.setOnClickListener(v -> {
             Postcard postcard = ARouter.getInstance().build(Routes.Main.PERSON_DETAIL);
             LogisticsCenter.completion(postcard);
-            personDetailLauncher.launch(new Intent(this, postcard.getDestination()).putExtra(Constant.K_ID, vm.userID).putExtra(Constant.K_RESULT, true));
+            personDetailLauncher.launch(new Intent(this, postcard.getDestination()).putExtra(Constants.K_ID, vm.userID).putExtra(Constants.K_RESULT, true));
         });
         view.clearRecord.setOnClickListener(v -> {
             CommonDialog commonDialog = new CommonDialog(this);

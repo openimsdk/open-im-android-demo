@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Ex implements Serializable {
+
     public String key; //Id
 
     public Ex(String key) {
@@ -15,8 +16,8 @@ public class Ex implements Serializable {
     @Override
     public boolean equals(@Nullable Object obj) {
         if (null != obj) {
-            if (hashCode() ==
-                obj.hashCode()) return true;
+            if (hashCode() == obj.hashCode())
+                return true;
         }
         return super.equals(obj);
     }

@@ -1,77 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<io.openim.android.ouicore.widget.InterceptLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:paddingLeft="10dp"
     android:paddingRight="10dp">
 
-    <TextView
-        android:id="@+id/time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
-        android:text="今天"
-        android:textColor="@color/txt_black"
-        android:textSize="17sp"
-        android:textStyle="bold" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/media"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        />
-
-    <RelativeLayout
-        android:id="@+id/single"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/icon"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <ImageView
-            android:id="@+id/isVideo"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_video_play" />
-    </RelativeLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="10dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_marginBottom="15dp"
+        android:id="@+id/yearLy"
+        android:orientation="horizontal">
+
+        <include layout="@layout/view_dividing_line"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="1dp" />
 
         <TextView
-            android:id="@+id/content"
-            android:layout_width="match_parent"
+            android:id="@+id/year"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="4"
-            android:text="这是一条工作圈内容，这是一条工
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textColor="#ff8e9ab0"
+            android:textSize="12sp" />
+
+        <include layout="@layout/view_dividing_line"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="1dp" />
+
+    </LinearLayout>
+
+    <io.openim.android.ouicore.widget.InterceptLinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="25dp"
+            android:text="今天"
+            android:textColor="@color/txt_black"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/media"
+            android:layout_width="80dp"
+            android:layout_height="80dp" />
+
+        <RelativeLayout
+            android:id="@+id/single"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <ImageView
+                android:id="@+id/isVideo"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_video_play" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="4"
+                android:text="这是一条工作圈内容，这是一条工
 作圈内容，这是一条工作圈内容。
 这是一条工作圈内容，这是一这是一条工作圈内容，这是一条工
 作圈内容，这是一条工作圈内容。
 这是一条工作圈内容，这是一这是一条工作圈内容，这是一条工
 作圈内容，这是一条工作圈内容。
 这是一条工作圈内容，这是一"
-            android:textColor="#ff0c1c33"
-            android:textSize="14sp" />
+                android:textColor="#ff0c1c33"
+                android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/photoNum"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="共9张"
-            android:textColor="#ff8e9ab0"
-            android:textSize="12sp" />
+            <TextView
+                android:id="@+id/photoNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="共9张"
+                android:textColor="#ff8e9ab0"
+                android:textSize="12sp" />
 
-    </LinearLayout>
+        </LinearLayout>
 
 
-</io.openim.android.ouicore.widget.InterceptLinearLayout>
+    </io.openim.android.ouicore.widget.InterceptLinearLayout>
+</LinearLayout>
+

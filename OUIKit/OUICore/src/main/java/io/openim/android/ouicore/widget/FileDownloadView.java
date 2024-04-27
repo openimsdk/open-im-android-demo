@@ -12,12 +12,9 @@ import androidx.annotation.Nullable;
 import com.liulishuo.okdownload.DownloadTask;
 import com.liulishuo.okdownload.OkDownload;
 import com.liulishuo.okdownload.StatusUtil;
-import com.liulishuo.okdownload.UnifiedListenerManager;
-import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo;
 import com.liulishuo.okdownload.core.cause.EndCause;
 import com.liulishuo.okdownload.core.cause.ResumeFailedCause;
 import com.liulishuo.okdownload.core.listener.DownloadListener1;
-import com.liulishuo.okdownload.core.listener.DownloadListener4;
 import com.liulishuo.okdownload.core.listener.assist.Listener1Assist;
 
 import java.io.File;
@@ -26,9 +23,8 @@ import java.math.BigDecimal;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.OpenFileUtil;
@@ -82,7 +78,7 @@ public class FileDownloadView extends RelativeLayout {
             @Override
             public void click(View v) {
                 if (isCompleted()) {
-                    OpenFileUtil.openFile(getContext(), Constant.File_DIR + fileName);
+                    OpenFileUtil.openFile(getContext(), Constants.File_DIR + fileName);
                 } else {
                     if (getStatus() == StatusUtil.Status.RUNNING) {
                         task.cancel();
@@ -96,7 +92,7 @@ public class FileDownloadView extends RelativeLayout {
 
     private void buildTask() {
         task =
-            new DownloadTask.Builder(targetUrl, new File(Constant.File_DIR))
+            new DownloadTask.Builder(targetUrl, new File(Constants.File_DIR))
                 .setFilename(fileName)
                 // the minimal interval millisecond for callback progress
                 .setMinIntervalMillisCallbackProcess(30).build();
@@ -128,7 +124,7 @@ public class FileDownloadView extends RelativeLayout {
 
     public void setDownBtn(boolean isDown) {
         downBtn.setImageResource(isDown ?
-            R.mipmap.ic_file_download_pause : R.mipmap.ic_file_download);
+            R.mipmap.ic_file_download_pause2 : R.mipmap.ic_file_download);
     }
 
     public void setRes(String url) {
@@ -159,7 +155,7 @@ public class FileDownloadView extends RelativeLayout {
     }
 
     StatusUtil.Status getStatus() {
-        return StatusUtil.getStatus(targetUrl, Constant.File_DIR, fileName);
+        return StatusUtil.getStatus(targetUrl, Constants.File_DIR, fileName);
     }
 
 

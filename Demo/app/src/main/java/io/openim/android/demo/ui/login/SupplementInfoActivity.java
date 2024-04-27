@@ -61,13 +61,8 @@ public class SupplementInfoActivity extends BaseActivity<LoginVM, ActivitySupple
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        removeCacheVM();
-    }
-
-    @Override
     public void jump() {
+        removeCacheVM();
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }

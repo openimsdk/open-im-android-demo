@@ -8,6 +8,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingRight="30dp"
         android:orientation="horizontal">
 
         <TextView
@@ -77,6 +78,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:textColor="#ff8e9ab0"
+                    android:maxLines="3"
+                    android:ellipsize="end"
                     android:textSize="14sp" />
 
                 <TextView
@@ -85,10 +88,33 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
+                    android:maxLines="3"
+                    android:ellipsize="end"
                     android:textColor="#ff8e9ab0"
                     android:textSize="14sp" />
 
+                <TextView
+                    android:id="@+id/history3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:textColor="#ff8e9ab0"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:visibility="gone"
+                    android:textSize="14sp" />
 
+                <TextView
+                    android:id="@+id/history4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:visibility="gone"
+                    android:textColor="#ff8e9ab0"
+                    android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
 

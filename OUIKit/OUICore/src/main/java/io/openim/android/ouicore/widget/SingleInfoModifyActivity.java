@@ -12,6 +12,7 @@ import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.databinding.ActivitySingleModifyBinding;
+import io.openim.android.ouicore.utils.Common;
 
 public class SingleInfoModifyActivity extends BaseActivity<BaseViewModel, ActivitySingleModifyBinding> {
     public static final String SINGLE_INFO_MODIFY_DATA = "single_info_modify_data";
@@ -34,7 +35,12 @@ public class SingleInfoModifyActivity extends BaseActivity<BaseViewModel, Activi
     }
 
     public void complete(View v) {
-        setResult(RESULT_OK, new Intent().putExtra(SINGLE_INFO_MODIFY_DATA, view.editText.getText().toString()));
+        String input=view.editText.getText().toString();
+        if (Common.isBlank(input)){
+            toast(getString(R.string.empty_prompt));
+            return;
+        }
+        setResult(RESULT_OK, new Intent().putExtra(SINGLE_INFO_MODIFY_DATA, input));
         finish();
     }
 

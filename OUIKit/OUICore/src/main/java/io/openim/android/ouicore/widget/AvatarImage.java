@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 
@@ -22,10 +23,12 @@ import com.bumptech.glide.request.transition.Transition;
 import org.raphets.roundimageview.RoundImageView;
 
 import io.openim.android.ouicore.R;
+import io.openim.android.ouicore.base.BaseApp;
 
 public class AvatarImage extends FrameLayout {
-    private RoundImageView roundImageView;
+    private ImageView roundImageView;
     private TextView nameTv;
+    private int resId=-1;
 
     public AvatarImage(@NonNull Context context) {
         super(context);
@@ -42,7 +45,7 @@ public class AvatarImage extends FrameLayout {
         init(context);
     }
 
-    public RoundImageView getRoundImageView() {
+    public ImageView getRoundImageView() {
         return roundImageView;
     }
 
@@ -52,10 +55,8 @@ public class AvatarImage extends FrameLayout {
             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT
                 , LinearLayout.LayoutParams.MATCH_PARENT);
 
-        roundImageView = new RoundImageView(context);
-        roundImageView.setType(RoundImageView.TYPE_ROUND);
-        roundImageView.setCornerRadius(6);
-        roundImageView.setScaleType(ImageView.ScaleType.CENTER);
+        roundImageView=new ImageView(context);
+        roundImageView.setScaleType(ImageView.ScaleType.FIT_XY);
         addView(roundImageView,params);
         nameTv = new TextView(context);
         nameTv.setTextColor(Color.WHITE);
@@ -73,9 +74,18 @@ public class AvatarImage extends FrameLayout {
         load(url, isGroup, null);
     }
 
+    public void setResId(int resId) {
+        this.resId = resId;
+    }
+
     public void load(Object url, boolean isGroup, String name) {
-        int resId = isGroup ? R.mipmap.ic_my_group :
-            io.openim.android.ouicore.R.mipmap.ic_my_friend;
+        roundImageView.setImageDrawable(null);
+        setBackground(null);
+
+        if (resId == -1) {
+            resId = isGroup ? R.mipmap.ic_my_group :
+               R.mipmap.ic_my_friend;
+        }
         roundImageView.setVisibility(GONE);
         nameTv.setVisibility(GONE);
         if (null == url || (url instanceof String && (String.valueOf(url).isEmpty()
@@ -95,29 +105,12 @@ public class AvatarImage extends FrameLayout {
         } else {
             roundImageView.setVisibility(VISIBLE);
 
-
-            Glide.with(getContext())
+            Glide.with(BaseApp.inst())
                 .load(url)
                 .error(resId)
                 .centerInside()
-                .into(new CustomTarget<Drawable>() {
-                    @Override
-                    public void onLoadStarted(@Nullable Drawable placeholder) {
-                        roundImageView.setImageResource(resId);
-                    }
-
-                    @Override
-                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<
-                        ? super Drawable> transition) {
-                        roundImageView.setImageDrawable(resource);
-                    }
-
-                    @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {
-                        roundImageView.setImageDrawable(null);
-                    }
-                });
-
+                .transform(new RoundedCorners(12))
+                .into(roundImageView);
         }
     }
 }

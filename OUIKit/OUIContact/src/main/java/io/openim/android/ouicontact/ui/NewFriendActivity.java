@@ -2,7 +2,6 @@ package io.openim.android.ouicontact.ui;
 
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,13 +14,12 @@ import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import io.openim.android.ouicontact.R;
 import io.openim.android.ouicontact.databinding.ActivityNewFriendBinding;
 import io.openim.android.ouicontact.databinding.ItemFriendNoticeBinding;
 import io.openim.android.ouicontact.vm.ContactVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.sdk.models.FriendApplicationInfo;
@@ -76,8 +74,8 @@ public class NewFriendActivity extends BaseActivity<ContactVM, ActivityNewFriend
                 } else {
                     holder.view.handle.setText(getString(io.openim.android.ouicore.R.string.hil));
                     holder.view.getRoot().setOnClickListener(v -> ARouter.getInstance().build(Routes.Conversation.CHAT)
-                        .withString(Constant.K_ID, data.getFromUserID())
-                        .withString(Constant.K_NAME, data.getFromNickname())
+                        .withString(Constants.K_ID, data.getFromUserID())
+                        .withString(Constants.K_NAME, data.getFromNickname())
                         .navigation());
                 }
 

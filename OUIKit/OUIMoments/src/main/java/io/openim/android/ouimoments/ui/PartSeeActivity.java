@@ -1,15 +1,11 @@
 package io.openim.android.ouimoments.ui;
 
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
@@ -18,17 +14,11 @@ import java.util.List;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
-import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
-import io.openim.android.ouicore.entity.ExUserInfo;
-import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouimoments.bean.MomentsUser;
 import io.openim.android.ouimoments.databinding.ActivityPartSeeBinding;
-import io.openim.android.sdk.models.FriendInfo;
 
 public class PartSeeActivity extends BaseActivity<BaseViewModel, ActivityPartSeeBinding> {
 
@@ -39,9 +29,9 @@ public class PartSeeActivity extends BaseActivity<BaseViewModel, ActivityPartSee
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityPartSeeBinding.inflate(getLayoutInflater()));
         initView();
-        String title = getIntent().getStringExtra(Constant.K_NAME);
+        String title = getIntent().getStringExtra(Constants.K_NAME);
         List<MomentsUser> momentsUsers =
-            (List<MomentsUser>) getIntent().getSerializableExtra(Constant.K_RESULT);
+            (List<MomentsUser>) getIntent().getSerializableExtra(Constants.K_RESULT);
         view.title.setText(title);
         if (null != momentsUsers && !momentsUsers.isEmpty())
             adapter.setItems(momentsUsers);
@@ -61,7 +51,7 @@ public class PartSeeActivity extends BaseActivity<BaseViewModel, ActivityPartSee
 
                 holder.view.getRoot().setOnClickListener(v -> {
                     ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                        .withString(Constant.K_ID, data.userID)
+                        .withString(Constants.K_ID, data.userID)
                         .navigation();
                 });
             }

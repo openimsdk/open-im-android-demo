@@ -64,7 +64,7 @@ public class ResetPasswordActivity extends BaseActivity<LoginVM, ActivityResetPa
         view.submit.setOnClickListener(v -> {
             if (!RegexValid.isValidPassword(password)) {
                 toast(BaseApp.inst().getString(
-                    io.openim.android.ouicore.R.string.password_valid_tips));
+                    io.openim.android.ouicore.R.string.invalid_password));
                 return;
             }
             vm.resetPassword(password);

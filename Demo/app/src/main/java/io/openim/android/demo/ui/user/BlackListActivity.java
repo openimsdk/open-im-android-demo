@@ -70,7 +70,16 @@ public class BlackListActivity extends BaseActivity<FriendVM, ActivityBlackListB
 
     private void listener() {
         vm.blackListUser.observe(this, userInfos -> {
-            adapter.setItems(userInfos);
+            if (userInfos.isEmpty()){
+                view.empty.setVisibility(View.VISIBLE);
+                view.recyclerView.setVisibility(View.GONE);
+            }else {
+                view.recyclerView.setVisibility(View.VISIBLE);
+                adapter.setItems(userInfos);
+
+                view.empty.setVisibility(View.GONE);
+            }
+
         });
     }
 }

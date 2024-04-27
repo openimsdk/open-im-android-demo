@@ -132,11 +132,11 @@ public class CircleVideoView extends LinearLayout implements VideoLoadMvpView, L
                 PreviewMediaVM.MediaData data =new PreviewMediaVM
                     .MediaData(videoUrl);
                 data.thumbnail=imgUrl;
+                data.mediaUrl=videoUrl;
                 data.isVideo=true;
-                mediaVM .previewSingle(data);
+                mediaVM.previewSingle(data);
                 ARouter.getInstance().build(Routes.Conversation.PREVIEW)
-                    .withString("media_url",videoUrl)
-                    .withString("first_frame",imgUrl).navigation();
+                    .navigation();
             }
         });
 

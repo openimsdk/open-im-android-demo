@@ -8,6 +8,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
+import com.twilio.audioswitch.AudioDevice;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
@@ -35,15 +37,17 @@ import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
+import kotlinx.coroutines.CoroutineScope;
 
 public class CallingVM {
+    public final CoroutineScope scope;
     //通话时间
     private Timer timer;
     private int second = 0;
     public MutableLiveData<String> timeStr = new MutableLiveData<>("");
 
     //获取音频服务
-    public AudioManager audioManager;
+//    public AudioManager audioManager;
     private DialogInterface.OnDismissListener dismissListener;
     private OnParticipantsChangeListener onParticipantsChangeListener;
 
@@ -67,7 +71,8 @@ public class CallingVM {
         this.isCallOut = isCallOut;
 
         callViewModel = new CallViewModel(BaseApp.inst());
-        audioManager = (AudioManager) BaseApp.inst().getSystemService(Context.AUDIO_SERVICE);
+        scope = callViewModel.buildScope();
+//        audioManager = (AudioManager) BaseApp.inst().getSystemService(Context.AUDIO_SERVICE);
     }
 
     public void initRemoteVideoRenderer(TextureViewRenderer... viewRenderers) {
@@ -116,7 +121,7 @@ public class CallingVM {
             @Override
             public void onError(int code, String error) {
                 dismissUI();
-                Toast.makeText(BaseApp.inst(), error+"("+code+")", Toast.LENGTH_SHORT).show();
+                Toast.makeText(BaseApp.inst(), error + "(" + code + ")", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -148,7 +153,7 @@ public class CallingVM {
 
             @Override
             public void resumeWith(@NonNull Object o) {
-                audioManager.setSpeakerphoneOn(true);
+                setSpeakerphoneOn(true);
                 if (!isVideoCalls) callViewModel.setCameraEnabled(false);
 
                 localVideoTrack =
@@ -156,9 +161,10 @@ public class CallingVM {
                 if (null != localVideoTrack && null != localSpeakerVideoViews && !localSpeakerVideoViews.isEmpty()) {
                     for (TextureViewRenderer localSpeakerVideoView : localSpeakerVideoViews) {
                         localVideoTrack.addRenderer(localSpeakerVideoView);
+                        localSpeakerVideoView.setTag(localVideoTrack);
                     }
                 }
-                callViewModel.subscribe(callViewModel.getParticipants(), (v) -> {
+                callViewModel.subscribe(callViewModel.getAllParticipants(), (v) -> {
                     if (v.isEmpty()) return null;
                     if (null != onParticipantsChangeListener) {
                         onParticipantsChangeListener.onChange(v);
@@ -169,25 +175,24 @@ public class CallingVM {
                                 for (TextureViewRenderer remoteSpeakerVideoView :
                                     remoteSpeakerVideoViews) {
                                     callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoView,
-                                        participant, new Continuation<Unit>() {
-                                            @NonNull
-                                            @Override
-                                            public CoroutineContext getContext() {
-                                                return EmptyCoroutineContext.INSTANCE;
-                                            }
+                                        participant, scope, new Continuation<Unit>() {
+                                        @NonNull
+                                        @Override
+                                        public CoroutineContext getContext() {
+                                            return EmptyCoroutineContext.INSTANCE;
+                                        }
 
-                                            @Override
-                                            public void resumeWith(@NonNull Object o) {
-                                                L.e("");
-                                            }
-                                        });
+                                        @Override
+                                        public void resumeWith(@NonNull Object o) {
+                                        }
+                                    });
                                 }
                             }
                         }
                     }
 
                     return null;
-                }, callViewModel.buildScope());
+                }, scope);
             }
         });
     }
@@ -244,7 +249,7 @@ public class CallingVM {
         }
     }
 
-    public String buildPrimaryKey(SignalingInfo signalingInfo) {
+    public static String buildPrimaryKey(SignalingInfo signalingInfo) {
         return signalingInfo.getInvitation().getRoomID() + signalingInfo.getInvitation().getInitiateTime();
     }
 
@@ -252,7 +257,9 @@ public class CallingVM {
         OpenIMClient.getInstance().signalingManager.signalingAccept(new OnBase<SignalingCertificate>() {
             @Override
             public void onError(int code, String error) {
+                Toast.makeText(BaseApp.inst(), "加入会议失败,服务器错误(" + code + ")", Toast.LENGTH_LONG).show();
                 L.e(CallingServiceImp.TAG, error + code);
+                dismissUI();
             }
 
             @Override
@@ -271,25 +278,33 @@ public class CallingVM {
 
     public void unBindView() {
         try {
-            callViewModel.onCleared();
             cancelTimer();
             if (null != localVideoTrack) {
                 if (null != localSpeakerVideoViews) {
                     for (TextureViewRenderer localSpeakerVideoView : localSpeakerVideoViews) {
+                        localSpeakerVideoView.release();
                         localVideoTrack.removeRenderer(localSpeakerVideoView);
                     }
                 }
             }
             for (TextureViewRenderer textureViewRenderer : remoteSpeakerVideoViews) {
+                textureViewRenderer.release();
                 Object videoTask = textureViewRenderer.getTag();
                 if (null != videoTask) {
                     ((VideoTrack) videoTask).removeRenderer(textureViewRenderer);
                 }
             }
+            callViewModel.onCleared();
             L.e("unBindView");
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void setSpeakerphoneOn(boolean isChecked) {
+        callViewModel.getAudioHandler().selectDevice(isChecked ?
+            new AudioDevice.Speakerphone() :
+            new AudioDevice.Earpiece());
     }
 
 

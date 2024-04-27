@@ -22,7 +22,7 @@ import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.ex.CommEx;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.ouimoments.databinding.ActivitySelectDataBinding;
 
@@ -70,7 +70,7 @@ public class SelectDataActivity extends BaseActivity<BaseViewModel, ActivitySele
             for (RuleData ruleData : adapter.getItems()) {
                 if (ruleData.isSelect) selectRuleData.add(ruleData);
             }
-            setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
+            setResult(RESULT_OK, new Intent().putExtra(Constants.K_RESULT,
                 (Serializable) selectRuleData));
             finish();
         });
@@ -181,10 +181,10 @@ public class SelectDataActivity extends BaseActivity<BaseViewModel, ActivitySele
     }
 
     private void init() {
-        title = getIntent().getStringExtra(Constant.K_NAME);
-        isGroup = getIntent().getBooleanExtra(Constant.K_FROM, false);
-        ruleDatas = (List<RuleData>) getIntent().getSerializableExtra(Constant.K_RESULT);
-        maxNum = getIntent().getIntExtra(Constant.K_SIZE, 999);
+        title = getIntent().getStringExtra(Constants.K_NAME);
+        isGroup = getIntent().getBooleanExtra(Constants.K_FROM, false);
+        ruleDatas = (List<RuleData>) getIntent().getSerializableExtra(Constants.K_RESULT);
+        maxNum = getIntent().getIntExtra(Constants.K_SIZE, 999);
 
         installData();
     }

@@ -1,6 +1,11 @@
 package io.openim.android.ouicore.net.RXRetrofit.Exception;
 
 
+import android.content.Context;
+
+import io.openim.android.ouicore.R;
+import io.openim.android.ouicore.base.BaseApp;
+
 public class RXRetrofitException extends Exception {
 
     private static final long serialVersionUID = 114946L;
@@ -10,48 +15,54 @@ public class RXRetrofitException extends Exception {
         super(getErrTips(code, errMsg));
     }
 
-//    ErrPassword                 = errs.NewCodeError(20001, "PasswordError")            // 密码错误
-//    ErrAccountNotFound          = errs.NewCodeError(20002, "AccountNotFound")          // 账号不存在
-//    ErrPhoneAlreadyRegister     = errs.NewCodeError(20003, "PhoneAlreadyRegister")     // 手机号已经注册
-//    ErrAccountAlreadyRegister   = errs.NewCodeError(20004, "AccountAlreadyRegister")   // 账号已经注册
-//    ErrVerifyCodeSendFrequently = errs.NewCodeError(20005, "VerifyCodeSendFrequently") // 频繁获取验证码
-//    ErrVerifyCodeNotMatch       = errs.NewCodeError(20006, "VerifyCodeNotMatch")       // 验证码错误
-//    ErrVerifyCodeExpired        = errs.NewCodeError(20007, "VerifyCodeExpired")        // 验证码过期
-//    ErrVerifyCodeMaxCount       = errs.NewCodeError(20008, "VerifyCodeMaxCount")       //
-//    验证码失败次数过多
-//    ErrVerifyCodeUsed           = errs.NewCodeError(20009, "VerifyCodeUsed")           // 已经使用
-//    ErrInvitationCodeUsed       = errs.NewCodeError(20010, "InvitationCodeUsed")       // 邀请码已经使用
-//    ErrInvitationNotFound       = errs.NewCodeError(20011, "InvitationNotFound")       // 邀请码不存在
-//    ErrForbidden                = errs.NewCodeError(20012, "Forbidden")                // 限制登录注册
-//    ErrRefuseFriend             = errs.NewCodeError(20013, "RefuseFriend")             // 拒绝添加好友
+    //"1101" = "账号不存在";
+//"20001" = "密码错误";
+//"20002" = "账号不存在";
+//"20003" = "手机号已注册";
+//"20004" = "账号已注册";
+//"20005" = "频繁获取验证码";
+//"20006" = "验证码错误";
+//"20007" = "验证码过期";
+//"20008" = "验证码失败次数过多";
+//"20009" = "验证码已经使用";
+//"20010" = "邀请码已经使用";
+//"20011" = "邀请码不存在";
+//"20012" = "被禁止登录注册";
+//"20013" = "拒绝添加好友";
+//"20014" = "邮箱已注册";
     private static String getErrTips(int code, String errMsg) {
+        Context context = BaseApp.inst();
         switch (code) {
-            case 20001:
-                return "密码错误";
+            case 1101:
             case 20002:
-                return "账号不存在";
+                return context
+                    .getString(R.string.account_not_exist);
+            case 20001:
+                return context.getString(R.string.wrong_password);
             case 20003:
-                return "手机号已经注册";
+                return context.getString(R.string.phone_num_registered);
             case 20004:
-                return "账号已经注册";
+                return context.getString(R.string.account_registered);
             case 20005:
-                return "频繁获取验证码";
+                return context.getString(R.string.get_codes_frequently);
             case 20006:
-                return "验证码错误";
+                return context.getString(R.string.vq_err);
             case 20007:
-                return "验证码过期";
+                return context.getString(R.string.vq_expired);
             case 20008:
-                return " 验证码失败次数过多";
+                return context.getString(R.string.vq_failed_num_too_many);
             case 20009:
-                return " 验证码已经使用";
+                return context.getString(R.string.vq_used);
             case 20010:
-                return " 邀请码已经使用";
+                return context.getString(R.string.invite_used);
             case 20011:
-                return " 邀请码不存在";
+                return context.getString(R.string.invite_not_exist);
             case 20012:
-                return " 限制登录注册";
+                return context.getString(R.string.restrict_login_registration);
             case 20013:
-                return " 拒绝添加好友";
+                return context.getString(R.string.decline_add);
+            case 20014:
+                return context.getString(R.string.emil_registered);
         }
         return errMsg;
     }

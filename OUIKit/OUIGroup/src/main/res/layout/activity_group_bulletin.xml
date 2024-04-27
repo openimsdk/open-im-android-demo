@@ -69,65 +69,69 @@
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
-        <RelativeLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/maxTips"
-                android:layout_alignParentRight="true"
-                android:layout_marginBottom="200dp"
-                android:layout_marginRight="50dp"
-                android:layout_alignParentBottom="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/txt_shallow" />
-
-            <EditText
-                android:id="@+id/content"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@null"
-                android:enabled="false"
-                android:gravity="top"
-                android:maxLength="250"
-                android:padding="22dp"
-
-                android:text="@={GroupVM.groupsInfo.notification}"
-                android:textColor="#ff333333"
-                android:textSize="16sp" />
-
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="100dp"
-                android:gravity="center_vertical">
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
-
-                <View
-                    android:layout_width="20dp"
-                    android:layout_height="0.5dp"
-                    android:background="#ff999999" />
+                <EditText
+                    android:id="@+id/content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:gravity="top"
+                    android:minHeight="250dp"
+                    android:maxLength="250"
+                    android:padding="22dp"
+                    android:textIsSelectable="true"
+                    android:text="@={GroupVM.groupsInfo.notification}"
+                    android:textColor="#ff333333"
+                    android:textSize="16sp" />
 
                 <TextView
+                    android:id="@+id/maxTips"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:text="@string/bulletin_edit_tips"
-                    android:textColor="#ff999999"
-                    android:textSize="14sp" />
+                    android:layout_gravity="right"
+                    android:layout_marginRight="50dp"
+                    android:textColor="@color/txt_shallow" />
 
-                <View
-                    android:layout_width="20dp"
-                    android:layout_height="0.5dp"
-                    android:background="#ff999999" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="50dp"
+                    android:layout_marginBottom="100dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="20dp"
+                        android:layout_height="0.5dp"
+                        android:background="#ff999999" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:text="@string/bulletin_edit_tips"
+                        android:textColor="#ff999999"
+                        android:textSize="14sp" />
+
+                    <View
+                        android:layout_width="20dp"
+                        android:layout_height="0.5dp"
+                        android:background="#ff999999" />
+                </LinearLayout>
+
             </LinearLayout>
-
-        </RelativeLayout>
+        </ScrollView>
 
     </LinearLayout>
 </layout>

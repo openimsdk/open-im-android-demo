@@ -1,21 +1,17 @@
 package io.openim.android.demo;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 
-import androidx.annotation.NonNull;
 import androidx.multidex.MultiDex;
 
 
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.igexin.sdk.IUserLoggerInterface;
 import com.igexin.sdk.PushManager;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
-import java.io.IOException;
-import java.util.List;
+import java.io.File;
 
 import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.ouicore.base.BaseApp;
@@ -26,16 +22,15 @@ import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.net.RXRetrofit.HttpConfig;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.update.UpdateApp;
 import io.openim.android.ouicore.utils.ActivityManager;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.sdk.listener.OnConnListener;
-import io.realm.Realm;
-import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -46,28 +41,51 @@ public class DemoApplication extends BaseApp {
 
     @Override
     public void onCreate() {
-        L.e("App", "-----onCreate");
+        L.e(TAG, "-----onCreate------");
         super.onCreate();
-        initController();
-
         MultiDex.install(this);
-        //ARouter init
-        ARouter.init(this);
-//        ARouter.openimLog();
-//        ARouter.openDebug();
 
-        initPush();
-        //net init
+        initFile();
+        initARouter();
+        initController();
         initNet();
-
-        //im 初始化
+        initBugly();
+        initPush();
         initIM();
 
+        EmojiManager.install(new GoogleEmojiProvider());
         //音频播放
         SPlayer.init(this);
-        SPlayer.instance().setCacheDirPath(Constant.AUDIO_DIR);
+        SPlayer.instance().setCacheDirPath(Constants.AUDIO_DIR);
+    }
 
-        EmojiManager.install(new GoogleEmojiProvider());
+    private void initFile() {
+        buildDirectory(Constants.AUDIO_DIR);
+        buildDirectory(Constants.VIDEO_DIR);
+        buildDirectory(Constants.PICTURE_DIR);
+        buildDirectory(Constants.File_DIR);
+    }
+
+    private boolean buildDirectory(String path) {
+        File file = new File(path);
+        if (file.exists())
+            return true;
+        return file.mkdirs();
+    }
+
+    private void initARouter() {
+        ARouter.init(this);
+//        if (L.isDebug){
+//            ARouter.openLog();
+//            ARouter.openDebug();
+//        }
+    }
+
+    private void initBugly() {
+        CrashReport.setAppChannel(this,Common.isApkDebug() ? "debug" : "release");
+        CrashReport.initCrashReport(getApplicationContext(), "4d365d80d1", L.isDebug);
+
+        new UpdateApp().init(R.mipmap.ic_launcher).checkUpdate(BaseApp.inst());
     }
 
 
@@ -82,17 +100,17 @@ public class DemoApplication extends BaseApp {
     }
 
     private void initNet() {
-        N.init(new HttpConfig().setBaseUrl(Constant.getAppAuthUrl())
-            .addInterceptor(chain -> {
-                String token = "";
-                try {
-                    token = BaseApp.inst().loginCertificate.chatToken;
-                } catch (Exception ignored) {
-                }
-                return chain.proceed(chain.request().newBuilder().addHeader("token",
-                    token).addHeader("operationID",
-                    System.currentTimeMillis() + "").build());
-            }));
+        N.init(new HttpConfig().setBaseUrl(Constants.getAppAuthUrl()).addInterceptor(chain -> {
+            String token = "";
+            try {
+                token = BaseApp.inst().loginCertificate.chatToken;
+            } catch (Exception ignored) {
+            }
+            Request request = chain.request().newBuilder().addHeader("token", token).addHeader(
+                "operationID", System.currentTimeMillis() + "").build();
+            Response response = chain.proceed(request);
+            return response;
+        }));
     }
 
     private void initIM() {
@@ -136,15 +154,14 @@ public class DemoApplication extends BaseApp {
 
         });
     }
+
     public void offline() {
         LoginCertificate.clear();
-        CallingService callingService = (CallingService) ARouter.getInstance()
-            .build(Routes.Service.CALLING).navigation();
-        if (null != callingService)
-            callingService.stopAudioVideoService(BaseApp.inst());
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null != callingService) callingService.stopAudioVideoService(BaseApp.inst());
 
         ActivityManager.finishAllExceptActivity();
-        startActivity(new Intent(BaseApp.inst(), LoginActivity.class)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        startActivity(new Intent(BaseApp.inst(), LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }

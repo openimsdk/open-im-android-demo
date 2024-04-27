@@ -6,12 +6,8 @@ import io.openim.android.demo.ui.ServerConfigActivity;
 import io.openim.android.demo.ui.main.MainActivity;
 
 import android.content.res.Configuration;
-import android.database.DatabaseUtils;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.view.GestureDetector;
@@ -24,23 +20,21 @@ import androidx.annotation.NonNull;
 
 import com.hbb20.CountryCodePicker;
 
-import org.intellij.lang.annotations.Language;
-
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityLoginBinding;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
+import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
 
 public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> implements LoginVM.ViewAction {
@@ -72,11 +66,13 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
     void initView() {
         waitDialog = new WaitDialog(this);
         view.loginContent.setLoginVM(vm);
+        view.setLoginVM(vm);
 
         CountryCodePicker.Language language = buildDefaultLanguage();
         view.loginContent.countryCode.changeDefaultLanguage(language);
 
-        view.version.setText(Common.getAppVersionName(this));
+        view.version.setText(Common.getAppPackageInfo().versionName);
+        vm.isPhone.setValue(SharedPreferencesUtil.get(this).getInteger(Constants.K_LOGIN_TYPE)==0);
     }
 
     public static CountryCodePicker.Language buildDefaultLanguage() {
@@ -107,12 +103,14 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
             view.loginContent.edt1.setHint(v ?
                 getString(io.openim.android.ouicore.R.string.input_phone) :
                 getString(io.openim.android.ouicore.R.string.input_mail));
-            view.registerTv.setText(v ?
-                getString(io.openim.android.ouicore.R.string.phone_register) :
-                getString(io.openim.android.ouicore.R.string.mail_register));
         });
         vm.account.observe(this, v -> submitEnabled());
         vm.pwd.observe(this, v -> submitEnabled());
+
+    }
+
+    private void toRegister() {
+        startActivity(new Intent(this, RegisterActivity.class));
     }
 
     private final GestureDetector gestureDetector = new GestureDetector(BaseApp.inst(),
@@ -126,21 +124,34 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
 
     private void click() {
         view.welcome.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
-        view.phoneTv.setOnClickListener(v -> {
-            vm.isPhone.setValue(true);
-        });
-        view.mailTv.setOnClickListener(v -> {
-            vm.isPhone.setValue(false);
-        });
-        view.loginContent.clear.setOnClickListener(v -> view.loginContent.edt1.setText(""));
-        view.loginContent.eyes.setOnCheckedChangeListener((buttonView, isChecked) -> view.loginContent.edt2.setTransformationMethod(isChecked ? HideReturnsTransformationMethod.getInstance() : PasswordTransformationMethod.getInstance()));
-        view.protocol.setOnCheckedChangeListener((buttonView, isChecked) -> submitEnabled());
-        view.registerTv.setOnClickListener(v -> {
-            vm.isFindPassword=false;
-            startActivity(new Intent(this,
-                RegisterActivity.class));
+        view.changeLoginType.setOnClickListener(v -> {
+            vm.isPhone.setValue( !vm.isPhone.val());
         });
 
+        view.loginContent.clear.setOnClickListener(v -> view.loginContent.edt1.setText(""));
+        view.loginContent.clearPwd.setOnClickListener(v -> view.loginContent.edt2.setText(""));
+        view.loginContent.eyes.setOnCheckedChangeListener((buttonView, isChecked) -> view.loginContent.edt2.setTransformationMethod(isChecked ? HideReturnsTransformationMethod.getInstance() : PasswordTransformationMethod.getInstance()));
+        view.protocol.setOnCheckedChangeListener((buttonView, isChecked) -> submitEnabled());
+        view.registerTv.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                BottomPopDialog dialog =new BottomPopDialog(LoginActivity.this);
+                dialog.getMainView().menu1.setText(io.openim.android.ouicore.R.string.phone_register);
+                dialog.getMainView().menu2.setText(io.openim.android.ouicore.R.string.email_register);
+                dialog.getMainView().menu3.setOnClickListener(v1 -> dialog.dismiss());
+                dialog.getMainView().menu1.setOnClickListener(v1 -> {
+                    vm.isPhone.setValue(true);
+                    vm.isFindPassword=false;
+                    toRegister();
+                });
+                dialog.getMainView().menu2.setOnClickListener(v1 -> {
+                    vm.isPhone.setValue(false);
+                    vm.isFindPassword=false;
+                    toRegister();
+                });
+                dialog.show();
+            }
+        });
         view.submit.setOnClickListener(v -> {
             vm.areaCode.setValue("+"+view.loginContent.countryCode.getSelectedCountryCode());
             waitDialog.show();
@@ -156,8 +167,21 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
             vm.getVerificationCode(3);
         });
         view.loginContent.forgotPasswordTv.setOnClickListener(v -> {
-            vm.isFindPassword = true;
-            startActivity(new Intent(this, RegisterActivity.class));
+            BottomPopDialog dialog =new BottomPopDialog(LoginActivity.this);
+            dialog.getMainView().menu1.setText(io.openim.android.ouicore.R.string.forgot_pasword_by_phone);
+            dialog.getMainView().menu2.setText(io.openim.android.ouicore.R.string.forgot_pasword_by_email);
+            dialog.getMainView().menu3.setOnClickListener(v1 -> dialog.dismiss());
+            dialog.getMainView().menu1.setOnClickListener(v1 -> {
+                vm.isPhone.setValue(true);
+                vm.isFindPassword=true;
+                toRegister();
+            });
+            dialog.getMainView().menu2.setOnClickListener(v1 -> {
+                vm.isPhone.setValue(false);
+                vm.isFindPassword=true;
+                toRegister();
+            });
+            dialog.show();
         });
     }
 

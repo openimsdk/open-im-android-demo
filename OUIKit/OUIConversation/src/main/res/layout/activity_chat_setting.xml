@@ -12,7 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F6F6F6FF"
+        android:background="@color/theme_bg"
         android:orientation="vertical"
         tools:context=".ui.ChatSettingActivity">
 
@@ -44,10 +44,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:background="@color/white"
             android:orientation="horizontal"
-            android:padding="22dp">
+            android:padding="16dp">
 
             <LinearLayout
                 android:id="@+id/user"
@@ -83,11 +83,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
             android:background="@color/white"
             android:orientation="vertical"
             android:paddingLeft="22dp"
-            android:paddingTop="18dp"
+            android:paddingTop="16dp"
             android:paddingRight="22dp">
 
             <TextView
@@ -100,8 +100,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="23dp"
-                android:layout_marginBottom="28dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="16dp"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -131,6 +131,10 @@
 
                     </LinearLayout>
                 </LinearLayout>
+                <View
+                    android:layout_width="0dp"
+                    android:layout_weight="0.5"
+                    android:layout_height="0dp"/>
 
                 <LinearLayout
                     android:id="@+id/picture"
@@ -159,7 +163,10 @@
 
                     </LinearLayout>
                 </LinearLayout>
-
+                <View
+                    android:layout_width="0dp"
+                    android:layout_weight="0.5"
+                    android:layout_height="0dp"/>
                 <LinearLayout
                     android:id="@+id/video"
                     android:layout_width="0dp"
@@ -187,7 +194,10 @@
 
                     </LinearLayout>
                 </LinearLayout>
-
+                <View
+                    android:layout_width="0dp"
+                    android:layout_weight="0.5"
+                    android:layout_height="0dp"/>
                 <LinearLayout
                     android:id="@+id/file"
                     android:layout_width="0dp"
@@ -223,7 +233,7 @@
             android:id="@+id/topChat"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
             android:background="@color/white"
             android:gravity="center_vertical"
             android:paddingLeft="22dp"
@@ -270,8 +280,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/sty_radius_6_white"
             android:gravity="center_vertical"
             android:orientation="vertical"
@@ -335,7 +345,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/sty_radius_6_white"
             android:gravity="center_vertical"
             android:orientation="vertical"
@@ -423,7 +433,7 @@
             android:id="@+id/clearRecord"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
             android:background="@color/white"
             android:gravity="center_vertical"
             android:paddingLeft="22dp"
@@ -434,7 +444,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/clear_chat_record"
-                android:textColor="#ff333333"
+                android:textColor="@color/txt_warning"
                 android:textSize="16sp" />
 
             <ImageView

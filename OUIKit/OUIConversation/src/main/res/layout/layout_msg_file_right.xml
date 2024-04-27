@@ -89,6 +89,13 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp" />
 
+                    <io.openim.android.ouicore.widget.FileDownloadView
+                        android:id="@+id/downloadView"
+                        android:visibility="gone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp" />
+
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

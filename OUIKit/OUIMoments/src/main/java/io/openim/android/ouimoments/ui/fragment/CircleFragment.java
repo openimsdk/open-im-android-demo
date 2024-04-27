@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,20 +30,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Obs;
-import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
 import io.openim.android.ouicore.widget.SpacesItemDecoration;
@@ -92,7 +86,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
 
     public static CircleFragment newInstance(User user) {
         Bundle args = new Bundle();
-        args.putSerializable(Constant.K_RESULT, user);
+        args.putSerializable(Constants.K_RESULT, user);
         CircleFragment fragment = new CircleFragment();
         fragment.setArguments(args);
         return fragment;
@@ -122,7 +116,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
         super.onCreate(savedInstanceState);
         presenter = new CirclePresenter(this);
         if (getArguments() != null) {
-            presenter.user = (User) getArguments().getSerializable(Constant.K_RESULT);
+            presenter.user = (User) getArguments().getSerializable(Constants.K_RESULT);
         }
         getActivity().getWindow().getDecorView()
             .getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
@@ -214,8 +208,8 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
                 super.onScrolled(recyclerView, dx, dy);
                 Rect rect = new Rect();
                 recyclerView.getWindowVisibleDisplayFrame(rect);
-                boolean visible = rect.bottom - rect.top <= 0;
-                L.e("visible----" + visible + "==rect.bottom=" + rect.bottom + "==rect.top==" + rect.top);
+//                boolean visible = rect.bottom - rect.top <= 0;
+//                L.e("visible----" + visible + "==rect.bottom=" + rect.bottom + "==rect.top==" + rect.top);
                 int alpha = getScrolledYDistance();
                 if (alpha >= 255) {
                     alpha = 255;
@@ -315,7 +309,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
             resultLauncher.launch(new Intent(getActivity(), PushMomentsActivity.class));
         });
         view.pushVideo.setOnClickListener(v1 -> {
-            resultLauncher.launch(new Intent(getActivity(), PushMomentsActivity.class).putExtra(Constant.K_RESULT, false));
+            resultLauncher.launch(new Intent(getActivity(), PushMomentsActivity.class).putExtra(Constants.K_RESULT, false));
         });
         //设置PopupWindow的视图内容
         popupWindow.setContentView(view.getRoot());
@@ -340,9 +334,9 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
                 r.top = statusBarH;
             }
             int keyboardH = screenH - (r.bottom - r.top);
-            Log.d(TAG,
-                "screenH＝ " + screenH + " &keyboardH = " + keyboardH + " &r.bottom=" + r.bottom + " &top=" + r.top + " &statusBarH=" + statusBarH);
-
+//            Log.d(TAG,
+//                "screenH＝ " + screenH + " &keyboardH = " + keyboardH + " &r.bottom=" + r.bottom + " &top=" + r.top + " &statusBarH=" + statusBarH);
+//
             if (keyboardH == currentKeyboardH) {//有变化时才处理，否则会陷入死循环
                 return;
             }
@@ -464,6 +458,9 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
             circleAdapter.getDatas().addAll(datas);
         }
         circleAdapter.notifyDataSetChanged();
+        //重置
+        circleAdapter.lastYear=null;
+        circleAdapter.lastMd=null;
 
         if (datas.size() < CirclePresenter.pageSize) {
             recyclerView.removeMoreListener();
@@ -568,7 +565,7 @@ public class CircleFragment extends BaseFragment implements CircleContract.View,
     @Override
     public void update(Observable o, Object arg) {
         Obs.Message msg = (Obs.Message) arg;
-        if (msg.tag == Constant.Event.USER_INFO_UPDATE) {
+        if (msg.tag == Constants.Event.USER_INFO_UPDATE) {
             recyclerView.setRefreshing(true);
             refreshListener.onRefresh();
         }

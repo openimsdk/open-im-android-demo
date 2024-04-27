@@ -8,7 +8,8 @@
             type="io.openim.android.ouiconversation.vm.ChatVM" />
     </data>
 
-    <io.openim.android.ouicore.widget.InterceptLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <io.openim.android.ouicore.widget.InterceptLinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -18,6 +19,7 @@
         android:tag="layout/layout_input_cote_0">
 
         <LinearLayout
+            android:id="@+id/main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -57,9 +59,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/sty_radius_4_white"
-                        android:maxHeight="80dp"
+                        android:maxHeight="90dp"
                         android:minHeight="36dp"
                         android:paddingStart="3dp"
+                        android:imeOptions="actionSend"
                         android:text="@={ChatVM.inputMsg}"
                         android:visibility="visible" />
 
@@ -142,6 +145,30 @@
                 android:src="@mipmap/ic_chat_add" />
 
         </LinearLayout>
+        <RelativeLayout
+            android:id="@+id/highTips"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:background="@color/theme_bg"
+            android:layout_height="60dp">
+            <TextView
+                android:id="@+id/tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/quited_tips"
+                android:layout_centerInParent="true"
+                android:textColor="#ff8e9ab0"
+                android:textSize="14sp"
+                />
+            <ImageView
+                android:layout_toLeftOf="@id/tips"
+                android:layout_width="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_centerVertical="true"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_ex_mark"/>
+        </RelativeLayout>
+
 
         <FrameLayout
             android:id="@+id/fragment_container"

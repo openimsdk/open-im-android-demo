@@ -17,13 +17,11 @@ import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.hjq.permissions.Permission;
 import com.hjq.window.EasyWindow;
 import com.igexin.sdk.PushManager;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
-import io.openim.android.demo.ui.ServerConfigActivity;
 import io.openim.android.demo.ui.login.LoginActivity;
 import io.openim.android.demo.ui.user.PersonalFragment;
 import io.openim.android.demo.vm.LoginVM;
@@ -34,11 +32,14 @@ import io.openim.android.ouiconversation.ui.fragment.ConversationListFragment;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
+import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.vm.NotificationVM;
+import io.openim.android.ouicore.vm.UserLogic;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
@@ -47,11 +48,10 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     private BaseFragment lastFragment, conversationListFragment, contactFragment,
         personalFragment, appletFragment;
     private ActivityResultLauncher<Intent> resultLauncher = Common.getCaptureActivityLauncher(this);
-    private HasPermissions hasShoot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        init();
+        init(getIntent());
 
         PushManager.getInstance().initialize(this);
         bindVM(MainVM.class);
@@ -73,18 +73,32 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         try {
             Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
             LogisticsCenter.completion(postcard);
-            ActivityManager.finishActivity(postcard.getDestination());
-            EasyWindow.cancelAll();
-        } catch (Exception ignore) {
-        }
+            if (ActivityManager.getActivityStack().peek().getClass() == postcard.getDestination()){
+                ActivityManager.finishActivity(postcard.getDestination());
+                EasyWindow.cancelAll();
+            }
+        } catch (Exception ignore) {}
     }
 
 
-    private void init() {
-       Common.UIHandler.postDelayed(() -> new HasPermissions(MainActivity.this, Permission.SYSTEM_ALERT_WINDOW)
-           .safeGo(() -> new HasPermissions(MainActivity.this, Permission.CAMERA,
-               Permission.RECORD_AUDIO).safeGo(() -> {
-           })),2000);
+    private void init(Intent intent) {
+        Easy.find(UserLogic.class).loginCacheUser();
+        callingStatus();
+    }
+
+    private void callingStatus() {
+        CallingService callingService =
+            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (null != callingService && callingService.getCallStatus()) {
+            callingService.buildCallDialog(this, null,
+                false).show();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        callingStatus();
     }
 
     private void listener() {
@@ -93,24 +107,18 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
 
 
     private void bindDot() {
-        ContactVM contactVM = ((ContactFragment) contactFragment).getVM();
-        if (null == contactVM) return;
-        contactVM.friendDotNum.observe(this, integer -> {
-            view.badge.setVisibility((integer > 0 || contactVM.groupDotNum.val() > 0) ?
-                View.VISIBLE : View.GONE);
-        });
-        contactVM.groupDotNum.observe(this, integer -> {
-            view.badge.setVisibility((integer > 0 || contactVM.friendDotNum.val() > 0) ?
-                View.VISIBLE : View.GONE);
-        });
+        NotificationVM notificationVM=Easy.find(NotificationVM.class);
+        notificationVM.friendDot.observe(this, v -> view.badge.setVisibility((notificationVM.hasDot()) ?
+            View.VISIBLE : View.GONE));
+        notificationVM.groupDot.observe(this, v -> view.badge.setVisibility((notificationVM.hasDot()) ?
+            View.VISIBLE : View.GONE));
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             RadioButton[] menus = new RadioButton[]{view.men1, view.men2, view.men3, view.men4};
-            if (v == view.men1)
-                switchFragment(conversationListFragment);
+            if (v == view.men1) switchFragment(conversationListFragment);
             if (v == view.men2) switchFragment(contactFragment);
             if (v == view.men3) switchFragment(appletFragment);
             if (v == view.men4) switchFragment(personalFragment);
@@ -216,5 +224,9 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         }
     }
 
-
+    @Override
+    protected void onNewIntent(Intent intent) {
+        init(intent);
+        super.onNewIntent(intent);
+    }
 }

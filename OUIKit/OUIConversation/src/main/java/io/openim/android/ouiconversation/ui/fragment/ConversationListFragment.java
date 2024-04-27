@@ -48,6 +48,8 @@ import io.openim.android.ouiconversation.ui.NotificationActivity;
 import io.openim.android.ouiconversation.ui.SearchActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.ex.MultipleChoice;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
@@ -58,14 +60,16 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
+import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.FriendInfo;
 
 @Route(path = Routes.Conversation.CONTACT_LIST)
 public class ConversationListFragment extends BaseFragment<ContactListVM> implements ContactListVM.ViewAction, Observer {
@@ -130,24 +134,24 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
         if (msgConversation.conversationInfo.getConversationType() == ConversationType.NOTIFICATION) {
             //系统通知
             Intent intent =
-                new Intent(getContext(), NotificationActivity.class).putExtra(Constant.K_NAME
-                    , msgConversation.conversationInfo.getShowName()).putExtra(Constant.K_ID,
+                new Intent(getContext(), NotificationActivity.class).putExtra(Constants.K_NAME
+                    , msgConversation.conversationInfo.getShowName()).putExtra(Constants.K_ID,
                     msgConversation.conversationInfo.getConversationID());
             startActivity(intent);
             return;
         }
         Intent intent = new Intent(getContext(), ChatActivity.class)
-            .putExtra(Constant.K_NAME
+            .putExtra(Constants.K_NAME
                 , msgConversation.conversationInfo.getShowName());
         if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT)
-            intent.putExtra(Constant.K_ID, msgConversation.conversationInfo.getUserID());
+            intent.putExtra(Constants.K_ID, msgConversation.conversationInfo.getUserID());
 
         if (msgConversation.conversationInfo.getConversationType() == ConversationType.GROUP_CHAT
             || msgConversation.conversationInfo.getConversationType() == ConversationType.SUPER_GROUP_CHAT)
-            intent.putExtra(Constant.K_GROUP_ID, msgConversation.conversationInfo.getGroupID());
+            intent.putExtra(Constants.K_GROUP_ID, msgConversation.conversationInfo.getGroupID());
 
         if (msgConversation.conversationInfo.getGroupAtType() == ConversationType.NOTIFICATION)
-            intent.putExtra(Constant.K_NOTICE, msgConversation.notificationMsg);
+            intent.putExtra(Constants.K_NOTICE, msgConversation.notificationMsg);
         startActivity(intent);
 
         //重置强提醒
@@ -231,11 +235,6 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
             adapter.setConversationInfos(v);
             adapter.notifyDataSetChanged();
         });
-        vm.subscribe(getActivity(), subject -> {
-            if (subject.equals(ContactListVM.NOTIFY_ITEM_CHANGED)) {
-                adapter.notifyItemChanged((Integer) subject.value);
-            }
-        });
 
         Animation animation = AnimationUtils.loadAnimation(getActivity(),
             R.anim.animation_repeat_spinning);
@@ -263,8 +262,8 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
     }
 
     private void initHeader() {
-        user.info.observe(getActivity(),v-> {
-            view.avatar.load(v.getFaceURL(),v.getNickname());
+        user.info.observe(getActivity(), v -> {
+            view.avatar.load(v.getFaceURL(), v.getNickname());
             view.name.setText(v.getNickname());
         });
         view.addFriend.setOnClickListener(this::showPopupWindow);
@@ -292,14 +291,31 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
         });
         view.addGroup.setOnClickListener(c -> {
             popupWindow.dismiss();
-            ARouter.getInstance().build(Routes.Main.ADD_CONVERS).withBoolean(Constant.K_RESULT,
+            ARouter.getInstance().build(Routes.Main.ADD_CONVERS).withBoolean(Constants.K_RESULT,
                 false).navigation();
         });
         view.createGroup.setOnClickListener(c -> {
             popupWindow.dismiss();
 
-            Easy.installVM(SelectTargetVM.class)
+            SelectTargetVM targetVM = Easy.installVM(SelectTargetVM.class)
                 .setIntention(SelectTargetVM.Intention.isCreateGroup);
+            targetVM.setOnFinishListener(() -> {
+                GroupVM groupVM = BaseApp.inst().getVMByCache(GroupVM.class);
+                if (null == groupVM)
+                    groupVM = new GroupVM();
+                groupVM.selectedFriendInfo.getValue().clear();
+                List<MultipleChoice> multipleChoices = targetVM.metaData.getValue();
+                for (int i = 0; i < multipleChoices.size(); i++) {
+                    MultipleChoice us = multipleChoices.get(i);
+                    FriendInfo friendInfo = new FriendInfo();
+                    friendInfo.setUserID(us.key);
+                    friendInfo.setNickname(us.name);
+                    friendInfo.setFaceURL(us.icon);
+                    groupVM.selectedFriendInfo.getValue().add(friendInfo);
+                }
+                BaseApp.inst().putVM(groupVM);
+                ARouter.getInstance().build(Routes.Group.CREATE_GROUP2).navigation();
+            });
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
         });
         view.videoMeeting.setOnClickListener(c -> {
@@ -327,11 +343,11 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
     }
 
     public void clickSlideSet() {
-        if (slideSet.isEmpty())return;
-        if (slideNum>slideSet.size()-1)
-            slideNum=0;
+        if (slideSet.isEmpty()) return;
+        if (slideNum > slideSet.size() - 1)
+            slideNum = 0;
         Common.smoothMoveToPosition(view.recyclerView,
-            (int)slideSet.toArray()[slideNum++]);
+            (int) slideSet.toArray()[slideNum++]);
     }
 
     @Override
@@ -350,6 +366,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
 
         public void setConversationInfos(List<MsgConversation> conversationInfos) {
             this.conversationInfos = conversationInfos;
+            notifyItemChanged(1);
         }
 
         @Override
@@ -367,7 +384,6 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
                         itemClickListener.onItemClick(v, index);
                 }
             });
-
             MsgConversation msgConversation = conversationInfos.get(position);
             boolean isGroup =
                 msgConversation.conversationInfo.getConversationType() != ConversationType.SINGLE_CHAT;
@@ -375,7 +391,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
                 isGroup, isGroup ? null : msgConversation.conversationInfo.getShowName());
             viewHolder.viewBinding.nickName.setText(msgConversation.conversationInfo.getShowName());
 
-            if (msgConversation.conversationInfo.getRecvMsgOpt() != 0) {
+            if (msgConversation.conversationInfo.getRecvMsgOpt() != Opt.NORMAL) {
                 viewHolder.viewBinding.noDisturbTips
                     .setVisibility(msgConversation.conversationInfo.getUnreadCount() > 0 ?
                         View.VISIBLE : View.GONE);
@@ -392,8 +408,6 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
             }
             viewHolder.viewBinding.time.setText(TimeUtil.getTimeString(msgConversation.conversationInfo.getLatestMsgSendTime()));
 
-//            viewHolder.viewBinding.getRoot().setBackgroundColor(Color.parseColor
-//            (msgConversation.conversationInfo.isPinned() ? "#FFF3F3F3" : "#FFFFFF"));
             viewHolder.viewBinding.setTop.setVisibility(msgConversation.conversationInfo.isPinned() ? View.VISIBLE : View.GONE);
 
             CharSequence lastMsg = msgConversation.lastMsg;
@@ -419,7 +433,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
     @Override
     public void update(Observable observable, Object o) {
         Obs.Message message = (Obs.Message) o;
-        if (message.tag == Constant.Event.USER_INFO_UPDATE) {
+        if (message.tag == Constants.Event.USER_INFO_UPDATE) {
             initHeader();
         }
     }

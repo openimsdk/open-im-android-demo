@@ -29,7 +29,7 @@ import io.openim.android.ouicore.entity.ExUserInfo;
 
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 
@@ -68,14 +68,14 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        isInviteToGroup = getIntent().getBooleanExtra(Constant.IS_INVITE_TO_GROUP, false);
-        isRemoveGroup = getIntent().getBooleanExtra(Constant.IS_REMOVE_GROUP, false);
-        isSelectMember = getIntent().getBooleanExtra(Constant.IS_SELECT_MEMBER, false);
-        isSelectFriend = getIntent().getBooleanExtra(Constant.IS_SELECT_FRIEND, false);
-        maxNum = getIntent().getIntExtra(Constant.K_SIZE, 0);
-        String groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
-        title = getIntent().getStringExtra(Constant.K_NAME);
-        defSelectId = getIntent().getStringExtra(Constant.K_ID);
+        isInviteToGroup = getIntent().getBooleanExtra(Constants.IS_INVITE_TO_GROUP, false);
+        isRemoveGroup = getIntent().getBooleanExtra(Constants.IS_REMOVE_GROUP, false);
+        isSelectMember = getIntent().getBooleanExtra(Constants.IS_SELECT_MEMBER, false);
+        isSelectFriend = getIntent().getBooleanExtra(Constants.IS_SELECT_FRIEND, false);
+        maxNum = getIntent().getIntExtra(Constants.K_SIZE, 0);
+        String groupId = getIntent().getStringExtra(Constants.K_GROUP_ID);
+        title = getIntent().getStringExtra(Constants.K_NAME);
+        defSelectId = getIntent().getStringExtra(Constants.K_ID);
 
         if (isInviteToGroup || isRemoveGroup)
             bindVMByCache(GroupVM.class);
@@ -363,22 +363,18 @@ public class InitiateGroupActivity extends BaseActivity<GroupVM, ActivityInitiat
 //                        vm.inviteUserToGroup(vm.selectedFriendInfoV3);
                         return;
                     }
-                    if (isRemoveGroup) {
-                        vm.kickGroupMember(vm.selectedFriendInfo.getValue());
-                        return;
-                    }
                     if (isSelectMember) {
                         ArrayList<String> ids = new ArrayList<>();
                         for (FriendInfo friendInfo : vm.selectedFriendInfo.getValue()) {
                             ids.add(friendInfo.getUserID());
                         }
-                        setResult(RESULT_OK, new Intent().putStringArrayListExtra(Constant.K_RESULT,
+                        setResult(RESULT_OK, new Intent().putStringArrayListExtra(Constants.K_RESULT,
                             ids));
                         finish();
                         return;
                     }
                     if (isSelectFriend) {
-                        setResult(RESULT_OK, new Intent().putExtra(Constant.K_RESULT,
+                        setResult(RESULT_OK, new Intent().putExtra(Constants.K_RESULT,
                             GsonHel.toJson(vm.selectedFriendInfo.getValue())));
                         finish();
                         return;

@@ -16,6 +16,7 @@ import io.openim.android.ouicore.databinding.ItemLabelMemberBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonSelectBinding;
 import io.openim.android.ouicore.databinding.ItemPsrsonStickyBinding;
 import io.openim.android.ouicore.databinding.ItemSearchTitleBinding;
+import io.openim.android.ouicore.databinding.LayoutChatHistoryItemBinding;
 import io.openim.android.ouicore.databinding.LayoutContactItemBinding;
 import io.openim.android.ouicore.databinding.LayoutLabelItemBinding;
 import io.openim.android.ouicore.databinding.ViewDividingLineBinding;
@@ -53,6 +54,7 @@ public class ViewHol {
         public ItemViewHo(@NonNull View itemView) {
             super(ItemPsrsonSelectBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
             view = ItemPsrsonSelectBinding.bind(this.itemView);
+            view.getRoot().setIntercept(false);
         }
     }
 
@@ -97,6 +99,14 @@ public class ViewHol {
         public ContactItemHolder(@NonNull View itemView) {
             super(LayoutContactItemBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
             this.viewBinding = LayoutContactItemBinding.bind(this.itemView);
+        }
+    }
+    public static class ChatHistoryItemHolder extends RecyclerView.ViewHolder {
+        public LayoutChatHistoryItemBinding viewBinding;
+
+        public ChatHistoryItemHolder(@NonNull View itemView) {
+            super(LayoutChatHistoryItemBinding.inflate(LayoutInflater.from(itemView.getContext()), (ViewGroup) itemView, false).getRoot());
+            this.viewBinding = LayoutChatHistoryItemBinding.bind(this.itemView);
         }
     }
 

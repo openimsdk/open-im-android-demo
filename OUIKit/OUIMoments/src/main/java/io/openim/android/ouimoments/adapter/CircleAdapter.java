@@ -2,12 +2,14 @@ package io.openim.android.ouimoments.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -18,18 +20,14 @@ import com.bumptech.glide.Glide;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.entity.CustomEmoji;
-import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.AvatarImage;
@@ -62,8 +60,6 @@ import io.openim.android.ouimoments.widgets.MultiImageView;
 import io.openim.android.ouimoments.widgets.PraiseListView;
 import io.openim.android.ouimoments.widgets.SnsPopupWindow;
 import io.openim.android.ouimoments.widgets.dialog.CommentDialog;
-import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.models.Message;
 
 public class CircleAdapter extends BaseRecycleViewAdapter {
 
@@ -79,6 +75,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
 
     private CirclePresenter presenter;
     private Context context;
+    public String lastYear,lastMd;
 
     public void setCirclePresenter(CirclePresenter presenter) {
         this.presenter = presenter;
@@ -149,9 +146,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                     holder.headIv.load(BaseApp.inst().loginCertificate.faceURL);
                     holder.nameTv.setText(BaseApp.inst().loginCertificate.nickname);
                     holder.headIv.setOnClickListener(v -> {
-                        context.startActivity(new Intent(context,
-                            ToUserMomentsActivity.class).putExtra(Constant.K_RESULT,
-                            DatasUtil.curUser));
+                        context.startActivity(new Intent(context, ToUserMomentsActivity.class).putExtra(Constants.K_RESULT, DatasUtil.curUser));
                     });
 
                     holder.newMsgTips.setVisibility(TextUtils.isEmpty(presenter.unReadCount) ?
@@ -173,8 +168,8 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
             final CircleItem circleItem = (CircleItem) datas.get(circlePosition);
             if (presenter.isSpecifiedUser()) {
                 //绑定指定用户的朋友圈视图的数据
-                bindTargetMomentsView((TargetMomentsViewHolder) viewHolder,
-                    circlePosition, circleItem);
+                bindTargetMomentsView((TargetMomentsViewHolder) viewHolder, circlePosition,
+                    circleItem);
                 return;
             }
 
@@ -191,7 +186,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
 
             holder.headIv.load(headImg);
             if (!presenter.isSpecifiedUser()) holder.headIv.setOnClickListener(v -> {
-                context.startActivity(new Intent(context, ToUserMomentsActivity.class).putExtra(Constant.K_RESULT, circleItem.getUser()));
+                context.startActivity(new Intent(context, ToUserMomentsActivity.class).putExtra(Constants.K_RESULT, circleItem.getUser()));
             });
             holder.nameTv.setText(name);
             holder.timeTv.setText(createTime);
@@ -222,13 +217,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                     holder.authorityIv.setImageResource(R.mipmap.ic_m_friends);
                     holder.authorityTv.setText(io.openim.android.ouicore.R.string.part_see_tips2);
                     holder.authorityLy.setOnClickListener(v -> {
-                        context.startActivity(new Intent(context, PartSeeActivity.class)
-                            .putExtra(Constant.K_NAME, circleItem.getPermission() == 2 ?
-                                this.context.getString(io.openim.android.ouicore.R.string.part_see_tips2)
-                                :
-                                this.context.getString(io.openim.android.ouicore.R.string.who_invisible))
-                            .putExtra(Constant.K_RESULT,
-                                (Serializable) circleItem.getPermissionUsers()));
+                        context.startActivity(new Intent(context, PartSeeActivity.class).putExtra(Constants.K_NAME, circleItem.getPermission() == 2 ? this.context.getString(io.openim.android.ouicore.R.string.part_see_tips2) : this.context.getString(io.openim.android.ouicore.R.string.who_invisible)).putExtra(Constants.K_RESULT, (Serializable) circleItem.getPermissionUsers()));
                     });
                 }
             } else {
@@ -259,9 +248,7 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                             String userName = favortDatas.get(position).getUser().getName();
                             String userId = favortDatas.get(position).getUser().getId();
 
-                            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                                .withString(Constant.K_ID, userId)
-                                .navigation();
+                            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constants.K_ID, userId).navigation();
                         }
                     });
                     holder.praiseListView.setDatas(favortDatas);
@@ -320,9 +307,11 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
             String curUserFavortId =
                 circleItem.getCurUserFavortId(BaseApp.inst().loginCertificate.userID);
             if (!TextUtils.isEmpty(curUserFavortId)) {
-                snsPopupWindow.getmActionItems().get(0).mTitle = "取消";
+                snsPopupWindow.getmActionItems().get(0).mTitle =
+                    context.getString(io.openim.android.ouicore.R.string.cancel);
             } else {
-                snsPopupWindow.getmActionItems().get(0).mTitle = "赞";
+                snsPopupWindow.getmActionItems().get(0).mTitle =
+                    context.getString(io.openim.android.ouicore.R.string.star);
             }
             snsPopupWindow.update();
             snsPopupWindow.setmItemClickListener(new PopupItemClickListener(circlePosition,
@@ -404,29 +393,43 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
     private void bindTargetMomentsView(TargetMomentsViewHolder holder, int circlePosition,
                                        CircleItem circleItem) {
         holder.view.getRoot().setOnClickListener(v -> {
-            context.startActivity(new Intent(context, MomentsDetailActivity.class)
-                .putExtra(Constant.K_ID,
-                    circleItem.getId()));
+            context.startActivity(new Intent(context, MomentsDetailActivity.class).putExtra(Constants.K_ID, circleItem.getId()));
         });
 
         int index = circlePosition - 1;
-        if (index < 0)
-            index = 0;
-        boolean isSameDate = index != 0 && ((CircleItem) datas.get(index))
-            .getCreateTime().equals(circleItem.getCreateTime());
+        if (index < 0) index = 0;
+        boolean isSameDate =
+            index != 0 && ((CircleItem) datas.get(index)).getCreateTime().equals(circleItem.getCreateTime());
         int i10 = Common.dp2px(10);
         int i30 = Common.dp2px(30);
         int i15 = Common.dp2px(15);
         if (index == 0) {
-            holder.view.getRoot().setPadding(i10, i30,
-                i10, 0);
+            holder.view.getRoot().setPadding(i10, i30, i10, 0);
         } else {
-            holder.view.getRoot().setPadding(i10, isSameDate ? i15 : i30,
-                i10, circlePosition == datas.size() - 1 ? i30 : 0);
+            holder.view.getRoot().setPadding(i10, isSameDate ? i15 : i30, i10,
+                circlePosition == datas.size() - 1 ? i30 : 0);
+        }
+        holder.view.yearLy.setVisibility(View.GONE);
+        String year = TimeUtil.getTime(circleItem.getCreateTimeL(), "yyyy");
+        String localDate = TimeUtil.getTime(System.currentTimeMillis(), "yyyy");
+        if (!localDate.equals(year) && !year.equals(lastYear)) {
+            holder.view.yearLy.setVisibility(View.VISIBLE);
+            holder.view.year.setText(year);
+            lastYear = year;
         }
 
-        holder.view.time.setVisibility(isSameDate ? View.INVISIBLE : View.VISIBLE);
-        holder.view.time.setText(TimeUtil.getTimeString(circleItem.getCreateTimeL()));
+        String md = TimeUtil.getTime(circleItem.getCreateTimeL(), "dd\nMM月");
+        holder.view.time.setVisibility(View.INVISIBLE);
+        SpannableStringBuilder stringBuilder =new SpannableStringBuilder(md);
+        stringBuilder .setSpan(new AbsoluteSizeSpan(11,true),
+            md.indexOf("\n"),md.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE
+        );
+        holder.view.time.setText(stringBuilder);
+        if (!md.equals(lastMd)){
+            holder.view.time.setVisibility(View.VISIBLE);
+            lastMd=md;
+        }
+
         holder.view.content.setText(circleItem.getContent());
 
         if (Objects.equals(circleItem.getType(), CircleItem.TYPE_IMG)) {
@@ -437,43 +440,31 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
                 holder.view.media.setVisibility(View.GONE);
                 holder.view.single.setVisibility(View.GONE);
                 holder.view.photoNum.setVisibility(View.GONE);
-                holder.view.content.setBackgroundColor(context.getResources()
-                    .getColor(io.openim.android.ouicore.R.color.theme_bg2));
+                holder.view.content.setBackgroundColor(context.getResources().getColor(io.openim.android.ouicore.R.color.theme_bg2));
 
             } else if (photoNum == 1) {
                 holder.view.single.setVisibility(View.VISIBLE);
                 holder.view.media.setVisibility(View.GONE);
                 holder.view.photoNum.setVisibility(View.GONE);
 
-                Glide.with(context)
-                    .load(circleItem.getPhotos().get(0).url)
-                    .placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo)
-                    .error(io.openim.android.ouicore.R.mipmap.ic_chat_photo)
-                    .centerCrop()
-                    .into(holder.view.icon);
+                Glide.with(context).load(circleItem.getPhotos().get(0).url).placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo).error(io.openim.android.ouicore.R.mipmap.ic_chat_photo).centerCrop().into(holder.view.icon);
             } else {
                 holder.view.media.setVisibility(View.VISIBLE);
                 holder.view.single.setVisibility(View.GONE);
                 holder.view.photoNum.setVisibility(View.VISIBLE);
-                holder.view.photoNum.setText(String.format(context.getString(io.openim.android.ouicore
-                    .R.string.tal_num_photo), photoNum));
+                holder.view.photoNum.setText(String.format(context.getString(io.openim.android.ouicore.R.string.tal_num_photo), photoNum));
                 holder.view.media.setLayoutManager(new GridLayoutManager(context, 2));
                 RecyclerViewAdapter<PhotoInfo, ViewHol.ImageViewHolder> adapter;
                 holder.view.media.setAdapter(adapter = new RecyclerViewAdapter<PhotoInfo,
                     ViewHol.ImageViewHolder>(ViewHol.ImageViewHolder.class) {
 
                     @Override
-                    public void onBindView(@NonNull ViewHol.ImageViewHolder holder, PhotoInfo url,
-                                           int position) {
-                        holder.view.getRoot().getLayoutParams().height =
-                            (photoNum > 2) ? Common.dp2px(38) : -1;
+                    public void onBindView(@NonNull ViewHol.ImageViewHolder holder, PhotoInfo url
+                        , int position) {
+                        holder.view.getRoot().getLayoutParams().height = (photoNum > 2) ?
+                            Common.dp2px(38) : -1;
 
-                        Glide.with(context)
-                            .load(url.url)
-                            .placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo)
-                            .error(io.openim.android.ouicore.R.mipmap.ic_chat_photo)
-                            .centerCrop()
-                            .into(holder.view.getRoot());
+                        Glide.with(context).load(url.url).placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo).error(io.openim.android.ouicore.R.mipmap.ic_chat_photo).centerCrop().into(holder.view.getRoot());
                     }
                 });
                 adapter.setItems(circleItem.getPhotos().subList(0, Math.min(photoNum, 4)));
@@ -484,17 +475,13 @@ public class CircleAdapter extends BaseRecycleViewAdapter {
             holder.view.media.setVisibility(View.GONE);
             holder.view.photoNum.setVisibility(View.GONE);
 
-            Glide.with(context)
-                .load(circleItem.getVideoImgUrl())
-                .placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo)
-                .error(io.openim.android.ouicore.R.mipmap.ic_chat_photo)
-                .centerCrop()
-                .into(holder.view.icon);
+            Glide.with(context).load(circleItem.getVideoImgUrl()).placeholder(io.openim.android.ouicore.R.mipmap.ic_chat_photo).error(io.openim.android.ouicore.R.mipmap.ic_chat_photo).centerCrop().into(holder.view.icon);
         } else {
             holder.view.media.setVisibility(View.GONE);
             holder.view.single.setVisibility(View.GONE);
         }
     }
+
 
     @Override
     public int getItemCount() {

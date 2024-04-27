@@ -8,7 +8,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.NotificationMsg;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouigroup.databinding.ActivityNoticeDetailBinding;
@@ -25,7 +25,7 @@ public class NoticeDetailActivity extends BaseActivity<GroupVM, ActivityNoticeDe
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityNoticeDetailBinding.inflate(getLayoutInflater()));
         sink();
-        NotificationMsg notificationMsg = (NotificationMsg) getIntent().getSerializableExtra(Constant.K_NOTICE);
+        NotificationMsg notificationMsg = (NotificationMsg) getIntent().getSerializableExtra(Constants.K_NOTICE);
         vm.groupId=notificationMsg.group.groupID;
         vm.getGroupMemberList();
         vm.exGroupMembers.observe(this, exGroupMemberInfos -> {
@@ -35,7 +35,7 @@ public class NoticeDetailActivity extends BaseActivity<GroupVM, ActivityNoticeDe
                 if (null==exGroupMemberInfo)return;
                 view.avatar.load(exGroupMemberInfo.groupMembersInfo.getFaceURL());
                 view.name.setText(exGroupMemberInfo.groupMembersInfo.getNickname());
-                view.time.setText(TimeUtil.getTime(notificationMsg.group.createTime* 1000L, TimeUtil.yearTimeFormat));
+                view.time.setText(TimeUtil.getTime(notificationMsg.group.createTime, TimeUtil.yearTimeFormat));
                 view.content.setText(notificationMsg.group.notification);
             }
         });

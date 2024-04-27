@@ -10,11 +10,14 @@
 
         <CheckBox
             android:id="@+id/choose"
-            android:layout_width="40dp"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:button="@null"
+            android:scaleY="1.2"
+            android:scaleX="1.2"
+            android:layout_margin="3dp"
             android:drawableLeft="@drawable/selector_checkbox"
-            android:paddingLeft="13dp"
+            android:paddingLeft="15dp"
             android:visibility="gone" />
 
         <LinearLayout

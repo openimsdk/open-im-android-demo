@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
         <variable
             name="loginVM"
             type="io.openim.android.demo.vm.LoginVM" />
+        <import type="android.view.View"/>
     </data>
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white">
@@ -25,8 +27,8 @@
                 android:background="@drawable/sty_radius_6_stroke_e6e6e6"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingLeft="10dp"
-                android:paddingRight="5dp">
+                android:paddingRight="5dp"
+                >
 
 
                 <com.hbb20.CountryCodePicker
@@ -36,14 +38,21 @@
                     android:textColor="#ff0c1c33"
                     android:textSize="17sp"
                     android:textStyle="bold"
+                    android:layout_marginLeft="10dp"
                     app:ccp_autoDetectCountry="true"
                     app:ccp_defaultNameCode="CN"
                     app:ccp_showFlag="false"
+                    android:visibility="@{loginVM.isPhone?View.VISIBLE:View.GONE}"
                     app:ccp_showFullName="false"
                     app:ccp_showNameCode="false" />
 
 
-                <include layout="@layout/view_dividing_line_verticle" />
+                <View xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/divider"
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:visibility="@{loginVM.isPhone?View.VISIBLE:View.GONE}"
+                    android:background="@color/txt_grey"/>
 
                 <EditText
                     android:id="@+id/edt1"
@@ -61,8 +70,8 @@
                     android:id="@+id/clear"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
-                    android:padding="8dp"
-                    android:src="@mipmap/ic_close" />
+                    android:padding="4dp"
+                    android:src="@mipmap/ic_close3" />
             </LinearLayout>
 
 
@@ -90,12 +99,21 @@
                     android:layout_width="0dp"
                     android:layout_height="45dp"
                     android:layout_weight="1"
+                    android:layout_marginLeft="5dp"
                     android:background="@android:color/transparent"
                     android:hint="@string/input_password"
                     android:inputType="textPassword"
                     android:text="@={loginVM.pwd}"
                     android:textColor="#ff333333"
                     android:textSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/clearPwd"
+                    android:layout_width="35dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:padding="4dp"
+                    android:src="@mipmap/ic_close3" />
 
                 <CheckBox
                     android:id="@+id/eyes"

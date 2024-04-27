@@ -11,11 +11,14 @@
         <item name="colorSecondaryVariant">@color/teal_200</item>
         <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" >@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowNoTitle">true</item>
         <!-- Customize your theme here. -->
+
+        <item name="colorButtonNormal">@color/txt_warning</item>
     </style>
+
     <style name="ImageTranslucentTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowTranslucentStatus">true</item>

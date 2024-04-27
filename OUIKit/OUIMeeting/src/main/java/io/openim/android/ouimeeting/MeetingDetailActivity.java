@@ -1,7 +1,6 @@
 package io.openim.android.ouimeeting;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -15,9 +14,8 @@ import java.util.List;
 
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
@@ -47,11 +45,11 @@ public class MeetingDetailActivity extends BaseActivity<MeetingVM, ActivityMeeti
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != RESULT_OK) return;
-        if (requestCode == Constant.Event.FORWARD && null != data) {
+        if (requestCode == Constants.Event.FORWARD && null != data) {
             //在这里转发
-            String id = data.getStringExtra(Constant.K_ID);
-            String otherSideNickName = data.getStringExtra(Constant.K_NAME);
-            String groupId = data.getStringExtra(Constant.K_GROUP_ID);
+            String id = data.getStringExtra(Constants.K_ID);
+            String otherSideNickName = data.getStringExtra(Constants.K_NAME);
+            String groupId = data.getStringExtra(Constants.K_GROUP_ID);
             vm.inviterUser(id, groupId);
         }
     }
@@ -67,7 +65,7 @@ public class MeetingDetailActivity extends BaseActivity<MeetingVM, ActivityMeeti
     public void onSuccess(Object body) {
         waitDialog.dismiss();
         finish();
-        startActivity(new Intent(this, MeetingHomeActivity.class));
+        startActivity(new Intent(this, MeetingHomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     private void listener() {
@@ -77,7 +75,7 @@ public class MeetingDetailActivity extends BaseActivity<MeetingVM, ActivityMeeti
         });
         view.forward.setOnClickListener(v -> {
             ARouter.getInstance().build(Routes.Contact.FORWARD).navigation(this,
-                Constant.Event.FORWARD);
+                Constants.Event.FORWARD);
         });
         view.more.setOnClickListener(v -> {
             if (null == popDialog) {
@@ -94,7 +92,7 @@ public class MeetingDetailActivity extends BaseActivity<MeetingVM, ActivityMeeti
             popDialog.getMainView().menu1.setOnClickListener(v1 -> {
                 popDialog.dismiss();
                 finish();
-                startActivity(new Intent(this, TimingMeetingActivity.class).putExtra(Constant.K_RESULT, true));
+                startActivity(new Intent(this, TimingMeetingActivity.class).putExtra(Constants.K_RESULT, true));
             });
             popDialog.getMainView().menu2.setOnClickListener(v1 -> {
                 CommonDialog commonDialog = new CommonDialog(this).atShow();

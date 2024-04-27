@@ -18,7 +18,15 @@ public class MoreDataActivity extends BaseActivity<PersonalVM, ActivityMoreDataB
         bindVMByCache(PersonalVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityMoreDataBinding.inflate(getLayoutInflater()));
-        init();
+        vm.getUserInfo(vm.uid);
+        listener();
+    }
+
+    private void listener() {
+        vm.userInfo.observe(this,v->{
+            if (v==null)return;
+            init();
+        });
     }
 
     void init() {
@@ -28,10 +36,11 @@ public class MoreDataActivity extends BaseActivity<PersonalVM, ActivityMoreDataB
             : io.openim.android.ouicore.R.string.girl);
         long birth = vm.userInfo.val().getBirth();
         if (birth != 0) {
-            view.birthday.setText(TimeUtil.getTime(birth * 1000,
+            view.birthday.setText(TimeUtil.getTime(birth ,
                 TimeUtil.yearMonthDayFormat));
         }
         view.phoneTv.setText(vm.userInfo.val().getPhoneNumber());
         view.mailTv.setText(vm.userInfo.val().getEmail());
     }
+    
 }

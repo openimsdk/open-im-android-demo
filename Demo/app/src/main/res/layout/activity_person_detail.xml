@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <FrameLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white">
@@ -28,6 +29,15 @@
                         android:id="@+id/back"
                         layout="@layout/view_back" />
 
+                    <ImageView
+                        android:id="@+id/more"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginEnd="10dp"
+                        android:padding="4dp"
+                        android:src="@mipmap/ic_more" />
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
 
@@ -77,6 +87,7 @@
                     android:id="@+id/addFriend"
                     android:layout_width="wrap_content"
                     android:layout_height="35dp"
+                    android:visibility="gone"
                     android:background="@drawable/sty_radius_6_ff0089ff"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp">
@@ -109,7 +120,6 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
                     android:orientation="vertical"
                     android:paddingLeft="20dp"
                     android:paddingTop="15dp"
@@ -120,6 +130,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
+                        android:visibility="gone"
                         android:orientation="horizontal">
 
                         <TextView
@@ -142,7 +153,6 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -189,26 +199,24 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="12dp"
-                    android:background="@color/theme_bg" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingLeft="20dp"
-                    android:paddingTop="15dp"
-                    android:paddingRight="20dp"
-                    android:paddingBottom="15dp">
+                    android:background="@color/theme_bg">
 
                     <LinearLayout
                         android:id="@+id/manager"
+                        android:background="@color/white"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="20dp"
+                        android:layout_marginTop="15dp"
+                        android:paddingTop="15dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:paddingBottom="15dp"
                         android:orientation="horizontal"
                         android:visibility="gone">
 
@@ -232,6 +240,11 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
+                        android:background="@color/white"
+                        android:paddingTop="15dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:paddingBottom="15dp"
                         android:visibility="gone">
 
                         <TextView
@@ -261,31 +274,61 @@
 
             </LinearLayout>
 
-
             <LinearLayout
-                android:id="@+id/userInfo"
+                android:id="@+id/userInfoLy"
                 android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:layout_marginTop="12dp"
-                android:background="@color/white"
-                android:gravity="center_vertical"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="22dp"
-                    android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:id="@+id/userInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@color/white"
                     android:gravity="center_vertical"
-                    android:text="@string/person_info"
-                    android:textColor="#ff333333"
-                    android:textSize="18sp" />
+                    android:visibility="visible">
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="22dp"
-                    android:src="@mipmap/ic_right" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="22dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="@string/person_info"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="22dp"
+                        android:src="@mipmap/ic_right" />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/moments"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:background="@color/white"
+                    android:gravity="center_vertical"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="22dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="@string/see_moments"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="22dp"
+                        android:src="@mipmap/ic_right" />
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -300,15 +343,18 @@
                 android:id="@+id/bottomMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginBottom="60dp"
                 android:orientation="horizontal"
-                android:visibility="gone">
+                android:visibility="visible">
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="0.2" />
 
                 <LinearLayout
                     android:id="@+id/call"
-                    android:layout_width="170dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="46dp"
                     android:gravity="center"
                     android:background="@drawable/sty_radius_6_white"
@@ -331,11 +377,12 @@
                 <View
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:layout_weight="1" />
+                    android:layout_weight="0.2" />
 
                 <LinearLayout
-                    android:layout_width="170dp"
                     android:layout_height="46dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:id="@+id/sendMsg"
                     android:background="@drawable/sty_radius_6_ff0089ff"
                     android:gravity="center"
@@ -352,6 +399,11 @@
                         android:textColor="@color/white"
                         android:textSize="17sp" />
                 </LinearLayout>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="0.2" />
 
             </LinearLayout>
 

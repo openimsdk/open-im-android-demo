@@ -3,7 +3,6 @@ package io.openim.android.ouiconversation.vm;
 
 import static io.openim.android.ouicore.utils.Common.UIHandler;
 
-import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
@@ -19,7 +18,6 @@ import androidx.lifecycle.Observer;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,28 +25,29 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Vector;
 
 
 import javax.annotation.Nullable;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
+import io.openim.android.ouicore.ex.AtUser;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
@@ -69,31 +68,26 @@ import io.openim.android.sdk.listener.OnUserListener;
 import io.openim.android.sdk.models.AdvancedMessage;
 import io.openim.android.sdk.models.C2CReadReceiptInfo;
 import io.openim.android.sdk.models.ConversationInfo;
-import io.openim.android.sdk.models.CustomSignalingInfo;
-import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupHasReadInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.GroupMessageReadInfo;
 import io.openim.android.sdk.models.GroupMessageReceipt;
-import io.openim.android.sdk.models.KeyValue;
-import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.PictureElem;
+import io.openim.android.sdk.models.QuoteElem;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SearchResult;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.TextElem;
-import io.openim.android.sdk.models.UserInfo;
 import io.openim.android.sdk.models.UsersOnlineStatus;
 import io.openim.android.sdk.models.VideoElem;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener,
-    OnGroupListener, OnConversationListener, java.util.Observer, OnSignalingListener,
-    OnUserListener {
+    OnGroupListener, OnConversationListener, OnSignalingListener, OnUserListener {
 
     public static final String REEDIT_MSG = "reeditMsg";
     //图片、视频消息 用于预览
@@ -103,6 +97,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
     //阅后即焚Timers
     HashMap<String, Timer> readVanishTimers = new HashMap<>();
+    //禁言timer
+    private Timer banTimer;
+
     //搜索的本地消息
     public State<List<Message>> searchMessageItems = new State<>(new ArrayList<>());
     public State<List<Message>> addSearchMessageItems = new State<>(new ArrayList<>());
@@ -113,20 +110,23 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     //通知消息
     public State<ConversationInfo> conversationInfo = new State<>();
     public State<GroupInfo> groupInfo = new State<>();
+    public State<GroupMembersInfo> memberInfo = new State<>();
     public State<NotificationMsg> notificationMsg = new State<>();
     public State<List<Message>> messages = new State<>(new ArrayList<>());
     //@消息
-    public State<List<Message>> atMessages = new State<>(new ArrayList<>());
+    public State<List<AtUser>> atUsers = new State<>(new ArrayList<>());
     //表情
     public State<List<String>> emojiMessages = new State<>(new ArrayList<>());
     //会议流
     public State<RoomCallingInfo> roomCallingInfo = new State<>();
     public ObservableBoolean typing = new ObservableBoolean(false);
-    public State<String> inputMsg = new State<>("");
+    public State<CharSequence> inputMsg = new State<>("");
     public State<Boolean> isNoData = new State<>(false);
 
     //开启多选
     public State<Boolean> enableMultipleSelect = new State<>();
+    //是否加入群
+    public State<Boolean> isJoinGroup = new State<>(true);
 
     private UserOnlineStatusListener userOnlineStatusListener;
 
@@ -143,7 +143,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     public boolean fromChatHistory = false;//从查看聊天记录跳转过来
     public boolean firstChatHistory = true;// //用于第一次消息定位
-    public boolean hasPermission = false;// 为true 则是管理员或群主
+    public boolean isAdminOrCreator = false;// 为true 则是管理员或群主
 
     public int count = 20; //条数
     public Message loading;
@@ -151,7 +151,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     public void init() {
         loading = new Message();
-        loading.setContentType(Constant.LOADING);
+        loading.setContentType(Constants.LOADING);
         //获取会话信息
         getConversationInfo();
 
@@ -215,9 +215,17 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             @Override
             public void onSuccess(List<GroupMembersInfo> data) {
                 if (data.isEmpty()) return;
-                hasPermission = data.get(0).getRoleLevel() != GroupRole.MEMBER;
+                GroupMembersInfo membersInfo = data.get(0);
+                isAdminOrCreator = membersInfo.getRoleLevel() != GroupRole.MEMBER;
+                ban(getMuteEndTime(membersInfo));
+                memberInfo.setValue(membersInfo);
             }
         }, groupID, uid);
+    }
+
+    public long getMuteEndTime(GroupMembersInfo membersInfo) {
+        return membersInfo.getMuteEndTime();
+//        return 1705999140000L;
     }
 
     @Override
@@ -258,6 +266,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 pList.add(getContext().getString(io.openim.android.ouicore.R.string.android));
             } else if (platform == Platform.IOS) {
                 pList.add(getContext().getString(io.openim.android.ouicore.R.string.ios));
+            } else if (platform == Platform.XOS) {
+                pList.add("Mac");
             } else if (platform == Platform.WIN) {
                 pList.add(getContext().getString(io.openim.android.ouicore.R.string.pc));
             } else if (platform == Platform.WEB) {
@@ -286,60 +296,59 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     }
 
     @Override
-    public void onGroupApplicationAccepted(GroupApplicationInfo info) {
-
-    }
-
-    @Override
-    public void onGroupApplicationAdded(GroupApplicationInfo info) {
-
-    }
-
-    @Override
-    public void onGroupApplicationDeleted(GroupApplicationInfo info) {
-
-    }
-
-    @Override
-    public void onGroupApplicationRejected(GroupApplicationInfo info) {
-
-    }
-
-    @Override
-    public void onGroupDismissed(GroupInfo info) {
-
-    }
-
-    @Override
     public void onGroupInfoChanged(GroupInfo info) {
         if (info.getGroupID().equals(groupID)) groupInfo.setValue(info);
     }
 
-    @Override
-    public void onGroupMemberAdded(GroupMembersInfo info) {
-
-    }
-
-    @Override
-    public void onGroupMemberDeleted(GroupMembersInfo info) {
-
-    }
 
     @Override
     public void onGroupMemberInfoChanged(GroupMembersInfo info) {
         if (info.getGroupID().equals(groupID) && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
-            hasPermission = info.getRoleLevel() != GroupRole.MEMBER;
+            isAdminOrCreator = info.getRoleLevel() != GroupRole.MEMBER;
+            memberInfo.setValue(info);
+            ban(getMuteEndTime(info));
+        }
+        updateMemberInfo(info);
+    }
+
+    //禁言或取消禁言
+    private void ban(long muteEndTime) {
+        long endTime = muteEndTime - System.currentTimeMillis();
+        cancelBanTimer();
+        if (endTime > 0) {
+            banTimer = new Timer();
+            banTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    cancelBanTimer();
+                    memberInfo.postValue(memberInfo.val());
+                }
+            }, endTime);
         }
     }
 
-    @Override
-    public void onJoinedGroupAdded(GroupInfo info) {
-
+    private void cancelBanTimer() {
+        if (null != banTimer) {
+            banTimer.cancel();
+            banTimer = null;
+        }
     }
 
-    @Override
-    public void onJoinedGroupDeleted(GroupInfo info) {
-
+    private void updateMemberInfo(GroupMembersInfo info) {
+        for (Message message : messages.val()) {
+            try {
+                if (message.getContentType() >= MessageType.NTF_BEGIN) continue;
+                if (message.getSendID().equals(info.getUserID())) {
+                    message.setSenderNickname(info.getNickname());
+                    message.setSenderFaceUrl(info.getFaceURL());
+                    int index;
+                    if ((index = messages.val().indexOf(message)) != -1) {
+                        messageAdapter.notifyItemChanged(index);
+                    }
+                }
+            } catch (Exception ignore) {
+            }
+        }
     }
 
     @Override
@@ -353,30 +362,26 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }
     }
 
-    @Override
-    public void onNewConversation(List<ConversationInfo> list) {
-
+    /**
+     * 存储草稿
+     */
+    public void cacheDraft(String inputMsg, String conversationID) {
+        String cacheKey = conversationID + "_draft";
+        String atKey = cacheKey + "_at";
+        if (TextUtils.isEmpty(inputMsg)) {
+            SharedPreferencesUtil.remove(BaseApp.inst(), cacheKey);
+            SharedPreferencesUtil.remove(BaseApp.inst(), atKey);
+            return;
+        }
+        if (!Common.isBlank(inputMsg)) {
+            SharedPreferencesUtil.get(BaseApp.inst()).setCache(cacheKey, inputMsg);
+        }
+        if (!atUsers.val().isEmpty()) {
+            String atUser = GsonHel.toJson(atUsers.val());
+            SharedPreferencesUtil.get(BaseApp.inst()).setCache(atKey, atUser);
+        }
     }
 
-    @Override
-    public void onSyncServerFailed() {
-
-    }
-
-    @Override
-    public void onSyncServerFinish() {
-
-    }
-
-    @Override
-    public void onSyncServerStart() {
-
-    }
-
-    @Override
-    public void onTotalUnreadMessageCountChanged(int i) {
-
-    }
 
     /**
      * 添加到阅后即焚timers
@@ -429,57 +434,13 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     int getReadCountdown(Message message) {
         int burnDuration = message.getAttachedInfoElem().getBurnDuration();
         long hasReadTime = message.getAttachedInfoElem().getHasReadTime();
+        if (burnDuration == 0) burnDuration = 30;
         if (hasReadTime > 0) {
             long end = hasReadTime + (burnDuration * 1000L);
             long diff = (end - System.currentTimeMillis()) / 1000;
             return diff < 0 ? 0 : (int) diff;
         }
         return 0;
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-
-    }
-
-    @Override
-    public void onInvitationCancelled(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInvitationTimeout(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeAccepted(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeAcceptedByOtherDevice(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeRejected(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onInviteeRejectedByOtherDevice(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onReceiveNewInvitation(SignalingInfo s) {
-
-    }
-
-    @Override
-    public void onHangup(SignalingInfo s) {
-
     }
 
     @Override
@@ -496,20 +457,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         }
     }
 
-    @Override
-    public void onMeetingStreamChanged(MeetingStreamEvent e) {
-
-    }
-
-    @Override
-    public void onReceiveCustomSignal(CustomSignalingInfo s) {
-
-    }
-
-    @Override
-    public void onStreamChange(String s) {
-
-    }
 
     public String getRoomCallingInfoRoomID() {
         String roomID = "";
@@ -529,10 +476,6 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         subject(REEDIT_MSG, content);
     }
 
-    @Override
-    public void onSelfInfoUpdated(UserInfo info) {
-
-    }
 
     @Override
     public void onUserStatusChanged(UsersOnlineStatus onlineStatus) {
@@ -550,6 +493,12 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             getOneConversation(null);
         } else {
             getGroupsInfo(groupID, null);
+            OpenIMClient.getInstance().groupManager.isJoinGroup(groupID, new OnBase<Boolean>() {
+                @Override
+                public void onSuccess(Boolean data) {
+                    isJoinGroup.setValue(data);
+                }
+            });
         }
     }
 
@@ -620,6 +569,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         IMEvent.getInstance().removeUserListener(this);
         inputMsg.removeObserver(inputObserver);
 
+        cancelBanTimer();
         for (Timer value : readVanishTimers.values()) {
             value.cancel();
         }
@@ -643,6 +593,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
         }
         OnBase<String> callBack = new IMUtil.IMCallBack<String>() {
+
             @Override
             public void onSuccess(String data) {
                 if (null != msgList) {
@@ -662,11 +613,9 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             OpenIMClient.getInstance().messageManager.markConversationMessageAsRead(conversationID, callBack);
         } else {
             if (isSingleChat) {
-                OpenIMClient.getInstance().messageManager.markMessagesAsReadByMsgID(conversationID,
-                    msgIDs, callBack);
+                OpenIMClient.getInstance().messageManager.markMessagesAsReadByMsgID(conversationID, msgIDs, callBack);
             } else {
-                OpenIMClient.getInstance().messageManager.sendGroupMessageReadReceipt(conversationID,
-                    msgIDs, callBack);
+                OpenIMClient.getInstance().messageManager.sendGroupMessageReadReceipt(conversationID, msgIDs, callBack);
             }
 
             NotificationManager manager =
@@ -785,18 +734,16 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             PreviewMediaVM.MediaData mediaData = null;
             if (datum.getContentType() == MessageType.PICTURE) {
                 PictureElem pictureElem = datum.getPictureElem();
-                String sUrl = pictureElem.getSourcePicture().getUrl();
-                if (TextUtils.isEmpty(sUrl)) {
-                    sUrl = pictureElem.getSourcePath();
-                }
-                mediaData = new PreviewMediaVM.MediaData(sUrl);
+                mediaData = new PreviewMediaVM.MediaData(datum.getClientMsgID());
+                mediaData.mediaUrl = IMUtil.getFastPicturePath(pictureElem);
                 if (null != pictureElem.getSnapshotPicture())
                     mediaData.thumbnail = pictureElem.getSnapshotPicture().getUrl();
             }
             if (datum.getContentType() == MessageType.VIDEO) {
                 VideoElem videoElem = datum.getVideoElem();
-                mediaData = new PreviewMediaVM.MediaData(IMUtil.getFastVideoPath(datum.getVideoElem()));
+                mediaData = new PreviewMediaVM.MediaData(datum.getClientMsgID());
                 mediaData.isVideo = true;
+                mediaData.mediaUrl = IMUtil.getFastVideoPath(videoElem);
                 mediaData.thumbnail = videoElem.getSnapshotUrl();
             }
             if (null != mediaData && !mediaDataList.contains(mediaData)) {
@@ -872,7 +819,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }
         }
         if (isTyp) return;
-        messages.getValue().add(0, IMUtil.buildExpandInfo(msg));
+        messages.val().add(0, IMUtil.buildExpandInfo(msg));
+        addMediaList(msg, false);
 
         UIHandler.post(() -> {
             getIView().scrollToPosition(0);
@@ -907,8 +855,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                         Message message = messages.val().get(i);
                         if (readInfo.getMsgIDList().contains(message.getClientMsgID())) {
                             message.setRead(true);
-                            if (null != message.getAttachedInfoElem()
-                                && message.getAttachedInfoElem().isPrivateChat()) {
+                            if (null != message.getAttachedInfoElem() && message.getAttachedInfoElem().isPrivateChat()) {
                                 message.getAttachedInfoElem().setHasReadTime(readInfo.getReadTime());
                             }
                             messageAdapter.notifyItemChanged(i);
@@ -924,54 +871,38 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     @Override
     public void onRecvGroupMessageReadReceipt(GroupMessageReceipt receipt) {
         try {
-                if (receipt.getConversationID().equals(conversationID)) {
-                    List<GroupMessageReadInfo> groupMessageReadInfo =
-                        receipt.getGroupMessageReadInfo();
-                    for (GroupMessageReadInfo messageReadInfo : groupMessageReadInfo) {
-                        Message message = new Message();
-                        message.setClientMsgID(messageReadInfo.getClientMsgID());
-                        int index = messages.val().indexOf(message);
-                        if (index == -1) continue;
-                        Message localMsg = messages.val().get(index);
-                        GroupHasReadInfo hasReadInfo =
-                            localMsg.getAttachedInfoElem().getGroupHasReadInfo();
-                        hasReadInfo.setHasReadCount(messageReadInfo.getHasReadCount());
-                        hasReadInfo.setUnreadCount(messageReadInfo.getUnreadCount());
-                        messageAdapter.notifyItemChanged(index);
-                    }
+            if (receipt.getConversationID().equals(conversationID)) {
+                List<GroupMessageReadInfo> groupMessageReadInfo = receipt.getGroupMessageReadInfo();
+                for (GroupMessageReadInfo messageReadInfo : groupMessageReadInfo) {
+                    Message message = new Message();
+                    message.setClientMsgID(messageReadInfo.getClientMsgID());
+                    int index = messages.val().indexOf(message);
+                    if (index == -1) continue;
+                    Message localMsg = messages.val().get(index);
+                    GroupHasReadInfo hasReadInfo =
+                        localMsg.getAttachedInfoElem().getGroupHasReadInfo();
+                    hasReadInfo.setHasReadCount(messageReadInfo.getHasReadCount());
+                    hasReadInfo.setUnreadCount(messageReadInfo.getUnreadCount());
+                    messageAdapter.notifyItemChanged(index);
                 }
+            }
         } catch (Exception ignored) {
         }
     }
 
-
-    @Override
-    public void onRecvMessageExtensionsChanged(String msgID, List<KeyValue> list) {
-
-    }
-
-    @Override
-    public void onRecvMessageExtensionsDeleted(String msgID, List<String> list) {
-
-    }
-
-    @Override
-    public void onRecvMessageExtensionsAdded(String msgID, List<KeyValue> list) {
-
-    }
-
-    @Override
-    public void onMsgDeleted(Message message) {
-
-    }
-
-    @Override
-    public void onRecvOfflineNewMessage(List<Message> msg) {
-
-    }
-
-
     public void sendMsg(Message msg) {
+        sendMsg(msg, false);
+    }
+
+    public void sendMsg(Message msg, boolean isResend) {
+        if (isResend) {
+            int orIndex = messages.val().indexOf(msg);
+            messages.val().remove(orIndex);
+            messageAdapter.notifyItemRemoved(orIndex);
+            messages.val().add(0, msg);
+            messageAdapter.notifyItemInserted(0);
+        }
+        //这里最好不要改变msg其他的变量
         msg.setStatus(MessageStatus.SENDING);
         if (messages.val().contains(msg)) {
             messageAdapter.notifyItemChanged(messages.val().indexOf(msg));
@@ -1058,36 +989,39 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
     public void onRecvMessageRevokedV2(RevokedInfo info) {
         try {
             for (Message message : messages.val()) {
+                QuoteElem quoteElem = message.getQuoteElem();
+                Message quoteMessage;
+                if (null != quoteElem && null != (quoteMessage = quoteElem.getQuoteMessage()) && quoteMessage.getClientMsgID().equals(info.getClientMsgID())) {
+                    //引用消息被删除
+                    quoteMessage.setContentType(MessageType.REVOKE_MESSAGE_NTF);
+                    messageAdapter.notifyItemChanged(messages.val().indexOf(message));
+                }
                 if (message.getClientMsgID().equals(info.getClientMsgID())) {
                     message.setContentType(MessageType.REVOKE_MESSAGE_NTF);
                     //a 撤回了一条消息
-                    String txt;
+                    String txt, target;
                     CharSequence tips;
                     if (info.getRevokerID().equals(info.getSourceMessageSendID())) {
                         txt =
-                            String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips), info.getRevokerNickname());
-                        if (message.getSendID().equals(BaseApp.inst().loginCertificate.userID)) {
+                            String.format(BaseApp.inst().getString(io.openim.android.ouicore.R.string.revoke_tips), target = IMUtil.getSelfName(info.getRevokerID(), info.getRevokerNickname()));
+                        if (message.getSendID().equals(BaseApp.inst().loginCertificate.userID) && null == message.getSoundElem()) {
                             //只有是自己发的文本才支持重新编辑
                             String reedit =
                                 BaseApp.inst().getString(io.openim.android.ouicore.R.string.re_edit);
                             txt += "\t" + reedit;
                             tips =
-                                IMUtil.buildClickAndColorSpannable((SpannableStringBuilder) IMUtil
-                                        .getSingleSequence(message.getGroupID(),
-                                            message.getSenderNickname(), message.getSendID(), txt),
-                                    reedit, new
-                                        ClickableSpan() {
-                                            @Override
-                                            public void onClick(@NonNull View widget) {
-                                                TextElem txt = message.getTextElem();
-                                                if (null != txt) {
-                                                    reeditMsg(txt.getContent());
-                                                }
-                                            }
-                                        });
+                                IMUtil.buildClickAndColorSpannable((SpannableStringBuilder) IMUtil.getSingleSequence(message.getGroupID(), target, message.getSendID(), txt), reedit, new ClickableSpan() {
+                                    @Override
+                                    public void onClick(@NonNull View widget) {
+                                        TextElem txt = message.getTextElem();
+                                        if (null != txt) {
+                                            reeditMsg(txt.getContent());
+                                        }
+                                    }
+                                });
                         } else {
-                            tips = IMUtil.getSingleSequence(message.getGroupID(),
-                                info.getRevokerNickname(), info.getRevokerID(), txt);
+                            tips = IMUtil.getSingleSequence(message.getGroupID(), target,
+                                info.getRevokerID(), txt);
                         }
                     } else {
                         txt =
@@ -1137,6 +1071,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         messageAdapter.notifyItemRemoved(index);
         enableMultipleSelect.setValue(false);
     }
+
 
     public void closePage() {
         getIView().closePage();
@@ -1249,6 +1184,23 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
         }, conversationID, startMsg, count * 80);
     }
+
+
+    @Override
+    public void onGroupMemberAdded(GroupMembersInfo info) {
+        if (info.getGroupID().equals(groupID) && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+            isJoinGroup.setValue(true);
+            getGroupsInfo(groupID, null);
+        }
+    }
+
+    @Override
+    public void onGroupMemberDeleted(GroupMembersInfo info) {
+        if (info.getGroupID().equals(groupID) && info.getUserID().equals(BaseApp.inst().loginCertificate.userID)) {
+            isJoinGroup.setValue(false);
+        }
+    }
+
 
     /**
      * 单聊呼叫

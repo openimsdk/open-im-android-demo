@@ -3,32 +3,34 @@ package io.openim.android.ouiconversation.ui;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
-import com.alibaba.android.arouter.launcher.ARouter;
+import com.airbnb.lottie.LottieAnimationView;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Objects;
 
+import io.openim.android.ouiconversation.R;
+import io.openim.android.ouiconversation.adapter.MessageViewHolder;
 import io.openim.android.ouiconversation.databinding.ActivityChatHistoryDetailsBinding;
+import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
-import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseViewModel;
-import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.GetFilePathFromUri;
-import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.utils.TimeUtil;
-import io.openim.android.ouicore.vm.PreviewMediaVM;
+import io.openim.android.ouicore.utils.Constants;
+import io.openim.android.ouicore.widget.AvatarImage;
+import io.openim.android.ouicore.widget.SpacesItemDecoration;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.Message;
 
-public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, ActivityChatHistoryDetailsBinding> {
+public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel,
+    ActivityChatHistoryDetailsBinding> {
 
 
     private RecyclerViewAdapter adapter;
@@ -44,70 +46,208 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel, Acti
 
     private void initView() {
         view.recyclerview.setLayoutManager(new LinearLayoutManager(this));
+        view.recyclerview.setBackgroundColor(getResources().getColor(io.openim.android.ouicore.R.color.theme_bg));
+        SpacesItemDecoration divItemDecoration = new SpacesItemDecoration();
+        divItemDecoration.setColor(getResources()
+            .getColor(io.openim.android.ouicore.R.color.txt_grey));
+        divItemDecoration.setMargin(7,50,0);
+        divItemDecoration.setDividerHeight(2);
+        view.recyclerview.addItemDecoration(divItemDecoration);
         view.recyclerview.setAdapter(adapter = new RecyclerViewAdapter<Message,
-            ViewHol.ContactItemHolder>(ViewHol.ContactItemHolder.class) {
+            MessageViewHolder.MsgViewHolder>() {
 
             @Override
-            public void onBindView(@NonNull ViewHol.ContactItemHolder holder, Message data, int position) {
-                holder.viewBinding.avatar.load(data.getSenderFaceUrl());
-                holder.viewBinding.nickName.setText(data.getSenderNickname());
-                holder.viewBinding.time.setText(TimeUtil.getTimeString(data.getSendTime()));
+            public int getItemViewType(int position) {
+                Message message = getItems().get(position);
+                return message.getContentType();
+            }
 
-                holder.viewBinding.lastMsg.setText(IMUtil.getMsgParse(data));
+            public void process(MessageViewHolder.MsgViewHolder holder, int position) {
+                holder.hFirstItem(position);
+                holder.hName();
+            }
 
-                holder.viewBinding.getRoot().setOnClickListener(v -> {
-                    String url;
-                    PreviewMediaVM previewMediaVM;
-                    PreviewMediaVM.MediaData mediaData;
-                    switch (data.getContentType()) {
-                        case MessageType.MERGER:
-                            startActivity(new Intent(ChatHistoryDetailsActivity.this,
-                                ChatHistoryDetailsActivity.class).putExtra(Constant.K_RESULT,
-                                GsonHel.toJson(data.getMergeElem().getMultiMessage())));
-                            break;
-                        case MessageType.PICTURE:
-                            url = data.getPictureElem().getSourcePicture().getUrl();
-                            previewMediaVM = Easy.installVM(PreviewMediaVM.class);
-                            mediaData =new PreviewMediaVM.MediaData(url);
-                            mediaData.thumbnail= data.getPictureElem().getSnapshotPicture().getUrl();
-                            previewMediaVM.previewSingle(mediaData);
-                            startActivity(
-                                new Intent(v.getContext(),
-                                    PreviewMediaActivity.class));
-                            break;
-                        case MessageType.VIDEO:
-                            String snapshotUrl = data.getVideoElem().getSnapshotUrl();
-                            url = data.getVideoElem().getVideoUrl();
-                            previewMediaVM = Easy.installVM(PreviewMediaVM.class);
-                            mediaData =new PreviewMediaVM.MediaData(url);
-                            mediaData.thumbnail= snapshotUrl;
-                            previewMediaVM.previewSingle(mediaData);
-                            v.getContext().startActivity(
-                                new Intent(v.getContext(), PreviewMediaActivity.class));
-                            break;
-                        case MessageType.CARD:
-                            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-                                .withString(Constant.K_ID, data.getCardElem().getUserID())
-                                .navigation();
-                            break;
-                        case MessageType.LOCATION:
-                            Common.toMap(data, v);
-                            break;
-                        case MessageType.FILE:
-                            GetFilePathFromUri.openFile(v.getContext(), data);
-                            break;
+            @NonNull
+            @Override
+            public MessageViewHolder.MsgViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+                                                                      int viewType) {
+                if (viewType==MessageType.QUOTE){
+                    return new MessageViewHolder.QuoteTXTView(parent){
+                        protected boolean getSendWay(Message message) {
+                            return false;
+                        }
+
+                        @Override
+                        protected void bindLeft(View itemView, Message message) {
+                            super.bindLeft(itemView, message);
+                            LayoutMsgTxtLeftBinding v = LayoutMsgTxtLeftBinding.bind(itemView);
+                            v.content.setBackground(getDrawable(R.drawable.sty_radius_unleft_30_blue));
+                            v.quoteLy1.setBackground(getDrawable(R.drawable.sty_radius_unleft_30));
+                        }
+                    };
+                }
+                if (viewType == Constants.MsgType.CUSTOMIZE_MEETING)
+                    return new MessageViewHolder.MeetingInviteView(parent){
+                        @Override
+                        protected boolean getSendWay(Message message) {
+                            return false;
+                        }
+
+                        @Override
+                        protected void unifiedProcess(int position) {
+                            process(this, position);
+                        }
+
+                    };
+                if (viewType == MessageType.FILE) return new MessageViewHolder.FileView(parent) {
+                    @Override
+                    protected boolean getSendWay(Message message) {
+                        return false;
                     }
 
-                });
+                    @Override
+                    protected void unifiedProcess(int position) {
+                        process(this, position);
+                    }
+
+                };
+                if (viewType == MessageType.VOICE) return new MessageViewHolder.AudioView(parent) {
+                    @Override
+                    protected boolean getSendWay(Message message) {
+                        return false;
+                    }
+
+                    @Override
+                    protected void unifiedProcess(int position) {
+                        process(this, position);
+                    }
+
+                    @Override
+                    protected void bindLeft(View itemView, Message message) {
+                        TextView badge =
+                            itemView.findViewById(io.openim.android.ouicore.R.id.badge);
+                        badge.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void clickPlay(Message message, LottieAnimationView lottieView) {
+
+                    }
+                };
+                if (viewType == MessageType.MERGER) return new MessageViewHolder.MergeView(parent) {
+                    @Override
+                    protected boolean getSendWay(Message message) {
+                        return false;
+                    }
+
+                    @Override
+                    protected void unifiedProcess(int position) {
+                        process(this, position);
+                    }
+                };
+                if (viewType == MessageType.LOCATION)
+                    return new MessageViewHolder.LocationView(parent) {
+                        @Override
+                        protected boolean getSendWay(Message message) {
+                            return false;
+                        }
+
+                        @Override
+                        protected void unifiedProcess(int position) {
+                            process(this, position);
+                        }
+                    };
+                if (viewType == MessageType.CARD)
+                    return new MessageViewHolder.BusinessCardView(parent) {
+                        @Override
+                        protected boolean getSendWay(Message message) {
+                            return false;
+                        }
+
+                        @Override
+                        protected void unifiedProcess(int position) {
+                            process(this, position);
+                        }
+                    };
+                if (viewType == MessageType.VIDEO) return new MessageViewHolder.VideoView(parent) {
+                    @Override
+                    protected boolean getSendWay(Message message) {
+                        return false;
+                    }
+
+                    @Override
+                    protected void unifiedProcess(int position) {
+                        process(this, position);
+                    }
+
+                    @Override
+                    public void toPreview(View view, String url, String firstFrameUrl) {
+                        super.toPreview(view, url, firstFrameUrl, true);
+                    }
+                };
+                if (viewType == MessageType.PICTURE || viewType == MessageType.CUSTOM_FACE)
+                    return new MessageViewHolder.IMGView(parent) {
+                        @Override
+                        protected boolean getSendWay(Message message) {
+                            return false;
+                        }
+
+                        @Override
+                        protected void unifiedProcess(int position) {
+                            process(this, position);
+                        }
+
+                        @Override
+                        public void toPreview(View view, String url, String firstFrameUrl) {
+                            super.toPreview(view, url, firstFrameUrl, true);
+                        }
+                    };
+                return new MessageViewHolder.TXTView(parent) {
+                    protected boolean getSendWay(Message message) {
+                        return false;
+                    }
+
+                    @Override
+                    protected void unifiedProcess(int position) {
+                        process(this, position);
+                    }
+
+                    @Override
+                    protected void bindLeft(View itemView, Message message) {
+                        super.bindLeft(itemView, message);
+                        LayoutMsgTxtLeftBinding v = LayoutMsgTxtLeftBinding.bind(itemView);
+                        v.content.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                        v.content.setTextIsSelectable(true);
+                    }
+                };
+            }
+
+            @Override
+            public void onBindView(@NonNull MessageViewHolder.MsgViewHolder holder,
+                                   Message message, int position) {
+                holder.bindData(message, position);
+                boolean isSame =
+                    position != 0 && Objects.equals(getItems().get(position - 1).getSenderFaceUrl(), message.getSenderFaceUrl());
+                AvatarImage avatarImage = holder.itemView.findViewById(R.id.avatar);
+                if (isSame) {
+                    avatarImage.setVisibility(View.INVISIBLE);
+                } else {
+                    avatarImage.setVisibility(View.VISIBLE);
+                    avatarImage.load(message.getSenderFaceUrl(), message.getSenderNickname());
+                }
             }
         });
     }
 
     void init() {
-        String extra = getIntent().getStringExtra(Constant.K_RESULT);
+        String extra = getIntent().getStringExtra(Constants.K_RESULT);
         try {
-            Type listType = new GsonHel.ParameterizedTypeImpl(List.class, new Class[]{Message.class});
+            Type listType = new GsonHel.ParameterizedTypeImpl(List.class,
+                new Class[]{Message.class});
             List<Message> messages = GsonHel.getGson().fromJson(extra, listType);
+            for (Message message : messages) {
+                IMUtil.buildExpandInfo(message);
+            }
             adapter.setItems(messages);
         } catch (Exception e) {
             e.printStackTrace();
