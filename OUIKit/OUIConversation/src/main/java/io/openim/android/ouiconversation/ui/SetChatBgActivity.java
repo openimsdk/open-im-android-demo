@@ -34,7 +34,7 @@ import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 
-public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBinding>implements ChatVM.ViewAction {
+public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBinding> implements ChatVM.ViewAction {
 
     private Uri fileUri;
     HasPermissions hasStorage, hasShoot;
@@ -49,10 +49,8 @@ public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBin
 
         hasStorage = new HasPermissions(this, Permission.Group.STORAGE);
         hasShoot = new HasPermissions(this, Permission.CAMERA);
-        if (vm.isSingleChat)
-            id = vm.userID;
-        else
-            id = vm.groupID;
+        if (vm.isSingleChat) id = vm.userID;
+        else id = vm.groupID;
 
         listener();
     }
@@ -76,15 +74,19 @@ public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBin
     private void cachePath(Uri uri) {
         String path = GetFilePathFromUri.getFileAbsolutePath(this, uri);
         SharedPreferencesUtil.get(this).setCache(Constants.K_SET_BACKGROUND + id, path);
+        setSuccess(path);
+    }
+
+    private void setSuccess(String path) {
         Obs.newMessage(Constants.Event.SET_BACKGROUND, path);
         toast(getString(io.openim.android.ouicore.R.string.set_succ));
+        finish();
     }
 
     private void listener() {
         view.reduction.setOnClickListener(view1 -> {
             SharedPreferencesUtil.remove(this, Constants.K_SET_BACKGROUND + id);
-            Obs.newMessage(Constants.Event.SET_BACKGROUND, "");
-            toast(getString(io.openim.android.ouicore.R.string.set_succ));
+            setSuccess("");
         });
         view.menu1.setOnClickListener(v -> {
             showMediaPicker();
@@ -130,14 +132,7 @@ public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBin
     }
 
     private void goMediaPicker() {
-        Matisse.from(this)
-            .choose(MimeType.ofImage())
-            .countable(true)
-            .maxSelectable(1)
-            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-            .thumbnailScale(0.85f)
-            .imageEngine(new GlideEngine())
-            .forResult(albumLauncher);
+        Matisse.from(this).choose(MimeType.ofImage()).countable(true).maxSelectable(1).restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED).thumbnailScale(0.85f).imageEngine(new GlideEngine()).forResult(albumLauncher);
     }
 
     @Override

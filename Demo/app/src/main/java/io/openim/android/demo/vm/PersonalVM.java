@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.openim.android.demo.R;
 import io.openim.android.demo.repository.OpenIMService;
 import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.base.BaseApp;
@@ -20,6 +21,7 @@ import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Obs;
+import io.openim.android.ouicore.utils.RegexValid;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.AllowType;
@@ -95,8 +97,11 @@ public class PersonalVM extends BaseViewModel {
                     ArrayList arrayList = (ArrayList) map.get("users");
                     if (null == arrayList || arrayList.isEmpty()) return;
 
-                    UserInfo u = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
-                        UserInfo.class);
+                    UserInfo u = GsonHel.getGson().fromJson(arrayList.get(0).toString(), UserInfo.class);
+                    if (null== userInfo.val()){
+                        userInfo.setValue(u);
+                        return;
+                    }
                     userInfo.val().setFriendInfo(null);
                     userInfo.setValue(updateUserInfo(userInfo.val(), u));
                     updateConfig(userInfo.val());
@@ -208,9 +213,12 @@ public class PersonalVM extends BaseViewModel {
     }
 
     public void setAllowAddFriend(boolean isOpen) {
-        int allow = isOpen ? AllowType.NotAllowed.value : AllowType.Allowed.value;
-        userInfo.val().setAllowAddFriend(allow);
-        setSelfInfo(new Parameter().add("allowAddFriend", allow));
+        try {
+            int allow = isOpen ? AllowType.NotAllowed.value : AllowType.Allowed.value;
+            userInfo.val().setAllowAddFriend(allow);
+            setSelfInfo(new Parameter().add("allowAddFriend", allow));
+        } catch (Exception ignored) {
+        }
     }
 
     public void setEmail(String email) {

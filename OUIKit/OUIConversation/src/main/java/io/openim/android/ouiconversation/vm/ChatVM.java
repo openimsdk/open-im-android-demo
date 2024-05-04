@@ -58,6 +58,7 @@ import io.openim.android.sdk.enums.GroupType;
 import io.openim.android.sdk.enums.MessageStatus;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.enums.Platform;
+import io.openim.android.sdk.listener.BaseImpl;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConversationListener;
@@ -85,6 +86,9 @@ import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.TextElem;
 import io.openim.android.sdk.models.UsersOnlineStatus;
 import io.openim.android.sdk.models.VideoElem;
+import io.openim.android.sdk.utils.ParamsUtil;
+import open_im_sdk.Open_im_sdk;
+import open_im_sdk_callback.Base;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener,
     OnGroupListener, OnConversationListener, OnSignalingListener, OnUserListener {
@@ -544,6 +548,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 }
                 conversationID = data.getConversationID();
                 conversationInfo.setValue(data);
+                changeInputStates();
                 loadHistory();
                 getConversationRecvMessageOpt(data.getConversationID());
 
@@ -663,6 +668,22 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }, userID, "");
         });
         IMEvent.getInstance().addUserListener(this);
+    }
+
+    private void changeInputStates() {
+        Open_im_sdk.changeInputStates(
+            new Base() {
+                @Override
+                public void onError(int i, String s) {
+                    L.e("");
+                }
+
+                @Override
+                public void onSuccess(String s) {
+                    L.e("");
+                }
+            }
+            , ParamsUtil.buildOperationID(), conversationID,true);
     }
 
 
@@ -799,6 +820,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             message.getSessionType() != ConversationType.SINGLE_CHAT && !isSingleChat && groupID.equals(groupId);
         return isCurSingleChat || isCurGroupChat;
     }
+
 
     /**
      * 接收到新消息

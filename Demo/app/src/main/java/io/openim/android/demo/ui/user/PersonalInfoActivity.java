@@ -18,9 +18,11 @@ import io.openim.android.demo.databinding.ActivityPersonalInfoBinding;
 import io.openim.android.demo.ui.main.EditTextActivity;
 import io.openim.android.demo.vm.PersonalVM;
 import io.openim.android.ouicore.base.BaseActivity;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constants;
+import io.openim.android.ouicore.utils.RegexValid;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.PhotographAlbumDialog;
@@ -118,6 +120,10 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() != Activity.RESULT_OK) return;
             String resultStr = result.getData().getStringExtra(Constants.K_RESULT);
+            if(!RegexValid.isValidEmail(resultStr)){
+                toast(BaseApp.inst().getString(io.openim.android.ouicore.R.string.email_tips));
+                return;
+            }
             vm.setEmail(resultStr);
         });
 

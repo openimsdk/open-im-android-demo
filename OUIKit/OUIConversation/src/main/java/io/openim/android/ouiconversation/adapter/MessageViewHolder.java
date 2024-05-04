@@ -1467,7 +1467,31 @@ public class MessageViewHolder {
                 v.picture1.setVisibility(View.GONE);
                 return;
             }
-            if (contentType == MessageType.TEXT || contentType == MessageType.AT_TEXT) {
+            v.downloadView1.setVisibility(View.GONE);
+            if (contentType == MessageType.FILE) {
+                v.downloadView1.setVisibility(View.VISIBLE);
+                String tips =
+                    message.getSenderNickname() + ":" + message.getFileElem().getFileName();
+                String path = message.getFileElem().getFilePath();
+                boolean isLocal = GetFilePathFromUri.fileIsExists(path);
+                if (!isLocal) path = message.getFileElem().getSourceUrl();
+                v.downloadView1.setRes(path);
+                v.quoteContent1.setText(tips);
+                Message finalMessage1 = message;
+                v.quoteLy1.setOnClickListener(v1 -> {
+                    GetFilePathFromUri.openFile(itemView.getContext(), finalMessage1);
+                });
+            } else if (contentType == MessageType.CARD
+                && null != message.getCardElem()) {
+                String tips =
+                    message.getSenderNickname() + ":" + IMUtil.getMsgParse(message) + message.getCardElem().getNickname();
+                v.quoteContent1.setText(tips);
+                String uid = message.getCardElem().getUserID();
+                v.quoteLy1.setOnClickListener(v1 -> {
+                    ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
+                        .withString(Constants.K_ID, uid).navigation(v.quoteContent1.getContext());
+                });
+            } else if (contentType == MessageType.TEXT || contentType == MessageType.AT_TEXT) {
                 v.quoteContent1.setText(message.getSenderNickname() + ":" + IMUtil.getMsgParse(message));
                 v.picture1.setVisibility(View.GONE);
             } else {
@@ -1526,6 +1550,10 @@ public class MessageViewHolder {
                 if (!isLocal) path = message.getFileElem().getSourceUrl();
                 v.downloadView.setRes(path);
                 v.quoteContent2.setText(tips);
+                Message finalMessage1 = message;
+                v.quoteLy2.setOnClickListener(v1 -> {
+                    GetFilePathFromUri.openFile(itemView.getContext(), finalMessage1);
+                });
             } else if (contentType == MessageType.CARD
                 && null != message.getCardElem()) {
                 String tips =

@@ -12,9 +12,12 @@ import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bigkoo.pickerview.adapter.ArrayWheelAdapter;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import io.openim.android.ouiconversation.databinding.ActivityChatSettingBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
@@ -23,7 +26,9 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutBurnAfterReadingBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Constants;
@@ -37,7 +42,7 @@ import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.UserInfo;
 
-public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding> implements ChatVM.ViewAction {
+public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding> implements ChatVM.ViewAction, Observer {
 
     ContactListVM contactListVM = new ContactListVM();
     UserInfo userInfo;
@@ -51,6 +56,8 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
         initView();
         click();
+
+        Obs.inst().addObserver(this);
     }
 
     private ActivityResultLauncher<Intent> personDetailLauncher =
@@ -323,4 +330,19 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
     public void closePage() {
 
     }
+
+    @Override
+    protected void fasterDestroy() {
+        super.fasterDestroy();
+        Obs.inst().deleteObserver(this);
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+            Obs.Message message = (Obs.Message) o;
+            if (message.tag == Constants.Event.SET_BACKGROUND) {
+               finish();
+            }
+    }
+
 }

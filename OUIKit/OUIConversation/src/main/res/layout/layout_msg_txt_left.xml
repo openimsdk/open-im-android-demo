@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,13 +36,12 @@
                 android:layout_marginTop="2dp"
                 android:background="@drawable/sty_radius_unleft_30"
                 android:gravity="center_vertical"
-                android:minHeight="40dp"
                 android:maxWidth="@dimen/msg_max_width"
+                android:minHeight="40dp"
                 android:padding="7dp"
                 android:textColor="@color/txt_black"
                 android:textSize="@dimen/main_body"
-                app:emojiSize="23sp"
-                />
+                app:emojiSize="23sp" />
 
 
             <LinearLayout
@@ -66,6 +65,12 @@
                     android:textColor="#ff999999"
                     android:textSize="12sp" />
 
+                <io.openim.android.ouicore.widget.FileDownloadView
+                    android:id="@+id/downloadView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -83,8 +88,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
-                        android:visibility="gone"
-                        android:layout_centerVertical="true">
+                        android:layout_centerVertical="true"
+                        android:visibility="gone">
 
                         <io.openim.android.ouicore.widget.CirclePgBar
                             android:layout_width="20dp"
@@ -101,7 +106,6 @@
 
                 </RelativeLayout>
             </LinearLayout>
-
 
 
         </LinearLayout>

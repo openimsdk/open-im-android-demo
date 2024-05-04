@@ -567,5 +567,6 @@
     <string name="other_accepted">已在其他端接受</string>
     <string name="other_rejected">已在其他端拒绝</string>
     <string name="friend_settings">好友设置</string>
+    <string name="email_tips">邮箱无效</string>
 
 </resources>
