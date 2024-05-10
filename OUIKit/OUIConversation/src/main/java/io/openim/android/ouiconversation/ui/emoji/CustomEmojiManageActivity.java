@@ -79,7 +79,7 @@ public class CustomEmojiManageActivity extends BaseActivity<BaseViewModel,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         runOnUiThread(() -> hasStorage = new HasPermissions(this,
-            Permission.Group.STORAGE));
+            Permission.MANAGE_EXTERNAL_STORAGE));
         customEmojiVM = Easy.find(CustomEmojiVM.class);
         bindViewDataBinding(ActivityCustomEmojiManageBinding.inflate(getLayoutInflater()));
 

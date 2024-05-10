@@ -89,7 +89,7 @@ public class PushMomentsActivity extends BaseActivity<PushMomentsVM, ActivityPus
 
     private void init() {
         MThreadTool.executorService.execute(() -> {
-            hasStorage = new HasPermissions(this, Permission.Group.STORAGE);
+            hasStorage = new HasPermissions(this, Permission.MANAGE_EXTERNAL_STORAGE);
             hasShoot = new HasPermissions(this, Permission.CAMERA,
                 Permission.RECORD_AUDIO);
         });

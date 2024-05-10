@@ -81,7 +81,7 @@ public class PhotographAlbumDialog extends BaseDialog {
     public void initView() {
         initLauncher();
         Common.UIHandler.postDelayed(() -> {
-            hasStorage = new HasPermissions(getContext(), Permission.Group.STORAGE);
+            hasStorage = new HasPermissions(getContext(), Permission.MANAGE_EXTERNAL_STORAGE);
             hasShoot = new HasPermissions(getContext(), Permission.CAMERA);
         }, 200);
 

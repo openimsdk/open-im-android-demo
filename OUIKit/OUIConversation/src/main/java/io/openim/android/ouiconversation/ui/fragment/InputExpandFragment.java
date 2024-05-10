@@ -87,11 +87,9 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MThreadTool.executorService.execute(() -> {
-            hasStorage = new HasPermissions(getActivity(), Permission.Group.STORAGE);
-            hasShoot = new HasPermissions(getActivity(), Permission.CAMERA,
-                Permission.RECORD_AUDIO);
-            hasLocation = new HasPermissions(getActivity(), Permission.ACCESS_FINE_LOCATION,
-                Permission.ACCESS_COARSE_LOCATION);
+            hasStorage = new HasPermissions(getActivity(), Permission.MANAGE_EXTERNAL_STORAGE);
+            hasShoot = new HasPermissions(getActivity(), Permission.CAMERA, Permission.RECORD_AUDIO);
+            hasLocation = new HasPermissions(getActivity(), Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
         });
 
     }

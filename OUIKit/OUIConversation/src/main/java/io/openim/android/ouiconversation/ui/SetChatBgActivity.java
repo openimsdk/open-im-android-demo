@@ -47,7 +47,7 @@ public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBin
         bindViewDataBinding(ActivitySetChatBgBinding.inflate(getLayoutInflater()));
         sink();
 
-        hasStorage = new HasPermissions(this, Permission.Group.STORAGE);
+        hasStorage = new HasPermissions(this, Permission.MANAGE_EXTERNAL_STORAGE);
         hasShoot = new HasPermissions(this, Permission.CAMERA);
         if (vm.isSingleChat) id = vm.userID;
         else id = vm.groupID;
