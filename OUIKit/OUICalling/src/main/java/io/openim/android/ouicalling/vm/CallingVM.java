@@ -1,7 +1,11 @@
 package io.openim.android.ouicalling.vm;
 
+import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.widget.Toast;
 
@@ -73,6 +77,16 @@ public class CallingVM {
         callViewModel = new CallViewModel(BaseApp.inst());
         scope = callViewModel.buildScope();
 //        audioManager = (AudioManager) BaseApp.inst().getSystemService(Context.AUDIO_SERVICE);
+        listenerBluetoothConnectionReceiver();
+    }
+
+    private void listenerBluetoothConnectionReceiver() {
+        BluetoothConnectionReceiver audioNoisyReceiver = new BluetoothConnectionReceiver(this);
+        //蓝牙状态广播监听
+        IntentFilter audioFilter = new IntentFilter();
+        audioFilter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
+        audioFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        BaseApp.inst().registerReceiver(audioNoisyReceiver, audioFilter);
     }
 
     public void initRemoteVideoRenderer(TextureViewRenderer... viewRenderers) {
@@ -131,11 +145,9 @@ public class CallingVM {
             }
         };
         if (isGroup)
-            OpenIMClient.getInstance().signalingManager.signalingInviteInGroup(certificateOnBase,
-                signalingInfo);
+            OpenIMClient.getInstance().signalingManager.signalingInviteInGroup(certificateOnBase, signalingInfo);
         else
-            OpenIMClient.getInstance().signalingManager.signalingInvite(certificateOnBase,
-                signalingInfo);
+            OpenIMClient.getInstance().signalingManager.signalingInvite(certificateOnBase, signalingInfo);
     }
 
     /**
@@ -156,8 +168,7 @@ public class CallingVM {
                 setSpeakerphoneOn(true);
                 if (!isVideoCalls) callViewModel.setCameraEnabled(false);
 
-                localVideoTrack =
-                    callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
+                localVideoTrack = callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
                 if (null != localVideoTrack && null != localSpeakerVideoViews && !localSpeakerVideoViews.isEmpty()) {
                     for (TextureViewRenderer localSpeakerVideoView : localSpeakerVideoViews) {
                         localVideoTrack.addRenderer(localSpeakerVideoView);
@@ -172,10 +183,8 @@ public class CallingVM {
                         for (int i = 0; i < v.size(); i++) {
                             Participant participant = v.get(i);
                             if (participant instanceof RemoteParticipant) {
-                                for (TextureViewRenderer remoteSpeakerVideoView :
-                                    remoteSpeakerVideoViews) {
-                                    callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoView,
-                                        participant, scope, new Continuation<Unit>() {
+                                for (TextureViewRenderer remoteSpeakerVideoView : remoteSpeakerVideoViews) {
+                                    callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoView, participant, scope, new Continuation<Unit>() {
                                         @NonNull
                                         @Override
                                         public CoroutineContext getContext() {
@@ -229,8 +238,7 @@ public class CallingVM {
             signalingCancel(signalingInfo);
             return;
         }
-        OpenIMClient.getInstance().signalingManager.signalingHungUp(callBackDismissUI,
-            signalingInfo);
+        OpenIMClient.getInstance().signalingManager.signalingHungUp(callBackDismissUI, signalingInfo);
     }
 
     private void dismissUI() {
@@ -240,12 +248,10 @@ public class CallingVM {
     private void signalingCancel(SignalingInfo signalingInfo) {
         if (isCallOut) {
             renewalDB(buildPrimaryKey(signalingInfo), (realm, v) -> v.setFailedState(1));
-            OpenIMClient.getInstance().signalingManager.signalingCancel(callBackDismissUI,
-                signalingInfo);
+            OpenIMClient.getInstance().signalingManager.signalingCancel(callBackDismissUI, signalingInfo);
         } else {
             renewalDB(buildPrimaryKey(signalingInfo), (realm, v) -> v.setFailedState(3));
-            OpenIMClient.getInstance().signalingManager.signalingReject(callBackDismissUI,
-                signalingInfo);
+            OpenIMClient.getInstance().signalingManager.signalingReject(callBackDismissUI, signalingInfo);
         }
     }
 
@@ -302,9 +308,10 @@ public class CallingVM {
     }
 
     public void setSpeakerphoneOn(boolean isChecked) {
-        callViewModel.getAudioHandler().selectDevice(isChecked ?
-            new AudioDevice.Speakerphone() :
-            new AudioDevice.Earpiece());
+        if (callViewModel.getAudioHandler().getSelectedAudioDevice() instanceof AudioDevice.BluetoothHeadset) {
+            return;
+        }
+        callViewModel.getAudioHandler().selectDevice(isChecked ? new AudioDevice.Speakerphone() : new AudioDevice.Earpiece());
     }
 
 
@@ -325,4 +332,42 @@ public class CallingVM {
     public interface OnRenewalDBListener {
         void onRenewal(Realm realm, CallHistory callHistory);
     }
+
+
+    public static class BluetoothConnectionReceiver extends BroadcastReceiver {
+        CallingVM callingVM;
+
+        public BluetoothConnectionReceiver(CallingVM callingVM) {
+            this.callingVM = callingVM;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED.equals(intent.getAction())) { //蓝牙连接状态
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, -1);
+                if (state == BluetoothAdapter.STATE_CONNECTED) {
+                    //连接或失联，切换音频输出（到蓝牙、或者强制仍然扬声器外放）
+                    callingVM.changeToHeadset();
+                } else if (state == BluetoothAdapter.STATE_DISCONNECTED) {
+                    callingVM.changeToSpeaker();
+                }
+            }
+        }
+    }
+
+    /**
+     * 切换到外放
+     */
+    public void changeToSpeaker() {
+        setSpeakerphoneOn(true);
+    }
+
+    /**
+     * 切换到蓝牙音箱
+     */
+    public void changeToHeadset() {
+        callViewModel.getAudioHandler()
+            .selectDevice(new AudioDevice.BluetoothHeadset());
+    }
+
 }
