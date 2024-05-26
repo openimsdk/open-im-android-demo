@@ -4,6 +4,7 @@
     <string name="group_bulletin">Group Announcement</string>
     <string name="search_by_id">Search and add by mobile number/ID number/nickname</string>
     <string name="send_succ">Send Successfully</string>
+    <string name="push_succ">发布成功</string>
     <string name="see_moments">View Moments</string>
     <string name="sunday">Sunday</string>
     <string name="monday">Monday</string>

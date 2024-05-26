@@ -54,6 +54,13 @@ public class GroupBulletinActivity extends BaseActivity<GroupVM, ActivityGroupBu
         });
     }
 
+    @Override
+    public void onSuccess(Object body) {
+        super.onSuccess(body);
+        toast(getString(io.openim.android.ouicore.R.string.push_succ));
+        finish();
+    }
+
     private final TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {

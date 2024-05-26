@@ -5,6 +5,7 @@
     <string name="group_bulletin">群公告</string>
     <string name="search_by_id">通过手机号/ID号/昵称搜索添加</string>
     <string name="send_succ">发送成功</string>
+    <string name="push_succ">发布成功</string>
     <string name="see_moments">查看动态</string>
 
     <string name="sunday">星期日</string>
