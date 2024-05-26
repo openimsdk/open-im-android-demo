@@ -155,7 +155,7 @@ public class CallingVM {
      *
      * @param data
      */
-    private void connectToRoom(SignalingCertificate data) {
+    public void connectToRoom(SignalingCertificate data) {
         callViewModel.connectToRoom(data.getLiveURL(), data.getToken(), new Continuation<Unit>() {
             @NonNull
             @Override

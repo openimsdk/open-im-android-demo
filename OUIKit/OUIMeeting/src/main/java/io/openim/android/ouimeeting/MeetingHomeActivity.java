@@ -423,7 +423,7 @@ public class MeetingHomeActivity extends BaseActivity<MeetingVM, ActivityMeeting
                         ParticipantMeta participantMeta = GsonHel.fromJson(data.getMetadata(),
                             ParticipantMeta.class);
                         meta.setTop = participantMeta.setTop = !meta.setTop;
-                        data.setMetadata$livekit_android_sdk_release(GsonHel.toJson(participantMeta));
+                        data.setMetadata(GsonHel.toJson(participantMeta));
                         memberAdapter.getItems().remove(data);
                         if (meta.setTop) {
                             memberAdapter.getItems().add(0, data);

@@ -146,7 +146,7 @@ public class MeetingVM extends BaseViewModel<MeetingVM.Interaction> {
                     ParticipantMeta.class);
                 participantMeta.setTop = null!= roomMetadata.val().pinedUserIDList&&
                     roomMetadata.val().pinedUserIDList.contains(getIdentity(data));
-                data.setMetadata$livekit_android_sdk_release(GsonHel.toJson(participantMeta));
+                data.setMetadata(GsonHel.toJson(participantMeta));
             }
         } catch (Exception ignored) {}
     }

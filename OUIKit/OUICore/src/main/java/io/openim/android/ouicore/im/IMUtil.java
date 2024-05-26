@@ -282,7 +282,7 @@ public class IMUtil {
             }
             handleNotification(msg);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         msg.setExt(msgExpand);
 
@@ -962,7 +962,7 @@ public class IMUtil {
     }
 
     public static String atD(String str) {
-        return "@" + str + "\t";
+        return "@" + str;
     }
 
     /**

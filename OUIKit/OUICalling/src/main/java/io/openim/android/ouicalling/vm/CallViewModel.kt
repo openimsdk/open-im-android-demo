@@ -3,6 +3,7 @@ package io.openim.android.ouicalling.vm
 import android.app.Application
 import android.content.Intent
 import android.os.Build
+import androidx.core.os.postDelayed
 import androidx.lifecycle.*
 import io.livekit.android.LiveKit
 import io.livekit.android.RoomOptions
@@ -23,6 +24,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import com.github.ajalt.timberkt.Timber
 import io.openim.android.ouicore.services.ForegroundService
+import io.openim.android.ouicore.utils.Common
+import io.openim.android.sdk.utils.CommonUtil
 import livekit.LivekitRtc
 import kotlinx.coroutines.flow.collectLatest as collectLatest1
 
@@ -40,7 +43,7 @@ class CallViewModel(
 //            )
         ),
     )
-
+    var roomEvent: RoomEvent? = null
     val audioHandler = room.audioHandler as AudioSwitchHandler
 
     val allParticipants = room::remoteParticipants.flow.map { remoteParticipants ->
@@ -100,6 +103,7 @@ class CallViewModel(
 
             launch {
                 room.events.collect {
+                    roomEvent = it
                     when (it) {
                         is RoomEvent.FailedToConnect -> mutableError.value = it.error
                         is RoomEvent.DataReceived -> {
@@ -284,8 +288,12 @@ class CallViewModel(
         try {
             scopes.forEach { it.cancel() }
             scopes.clear()
-            room.disconnect()
-            room.release()
+            Common.UIHandler.postDelayed(2000) {
+                if (room.state != Room.State.DISCONNECTED) {
+                    room.disconnect()
+                    room.release()
+                }
+            }
 
             // Clean up foreground service
             val application = getApplication<Application>()
@@ -394,9 +402,8 @@ class CallViewModel(
 public fun <T> LiveData<T>.hide(): LiveData<T> = this
 public fun <T> MutableStateFlow<T>.hide(): StateFlow<T> = this
 public fun <T> Flow<T>.hide(): Flow<T> = this
- fun Participant.getIdentity(): String {
-    if (null != this.identity)
-        return this.identity!!.value
+fun Participant.getIdentity(): String {
+    if (null != this.identity) return this.identity!!.value
     return ""
 }
 

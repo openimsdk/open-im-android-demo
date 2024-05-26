@@ -379,6 +379,7 @@ public class CallDialog extends BaseDialog {
         callingVM.signalingAccept(signalingInfo, new OnBase() {
             @Override
             public void onError(int code, String error) {
+                Toast.makeText(context, error + code, Toast.LENGTH_SHORT).show();
             }
 
             @Override
