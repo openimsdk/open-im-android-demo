@@ -97,8 +97,7 @@ public class CallingServiceImp implements CallingService {
         L.e(TAG, "----onInvitationCancelled-----");
         cancelNotify();
         if (null == callDialog) return;
-        callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(),
-            (realm, callHistory) -> callHistory.setFailedState(1));
+        callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(), (realm, callHistory) -> callHistory.setFailedState(1));
         dismissDialog();
     }
 
@@ -112,15 +111,13 @@ public class CallingServiceImp implements CallingService {
         L.e(TAG, "----onInviteeAccepted-----");
         if (null == callDialog) return;
         callDialog.otherSideAccepted();
-        callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(),
-            (realm, callHistory) -> callHistory.setSuccess(true));
+        callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(), (realm, callHistory) -> callHistory.setSuccess(true));
     }
 
     @Override
     public void onInviteeAcceptedByOtherDevice(SignalingInfo s) {
         L.e(TAG, "----onInviteeAcceptedByOtherDevice-----");
-        Toast.makeText(getContext(), io.openim.android.ouicore.R.string.other_accepted,
-            Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), io.openim.android.ouicore.R.string.other_accepted, Toast.LENGTH_SHORT).show();
         dismissDialog();
     }
 
@@ -144,8 +141,7 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onInviteeRejectedByOtherDevice(SignalingInfo s) {
         L.e(TAG, "----onInviteeRejectedByOtherDevice-----");
-        Toast.makeText(getContext(), io.openim.android.ouicore.R.string.other_rejected,
-            Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), io.openim.android.ouicore.R.string.other_rejected, Toast.LENGTH_SHORT).show();
         dismissDialog();
         cancelNotify();
     }
@@ -159,30 +155,24 @@ public class CallingServiceImp implements CallingService {
         setSignalingInfo(signalingInfo);
         isBeCalled = true;
 
-        boolean isSystemAlert = new HasPermissions(BaseApp.inst(),
-            Permission.SYSTEM_ALERT_WINDOW).isAllGranted();
+        boolean isSystemAlert = new HasPermissions(BaseApp.inst(), Permission.SYSTEM_ALERT_WINDOW).isAllGranted();
         Intent hangIntent;
-        boolean backgroundStart =
-            BackgroundStartPermissions.INSTANCE.isBackgroundStartAllowed(context);
+        boolean backgroundStart = BackgroundStartPermissions.INSTANCE.isBackgroundStartAllowed(context);
         if (isSystemAlert && backgroundStart) {
-            hangIntent =
-                new Intent(context, LockPushActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            hangIntent = new Intent(context, LockPushActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(hangIntent);
         } else {
             if (BaseApp.inst().isAppBackground.val()) {
                 Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
                 LogisticsCenter.completion(postcard);
-                hangIntent =
-                    new Intent(context, postcard.getDestination()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                hangIntent = new Intent(context, postcard.getDestination()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                 MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), R.raw.incoming_call_ring);
                 MediaPlayerUtil.INSTANCE.loopPlay();
 
-                PendingIntent hangPendingIntent = PendingIntent.getActivity(context, 1,
-                    hangIntent, PendingIntent.FLAG_MUTABLE);
+                PendingIntent hangPendingIntent = PendingIntent.getActivity(context, 1, hangIntent, PendingIntent.FLAG_MUTABLE);
 
-                Notification notification =
-                    NotificationUtil.builder(NotificationUtil.CALL_CHANNEL_ID).setPriority(Notification.PRIORITY_MAX).setCategory(Notification.CATEGORY_CALL).setContentTitle("OpenIM").setContentText(context.getString(io.openim.android.ouicore.R.string.receive_call_invite)).setAutoCancel(true).setOngoing(true).setFullScreenIntent(hangPendingIntent, true).setContentIntent(hangPendingIntent).setCustomHeadsUpContentView(new RemoteViews(BaseApp.inst().getPackageName(), R.layout.layout_call_invite)).build();
+                Notification notification = NotificationUtil.builder(NotificationUtil.CALL_CHANNEL_ID).setPriority(Notification.PRIORITY_MAX).setCategory(Notification.CATEGORY_CALL).setContentTitle("OpenIM").setContentText(context.getString(io.openim.android.ouicore.R.string.receive_call_invite)).setAutoCancel(true).setOngoing(true).setFullScreenIntent(hangPendingIntent, true).setContentIntent(hangPendingIntent).setCustomHeadsUpContentView(new RemoteViews(BaseApp.inst().getPackageName(), R.layout.layout_call_invite)).build();
 
                 NotificationUtil.sendNotify(A_NOTIFY_ID, notification);
             } else {
@@ -210,15 +200,15 @@ public class CallingServiceImp implements CallingService {
         MediaPlayerUtil.INSTANCE.release();
     }
 
-    public Dialog buildCallDialog(Context context,
-                                  DialogInterface.OnDismissListener dismissListener,
-                                  boolean isCallOut) {
+    public Dialog buildCallDialog(Context context, DialogInterface.OnDismissListener dismissListener, boolean isCallOut) {
         try {
             if (callDialog != null) return callDialog;
             if (signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT)
                 callDialog = new GroupCallDialog(context, this, isCallOut);
             else callDialog = new CallDialog(context, this, isCallOut);
+            insetDB();
             callDialog.bindData(signalingInfo);
+
             if (!callDialog.callingVM.isCallOut) {
                 callDialog.setOnDismissListener(dialog -> {
                     isBeCalled = false;
@@ -228,7 +218,6 @@ public class CallingServiceImp implements CallingService {
                     callDialog.setOnShowListener(dialog -> ARouter.getInstance().build(Routes.Main.HOME).navigation());
                 }
             }
-            insetDB();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -236,8 +225,7 @@ public class CallingServiceImp implements CallingService {
     }
 
     @Override
-    public Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener,
-                                  boolean isCallOut) {
+    public Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener, boolean isCallOut) {
         return buildCallDialog(getContext(), dismissListener, isCallOut);
     }
 
@@ -257,8 +245,7 @@ public class CallingServiceImp implements CallingService {
         if (isCallingTips()) return;
         setSignalingInfo(signalingInfo);
         Common.UIHandler.post(() -> {
-            GroupCallDialog callDialog = (GroupCallDialog) buildCallDialog(getContext(), null,
-                false);
+            GroupCallDialog callDialog = (GroupCallDialog) buildCallDialog(getContext(), null, false);
             callDialog.changeView();
             callDialog.joinToShow();
         });
@@ -267,8 +254,7 @@ public class CallingServiceImp implements CallingService {
     public boolean isCallingTips() {
         boolean is = isCalling();
         if (is) {
-            Toast.makeText(getContext(), io.openim.android.ouicore.R.string.now_calling,
-                Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), io.openim.android.ouicore.R.string.now_calling, Toast.LENGTH_SHORT).show();
         }
         return is;
     }
@@ -281,13 +267,9 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void onHangup(SignalingInfo signalingInfo) {
         L.e(TAG, "----onHangup-----");
-        L.e(TAG, "----callDialog-----"+callDialog);
+        L.e(TAG, "----callDialog-----" + callDialog);
         if (null == callDialog || callDialog.callingVM.isGroup) return;
-        L.e(TAG, "----buildPrimaryKey-----"+callDialog.buildPrimaryKey());
-        callDialog.callingVM.renewalDB(callDialog.buildPrimaryKey(), (realm, callHistory) -> {
-            L.e(TAG,"---getDate:"+callHistory.getDate());
-            callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate()));
-        });
+        L.e(TAG, "----buildPrimaryKey-----" + callDialog.buildPrimaryKey());
         dismissDialog();
     }
 
@@ -320,9 +302,7 @@ public class CallingServiceImp implements CallingService {
     private void insetDB() {
         if (callDialog.callingVM.isGroup) return;
         List<String> ids = new ArrayList<>();
-        ids.add(callDialog.callingVM.isCallOut ?
-            signalingInfo.getInvitation().getInviteeUserIDList().get(0) :
-            signalingInfo.getInvitation().getInviterUserID());
+        ids.add(callDialog.callingVM.isCallOut ? signalingInfo.getInvitation().getInviteeUserIDList().get(0) : signalingInfo.getInvitation().getInviterUserID());
 
         boolean isCallOut = !callDialog.callingVM.isCallOut;
         OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
@@ -337,10 +317,7 @@ public class CallingServiceImp implements CallingService {
                 BaseApp.inst().realm.executeTransactionAsync(realm -> {
                     if (null == callDialog) return;
                     L.e(TAG, "----insetDB-----");
-                    CallHistory callHistory = new CallHistory(callDialog.buildPrimaryKey(),
-                        userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(),
-                        signalingInfo.getInvitation().getMediaType(), false, 0, isCallOut,
-                        System.currentTimeMillis(), 0);
+                    CallHistory callHistory = new CallHistory(callDialog.buildPrimaryKey(), userInfo.getUserID(), userInfo.getNickname(), userInfo.getFaceURL(), signalingInfo.getInvitation().getMediaType(), false, 0, isCallOut, System.currentTimeMillis(), 0);
                     realm.insert(callHistory);
                 });
             }

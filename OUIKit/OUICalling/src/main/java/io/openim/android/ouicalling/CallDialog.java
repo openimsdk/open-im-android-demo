@@ -38,6 +38,7 @@ import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.HasPermissions;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.NotificationUtil;
 import io.openim.android.ouicore.utils.Obs;
@@ -102,8 +103,7 @@ public class CallDialog extends BaseDialog {
 
     public void initRendererView() {
         callingVM.initLocalSpeakerVideoView(view.localSpeakerVideoView);
-        callingVM.initRemoteVideoRenderer(view.remoteSpeakerVideoView,
-            view.remoteSpeakerVideoView2, floatViewBinding.shrinkRemoteSpeakerVideoView);
+        callingVM.initRemoteVideoRenderer(view.remoteSpeakerVideoView, view.remoteSpeakerVideoView2, floatViewBinding.shrinkRemoteSpeakerVideoView);
     }
 
     private void initView() {
@@ -145,15 +145,11 @@ public class CallDialog extends BaseDialog {
         if (callingVM.isStartCall) {
             floatViewBinding.sTips.setText(io.openim.android.ouicore.R.string.calling);
         } else {
-            floatViewBinding.sTips.setText(callingVM.isCallOut ?
-                context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
-                context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
+            floatViewBinding.sTips.setText(callingVM.isCallOut ? context.getString(io.openim.android.ouicore.R.string.waiting_tips2) : context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
         }
         WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.height = isShrink ? ViewGroup.LayoutParams.WRAP_CONTENT :
-            ViewGroup.LayoutParams.MATCH_PARENT;
-        params.width = isShrink ? ViewGroup.LayoutParams.WRAP_CONTENT :
-            ViewGroup.LayoutParams.MATCH_PARENT;
+        params.height = isShrink ? ViewGroup.LayoutParams.WRAP_CONTENT : ViewGroup.LayoutParams.MATCH_PARENT;
+        params.width = isShrink ? ViewGroup.LayoutParams.WRAP_CONTENT : ViewGroup.LayoutParams.MATCH_PARENT;
         params.gravity = isShrink ? (Gravity.TOP | Gravity.END) : Gravity.CENTER;
         getWindow().setAttributes(params);
     }
@@ -162,8 +158,7 @@ public class CallDialog extends BaseDialog {
         // 传入 Activity 对象表示设置成局部的，不需要有悬浮窗权限
         // 传入 Application 对象表示设置成全局的，但需要有悬浮窗权限
         if (null == easyWindow) {
-            easyWindow =
-                new EasyWindow<>(BaseApp.inst()).setContentView(floatViewBinding.getRoot()).setGravity(Gravity.END | Gravity.TOP)
+            easyWindow = new EasyWindow<>(BaseApp.inst()).setContentView(floatViewBinding.getRoot()).setGravity(Gravity.END | Gravity.TOP)
                 // 设置成可拖拽的
                 .setDraggable();
             floatViewBinding.shrink.setOnClickListener(v -> shrink(false));
@@ -173,8 +168,7 @@ public class CallDialog extends BaseDialog {
 
     public void bindData(SignalingInfo signalingInfo) {
         this.signalingInfo = signalingInfo;
-        callingVM.isGroup =
-            signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT;
+        callingVM.isGroup = signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT;
         callingVM.setVideoCalls(Constants.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
         view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.VISIBLE : View.GONE);
         if (!callingVM.isVideoCalls) {
@@ -207,9 +201,7 @@ public class CallDialog extends BaseDialog {
     public void bindUserInfo(SignalingInfo signalingInfo) {
         try {
             ArrayList<String> ids = new ArrayList<>();
-            ids.add(callingVM.isCallOut ?
-                signalingInfo.getInvitation().getInviteeUserIDList().get(0) :
-                signalingInfo.getInvitation().getInviterUserID());
+            ids.add(callingVM.isCallOut ? signalingInfo.getInvitation().getInviteeUserIDList().get(0) : signalingInfo.getInvitation().getInviterUserID());
 
             OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
                 @Override
@@ -274,18 +266,14 @@ public class CallDialog extends BaseDialog {
         view.micIsOn.setOnClickListener(new OnDedrepClickListener(1000) {
             @Override
             public void click(View v) {
-                view.micIsOn.setText(view.micIsOn.isChecked() ?
-                    context.getString(io.openim.android.ouicore.R.string.microphone_on) :
-                    context.getString(io.openim.android.ouicore.R.string.microphone_off));
+                view.micIsOn.setText(view.micIsOn.isChecked() ? context.getString(io.openim.android.ouicore.R.string.microphone_on) : context.getString(io.openim.android.ouicore.R.string.microphone_off));
                 //关闭麦克风
                 callingVM.callViewModel.setMicEnabled(view.micIsOn.isChecked());
             }
         });
 
         view.speakerIsOn.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            view.speakerIsOn.setText(isChecked ?
-                context.getString(io.openim.android.ouicore.R.string.speaker_on) :
-                context.getString(io.openim.android.ouicore.R.string.speaker_off));
+            view.speakerIsOn.setText(isChecked ? context.getString(io.openim.android.ouicore.R.string.speaker_on) : context.getString(io.openim.android.ouicore.R.string.speaker_off));
             // 打开扬声器
             callingVM.setSpeakerphoneOn(isChecked);
         });
@@ -293,9 +281,6 @@ public class CallDialog extends BaseDialog {
         view.hangUp.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                callingVM.renewalDB(callingVM.buildPrimaryKey(signalingInfo), (realm,
-                                                                               callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
-
                 callingVM.signalingHungUp(signalingInfo);
             }
         });
@@ -322,16 +307,11 @@ public class CallDialog extends BaseDialog {
             public void click(View v) {
                 Object object = view.remoteSpeakerVideoView.getTag();
                 if (null != object) {
-                    Participant participant = object instanceof RemoteVideoTrack ?
-                        (Participant) callingVM.callViewModel.getRoom().getLocalParticipant() :
-                        (Participant) callingVM.callViewModel.getSingleRemotePar();
-                    Participant participant2 = object instanceof RemoteVideoTrack ?
-                        (Participant) callingVM.callViewModel.getSingleRemotePar() :
-                        (Participant) callingVM.callViewModel.getRoom().getLocalParticipant();
+                    Participant participant = object instanceof RemoteVideoTrack ? (Participant) callingVM.callViewModel.getRoom().getLocalParticipant() : (Participant) callingVM.callViewModel.getSingleRemotePar();
+                    Participant participant2 = object instanceof RemoteVideoTrack ? (Participant) callingVM.callViewModel.getSingleRemotePar() : (Participant) callingVM.callViewModel.getRoom().getLocalParticipant();
                     if (null == participant2 || null == participant) return;
 
-                    callingVM.callViewModel.bindRemoteViewRenderer(view.localSpeakerVideoView,
-                        participant2, callingVM.scope, new Continuation<Unit>() {
+                    callingVM.callViewModel.bindRemoteViewRenderer(view.localSpeakerVideoView, participant2, callingVM.scope, new Continuation<Unit>() {
                         @NonNull
                         @Override
                         public CoroutineContext getContext() {
@@ -343,8 +323,7 @@ public class CallDialog extends BaseDialog {
 
                         }
                     });
-                    callingVM.callViewModel.bindRemoteViewRenderer(view.remoteSpeakerVideoView,
-                        participant, callingVM.scope, new Continuation<Unit>() {
+                    callingVM.callViewModel.bindRemoteViewRenderer(view.remoteSpeakerVideoView, participant, callingVM.scope, new Continuation<Unit>() {
                         @NonNull
                         @Override
                         public CoroutineContext getContext() {
@@ -386,8 +365,7 @@ public class CallDialog extends BaseDialog {
             public void onSuccess(Object data) {
                 changeView();
 
-                callingVM.renewalDB(CallingVM.buildPrimaryKey(signalingInfo),
-                    (realm, v1) -> v1.setSuccess(true));
+                callingVM.renewalDB(CallingVM.buildPrimaryKey(signalingInfo), (realm, v1) -> v1.setSuccess(true));
             }
         });
     }
@@ -426,6 +404,11 @@ public class CallDialog extends BaseDialog {
     @Override
     public void dismiss() {
         try {
+            callingVM.renewalDB(CallingVM.buildPrimaryKey(signalingInfo),
+                (realm, callHistory) ->
+                    callHistory.setDuration((int) (System.currentTimeMillis()
+                        - callHistory.getDate())));
+
             Common.UIHandler.removeCallbacksAndMessages(null);
             if (null != easyWindow) {
                 easyWindow.cancel();
@@ -439,6 +422,7 @@ public class CallDialog extends BaseDialog {
             callingVM.unBindView();
             super.dismiss();
             ((CallingServiceImp) callingVM.callingService).callDialog = null;
+            L.e("--------dismiss");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -457,8 +441,7 @@ public class CallDialog extends BaseDialog {
         if (!isShowing() || isGroup || (null != signalingInfo && TextUtils.isEmpty(callingVM.buildPrimaryKey(signalingInfo))))
             return;
         String id = callingVM.buildPrimaryKey(signalingInfo);
-        String senderID = isGroup ? BaseApp.inst().loginCertificate.userID :
-            signalingInfo.getInvitation().getInviterUserID();
+        String senderID = isGroup ? BaseApp.inst().loginCertificate.userID : signalingInfo.getInvitation().getInviterUserID();
         String receiver = signalingInfo.getInvitation().getInviteeUserIDList().get(0);
 
         callingVM.renewalDB(id, (realm, callHistory) -> {
@@ -469,8 +452,7 @@ public class CallDialog extends BaseDialog {
             map.put(Constants.K_DATA, callHistory);
 
             String data = GsonHel.toJson(map);
-            Message message = OpenIMClient.getInstance().messageManager.createCustomMessage(data,
-                "", "");
+            Message message = OpenIMClient.getInstance().messageManager.createCustomMessage(data, "", "");
             message.setRead(true);
             OpenIMClient.getInstance().messageManager.insertSingleMessageToLocalStorage(new IMUtil.IMCallBack<String>() {
                 @Override
@@ -502,9 +484,7 @@ public class CallDialog extends BaseDialog {
         if (callingVM.isStartCall) {
             floatViewBinding.sTips.setText(io.openim.android.ouicore.R.string.calling);
         } else {
-            floatViewBinding.sTips.setText(callingVM.isCallOut ?
-                context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
-                context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
+            floatViewBinding.sTips.setText(callingVM.isCallOut ? context.getString(io.openim.android.ouicore.R.string.waiting_tips2) : context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
         }
     }
 }

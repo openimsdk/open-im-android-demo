@@ -33,13 +33,14 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.NotificationVM;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.widget.WaitDialog;
+import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConnListener;
 import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.UserInfo;
 
-public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnListener,
-    OnConversationListener {
+public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnListener, OnConversationListener {
 
     public MutableLiveData<Integer> visibility = new MutableLiveData<>(View.INVISIBLE);
     public boolean fromLogin;
@@ -52,8 +53,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
         IMEvent.getInstance().addConnListener(this);
         IMEvent.getInstance().addConversationListener(this);
 
-        callingService =
-            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        callingService = (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
         if (null != callingService) callingService.setOnServicePriorLoginCallBack(this::initDate);
 
         if (fromLogin) {
@@ -85,14 +85,25 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
 
         initGlobalVM();
 
-        if (null != callingService)
-            callingService.startAudioVideoService(getContext());
+        if (null != callingService) callingService.startAudioVideoService(getContext());
 
         getIView().initDate();
         getSelfUserInfo();
         onConnectSuccess();
 
         getClientConfig();
+
+
+        getTotalUnreadMsgCount();
+    }
+
+    private void getTotalUnreadMsgCount() {
+        OpenIMClient.getInstance().conversationManager.getTotalUnreadMsgCount(new OnBase<String>() {
+            @Override
+            public void onSuccess(String data) {
+                totalUnreadMsgCount.setValue(Integer.valueOf(data));
+            }
+        });
     }
 
     private void initGlobalVM() {
@@ -100,9 +111,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     }
 
     private void getClientConfig() {
-        N.API(NiService.class).CommNI(Constants.getAppAuthUrl() + "client_config/get",
-            BaseApp.inst().loginCertificate.chatToken,
-            NiService.buildParameter().buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Map.class)).subscribe(new NetObserver<Map>(getContext()) {
+        N.API(NiService.class).CommNI(Constants.getAppAuthUrl() + "client_config/get", BaseApp.inst().loginCertificate.chatToken, NiService.buildParameter().buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Map.class)).subscribe(new NetObserver<Map>(getContext()) {
             @Override
             public void onSuccess(Map m) {
                 try {
@@ -112,7 +121,8 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
                     BaseApp.inst().loginCertificate.cache(BaseApp.inst());
                     userLogic.discoverPageURL.setValue((String) map.get("discoverPageURL"));
 
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
 
             @Override
@@ -141,32 +151,28 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
         List<String> ids = new ArrayList<>();
         ids.add(BaseApp.inst().loginCertificate.userID);
         Parameter parameter = new Parameter().add("userIDs", ids);
-        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody())
-            .map(OpenIMService.turn(HashMap.class))
-            .compose(N.IOMain())
-            .subscribe(new NetObserver<HashMap>(getContext()) {
-                @Override
-                protected void onFailure(Throwable e) {
-                    toast(e.getMessage());
+        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OpenIMService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
+            @Override
+            protected void onFailure(Throwable e) {
+                toast(e.getMessage());
+            }
+
+            @Override
+            public void onSuccess(HashMap map) {
+                try {
+                    List arrayList = (List) map.get("users");
+                    if (null == arrayList || arrayList.isEmpty()) return;
+
+                    UserInfo us = GsonHel.getGson().fromJson(arrayList.get(0).toString(), UserInfo.class);
+                    updateConfig(us);
+                    userLogic.info.setValue(us);
+                    Obs.newMessage(Constants.Event.USER_INFO_UPDATE);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
-                @Override
-                public void onSuccess(HashMap map) {
-                    try {
-                        List arrayList = (List) map.get("users");
-                        if (null == arrayList || arrayList.isEmpty()) return;
-
-                        UserInfo us = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
-                            UserInfo.class);
-                        updateConfig(us);
-                        userLogic.info.setValue(us);
-                        Obs.newMessage(Constants.Event.USER_INFO_UPDATE);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
+            }
+        });
     }
 
     @Override

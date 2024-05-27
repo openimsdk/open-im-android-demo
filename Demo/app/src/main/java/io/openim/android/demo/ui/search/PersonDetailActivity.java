@@ -356,7 +356,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             view.sendMsg.setVisibility(isFriend || allowSendMsgNotFriend ? View.VISIBLE :
                 View.GONE);
             view.call.setVisibility(isFriend || allowSendMsgNotFriend ? View.VISIBLE : View.GONE);
-//            view.more.setVisibility(isFriend?View.VISIBLE:View.INVISIBLE);
+            view.more.setVisibility(isFriend?View.VISIBLE:View.INVISIBLE);
         });
         vm.userInfo.observe(this, v -> {
             if (null != v && !v.isEmpty()) {

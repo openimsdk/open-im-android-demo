@@ -4,7 +4,11 @@ import android.app.Application
 import android.content.Intent
 import android.os.Build
 import androidx.core.os.postDelayed
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import com.github.ajalt.timberkt.Timber
 import io.livekit.android.LiveKit
 import io.livekit.android.RoomOptions
 import io.livekit.android.audio.AudioSwitchHandler
@@ -16,16 +20,32 @@ import io.livekit.android.room.participant.ConnectionQuality
 import io.livekit.android.room.participant.LocalParticipant
 import io.livekit.android.room.participant.Participant
 import io.livekit.android.room.participant.RemoteParticipant
-import io.livekit.android.room.participant.VideoTrackPublishDefaults
-import io.livekit.android.room.track.*
+import io.livekit.android.room.track.CameraPosition
+import io.livekit.android.room.track.LocalScreencastVideoTrack
+import io.livekit.android.room.track.LocalVideoTrack
+import io.livekit.android.room.track.RemoteVideoTrack
+import io.livekit.android.room.track.Track
+import io.livekit.android.room.track.VideoTrack
 import io.livekit.android.room.track.video.ViewVisibility
 import io.livekit.android.util.flow
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import com.github.ajalt.timberkt.Timber
 import io.openim.android.ouicore.services.ForegroundService
 import io.openim.android.ouicore.utils.Common
-import io.openim.android.sdk.utils.CommonUtil
+import io.openim.android.ouicore.utils.L
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import livekit.LivekitRtc
 import kotlinx.coroutines.flow.collectLatest as collectLatest1
 
@@ -292,6 +312,7 @@ class CallViewModel(
                 if (room.state != Room.State.DISCONNECTED) {
                     room.disconnect()
                     room.release()
+                    L.e("--------disconnect")
                 }
             }
 
@@ -299,6 +320,7 @@ class CallViewModel(
             val application = getApplication<Application>()
             val foregroundServiceIntent = Intent(application, ForegroundService::class.java)
             application.stopService(foregroundServiceIntent)
+            L.e("--------release")
         } catch (_: Exception) {
         }
     }

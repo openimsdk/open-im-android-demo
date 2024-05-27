@@ -301,7 +301,7 @@ public class CallingVM {
                 }
             }
             callViewModel.onCleared();
-            L.e("unBindView");
+            L.e("--------unBindView");
         } catch (Exception e) {
             e.printStackTrace();
         }
