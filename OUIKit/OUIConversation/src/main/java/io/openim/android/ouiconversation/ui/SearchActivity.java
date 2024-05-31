@@ -188,7 +188,7 @@ public class SearchActivity extends BaseActivity<SearchVM, ActivitySearchBinding
     }
 
     private void addNape(String title, List data) {
-        if (data.isEmpty() && !TextUtils.isEmpty(vm.searchContent.val())) {
+        if (adapter.getItems().isEmpty() && data.isEmpty() && !TextUtils.isEmpty(vm.searchContent.val())) {
             view.notFind.setVisibility(View.VISIBLE);
             view.recyclerview.setVisibility(View.GONE);
             return;
