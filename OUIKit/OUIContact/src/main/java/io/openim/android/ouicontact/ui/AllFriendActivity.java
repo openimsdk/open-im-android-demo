@@ -161,6 +161,7 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
                 itemViewHo.view.getRoot().setOnClickListener(v -> {
                     if (null != selectTargetVM) {
                         if (selectTargetVM.isSingleSelect()){
+                            selectTargetVM.metaData.val().clear();
                             selectTargetVM.addMetaData(friendInfo.getUserID(),
                                 friendInfo.getNickname(),
                                 friendInfo.getFaceURL());

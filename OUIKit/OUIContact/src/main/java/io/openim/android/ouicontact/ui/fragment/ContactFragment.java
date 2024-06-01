@@ -43,6 +43,7 @@ public class ContactFragment extends BaseFragment<ContactVM>  {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         bindVM(ContactVM.class);
          notificationVM=Easy.find(NotificationVM.class);
+        BaseApp.inst().putVM(vm);
         super.onCreate(savedInstanceState);
     }
 
