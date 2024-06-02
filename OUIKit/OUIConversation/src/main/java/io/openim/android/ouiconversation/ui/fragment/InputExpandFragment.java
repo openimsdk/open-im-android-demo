@@ -131,24 +131,24 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                         case 4:
                             SelectTargetVM selectTargetVM =
                                 Easy.installVM(SelectTargetVM.class);
-                            selectTargetVM.setIntention(SelectTargetVM.Intention.isShareCard);
+                            selectTargetVM.setIntention(SelectTargetVM.Intention.singleSelect);
                             selectTargetVM.setOnFinishListener(() -> {
-                                Activity activity= ActivityManager.isExist(ChatActivity.class);
-                                if (null==activity)return;
+                                Common.finishRoute(Routes.Group.SELECT_TARGET,
+                                    Routes.Contact.ALL_FRIEND);
+                                Activity activity = ActivityManager.isExist(ChatActivity.class);
+                                if (null == activity) return;
                                 CommonDialog commonDialog = new CommonDialog(activity);
-                                LayoutCommonDialogBinding mainView =
-                                    commonDialog.getMainView();
+                                LayoutCommonDialogBinding mainView = commonDialog.getMainView();
                                 mainView.tips.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.send_card_confirm));
                                 mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
                                 mainView.confirm.setOnClickListener(v1 -> {
                                     commonDialog.dismiss();
 
-                                        sendCardMessage(selectTargetVM.metaData.val().get(0));
-                                    });
-                                    commonDialog.show();
+                                    sendCardMessage(selectTargetVM.metaData.val().get(0));
                                 });
-                                ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
-                                break;
+                                commonDialog.show();
+                            });
+                            ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
                         }
                     });
                 }

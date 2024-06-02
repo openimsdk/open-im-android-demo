@@ -1,13 +1,15 @@
 package io.openim.android.ouicore.services;
 
+
+import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
 import com.alibaba.android.arouter.facade.template.IProvider;
 
+import io.openim.android.sdk.listener.OnSignalingListener;
 import io.openim.android.sdk.models.SignalingInfo;
-import open_im_sdk_callback.OnSignalingListener;
 
 public interface CallingService extends IProvider, OnSignalingListener {
 
