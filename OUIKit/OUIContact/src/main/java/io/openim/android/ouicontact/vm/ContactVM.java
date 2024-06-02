@@ -1,25 +1,16 @@
 package io.openim.android.ouicontact.vm;
 
-import java.util.Iterator;
 import java.util.List;
 
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.vm.State;
-import io.openim.android.ouicore.im.IMEvent;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnFriendshipListener;
 import io.openim.android.sdk.listener.OnGroupListener;
-import io.openim.android.sdk.models.BlacklistInfo;
 import io.openim.android.sdk.models.FriendApplicationInfo;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
-import io.openim.android.sdk.models.GroupInfo;
-import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 public class ContactVM extends BaseViewModel implements OnGroupListener, OnFriendshipListener {

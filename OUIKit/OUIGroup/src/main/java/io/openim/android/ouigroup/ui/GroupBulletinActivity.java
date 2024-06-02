@@ -4,20 +4,15 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.TextKeyListener;
-import android.view.KeyEvent;
 import android.view.View;
-
-import androidx.lifecycle.Observer;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouigroup.databinding.ActivityGroupBulletinBinding;
 import io.openim.android.ouicore.vm.GroupVM;
-import io.openim.android.sdk.models.GroupInfo;
 
 @Route(path = Routes.Group.GROUP_BULLETIN)
 public class GroupBulletinActivity extends BaseActivity<GroupVM, ActivityGroupBulletinBinding> {
@@ -57,6 +52,13 @@ public class GroupBulletinActivity extends BaseActivity<GroupVM, ActivityGroupBu
                 null, null);
 
         });
+    }
+
+    @Override
+    public void onSuccess(Object body) {
+        super.onSuccess(body);
+        toast(getString(io.openim.android.ouicore.R.string.push_succ));
+        finish();
     }
 
     private final TextWatcher textWatcher = new TextWatcher() {

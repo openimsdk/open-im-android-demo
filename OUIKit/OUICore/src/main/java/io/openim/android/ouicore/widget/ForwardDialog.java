@@ -24,7 +24,7 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.DialogForwardBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.utils.ActivityManager;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ForwardVM;
@@ -84,7 +84,7 @@ public class ForwardDialog extends BaseDialog {
             }
 
             finish();
-            Obs.newMessage(Constant.Event.FORWARD, choiceVM.metaData.val());
+            Obs.newMessage(Constants.Event.FORWARD, choiceVM.metaData.val());
             dismiss();
         });
     }

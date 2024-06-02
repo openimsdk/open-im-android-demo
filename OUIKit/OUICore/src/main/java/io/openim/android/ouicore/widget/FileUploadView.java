@@ -5,28 +5,11 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.liulishuo.okdownload.DownloadTask;
-import com.liulishuo.okdownload.StatusUtil;
-import com.liulishuo.okdownload.core.cause.EndCause;
-import com.liulishuo.okdownload.core.cause.ResumeFailedCause;
-import com.liulishuo.okdownload.core.listener.DownloadListener1;
-import com.liulishuo.okdownload.core.listener.assist.Listener1Assist;
-
-import java.io.File;
-import java.math.BigDecimal;
 
 import io.openim.android.ouicore.R;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
-import io.openim.android.ouicore.utils.OpenFileUtil;
 
 public class FileUploadView extends RelativeLayout {
     private ImageView res, bgMask;

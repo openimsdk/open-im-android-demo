@@ -13,23 +13,33 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import java.util.Map;
+
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.LoginCertificate;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.ActivityManager;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.ImageTxtViewHolder;
+import io.openim.android.ouicore.widget.PhotographAlbumDialog;
 import io.openim.android.ouigroup.R;
 import io.openim.android.ouigroup.databinding.ActivityCreateGroupBinding;
 import io.openim.android.ouicore.vm.GroupVM;
+import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
+import io.openim.android.sdk.models.PutArgs;
 
 @Route(path = Routes.Group.CREATE_GROUP2)
 public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGroupBinding> {
+
+    private PhotographAlbumDialog albumDialog;
+    private String faceURL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,13 +78,43 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
         view.recyclerview.setAdapter(adapter);
         adapter.setItems(vm.selectedFriendInfo.getValue());
 
-
         view.submit.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                vm.createGroup(true);
+                vm.createGroup(faceURL);
             }
         });
+
+        albumDialog = new PhotographAlbumDialog(this);
+        albumDialog.setOnSelectResultListener(path -> {
+            PutArgs putArgs = new PutArgs(path[0]);
+            OpenIMClient.getInstance().uploadFile(new OnFileUploadProgressListener() {
+                @Override
+                public void onError(int code, String error) {
+
+                }
+
+                @Override
+                public void onProgress(long progress) {
+
+                }
+
+                @Override
+                public void onSuccess(String s) {
+                    try {
+                        Map<String, String> fromJson = GsonHel.fromJson(s, Map.class);
+                        faceURL =fromJson.get("url");
+                        view.avatarEdit.load(faceURL);
+                    } catch (Exception ignored) {}
+                }
+            }, null, putArgs);
+        });
+
+        view.avatarEdit.setOnClickListener(v -> {
+            albumDialog.show();
+        });
+        view.avatarEdit.setResId(R.mipmap.ic_g_init_group_icon);
+        view.avatarEdit.load(null);
     }
 
     @Override
@@ -92,8 +132,8 @@ public class CreateGroupActivity extends BaseActivity<GroupVM, ActivityCreateGro
         GroupInfo groupInfo = (GroupInfo) body;
 
         Postcard postcard1=ARouter.getInstance().build(Routes.Conversation.CHAT);
-        postcard1.withString(Constant.K_GROUP_ID, groupInfo.getGroupID())
-            .withString(io.openim.android.ouicore.utils.Constant.K_NAME,
+        postcard1.withString(Constants.K_GROUP_ID, groupInfo.getGroupID())
+            .withString(Constants.K_NAME,
                 groupInfo.getGroupName()).navigation();
 
         setResult(RESULT_OK);

@@ -1,25 +1,14 @@
 package io.openim.android.demo.ui.user;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
-import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityAccountSettingBinding;
 import io.openim.android.demo.vm.PersonalVM;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.entity.ExtendUserInfo;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouicore.widget.SlideButton;
-import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.AllowType;
-import io.openim.android.sdk.listener.OnBase;
 
 public class AccountSettingActivity extends BaseActivity<PersonalVM, ActivityAccountSettingBinding> {
 

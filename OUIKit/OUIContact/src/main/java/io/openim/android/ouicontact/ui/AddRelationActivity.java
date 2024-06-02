@@ -9,7 +9,6 @@ import androidx.activity.result.ActivityResultLauncher;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.hjq.permissions.Permission;
-import com.hjq.permissions.XXPermissions;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ import io.openim.android.ouicore.base.BasicActivity;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
@@ -84,7 +83,7 @@ public class AddRelationActivity extends BasicActivity<ActivityAddRelationBindin
         view.addGroup.setOnClickListener(new OnDedrepClickListener() {
             @Override
             public void click(View v) {
-                ARouter.getInstance().build(Routes.Main.ADD_CONVERS).withBoolean(Constant.K_RESULT,
+                ARouter.getInstance().build(Routes.Main.ADD_CONVERS).withBoolean(Constants.K_RESULT,
                     false).navigation();
             }
         });

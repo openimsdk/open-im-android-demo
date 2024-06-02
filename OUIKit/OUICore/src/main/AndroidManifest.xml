@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.openim.android.ouicore">
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.REORDER_TASKS" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -10,7 +12,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!--    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />-->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
     <permission-group android:name="${applicationId}.andpermission" /> <!-- 录音 -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- 播音 -->
@@ -24,9 +26,9 @@
 
 
     <application>
-        <meta-data
-            android:name="ScopedStorage"
-            android:value="true" />
+<!--        <meta-data-->
+<!--            android:name="ScopedStorage"-->
+<!--            android:value="true" />-->
 
         <activity
             android:name=".widget.SingleInfoModifyActivity"

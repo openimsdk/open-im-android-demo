@@ -10,10 +10,9 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.hjq.permissions.Permission;
 
-import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityAddFriendBinding;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SearchVM;
@@ -32,7 +31,7 @@ public class AddConversActivity extends BaseActivity<SearchVM, ActivityAddFriend
         bindVM(SearchVM.class, true);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityAddFriendBinding.inflate(getLayoutInflater()));
-        vm.isPerson = getIntent().getBooleanExtra(Constant.K_RESULT, true);
+        vm.isPerson = getIntent().getBooleanExtra(Constants.K_RESULT, true);
         runOnUiThread(() -> {
             hasScanPermission = new HasPermissions(this, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE);
         });

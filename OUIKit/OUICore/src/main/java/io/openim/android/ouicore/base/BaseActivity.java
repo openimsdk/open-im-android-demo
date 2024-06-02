@@ -1,9 +1,6 @@
 package io.openim.android.ouicore.base;
 
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -23,22 +20,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.alibaba.android.arouter.core.LogisticsCenter;
-import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import java.util.List;
-
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.SinkHelper;
 
 

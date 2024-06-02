@@ -6,12 +6,10 @@ import static io.openim.android.ouicore.utils.Common.UIHandler;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
-import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.view.View;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
@@ -27,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,14 +34,13 @@ import javax.annotation.Nullable;
 import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.State;
-import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.ex.AtUser;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.IView;
 import io.openim.android.ouicore.im.IMEvent;
@@ -52,7 +48,6 @@ import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
-import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.vm.PreviewMediaVM;
 import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
@@ -63,6 +58,7 @@ import io.openim.android.sdk.enums.GroupType;
 import io.openim.android.sdk.enums.MessageStatus;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.enums.Platform;
+import io.openim.android.sdk.listener.BaseImpl;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConversationListener;
@@ -72,15 +68,11 @@ import io.openim.android.sdk.listener.OnUserListener;
 import io.openim.android.sdk.models.AdvancedMessage;
 import io.openim.android.sdk.models.C2CReadReceiptInfo;
 import io.openim.android.sdk.models.ConversationInfo;
-import io.openim.android.sdk.models.CustomSignalingInfo;
-import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupHasReadInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.GroupMessageReadInfo;
 import io.openim.android.sdk.models.GroupMessageReceipt;
-import io.openim.android.sdk.models.KeyValue;
-import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotDisturbInfo;
 import io.openim.android.sdk.models.OfflinePushInfo;
@@ -91,9 +83,11 @@ import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SearchResult;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.TextElem;
-import io.openim.android.sdk.models.UserInfo;
 import io.openim.android.sdk.models.UsersOnlineStatus;
 import io.openim.android.sdk.models.VideoElem;
+import io.openim.android.sdk.utils.ParamsUtil;
+import open_im_sdk.Open_im_sdk;
+import open_im_sdk_callback.Base;
 
 public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanceMsgListener,
     OnGroupListener, OnConversationListener, OnUserListener {
@@ -160,7 +154,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
 
     public void init() {
         loading = new Message();
-        loading.setContentType(Constant.LOADING);
+        loading.setContentType(Constants.LOADING);
         //获取会话信息
         getConversationInfo();
 
@@ -502,6 +496,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 }
                 conversationID = data.getConversationID();
                 conversationInfo.setValue(data);
+                changeInputStates();
                 loadHistory();
                 getConversationRecvMessageOpt(data.getConversationID());
 
@@ -618,6 +613,22 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             }, userID, "");
         });
         IMEvent.getInstance().addUserListener(this);
+    }
+
+    private void changeInputStates() {
+        Open_im_sdk.changeInputStates(
+            new Base() {
+                @Override
+                public void onError(int i, String s) {
+                    L.e("");
+                }
+
+                @Override
+                public void onSuccess(String s) {
+                    L.e("");
+                }
+            }
+            , ParamsUtil.buildOperationID(), conversationID,true);
     }
 
 
@@ -760,6 +771,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             message.getSessionType() != ConversationType.SINGLE_CHAT && !isSingleChat && groupID.equals(groupId);
         return isCurSingleChat || isCurGroupChat;
     }
+
 
     /**
      * 接收到新消息

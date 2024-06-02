@@ -74,7 +74,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:ellipsize="end"
-                            android:maxWidth="170dp"
+                            android:maxWidth="130dp"
                             android:maxLines="1"
                             android:textColor="@color/txt_black"
                             android:textSize="@dimen/main_body"

@@ -51,16 +51,16 @@ public class SelectTargetVM extends BaseVM {
          */
         invite,
         /**
-         * 分享名片
+         * 单选好友
          * 隐藏最近会话、隐藏群、隐藏底部菜单、只显示好友、单选
          */
-        isShareCard,
+        singleSelect,
 
         /**
-         * 选择好友
+         * 多选好友
          * 隐藏最近会话、隐藏群、显示底部菜单、显示好友、多选
          */
-        selectFriends
+        multipleSelect
     }
 
     private OnFinishListener onFinishListener;
@@ -71,16 +71,16 @@ public class SelectTargetVM extends BaseVM {
         return this;
     }
 
-    public boolean isShareCard() {
-        return intention == Intention.isShareCard;
+    public boolean isSingleSelect() {
+        return intention == Intention.singleSelect;
     }
 
     public boolean isInvite() {
         return intention == Intention.invite;
     }
 
-    public boolean isSelectFriends() {
-        return intention == Intention.selectFriends;
+    public boolean isMultipleSelectFriends() {
+        return intention == Intention.multipleSelect;
     }
 
     public boolean isCreateGroup() {
@@ -232,7 +232,7 @@ public class SelectTargetVM extends BaseVM {
 
     public void submitTap(Button button) {
         button.setOnClickListener(v -> {
-            if (isSelectFriends()) {
+            if (isMultipleSelectFriends()) {
                 toFinish();
                 return;
             }
@@ -257,7 +257,7 @@ public class SelectTargetVM extends BaseVM {
     }
 
     public interface OnFinishListener {
-        void onFinish();
+          void onFinish();
 
     }
 }

@@ -21,7 +21,7 @@ import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnCustomBusinessListener;
@@ -40,8 +40,8 @@ public class NotificationVM extends BaseVM implements OnCustomBusinessListener, 
 
     public State<String> customBusinessMessage = new State<>();
     public State<Integer> momentsUnread = new State<>();
-    public String K_friendRequest = BaseApp.inst().loginCertificate.userID + Constant.K_FRIEND_NUM;
-    public String K_groupRequest = BaseApp.inst().loginCertificate.userID + Constant.K_GROUP_NUM;
+    public String K_friendRequest = BaseApp.inst().loginCertificate.userID + Constants.K_FRIEND_NUM;
+    public String K_groupRequest = BaseApp.inst().loginCertificate.userID + Constants.K_GROUP_NUM;
 
     public NotificationVM() {
         OpenIMClient.getInstance().setCustomBusinessListener(this);

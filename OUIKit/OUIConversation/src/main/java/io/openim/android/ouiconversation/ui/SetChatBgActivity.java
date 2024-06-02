@@ -4,7 +4,6 @@ import static android.os.Environment.DIRECTORY_PICTURES;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import android.annotation.SuppressLint;
@@ -26,21 +25,16 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 import java.io.File;
 import java.util.List;
 
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.ActivitySetChatBgBinding;
-import io.openim.android.ouiconversation.databinding.ActivitySetChatBgBindingImpl;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseViewModel;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
-import io.openim.android.ouicore.widget.BottomPopDialog;
-import io.openim.android.ouicore.widget.PhotographAlbumDialog;
 
-public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBinding>implements ChatVM.ViewAction {
+public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBinding> implements ChatVM.ViewAction {
 
     private Uri fileUri;
     HasPermissions hasStorage, hasShoot;
@@ -53,12 +47,10 @@ public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBin
         bindViewDataBinding(ActivitySetChatBgBinding.inflate(getLayoutInflater()));
         sink();
 
-        hasStorage = new HasPermissions(this, Permission.Group.STORAGE);
+        hasStorage = new HasPermissions(this, Permission.MANAGE_EXTERNAL_STORAGE);
         hasShoot = new HasPermissions(this, Permission.CAMERA);
-        if (vm.isSingleChat)
-            id = vm.userID;
-        else
-            id = vm.groupID;
+        if (vm.isSingleChat) id = vm.userID;
+        else id = vm.groupID;
 
         listener();
     }
@@ -81,16 +73,20 @@ public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBin
 
     private void cachePath(Uri uri) {
         String path = GetFilePathFromUri.getFileAbsolutePath(this, uri);
-        SharedPreferencesUtil.get(this).setCache(Constant.K_SET_BACKGROUND + id, path);
-        Obs.newMessage(Constant.Event.SET_BACKGROUND, path);
+        SharedPreferencesUtil.get(this).setCache(Constants.K_SET_BACKGROUND + id, path);
+        setSuccess(path);
+    }
+
+    private void setSuccess(String path) {
+        Obs.newMessage(Constants.Event.SET_BACKGROUND, path);
         toast(getString(io.openim.android.ouicore.R.string.set_succ));
+        finish();
     }
 
     private void listener() {
         view.reduction.setOnClickListener(view1 -> {
-            SharedPreferencesUtil.remove(this, Constant.K_SET_BACKGROUND + id);
-            Obs.newMessage(Constant.Event.SET_BACKGROUND, "");
-            toast(getString(io.openim.android.ouicore.R.string.set_succ));
+            SharedPreferencesUtil.remove(this, Constants.K_SET_BACKGROUND + id);
+            setSuccess("");
         });
         view.menu1.setOnClickListener(v -> {
             showMediaPicker();
@@ -136,14 +132,7 @@ public class SetChatBgActivity extends BaseActivity<ChatVM, ActivitySetChatBgBin
     }
 
     private void goMediaPicker() {
-        Matisse.from(this)
-            .choose(MimeType.ofImage())
-            .countable(true)
-            .maxSelectable(1)
-            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-            .thumbnailScale(0.85f)
-            .imageEngine(new GlideEngine())
-            .forResult(albumLauncher);
+        Matisse.from(this).choose(MimeType.ofImage()).countable(true).maxSelectable(1).restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED).thumbnailScale(0.85f).imageEngine(new GlideEngine()).forResult(albumLauncher);
     }
 
     @Override

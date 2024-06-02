@@ -6,9 +6,9 @@ import android.os.Bundle;
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import io.openim.android.demo.databinding.ActivitySendVerifyBinding;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 
@@ -25,8 +25,8 @@ public class SendVerifyActivity extends BaseActivity<SearchVM, ActivitySendVerif
         setLightStatus();
         SinkHelper.get(this).setTranslucentStatus(view.getRoot());
 
-        vm.searchContent.setValue(getIntent().getStringExtra(Constant.K_ID));
-        vm.isPerson = getIntent().getBooleanExtra(Constant.K_IS_PERSON, true);
+        vm.searchContent.setValue(getIntent().getStringExtra(Constants.K_ID));
+        vm.isPerson = getIntent().getBooleanExtra(Constants.K_IS_PERSON, true);
         click();
     }
 

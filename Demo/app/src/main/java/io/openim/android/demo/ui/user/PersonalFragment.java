@@ -23,7 +23,7 @@ import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
@@ -130,7 +130,7 @@ public class PersonalFragment extends BaseFragment implements Observer {
     @Override
     public void update(Observable observable, Object o) {
         Obs.Message message = (Obs.Message) o;
-        if (message.tag == Constant.Event.USER_INFO_UPDATE) {
+        if (message.tag == Constants.Event.USER_INFO_UPDATE) {
             view.avatar.load(BaseApp.inst().loginCertificate.faceURL,BaseApp.inst().loginCertificate.nickname);
             view.name.setText(BaseApp.inst().loginCertificate.nickname);
         }

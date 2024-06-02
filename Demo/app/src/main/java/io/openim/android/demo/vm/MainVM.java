@@ -4,7 +4,6 @@ import android.view.View;
 
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -21,7 +20,6 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.im.IMEvent;
-import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
@@ -29,8 +27,7 @@ import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.api.NiService;
 import io.openim.android.ouicore.api.OneselfService;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.NotificationVM;
@@ -44,8 +41,7 @@ import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.UserInfo;
 import open_im_sdk.Open_im_sdk;
 
-public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnListener,
-    OnConversationListener {
+public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnListener, OnConversationListener {
 
     public MutableLiveData<Integer> visibility = new MutableLiveData<>(View.INVISIBLE);
     public boolean fromLogin;
@@ -58,8 +54,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
         IMEvent.getInstance().addConnListener(this);
         IMEvent.getInstance().addConversationListener(this);
 
-        callingService =
-            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        callingService = (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
         if (null != callingService) callingService.setOnServicePriorLoginCallBack(this::initDate);
 
         if (fromLogin) {
@@ -91,14 +86,25 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
 
         initGlobalVM();
 
-        if (null != callingService)
-            callingService.startAudioVideoService(getContext());
+        if (null != callingService) callingService.startAudioVideoService(getContext());
 
         getIView().initDate();
         getSelfUserInfo();
         onConnectSuccess();
 
         getClientConfig();
+
+
+        getTotalUnreadMsgCount();
+    }
+
+    private void getTotalUnreadMsgCount() {
+        OpenIMClient.getInstance().conversationManager.getTotalUnreadMsgCount(new OnBase<String>() {
+            @Override
+            public void onSuccess(String data) {
+                totalUnreadMsgCount.setValue(Integer.valueOf(data));
+            }
+        });
     }
 
     private void initGlobalVM() {
@@ -106,9 +112,7 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
     }
 
     private void getClientConfig() {
-        N.API(NiService.class).CommNI(Constant.getAppAuthUrl() + "client_config/get",
-            BaseApp.inst().loginCertificate.chatToken,
-            NiService.buildParameter().buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Map.class)).subscribe(new NetObserver<Map>(getContext()) {
+        N.API(NiService.class).CommNI(Constants.getAppAuthUrl() + "client_config/get", BaseApp.inst().loginCertificate.chatToken, NiService.buildParameter().buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Map.class)).subscribe(new NetObserver<Map>(getContext()) {
             @Override
             public void onSuccess(Map m) {
                 try {
@@ -118,7 +122,8 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
                     BaseApp.inst().loginCertificate.cache(BaseApp.inst());
                     userLogic.discoverPageURL.setValue((String) map.get("discoverPageURL"));
 
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
 
             @Override
@@ -147,32 +152,28 @@ public class MainVM extends BaseViewModel<LoginVM.ViewAction> implements OnConnL
         List<String> ids = new ArrayList<>();
         ids.add(BaseApp.inst().loginCertificate.userID);
         Parameter parameter = new Parameter().add("userIDs", ids);
-        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody())
-            .map(OpenIMService.turn(HashMap.class))
-            .compose(N.IOMain())
-            .subscribe(new NetObserver<HashMap>(getContext()) {
-                @Override
-                protected void onFailure(Throwable e) {
-                    toast(e.getMessage());
+        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody()).map(OpenIMService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(getContext()) {
+            @Override
+            protected void onFailure(Throwable e) {
+                toast(e.getMessage());
+            }
+
+            @Override
+            public void onSuccess(HashMap map) {
+                try {
+                    List arrayList = (List) map.get("users");
+                    if (null == arrayList || arrayList.isEmpty()) return;
+
+                    UserInfo us = GsonHel.getGson().fromJson(arrayList.get(0).toString(), UserInfo.class);
+                    updateConfig(us);
+                    userLogic.info.setValue(us);
+                    Obs.newMessage(Constants.Event.USER_INFO_UPDATE);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
-                @Override
-                public void onSuccess(HashMap map) {
-                    try {
-                        List arrayList = (List) map.get("users");
-                        if (null == arrayList || arrayList.isEmpty()) return;
-
-                        UserInfo us = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
-                            UserInfo.class);
-                        updateConfig(us);
-                        userLogic.info.setValue(us);
-                        Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
+            }
+        });
     }
 
     @Override

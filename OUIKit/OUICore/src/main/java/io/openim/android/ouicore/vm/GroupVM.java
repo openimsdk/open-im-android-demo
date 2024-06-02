@@ -19,13 +19,12 @@ import io.openim.android.ouicore.entity.ExGroupMemberInfo;
 import io.openim.android.ouicore.entity.LoginCertificate;
 
 import io.openim.android.ouicore.im.IMBack;
-import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.Common;
 
 
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.CommonDialog;
@@ -35,10 +34,8 @@ import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.enums.GroupType;
 import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.listener.OnGroupListener;
 import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.FriendInfo;
-import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
@@ -124,7 +121,7 @@ public class GroupVM extends SocialityVM {
     /**
      * 创建群组
      */
-    public void createGroup(boolean isWordGroup) {
+    public void createGroup(String faceURL) {
         WaitDialog waitDialog = new WaitDialog(getContext());
         waitDialog.setNotDismiss();
         waitDialog.show();
@@ -137,6 +134,7 @@ public class GroupVM extends SocialityVM {
             }
         }
         GroupInfo groupInfo = new GroupInfo();
+        groupInfo.setFaceURL(faceURL);
         groupInfo.setGroupName(groupName.getValue());
         groupInfo.setGroupType(GroupType.WORK);
         OpenIMClient.getInstance().groupManager.createGroup(memberUserIDs, null, groupInfo,
@@ -189,10 +187,10 @@ public class GroupVM extends SocialityVM {
             @Override
             public void onSuccess(String data) {
                 if (!TextUtils.isEmpty(groupName)) {
-                    Obs.newMessage(Constant.Event.UPDATE_GROUP_INFO, groupName);
+                    Obs.newMessage(Constants.Event.UPDATE_GROUP_INFO, groupName);
                 }
                 if (!TextUtils.isEmpty(notification)) {
-                    Obs.newMessage(Constant.Event.SET_GROUP_NOTIFICATION);
+                    Obs.newMessage(Constants.Event.SET_GROUP_NOTIFICATION);
                 }
                 getIView().onSuccess(data);
                 getGroupsInfo();
@@ -376,8 +374,8 @@ public class GroupVM extends SocialityVM {
                     getGroupMemberList();
                     getIView().onSuccess(null);
 
-                    Obs.newMessage(Constant.Event.UPDATE_GROUP_INFO, groupName);
-                    postSubject(Constant.Event.UPDATE_GROUP_INFO+"");
+                    Obs.newMessage(Constants.Event.UPDATE_GROUP_INFO, groupName);
+                    postSubject(Constants.Event.UPDATE_GROUP_INFO+"");
                 }
             }, groupId, userIds, "welcome");
     }
@@ -398,8 +396,8 @@ public class GroupVM extends SocialityVM {
                 getGroupMemberList();
                 getIView().onSuccess(null);
 
-                Obs.newMessage(Constant.Event.UPDATE_GROUP_INFO, groupName);
-                postSubject(Constant.Event.UPDATE_GROUP_INFO+"");
+                Obs.newMessage(Constants.Event.UPDATE_GROUP_INFO, groupName);
+                postSubject(Constants.Event.UPDATE_GROUP_INFO+"");
             }
         }, groupId, uids, "");
     }
@@ -431,6 +429,7 @@ public class GroupVM extends SocialityVM {
         CommonDialog commonDialog = new CommonDialog(getContext());
         commonDialog.show();
         commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.dissolve_tips);
+        commonDialog.getMainView().confirm.setTextColor(getContext().getResources().getColor(R.color.theme));
         commonDialog.getMainView().cancel.setOnClickListener(v -> commonDialog.dismiss());
         commonDialog.getMainView().confirm.setOnClickListener(v -> OpenIMClient.getInstance().groupManager.dismissGroup(new OnBase<String>() {
             @Override
@@ -441,7 +440,7 @@ public class GroupVM extends SocialityVM {
             @Override
             public void onSuccess(String data) {
                 getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.dissolve_tips2));
-                Obs.newMessage(Constant.Event.DISSOLVE_GROUP);
+                Obs.newMessage(Constants.Event.DISSOLVE_GROUP);
                 close(commonDialog);
             }
         }, groupId));
@@ -453,6 +452,7 @@ public class GroupVM extends SocialityVM {
         commonDialog.show();
         commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.quit_group_tips);
         commonDialog.getMainView().cancel.setOnClickListener(v -> commonDialog.dismiss());
+        commonDialog.getMainView().confirm.setTextColor(getContext().getResources().getColor(R.color.theme));
         commonDialog.getMainView().confirm.setOnClickListener(v -> OpenIMClient.getInstance().groupManager.quitGroup(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {

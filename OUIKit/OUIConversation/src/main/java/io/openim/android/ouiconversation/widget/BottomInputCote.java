@@ -21,7 +21,6 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.TextView;
 
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentTransaction;
@@ -30,7 +29,6 @@ import androidx.lifecycle.LifecycleOwner;
 import com.hjq.permissions.Permission;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import io.openim.android.ouiconversation.R;
@@ -38,18 +36,14 @@ import io.openim.android.ouiconversation.databinding.LayoutInputCoteBinding;
 import io.openim.android.ouiconversation.ui.fragment.InputExpandFragment;
 import io.openim.android.ouicore.ex.AtUser;
 import io.openim.android.ouicore.im.IMUtil;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.EmojiUtil;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
-import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.HasPermissions;
-import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
-import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.enums.GroupStatus;

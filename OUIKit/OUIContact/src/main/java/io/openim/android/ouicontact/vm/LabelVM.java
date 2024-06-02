@@ -14,7 +14,7 @@ import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.api.OneselfService;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.widget.WaitDialog;
 
 public class LabelVM extends BaseViewModel {
@@ -24,7 +24,7 @@ public class LabelVM extends BaseViewModel {
 
     public void getUserTags() {
         Parameter parameter = getParameter();
-        N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office/get_user_tags",
+        N.API(NiService.class).CommNI(Constants.getImApiUrl() + "office/get_user_tags",
             BaseApp.inst().loginCertificate.imToken, parameter.buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(UserLabel.class)).subscribe(new NetObserver<UserLabel>(TAG) {
             @Override
             public void onSuccess(UserLabel o) {
@@ -45,7 +45,7 @@ public class LabelVM extends BaseViewModel {
 //        'tagName': tagName,
 //         'userIDList': userIDList,
 
-        N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office/create_tag",
+        N.API(NiService.class).CommNI(Constants.getImApiUrl() + "office/create_tag",
             BaseApp.inst().loginCertificate.imToken,
             parameter.add("tagName", tagName).add(
                 "userIDList", ids).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Object.class)).subscribe(new NetObserver<Object>(TAG) {
@@ -68,7 +68,7 @@ public class LabelVM extends BaseViewModel {
             waitDialog.show();
         }
         WaitDialog finalWaitDialog = waitDialog;
-        N.API(NiService.class).CommNI(Constant.getImApiUrl() + "office/delete_tag",
+        N.API(NiService.class).CommNI(Constants.getImApiUrl() + "office/delete_tag",
             BaseApp.inst().loginCertificate.imToken, getParameter().add("tagID",
                 userLabel.getTagID()).buildJsonBody()).compose(N.IOMain()).map(OneselfService.turn(Object.class)).subscribe(new NetObserver<Object>(TAG) {
             @Override
