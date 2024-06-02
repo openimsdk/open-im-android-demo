@@ -1,34 +1,24 @@
 package io.openim.android.demo.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
-import android.annotation.SuppressLint;
-import android.app.ActivityManager;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
-import io.openim.android.demo.R;
 import io.openim.android.demo.SplashActivity;
 import io.openim.android.demo.databinding.ActivityServerConfigBinding;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
-import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WaitDialog;
 
 public class ServerConfigActivity extends BaseActivity<BaseViewModel, ActivityServerConfigBinding> {
 
     private final ServerConfigVM serverConfigVM = new ServerConfigVM();
-    private boolean isIP = Constant.getIsIp();
+    private boolean isIP = Constants.getIsIp();
     private boolean isFirst = true;
 
     @Override
@@ -38,25 +28,25 @@ public class ServerConfigActivity extends BaseActivity<BaseViewModel, ActivitySe
         sink();
         view.setServerConfigVM(serverConfigVM);
         view.restart.setOnClickListener(v -> {
-            if (!serverConfigVM.HEAD.getValue().equals(Constant.getHost()))
+            if (!serverConfigVM.HEAD.getValue().equals(Constants.getHost()))
                 SharedPreferencesUtil.get(BaseApp.inst()).setCache("DEFAULT_IP",
                     serverConfigVM.HEAD.getValue());
 
-            if (!serverConfigVM.IM_API_URL.getValue().equals(Constant.getImApiUrl()))
+            if (!serverConfigVM.IM_API_URL.getValue().equals(Constants.getImApiUrl()))
                 SharedPreferencesUtil.get(BaseApp.inst()).setCache("IM_API_URL",
                     serverConfigVM.IM_API_URL.getValue());
 
-            if (!serverConfigVM.APP_AUTH_URL.getValue().equals(Constant.getAppAuthUrl())) {
+            if (!serverConfigVM.APP_AUTH_URL.getValue().equals(Constants.getAppAuthUrl())) {
                 String appAuthUrl = serverConfigVM.APP_AUTH_URL.getValue();
                 if (!appAuthUrl.endsWith("/")) {
                     appAuthUrl += "/";
                 }
                 SharedPreferencesUtil.get(BaseApp.inst()).setCache("APP_AUTH_URL", appAuthUrl);
             }
-            if (!serverConfigVM.IM_WS_URL.getValue().equals(Constant.getImWsUrl()))
+            if (!serverConfigVM.IM_WS_URL.getValue().equals(Constants.getImWsUrl()))
                 SharedPreferencesUtil.get(BaseApp.inst()).setCache("IM_WS_URL",
                     serverConfigVM.IM_WS_URL.getValue());
-            if (!serverConfigVM.STORAGE_TYPE.getValue().equals(Constant.getStorageType()))
+            if (!serverConfigVM.STORAGE_TYPE.getValue().equals(Constants.getStorageType()))
                 SharedPreferencesUtil.get(BaseApp.inst()).setCache("STORAGE_TYPE",
                     serverConfigVM.STORAGE_TYPE.getValue());
 
@@ -70,13 +60,13 @@ public class ServerConfigActivity extends BaseActivity<BaseViewModel, ActivitySe
             isIP = false;
             view.head.setText("域名");
             SharedPreferencesUtil.get(BaseApp.inst()).setCache("IS_IP", isIP);
-            serverConfigVM.HEAD.setValue(Constant.DEFAULT_HOST);
+            serverConfigVM.HEAD.setValue(Constants.DEFAULT_HOST);
         });
         view.swIP.setOnClickListener(v -> {
             isIP = true;
             view.head.setText("IP");
             SharedPreferencesUtil.get(BaseApp.inst()).setCache("IS_IP", isIP);
-            serverConfigVM.HEAD.setValue(Constant.DEFAULT_HOST);
+            serverConfigVM.HEAD.setValue(Constants.DEFAULT_HOST);
         });
 
         serverConfigVM.HEAD.observe(this, s -> {
@@ -111,12 +101,12 @@ public class ServerConfigActivity extends BaseActivity<BaseViewModel, ActivitySe
     }
 
     public static class ServerConfigVM {
-        public MutableLiveData<String> HEAD = new MutableLiveData<>(Constant.getHost());
-        public MutableLiveData<String> IM_API_URL = new MutableLiveData<>(Constant.getImApiUrl());
+        public MutableLiveData<String> HEAD = new MutableLiveData<>(Constants.getHost());
+        public MutableLiveData<String> IM_API_URL = new MutableLiveData<>(Constants.getImApiUrl());
         public MutableLiveData<String> APP_AUTH_URL =
-            new MutableLiveData<>(Constant.getAppAuthUrl());
-        public MutableLiveData<String> IM_WS_URL = new MutableLiveData<>(Constant.getImWsUrl());
+            new MutableLiveData<>(Constants.getAppAuthUrl());
+        public MutableLiveData<String> IM_WS_URL = new MutableLiveData<>(Constants.getImWsUrl());
         public MutableLiveData<String> STORAGE_TYPE =
-            new MutableLiveData<>(Constant.getStorageType());
+            new MutableLiveData<>(Constants.getStorageType());
     }
 }

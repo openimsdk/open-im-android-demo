@@ -9,9 +9,7 @@ import android.text.TextWatcher;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
@@ -26,16 +24,12 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.NotificationMsg;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.sdk.enums.ConversationType;
-import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotificationElem;
-import io.openim.android.sdk.models.SearchResultItem;
 
 public class ChatHistoryRelationActivity extends BasicActivity<ActivityChatHistoryRelationBinding> {
 
@@ -112,8 +106,8 @@ public class ChatHistoryRelationActivity extends BasicActivity<ActivityChatHisto
                     groupID = message.getGroupID();
 
                 ARouter.getInstance().build(Routes.Conversation.CHAT)
-                    .withString(Constant.K_GROUP_ID, groupID)
-                    .withString(Constant.K_ID, userID)
+                    .withString(Constants.K_GROUP_ID, groupID)
+                    .withString(Constants.K_ID, userID)
                     .navigation();
             }
         });
@@ -172,7 +166,7 @@ public class ChatHistoryRelationActivity extends BasicActivity<ActivityChatHisto
                                     chatVM.notificationMsg.setValue(notificationMsg);
                                 }
                                 startActivity(new Intent(ChatHistoryRelationActivity.this,
-                                    ChatActivity.class).putExtra(Constant.K_FROM, true));
+                                    ChatActivity.class).putExtra(Constants.K_FROM, true));
                             }
                         });
                     }

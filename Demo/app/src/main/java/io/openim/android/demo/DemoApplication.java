@@ -1,25 +1,19 @@
 package io.openim.android.demo;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 
 import androidx.multidex.MultiDex;
 
 
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.cretin.www.cretinautoupdatelibrary.model.TypeConfig;
-import com.cretin.www.cretinautoupdatelibrary.model.UpdateConfig;
-import com.cretin.www.cretinautoupdatelibrary.utils.AppUpdateUtils;
 import com.igexin.sdk.PushManager;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
 import java.io.File;
-import java.util.concurrent.TimeUnit;
 
 import io.openim.android.demo.ui.login.LoginActivity;
-import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.entity.LoginCertificate;
@@ -28,17 +22,15 @@ import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.net.RXRetrofit.HttpConfig;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
-import io.openim.android.ouicore.update.OkHttp3Connection;
 import io.openim.android.ouicore.update.UpdateApp;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.sdk.listener.OnConnListener;
-import io.openim.android.sdk.listener.OnSignalingListener;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -65,14 +57,14 @@ public class DemoApplication extends BaseApp {
         EmojiManager.install(new GoogleEmojiProvider());
         //音频播放
         SPlayer.init(this);
-        SPlayer.instance().setCacheDirPath(Constant.AUDIO_DIR);
+        SPlayer.instance().setCacheDirPath(Constants.AUDIO_DIR);
     }
 
     private void initFile() {
-        buildDirectory(Constant.AUDIO_DIR);
-        buildDirectory(Constant.VIDEO_DIR);
-        buildDirectory(Constant.PICTURE_DIR);
-        buildDirectory(Constant.File_DIR);
+        buildDirectory(Constants.AUDIO_DIR);
+        buildDirectory(Constants.VIDEO_DIR);
+        buildDirectory(Constants.PICTURE_DIR);
+        buildDirectory(Constants.File_DIR);
     }
 
     private boolean buildDirectory(String path) {
@@ -109,7 +101,7 @@ public class DemoApplication extends BaseApp {
     }
 
     private void initNet() {
-        N.init(new HttpConfig().setBaseUrl(Constant.getAppAuthUrl()).addInterceptor(chain -> {
+        N.init(new HttpConfig().setBaseUrl(Constants.getAppAuthUrl()).addInterceptor(chain -> {
             String token = "";
             try {
                 token = BaseApp.inst().loginCertificate.chatToken;
@@ -129,7 +121,7 @@ public class DemoApplication extends BaseApp {
             (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
         if (null != callingService) {
             callingService.initKeepAlive(getPackageName());
-            IMEvent.getInstance().addSignalingListener((OnSignalingListener) callingService);
+            IMEvent.getInstance().addSignalingListener(callingService);
         }
     }
 

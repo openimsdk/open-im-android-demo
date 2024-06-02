@@ -28,6 +28,7 @@ import io.openim.android.ouicore.base.BaseApp;
 public class AvatarImage extends FrameLayout {
     private ImageView roundImageView;
     private TextView nameTv;
+    private int resId=-1;
 
     public AvatarImage(@NonNull Context context) {
         super(context);
@@ -73,12 +74,18 @@ public class AvatarImage extends FrameLayout {
         load(url, isGroup, null);
     }
 
+    public void setResId(int resId) {
+        this.resId = resId;
+    }
+
     public void load(Object url, boolean isGroup, String name) {
         roundImageView.setImageDrawable(null);
         setBackground(null);
 
-        int resId = isGroup ? R.mipmap.ic_my_group :
-            io.openim.android.ouicore.R.mipmap.ic_my_friend;
+        if (resId == -1) {
+            resId = isGroup ? R.mipmap.ic_my_group :
+               R.mipmap.ic_my_friend;
+        }
         roundImageView.setVisibility(GONE);
         nameTv.setVisibility(GONE);
         if (null == url || (url instanceof String && (String.valueOf(url).isEmpty()

@@ -96,9 +96,15 @@
                 android:textColor="#ff999999"
                 android:textSize="12sp" />
 
-            <RelativeLayout
-                android:layout_height="wrap_content"
+            <io.openim.android.ouicore.widget.FileDownloadView
+                android:id="@+id/downloadView"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp">
 
                 <ImageView
@@ -112,8 +118,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:visibility="gone"
-                    android:layout_centerVertical="true">
+                    android:layout_centerVertical="true"
+                    android:visibility="gone">
 
                     <io.openim.android.ouicore.widget.CirclePgBar
                         android:layout_width="20dp"

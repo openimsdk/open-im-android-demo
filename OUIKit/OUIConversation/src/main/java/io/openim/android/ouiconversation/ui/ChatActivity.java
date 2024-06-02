@@ -55,7 +55,7 @@ import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
@@ -111,11 +111,11 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         Easy.installVM(CustomEmojiVM.class);
         Easy.installVM(ForwardVM.class);
 
-        String userId = getIntent().getStringExtra(Constant.K_ID);
-        String groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
-        boolean fromChatHistory = getIntent().getBooleanExtra(Constant.K_FROM, false);
+        String userId = getIntent().getStringExtra(Constants.K_ID);
+        String groupId = getIntent().getStringExtra(Constants.K_GROUP_ID);
+        boolean fromChatHistory = getIntent().getBooleanExtra(Constants.K_FROM, false);
         NotificationMsg notificationMsg =
-            (NotificationMsg) getIntent().getSerializableExtra(Constant.K_NOTICE);
+            (NotificationMsg) getIntent().getSerializableExtra(Constants.K_NOTICE);
 
         bindVM(ChatVM.class, !fromChatHistory);
         if (null != userId) vm.userID = userId;
@@ -260,7 +260,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
 
         String chatBg =
-            SharedPreferencesUtil.get(this).getString(Constant.K_SET_BACKGROUND + (vm.isSingleChat ? vm.userID : vm.groupID));
+            SharedPreferencesUtil.get(this).getString(Constants.K_SET_BACKGROUND + (vm.isSingleChat ? vm.userID : vm.groupID));
         if (!chatBg.isEmpty()) Glide.with(this).load(chatBg).into(view.chatBg);
 
 
@@ -384,7 +384,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
                 commonDialog.getMainView().confirm.setText(io.openim.android.ouicore.R.string.join);
                 commonDialog.getMainView().confirm.setOnClickListener(v2 -> {
-                    if (vm.roomCallingInfo.getValue().getParticipant().size() >= Constant.MAX_CALL_NUM) {
+                    if (vm.roomCallingInfo.getValue().getParticipant().size() >= Constants.MAX_CALL_NUM) {
                         toast(getString(io.openim.android.ouicore.R.string.group_calling_tips2));
                         return;
                     }
@@ -401,7 +401,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
         view.mergeForward.setOnClickListener(v -> {
 //            ARouter.getInstance().build(Routes.Contact.FORWARD).navigation(this,
-//                Constant.Event.FORWARD);
+//                Constants.Event.FORWARD);
             List<Message> msgList = getSelectMsg();
             Collections.reverse(msgList);
             Easy.find(ForwardVM.class).createMergerMessage(vm.isSingleChat,
@@ -409,7 +409,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
             Easy.installVM(SelectTargetVM.class);
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) this,
-                Constant.Event.FORWARD);
+                Constants.Event.FORWARD);
             Common.UIHandler.postDelayed(() -> vm.enableMultipleSelect.setValue(false), 300);
         });
 
@@ -446,7 +446,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             meetingRvAdapter.setItems(vm.roomCallingInfo.getValue().getParticipant());
         });
 
-        view.notice.setOnClickListener(v -> ARouter.getInstance().build(Routes.Group.NOTICE_DETAIL).withSerializable(Constant.K_NOTICE, vm.notificationMsg.getValue()).navigation());
+        view.notice.setOnClickListener(v -> ARouter.getInstance().build(Routes.Group.NOTICE_DETAIL).withSerializable(Constants.K_NOTICE, vm.notificationMsg.getValue()).navigation());
         view.back.setOnClickListener(v -> finish());
 
         view.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -475,8 +475,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                     chatSettingActivityLauncher.launch(new Intent(ChatActivity.this,
                         ChatSettingActivity.class));
                 } else {
-                    ARouter.getInstance().build(Routes.Group.MATERIAL).withString(Constant.K_ID,
-                        vm.conversationID).withString(Constant.K_GROUP_ID, vm.groupID).navigation();
+                    ARouter.getInstance().build(Routes.Group.MATERIAL).withString(Constants.K_ID,
+                        vm.conversationID).withString(Constants.K_GROUP_ID, vm.groupID).navigation();
                 }
             }
         });
@@ -500,7 +500,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             try {
                 if (roomCallingInfo.getParticipant().isEmpty()) return;
                 boolean isVideoCall =
-                    roomCallingInfo.getInvitation().getMediaType().equals(Constant.MediaType.VIDEO);
+                    roomCallingInfo.getInvitation().getMediaType().equals(Constants.MediaType.VIDEO);
                 String tips = "";
                 if (isVideoCall)
                     tips =
@@ -602,23 +602,23 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     public void update(Observable observable, Object o) {
         try {
             Obs.Message message = (Obs.Message) o;
-            if (message.tag == Constant.Event.SET_BACKGROUND) {
+            if (message.tag == Constants.Event.SET_BACKGROUND) {
                 String path = "";
                 if (null != message.object) {
                     path = (String) message.object;
                 } else {
                     path =
-                        SharedPreferencesUtil.get(this).getString(Constant.K_SET_BACKGROUND + (vm.isSingleChat ? vm.userID : vm.groupID));
+                        SharedPreferencesUtil.get(this).getString(Constants.K_SET_BACKGROUND + (vm.isSingleChat ? vm.userID : vm.groupID));
                 }
                 if (path.isEmpty()) view.chatBg.setVisibility(View.GONE);
                 else Glide.with(this).load(path).into(view.chatBg);
             }
-            if (message.tag == Constant.Event.INSERT_MSG) {
+            if (message.tag == Constants.Event.INSERT_MSG) {
                 vm.messages.getValue().clear();
                 vm.startMsg = null;
                 vm.loadHistoryMessage();
             }
-            if (message.tag == Constant.Event.FORWARD) {
+            if (message.tag == Constants.Event.FORWARD) {
                 List<MultipleChoice> choices = (List<MultipleChoice>) message.object;
                 if (null == choices || choices.isEmpty()) return;
                 forward(choices);

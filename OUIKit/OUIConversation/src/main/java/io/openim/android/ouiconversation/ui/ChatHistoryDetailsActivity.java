@@ -3,38 +3,27 @@ package io.openim.android.ouiconversation.ui;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.alibaba.android.arouter.launcher.ARouter;
 
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
 
 import io.openim.android.ouiconversation.R;
-import io.openim.android.ouiconversation.adapter.MessageAdapter;
 import io.openim.android.ouiconversation.adapter.MessageViewHolder;
 import io.openim.android.ouiconversation.databinding.ActivityChatHistoryDetailsBinding;
 import io.openim.android.ouiconversation.databinding.LayoutMsgTxtLeftBinding;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
-import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseViewModel;
-import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.entity.MsgExpand;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.GetFilePathFromUri;
-import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.utils.TimeUtil;
-import io.openim.android.ouicore.vm.PreviewMediaVM;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.ouicore.widget.SpacesItemDecoration;
 import io.openim.android.sdk.enums.MessageType;
@@ -82,7 +71,22 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel,
             @Override
             public MessageViewHolder.MsgViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                                       int viewType) {
-                if (viewType == Constant.MsgType.CUSTOMIZE_MEETING)
+                if (viewType==MessageType.QUOTE){
+                    return new MessageViewHolder.QuoteTXTView(parent){
+                        protected boolean getSendWay(Message message) {
+                            return false;
+                        }
+
+                        @Override
+                        protected void bindLeft(View itemView, Message message) {
+                            super.bindLeft(itemView, message);
+                            LayoutMsgTxtLeftBinding v = LayoutMsgTxtLeftBinding.bind(itemView);
+                            v.content.setBackground(getDrawable(R.drawable.sty_radius_unleft_30_blue));
+                            v.quoteLy1.setBackground(getDrawable(R.drawable.sty_radius_unleft_30));
+                        }
+                    };
+                }
+                if (viewType == Constants.MsgType.CUSTOMIZE_MEETING)
                     return new MessageViewHolder.MeetingInviteView(parent){
                         @Override
                         protected boolean getSendWay(Message message) {
@@ -236,7 +240,7 @@ public class ChatHistoryDetailsActivity extends BaseActivity<BaseViewModel,
     }
 
     void init() {
-        String extra = getIntent().getStringExtra(Constant.K_RESULT);
+        String extra = getIntent().getStringExtra(Constants.K_RESULT);
         try {
             Type listType = new GsonHel.ParameterizedTypeImpl(List.class,
                 new Class[]{Message.class});

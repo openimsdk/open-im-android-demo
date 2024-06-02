@@ -21,7 +21,7 @@ import io.openim.android.ouiconversation.databinding.LayoutTouchVoiceBinding;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseDialog;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 
 public class TouchVoiceDialog extends BaseDialog {
     //和布局里保持一致
@@ -67,7 +67,7 @@ public class TouchVoiceDialog extends BaseDialog {
         //默认时长秒
         AudioRecordManager.getInstance(getContext()).setMaxVoiceDuration(60 * 5);
         //该库内不对文件夹是否存在进行判断，所以请在你的项目中自行判断
-        File mAudioDir = new File(Constant.AUDIO_DIR);
+        File mAudioDir = new File(Constants.AUDIO_DIR);
         if (!mAudioDir.exists()) {
             mAudioDir.mkdirs();
         }

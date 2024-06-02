@@ -61,7 +61,8 @@ public class BaseApp extends Application {
     private void realmInit() {
         Realm.init(this);
         String realmName = "open_im_db";
-        RealmConfiguration config = new RealmConfiguration.Builder().name(realmName).build();
+        RealmConfiguration config = new RealmConfiguration.Builder()
+            .name(realmName).build();
         realm = Realm.getInstance(config);
     }
 

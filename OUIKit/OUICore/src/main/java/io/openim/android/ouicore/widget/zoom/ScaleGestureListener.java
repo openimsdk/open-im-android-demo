@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by 王德惠.
  * Description :放大缩放手势的监听器
  */
 

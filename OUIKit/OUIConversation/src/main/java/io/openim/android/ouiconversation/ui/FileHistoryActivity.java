@@ -1,7 +1,6 @@
 package io.openim.android.ouiconversation.ui;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,17 +11,12 @@ import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.openim.android.ouiconversation.databinding.ActivityMediaHistoryBinding;
 import io.openim.android.ouiconversation.databinding.ItemFileBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.databinding.ItemImgTxtBinding;
 import io.openim.android.ouicore.utils.ByteUtil;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;

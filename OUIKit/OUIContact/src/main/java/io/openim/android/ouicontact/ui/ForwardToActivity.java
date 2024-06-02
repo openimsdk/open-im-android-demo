@@ -2,41 +2,24 @@ package io.openim.android.ouicontact.ui;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.RadioGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.alibaba.android.arouter.launcher.ARouter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import io.openim.android.ouicontact.R;
 import io.openim.android.ouicontact.databinding.ActivityForwardToBinding;
 import io.openim.android.ouicontact.ui.fragment.FriendFragment;
 import io.openim.android.ouicontact.ui.fragment.GroupFragment;
 import io.openim.android.ouicontact.ui.search.SearchGroupAndFriendsActivity;
-import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
-import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseFragment;
-import io.openim.android.ouicore.entity.ExUserInfo;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.UserInfo;
 
 
@@ -63,7 +46,7 @@ public class ForwardToActivity extends BaseActivity<SocialityVM, ActivityForward
         CommonDialog commonDialog =
             new CommonDialog(this);
         commonDialog.getMainView().tips.setText(getString(io.openim.android.ouicore.R.string.confirm_send_who)
-            + v.getData().getStringExtra(Constant.K_NAME));
+            + v.getData().getStringExtra(Constants.K_NAME));
         commonDialog.getMainView().cancel.setOnClickListener(v1 -> commonDialog.dismiss());
         commonDialog.getMainView().confirm.setOnClickListener(v1 -> {
             setResult(RESULT_OK, v.getData());
@@ -75,7 +58,7 @@ public class ForwardToActivity extends BaseActivity<SocialityVM, ActivityForward
     private void listener() {
         view.searchView.setOnClickListener(v -> {
             launcher.launch(new Intent(this, SearchGroupAndFriendsActivity.class)
-                .putExtra(Constant.IS_SELECT_FRIEND,true));
+                .putExtra(Constants.IS_SELECT_FRIEND,true));
         });
         view.menuGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == view.men1.getId()) {
@@ -101,12 +84,12 @@ public class ForwardToActivity extends BaseActivity<SocialityVM, ActivityForward
 
 
         ((FriendFragment) friendFragment).setConfirmListener((userInfo, id) -> {
-            setResult(RESULT_OK, new Intent().putExtra(Constant.K_ID, id)
-                .putExtra(Constant.K_NAME, userInfo.getNickname()));
+            setResult(RESULT_OK, new Intent().putExtra(Constants.K_ID, id)
+                .putExtra(Constants.K_NAME, userInfo.getNickname()));
             finish();
         });
         ((GroupFragment) groupFragment).setConfirmListener((userInfo, id) -> {
-            setResult(RESULT_OK, new Intent().putExtra(Constant.K_GROUP_ID, id));
+            setResult(RESULT_OK, new Intent().putExtra(Constants.K_GROUP_ID, id));
             finish();
         });
     }

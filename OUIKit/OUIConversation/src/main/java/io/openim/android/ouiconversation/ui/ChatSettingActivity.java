@@ -12,9 +12,12 @@ import com.alibaba.android.arouter.core.LogisticsCenter;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bigkoo.pickerview.adapter.ArrayWheelAdapter;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import io.openim.android.ouiconversation.databinding.ActivityChatSettingBinding;
 import io.openim.android.ouiconversation.vm.ChatVM;
@@ -23,10 +26,12 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutBurnAfterReadingBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
@@ -37,7 +42,7 @@ import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.UserInfo;
 
-public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding> implements ChatVM.ViewAction {
+public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettingBinding> implements ChatVM.ViewAction, Observer {
 
     ContactListVM contactListVM = new ContactListVM();
     UserInfo userInfo;
@@ -51,6 +56,8 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
 
         initView();
         click();
+
+        Obs.inst().addObserver(this);
     }
 
     private ActivityResultLauncher<Intent> personDetailLauncher =
@@ -156,7 +163,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
         });
         view.picture.setOnClickListener(v -> {
-            startActivity(new Intent(this, MediaHistoryActivity.class).putExtra(Constant.K_RESULT
+            startActivity(new Intent(this, MediaHistoryActivity.class).putExtra(Constants.K_RESULT
                 , true));
         });
         view.video.setOnClickListener(v -> {
@@ -196,7 +203,7 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
         view.user.setOnClickListener(v -> {
             Postcard postcard = ARouter.getInstance().build(Routes.Main.PERSON_DETAIL);
             LogisticsCenter.completion(postcard);
-            personDetailLauncher.launch(new Intent(this, postcard.getDestination()).putExtra(Constant.K_ID, vm.userID).putExtra(Constant.K_RESULT, true));
+            personDetailLauncher.launch(new Intent(this, postcard.getDestination()).putExtra(Constants.K_ID, vm.userID).putExtra(Constants.K_RESULT, true));
         });
         view.clearRecord.setOnClickListener(v -> {
             CommonDialog commonDialog = new CommonDialog(this);
@@ -323,4 +330,19 @@ public class ChatSettingActivity extends BaseActivity<ChatVM, ActivityChatSettin
     public void closePage() {
 
     }
+
+    @Override
+    protected void fasterDestroy() {
+        super.fasterDestroy();
+        Obs.inst().deleteObserver(this);
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+            Obs.Message message = (Obs.Message) o;
+            if (message.tag == Constants.Event.SET_BACKGROUND) {
+               finish();
+            }
+    }
+
 }

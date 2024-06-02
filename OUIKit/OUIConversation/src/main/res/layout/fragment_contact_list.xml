@@ -55,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:ellipsize="end"
-                    android:maxWidth="120dp"
+                    android:maxWidth="100dp"
                     android:maxLines="1"
                     android:text="@{user.info.nickname}"
                     android:textColor="@color/txt_black"

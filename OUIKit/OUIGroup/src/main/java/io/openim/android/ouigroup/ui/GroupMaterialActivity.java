@@ -1,7 +1,6 @@
 package io.openim.android.ouigroup.ui;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -39,8 +38,7 @@ import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.IConversationBridge;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ContactListVM;
@@ -62,7 +60,6 @@ import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.listener.OnGroupListener;
-import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
@@ -83,8 +80,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         bindVM(GroupVM.class, true);
         vm.setContext(this);
         Easy.put(vm);
-        vm.groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
-        conversationId = getIntent().getStringExtra(Constant.K_ID);
+        vm.groupId = getIntent().getStringExtra(Constants.K_GROUP_ID);
+        conversationId = getIntent().getStringExtra(Constants.K_ID);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityGroupMaterialBinding.inflate(getLayoutInflater()));
         view.setGroupVM(vm);
@@ -132,7 +129,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             ARouter.getInstance().build(Routes.Conversation.CHAT_HISTORY).navigation();
         });
         view.photo.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Conversation.MEDIA_HISTORY).withBoolean(Constant.K_RESULT, true).navigation();
+            ARouter.getInstance().build(Routes.Conversation.MEDIA_HISTORY).withBoolean(Constants.K_RESULT, true).navigation();
         });
         view.video.setOnClickListener(v -> {
             ARouter.getInstance().build(Routes.Conversation.MEDIA_HISTORY).navigation();
@@ -216,6 +213,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             CommonDialog commonDialog = new CommonDialog(this);
             commonDialog.show();
             commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.clear_chat_tips);
+            commonDialog.getMainView().confirm.setTextColor(getResources().getColor(io.openim.android.ouicore.R.color.theme));
             commonDialog.getMainView().cancel.setOnClickListener(view1 -> commonDialog.dismiss());
             commonDialog.getMainView().confirm.setOnClickListener(view1 -> {
                 commonDialog.dismiss();
@@ -305,7 +303,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
                     holder.view.img.load(data.getFaceURL(), data.getNickname());
                     holder.view.txt.setText(data.getNickname());
                     holder.view.getRoot().setOnClickListener(v -> {
-                        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, data.getUserID()).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
+                        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constants.K_ID, data.getUserID()).withString(Constants.K_GROUP_ID, vm.groupId).navigation();
                     });
                 }
             }
@@ -439,8 +437,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         memberVM.isOwnerOrAdmin = vm.isOwnerOrAdmin.val();
         memberVM.setIntention(GroupMemberVM.Intention.CHECK);
         memberVM.setOnFinishListener(activity -> {
-            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID,
-                memberVM.choiceList.val().get(0).key).withString(Constant.K_GROUP_ID, vm.groupId).navigation();
+            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constants.K_ID,
+                memberVM.choiceList.val().get(0).key).withString(Constants.K_GROUP_ID, vm.groupId).navigation();
         });
         startActivity(new Intent(this, SuperGroupMemberActivity.class));
     }

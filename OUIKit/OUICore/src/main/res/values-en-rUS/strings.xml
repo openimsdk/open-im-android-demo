@@ -4,6 +4,7 @@
     <string name="group_bulletin">Group Announcement</string>
     <string name="search_by_id">Search and add by mobile number/ID number/nickname</string>
     <string name="send_succ">Send Successfully</string>
+    <string name="push_succ">发布成功</string>
     <string name="see_moments">View Moments</string>
     <string name="sunday">Sunday</string>
     <string name="monday">Monday</string>
@@ -326,7 +327,7 @@
 
     <string name="msg_tap_tips">Tap this message to join the meeting directly</string>
     <string name="meeting_has_ended">The meeting has ended or the room does not exist</string>
-    <string name="cancle_all_mute">Cancel mute for all</string>
+    <string name="cancel_all_mute">Cancel mute for all</string>
     <string name="meeting_setting">Meeting Settings</string>
     <string name="allow_cancel_mute">Allow members to unmute themselves</string>
     <string name="allow_open_camera">Allow members to turn on video</string>
@@ -555,4 +556,6 @@
     <string name="delete_tips">确定删除?</string>
     <string name="other_accepted">已在其他端接受</string>
     <string name="other_rejected">已在其他端拒绝</string>
+    <string name="friend_settings">好友设置</string>
+    <string name="email_tips">邮箱无效</string>
 </resources>

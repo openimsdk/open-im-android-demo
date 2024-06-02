@@ -3,16 +3,12 @@ package io.openim.android.ouiconversation.widget;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.wang.avi.AVLoadingIndicatorView;
 
 import io.openim.android.ouiconversation.R;
-import io.openim.android.ouiconversation.databinding.LayoutSendStateBinding;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.sdk.enums.MessageStatus;
 
 public class SendStateView extends FrameLayout {

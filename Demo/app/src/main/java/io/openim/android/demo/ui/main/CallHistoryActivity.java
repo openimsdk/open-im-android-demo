@@ -26,7 +26,7 @@ import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.entity.CallHistory;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.services.CallingService;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.models.SignalingInfo;
@@ -136,7 +136,7 @@ public class CallHistoryActivity extends BaseActivity<BaseViewModel,
 
                 holder.v.avatar.load(data.getFaceURL());
                 holder.v.nickName.setText(data.getNickname());
-                holder.v.action.setText("[" + (data.getType().equals(Constant.MediaType.VIDEO)
+                holder.v.action.setText("[" + (data.getType().equals(Constants.MediaType.VIDEO)
                     ? getString(io.openim.android.ouicore.R.string.voice)
                     : getString(io.openim.android.ouicore.R.string.video))
                     + "] " + TimeUtil.getTime(data.getDate(), TimeUtil.yearTimeFormat));

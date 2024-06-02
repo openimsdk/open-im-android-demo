@@ -2,15 +2,11 @@ package io.openim.android.ouicore.entity;
 
 import android.text.SpannableStringBuilder;
 
-import androidx.annotation.Nullable;
-
 import java.util.Objects;
 
-import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.GroupAtType;
 import io.openim.android.sdk.enums.MessageType;

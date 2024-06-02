@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 
 
-import androidx.lifecycle.Observer;
-
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
@@ -15,7 +13,7 @@ import java.util.List;
 
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.ouicore.utils.TimeUtil;
@@ -25,7 +23,6 @@ import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.GroupVerification;
 import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 @Route(path = Routes.Group.DETAIL)
@@ -35,7 +32,7 @@ public class GroupDetailActivity extends BaseActivity<GroupVM, ActivityGroupDeta
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         bindVM(GroupVM.class);
-        vm.groupId = getIntent().getStringExtra(Constant.K_GROUP_ID);
+        vm.groupId = getIntent().getStringExtra(Constants.K_GROUP_ID);
         vm.getGroupsInfo();
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityGroupDetailBinding.inflate(getLayoutInflater()));
@@ -67,7 +64,7 @@ public class GroupDetailActivity extends BaseActivity<GroupVM, ActivityGroupDeta
                     public void onSuccess(List<GroupMembersInfo> data) {
                         if (data.isEmpty()) {
                             view.joinGroup.setOnClickListener(v -> ARouter.getInstance().build(Routes.Main.SEND_VERIFY)
-                                .withString(Constant.K_ID, vm.groupId).withBoolean(Constant.K_IS_PERSON, false).navigation());
+                                .withString(Constants.K_ID, vm.groupId).withBoolean(Constants.K_IS_PERSON, false).navigation());
                         } else {
                             startChat();
                         }
@@ -98,15 +95,15 @@ public class GroupDetailActivity extends BaseActivity<GroupVM, ActivityGroupDeta
                     public void onSuccess(String data) {
                         dialog.dismiss();
                         ARouter.getInstance().build(Routes.Conversation.CHAT)
-                            .withString(Constant.K_GROUP_ID, vm.groupId)
-                            .withString(Constant.K_NAME, vm.groupsInfo.getValue().getGroupName())
+                            .withString(Constants.K_GROUP_ID, vm.groupId)
+                            .withString(Constants.K_NAME, vm.groupsInfo.getValue().getGroupName())
                             .navigation();
                     }
                 }, vm.groupId, "", 2);
             } else
                 ARouter.getInstance().build(Routes.Conversation.CHAT)
-                    .withString(Constant.K_GROUP_ID, vm.groupId)
-                    .withString(Constant.K_NAME, vm.groupsInfo.getValue().getGroupName())
+                    .withString(Constants.K_GROUP_ID, vm.groupId)
+                    .withString(Constants.K_NAME, vm.groupsInfo.getValue().getGroupName())
                     .navigation();
         });
     }

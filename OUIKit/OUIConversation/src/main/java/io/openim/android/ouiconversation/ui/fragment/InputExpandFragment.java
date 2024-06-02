@@ -35,11 +35,8 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.FragmentInputExpandBinding;
@@ -54,25 +51,22 @@ import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
-import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.HasPermissions;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.models.CardElem;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.SignalingInfo;
 
 
 public class InputExpandFragment extends BaseFragment<ChatVM> {
@@ -93,6 +87,9 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                 Permission.RECORD_AUDIO);
             hasLocation = new HasPermissions(getActivity(),
                 Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
+            hasStorage = new HasPermissions(getActivity(), Permission.MANAGE_EXTERNAL_STORAGE);
+            hasShoot = new HasPermissions(getActivity(), Permission.CAMERA, Permission.RECORD_AUDIO);
+            hasLocation = new HasPermissions(getActivity(), Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
         });
 
     }
@@ -146,16 +143,16 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                                 mainView.confirm.setOnClickListener(v1 -> {
                                     commonDialog.dismiss();
 
-                                    sendCardMessage(selectTargetVM.metaData.val().get(0));
+                                        sendCardMessage(selectTargetVM.metaData.val().get(0));
+                                    });
+                                    commonDialog.show();
                                 });
-                                commonDialog.show();
-                            });
-                            ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
-                            break;
-                    }
-                });
-            }
-        };
+                                ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
+                                break;
+                        }
+                    });
+                }
+            };
         v.getRoot().setAdapter(adapter);
         adapter.setItems(menuIcons);
     }
@@ -232,7 +229,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                                 public void onResourceReady(@NonNull Bitmap resource,
                                                             @Nullable Transition<? super Bitmap> transition) {
                                     String firstFame = MediaFileUtil.saveBitmap(resource,
-                                        Constant.PICTURE_DIR, false);
+                                        Constants.PICTURE_DIR, false);
                                     long duration = MediaFileUtil.getDuration(filePath);
                                     Message msg =
                                         OpenIMClient.getInstance().messageManager.createVideoMessageFromFullPath(filePath, MediaFileUtil.getFileType(filePath).mimeType, duration, firstFame);
@@ -243,7 +240,8 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                         }
                         Message msg =
                             OpenIMClient.getInstance().messageManager.createFileMessageFromFullPath(filePath, new File(filePath).getName());
-                        vm.sendMsg(msg);
+                        if (null != msg)
+                            vm.sendMsg(msg);
                     }
                 }
             }
@@ -266,7 +264,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                             public void onResourceReady(@NonNull Bitmap resource,
                                                         @Nullable Transition<? super Bitmap> transition) {
                                 String firstFame = MediaFileUtil.saveBitmap(resource,
-                                    Constant.PICTURE_DIR, false);
+                                    Constants.PICTURE_DIR, false);
                                 long duration = MediaFileUtil.getDuration(file);
                                 Message msg =
                                     OpenIMClient.getInstance().messageManager.createVideoMessageFromFullPath(file, MediaFileUtil.getFileType(file).mimeType, duration, firstFame);
@@ -305,14 +303,8 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
 
     @SuppressLint("WrongConstant")
     private void showMediaPicker() {
-        hasStorage.safeGo(() -> Matisse.from(getActivity()).choose(MimeType.ofAll())
-            .countable(true)
-            .maxSelectable(9)
-            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-            .thumbnailScale(0.85f)
-            .imageEngine(new GlideEngine()).forResult(captureLauncher));
+        hasStorage.safeGo(() -> Matisse.from(getActivity()).choose(MimeType.ofAll()).countable(true).maxSelectable(9).restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED).thumbnailScale(0.85f).imageEngine(new GlideEngine()).forResult(captureLauncher));
     }
-
 
 
     public void setChatVM(ChatVM vm) {

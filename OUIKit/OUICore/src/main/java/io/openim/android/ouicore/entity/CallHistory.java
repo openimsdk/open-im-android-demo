@@ -1,5 +1,6 @@
 package io.openim.android.ouicore.entity;
 
+import io.openim.android.ouicore.utils.L;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -115,6 +116,7 @@ public class CallHistory extends RealmObject {
     }
 
     public void setDuration(int duration) {
+        L.e("======================="+duration);
         this.duration = duration;
     }
 }

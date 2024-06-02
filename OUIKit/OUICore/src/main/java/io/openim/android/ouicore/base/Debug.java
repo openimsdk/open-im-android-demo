@@ -1,12 +1,10 @@
 package io.openim.android.ouicore.base;
 
-import com.alibaba.android.arouter.launcher.ARouter;
-
 import io.openim.android.ouicore.entity.LoginCertificate;
 import io.openim.android.ouicore.im.IM;
 import io.openim.android.ouicore.net.RXRetrofit.HttpConfig;
 import io.openim.android.ouicore.net.RXRetrofit.N;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.listener.OnBase;
@@ -24,7 +22,7 @@ public class Debug extends BaseApp {
         BaseApp.inst().loginCertificate.faceURL = "http://img.touxiangwu" +
             ".com/zb_users/upload/2022/11/202211071667789271294192.jpg";
 
-        N.init(new HttpConfig().setBaseUrl(Constant.getAppAuthUrl())
+        N.init(new HttpConfig().setBaseUrl(Constants.getAppAuthUrl())
             .addInterceptor(chain -> {
                 String token = "";
                 try {
@@ -48,6 +46,6 @@ public class Debug extends BaseApp {
 
         //音频播放
         SPlayer.init(this);
-        SPlayer.instance().setCacheDirPath(Constant.AUDIO_DIR);
+        SPlayer.instance().setCacheDirPath(Constants.AUDIO_DIR);
     }
 }

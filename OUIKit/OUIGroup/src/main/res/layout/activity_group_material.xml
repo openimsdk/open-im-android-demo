@@ -102,26 +102,29 @@
                             android:layout_weight="1"
                             android:orientation="vertical">
 
-                          <LinearLayout
-                              android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:gravity="center_vertical"
-                              android:orientation="horizontal">
-                              <TextView
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:layout_marginRight="5dp"
-                                  android:textColor="@color/txt_black"
-                                  android:text="@{GroupVM.groupsInfo.groupName}"
-                                  android:textSize="17sp" />
-                              <ImageView
-                                  android:id="@+id/groupName"
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:src="@mipmap/ic_g_edit2"
-                                  android:padding="4dp"
-                                  android:visibility="@{GroupVM.isOwnerOrAdmin?View.VISIBLE:View.GONE}" />
-                          </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="5dp"
+                                    android:layout_weight="1"
+                                    android:text="@{GroupVM.groupsInfo.groupName}"
+                                    android:textColor="@color/txt_black"
+                                    android:textSize="17sp" />
+
+                                <ImageView
+                                    android:id="@+id/groupName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:padding="4dp"
+                                    android:src="@mipmap/ic_g_edit2"
+                                    android:visibility="@{GroupVM.isOwnerOrAdmin?View.VISIBLE:View.GONE}" />
+                            </LinearLayout>
 
                             <TextView
                                 android:id="@+id/groupId"
@@ -193,10 +196,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
-                        android:paddingTop="16dp"
                         android:background="@drawable/sty_radius_6_white"
                         android:orientation="vertical"
                         android:paddingLeft="15dp"
+                        android:paddingTop="16dp"
                         android:paddingRight="15dp">
 
                         <TextView
@@ -209,9 +212,9 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:orientation="horizontal"
                             android:paddingTop="12dp"
-                            android:paddingBottom="16dp"
-                            android:orientation="horizontal">
+                            android:paddingBottom="16dp">
 
                             <CheckBox
                                 android:id="@+id/chatHistory"
@@ -321,6 +324,7 @@
                         </LinearLayout>
 
                         <include layout="@layout/view_dividing_line" />
+
                         <LinearLayout
                             android:id="@+id/groupManage"
                             android:layout_width="match_parent"
@@ -347,7 +351,6 @@
                         </LinearLayout>
 
 
-
                         <include layout="@layout/view_dividing_line" />
 
 
@@ -357,11 +360,11 @@
                         android:id="@+id/myName"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:gravity="center_vertical"
-                        android:paddingLeft="15dp"
-                        android:background="@drawable/sty_radius_6_white"
                         android:layout_marginTop="12dp"
                         android:layout_marginBottom="12dp"
+                        android:background="@drawable/sty_radius_6_white"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="15dp"
                         android:paddingRight="15dp">
 
                         <TextView
@@ -410,7 +413,9 @@
                             android:layout_width="38dp"
                             android:layout_height="23dp" />
                     </LinearLayout>
+
                     <include layout="@layout/view_dividing_line" />
+
                     <LinearLayout
                         android:id="@+id/notDisturb"
                         android:layout_width="match_parent"
@@ -433,6 +438,7 @@
                             android:layout_width="38dp"
                             android:layout_height="23dp" />
                     </LinearLayout>
+
                     <include layout="@layout/view_dividing_line" />
 
                     <LinearLayout
@@ -442,8 +448,7 @@
                         android:background="@color/white"
                         android:gravity="center_vertical"
                         android:paddingLeft="15dp"
-                        android:paddingRight="15dp"
-                        >
+                        android:paddingRight="15dp">
 
                         <TextView
                             android:layout_width="0dp"

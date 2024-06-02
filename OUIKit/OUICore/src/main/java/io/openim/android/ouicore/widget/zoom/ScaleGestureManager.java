@@ -5,7 +5,6 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
 /**
- * Created by 王德惠
  * Description :放大缩放手势的点击器
  */
 

@@ -6,7 +6,6 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -50,7 +49,7 @@ import io.openim.android.ouiconversation.ui.SearchActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.ex.MultipleChoice;
-import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
@@ -61,7 +60,6 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.vm.GroupVM;
@@ -136,24 +134,24 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
         if (msgConversation.conversationInfo.getConversationType() == ConversationType.NOTIFICATION) {
             //系统通知
             Intent intent =
-                new Intent(getContext(), NotificationActivity.class).putExtra(Constant.K_NAME
-                    , msgConversation.conversationInfo.getShowName()).putExtra(Constant.K_ID,
+                new Intent(getContext(), NotificationActivity.class).putExtra(Constants.K_NAME
+                    , msgConversation.conversationInfo.getShowName()).putExtra(Constants.K_ID,
                     msgConversation.conversationInfo.getConversationID());
             startActivity(intent);
             return;
         }
         Intent intent = new Intent(getContext(), ChatActivity.class)
-            .putExtra(Constant.K_NAME
+            .putExtra(Constants.K_NAME
                 , msgConversation.conversationInfo.getShowName());
         if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT)
-            intent.putExtra(Constant.K_ID, msgConversation.conversationInfo.getUserID());
+            intent.putExtra(Constants.K_ID, msgConversation.conversationInfo.getUserID());
 
         if (msgConversation.conversationInfo.getConversationType() == ConversationType.GROUP_CHAT
             || msgConversation.conversationInfo.getConversationType() == ConversationType.SUPER_GROUP_CHAT)
-            intent.putExtra(Constant.K_GROUP_ID, msgConversation.conversationInfo.getGroupID());
+            intent.putExtra(Constants.K_GROUP_ID, msgConversation.conversationInfo.getGroupID());
 
         if (msgConversation.conversationInfo.getGroupAtType() == ConversationType.NOTIFICATION)
-            intent.putExtra(Constant.K_NOTICE, msgConversation.notificationMsg);
+            intent.putExtra(Constants.K_NOTICE, msgConversation.notificationMsg);
         startActivity(intent);
 
         //重置强提醒
@@ -293,7 +291,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
         });
         view.addGroup.setOnClickListener(c -> {
             popupWindow.dismiss();
-            ARouter.getInstance().build(Routes.Main.ADD_CONVERS).withBoolean(Constant.K_RESULT,
+            ARouter.getInstance().build(Routes.Main.ADD_CONVERS).withBoolean(Constants.K_RESULT,
                 false).navigation();
         });
         view.createGroup.setOnClickListener(c -> {
@@ -435,7 +433,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
     @Override
     public void update(Observable observable, Object o) {
         Obs.Message message = (Obs.Message) o;
-        if (message.tag == Constant.Event.USER_INFO_UPDATE) {
+        if (message.tag == Constants.Event.USER_INFO_UPDATE) {
             initHeader();
         }
     }

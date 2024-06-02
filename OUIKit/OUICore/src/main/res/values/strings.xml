@@ -5,6 +5,7 @@
     <string name="group_bulletin">群公告</string>
     <string name="search_by_id">通过手机号/ID号/昵称搜索添加</string>
     <string name="send_succ">发送成功</string>
+    <string name="push_succ">发布成功</string>
     <string name="see_moments">查看动态</string>
 
     <string name="sunday">星期日</string>
@@ -330,7 +331,7 @@
 
     <string name="msg_tap_tips">点击此消息可直接加入会议</string>
     <string name="meeting_has_ended">会议已结束或房间不存在</string>
-    <string name="cancle_all_mute">取消全员禁音</string>
+    <string name="cancel_all_mute">解除全员禁音</string>
     <string name="meeting_setting">会议设置</string>
     <string name="allow_cancel_mute">允许成员自我解除静音</string>
     <string name="allow_open_camera">允许成员开启视频</string>
@@ -566,5 +567,7 @@
     <string name="delete_tips">确定删除?</string>
     <string name="other_accepted">已在其他端接受</string>
     <string name="other_rejected">已在其他端拒绝</string>
+    <string name="friend_settings">好友设置</string>
+    <string name="email_tips">邮箱无效</string>
 
 </resources>

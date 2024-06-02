@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Vibrator;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
@@ -65,7 +66,7 @@ import io.openim.android.ouicore.ex.AtUser;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.L;
@@ -214,14 +215,14 @@ public class IMUtil {
         if (null == msgExpand) msgExpand = new MsgExpand();
         msg.setExt(msgExpand);
         try {
-            if (msg.getContentType() == MessageType.CUSTOM) {
+            if (msg.getContentType() == MessageType.CUSTOM || null!=msg.getCustomElem()) {
                 Map map = JSONArray.parseObject(msg.getCustomElem().getData(), Map.class);
-                if (map.containsKey(Constant.K_CUSTOM_TYPE)) {
-                    int customType = (int) map.get(Constant.K_CUSTOM_TYPE);
-                    Object result = map.get(Constant.K_DATA);
+                if (map.containsKey(Constants.K_CUSTOM_TYPE)) {
+                    int customType = (int) map.get(Constants.K_CUSTOM_TYPE);
+                    Object result = map.get(Constants.K_DATA);
                     msg.setContentType(customType);
 
-                    if (customType == Constant.MsgType.CUSTOMIZE_MEETING) {
+                    if (customType == Constants.MsgType.CUSTOMIZE_MEETING) {
                         MeetingInfo meetingInfo =
                             GsonHel.fromJson(JSONObject.toJSONString(result), MeetingInfo.class);
                         meetingInfo.startTime = TimeUtil.getTime(meetingInfo.start * 1000,
@@ -234,12 +235,12 @@ public class IMUtil {
                         return msg;
                     }
 
-                    if (customType == Constant.MsgType.LOCAL_CALL_HISTORY) {
+                    if (customType == Constants.MsgType.LOCAL_CALL_HISTORY) {
                         msgExpand.callHistory = GsonHel.fromJson(JSONObject.toJSONString(result),
                             CallHistory.class);
                         if (TextUtils.isEmpty(msgExpand.callHistory.getId())) return msg;
                         //当callHistory.getRoomID 不null 表示我们本地插入的呼叫记录
-                        msg.setContentType(Constant.MsgType.LOCAL_CALL_HISTORY);
+                        msg.setContentType(Constants.MsgType.LOCAL_CALL_HISTORY);
 
                         int second = msgExpand.callHistory.getDuration() / 1000;
                         String secondFormat = TimeUtil.secondFormat(second, TimeUtil.secondFormat);
@@ -281,7 +282,7 @@ public class IMUtil {
             }
             handleNotification(msg);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         msg.setExt(msgExpand);
 
@@ -635,7 +636,7 @@ public class IMUtil {
     }
 
     private static void toPersonDetail(String uid, String groupId) {
-        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constant.K_ID, uid).withString(Constant.K_GROUP_ID, groupId).navigation();
+        ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constants.K_ID, uid).withString(Constants.K_GROUP_ID, groupId).navigation();
     }
 
     private static String atSelf(AtUserInfo atUsersInfo) {
@@ -669,7 +670,12 @@ public class IMUtil {
                     if (!atUsersInfo.getAtUserID().equals(IMUtil.AT_ALL))
                         toPersonDetail(atUsersInfo.getAtUserID(), gid);
                 }
-            });
+
+                        @Override
+                        public void updateDrawState(@NonNull TextPaint ds) {
+                            ds.setUnderlineText(false);
+                        }
+                    });
             spannableString.replace(start, end, tagSpannable);
         }
         msgExpand.sequence = spannableString;
@@ -799,12 +805,12 @@ public class IMUtil {
                         IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(lastMsg),
                             target, android.R.color.holo_red_dark, null);
                     break;
-                case Constant.MsgType.LOCAL_CALL_HISTORY:
+                case Constants.MsgType.LOCAL_CALL_HISTORY:
                     boolean isAudio = msgExpand.callHistory.getType().equals("audio");
                     lastMsg += "[" + (isAudio ? BaseApp.inst().getString(R.string.voice_calls) :
                         BaseApp.inst().getString(R.string.video_calls)) + "]";
                     break;
-                case Constant.MsgType.CUSTOMIZE_MEETING:
+                case Constants.MsgType.CUSTOMIZE_MEETING:
                     lastMsg += "[" + BaseApp.inst().getString(R.string.video_meeting) + "]";
                     break;
             }
@@ -868,8 +874,8 @@ public class IMUtil {
         signalingInvitationInfo.setTimeout(30);
         signalingInvitationInfo.setInitiateTime(System.currentTimeMillis());
 
-        signalingInvitationInfo.setMediaType(isVideoCalls ? Constant.MediaType.VIDEO :
-            Constant.MediaType.AUDIO);
+        signalingInvitationInfo.setMediaType(isVideoCalls ? Constants.MediaType.VIDEO :
+            Constants.MediaType.AUDIO);
         signalingInvitationInfo.setPlatformID(IMUtil.PLATFORM_ID);
         signalingInvitationInfo.setSessionType(isSingleChat ? ConversationType.SINGLE_CHAT :
             ConversationType.SUPER_GROUP_CHAT);
@@ -956,7 +962,7 @@ public class IMUtil {
     }
 
     public static String atD(String str) {
-        return "@" + str + "\t";
+        return "@" + str;
     }
 
     /**

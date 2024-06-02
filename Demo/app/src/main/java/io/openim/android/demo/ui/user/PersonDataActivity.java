@@ -6,7 +6,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
@@ -14,13 +13,13 @@ import io.openim.android.demo.databinding.ActivityPersonInfoBinding;
 import io.openim.android.demo.ui.main.EditTextActivity;
 import io.openim.android.demo.vm.FriendVM;
 import io.openim.android.demo.vm.PersonalVM;
-import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ContactListVM;
@@ -42,7 +41,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        vm=Easy.find(PersonalVM.class);
+        vm = Easy.find(PersonalVM.class);
         vm.setContext(this);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityPersonInfoBinding.inflate(getLayoutInflater()));
@@ -91,11 +90,14 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
         view.recommend.setOnClickListener(v -> {
             SelectTargetVM selectTargetVM =
                 Easy.installVM(SelectTargetVM.class);
-            selectTargetVM.setIntention(SelectTargetVM.Intention.isShareCard);
+            selectTargetVM.setIntention(SelectTargetVM.Intention.singleSelect);
             selectTargetVM.setOnFinishListener(() -> {
+                Common.finishRoute(Routes.Group.SELECT_TARGET,
+                    Routes.Contact.ALL_FRIEND);
+
                 CommonDialog commonDialog = new CommonDialog(this);
                 commonDialog.show();
-                MultipleChoice target =selectTargetVM.metaData.val().get(0);
+                MultipleChoice target = selectTargetVM.metaData.val().get(0);
                 LayoutCommonDialogBinding mainView = commonDialog.getMainView();
                 mainView.tips.setText(String.format(getString(io.openim.android.ouicore.R.string.recommend_who),
                     target.name));
@@ -107,36 +109,36 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
                     cardElem.setUserID(vm.userInfo.val().getUserID());
                     cardElem.setNickname(vm.userInfo.val().getNickname());
                     cardElem.setFaceURL(vm.userInfo.val().getFaceURL());
-                    Message message = OpenIMClient.getInstance().messageManager.createCardMessage(cardElem);
+                    Message message =
+                        OpenIMClient.getInstance().messageManager.createCardMessage(cardElem);
                     OfflinePushInfo offlinePushInfo = new OfflinePushInfo(); // 离线推送的消息备注；不为null
                     OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
-                        @Override
-                        public void onError(int code, String error) {
-                            toast(error + code);
-                        }
+                                                                              @Override
+                                                                              public void onError(int code, String error) {
+                                                                                  toast(error + code);
+                                                                              }
 
-                        @Override
-                        public void onProgress(long progress) {
-                        }
+                                                                              @Override
+                                                                              public void onProgress(long progress) {
+                                                                              }
 
-                        @Override
-                        public void onSuccess(Message message) {
-                            toast(PersonDataActivity.this
-                                .getString(io.openim.android.ouicore.R.string.send_succ));
-                        }
-                    }, message,target.key,
+                                                                              @Override
+                                                                              public void onSuccess(Message message) {
+                                                                                  toast(PersonDataActivity.this
+                                                                                      .getString(io.openim.android.ouicore.R.string.send_succ));
+                                                                              }
+                                                                          }, message, target.key,
                         null, offlinePushInfo);
                 });
             });
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
         });
-        view.moreData.setOnClickListener(v -> {
-            startActivity(new Intent(this, MoreDataActivity.class));
-        });
+
         view.remark.setOnClickListener(view -> {
             resultLauncher.launch(new Intent(this, EditTextActivity.class)
-                .putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.remark))
-                    .putExtra(EditTextActivity.MAX_LENGTH,16)
+                .putExtra(EditTextActivity.TITLE,
+                    getString(io.openim.android.ouicore.R.string.remark))
+                .putExtra(EditTextActivity.MAX_LENGTH, 16)
                 .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.val().getRemark()));
         });
         friendVM.blackListUser.observe(this, userInfos -> {
@@ -181,7 +183,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
     private ActivityResultLauncher<Intent> resultLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() != Activity.RESULT_OK) return;
-            String resultStr = result.getData().getStringExtra(Constant.K_RESULT);
+            String resultStr = result.getData().getStringExtra(Constants.K_RESULT);
 
             waitDialog.show();
             OpenIMClient.getInstance().friendshipManager.setFriendRemark(new OnBase<String>() {
@@ -195,7 +197,7 @@ public class PersonDataActivity extends BaseActivity<PersonalVM, ActivityPersonI
                 public void onSuccess(String data) {
                     waitDialog.dismiss();
                     vm.userInfo.val().setRemark(resultStr);
-                    Obs.newMessage(Constant.Event.USER_INFO_UPDATE);
+                    Obs.newMessage(Constants.Event.USER_INFO_UPDATE);
                 }
             }, vm.uid, resultStr);
         });

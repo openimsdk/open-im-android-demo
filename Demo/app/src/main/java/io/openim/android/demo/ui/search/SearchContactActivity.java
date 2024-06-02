@@ -26,7 +26,7 @@ import io.openim.android.ouicore.ex.Title;
 import io.openim.android.ouicore.utils.RegexValid;
 import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
 import io.openim.android.sdk.models.GroupInfo;
@@ -154,10 +154,10 @@ public class SearchContactActivity extends BaseActivity<SearchVM, ActivitySearch
             holder.view.getRoot().setOnClickListener(v -> {
                 if (isPerson)
                     context.startActivity(new Intent(context,
-                        PersonDetailActivity.class).putExtra(Constant.K_ID, title.key));
+                        PersonDetailActivity.class).putExtra(Constants.K_ID, title.key));
                 else
                     ARouter.getInstance().build(Routes.Group.DETAIL)
-                        .withString(io.openim.android.ouicore.utils.Constant.K_GROUP_ID,
+                        .withString(Constants.K_GROUP_ID,
                             title.key).navigation();
             });
         }

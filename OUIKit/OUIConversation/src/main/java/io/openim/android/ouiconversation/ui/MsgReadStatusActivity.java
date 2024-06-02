@@ -1,37 +1,21 @@
 package io.openim.android.ouiconversation.ui;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.ActivityMsgReadStatusBinding;
-import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouiconversation.vm.MsgStatusVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
-import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BasicActivity;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.entity.CallHistory;
-import io.openim.android.ouicore.entity.ExGroupMemberInfo;
-import io.openim.android.ouicore.utils.Constant;
-import io.openim.android.ouicore.vm.GroupVM;
-import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.sdk.models.GroupHasReadInfo;
-import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 
 public class MsgReadStatusActivity extends BasicActivity<ActivityMsgReadStatusBinding> {
@@ -54,9 +38,9 @@ public class MsgReadStatusActivity extends BasicActivity<ActivityMsgReadStatusBi
 
     void init() {
         vm= Easy.installVM(this, MsgStatusVM.class);
-        vm.conversationId = getIntent().getStringExtra(Constant.K_ID);
-        vm.msgId = getIntent().getStringExtra(Constant.K_RESULT);
-         groupHasReadInfo = (GroupHasReadInfo) getIntent().getSerializableExtra(Constant.K_RESULT2);
+        vm.conversationId = getIntent().getStringExtra(Constants.K_ID);
+        vm.msgId = getIntent().getStringExtra(Constants.K_RESULT);
+         groupHasReadInfo = (GroupHasReadInfo) getIntent().getSerializableExtra(Constants.K_RESULT2);
     }
 
     private void initView() {

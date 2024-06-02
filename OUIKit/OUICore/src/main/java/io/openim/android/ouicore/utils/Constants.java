@@ -5,7 +5,7 @@ import android.text.TextUtils;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.im.IM;
 
-public class Constant {
+public class Constants {
 
     //    public static final String DEFAULT_HOST = "test-web.rentsoft.cn";//43
 //    public static final String DEFAULT_HOST = "web.rentsoft.cn";//121
