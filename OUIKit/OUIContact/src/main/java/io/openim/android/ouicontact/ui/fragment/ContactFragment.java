@@ -22,6 +22,7 @@ import io.openim.android.ouicontact.ui.GroupNoticeListActivity;
 import io.openim.android.ouicontact.ui.MyGroupActivity;
 import io.openim.android.ouicontact.ui.NewFriendActivity;
 import io.openim.android.ouicontact.vm.ContactVM;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.ex.MultipleChoice;
