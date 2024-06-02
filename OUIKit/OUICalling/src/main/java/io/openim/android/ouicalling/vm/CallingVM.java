@@ -1,12 +1,18 @@
 package io.openim.android.ouicalling.vm;
 
+import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
+
+import com.twilio.audioswitch.AudioDevice;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,29 +28,23 @@ import io.openim.android.ouicalling.CallingServiceImp;
 import io.openim.android.ouicore.api.OneselfService;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.entity.CallHistory;
-import io.openim.android.ouicore.entity.MeetingInfo;
-import io.openim.android.ouicore.entity.MeetingInfoAttach;
-import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 import io.openim.android.ouicore.net.RXRetrofit.NetObserver;
 import io.openim.android.ouicore.net.RXRetrofit.Parameter;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
-import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.SignalingCertificate;
 import io.openim.android.sdk.models.SignalingInfo;
-import io.openim.android.sdk.models.SignalingInvitationInfo;
 import io.reactivex.functions.Function;
 import io.realm.Realm;
 import kotlin.Unit;
@@ -52,7 +52,6 @@ import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
 import kotlinx.coroutines.CoroutineScope;
-import okhttp3.ResponseBody;
 
 public class CallingVM {
     public final CoroutineScope scope;
@@ -62,7 +61,7 @@ public class CallingVM {
     public MutableLiveData<String> timeStr = new MutableLiveData<>("");
 
     //获取音频服务
-    public AudioManager audioManager;
+//    public AudioManager audioManager;
     private DialogInterface.OnDismissListener dismissListener;
     private OnParticipantsChangeListener onParticipantsChangeListener;
 
@@ -87,7 +86,17 @@ public class CallingVM {
 
         callViewModel = new CallViewModel(BaseApp.inst());
         scope = callViewModel.buildScope();
-        audioManager = (AudioManager) BaseApp.inst().getSystemService(Context.AUDIO_SERVICE);
+//        audioManager = (AudioManager) BaseApp.inst().getSystemService(Context.AUDIO_SERVICE);
+        listenerBluetoothConnectionReceiver();
+    }
+
+    private void listenerBluetoothConnectionReceiver() {
+        BluetoothConnectionReceiver audioNoisyReceiver = new BluetoothConnectionReceiver(this);
+        //蓝牙状态广播监听
+        IntentFilter audioFilter = new IntentFilter();
+        audioFilter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
+        audioFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        BaseApp.inst().registerReceiver(audioNoisyReceiver, audioFilter);
     }
 
     public void initRemoteVideoRenderer(TextureViewRenderer... viewRenderers) {
@@ -135,7 +144,7 @@ public class CallingVM {
         if (isGroup) {
             //TODO
         } else {
-            sendSignaling(Constant.MsgType.callingInvite, signalingInfo, new OnMsgSendCallback() {
+            sendSignaling(Constants.MsgType.callingInvite, signalingInfo, new OnMsgSendCallback() {
                 @Override
                 public void onSuccess(Message s) {
                     getTokenAndConnectRoom(signalingInfo, new OnBase<SignalingCertificate>() {
@@ -149,27 +158,21 @@ public class CallingVM {
         }
     }
 
-    private void sendSignaling(int code, SignalingInfo signalingInfo,
-                               OnMsgSendCallback onMsgSendCallback) {
+    private void sendSignaling(int code, SignalingInfo signalingInfo, OnMsgSendCallback onMsgSendCallback) {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("customType", code);
         hashMap.put("data", GsonHel.toJson(signalingInfo.getInvitation()));
-        Message message =
-            OpenIMClient.getInstance().messageManager.createCustomMessage(GsonHel.toJson(hashMap)
-                , "", "");
+        Message message = OpenIMClient.getInstance().messageManager.createCustomMessage(GsonHel.toJson(hashMap), "", "");
 
         List<String> uidList = signalingInfo.getInvitation().getInviteeUserIDList();
         if (null != message && !uidList.isEmpty()) {
-            String recvUid =
-                signalingInfo.getInvitation().getInviterUserID().equals(BaseApp.inst().loginCertificate.userID) ? signalingInfo.getInvitation().getInviteeUserIDList().get(0) : signalingInfo.getInvitation().getInviterUserID();
+            String recvUid = signalingInfo.getInvitation().getInviterUserID().equals(BaseApp.inst().loginCertificate.userID) ? signalingInfo.getInvitation().getInviteeUserIDList().get(0) : signalingInfo.getInvitation().getInviterUserID();
 
-            OpenIMClient.getInstance().messageManager.sendMessage(onMsgSendCallback, message,
-                recvUid, null, new OfflinePushInfo());
+            OpenIMClient.getInstance().messageManager.sendMessage(onMsgSendCallback, message, recvUid, null, new OfflinePushInfo());
         }
     }
 
-    private void getTokenAndConnectRoom(SignalingInfo signalingInfo,
-                                        OnBase<SignalingCertificate> callBack) {
+    private void getTokenAndConnectRoom(SignalingInfo signalingInfo, OnBase<SignalingCertificate> callBack) {
         Parameter parameter = new Parameter();
         parameter.add("room", signalingInfo.getInvitation().getRoomID());
         parameter.add("identity", BaseApp.inst().loginCertificate.userID);
@@ -210,11 +213,10 @@ public class CallingVM {
 
             @Override
             public void resumeWith(@NonNull Object o) {
-                audioManager.setSpeakerphoneOn(true);
+                setSpeakerphoneOn(true);
                 if (!isVideoCalls) callViewModel.setCameraEnabled(false);
 
-                localVideoTrack =
-                    callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
+                localVideoTrack = callViewModel.getVideoTrack(callViewModel.getRoom().getLocalParticipant());
                 if (null != localVideoTrack && null != localSpeakerVideoViews && !localSpeakerVideoViews.isEmpty()) {
                     for (TextureViewRenderer localSpeakerVideoView : localSpeakerVideoViews) {
                         localVideoTrack.addRenderer(localSpeakerVideoView);
@@ -229,20 +231,18 @@ public class CallingVM {
                         for (int i = 0; i < v.size(); i++) {
                             Participant participant = v.get(i);
                             if (participant instanceof RemoteParticipant) {
-                                for (TextureViewRenderer remoteSpeakerVideoView :
-                                    remoteSpeakerVideoViews) {
-                                    callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoView,
-                                        participant, scope, new Continuation<Unit>() {
-                                            @NonNull
-                                            @Override
-                                            public CoroutineContext getContext() {
-                                                return EmptyCoroutineContext.INSTANCE;
-                                            }
+                                for (TextureViewRenderer remoteSpeakerVideoView : remoteSpeakerVideoViews) {
+                                    callViewModel.bindRemoteViewRenderer(remoteSpeakerVideoView, participant, scope, new Continuation<Unit>() {
+                                        @NonNull
+                                        @Override
+                                        public CoroutineContext getContext() {
+                                            return EmptyCoroutineContext.INSTANCE;
+                                        }
 
-                                            @Override
-                                            public void resumeWith(@NonNull Object o) {
-                                            }
-                                        });
+                                        @Override
+                                        public void resumeWith(@NonNull Object o) {
+                                        }
+                                    });
                                 }
                             }
                         }
@@ -286,7 +286,7 @@ public class CallingVM {
             signalingCancel(signalingInfo);
             return;
         }
-        sendSignaling(Constant.MsgType.callingHungup, signalingInfo, callBackDismissUI);
+        sendSignaling(Constants.MsgType.callingHungup, signalingInfo, callBackDismissUI);
     }
 
     private void dismissUI() {
@@ -296,10 +296,10 @@ public class CallingVM {
     private void signalingCancel(SignalingInfo signalingInfo) {
         if (isCallOut) {
             renewalDB(buildPrimaryKey(signalingInfo), (realm, v) -> v.setFailedState(1));
-            sendSignaling(Constant.MsgType.callingCancel, signalingInfo, callBackDismissUI);
+            sendSignaling(Constants.MsgType.callingCancel, signalingInfo, callBackDismissUI);
         } else {
             renewalDB(buildPrimaryKey(signalingInfo), (realm, v) -> v.setFailedState(3));
-            sendSignaling(Constant.MsgType.callingReject, signalingInfo, callBackDismissUI);
+            sendSignaling(Constants.MsgType.callingReject, signalingInfo, callBackDismissUI);
         }
     }
 
@@ -308,7 +308,7 @@ public class CallingVM {
     }
 
     public void signalingAccept(SignalingInfo signalingInfo, OnBase onBase) {
-        sendSignaling(Constant.MsgType.callingAccept, signalingInfo, new OnMsgSendCallback() {
+        sendSignaling(Constants.MsgType.callingAccept, signalingInfo, new OnMsgSendCallback() {
             @Override
             public void onError(int code, String error) {
                 OnMsgSendCallback.super.onError(code, error);
@@ -319,8 +319,7 @@ public class CallingVM {
                 getTokenAndConnectRoom(signalingInfo, new OnBase<SignalingCertificate>() {
                     @Override
                     public void onError(int code, String error) {
-                        Toast.makeText(BaseApp.inst(), "加入会议失败,服务器错误(" + error + ")",
-                            Toast.LENGTH_LONG).show();
+                        Toast.makeText(BaseApp.inst(), "加入会议失败,服务器错误(" + error + ")", Toast.LENGTH_LONG).show();
                         L.e(CallingServiceImp.TAG, error + code);
                         dismissUI();
                     }
@@ -368,6 +367,14 @@ public class CallingVM {
         }
     }
 
+    public void setSpeakerphoneOn(boolean isChecked) {
+        if (callViewModel.getAudioHandler().getSelectedAudioDevice() instanceof AudioDevice.BluetoothHeadset) {
+            return;
+        }
+        callViewModel.getAudioHandler().selectDevice(isChecked ? new AudioDevice.Speakerphone()
+            : new AudioDevice.Earpiece());
+    }
+
 
     public interface OnParticipantsChangeListener {
         void onChange(List<Participant> participants);
@@ -386,4 +393,41 @@ public class CallingVM {
     public interface OnRenewalDBListener {
         void onRenewal(Realm realm, CallHistory callHistory);
     }
+
+
+    public static class BluetoothConnectionReceiver extends BroadcastReceiver {
+        CallingVM callingVM;
+
+        public BluetoothConnectionReceiver(CallingVM callingVM) {
+            this.callingVM = callingVM;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED.equals(intent.getAction())) { //蓝牙连接状态
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, -1);
+                if (state == BluetoothAdapter.STATE_CONNECTED) {
+                    //连接或失联，切换音频输出（到蓝牙、或者强制仍然扬声器外放）
+                    callingVM.changeToHeadset();
+                } else if (state == BluetoothAdapter.STATE_DISCONNECTED) {
+                    callingVM.changeToSpeaker();
+                }
+            }
+        }
+    }
+
+    /**
+     * 切换到外放
+     */
+    public void changeToSpeaker() {
+        setSpeakerphoneOn(true);
+    }
+
+    /**
+     * 切换到蓝牙音箱
+     */
+    public void changeToHeadset() {
+        callViewModel.getAudioHandler().selectDevice(new AudioDevice.BluetoothHeadset());
+    }
+
 }

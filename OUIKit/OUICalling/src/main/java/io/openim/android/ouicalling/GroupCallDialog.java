@@ -14,57 +14,40 @@ import android.view.WindowManager;
 import android.widget.CheckBox;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import io.livekit.android.events.EventListenable;
-import io.livekit.android.events.ParticipantEvent;
 import io.livekit.android.events.RoomEvent;
 import io.livekit.android.room.participant.LocalParticipant;
 import io.livekit.android.room.participant.Participant;
-import io.livekit.android.room.participant.RemoteParticipant;
-import io.livekit.android.room.track.LocalVideoTrack;
-import io.livekit.android.room.track.Track;
-import io.livekit.android.room.track.TrackPublication;
 import io.livekit.android.room.track.VideoTrack;
 import io.openim.android.ouicalling.databinding.DialogGroupCallBinding;
 import io.openim.android.ouicalling.databinding.ItemMemberRendererBinding;
-import io.openim.android.ouicalling.vm.CallViewModel;
-import io.openim.android.ouicalling.vm.CallingVM;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
 import io.openim.android.ouicore.entity.ParticipantMeta;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.models.ConversationInfo;
-import io.openim.android.sdk.models.GroupInfo;
-import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
-import kotlin.Pair;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
-import kotlin.jvm.functions.Function0;
-import kotlin.jvm.internal.FunctionImpl;
 import kotlinx.coroutines.CoroutineScope;
-import kotlinx.coroutines.flow.FlowCollector;
 
 public class GroupCallDialog extends CallDialog {
     private DialogGroupCallBinding view;
@@ -197,7 +180,7 @@ public class GroupCallDialog extends CallDialog {
         super.signalingInfo = signalingInfo;
         callingVM.isGroup =
             signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT;
-        callingVM.setVideoCalls(Constant.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
+        callingVM.setVideoCalls(Constants.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
         view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.VISIBLE : View.GONE);
         if (callingVM.isCallOut) {
             view.ask.setVisibility(View.GONE);
@@ -285,7 +268,7 @@ public class GroupCallDialog extends CallDialog {
                 context.getString(io.openim.android.ouicore.R.string.speaker_on) :
                 context.getString(io.openim.android.ouicore.R.string.speaker_off));
             // 打开扬声器
-            callingVM.audioManager.setSpeakerphoneOn(isChecked);
+            callingVM.setSpeakerphoneOn(isChecked);
         });
 
         view.hangUp.setOnClickListener(new OnDedrepClickListener() {

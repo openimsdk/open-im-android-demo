@@ -1,34 +1,18 @@
 package io.openim.android.ouicore.im;
 
 
-import android.content.res.AssetFileDescriptor;
-import android.os.Build;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.alibaba.android.arouter.launcher.ARouter;
-import com.alibaba.fastjson.JSONArray;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 
-import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.services.CallingService;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
 import io.openim.android.ouicore.utils.L;
-import io.openim.android.ouicore.utils.MediaPlayerListener;
-import io.openim.android.ouicore.utils.MediaPlayerUtil;
-import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.UserLogic;
-import io.openim.android.ouicore.widget.AvatarImage;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.MessageType;
@@ -41,7 +25,6 @@ import io.openim.android.sdk.listener.OnUserListener;
 import io.openim.android.sdk.models.BlacklistInfo;
 import io.openim.android.sdk.models.C2CReadReceiptInfo;
 import io.openim.android.sdk.models.ConversationInfo;
-import io.openim.android.sdk.models.CustomSignalingInfo;
 import io.openim.android.sdk.models.FriendApplicationInfo;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
@@ -49,11 +32,8 @@ import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.GroupMessageReceipt;
 import io.openim.android.sdk.models.KeyValue;
-import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.RevokedInfo;
-import io.openim.android.sdk.models.RoomCallingInfo;
-import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
 import io.openim.android.sdk.models.UsersOnlineStatus;
 

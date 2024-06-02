@@ -6,6 +6,7 @@ import androidx.multidex.MultiDex;
 
 
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.alibaba.fastjson.JSONArray;
 import com.cretin.www.cretinautoupdatelibrary.model.TypeConfig;
 import com.cretin.www.cretinautoupdatelibrary.model.UpdateConfig;
 import com.cretin.www.cretinautoupdatelibrary.utils.AppUpdateUtils;
@@ -15,6 +16,7 @@ import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
 import java.io.File;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.openim.android.demo.ui.login.LoginActivity;
@@ -25,6 +27,7 @@ import io.openim.android.ouicore.im.IM;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.net.RXRetrofit.HttpConfig;
 import io.openim.android.ouicore.net.RXRetrofit.N;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.update.UpdateApp;
 import io.openim.android.ouicore.utils.ActivityManager;
@@ -34,8 +37,13 @@ import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.ouicore.voice.SPlayer;
+import io.openim.android.sdk.enums.MessageType;
+import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnConnListener;
 import io.openim.android.sdk.listener.OnSignalingListener;
+import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.SignalingInfo;
+import io.openim.android.sdk.models.SignalingInvitationInfo;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -129,30 +137,30 @@ public class DemoApplication extends BaseApp {
                 public void onRecvNewMessage(Message msg) {
                     if (msg.getContentType() == MessageType.CUSTOM) {
                         Map map = JSONArray.parseObject(msg.getCustomElem().getData(), Map.class);
-                        if (map.containsKey(Constant.K_CUSTOM_TYPE)) {
-                            int customType = (int) map.get(Constant.K_CUSTOM_TYPE);
-                            Object result = map.get(Constant.K_DATA);
+                        if (map.containsKey(Constants.K_CUSTOM_TYPE)) {
+                            int customType = (int) map.get(Constants.K_CUSTOM_TYPE);
+                            Object result = map.get(Constants.K_DATA);
 
-                            if (customType >= Constant.MsgType.callingInvite
-                                && customType<=Constant.MsgType.callingHungup ) {
-                                SignalingInvitationInfo signalingInvitationInfo =GsonHel.fromJson((String) result, SignalingInvitationInfo.class);
+                            if (customType >= Constants.MsgType.callingInvite
+                                && customType<=Constants.MsgType.callingHungup ) {
+                                SignalingInvitationInfo signalingInvitationInfo = GsonHel.fromJson((String) result, SignalingInvitationInfo.class);
                                 SignalingInfo signalingInfo=new SignalingInfo();
                                 signalingInfo.setInvitation(signalingInvitationInfo);
 
                                 switch (customType) {
-                                    case Constant.MsgType.callingInvite:
+                                    case Constants.MsgType.callingInvite:
                                         callingService.onReceiveNewInvitation(signalingInfo);
                                         break;
-                                    case Constant.MsgType.callingAccept:
+                                    case Constants.MsgType.callingAccept:
                                         callingService.onInviteeAccepted(signalingInfo);
                                         break;
-                                    case Constant.MsgType.callingReject:
+                                    case Constants.MsgType.callingReject:
                                         callingService.onInviteeRejected(signalingInfo);
                                         break;
-                                    case Constant.MsgType.callingCancel:
+                                    case Constants.MsgType.callingCancel:
                                         callingService.onInvitationCancelled(signalingInfo);
                                         break;
-                                    case Constant.MsgType.callingHungup:
+                                    case Constants.MsgType.callingHungup:
                                         callingService.onHangup(signalingInfo);
                                         break;
                                 }

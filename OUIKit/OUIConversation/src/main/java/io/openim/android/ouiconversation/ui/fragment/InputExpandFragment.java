@@ -22,8 +22,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-import com.alibaba.android.arouter.core.LogisticsCenter;
-import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -35,11 +33,8 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.openim.android.ouiconversation.R;
 import io.openim.android.ouiconversation.databinding.FragmentInputExpandBinding;
@@ -52,27 +47,17 @@ import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutCommonDialogBinding;
-import io.openim.android.ouicore.ex.MultipleChoice;
-import io.openim.android.ouicore.im.IMUtil;
-import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
-import io.openim.android.ouicore.utils.Common;
-import io.openim.android.ouicore.utils.Constant;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.HasPermissions;
 import io.openim.android.ouicore.utils.MThreadTool;
 import io.openim.android.ouicore.utils.MediaFileUtil;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.vm.GroupVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.widget.CommonDialog;
-import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
-import io.openim.android.sdk.models.CardElem;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.SignalingInfo;
 
 
 public class InputExpandFragment extends BaseFragment<ChatVM> {
@@ -90,7 +75,6 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         MThreadTool.executorService.execute(() -> {
             hasStorage = new HasPermissions(getActivity(), Permission.MANAGE_EXTERNAL_STORAGE);
             hasShoot = new HasPermissions(getActivity(), Permission.CAMERA, Permission.RECORD_AUDIO);
-            hasLocation = new HasPermissions(getActivity(), Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION);
         });
 
     }
@@ -119,36 +103,6 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                         case 1:
                             goToShoot();
                             break;
-//                        case 2:
-//                            goToCall();
-//                            break;
-                        case 2:
-                            gotoSelectFile();
-                            break;
-                        case 3:
-                            gotoShareLocation();
-                            break;
-                        case 4:
-                            SelectTargetVM selectTargetVM =
-                                Easy.installVM(SelectTargetVM.class);
-                            selectTargetVM.setIntention(SelectTargetVM.Intention.isShareCard);
-                            selectTargetVM.setOnFinishListener(() -> {
-                                Activity activity= ActivityManager.isExist(ChatActivity.class);
-                                if (null==activity)return;
-                                CommonDialog commonDialog = new CommonDialog(activity);
-                                LayoutCommonDialogBinding mainView =
-                                    commonDialog.getMainView();
-                                mainView.tips.setText(BaseApp.inst().getString(io.openim.android.ouicore.R.string.send_card_confirm));
-                                mainView.cancel.setOnClickListener(v1 -> commonDialog.dismiss());
-                                mainView.confirm.setOnClickListener(v1 -> {
-                                    commonDialog.dismiss();
-
-                                    sendCardMessage(selectTargetVM.metaData.val().get(0));
-                                });
-                                commonDialog.show();
-                            });
-                            ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
-                            break;
                     }
                 });
             }
@@ -165,43 +119,6 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
         hasShoot.safeGo(()-> shootLauncher.launch(new Intent(getActivity(), ShootActivity.class)));
     }
 
-    private final ActivityResultLauncher<Intent> fileLauncher =
-        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == Activity.RESULT_OK) {
-                Intent data = result.getData();
-                if (null != data) {
-                    Uri uri = data.getData();
-                    if (null != uri) {
-                        String filePath = GetFilePathFromUri.getFileAbsolutePath(getContext(), uri);
-                        if (TextUtils.isEmpty(filePath)) return;
-                        if (MediaFileUtil.isImageType(filePath)) {
-                            Message msg =
-                                OpenIMClient.getInstance().messageManager.createImageMessageFromFullPath(filePath);
-                            vm.sendMsg(msg);
-                            return;
-                        }
-                        if (MediaFileUtil.isVideoType(filePath)) {
-                            Glide.with(this).asBitmap().load(filePath).into(new SimpleTarget<Bitmap>() {
-                                @Override
-                                public void onResourceReady(@NonNull Bitmap resource,
-                                                            @Nullable Transition<? super Bitmap> transition) {
-                                    String firstFame = MediaFileUtil.saveBitmap(resource,
-                                        Constant.PICTURE_DIR, false);
-                                    long duration = MediaFileUtil.getDuration(filePath);
-                                    Message msg =
-                                        OpenIMClient.getInstance().messageManager.createVideoMessageFromFullPath(filePath, MediaFileUtil.getFileType(filePath).mimeType, duration, firstFame);
-                                    vm.sendMsg(msg);
-                                }
-                            });
-                            return;
-                        }
-                        Message msg =
-                            OpenIMClient.getInstance().messageManager.createFileMessageFromFullPath(filePath, new File(filePath).getName());
-                        vm.sendMsg(msg);
-                    }
-                }
-            }
-        });
     private final ActivityResultLauncher<Intent> captureLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == Activity.RESULT_OK) {
@@ -220,7 +137,7 @@ public class InputExpandFragment extends BaseFragment<ChatVM> {
                             public void onResourceReady(@NonNull Bitmap resource,
                                                         @Nullable Transition<? super Bitmap> transition) {
                                 String firstFame = MediaFileUtil.saveBitmap(resource,
-                                    Constant.PICTURE_DIR, false);
+                                    Constants.PICTURE_DIR, false);
                                 long duration = MediaFileUtil.getDuration(file);
                                 Message msg =
                                     OpenIMClient.getInstance().messageManager.createVideoMessageFromFullPath(file, MediaFileUtil.getFileType(file).mimeType, duration, firstFame);
