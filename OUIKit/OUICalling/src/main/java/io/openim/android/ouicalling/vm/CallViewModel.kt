@@ -151,8 +151,10 @@ class CallViewModel(
             mutableCameraEnabled.postValue(localParticipant.isCameraEnabled())
 
             handlePrimarySpeaker(emptyList(), emptyList(), room)
+            Timber.i{"connect ok"};
         } catch (e: Throwable) {
             mutableError.value = e
+            Timber.e{"connect fail"}
         }
 
     }

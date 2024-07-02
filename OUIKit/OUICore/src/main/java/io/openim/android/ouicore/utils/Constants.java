@@ -9,8 +9,8 @@ public class Constants {
 
     //    public static final String DEFAULT_HOST = "test-web.rentsoft.cn";//43
 //    public static final String DEFAULT_HOST = "web.rentsoft.cn";//121
-    public static final String DEFAULT_HOST = "43.128.72.19";
-
+    //public static final String DEFAULT_HOST = "43.128.72.19";
+    public static final String DEFAULT_HOST = "talk.ls150301.site";
     //登录注册手机验 证服务器地址
     private static final String APP_AUTH_URL = "https://" + DEFAULT_HOST + "/chat/";
     //IM sdk api地址

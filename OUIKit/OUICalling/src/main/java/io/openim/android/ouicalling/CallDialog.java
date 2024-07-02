@@ -1,31 +1,49 @@
 package io.openim.android.ouicalling;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.PermissionChecker;
+import androidx.lifecycle.Observer;
 
+import android.Manifest;
 import android.content.Context;
-
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.http.SslError;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
+import android.webkit.PermissionRequest;
+import android.webkit.SslErrorHandler;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.Observer;
-
 
 import com.hjq.permissions.Permission;
 import com.hjq.window.EasyWindow;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.livekit.android.events.RoomEvent;
-import io.livekit.android.room.participant.Participant;
-import io.livekit.android.room.participant.RemoteParticipant;
-import io.livekit.android.room.track.RemoteVideoTrack;
 import io.openim.android.ouicalling.databinding.DialogCallBinding;
 import io.openim.android.ouicalling.databinding.LayoutFloatViewBinding;
 import io.openim.android.ouicalling.service.AudioVideoService;
@@ -38,39 +56,48 @@ import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.HasPermissions;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.MediaPlayerUtil;
 import io.openim.android.ouicore.utils.NotificationUtil;
 import io.openim.android.ouicore.utils.Obs;
-import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
-import kotlin.Unit;
-import kotlin.coroutines.Continuation;
-import kotlin.coroutines.CoroutineContext;
-
 
 public class CallDialog extends BaseDialog {
 
+    private static final String[] RECORD_AV_PERMISSION = new String[]{
+        PermissionRequest.RESOURCE_AUDIO_CAPTURE
+        , PermissionRequest.RESOURCE_VIDEO_CAPTURE
+    };
+    //https://www.digai.top:3000/call?callout=0&caller=3933277045&callee=4885942569
+    //private static final String BaseURL = "https://www.digai.top/char?tagType=tags&tag=bible&isroot=true";
+    private static final String BASEURL = "https://www.digai.top:3000/call";//callout=1&caller=lee&callee=wang";
+    private String mWebURL;
+    private WebView mWebView;
+
+    //call
     protected final HasPermissions hasShoot, hasRecord, hasSystemAlert;
     protected Context context;
     private DialogCallBinding view;
     public CallingVM callingVM;
+
+    UserInfo mUserInfo;
     protected SignalingInfo signalingInfo;
 
-    protected EasyWindow easyWindow;
-    protected LayoutFloatViewBinding floatViewBinding;
+
+
     private boolean isSubscribe;
+
 
     public CallDialog(@NonNull Context context, CallingService callingService) {
         this(context, callingService, false);
     }
 
-
-    /**
+    /*
      * 弹出通话界面
      *
      * @param context        上下文
@@ -80,7 +107,7 @@ public class CallDialog extends BaseDialog {
     public CallDialog(@NonNull Context context, CallingService callingService, boolean isCallOut) {
         super(context);
         this.context = context;
-        hasShoot = new HasPermissions(context, Permission.CAMERA, Permission.RECORD_AUDIO);
+        hasShoot = new HasPermissions(context, Permission.CAMERA);
         hasRecord = new HasPermissions(context, Permission.RECORD_AUDIO);
         hasSystemAlert = new HasPermissions(context, Permission.SYSTEM_ALERT_WINDOW);
 
@@ -88,27 +115,13 @@ public class CallDialog extends BaseDialog {
         callingVM.setDismissListener(v -> {
             dismiss();
         });
-        callingVM.callViewModel.subscribe(callingVM.callViewModel.getRoom().getEvents().getEvents(), (v) -> {
-            if (v instanceof RoomEvent.ParticipantDisconnected
-                && v.getRoom().getRemoteParticipants().size() == 0) {
-                //当只有1个人时关闭会议
-                dismiss();
-            }
-            return null;
-        }, callingVM.scope);
 
         initView();
-        initRendererView();
-    }
 
-    public void initRendererView() {
-        callingVM.initLocalSpeakerVideoView(view.localSpeakerVideoView);
-        callingVM.initRemoteVideoRenderer(view.remoteSpeakerVideoView,
-            view.remoteSpeakerVideoView2, floatViewBinding.shrinkRemoteSpeakerVideoView);
     }
 
     private void initView() {
-        floatViewBinding = LayoutFloatViewBinding.inflate(getLayoutInflater());
+
         Window window = getWindow();
         view = DialogCallBinding.inflate(getLayoutInflater());
         window.requestFeature(Window.FEATURE_NO_TITLE);
@@ -129,47 +142,7 @@ public class CallDialog extends BaseDialog {
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
 
-        view.zoomOut.setVisibility(Common.isScreenLocked() ? View.GONE : View.VISIBLE);
-    }
-
-
-    //    收起/展开
-    public void shrink(boolean isShrink) {
-        if (isShrink) {
-            showFloatView();
-        } else if (null != easyWindow) {
-            easyWindow.cancel();
-        }
-        view.home.setVisibility(isShrink ? View.GONE : View.VISIBLE);
-        getWindow().setDimAmount(isShrink ? 0f : 1f);
-
-        if (callingVM.isStartCall) {
-            floatViewBinding.sTips.setText(io.openim.android.ouicore.R.string.calling);
-        } else {
-            floatViewBinding.sTips.setText(callingVM.isCallOut ?
-                context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
-                context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
-        }
-        WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.height = isShrink ? ViewGroup.LayoutParams.WRAP_CONTENT :
-            ViewGroup.LayoutParams.MATCH_PARENT;
-        params.width = isShrink ? ViewGroup.LayoutParams.WRAP_CONTENT :
-            ViewGroup.LayoutParams.MATCH_PARENT;
-        params.gravity = isShrink ? (Gravity.TOP | Gravity.END) : Gravity.CENTER;
-        getWindow().setAttributes(params);
-    }
-
-    protected void showFloatView() {
-        // 传入 Activity 对象表示设置成局部的，不需要有悬浮窗权限
-        // 传入 Application 对象表示设置成全局的，但需要有悬浮窗权限
-        if (null == easyWindow) {
-            easyWindow =
-                new EasyWindow<>(BaseApp.inst()).setContentView(floatViewBinding.getRoot()).setGravity(Gravity.END | Gravity.TOP)
-                    // 设置成可拖拽的
-                    .setDraggable();
-            floatViewBinding.shrink.setOnClickListener(v -> shrink(false));
-        }
-        if (!easyWindow.isShowing()) easyWindow.show();
+        //view.zoomOut.setVisibility(Common.isScreenLocked() ? View.GONE : View.VISIBLE);
     }
 
     public void bindData(SignalingInfo signalingInfo) {
@@ -177,34 +150,18 @@ public class CallDialog extends BaseDialog {
         callingVM.isGroup =
             signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT;
         callingVM.setVideoCalls(Constants.MediaType.VIDEO.equals(signalingInfo.getInvitation().getMediaType()));
-        view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.VISIBLE : View.GONE);
-        if (!callingVM.isVideoCalls) {
-            callingVM.callViewModel.setCameraEnabled(false);
-            view.localSpeakerVideoView.setVisibility(View.GONE);
-            view.timeTv.setVisibility(View.GONE);
-            view.headTips.setVisibility(View.GONE);
-            view.audioCall.setVisibility(View.VISIBLE);
-        }
-        view.micIsOn.setChecked(true);
-        view.speakerIsOn.setChecked(true);
-        if (callingVM.isCallOut) {
-            view.callingMenu.setVisibility(View.VISIBLE);
-            view.ask.setVisibility(View.GONE);
 
-            view.callingTips.setText(context.getString(io.openim.android.ouicore.R.string.waiting_tips) + "...");
-            view.callingTips2.setText(context.getString(io.openim.android.ouicore.R.string.waiting_tips) + "...");
-            callingVM.signalingInvite(signalingInfo);
-        } else {
-            view.callingMenu.setVisibility(View.GONE);
-            view.ask.setVisibility(View.VISIBLE);
-        }
+        callingVM.callViewModel.setCameraEnabled(callingVM.isVideoCalls);
+
         bindUserInfo(signalingInfo);
         listener(signalingInfo);
+
+        initWebView();
+        if (callingVM.isCallOut) {
+            callingVM.signalingInviteByWeb(signalingInfo);//only notify receiver pop my CallDialog
+        }
     }
 
-    /**
-     * 绑定用户信息
-     */
     public void bindUserInfo(SignalingInfo signalingInfo) {
         try {
             ArrayList<String> ids = new ArrayList<>();
@@ -220,8 +177,12 @@ public class CallDialog extends BaseDialog {
 
                 @Override
                 public void onSuccess(List<UserInfo> data) {
-                    if (data.isEmpty()) return;
-                    UserInfo userInfo = data.get(0);
+                    if (data.isEmpty())
+                        return;
+                    mUserInfo = data.get(0);
+                    L.i(String.format("login user=%s:%s", mUserInfo.getUserID(), mUserInfo.getNickname()));
+
+                    /*
                     view.avatar.load(userInfo.getFaceURL());
                     floatViewBinding.sAvatar.load(userInfo.getFaceURL(), userInfo.getNickname());
                     view.name.setText(userInfo.getNickname());
@@ -229,6 +190,8 @@ public class CallDialog extends BaseDialog {
                     //audio call
                     view.avatar2.load(userInfo.getFaceURL());
                     view.name2.setText(userInfo.getNickname());
+
+                     */
                 }
             }, ids);
         } catch (Exception e) {
@@ -236,172 +199,11 @@ public class CallDialog extends BaseDialog {
         }
     }
 
-    public final Observer<String> bindTime = new Observer<String>() {
-        @Override
-        public void onChanged(String s) {
-            if (TextUtils.isEmpty(s)) return;
-            view.timeTv.setText(s);
-            view.callingTips2.setText(s);
-        }
-    };
 
     public void listener(SignalingInfo signalingInfo) {
-        callingVM.callViewModel.subscribe(callingVM.callViewModel.getRemoteParticipants(), (v) -> {
-            if (isSubscribe) return null;
-            Object[] toArray = v.values().toArray();
-            if (toArray.length == 0) return null;
-            callingVM.callViewModel.subscribe(((RemoteParticipant) toArray[0]).getEvents().getEvents(), (event) -> {
-                isSubscribe = true;
-                view.remoteSpeakerVideoView.setVisibility(event.getParticipant().isCameraEnabled() ? View.VISIBLE : View.GONE);
-                return null;
-            }, callingVM.scope);
-            return null;
-        }, callingVM.scope);
 
-        callingVM.timeStr.observeForever(bindTime);
-        view.closeCamera.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            hasShoot.safeGo(() -> {
-                boolean isEnabled = !isChecked;
-                callingVM.callViewModel.setCameraEnabled(isEnabled);
-                view.localSpeakerVideoView.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
-            });
-        });
-        view.switchCamera.setOnClickListener(new OnDedrepClickListener(1000) {
-            @Override
-            public void click(View v) {
-                callingVM.callViewModel.flipCamera();
-            }
-        });
-        view.micIsOn.setOnClickListener(new OnDedrepClickListener(1000) {
-            @Override
-            public void click(View v) {
-                view.micIsOn.setText(view.micIsOn.isChecked() ?
-                    context.getString(io.openim.android.ouicore.R.string.microphone_on) :
-                    context.getString(io.openim.android.ouicore.R.string.microphone_off));
-                //关闭麦克风
-                callingVM.callViewModel.setMicEnabled(view.micIsOn.isChecked());
-            }
-        });
 
-        view.speakerIsOn.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            view.speakerIsOn.setText(isChecked ?
-                context.getString(io.openim.android.ouicore.R.string.speaker_on) :
-                context.getString(io.openim.android.ouicore.R.string.speaker_off));
-            // 打开扬声器
-            callingVM.setSpeakerphoneOn(isChecked);
-        });
-
-        view.hangUp.setOnClickListener(new OnDedrepClickListener() {
-            @Override
-            public void click(View v) {
-                callingVM.renewalDB(callingVM.buildPrimaryKey(signalingInfo), (realm,
-                                                                               callHistory) -> callHistory.setDuration((int) (System.currentTimeMillis() - callHistory.getDate())));
-
-                callingVM.signalingHungUp(signalingInfo);
-            }
-        });
-        view.reject.setOnClickListener(new OnDedrepClickListener() {
-            @Override
-            public void click(View v) {
-                callingVM.signalingHungUp(signalingInfo);
-            }
-        });
-        view.answer.setOnClickListener(new OnDedrepClickListener() {
-            @Override
-            public void click(View v) {
-                answerClick(signalingInfo);
-            }
-        });
-        view.zoomOut.setOnClickListener(v -> {
-            zoomOutClick();
-        });
-        view.shrink.setOnClickListener(v -> {
-            shrink(false);
-        });
-        view.localSpeakerVideoView.setOnClickListener(new OnDedrepClickListener() {
-            @Override
-            public void click(View v) {
-                Object object = view.remoteSpeakerVideoView.getTag();
-                if ( null != object) {
-                    Participant participant = object instanceof RemoteVideoTrack
-                        ? (Participant) callingVM.callViewModel.getRoom().getLocalParticipant()
-                        : (Participant) callingVM.callViewModel.getSingleRemotePar();
-                    Participant participant2 = object instanceof RemoteVideoTrack
-                        ? (Participant)  callingVM.callViewModel.getSingleRemotePar()
-                        : (Participant) callingVM.callViewModel.getRoom().getLocalParticipant();
-                       if (null==participant2||null==participant)return;
-
-                    callingVM.callViewModel.bindRemoteViewRenderer(view.localSpeakerVideoView,
-                        participant2, callingVM.scope, new Continuation<Unit>() {
-                            @NonNull
-                            @Override
-                            public CoroutineContext getContext() {
-                                return null;
-                            }
-
-                            @Override
-                            public void resumeWith(@NonNull Object o) {
-
-                            }
-                        });
-                    callingVM.callViewModel.bindRemoteViewRenderer(view.remoteSpeakerVideoView,
-                        participant, callingVM.scope, new Continuation<Unit>() {
-                            @NonNull
-                            @Override
-                            public CoroutineContext getContext() {
-                                return null;
-                            }
-
-                            @Override
-                            public void resumeWith(@NonNull Object o) {
-
-                            }
-                        });
-
-                }
-
-            }
-        });
     }
-
-    public void zoomOutClick() {
-        hasSystemAlert.safeGo(() -> shrink(true));
-    }
-
-    public void answerClick(SignalingInfo signalingInfo) {
-        if (callingVM.isVideoCalls) {
-            hasShoot.safeGo(() -> signalingAccept(signalingInfo));
-        } else {
-            hasRecord.safeGo(() -> signalingAccept(signalingInfo));
-        }
-    }
-
-    public void signalingAccept(SignalingInfo signalingInfo) {
-        callingVM.signalingAccept(signalingInfo, new OnBase() {
-            @Override
-            public void onError(int code, String error) {
-            }
-
-            @Override
-            public void onSuccess(Object data) {
-                changeView();
-
-                callingVM.renewalDB(CallingVM.buildPrimaryKey(signalingInfo),
-                    (realm, v1) -> v1.setSuccess(true));
-            }
-        });
-    }
-
-
-    public void changeView() {
-        view.headTips.setVisibility(View.GONE);
-        view.ask.setVisibility(View.GONE);
-        view.callingMenu.setVisibility(View.VISIBLE);
-        view.cameraControl.setVisibility(callingVM.isVideoCalls ? View.VISIBLE : View.GONE);
-
-        waitingHandle();
-    }
-
 
     @Override
     public void show() {
@@ -426,16 +228,12 @@ public class CallDialog extends BaseDialog {
     @Override
     public void dismiss() {
         try {
-            if (null != easyWindow) {
-                easyWindow.cancel();
-            }
             insertChatHistory();
             MediaPlayerUtil.INSTANCE.pause();
             MediaPlayerUtil.INSTANCE.release();
-            callingVM.setSpeakerphoneOn(true);
-            callingVM.timeStr.removeObserver(bindTime);
-            videoViewRelease();
-            callingVM.unBindView();
+           // callingVM.setSpeakerphoneOn(true);
+            callingVM.callViewModel.setCameraEnabled(false);
+
             super.dismiss();
             ((CallingServiceImp) callingVM.callingService).callDialog = null;
         } catch (Exception e) {
@@ -443,14 +241,6 @@ public class CallDialog extends BaseDialog {
         }
 
     }
-
-    public void videoViewRelease() {
-        view.localSpeakerVideoView.release();
-        view.remoteSpeakerVideoView.release();
-        view.remoteSpeakerVideoView2.release();
-        floatViewBinding.shrinkRemoteSpeakerVideoView.release();
-    }
-
     private void insertChatHistory() {
         boolean isGroup = callingVM.isGroup;
         if (!isShowing() || isGroup || (null != signalingInfo && TextUtils.isEmpty(callingVM.buildPrimaryKey(signalingInfo))))
@@ -480,30 +270,184 @@ public class CallDialog extends BaseDialog {
         });
     }
 
+    public void videoViewRelease() {
+
+    }
+    public String buildPrimaryKey() {
+        return CallingVM.buildPrimaryKey(signalingInfo);
+    }
 
     public void otherSideAccepted() {
         callingVM.isStartCall = true;
-        callingVM.buildTimer();
-        view.headTips.setVisibility(View.GONE);
+        //view.headTips.setVisibility(View.GONE);
         MediaPlayerUtil.INSTANCE.pause();
         MediaPlayerUtil.INSTANCE.release();
 
         waitingHandle();
     }
 
-    public String buildPrimaryKey() {
-        return CallingVM.buildPrimaryKey(signalingInfo);
-    }
-
     private void waitingHandle() {
-        if (callingVM.isVideoCalls) floatViewBinding.waiting.setVisibility(View.GONE);
 
-        if (callingVM.isStartCall) {
-            floatViewBinding.sTips.setText(io.openim.android.ouicore.R.string.calling);
-        } else {
-            floatViewBinding.sTips.setText(callingVM.isCallOut ?
-                context.getString(io.openim.android.ouicore.R.string.waiting_tips2) :
-                context.getString(io.openim.android.ouicore.R.string.waiting_tips3));
-        }
     }
+
+    protected void initWebView() {
+        mWebView = (WebView) findViewById(R.id.webMain);
+        WebSettings settings = mWebView.getSettings();
+
+        settings.setDomStorageEnabled(true);//开启DOM
+        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        settings.setAllowFileAccess(true);
+        settings.setAllowContentAccess(true);
+        settings.setAllowFileAccessFromFileURLs(true);
+        settings.setAllowUniversalAccessFromFileURLs(true);
+        settings.setJavaScriptEnabled(true);
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+        settings.setMediaPlaybackRequiresUserGesture(false);
+
+        mWebView.addJavascriptInterface(this, "$jsi");
+
+        mWebView.setWebViewClient(new WebViewClient() {
+            final String LogTag = "WebVIew";
+            private boolean onPageChanging = false;
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                Log.i("onPageStarted", "start url:" + url);
+                //设定加载开始的操作
+            }
+
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                Log.i("onReceivedSslError", error.toString());
+                //handler.cancel(); 默认的处理方式，WebView变成空白页
+                handler.proceed();//接受证书
+                //handleMessage(Message msg); 其他处理
+            }
+
+            @Override
+            public void onPageFinished(WebView webView, String s) {
+                super.onPageFinished(webView, s);
+
+                //安卓调用js方法。注意需要在 onPageFinished 回调里调用
+                Log.i("onPageFinished", String.format("webView:onPageFinished(),s=%s", s));
+
+                // onPageChanging = false;
+            }
+
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                super.onReceivedError(view, request, error);
+                Log.e(LogTag, "onReceivedError:" + Integer.toString(error.getErrorCode()) + ":" + error.getDescription());
+
+                switch (error.getErrorCode()) {
+                    case -2:
+                        view.loadUrl("file:///android_asset/neterr.html");
+                        new Handler().postDelayed(() -> {
+                            mWebView.loadUrl(mWebURL);
+                        }, 4000);
+                        break;
+                    case 404:
+                        //view.loadUrl("加载一个错误页面提示，优化体验");
+                        break;
+                }
+
+            }
+
+            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+                Log.e(LogTag, "onReceivedHttpError: " + errorResponse.toString());
+            }
+
+
+        });
+        mWebView.setWebChromeClient(new WebChromeClient() {
+
+            @Override
+            public void onPermissionRequest(PermissionRequest request) {
+                String[] PERMISSIONS = {
+                    PermissionRequest.RESOURCE_AUDIO_CAPTURE,
+                    PermissionRequest.RESOURCE_VIDEO_CAPTURE
+                };
+                request.grant(PERMISSIONS);
+
+            }
+
+
+        });
+
+        //mWebView.loadUrl("file:android_asset/index.html");
+        L.e("tip-------------------------------------------------");
+        String roomID = signalingInfo.getInvitation().getRoomID();
+        String receiver = signalingInfo.getInvitation().getInviteeUserIDList().get(0);
+        String sender = signalingInfo.getInvitation().getInviterUserID();
+        int callout = callingVM.isCallOut ? 1 : 0;
+        String mediaType = callingVM.isVideoCalls?"v":"a";
+        String caller = receiver;
+        String callee = sender;
+        String query = String.format("?callout=%d&mediatype=%s&roomID=%s&caller=%s&callee=%s", callout,mediaType,roomID, caller, callee);
+        L.i("weburl:");
+
+        mWebURL = BASEURL + query;
+        L.i(mWebURL);
+        mWebView.loadUrl(mWebURL);
+
+    }
+
+    @JavascriptInterface
+    public void handupClick() {
+
+        callingVM.signalingHungUpByWeb(signalingInfo);
+    }
+
+    @JavascriptInterface
+    public void rejectClick() {
+        callingVM.signalingHungUpByWeb(signalingInfo);
+    }
+
+    //answer click
+    @JavascriptInterface
+    public void answerClick() {
+        otherSideAccepted();
+        callingVM.isStartCall = true;
+    }
+    @JavascriptInterface
+    public void onConnect() {
+        L.i(" webview onConnect ");
+    }
+
+    @JavascriptInterface
+    public void onConnectClose() {
+        L.i(" webview onConnectClose");
+    }
+
+    @JavascriptInterface
+    public void onIceConnected() {
+        L.i(" webview onIceConnected");
+    }
+
+    @JavascriptInterface
+    public void onIceDisConnected() {
+        L.i(" webview onICeDisConnect");
+        callingVM.signalingHungUpByWeb(signalingInfo);
+    }
+    @JavascriptInterface
+    public void handleReceiveOffer() {
+        L.i(" webview handleReceiveOffer");
+    }
+
+    @JavascriptInterface
+    public void handleReceiveAnswer() {
+        L.i(" webview handleReceiveAnswer");
+        otherSideAccepted();
+    }
+
+    @JavascriptInterface
+    public void handleReceiveCandidate() {
+        L.i(" webview handleReciveCandicate");
+    }
+
+
+
+
 }
+

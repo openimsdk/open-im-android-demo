@@ -140,6 +140,18 @@ public class CallingVM {
         }
     };
 
+    public void signalingInviteByWeb(SignalingInfo signalingInfo) {
+        if (isGroup) {
+            //TODO
+        } else {
+            sendSignaling(Constants.MsgType.callingInvite, signalingInfo, new OnMsgSendCallback() {
+                @Override
+                public void onSuccess(Message s) {
+                    L.i("send Singaling ...");
+                }
+            });
+        }
+    }
     public void signalingInvite(SignalingInfo signalingInfo) {
         if (isGroup) {
             //TODO
@@ -177,8 +189,8 @@ public class CallingVM {
         parameter.add("room", signalingInfo.getInvitation().getRoomID());
         parameter.add("identity", BaseApp.inst().loginCertificate.userID);
         N.API(OneselfService.class).getTokenForRTC(parameter.buildJsonBody()).map(OneselfService.turn(HashMap.class)).map((Function<HashMap, SignalingCertificate>) responseBody -> {
-            String serverUrl = (String) responseBody.get("serverUrl");
-            String token = (String) responseBody.get("token");
+            String serverUrl = "wss://hsstream-wo459fhx.livekit.cloud";//(String) responseBody.get("serverUrl");
+            String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTkzOTk0NTMsImlzcyI6IkFQSXlDY0RZQnlhQXdLNiIsIm5iZiI6MTcxOTM5MDQ1Mywic3ViIjoidXNlcjExIiwidmlkZW8iOnsiY2FuUHVibGlzaCI6dHJ1ZSwiY2FuUHVibGlzaERhdGEiOnRydWUsImNhblN1YnNjcmliZSI6dHJ1ZSwicm9vbSI6InJvb20xMSIsInJvb21Kb2luIjp0cnVlfX0.ZDre7hT_doNXdGj7F_gqpDHSOLXtF8NV-ExFM9BDPHc";
             SignalingCertificate signalingCertificate = new SignalingCertificate();
             signalingCertificate.setLiveURL(serverUrl);
             signalingCertificate.setToken(token);
@@ -280,6 +292,14 @@ public class CallingVM {
         }
     }
 
+    public void signalingHungUpByWeb(SignalingInfo signalingInfo) {
+        Common.UIHandler.postDelayed(this::dismissUI, 3 * 1000);
+        if (isCallOut) {
+            sendSignaling(Constants.MsgType.callingCancel, signalingInfo, callBackDismissUI);
+        } else {
+           sendSignaling(Constants.MsgType.callingReject, signalingInfo, callBackDismissUI);
+        }
+    }
     public void signalingHungUp(SignalingInfo signalingInfo) {
         Common.UIHandler.postDelayed(this::dismissUI, 18 * 1000);
         if (!isStartCall) {

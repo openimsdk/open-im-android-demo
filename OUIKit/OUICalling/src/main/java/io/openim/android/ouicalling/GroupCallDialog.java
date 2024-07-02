@@ -49,7 +49,7 @@ import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
 import kotlinx.coroutines.CoroutineScope;
 
-public class GroupCallDialog extends CallDialog {
+public class GroupCallDialog extends CallDialogsrc {
     private DialogGroupCallBinding view;
     private RecyclerViewAdapter<UserInfo, ViewHol.ImageTxtViewHolder> memberAdapter;
     private RecyclerViewAdapter<Participant, RendererViewHole> viewRenderersAdapter;

@@ -216,7 +216,8 @@ public class CallingServiceImp implements CallingService {
         try {
             if (callDialog != null) return callDialog;
             if (signalingInfo.getInvitation().getSessionType() != ConversationType.SINGLE_CHAT)
-                callDialog = new GroupCallDialog(context, this, isCallOut);
+                //callDialog = new GroupCallDialog(context, this, isCallOut);
+                callDialog = new CallDialog(context, this, isCallOut);
             else callDialog = new CallDialog(context, this, isCallOut);
             callDialog.bindData(signalingInfo);
             if (!callDialog.callingVM.isCallOut) {

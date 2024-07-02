@@ -8,7 +8,7 @@ ext {
     //android 配置
     androidConfig = [
             minSdk     : 21,
-            targetSdk  : 32,
+            targetSdk  : 29,
             compileSdk : 33,
             versionCode: 8,
             versionName: "1.0.8",
