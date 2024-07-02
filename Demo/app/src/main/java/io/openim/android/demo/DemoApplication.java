@@ -1,6 +1,7 @@
 package io.openim.android.demo;
 
 import android.content.Intent;
+import android.util.Log;
 
 import androidx.multidex.MultiDex;
 
@@ -66,6 +67,8 @@ public class DemoApplication extends BaseApp {
         initBugly();
         initPush();
         initIM();
+
+
 
         EmojiManager.install(new GoogleEmojiProvider());
         //音频播放

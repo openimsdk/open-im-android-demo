@@ -1,5 +1,7 @@
 package io.openim.android.ouicalling;
 
+import static com.tencent.smtt.sdk.WebSettings.*;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -21,16 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+
 import android.webkit.JavascriptInterface;
-import android.webkit.PermissionRequest;
-import android.webkit.SslErrorHandler;
-import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.hjq.permissions.Permission;
@@ -66,6 +60,17 @@ import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
+import timber.log.Timber;
+
+import com.tencent.smtt.export.external.interfaces.PermissionRequest;
+import com.tencent.smtt.export.external.interfaces.SslErrorHandler;
+import com.tencent.smtt.export.external.interfaces.WebResourceError;
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
+import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
+import com.tencent.smtt.sdk.WebChromeClient;
+import com.tencent.smtt.sdk.WebSettings;
+import  com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewClient;
 
 public class CallDialog extends BaseDialog {
 
@@ -77,7 +82,7 @@ public class CallDialog extends BaseDialog {
     //private static final String BaseURL = "https://www.digai.top/char?tagType=tags&tag=bible&isroot=true";
     private static final String BASEURL = "https://www.digai.top:3000/call";//callout=1&caller=lee&callee=wang";
     private String mWebURL;
-    private WebView mWebView;
+    private WebView  mWebView;
 
     //call
     protected final HasPermissions hasShoot, hasRecord, hasSystemAlert;
@@ -295,7 +300,7 @@ public class CallDialog extends BaseDialog {
         WebSettings settings = mWebView.getSettings();
 
         settings.setDomStorageEnabled(true);//开启DOM
-        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+       // settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
         settings.setAllowFileAccessFromFileURLs(true);
@@ -315,15 +320,15 @@ public class CallDialog extends BaseDialog {
                 Log.i("onPageStarted", "start url:" + url);
                 //设定加载开始的操作
             }
+            //qq webview not support
 
             @Override
-            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                Log.i("onReceivedSslError", error.toString());
+            public void onReceivedSslError(WebView var1, SslErrorHandler handler, com.tencent.smtt.export.external.interfaces.SslError error) {
+                Timber.tag("onReceivedSslError").i(error.toString());
+                Timber.i("i will handle the error ^^^^");
                 //handler.cancel(); 默认的处理方式，WebView变成空白页
                 handler.proceed();//接受证书
-                //handleMessage(Message msg); 其他处理
             }
-
             @Override
             public void onPageFinished(WebView webView, String s) {
                 super.onPageFinished(webView, s);

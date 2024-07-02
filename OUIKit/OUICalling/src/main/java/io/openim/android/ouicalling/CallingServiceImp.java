@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -40,6 +41,12 @@ import io.openim.android.sdk.models.RoomCallingInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
 import p3dn6v.h4wm1s.k2ro8t.G5qU0x;
+
+
+import com.tencent.smtt.sdk.QbSdk;
+import com.tencent.smtt.sdk.QbSdk.PreInitCallback;
+import com.tencent.smtt.sdk.TbsListener;
+import com.tencent.smtt.sdk.WebView;
 
 @Route(path = Routes.Service.CALLING)
 public class CallingServiceImp implements CallingService {
@@ -90,6 +97,25 @@ public class CallingServiceImp implements CallingService {
     @Override
     public void init(Context context) {
         this.context = context;
+        initX5();
+    }
+    private void initX5() {
+        //x5內核初始化回调
+        QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
+            @Override
+            public void onViewInitFinished(boolean arg0) {
+                //x5內核初始化完成的回调，为true表示x5内核加载成功，
+                // 否则表示x5内核加载失败，会自动切换到系统内核。
+                Log.e("app", " onViewInitFinished is ======== >>> " + arg0);
+            }
+
+            @Override
+            public void onCoreInitFinished() {
+
+            }
+        };
+        //x5内核初始化接口
+        QbSdk.initX5Environment(context, cb);
     }
 
     @Override
