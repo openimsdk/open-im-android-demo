@@ -37,10 +37,10 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
 
         view.submit.setOnClickListener(v -> {
             if (vm.isPhone.val()){
-               if ( !RegexValid.isValidPhoneNumber(vm.account.val())){
-                   toast(getString(io.openim.android.ouicore.R.string.valid_phone_num));
-                   return;
-               }
+                if ( !RegexValid.isValidPhoneNumber(vm.account.val())){
+                    toast(getString(io.openim.android.ouicore.R.string.valid_phone_num));
+                    return;
+                }
             }
             vm.areaCode.setValue("+"+view.countryCode.getSelectedCountryCode());
             vm.getVerificationCode(vm.isFindPassword?2:1);
@@ -48,7 +48,7 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
     }
 
     private void initView() {
-        view.countryCode.changeDefaultLanguage(LoginActivity.buildDefaultLanguage());
+        view.countryCode.changeDefaultLanguage(LoginActivity.Companion.buildDefaultLanguage());
 
         view.tips.setText(vm.isPhone.getValue() ? getString(io.openim.android.ouicore.R.string.phone_register) : getString(io.openim.android.ouicore.R.string.mail_register));
         view.edt1.setHint(vm.isPhone.getValue() ? getString(io.openim.android.ouicore.R.string.input_phone) : getString(io.openim.android.ouicore.R.string.input_mail));

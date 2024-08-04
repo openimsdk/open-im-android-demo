@@ -8,8 +8,8 @@ ext {
     //android 配置
     androidConfig = [
             minSdk     : 21,
-            targetSdk  : 32,
-            compileSdk : 33,
+            targetSdk  : 34,
+            compileSdk : 34,
             versionCode: 8,
             versionName: "1.0.8",
             abiFilters : ['armeabi-v7a','arm64-v8a']
