@@ -4,7 +4,11 @@
     </a>
 </p>
 
-# OpenIM Android Demo 💬💻
+# OpenIM Android Demo for Jetpack Compose 💬💻
+
+# 注意：这个项目更新缓慢
+# MVI, Jetpack Compose, Kotlin, Coroutines, Navigation, Kotlinx-serialization
+# 以下是原README.md内容
 
 <p>
   <a href="https://doc.rentsoft.cn/">OpenIM Docs</a>
