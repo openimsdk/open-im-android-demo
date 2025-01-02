@@ -25,6 +25,7 @@
     <string name="shoot">Shoot</string>
     <string name="camera_punch_failed">Camera Opening Failed</string>
     <string name="camera_permission_failed">Unable to Obtain Camera Permission</string>
+    <string name="camera_is_occupied">Camera is occupied</string>
     <string name="file">File</string>
     <string name="new_friend">New Friend</string>
     <string name="new_friend_request">New Friend Request</string>
@@ -93,13 +94,13 @@
     <string name="video_calls">Video Calls</string>
     <string name="waiting_tips">Waiting for the other party to answer</string>
     <string name="Invite_a_audio_call">Invites you to a voice call</string>
-    <string name="selete_member">Select Members</string>
     <string name="invite_audio_call">Invites you to a voice call</string>
     <string name="invite_video_call">Invites you to a video call</string>
     <string name="calling">In a call...</string>
     <string name="audio_video_service">Audio and Video Service</string>
     <string name="audio_video_service_tips1">OpenIM Audio and Video Service</string>
     <string name="audio_video_service_tips2">Turning off app auto-start will disable receiving audio and video requests</string>
+    <string name="selete_member">Select Members</string>
     <string name="start_chat">Start Chat</string>
     <string name="dissolve_group">Dissolve Group Chat</string>
     <string name="dissolve_tips">After dissolving the group chat, you will lose contact with the group members</string>
@@ -143,7 +144,7 @@
     <string name="cancel_top">Cancel Top</string>
     <string name="msg_dont_disturb">Message Do Not Disturb</string>
     <string name="top_chat">Top Chat</string>
-    <string name="person_unRead">Person Unread</string>
+    <string name="person_unRead"> Unread</string>
     <string name="friend_add">You have become friends, you can start chatting now</string>
     <string name="created_group">%1$s created a group chat</string>
     <string name="change_group_data">%1$s changed the group information</string>
@@ -178,6 +179,7 @@
     <string name="sender">Sender</string>
     <string name="kicked_offline_tips">Account logged in elsewhere, current device kicked offline!</string>
     <string name="token_expired">Login token expired, please log in again!</string>
+    <string name="token_invalid">Login token invalid, please log in again!</string>
     <string name="repeat_group_manager">You are already the group owner</string>
     <string name="transfer_permission">Confirm transferring group ownership to：%1$s?</string>
     <string name="transfer_succ">Transfer Successful</string>
@@ -201,12 +203,15 @@
     <string name="copy">Copy</string>
     <string name="recommend_to_friend">Recommend him to a friend</string>
     <string name="recommend_who">Are you sure to recommend to %1$s?</string>
+    <string name="recommend_who_to_friends">Are you sure to recommend him/her to %1$s and other %2$d friends?</string>
     <string name="send_card_confirm">Confirm sending this card to this chat?</string>
     <string name="bulletin_edit_tips">Only group owner and administrators can edit</string>
     <string name="mark_read">Mark as Read</string>
     <string name="start_download">Start Download</string>
+    <string name="save_custom_dir">Saved to %1$s</string>
     <string name="save_succ">Save Successful</string>
     <string name="save_failure">Save Failed</string>
+    <string name="save_cancel">Save Canceled</string>
     <string name="search_friends">Search Friends</string>
     <string name="group_nickName">Group Nickname</string>
     <string name="join_group_time">Time of Joining Group</string>
@@ -237,9 +242,7 @@
     <string name="login_tips2">Requires 6-20 characters</string>
     <string name="confirm_modification">Confirm Modification</string>
     <string name="login_tips3">Password length between 6-20 characters</string>
-    <string name="group_call_tips">To initiate a group video call, you must participate</string>
     <string name="group_call_tips2">Select at least one member</string>
-    <string name="group_call_tips3">Cannot group video call with yourself</string>
     <string name="call_time">Call Duration\t</string>
     <string name="conn_failed">Connection Failed</string>
     <string name="ot_refuses">The other party has refused</string>
@@ -288,11 +291,7 @@
     <string name="push_video">Post Video</string>
     <string name="about_who">Mentioned：%1$s</string>
     <string name="say_more2">Say something...</string>
-    <string name="s_person_audio_calling">%1$d people in a voice call</string>
-    <string name="s_person_video_calling">%1$d people in a video call</string>
     <string name="join">Join</string>
-    <string name="group_calling_tips">The group is currently in a call, are you sure you want to join the current call?</string>
-    <string name="group_calling_tips2">Call capacity is full</string>
     <string name="not_err">Unknown Error</string>
     <string name="video_meeting">Video Meeting</string>
     <string name="join_meeting">Join Meeting</string>
@@ -300,6 +299,7 @@
     <string name="timing_meeting">Scheduled Meeting</string>
     <string name="end">End</string>
     <string name="download">Download</string>
+    <string name="downloading">Download...</string>
     <string name="emcee">Host</string>
     <string name="cancel_mute">Unmute</string>
     <string name="start_camera">Start Camera</string>
@@ -368,9 +368,15 @@
     <string name="recent_contact">Recent Contact</string>
     <string name="account">Account</string>
     <string name="please_input_account">Please enter account</string>
+    <string name="please_input_email">Please enter email</string>
+    <string name="please_input_phone_num">Please enter phone number</string>
     <string name="organizational_structure">Organizational Structure</string>
     <string name="who_talk">%1$s speaking...</string>
     <string name="meeting">In a meeting...</string>
+
+    <string name="login_tab_phone">Phone</string>
+    <string name="login_tab_email">Email</string>
+    <string name="login_tab_account">Account</string>
 
     <string name="syncing">Syncing...</string>
     <string name="connecting">Connecting...</string>
@@ -415,8 +421,6 @@
     <string name="periodic_deletion">Periodic Deletion of Messages</string>
     <string name="week">Week</string>
     <string name="month">Month</string>
-    <string name="period_deletion_tips1">Periodically delete message records</string>
-    <string name="period_deletion_tips2">Messages sent after this will be automatically deleted after the chosen time</string>
     <string name="language_setting">Language Setting</string>
     <string name="with_system">Follow System</string>
     <string name="chinese">Simplified Chinese</string>
@@ -496,6 +500,10 @@
     <string name="declined">Declined</string>
     <string name="timing_meeting_tips">Cannot select a past time</string>
     <string name="cancle_see_he">Cancel Watching Him</string>
+    <string name="workbench">WorkSpace</string>
+    <string name="workmate_moments">Moments</string>
+    <string name="department">Department</string>
+    <string name="organizational_information">Organization</string>
     <string name="recover">" Replied "</string>
     <string name="edit_group_name2">Edit Group Chat Name</string>
     <string name="edit_group_name_tips">After changing the group chat name, other members will be notified in the group.</string>
@@ -535,6 +543,7 @@
     <string name="quited_tips">Cannot send messages in a group you have left</string>
     <string name="password_valid_tips3">New password is the same as the old password</string>
     <string name="valid_phone_num">Invalid mobile number</string>
+    <string name="valid_email">Invalid Email</string>
     <string name="empty_prompt">Input cannot be empty</string>
     <string name="quote_delete_tips">The quoted content has been deleted</string>
     <string name="account_not_exist">Account does not exist</string>
@@ -552,10 +561,12 @@
     <string name="decline_add">" Declined to add friend"</string>
     <string name="emil_registered">" Email already registered"</string>
     <string name="count">items</string>
-    <string name="reset_success_tips">点击确认后跳转回登录页面。</string>
-    <string name="delete_tips">确定删除?</string>
-    <string name="other_accepted">已在其他端接受</string>
-    <string name="other_rejected">已在其他端拒绝</string>
-    <string name="friend_settings">好友设置</string>
-    <string name="email_tips">邮箱无效</string>
+    <string name="reset_success_tips">Click Confirm to jump back to the login page.</string>
+    <string name="delete_tips">Are you sure to delete this?</string>
+    <string name="other_accepted">Accepted on other device</string>
+    <string name="other_rejected">Rejected on other device</string>
+    <string name="friend_settings">Setting of friend</string>
+    <string name="email_tips">Email is invalid</string>
+    <string name="all_readed">All read</string>
+    <string name="no_map_key">Please configure the map key</string>
 </resources>

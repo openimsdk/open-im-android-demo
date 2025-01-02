@@ -41,20 +41,6 @@
                 android:textSize="18sp" />
         </LinearLayout>
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            app:tabIndicatorColor="@color/purple_200"
-            app:tabIndicatorFullWidth="false"
-            app:tabMaxWidth="200dp"
-            app:tabMinWidth="70dp"
-            app:tabMode="scrollable"
-            app:tabRippleColor="@color/white"
-            app:tabSelectedTextColor="@color/purple_200"
-            app:tabTextColor="#FF999999" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview"
             android:layout_width="match_parent"

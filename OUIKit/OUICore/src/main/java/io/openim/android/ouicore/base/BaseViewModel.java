@@ -3,6 +3,8 @@ package io.openim.android.ouicore.base;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
+
 import java.lang.ref.WeakReference;
 
 import io.openim.android.ouicore.base.vm.injection.BaseVM;
@@ -29,7 +31,10 @@ public class BaseViewModel<T extends IView> extends BaseVM {
         this.IView = new WeakReference<T>(iView);
     }
 
+    @Nullable
     public T getIView() {
+        if (IView == null)
+            return null;
         return IView.get();
     }
 

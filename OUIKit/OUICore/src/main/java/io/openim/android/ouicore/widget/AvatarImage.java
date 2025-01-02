@@ -86,15 +86,15 @@ public class AvatarImage extends FrameLayout {
             resId = isGroup ? R.mipmap.ic_my_group :
                R.mipmap.ic_my_friend;
         }
-        roundImageView.setVisibility(GONE);
-        nameTv.setVisibility(GONE);
         if (null == url || (url instanceof String && (String.valueOf(url).isEmpty()
             || String.valueOf(url).contains("ic_avatar")))) {
             if (TextUtils.isEmpty(name)) {
                 roundImageView.setVisibility(VISIBLE);
+                nameTv.setVisibility(GONE);
                 roundImageView.setImageDrawable(AppCompatResources.getDrawable(getContext(),
                     resId));
             } else {
+                roundImageView.setVisibility(GONE);
                 nameTv.setVisibility(VISIBLE);
                 name=name.substring(0,1);
                 setBackground(AppCompatResources.getDrawable(getContext(),
@@ -104,9 +104,10 @@ public class AvatarImage extends FrameLayout {
             }
         } else {
             roundImageView.setVisibility(VISIBLE);
-
+            nameTv.setVisibility(GONE);
             Glide.with(BaseApp.inst())
                 .load(url)
+                .placeholder(resId)
                 .error(resId)
                 .centerInside()
                 .transform(new RoundedCorners(12))

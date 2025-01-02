@@ -17,9 +17,6 @@ public class MsgExpand {
     public boolean isShowTime;
     //地址信息（发送位置才有）
     public LocationInfo locationInfo;
-    //at消息（at人才有）
-    public AtMsgInfo atMsgInfo;
-
     //富文本（at 消息、表情）
     public transient SpannableStringBuilder sequence;
     //oa 通知
@@ -28,19 +25,11 @@ public class MsgExpand {
     public NotificationMsg notificationMsg;
     //普通通知 富文本
     public CharSequence tips;
-    //阅后即焚倒计时
-    public int readVanishNum;
-
     // ---呼叫记录---
     public CallHistory callHistory;
     // 呼叫时长
     public String callDuration;
     // ------
-
-    //会议邀请信息
-    public MeetingInfo meetingInfo;
     //自定义表情
     public CustomEmojiEntity customEmoji;
-    //发送消息进度
-    public long sendProgress=0;
 }

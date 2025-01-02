@@ -21,19 +21,20 @@ import java.util.Set;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
-import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BasicActivity;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.databinding.LayoutPopSelectedFriendsBinding;
 import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.utils.Constants;
+import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
-import io.openim.android.ouicore.vm.ContactListVM;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouigroup.databinding.ActivityCreateGroupV3Binding;
 import io.openim.android.ouigroup.ui.AllGroupActivity;
 import io.openim.android.sdk.enums.ConversationType;
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
 
 @Route(path = Routes.Group.SELECT_TARGET)
 public class SelectTargetActivityV3 extends BasicActivity<
@@ -148,20 +149,22 @@ public class SelectTargetActivityV3 extends BasicActivity<
                     });
                 }
             });
-            ContactListVM vmByCache = BaseApp.inst().getVMByCache(ContactListVM.class);
-            List<MsgConversation> conversations = new ArrayList<>();
-            if (selectTargetVM.isInvite() || selectTargetVM.isCreateGroup()) {
-                //只保留单聊
-                for (MsgConversation msgConversation : vmByCache.conversations.val()) {
-                    if (msgConversation.conversationInfo.getConversationType()
-                        == ConversationType.SINGLE_CHAT) {
-                        conversations.add(msgConversation);
-                    }
+            selectTargetVM.getRecentConversations().subscribe(new SingleObserver<List<MsgConversation>>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+
                 }
-            } else {
-                conversations.addAll(vmByCache.conversations.val());
-            }
-            adapter.setItems(conversations);
+
+                @Override
+                public void onSuccess(List<MsgConversation> msgConversations) {
+                    adapter.setItems(msgConversations);
+                }
+
+                @Override
+                public void onError(Throwable e) {
+
+                }
+            });
         }
     }
 

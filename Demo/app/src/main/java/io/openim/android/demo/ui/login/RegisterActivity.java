@@ -21,6 +21,9 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bindVMByCache(LoginVM.class);
+        if (null == vm) {
+            bindVM(LoginVM.class);
+        }
         bindViewDataBinding(ActivityRegisterBinding.inflate(getLayoutInflater()));
         sink();
         view.setLoginVM(vm);
@@ -50,8 +53,8 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
     private void initView() {
         view.countryCode.changeDefaultLanguage(LoginActivity.buildDefaultLanguage());
 
-        view.tips.setText(vm.isPhone.getValue() ? getString(io.openim.android.ouicore.R.string.phone_register) : getString(io.openim.android.ouicore.R.string.mail_register));
-        view.edt1.setHint(vm.isPhone.getValue() ? getString(io.openim.android.ouicore.R.string.input_phone) : getString(io.openim.android.ouicore.R.string.input_mail));
+        view.tips.setText(vm.isPhone.val() ? getString(io.openim.android.ouicore.R.string.phone_register) : getString(io.openim.android.ouicore.R.string.mail_register));
+        view.edt1.setHint(vm.isPhone.val() ? getString(io.openim.android.ouicore.R.string.input_phone) : getString(io.openim.android.ouicore.R.string.input_mail));
         if (vm.isFindPassword){
             view.tips.setText(io.openim.android.ouicore.R.string.phone_num);
             view.title.setText(io.openim.android.ouicore.R.string.forgot_password);
@@ -109,6 +112,6 @@ public class RegisterActivity extends BaseActivity<LoginVM, ActivityRegisterBind
 
     @Override
     public void afterTextChanged(Editable s) {
-
+        vm.account.setValue(s.toString());
     }
 }

@@ -30,19 +30,18 @@ import io.openim.android.ouicore.utils.L;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnBase;
-import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.FriendshipInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
+import io.openim.android.sdk.models.PublicUserInfo;
 import io.openim.android.sdk.models.SearchResult;
 import io.openim.android.sdk.models.SearchResultItem;
 import io.openim.android.sdk.models.UserInfo;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import kotlin.Pair;
 
 public class SearchVM extends BaseViewModel {
-    public State<List<SearchResultItem>> messageItems =
-        new State<>(new ArrayList<>());
-    public State<List<SearchResultItem>> fileItems =
-        new State<>(new ArrayList<>());
     public State<List<GroupInfo>> groupsInfo = new State<>(new ArrayList<>());
     public State<List<UserInfo>> userInfo = new State<>(new ArrayList<>());
     public State<List<FriendshipInfo>> friendshipInfo =
@@ -53,54 +52,62 @@ public class SearchVM extends BaseViewModel {
     public State<String> hail = new State<>();
     //用户 或群组id
     public State<String> searchContent = new State<>("");
-
+    public State<Boolean> isFriend = new State<>(null);
     //true 搜索人 false 搜索群
     public boolean isPerson = false;
     public int page;
     public int pageSize=50;
     private final Handler handler = new Handler();
 
-    public void getExtendUserInfo(String uid) {
-        List<String> ids = new ArrayList<>();
-        ids.add(uid);
-        Parameter parameter = new Parameter().add("userIDs", ids);
-        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody())
-            .map(OneselfService.turn(HashMap.class))
-            .compose(N.IOMain())
-            .subscribe(new NetObserver<HashMap>(getContext()) {
-                @Override
-                protected void onFailure(Throwable e) {
-                    getIView().toast(e.getMessage());
-                }
-
-                @Override
-                public void onSuccess(HashMap map) {
-                    try {
-                        ArrayList arrayList = (ArrayList) map.get("users");
-                        if (null == arrayList || arrayList.isEmpty()) return;
-
-                        UserInfo u = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
-                            UserInfo.class);
-                        userInfo.setValue(new ArrayList<>(Collections.
-                            singleton(updateUserInfo(
-                                userInfo.val().isEmpty()?null:
-                                userInfo.val().get(0), u))));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-    }
-    private UserInfo updateUserInfo(UserInfo origin, UserInfo update) {
+//    public void getExtendUserInfo(String uid) {
+//        List<String> ids = new ArrayList<>();
+//        ids.add(uid);
+//        Parameter parameter = new Parameter().add("userIDs", ids);
+//        N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody())
+//            .map(OneselfService.turn(HashMap.class))
+//            .compose(N.IOMain())
+//            .subscribe(new NetObserver<HashMap>(getContext()) {
+//                @Override
+//                protected void onFailure(Throwable e) {
+//                    getIView().toast(e.getMessage());
+//                }
+//
+//                @Override
+//                public void onSuccess(HashMap map) {
+//                    try {
+//                        ArrayList arrayList = (ArrayList) map.get("users");
+//                        if (null == arrayList || arrayList.isEmpty()) return;
+//
+//                        UserInfo u = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
+//                            UserInfo.class);
+//                        userInfo.setValue(new ArrayList<>(Collections.
+//                            singleton(updateUserInfo(
+//                                userInfo.val().isEmpty()?null:
+//                                userInfo.val().get(0), u))));
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//            });
+//    }
+    public UserInfo updateUserInfo(UserInfo origin, Object update) {
         try {
+            UserInfo updateInfo = new UserInfo();
+            if (update instanceof PublicUserInfo) {
+                updateInfo.setUserID(((PublicUserInfo)update).getUserID());
+                updateInfo.setNickname(((PublicUserInfo)update).getNickname());
+                updateInfo.setFaceURL(((PublicUserInfo)update).getFaceURL());
+                updateInfo.setEx(((PublicUserInfo)update).getEx());
+                updateInfo.setCreateTime(((PublicUserInfo)update).getCreateTime());
+            } else updateInfo = (UserInfo) update;
             if (null == origin) {
-                return update;
+                return updateInfo;
             }
             String json = JSONObject.toJSONString(origin);
             Map originMap = JSONObject.parseObject(json, Map.class);
 
-            String json2 = JSONObject.toJSONString(update);
+            String json2 = JSONObject.toJSONString(updateInfo);
             Map updateMap = JSONObject.parseObject(json2, Map.class);
 
             originMap.putAll(updateMap);
@@ -110,39 +117,82 @@ public class SearchVM extends BaseViewModel {
         }
         return origin;
     }
-    public SearchVM getUsersInfoWithCache(String id, String gid) {
-        OpenIMClient.getInstance().userInfoManager
-            .getUsersInfoWithCache(new OnBase<List<UserInfo>>() {
+//    public SearchVM getUsersInfoWithCache(String id, String gid) {
+//        OpenIMClient.getInstance().userInfoManager
+//            .getUsersInfoWithCache(new OnBase<List<PublicUserInfo>>() {
+//                @Override
+//                public void onSuccess(List<PublicUserInfo> data) {
+//                    if (!data.isEmpty()) {
+//                        PublicUserInfo u = data.get(0);
+//                        userInfo.setValue(new ArrayList<>(Collections.
+//                            singleton(updateUserInfo(
+//                                userInfo.val().isEmpty()?null:
+//                                userInfo.val().get(0), u))));
+//                    }
+//                }
+//            }, new ArrayList<>(Collections.singleton(id)), gid);
+//        return this;
+//    }
+
+    public Observable<UserInfo> getUserData(String uid) {
+        List<String> uids = new ArrayList<>();
+        uids.add(uid);
+        return Observable.create((ObservableOnSubscribe<Pair<UserInfo, Boolean>>) emitter -> {
+            OpenIMClient.getInstance().friendshipManager.getFriendsInfo(new OnBase<List<UserInfo>>() {
+                @Override
+                public void onError(int code, String error) {
+                    emitter.onError(new Exception(code+error));
+                }
+
                 @Override
                 public void onSuccess(List<UserInfo> data) {
-                    if (!data.isEmpty()) {
-                        UserInfo u = data.get(0);
-                        userInfo.setValue(new ArrayList<>(Collections.
-                            singleton(updateUserInfo(
-                                userInfo.val().isEmpty()?null:
-                                userInfo.val().get(0), u))));
+                    boolean hasFriendInfo = data != null && !data.isEmpty();
+                    if (hasFriendInfo) {
+                        emitter.onNext(new Pair<>(data.get(0), true));
+                    } else {
+                        emitter.onNext(new Pair<>(new UserInfo(), false));
                     }
+                    emitter.onComplete();
                 }
-            }, new ArrayList<>(Collections.singleton(id)), gid);
-        return this;
-    }
+            }, uids, false);
+        }).concatMap(upStreamData ->
+            Observable.create(emitter -> {
+                if (TextUtils.isEmpty(upStreamData.getFirst().getUserID())) {
+                    List<String> ids = new ArrayList<>();
+                    ids.add(uid);
+                    Parameter parameter = new Parameter().add("userIDs", ids);
+                    N.API(OneselfService.class).getUsersFullInfo(parameter.buildJsonBody())
+                        .map(OneselfService.turn(HashMap.class))
+                        .compose(N.IOMain())
+                        .subscribe(new NetObserver<HashMap>(getContext()) {
+                            @Override
+                            protected void onFailure(Throwable e) {
+                                emitter.onError(e);
+                            }
 
+                            @Override
+                            public void onSuccess(HashMap map) {
+                                try {
+                                    ArrayList arrayList = (ArrayList) map.get("users");
+                                    if (null == arrayList || arrayList.isEmpty()) return;
 
-    public void checkFriend(List<UserInfo> data) {
-        List<String> uIds = new ArrayList<>();
-        uIds.add(data.get(0).getUserID());
-        OpenIMClient.getInstance().friendshipManager.checkFriend(new OnBase<List<FriendshipInfo>>() {
-            @Override
-            public void onError(int code, String error) {
-
-            }
-
-            @Override
-            public void onSuccess(List<FriendshipInfo> data) {
-                friendshipInfo.setValue(data);
-            }
-        }, uIds);
-
+                                    UserInfo u = GsonHel.getGson().fromJson(arrayList.get(0).toString(),
+                                        UserInfo.class);
+                                    emitter.onNext(u);
+                                } catch (Exception e) {
+                                   emitter.onError(e);
+                                } finally {
+                                    emitter.onComplete();
+                                }
+                            }
+                        });
+                } else {
+                    emitter.onNext(upStreamData.getFirst());
+                    emitter.onComplete();
+                }
+                isFriend.setValue(upStreamData.getSecond());
+            })
+        );
     }
 
     //uid、昵称、备注、手机号
@@ -281,45 +331,72 @@ public class SearchVM extends BaseViewModel {
         }, buildKeyWord(), true, true);
     }
 
-    public void searchLocalMessages(String key, Integer... messageTypes) {
-        List<String> keys = null;
-        if (!TextUtils.isEmpty(key)) {
-            keys = new ArrayList<>();
-            keys.add(key);
-        }
-        List<Integer> messageTypeLists;
-        if (0 == messageTypes.length) {
-            messageTypeLists = new ArrayList<>();
-            messageTypeLists.add(MessageType.TEXT);
-            messageTypeLists.add(MessageType.AT_TEXT);
-        } else {
-            messageTypeLists = Arrays.asList(messageTypes);
-        }
-        State<List<SearchResultItem>> items;
-        List<Integer> type;
-        if ((type = Arrays.asList(messageTypes)).size() == 1
-            && type.get(0) == MessageType.FILE) {
-            items = fileItems;
-        } else {
-            items = messageItems;
-        }
-        OpenIMClient.getInstance().messageManager.searchLocalMessages(new OnBase<SearchResult>() {
-            @Override
-            public void onError(int code, String error) {
-                getIView().toast(error + code);
-            }
+    /**
+     * 查询当前用户信息，如果是好友则返回好友信息，反之则为普通的PublicUserInfo
+     * @param uid 待查询用户id
+     * @return 可订阅UserInfo
+     */
+    public Observable<UserInfo> queryRealUserInfo(String uid) {
+        List<String> uids = new ArrayList<>();
+        uids.add(uid);
+        return Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            OpenIMClient.getInstance().friendshipManager.checkFriend(new OnBase<List<FriendshipInfo>>() {
+                @Override
+                public void onError(int code, String error) {
+                    emitter.onError(new Exception(error+code));
+                }
 
-            @Override
-            public void onSuccess(SearchResult data) {
-                if (page == 1) {
-                    items.getValue().clear();
+                @Override
+                public void onSuccess(List<FriendshipInfo> data) {
+                    emitter.onNext(data != null && !data.isEmpty() && data.get(0).getResult() == 1);
+                    emitter.onComplete();
                 }
-                if (data.getTotalCount() != 0) {
-                    items.getValue().addAll(data.getSearchResultItems());
+            }, uids);
+        }).concatMap(isFriend ->
+            Observable.create(emitter -> {
+                    if (isFriend)
+                        OpenIMClient.getInstance().friendshipManager.getFriendsInfo(new OnBase<List<UserInfo>>() {
+                            @Override
+                            public void onError(int code, String error) {
+                                emitter.onError(new Exception(error+code));
+                            }
+
+                            @Override
+                            public void onSuccess(List<UserInfo> data) {
+                                if (data != null && !data.isEmpty()) {
+                                    emitter.onNext(data.get(0));
+                                    emitter.onComplete();
+                                }
+                                else
+                                    emitter.onError(new Exception("The queried friend info is null value. "));
+                            }
+                        }, uids, false);
+                    else
+                        OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<PublicUserInfo>>() {
+                            @Override
+                            public void onError(int code, String error) {
+                                emitter.onError(new Exception(error+code));
+                            }
+
+                            @Override
+                            public void onSuccess(List<PublicUserInfo> data) {
+                                if (data != null && !data.isEmpty()){
+                                    PublicUserInfo current = data.get(0);
+                                    UserInfo publicUserInfo = new UserInfo();
+                                    publicUserInfo.setUserID(current.getUserID());
+                                    publicUserInfo.setNickname(current.getNickname());
+                                    publicUserInfo.setFaceURL(current.getFaceURL());
+                                    publicUserInfo.setEx(current.getEx());
+                                    publicUserInfo.setCreateTime(current.getCreateTime());
+                                    emitter.onNext(publicUserInfo);
+                                    emitter.onComplete();
+                                }
+                                else
+                                    emitter.onError(new Exception("The queried user info is null value. "));
+                            }
+                        }, uids);
                 }
-                items.setValue(items.getValue());
-            }
-        }, null, keys, 0, null, messageTypeLists, 0, 0, page, pageSize);
+            ));
     }
 
     private List<String> buildKeyWord() {
@@ -330,8 +407,6 @@ public class SearchVM extends BaseViewModel {
 
 
     public void clearData() {
-        messageItems.getValue().clear();
-        fileItems.getValue().clear();
         groupsInfo.getValue().clear();
         userInfo.getValue().clear();
     }

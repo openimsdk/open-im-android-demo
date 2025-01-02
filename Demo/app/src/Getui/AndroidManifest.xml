@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="io.openim.android.demo">
+    <!-- getui -->
+    <queries>
+        <intent>
+            <action android:name="com.getui.sdk.action" />
+        </intent>
+    </queries>
+
+    <!--hardwareAccelerated=false livekit 会出问题 -->
+    <application>
+        <!--个推SDK Service-->
+        <service
+            android:name=".services.GetuiPushService"
+            android:exported="false"
+            android:label="PushService"
+            android:process=":pushservice" />
+        <service android:name=".services.GetuiPushIntentService" />
+    </application>
+
+</manifest>

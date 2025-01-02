@@ -8,8 +8,6 @@ public class Routes {
     public static class Service {
         public final static String CALLING = "/CallingService/CallingServiceImp";
         public static final String CONVERSATION = "/ConversationService/IBridgeImpl";
-        public static final String MOMENTS = "/MomentsService/IBridgeImpl";
-        public static final String MEETING = "/MeetingService/IBridgeImpl";
     }
 
     public static class Main {
@@ -24,8 +22,6 @@ public class Routes {
 
         //添加
         public static final String ADD_CONVERS = "/main/AddConversActivity";
-
-        public static final String CALL_HISTORY = "/main/CallHistoryActivity";
         //搜索id
         public static final String SEARCH_CONVER = "/main/SearchContactActivity";
     }
@@ -36,18 +32,12 @@ public class Routes {
         public final static String CONTACT_LIST = "/conversation/ContactListFragment";
         //聊天页
         public final static String CHAT = "/conversation/ChatActivity";
-
-        public static final String CHAT_HISTORY = "/conversation/ChatHistorySearchActivity";
         //全局搜索
         public final static String SEARCH = "/conversation/SearchActivity";
         //预览图片或视频
         public static final String PREVIEW = "/conversation/PreviewActivity";
         //拍摄照片或视频
         public static final String SHOOT = "/conversation/ShootActivity";
-        //多媒体聊天记录
-        public static final String MEDIA_HISTORY = "/conversation/MediaHistoryActivity";
-        //文件记录
-        public static final String FILE_HISTORY = "/conversation/FileHistoryActivity";
     }
 
     //群组
@@ -77,18 +67,5 @@ public class Routes {
         public static final String ALL_FRIEND = "/contact/AllFriendActivity";
         public static final String SEARCH_GROUP_MEMBER = "/contact/SearchGroupMember";
         public static final String SEARCH_FRIENDS_GROUP = "/contact/SearchGroupAndFriendsActivity";
-    }
-
-    //朋友圈
-    public static class Moments {
-        public static final String HOME = "/moments/MomentsActivity";
-        public static final String ToUserMoments = "/moments/ToUserMomentsActivity";
-    }
-
-    //会议
-    public static class Meeting {
-        public static final String LAUNCH = "/meeting/MeetingLaunchActivity";
-        public static final String HOME = "/meeting/MeetingHomeActivity";
-
     }
 }

@@ -1,0 +1,10 @@
+<!-- res/layout/transparent_dialog.xml -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent">
+    </FrameLayout>
+
+</layout>

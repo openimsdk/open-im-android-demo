@@ -44,7 +44,8 @@ public class CreateLabelActivity extends BaseActivity<LabelVM, ActivityCreateLab
     private void listener() {
         view.addMember.setOnClickListener(v -> {
             ARouter.getInstance().build(Routes.Group.CREATE_GROUP).withString(Constants.K_NAME,
-                getString(io.openim.android.ouicore.R.string.selete_member)).withBoolean(Constants.IS_SELECT_FRIEND, true).navigation(this, Constants.Event.CALLING_REQUEST_CODE);
+                getString(io.openim.android.ouicore.R.string.selete_member)).withBoolean(Constants.IS_SELECT_FRIEND, true)
+                .navigation(this, Constants.Event.CALLING_REQUEST_CODE);
         });
         view.submit.setOnClickListener(v -> {
             String title;

@@ -8,7 +8,6 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="40dp"
         android:orientation="horizontal">
 
         <TextView
@@ -16,27 +15,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginRight="8dp"
-            android:layout_toLeftOf="@id/sendState2"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@id/content2"
+            android:maxLines="1"
             android:textColor="#ff5496eb"
             android:textSize="12sp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:text="123123"/>
 
         <io.openim.android.ouiconversation.widget.SendStateView
             android:id="@+id/sendState2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginRight="8dp"
-            android:layout_toLeftOf="@id/content2" />
+            android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@id/content2" />
 
         <LinearLayout
             android:id="@+id/content2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:layout_marginRight="7dp"
-            android:layout_toLeftOf="@id/avatar2"
+            android:layout_marginEnd="7dp"
+            android:layout_toStartOf="@id/avatar2"
+            android:maxWidth="@dimen/msg_max_width"
+            android:minWidth="@dimen/msg_min_width"
+            android:minHeight="@dimen/msg_min_height"
             android:orientation="vertical">
 
             <TextView

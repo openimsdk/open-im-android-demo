@@ -4,7 +4,7 @@
     <dimen name="button_height">57dp</dimen>
     <dimen name="button_h">48dp</dimen>
 
-    <dimen name="msg_max_width">290dp</dimen>
+    <dimen name="msg_max_width">260dp</dimen>
     <dimen name="msg_min_width">240dp</dimen>
     <dimen name="msg_min_height">80dp</dimen>
 

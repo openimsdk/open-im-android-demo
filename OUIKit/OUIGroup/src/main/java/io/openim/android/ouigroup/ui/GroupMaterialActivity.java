@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -60,6 +61,7 @@ import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.listener.OnFileUploadProgressListener;
 import io.openim.android.sdk.listener.OnGroupListener;
+import io.openim.android.sdk.models.ConversationReq;
 import io.openim.android.sdk.models.GroupApplicationInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
@@ -67,7 +69,7 @@ import io.openim.android.sdk.models.PutArgs;
 
 @Route(path = Routes.Group.MATERIAL)
 public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMaterialBinding> implements OnGroupListener {
-
+    private final String TAG = "GroupMaterialActivity";
     int spanCount = 5;
     private PhotographAlbumDialog albumDialog;
     private ActivityResultLauncher infoModifyLauncher;
@@ -92,24 +94,26 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         initView();
         click();
 
-        infoModifyLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() != RESULT_OK) return;
-                    String var =
-                        result.getData().getStringExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA);
-                    if (infoModifyType == 1)
-                        vm.UPDATEGroup(vm.groupId, var, null, null, null, null);
-                    if (infoModifyType == 2)
-                        vm.setGroupMemberNickname(vm.groupId, BaseApp.inst().loginCertificate.userID, var);
-                });
+        infoModifyLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() != RESULT_OK) return;
+            String var = result.getData().getStringExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA);
+            if (infoModifyType == 1) {
+                vm.UPDATEGroup(vm.groupId, var, null, null, null, null);
+            }
+            if (infoModifyType == 2) {
+                try {
+                    vm.setGroupMemberNickname(vm.groupId, BaseApp.inst().loginCertificate.userID, var);
+                } catch (Exception e) {
+                    Log.e(TAG, "Exception:" + e);
+                }
+            }
+        });
     }
 
 
     void init() {
-        iConversationBridge =
-            (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();
-     IMEvent.getInstance().addGroupListener(this);
+        iConversationBridge = (IConversationBridge) ARouter.getInstance().build(Routes.Service.CONVERSATION).navigation();
+        IMEvent.getInstance().addGroupListener(this);
 
         vm.getGroupsInfo();
         vm.getMyMemberInfo();
@@ -117,39 +121,59 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     private void click() {
+        view.groupId.setOnClickListener(v -> {
+            Common.copy(vm.groupId);
+            toast(getString(io.openim.android.ouicore.R.string.copy_succ));
+        });
+        view.topSlideButton.setOnSlideButtonClickListener(is -> {
+            if (null == iConversationBridge) return;
+            iConversationBridge.pinConversation(iConversationBridge.getConversationInfo(), is);
+        });
+        view.noDisturb.setOnSlideButtonClickListener(is -> {
+            if (null == iConversationBridge) return;
+            iConversationBridge.setConversationRecvMessageOpt(is ? Opt.ReceiveNotNotifyMessage : Opt.NORMAL, iConversationBridge.getConversationInfo().getConversationID());
+        });
+        view.qrCode.setOnClickListener(v -> startActivity(new Intent(this, ShareQrcodeActivity.class)));
+
         view.groupMember.setOnClickListener(v -> {
             gotoMemberList();
         });
         view.groupName.setOnClickListener(v -> {
             try {
                 infoModifyType = 1;
-                SingleInfoModifyActivity.SingleInfoModifyData modifyData =
-                    new SingleInfoModifyActivity.SingleInfoModifyData();
+                SingleInfoModifyActivity.SingleInfoModifyData modifyData = new SingleInfoModifyActivity.SingleInfoModifyData();
                 modifyData.title = getString(io.openim.android.ouicore.R.string.edit_group_name2);
-                modifyData.description =
-                    getString(io.openim.android.ouicore.R.string.edit_group_name_tips);
+                modifyData.description = getString(io.openim.android.ouicore.R.string.edit_group_name_tips);
                 modifyData.avatarUrl = vm.groupsInfo.getValue().getFaceURL();
                 modifyData.editT = vm.groupsInfo.getValue().getGroupName();
                 infoModifyLauncher.launch(new Intent(this, SingleInfoModifyActivity.class).putExtra(SingleInfoModifyActivity.SINGLE_INFO_MODIFY_DATA, modifyData));
             } catch (Exception ignored) {
             }
         });
-        view.qrCode.setOnClickListener(v -> startActivity(new Intent(this,
-            ShareQrcodeActivity.class)));
         view.avatarEdit.setOnClickListener(v -> {
             if (!vm.isOwnerOrAdmin.val()) return;
             albumDialog.show();
         });
 
         view.quitGroup.setOnClickListener(v -> {
-            if (vm.isOwner.val()) {
-                vm.dissolveGroup();
-            } else {
-                vm.quitGroup();
-            }
+            vm.quitGroup();
+        });
+
+        view.dissolveGroup.setOnClickListener(v -> {
+            vm.dissolveGroup();
+        });
+        view.clearRecord.setOnClickListener(v -> {
+            CommonDialog commonDialog = new CommonDialog(this);
+            commonDialog.show();
+            commonDialog.getMainView().tips.setText(io.openim.android.ouicore.R.string.clear_chat_tips);
+            commonDialog.getMainView().confirm.setTextColor(getResources().getColor(io.openim.android.ouicore.R.color.theme));
+            commonDialog.getMainView().cancel.setOnClickListener(view1 -> commonDialog.dismiss());
+            commonDialog.getMainView().confirm.setOnClickListener(view1 -> {
+                commonDialog.dismiss();
+                iConversationBridge.clearCHistory(conversationId);
+            });
         });
     }
-
 
     @Override
     protected void fasterDestroy() {
@@ -165,8 +189,6 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
     }
 
     private void initView() {
-        if (vm.isOwner.val())
-            view.quitGroup.setText(io.openim.android.ouicore.R.string.dissolve_group);
 
         albumDialog = new PhotographAlbumDialog(this);
         albumDialog.setOnSelectResultListener(path -> {
@@ -194,31 +216,24 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         });
 
         view.recyclerview.setLayoutManager(new GridLayoutManager(this, spanCount));
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter<GroupMembersInfo,
-            ImageTxtViewHolder>(ImageTxtViewHolder.class) {
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter<GroupMembersInfo, ImageTxtViewHolder>(ImageTxtViewHolder.class) {
 
             @Override
-            public void onBindView(@NonNull ImageTxtViewHolder holder, GroupMembersInfo data,
-                                   int position) {
-                LinearLayout.LayoutParams layoutParams =
-                    (LinearLayout.LayoutParams) holder.view.img.getLayoutParams();
+            public void onBindView(@NonNull ImageTxtViewHolder holder, GroupMembersInfo data, int position) {
+                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.view.img.getLayoutParams();
                 layoutParams.topMargin = 0;
                 layoutParams.width = Common.dp2px(48);
                 layoutParams.height = Common.dp2px(48);
 
                 holder.view.txt.setTextSize(12);
                 holder.view.txt.setTextColor(getResources().getColor(io.openim.android.ouicore.R.color.txt_shallow));
-                holder.view.img.setVisibility(TextUtils.isEmpty(data.getGroupID()) ? View.GONE :
-                    View.VISIBLE);
-                holder.view.img2.setVisibility(TextUtils.isEmpty(data.getGroupID()) ?
-                    View.VISIBLE : View.GONE);
+                holder.view.img.setVisibility(TextUtils.isEmpty(data.getGroupID()) ? View.GONE : View.VISIBLE);
+                holder.view.img2.setVisibility(TextUtils.isEmpty(data.getGroupID()) ? View.VISIBLE : View.GONE);
                 if (TextUtils.isEmpty(data.getGroupID())) {
                     //加/减按钮
                     int reId;
                     holder.view.img2.setImageResource(reId = data.getRoleLevel());
-                    holder.view.txt.setText(reId == R.mipmap.ic_group_add ?
-                        io.openim.android.ouicore.R.string.add :
-                        io.openim.android.ouicore.R.string.remove);
+                    holder.view.txt.setText(reId == R.mipmap.ic_group_add ? io.openim.android.ouicore.R.string.add : io.openim.android.ouicore.R.string.remove);
                     holder.view.getRoot().setOnClickListener(v -> {
                         boolean isAdd = reId == R.mipmap.ic_group_add;
                         if (isAdd) {
@@ -244,28 +259,13 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
 
             view.all.setText(String.format(getResources().getString(io.openim.android.ouicore.R.string.view_all_member), groupInfo.getMemberCount()));
             if (groupInfo.getMemberCount() == 0) {
-                view.quitGroup.setText(io.openim.android.ouicore.R.string.delete_conversiton);
-                view.quitGroup.setOnClickListener(new OnDedrepClickListener() {
-                    @Override
-                    public void click(View v) {
-                        ContactListVM contactListVM =
-                            BaseApp.inst().getVMByCache(ContactListVM.class);
-                        if (null != contactListVM) {
-                            contactListVM.deleteConversationAndDeleteAllMsg(conversationId);
-                            Postcard postcard =
-                                ARouter.getInstance().build(Routes.Conversation.CHAT);
-                            LogisticsCenter.completion(postcard);
-                            ActivityManager.finishActivity(postcard.getDestination());
-                            finish();
-                        }
-                    }
-                });
+                deleteChat();
             }
         });
-        vm.isOwner.observe(this,v->{
-            view.quitGroup.setText(getString(vm.isOwner.val() ?
-                io.openim.android.ouicore.R.string.dissolve_group :
-                io.openim.android.ouicore.R.string.quit_group));
+        vm.isJoinGroup.observe(this, v -> {
+            if (!v) {
+                deleteChat();
+            }
         });
 
         vm.groupMembers.observe(this, groupMembersInfos -> {
@@ -277,8 +277,7 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             if (groupMembersInfos.size() < end) {
                 end = groupMembersInfos.size();
             }
-            List<GroupMembersInfo> groupMembersInfos1 =
-                new ArrayList<>(groupMembersInfos.subList(0, end));
+            List<GroupMembersInfo> groupMembersInfos1 = new ArrayList<>(groupMembersInfos.subList(0, end));
             GroupMembersInfo add = new GroupMembersInfo();
             add.setRoleLevel(R.mipmap.ic_group_add);
             groupMembersInfos1.add(add);
@@ -292,17 +291,40 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             adapter.setItems(groupMembersInfos1);
             spanCount = 5;
         });
-
-
+        iConversationBridge.setNotDisturbStatusListener(this, data -> {
+            view.noDisturb.post(() -> view.noDisturb.setCheckedWithAnimation(data == Opt.ReceiveNotNotifyMessage));
+        });
+        iConversationBridge.setConversationInfoChangeListener(this, data -> {
+            view.topSlideButton.post(() -> view.topSlideButton.setCheckedWithAnimation(data.isPinned()));
+        });
+        view.groupManage.setOnClickListener(v -> {
+            startActivity(new Intent(this, GroupManageActivity.class));
+        });
     }
 
+    private void deleteChat() {
+        view.quitGroupText.setText(io.openim.android.ouicore.R.string.delete_conversiton);
+        view.quitGroup.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                ContactListVM contactListVM = BaseApp.inst().getVMByCache(ContactListVM.class);
+                if (null != contactListVM) {
+                    contactListVM.deleteConversationAndDeleteAllMsg(conversationId);
+                    Postcard postcard = ARouter.getInstance().build(Routes.Conversation.CHAT);
+                    LogisticsCenter.completion(postcard);
+                    ActivityManager.finishActivity(postcard.getDestination());
+                    finish();
+                }
+            }
+        });
+    }
 
     private void gotoMemberListByRemove() {
         GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class);
         memberVM.groupId = vm.groupId;
         memberVM.setIntention(GroupMemberVM.Intention.AT);
-        memberVM.isSearchSingle=true;
-        memberVM.isRemoveOwnerAndAdmin=true;
+        memberVM.isSearchSingle = true;
+        memberVM.isRemoveOwnerAndAdmin = false;
         memberVM.setOnFinishListener(activity -> {
             List<String> ids = new ArrayList<>();
             for (MultipleChoice choice : memberVM.choiceList.val()) {
@@ -318,13 +340,14 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         SelectTargetVM sv = Easy.installVM(SelectTargetVM.class);
         sv.setIntention(SelectTargetVM.Intention.invite);
         ContactListVM ctv = BaseApp.inst().getVMByCache(ContactListVM.class);
+        if (null == ctv) return;
         List<String> ids = new ArrayList<>();
         for (MsgConversation msgConversation : ctv.conversations.val()) {
             if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT) {
                 ids.add(msgConversation.conversationInfo.getUserID());
             }
         }
-        sv.isInGroup(vm.groupId, ids);
+        sv.isInGroup(vm.groupId, ids, null);
         sv.setOnFinishListener(() -> {
             List<String> selectIds = new ArrayList<>();
             for (MultipleChoice choice : sv.inviteList.val()) {
@@ -332,9 +355,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
             }
             vm.inviteUserToGroup(selectIds);
         });
-        ctx.startActivity(new Intent(ctx, SelectTargetActivityV3.class));
+        ctx.startActivity(new Intent(ctx, SelectTargetActivityV3.class).putExtra("groupId", vm.groupId));
     }
-
 
     public String convertToDaysWeeksMonths(long seconds) {
         long days = seconds / (60 * 60 * 24);
@@ -356,8 +378,8 @@ public class GroupMaterialActivity extends BaseActivity<GroupVM, ActivityGroupMa
         memberVM.isOwnerOrAdmin = vm.isOwnerOrAdmin.val();
         memberVM.setIntention(GroupMemberVM.Intention.CHECK);
         memberVM.setOnFinishListener(activity -> {
-            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constants.K_ID,
-                memberVM.choiceList.val().get(0).key).withString(Constants.K_GROUP_ID, vm.groupId).navigation();
+            ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constants.K_ID, memberVM.choiceList.val().get(0).key).withString(Constants.K_GROUP_ID, vm.groupId).navigation();
+            memberVM.removeChoice(memberVM.choiceList.val().get(0).key);
         });
         startActivity(new Intent(this, SuperGroupMemberActivity.class));
     }

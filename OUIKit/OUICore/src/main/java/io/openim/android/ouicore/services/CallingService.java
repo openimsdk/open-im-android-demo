@@ -1,19 +1,14 @@
 package io.openim.android.ouicore.services;
 
-
-import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
 import com.alibaba.android.arouter.facade.template.IProvider;
 
-import io.openim.android.sdk.listener.OnSignalingListener;
 import io.openim.android.sdk.models.SignalingInfo;
 
-public interface CallingService extends IProvider, OnSignalingListener {
-
-    Dialog buildCallDialog(DialogInterface.OnDismissListener dismissListener, boolean isCallOut);
+public interface CallingService extends IProvider {
 
     default Dialog buildCallDialog(Context context,
                                    DialogInterface.OnDismissListener dismissListener,
@@ -21,41 +16,49 @@ public interface CallingService extends IProvider, OnSignalingListener {
         throw new RuntimeException();
     }
 
-    /**
-     * 获取呼叫状态  true 正在呼叫
-     *
-     * @return
-     */
-    default boolean getCallStatus() {
-        return false;
-    }
-    default boolean isCalling(){
-        return false;
+    default void call(SignalingInfo signalingInfo) {
+        throw new RuntimeException();
     }
 
-    /**
-     * 呼叫
-     */
-    void call(SignalingInfo signalingInfo);
+    default void setOnServicePriorLoginCallBack(OnServicePriorLoginCallBack onServicePriorLoginCallBack) {
+        throw new RuntimeException();
+    }
 
-    /**
-     * 加入
-     */
-    void join(SignalingInfo signalingInfo);
+    default void onInvitationCancelled(SignalingInfo s) {
+        throw new RuntimeException();
+    }
 
-    void initKeepAlive(String precessName);
+    default void onInvitationTimeout(SignalingInfo s) {
+        throw new RuntimeException();
+    }
 
-    void startAudioVideoService(Context base);
+    default void onInviteeAccepted(SignalingInfo s) {
+        throw new RuntimeException();
+    }
 
-    void stopAudioVideoService(Context base);
+    default void onInviteeAcceptedByOtherDevice(SignalingInfo s) {
+        throw new RuntimeException();
+    }
 
-    void setOnServicePriorLoginCallBack(OnServicePriorLoginCallBack onServicePriorLoginCallBack);
+    default void onInviteeRejected(SignalingInfo s) {
+        throw new RuntimeException();
+    }
+
+    default void onInviteeRejectedByOtherDevice(SignalingInfo s) {
+        throw new RuntimeException();
+    }
+
+    default void onReceiveNewInvitation(SignalingInfo s) {
+        throw new RuntimeException();
+    }
+
+    default void onHangup(SignalingInfo s) {
+        throw new RuntimeException();
+    }
 
     OnServicePriorLoginCallBack getOnServicePriorLoginCallBack();
-
 
     interface OnServicePriorLoginCallBack {
         void onLogin();
     }
-
 }

@@ -80,13 +80,7 @@ public class GetFilePathFromUri {
             return null;
         }
 
-        //4.4以下的版本
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.KITKAT) {
-            return getRealFilePath(context, imageUri);
-        }
-
-        //大于4.4，小于10
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT && android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && DocumentsContract.isDocumentUri(context, imageUri)) {
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
 
             if (isExternalStorageDocument(imageUri)) {
                 String docId = DocumentsContract.getDocumentId(imageUri);
@@ -115,7 +109,8 @@ public class GetFilePathFromUri {
                 String selection = MediaStore.Images.Media._ID + "=?";
                 String[] selectionArgs = new String[]{split[1]};
                 return getDataColumn(context, contentUri, selection, selectionArgs);
-            }
+            } else
+                return getRealFilePath(context, imageUri);
         }
 
         // MediaStore (and general)  大于等于10

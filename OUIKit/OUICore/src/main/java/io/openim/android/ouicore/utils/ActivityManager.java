@@ -1,6 +1,11 @@
 package io.openim.android.ouicore.utils;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -68,8 +73,27 @@ public class ActivityManager {
             }
         }
         activityStack.clear();
-        if (!excepts.isEmpty())
-            activityStack.addAll(excepts);
+        if (!excepts.isEmpty()) activityStack.addAll(excepts);
+    }
+
+    /**
+     * Finish all activities top of this activity include this in app activity's stack
+     * @param clz target activities
+     */
+    public static void finishAllAfterCurrent(Class<?> clz) throws ClassCastException {
+        Stack<Activity> newStack = (Stack<Activity>) activityStack.clone();
+        for (int i = activityStack.size() - 1; i >= 0; i --) {
+            Activity activity = activityStack.get(i);
+            if (activity != null) {
+                activity.finish();
+                newStack.remove(activity);
+                if (activity.getClass().equals(clz)) break;
+            }
+        }
+        if (!newStack.isEmpty()) {
+            activityStack.clear();
+            activityStack.addAll(newStack);
+        }
     }
 
     /**
@@ -84,6 +108,20 @@ public class ActivityManager {
                 return activity;
             }
         }
+        return null;
+    }
+
+    @Nullable
+    public static Activity hasSingleInstanceRunning(Context context) {
+        try {
+            for (Activity activity : activityStack) {
+                int currentLaunchMode = context.getPackageManager()
+                    .getActivityInfo(activity.getComponentName(), PackageManager.GET_META_DATA).launchMode;
+                if (currentLaunchMode == ActivityInfo.LAUNCH_SINGLE_INSTANCE) {
+                    return activity;
+                }
+            }
+        } catch (Exception e) {}
         return null;
     }
 

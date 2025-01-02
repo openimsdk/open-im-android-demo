@@ -16,7 +16,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:layout_toRightOf="@id/avatar"
             android:orientation="vertical">
 
@@ -24,13 +24,13 @@
                 android:id="@+id/nickName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
+                android:layout_marginStart="2dp"
                 android:layout_marginBottom="2dp"
                 android:textColor="#ff666666"
                 android:textSize="12sp"
                 android:visibility="gone" />
 
-            <RelativeLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/contentGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -40,30 +40,38 @@
 
                 <ImageView
                     android:id="@+id/content"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_chat_photo" />
+                    android:src="@mipmap/ic_chat_photo"
+                    app:layout_constraintLeft_toLeftOf="@id/contentGroup"
+                    app:layout_constraintRight_toRightOf="@id/contentGroup"
+                    app:layout_constraintTop_toTopOf="@id/contentGroup"
+                    app:layout_constraintBottom_toBottomOf="@id/contentGroup"/>
 
                 <io.openim.android.ouicore.widget.CirclePgBar
                     android:id="@+id/circleBar"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
                     android:visibility="gone"
-                    app:strokeWidth="2dp" />
+                    app:strokeWidth="2dp"
+                    app:layout_constraintLeft_toLeftOf="@id/contentGroup"
+                    app:layout_constraintRight_toRightOf="@id/contentGroup"
+                    app:layout_constraintTop_toTopOf="@id/contentGroup"
+                    app:layout_constraintBottom_toBottomOf="@id/contentGroup"/>
 
                 <ImageView
                     android:id="@+id/playBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
                     android:src="@mipmap/ic_video_pause"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    app:layout_constraintLeft_toLeftOf="@id/contentGroup"
+                    app:layout_constraintRight_toRightOf="@id/contentGroup"
+                    app:layout_constraintTop_toTopOf="@id/contentGroup"
+                    app:layout_constraintBottom_toBottomOf="@id/contentGroup" />
 
 
                 <TextView
@@ -71,12 +79,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
                     android:layout_toRightOf="@id/content"
                     android:text="11233"
                     android:textColor="#ff5496eb"
                     android:textSize="12sp"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    app:layout_constraintLeft_toRightOf="@id/contentGroup"
+                    app:layout_constraintBottom_toBottomOf="@id/contentGroup"/>
 
                 <io.openim.android.ouiconversation.widget.SendStateView
                     android:id="@+id/sendState"
@@ -84,9 +94,20 @@
                     android:layout_height="wrap_content"
                     android:visibility="gone"
                     android:layout_centerVertical="true"
-                    android:layout_toRightOf="@id/readVanishNum" />
+                    app:layout_constraintLeft_toRightOf="@id/contentGroup"
+                    app:layout_constraintBottom_toBottomOf="@id/contentGroup"/>
 
-            </RelativeLayout>
+                <TextView
+                    android:id="@+id/durationLeft"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ffffffff"
+                    android:textSize="10sp"
+                    android:layout_margin="4dp"
+                    app:layout_constraintRight_toRightOf="@id/contentGroup"
+                    app:layout_constraintBottom_toBottomOf="@id/contentGroup"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
 
     </RelativeLayout>

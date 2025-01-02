@@ -1,5 +1,8 @@
 package io.openim.android.ouicore.vm;
 
+import androidx.annotation.Nullable;
+import androidx.core.util.Consumer;
+
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.BaseVM;
@@ -38,15 +41,17 @@ public class UserLogic extends BaseVM {
     public State<ConnectStatus> connectStatus = new State<>(ConnectStatus.DEFAULT);
     public State<UserInfo> info = new State<>();
     //发现页
-    public State<String> discoverPageURL=new State<>("");
+    public State<String> discoverPageURL=new State<>("https://docs.openim.io/");
 
     public boolean isCacheUser() {
         return null!=LoginCertificate.getCache(BaseApp.inst());
     }
 
-    public void loginCacheUser() {
+    public void loginCacheUser(@Nullable Consumer<String> loginCallback) {
         if (IMUtil.isLogged()) {
             loginStatus.setValue(LoginStatus.SUCCESS);
+            if (loginCallback != null)
+                loginCallback.accept(BaseApp.inst().loginCertificate.userID);
             return;
         }
         loginStatus.setValue(LoginStatus.LOGGING);
@@ -56,11 +61,15 @@ public class UserLogic extends BaseVM {
             @Override
             public void onError(int code, String error) {
                 loginStatus.setValue(LoginStatus.FAIL.setValue("(" + code + ")" + error));
+                if (loginCallback != null)
+                    loginCallback.accept(null);
             }
 
             @Override
             public void onSuccess(String data) {
                 loginStatus.setValue(LoginStatus.SUCCESS);
+                if (loginCallback != null)
+                    loginCallback.accept(BaseApp.inst().loginCertificate.userID);
             }
         }, certificate.userID, certificate.imToken);
     }

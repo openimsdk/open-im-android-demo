@@ -28,7 +28,6 @@ import io.livekit.android.room.participant.RemoteParticipant;
 import io.livekit.android.room.track.RemoteVideoTrack;
 import io.openim.android.ouicalling.databinding.DialogCallBinding;
 import io.openim.android.ouicalling.databinding.LayoutFloatViewBinding;
-import io.openim.android.ouicalling.service.AudioVideoService;
 import io.openim.android.ouicalling.vm.CallingVM;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseDialog;
@@ -46,8 +45,8 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.PublicUserInfo;
 import io.openim.android.sdk.models.SignalingInfo;
-import io.openim.android.sdk.models.UserInfo;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
@@ -64,11 +63,6 @@ public class CallDialog extends BaseDialog {
     protected EasyWindow easyWindow;
     protected LayoutFloatViewBinding floatViewBinding;
     private boolean isSubscribe;
-
-    public CallDialog(@NonNull Context context, CallingService callingService) {
-        this(context, callingService, false);
-    }
-
 
     /**
      * 弹出通话界面
@@ -212,16 +206,16 @@ public class CallDialog extends BaseDialog {
                 signalingInfo.getInvitation().getInviteeUserIDList().get(0) :
                 signalingInfo.getInvitation().getInviterUserID());
 
-            OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<UserInfo>>() {
+            OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<PublicUserInfo>>() {
                 @Override
                 public void onError(int code, String error) {
                     Toast.makeText(context, error + code, Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
-                public void onSuccess(List<UserInfo> data) {
+                public void onSuccess(List<PublicUserInfo> data) {
                     if (data.isEmpty()) return;
-                    UserInfo userInfo = data.get(0);
+                    PublicUserInfo userInfo = data.get(0);
                     view.avatar.load(userInfo.getFaceURL());
                     floatViewBinding.sAvatar.load(userInfo.getFaceURL(), userInfo.getNickname());
                     view.name.setText(userInfo.getNickname());
@@ -412,7 +406,6 @@ public class CallDialog extends BaseDialog {
     public void playRingtone() {
         try {
             Common.wakeUp(context);
-            NotificationUtil.cancelNotify(AudioVideoService.NOTIFY_ID);
 //           Ringtone铃声
             if (!MediaPlayerUtil.INSTANCE.isPlaying()) {
                 MediaPlayerUtil.INSTANCE.initMedia(BaseApp.inst(), R.raw.incoming_call_ring);
@@ -462,6 +455,9 @@ public class CallDialog extends BaseDialog {
 
         callingVM.renewalDB(id, (realm, callHistory) -> {
             callHistory = realm.copyFromRealm(callHistory);
+            try {
+                callHistory.setDuration((int)(System.currentTimeMillis() - callHistory.getDate()));
+            } catch (Exception e){}
 
             HashMap<String, Object> map = new HashMap<>();
             map.put(Constants.K_CUSTOM_TYPE, Constants.MsgType.LOCAL_CALL_HISTORY);

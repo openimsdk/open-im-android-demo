@@ -55,13 +55,14 @@ public class NotificationVM extends BaseVM implements OnCustomBusinessListener, 
       try {
           String friendRequest = SharedPreferencesUtil.get(BaseApp.inst()).getString(K_friendRequest);
           String groupRequest = SharedPreferencesUtil.get(BaseApp.inst()).getString(K_groupRequest);
-          Type type = new TypeToken<Set<UserEx>>() {}.getType();
           if (!TextUtils.isEmpty(friendRequest)) {
-              List<UserEx> mexList = JSON.parseObject(friendRequest, type);
+              List<UserEx> mexList = new ArrayList<>();
+              mexList.add(new UserEx(friendRequest));
               friendDot.setValue(mexList);
           }
           if (!TextUtils.isEmpty(groupRequest)) {
-              List<UserEx> mexList = JSON.parseObject(groupRequest, type);
+              List<UserEx> mexList = new ArrayList<>();
+              mexList.add(new UserEx(groupRequest));
               groupDot.setValue(mexList);
           }
       }catch (Exception e){
@@ -71,27 +72,7 @@ public class NotificationVM extends BaseVM implements OnCustomBusinessListener, 
 
     @Override
     public void onRecvCustomBusinessMessage(String s) {
-        getWorkMomentsUnReadCount();
         customBusinessMessage.setValue(s);
-    }
-
-    public void getWorkMomentsUnReadCount() {
-        N.API(OneselfService.class).getMomentsUnreadCount(new Parameter().buildJsonBody()).map(OneselfService.turn(HashMap.class)).compose(N.IOMain()).subscribe(new NetObserver<HashMap>(tag()) {
-            @Override
-            public void onSuccess(HashMap map) {
-                try {
-                    int size = (int) map.get("total");
-                    momentsUnread.setValue(size);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            protected void onFailure(Throwable e) {
-                toast(e.getMessage());
-            }
-        });
     }
 
 
@@ -119,7 +100,7 @@ public class NotificationVM extends BaseVM implements OnCustomBusinessListener, 
                 groupDot.val().add(userEx);
                 groupDot.update();
                 SharedPreferencesUtil.get(BaseApp.inst()).setCache(K_groupRequest,
-                    GsonHel.toJson(groupDot.val()));
+                    info.getGroupID());
             }
         }
     }
@@ -131,7 +112,7 @@ public class NotificationVM extends BaseVM implements OnCustomBusinessListener, 
                 friendDot.val().add(userEx);
                 friendDot.update();
                 SharedPreferencesUtil.get(BaseApp.inst()).setCache(K_friendRequest,
-                    GsonHel.toJson(friendDot.val()));
+                    u.getFromUserID());
             }
         }
     }

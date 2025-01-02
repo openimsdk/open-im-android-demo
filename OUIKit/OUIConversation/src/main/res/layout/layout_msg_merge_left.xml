@@ -8,7 +8,6 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingRight="30dp"
         android:orientation="horizontal">
 
         <TextView
@@ -17,8 +16,9 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="8dp"
-            android:layout_toEndOf="@id/sendState"
+            android:layout_marginEnd="5dp"
+            android:layout_toEndOf="@id/content"
+            android:maxLines="1"
             android:textColor="#ff5496eb"
             android:textSize="12sp"
             android:visibility="gone" />
@@ -28,16 +28,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="8dp"
-            android:layout_toRightOf="@id/content" />
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/content" />
 
 
         <LinearLayout
             android:id="@+id/content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_toRightOf="@id/avatar"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/avatar"
+            android:maxWidth="@dimen/msg_max_width"
+            android:minWidth="@dimen/msg_min_width"
+            android:minHeight="@dimen/msg_min_height"
             android:orientation="vertical">
 
             <TextView

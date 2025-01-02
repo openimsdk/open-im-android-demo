@@ -71,37 +71,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/recommend"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="55dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/recommend_to_friend"
-                        android:textColor="#ff333333"
-                        android:textSize="18sp" />
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@mipmap/ic_right" />
-                </LinearLayout>
-
-
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/joinBlackList"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"

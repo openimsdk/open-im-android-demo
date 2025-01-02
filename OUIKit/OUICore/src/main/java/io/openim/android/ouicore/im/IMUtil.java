@@ -1,5 +1,6 @@
 package io.openim.android.ouicore.im;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -10,9 +11,11 @@ import android.net.Uri;
 import android.os.Vibrator;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -32,6 +35,7 @@ import com.hjq.permissions.Permission;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -39,7 +43,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
@@ -64,7 +71,7 @@ import io.openim.android.ouicore.entity.QuitGroupNotification;
 import io.openim.android.ouicore.ex.AtUser;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.net.bage.GsonHel;
-import io.openim.android.ouicore.services.CallingService;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
 import io.openim.android.ouicore.utils.HasPermissions;
@@ -75,6 +82,8 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.utils.TimeUtil;
 import io.openim.android.ouicore.widget.BottomPopDialog;
+import io.openim.android.ouicore.widget.PlaceHolderDrawable;
+import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.GroupAtType;
@@ -88,10 +97,12 @@ import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.NotificationElem;
 import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.PictureElem;
+import io.openim.android.sdk.models.PublicUserInfo;
 import io.openim.android.sdk.models.QuoteElem;
 import io.openim.android.sdk.models.RevokedInfo;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.SignalingInvitationInfo;
+import io.openim.android.sdk.models.TextElem;
 import io.openim.android.sdk.models.VideoElem;
 
 public class IMUtil {
@@ -99,53 +110,6 @@ public class IMUtil {
     public static final int PLATFORM_ID = 2;
     public static final String AT_ALL = "AtAllTag";
     private static final String TAG = "IMUtil";
-
-    public static String getFastVideoPath(VideoElem elem) {
-        String videoPath = elem.getVideoPath();
-        if (!GetFilePathFromUri.fileIsExists(videoPath)) videoPath = elem.getVideoUrl();
-        return videoPath;
-    }
-
-    public static String getFastPicturePath(PictureElem elem) {
-        String path = elem.getSourcePath();
-        if (!GetFilePathFromUri.fileIsExists(path)) path = elem.getSourcePicture().getUrl();
-        return path;
-    }
-
-    /**
-     * 加载图片
-     * 本地存在直接加载-》缩略图-》加载原图
-     *
-     * @return
-     */
-    public static RequestBuilder<?> loadPicture(PictureElem elem) {
-        String url = "";
-        String filePath = elem.getSourcePath();
-        if (GetFilePathFromUri.fileIsExists(filePath)) url = filePath;
-        if (TextUtils.isEmpty(url) && null != elem.getSnapshotPicture())
-            url = elem.getSnapshotPicture().getUrl();
-        if (TextUtils.isEmpty(url)) {
-            url = elem.getSourcePicture().getUrl();
-        }
-        return Glide.with(BaseApp.inst()).load(url).placeholder(R.mipmap.ic_chat_photo).error(R.mipmap.ic_chat_photo);
-    }
-
-    /**
-     * 加载视频缩略图
-     * 判断本地是否存在 本地存在直接加载 不存在加载网络
-     *
-     * @return
-     */
-    public static RequestBuilder<?> loadVideoSnapshot(VideoElem elem) {
-        //本地
-        String path = elem.getSnapshotPath();
-        if (!GetFilePathFromUri.fileIsExists(path)) {
-            //远程
-            path = elem.getSnapshotUrl();
-        }
-        return Glide.with(BaseApp.inst()).load(path).placeholder(R.mipmap.ic_chat_photo).error(R.mipmap.ic_chat_photo);
-    }
-
 
     /**
      * 会话排序比较器
@@ -165,7 +129,6 @@ public class IMUtil {
             }
         };
     }
-
 
     /**
      * 设置时间显示
@@ -193,19 +156,6 @@ public class IMUtil {
         return list;
     }
 
-    public static Message createMergerMessage(String title, List<Message> list) {
-        List<String> summaryList = new ArrayList<>();
-        for (Message message : list) {
-            summaryList.add(message.getSenderNickname() + ":" + getMsgParse(message));
-            if (summaryList.size() >= 4) break;
-        }
-
-        return OpenIMClient.getInstance().messageManager.createMergerMessage(list, title,
-            summaryList);
-
-
-    }
-
     /**
      * 是信令消息
      * @param msg
@@ -223,41 +173,22 @@ public class IMUtil {
         return false;
     }
 
-    /**
-     * 解析扩展信息 避免在bindView时解析造成卡顿
-     *
-     * @param msg
-     */
     public static Message buildExpandInfo(Message msg) {
         MsgExpand msgExpand = (MsgExpand) msg.getExt();
         if (null == msgExpand) msgExpand = new MsgExpand();
         msg.setExt(msgExpand);
         try {
-            if (msg.getContentType() == MessageType.CUSTOM) {
+            if (msg.getContentType() == MessageType.CUSTOM || null!=msg.getCustomElem()) {
                 Map map = JSONArray.parseObject(msg.getCustomElem().getData(), Map.class);
                 if (map.containsKey(Constants.K_CUSTOM_TYPE)) {
-                    int customType = (int) map.get(Constants.K_CUSTOM_TYPE);
+                    int customType = Objects.requireNonNullElse((Integer) map.get(Constants.K_CUSTOM_TYPE), 0);
                     Object result = map.get(Constants.K_DATA);
                     msg.setContentType(customType);
-
-                    if (customType == Constants.MsgType.CUSTOMIZE_MEETING) {
-                        MeetingInfo meetingInfo =
-                            GsonHel.fromJson(JSONObject.toJSONString(result), MeetingInfo.class);
-                        meetingInfo.startTime = TimeUtil.getTime(meetingInfo.start * 1000,
-                            TimeUtil.yearTimeFormat);
-                        BigDecimal bigDecimal =
-                            (BigDecimal.valueOf(meetingInfo.duration).divide(BigDecimal.valueOf(3600), 1, BigDecimal.ROUND_HALF_DOWN));
-                        meetingInfo.durationStr =
-                            bigDecimal.toString() + BaseApp.inst().getString(R.string.hour);
-                        msgExpand.meetingInfo = meetingInfo;
-                        return msg;
-                    }
 
                     if (customType == Constants.MsgType.LOCAL_CALL_HISTORY) {
                         msgExpand.callHistory = GsonHel.fromJson(JSONObject.toJSONString(result),
                             CallHistory.class);
                         if (TextUtils.isEmpty(msgExpand.callHistory.getId())) return msg;
-                        //当callHistory.getRoomID 不null 表示我们本地插入的呼叫记录
                         msg.setContentType(Constants.MsgType.LOCAL_CALL_HISTORY);
 
                         int second = msgExpand.callHistory.getDuration() / 1000;
@@ -282,25 +213,14 @@ public class IMUtil {
             if (msg.getContentType() == MessageType.LOCATION)
                 msgExpand.locationInfo = GsonHel.fromJson(msg.getLocationElem().getDescription(),
                     LocationInfo.class);
-            if (msg.getContentType() == MessageType.AT_TEXT) {
-                AtMsgInfo atMsgInfo = new AtMsgInfo();
-                atMsgInfo.atUsersInfo = msg.getAtTextElem().atUsersInfo;
-                atMsgInfo.text = msg.getAtTextElem().getText();
-                msgExpand.atMsgInfo = atMsgInfo;
-                handleAt(msgExpand, msg.getGroupID());
-
-                Message quoteMessage = msg.getAtTextElem().getQuoteMessage();
-                if (null != quoteMessage) {
-                    buildExpandInfo(quoteMessage);
-                    QuoteElem quoteElem = new QuoteElem();
-                    quoteElem.setText(atMsgInfo.text);
-                    quoteElem.setQuoteMessage(quoteMessage);
-                    msg.setQuoteElem(quoteElem);
-                }
+            if (msg.getContentType() == MessageType.TEXT) {
+                TextElem textElem = msg.getTextElem();
+                SpannableStringBuilder stringBuilder = new SpannableStringBuilder(textElem.getContent());
+                msgExpand.sequence = handleHyperLink(stringBuilder);
             }
             handleNotification(msg);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         msg.setExt(msgExpand);
 
@@ -380,8 +300,8 @@ public class IMUtil {
 
                 // a 修改了群名字
                 String txt = String.format(ctx.getString(R.string.edit_group_name), target =
-                        getSelfName(groupNotification.opUser.getUserID(),
-                            groupNotification.opUser.getNickname()),
+                    getSelfName(groupNotification.opUser.getUserID(),
+                        groupNotification.opUser.getNickname()),
                     groupNotification.group.getGroupName());
                 tips = getSingleSequence(msg.getGroupID(), target,
                     groupNotification.opUser.getUserID(), txt);
@@ -485,7 +405,7 @@ public class IMUtil {
                 choice.name = target2;
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(), target,
-                        transferredGroupNotification.opUser.getUserID(), txt),
+                    transferredGroupNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -494,10 +414,10 @@ public class IMUtil {
                     MuteMemberNotification.class);
                 // b 被 a 禁言
                 String txt = String.format(ctx.getString(R.string.Muted_group), target =
-                        getSelfName(memberNotification.mutedUser.getUserID(),
-                            memberNotification.mutedUser.getNickname()), target2 =
-                        getSelfName(memberNotification.opUser.getUserID(),
-                            memberNotification.opUser.getNickname()),
+                    getSelfName(memberNotification.mutedUser.getUserID(),
+                        memberNotification.mutedUser.getNickname()), target2 =
+                    getSelfName(memberNotification.opUser.getUserID(),
+                        memberNotification.opUser.getNickname()),
                     TimeUtil.secondFormat(memberNotification.mutedSeconds));
 
                 List<MultipleChoice> choices = new ArrayList<>();
@@ -529,7 +449,7 @@ public class IMUtil {
                 choice.name = target;
                 choice.groupId = msg.getGroupID();
                 tips = getMultipleSequence(getSingleSequence(msg.getGroupID(), target2,
-                        memberNotification.opUser.getUserID(), txt),
+                    memberNotification.opUser.getUserID(), txt),
                     new ArrayList<>(Collections.singleton(choice)));
                 break;
             }
@@ -624,11 +544,11 @@ public class IMUtil {
         for (MultipleChoice choice : choices) {
             buildClickAndColorSpannable((SpannableStringBuilder) sequence, choice.name,
                 new ClickableSpan() {
-                    @Override
-                    public void onClick(@NonNull View widget) {
-                        toPersonDetail(choice.key, choice.groupId);
-                    }
-                });
+                @Override
+                public void onClick(@NonNull View widget) {
+                    toPersonDetail(choice.key, choice.groupId);
+                }
+            });
         }
         return sequence;
     }
@@ -646,52 +566,36 @@ public class IMUtil {
                                                  String txt) {
         return buildClickAndColorSpannable(new SpannableStringBuilder(txt), nickName,
             new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    toPersonDetail(uid, groupId);
-                }
-            });
+            @Override
+            public void onClick(@NonNull View widget) {
+                toPersonDetail(uid, groupId);
+            }
+        });
     }
 
     private static void toPersonDetail(String uid, String groupId) {
         ARouter.getInstance().build(Routes.Main.PERSON_DETAIL).withString(Constants.K_ID, uid).withString(Constants.K_GROUP_ID, groupId).navigation();
     }
 
-    private static String atSelf(AtUserInfo atUsersInfo) {
-        return atSelf(atUsersInfo, true);
-    }
-
-    private static String atSelf(AtUserInfo atUsersInfo, boolean isNickName) {
-        if (isNickName) return "@" + atUsersInfo.getGroupNickname();
-        return "@" + (atUsersInfo.getAtUserID().equals(BaseApp.inst().loginCertificate.userID) ?
-            BaseApp.inst().getString(R.string.you) : atUsersInfo.getGroupNickname());
-    }
-
-    private static void handleAt(MsgExpand msgExpand, String gid) {
-        if (null == msgExpand.atMsgInfo) return;
-        String atTxt = msgExpand.atMsgInfo.text;
-        SpannableStringBuilder spannableString = null;
-        for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
-            String atUid = "@" + atUsersInfo.getAtUserID();
-            String tag = atSelf(atUsersInfo);
-
-            if (null == spannableString) spannableString = new SpannableStringBuilder(atTxt);
-            else spannableString = new SpannableStringBuilder(spannableString);
-            atTxt = spannableString.toString();
-            int start = atTxt.indexOf(atUid);
-            int end = start + atUid.length();
-            SpannableStringBuilder tagSpannable =
-                (SpannableStringBuilder) buildClickAndColorSpannable
-                    (new SpannableStringBuilder(tag), tag, new ClickableSpan() {
-                        @Override
-                        public void onClick(@NonNull View widget) {
-                            if (!atUsersInfo.getAtUserID().equals(IMUtil.AT_ALL))
-                                toPersonDetail(atUsersInfo.getAtUserID(), gid);
-                        }
-                    });
-            spannableString.replace(start, end, tagSpannable);
+    private static SpannableStringBuilder handleHyperLink(@NonNull SpannableStringBuilder spannableString) {
+        Matcher matcher = Patterns.WEB_URL.matcher(spannableString);
+        while (matcher.find()) {
+            int linkStartIndex = matcher.start();
+            int linkEndIndex = matcher.end();
+            String link = matcher.group();
+            spannableString.setSpan(new ClickableSpan() {
+                @Override
+                public void onClick(@NonNull View widget) {
+                    try {
+                            widget.getContext().startActivity(new Intent(widget.getContext(), WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, link));
+                    } catch (Exception e) {
+                        if (!TextUtils.isEmpty(e.getMessage()))
+                            L.e(e.getMessage());
+                    }
+                }
+            }, linkStartIndex, linkEndIndex, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
         }
-        msgExpand.sequence = spannableString;
+        return spannableString;
     }
 
     public static CharSequence buildClickAndColorSpannable(@NotNull SpannableStringBuilder spannableString, String tag, ClickableSpan clickableSpan) {
@@ -714,48 +618,6 @@ public class IMUtil {
     }
 
 
-    /**
-     * 获取草稿
-     * [0] CharSequence草稿
-     * [1] atUsers
-     */
-    public static Object[] getDraft(String conversationID) {
-        String cacheKey = conversationID + "_draft";
-        String atKey = cacheKey + "_at";
-        String atJson = SharedPreferencesUtil.get(BaseApp.inst()).getString(atKey);
-        String draft = SharedPreferencesUtil.get(BaseApp.inst()).getString(cacheKey);
-        List<AtUser> atUsers = new ArrayList<>();
-        try {
-            if (!TextUtils.isEmpty(atJson)) {
-                Type type = new TypeToken<List<AtUser>>() {
-                }.getType();
-                atUsers = GsonHel.getGson().fromJson(atJson, type);
-                SpannableStringBuilder spannableString = null;
-                for (AtUser atUser : atUsers) {
-                    String atUid = IMUtil.atD(atUser.key);
-                    String tag = IMUtil.atD(atUser.name);
-
-                    if (null == spannableString)
-                        spannableString = new SpannableStringBuilder(draft);
-                    else spannableString = new SpannableStringBuilder(spannableString);
-                    draft = spannableString.toString();
-                    int start = draft.indexOf(atUid);
-                    int end = start + atUid.length();
-
-                    SpannableStringBuilder tagSpannable = new SpannableStringBuilder(tag);
-                    ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor(
-                        "#009ad6"));
-                    tagSpannable.setSpan(colorSpan, 0, tag.length(),
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    atUser.spanHashCode = colorSpan.hashCode();
-                    spannableString.replace(start, end, tagSpannable);
-                }
-                return new Object[]{spannableString, atUsers};
-            }
-        } catch (Exception ignore) {
-        }
-        return new Object[]{draft, atUsers};
-    }
 
     public static CharSequence getMsgParse(Message msg) {
         return getMsgParse(msg, false);
@@ -794,14 +656,6 @@ public class IMUtil {
                 case MessageType.LOCATION:
                     lastMsg += "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.location) + "]";
                     break;
-                case MessageType.AT_TEXT:
-                    String atTxt = msgExpand.atMsgInfo.text;
-                    for (AtUserInfo atUsersInfo : msgExpand.atMsgInfo.atUsersInfo) {
-                        atTxt = atTxt.replace("@" + atUsersInfo.getAtUserID(), atSelf(atUsersInfo));
-                    }
-                    lastMsg += atTxt;
-                    break;
-
                 case MessageType.MERGER:
                     lastMsg += "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.chat_history2) + "]";
                     break;
@@ -818,17 +672,14 @@ public class IMUtil {
                     String target =
                         "[" + BaseApp.inst().getString(io.openim.android.ouicore.R.string.group_bulletin) + "]";
                     lastMsg += target + msgExpand.notificationMsg.group.notification;
-                    lastMsg =
-                        IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(lastMsg),
-                            target, android.R.color.holo_red_dark, null);
                     break;
                 case Constants.MsgType.LOCAL_CALL_HISTORY:
                     boolean isAudio = msgExpand.callHistory.getType().equals("audio");
                     lastMsg += "[" + (isAudio ? BaseApp.inst().getString(R.string.voice_calls) :
                         BaseApp.inst().getString(R.string.video_calls)) + "]";
                     break;
-                case Constants.MsgType.CUSTOMIZE_MEETING:
-                    lastMsg += "[" + BaseApp.inst().getString(R.string.video_meeting) + "]";
+                case MessageType.CUSTOM_FACE:
+                    lastMsg += "[" + BaseApp.inst().getString(R.string.favorite_emoji) + "]";
                     break;
             }
         } catch (Exception e) {
@@ -869,43 +720,29 @@ public class IMUtil {
     /**
      * build SignalingInfo
      *
-     * @param isVideoCalls   是否视频通话
-     * @param isSingleChat   是否单聊
-     * @param inviteeUserIDs 邀请ids
-     * @param groupID        群id
-     * @return
+     * @param isVideoCalls   if true, called by video.
+     * @param inviteeUserIDs invited user
+     * @return calling parameter
      */
-    public static SignalingInfo buildSignalingInfo(boolean isVideoCalls, boolean isSingleChat,
-                                                   List<String> inviteeUserIDs, String groupID) {
-        boolean isGroupChat = !TextUtils.isEmpty(groupID);
-        if (!isGroupChat) groupID = UUID.randomUUID().toString(); //单聊Id自动生成
-        groupID = groupID.replaceAll("\u200B", "");
-
+    public static SignalingInfo buildSignalingInfo(boolean isVideoCalls, List<String> inviteeUserIDs) {
         SignalingInfo signalingInfo = new SignalingInfo();
         String inId = BaseApp.inst().loginCertificate.userID;
         signalingInfo.setOpUserID(inId);
         SignalingInvitationInfo signalingInvitationInfo = new SignalingInvitationInfo();
         signalingInvitationInfo.setInviterUserID(inId);
         signalingInvitationInfo.setInviteeUserIDList(inviteeUserIDs);
-        signalingInvitationInfo.setRoomID(groupID);
+        signalingInvitationInfo.setRoomID(UUID.randomUUID().toString().replaceAll("\u200B", ""));
         signalingInvitationInfo.setTimeout(30);
         signalingInvitationInfo.setInitiateTime(System.currentTimeMillis());
-
         signalingInvitationInfo.setMediaType(isVideoCalls ? Constants.MediaType.VIDEO :
             Constants.MediaType.AUDIO);
         signalingInvitationInfo.setPlatformID(IMUtil.PLATFORM_ID);
-        signalingInvitationInfo.setSessionType(isSingleChat ? ConversationType.SINGLE_CHAT :
-            ConversationType.SUPER_GROUP_CHAT);
-        if (isGroupChat) signalingInvitationInfo.setGroupID(groupID);
-
+        signalingInvitationInfo.setSessionType(ConversationType.SINGLE_CHAT);
         signalingInfo.setInvitation(signalingInvitationInfo);
         signalingInfo.setOfflinePushInfo(new OfflinePushInfo());
         return signalingInfo;
     }
 
-    /**
-     * 弹出底部菜单选择 音视通话
-     */
     public static void showBottomCallsPopMenu(Context context, View.OnKeyListener v) {
         HasPermissions hasPermissions = new HasPermissions(context, Permission.CAMERA,
             Permission.RECORD_AUDIO);
@@ -950,9 +787,6 @@ public class IMUtil {
         from.startActivity(new Intent(from, to));
         LoginCertificate.clear();
         BaseApp.inst().loginCertificate = null;
-        CallingService callingService =
-            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-        if (null != callingService) callingService.stopAudioVideoService(from);
         from.finish();
     }
 
@@ -980,7 +814,7 @@ public class IMUtil {
     }
 
     public static String atD(String str) {
-        return "@" + str + "\t";
+        return "@" + str + " ";
     }
 
     /**

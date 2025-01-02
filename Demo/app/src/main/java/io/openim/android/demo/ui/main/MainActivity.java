@@ -3,6 +3,7 @@ package io.openim.android.demo.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,13 +13,12 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentTransaction;
 
-
-import com.alibaba.android.arouter.core.LogisticsCenter;
-import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.hjq.window.EasyWindow;
-import com.igexin.sdk.PushManager;
+import com.alibaba.fastjson.JSONArray;
+
+import java.util.Map;
+import java.util.Objects;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMainBinding;
@@ -27,34 +27,37 @@ import io.openim.android.demo.ui.user.PersonalFragment;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.demo.vm.MainVM;
 import io.openim.android.ouicontact.ui.fragment.ContactFragment;
-import io.openim.android.ouicontact.vm.ContactVM;
 import io.openim.android.ouiconversation.ui.fragment.ConversationListFragment;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
+import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.NotificationVM;
 import io.openim.android.ouicore.vm.UserLogic;
+import io.openim.android.sdk.listener.OnAdvanceMsgListener;
+import io.openim.android.sdk.models.SignalingInfo;
+import io.openim.android.sdk.models.SignalingInvitationInfo;
 
 @Route(path = Routes.Main.HOME)
 public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> implements LoginVM.ViewAction {
 
     private int mCurrentTabIndex;
     private BaseFragment lastFragment, conversationListFragment, contactFragment,
-        personalFragment, appletFragment;
+        personalFragment;
     private ActivityResultLauncher<Intent> resultLauncher = Common.getCaptureActivityLauncher(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        init(getIntent());
-
-        PushManager.getInstance().initialize(this);
         bindVM(MainVM.class);
+        init(getIntent());
         vm.fromLogin = getIntent().getBooleanExtra(LoginActivity.FORM_LOGIN, false);
         bindViewDataBinding(ActivityMainBinding.inflate(getLayoutInflater()));
         super.onCreate(savedInstanceState);
@@ -70,39 +73,59 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        try {
-            Postcard postcard = ARouter.getInstance().build(Routes.Meeting.HOME);
-            LogisticsCenter.completion(postcard);
-            if (ActivityManager.getActivityStack().peek().getClass() == postcard.getDestination()){
-                ActivityManager.finishActivity(postcard.getDestination());
-                EasyWindow.cancelAll();
-            }
-        } catch (Exception ignore) {}
     }
 
 
     private void init(Intent intent) {
-        Easy.find(UserLogic.class).loginCacheUser();
-        callingStatus();
-    }
-
-    private void callingStatus() {
-        CallingService callingService =
-            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-        if (null != callingService && callingService.getCallStatus()) {
-            callingService.buildCallDialog(this, null,
-                false).show();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        callingStatus();
+        Easy.find(UserLogic.class).loginCacheUser(userId -> {
+            if (!TextUtils.isEmpty(userId))
+                vm.initOfflineNotificationConfig(MainActivity.this, userId);
+        });
     }
 
     private void listener() {
         vm.totalUnreadMsgCount.observe(this, v -> Common.buildBadgeView(this, view.men1, v));
+        handleCallingMsg();
+    }
+
+    private void handleCallingMsg() {
+        CallingService callingService = (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
+        if (callingService != null) {
+            IMEvent.getInstance().addAdvanceMsgListener(new OnAdvanceMsgListener() {
+                @Override
+                public void onRecvOnlineOnlyMessage(String msg) {
+                    Map map = JSONArray.parseObject(msg, Map.class);
+                    if (map.containsKey(Constants.K_CUSTOM_TYPE)) {
+                        int customType = Objects.requireNonNullElse((Integer) map.get(Constants.K_CUSTOM_TYPE), -1);
+                        Object result = map.get(Constants.K_DATA);
+                        if (customType >= Constants.MsgType.callingInvite
+                            && customType <= Constants.MsgType.callingHungup) {
+                            SignalingInvitationInfo signalingInvitationInfo = GsonHel.fromJson((String) result, SignalingInvitationInfo.class);
+                            SignalingInfo signalingInfo = new SignalingInfo();
+                            signalingInfo.setInvitation(signalingInvitationInfo);
+
+                            switch (customType) {
+                                case Constants.MsgType.callingInvite:
+                                    callingService.onReceiveNewInvitation(signalingInfo);
+                                    break;
+                                case Constants.MsgType.callingAccept:
+                                    callingService.onInviteeAccepted(signalingInfo);
+                                    break;
+                                case Constants.MsgType.callingReject:
+                                    callingService.onInviteeRejected(signalingInfo);
+                                    break;
+                                case Constants.MsgType.callingCancel:
+                                    callingService.onInvitationCancelled(signalingInfo);
+                                    break;
+                                case Constants.MsgType.callingHungup:
+                                    callingService.onHangup(signalingInfo);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 
 
@@ -117,11 +140,11 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            RadioButton[] menus = new RadioButton[]{view.men1, view.men2, view.men3, view.men4};
-            if (v == view.men1) switchFragment(conversationListFragment);
+            RadioButton[] menus = new RadioButton[]{view.men1, view.men2, view.men3};
+            if (v == view.men1)
+                switchFragment(conversationListFragment);
             if (v == view.men2) switchFragment(contactFragment);
-            if (v == view.men3) switchFragment(appletFragment);
-            if (v == view.men4) switchFragment(personalFragment);
+            if (v == view.men3) switchFragment(personalFragment);
             for (RadioButton menu : menus) {
                 menu.setChecked(menu == v);
             }
@@ -147,7 +170,6 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         view.men1.setOnClickListener(clickListener);
         view.men2.setOnClickListener(clickListener);
         view.men3.setOnClickListener(clickListener);
-        view.men4.setOnClickListener(clickListener);
 
         view.men1.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
     }
@@ -156,6 +178,8 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
     @Override
     public void jump() {
         //token过期
+        if (vm != null)
+            vm.clearOfflineNotificationConfig(ActivityManager.getActivityStack().pop(), BaseApp.inst().loginCertificate.userID);
         IMUtil.logout(this, LoginActivity.class);
     }
 
@@ -175,20 +199,11 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
             (ContactFragment) ARouter.getInstance().build(Routes.Contact.HOME).navigation();
         conversationListFragment =
             (ConversationListFragment) ARouter.getInstance().build(Routes.Conversation.CONTACT_LIST).navigation();
-        personalFragment = PersonalFragment.newInstance();
+        personalFragment = PersonalFragment.newInstance().setParentViewModel(vm);
 
-        appletFragment =
-            (BaseFragment) ARouter.getInstance().build(Routes.Applet.HOME).navigation();
-
-        personalFragment.setPage(4);
+        personalFragment.setPage(3);
         switchFragment(personalFragment);
 
-        if (null != appletFragment) {
-            appletFragment.setPage(3);
-            switchFragment(appletFragment);
-        } else {
-            view.men3.setVisibility(View.GONE);
-        }
         if (null != contactFragment) {
             contactFragment.setPage(2);
             switchFragment(contactFragment);
@@ -222,11 +237,5 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        init(intent);
-        super.onNewIntent(intent);
     }
 }

@@ -40,6 +40,7 @@
                 android:minHeight="40dp"
                 android:padding="7dp"
                 android:textColor="@color/txt_black"
+                android:textColorLink="@color/theme"
                 android:textSize="@dimen/main_body"
                 app:emojiSize="23sp" />
 

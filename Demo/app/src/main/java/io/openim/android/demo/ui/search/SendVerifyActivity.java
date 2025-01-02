@@ -1,6 +1,7 @@
 package io.openim.android.demo.ui.search;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -11,6 +12,7 @@ import io.openim.android.ouicore.vm.SearchVM;
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
+import io.openim.android.ouigroup.ui.GroupDetailActivity;
 
 @Route(path = Routes.Main.SEND_VERIFY)
 public class SendVerifyActivity extends BaseActivity<SearchVM, ActivitySendVerifyBinding> {
@@ -39,6 +41,7 @@ public class SendVerifyActivity extends BaseActivity<SearchVM, ActivitySendVerif
 
     @Override
     public void onSuccess(Object body) {
+        setResult(GroupDetailActivity.RESULT_CODE, new Intent().putExtra("groupId", vm.searchContent.getValue()));
         finish();
     }
 }

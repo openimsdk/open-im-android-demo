@@ -131,7 +131,6 @@
 
                 </LinearLayout>
 
-
                 <ImageView
                     android:id="@+id/call"
                     android:layout_width="wrap_content"
@@ -140,7 +139,7 @@
                     android:layout_marginRight="10dp"
                     android:layout_toStartOf="@id/more"
                     android:src="@mipmap/ic_phone"
-                    android:visibility="visible" />
+                    android:visibility="@{ChatVM.isSingleChat?View.VISIBLE:View.GONE}" />
 
                 <ImageView
                     android:id="@+id/more"
@@ -197,127 +196,13 @@
         </FrameLayout>
 
 
-        <LinearLayout
-            android:id="@+id/notice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/card"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="12dp"
-            android:background="@drawable/sty_radius_4_f0f6ff"
-            android:gravity="center_vertical"
-            android:paddingLeft="16dp"
-            android:paddingTop="7dp"
-            android:paddingRight="16dp"
-            android:paddingBottom="7dp"
-            android:visibility="@{null!=ChatVM.notificationMsg? View.VISIBLE:View.GONE}">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@mipmap/ic_notice" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="@{ChatVM.notificationMsg.group.notification}"
-                android:textColor="#ff617183"
-                android:textSize="12sp" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@mipmap/ic_right" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/card"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="12dp"
-            android:animateLayoutChanges="true"
-            android:background="@drawable/sty_radius_4_fff1f7ff"
-            android:orientation="vertical"
-            android:padding="12dp"
-            android:visibility="@{ChatVM.roomCallingInfo.participant.size()
-            >0?View.VISIBLE:View.GONE}">
-
-            <io.openim.android.ouicore.widget.InterceptLinearLayout
-                android:id="@+id/callingUser"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:src="@mipmap/ic_blue_phone" />
-
-                <TextView
-                    android:id="@+id/callingUserNum"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/s_person_audio_calling"
-                    android:textColor="#ff5496eb"
-                    android:textSize="12sp" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:src="@mipmap/ic_down_arrow2" />
-            </io.openim.android.ouicore.widget.InterceptLinearLayout>
-
-            <LinearLayout
-                android:id="@+id/meetingLy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/sty_radius_4_white"
-                android:gravity="center_horizontal"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/meetingRv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:padding="12dp" />
-
-                <include layout="@layout/view_dividing_line" />
-
-                <TextView
-                    android:id="@+id/join"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:padding="12dp"
-                    android:text="@string/join"
-                    android:textColor="#ff5496eb"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-
         <include
             android:id="@+id/layout_input_cote"
             layout="@layout/layout_input_cote"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true" />
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="0dp"/>
 
         <com.lihang.ShadowLayout
             android:id="@+id/choiceMenu"
@@ -350,20 +235,6 @@
                     android:padding="7dp"
                     android:text="@string/delete"
                     android:textColor="@color/txt_warning"
-                    android:textSize="12sp" />
-
-                <CheckBox
-                    android:id="@+id/mergeForward"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:button="@null"
-                    android:drawableTop="@mipmap/ic_forward_grey"
-                    android:drawablePadding="3dp"
-                    android:gravity="center"
-                    android:padding="7dp"
-                    android:text="@string/merge_forward"
-                    android:textColor="@color/txt_black"
                     android:textSize="12sp" />
 
             </LinearLayout>

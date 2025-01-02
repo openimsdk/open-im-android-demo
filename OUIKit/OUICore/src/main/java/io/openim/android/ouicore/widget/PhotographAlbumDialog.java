@@ -25,9 +25,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import com.hjq.permissions.Permission;
-import com.zhihu.matisse.Matisse;
-import com.zhihu.matisse.MimeType;
-import com.zhihu.matisse.engine.impl.GlideEngine;
+import com.luck.picture.lib.basic.PictureSelector;
+import com.luck.picture.lib.config.SelectMimeType;
+import com.luck.picture.lib.entity.LocalMedia;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,7 +43,9 @@ import io.openim.android.ouicore.databinding.DialogPhotographAlbumBinding;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.GetFilePathFromUri;
+import io.openim.android.ouicore.utils.GlideEngine;
 import io.openim.android.ouicore.utils.HasPermissions;
+import io.openim.android.ouicore.utils.L;
 
 public class PhotographAlbumDialog extends BaseDialog {
     private AppCompatActivity compatActivity;
@@ -115,7 +118,6 @@ public class PhotographAlbumDialog extends BaseDialog {
             compatActivity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() != Activity.RESULT_OK) return;
                 String path = GetFilePathFromUri.getFileAbsolutePath(compatActivity, fileUri);
-                waitDialog.dismiss();
                 dismiss();
                 if (null != onSelectResultListener) onSelectResultListener.onResult(path);
             });
@@ -132,22 +134,20 @@ public class PhotographAlbumDialog extends BaseDialog {
             compatActivity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() != Activity.RESULT_OK) return;
                 try {
-                    List<Uri> uris = (List<Uri>) result.getData().getExtras().get(
-                        "extra_result_selection");
-
+                    List<LocalMedia> localMediaList = PictureSelector.obtainSelectorList(result.getData());
                     if (isToCrop) {
-                        Uri uri = uris.get(0);
+                        Uri uri = Uri.parse(localMediaList.get(0).getAvailablePath());
                         goCrop(uri);
                     } else if (null != onSelectResultListener) {
-                        String[] paths = new String[uris.size()];
-                        for (int i = 0; i < uris.size(); i++) {
+                        String[] paths = new String[localMediaList.size()];
+                        for (int i = 0; i < localMediaList.size(); i++) {
                             paths[i] = GetFilePathFromUri.getFileAbsolutePath(getContext(),
-                                uris.get(i));
+                                Uri.parse(localMediaList.get(i).getAvailablePath()));
                         }
                         onSelectResultListener.onResult(paths);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    L.e(e.getMessage());
                 }
 
             });
@@ -158,35 +158,18 @@ public class PhotographAlbumDialog extends BaseDialog {
      * 裁剪照片
      */
     private void goCrop(Uri sourceUri) {
-         fileUri = Uri.fromFile(new File(compatActivity.getExternalCacheDir(), System.currentTimeMillis() + ".jpg"));
+        fileUri = Uri.fromFile(new File(compatActivity.getExternalCacheDir(), System.currentTimeMillis() + ".jpg"));
+        File file = new File(sourceUri.getPath());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            File file = uriToFileApiQ(sourceUri, BaseApp.inst());
+            file = uriToFileApiQ(sourceUri, BaseApp.inst());
             fileUri = FileProvider.getUriForFile(BaseApp.inst(),
                 BaseApp.inst().getPackageName() + ".fileProvider", file);
         }
-        Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.putExtra("crop", "true");
-        intent.putExtra("aspectX", 1);  //X方向上的比例
-        intent.putExtra("aspectY", 1);  //Y方向上的比例
-        intent.putExtra("outputX", 500); //裁剪区的宽
-        intent.putExtra("outputY", 500);//裁剪区的高
-        intent.putExtra("scale ", true); //是否保留比例
-        intent.putExtra("return-data", false);
-        intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            intent.setDataAndType(fileUri, "image/*");
-        } else {
-            intent.setDataAndType(sourceUri, "image/*");
-        }
-        // 7.0 使用 FileProvider 并赋予临时权限
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        }
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);      //设置输出
-
-        waitDialog = new WaitDialog(getContext());
-        waitDialog.show();
-        cropLauncher.launch(intent);
+        Uri uri = Uri.fromFile(file);
+        UCrop.of(uri, fileUri)
+            .withAspectRatio(1, 1)
+            .withMaxResultSize(500, 500)
+            .start(this.compatActivity, cropLauncher);
     }
 
     @TargetApi(Build.VERSION_CODES.Q)
@@ -263,11 +246,15 @@ public class PhotographAlbumDialog extends BaseDialog {
     }
 
     private void goMediaPicker() {
-        Matisse.from(compatActivity).choose(MimeType.ofImage())
-            .countable(true).maxSelectable(maxSelectable)
-            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-            .thumbnailScale(0.85f).
-            imageEngine(new GlideEngine()).forResult(albumLauncher);
+        try {
+            PictureSelector.create(compatActivity)
+                .openGallery(SelectMimeType.ofImage())
+                .setImageEngine(GlideEngine.createGlideEngine())
+                .setMaxSelectNum(maxSelectable)
+                .forResult(albumLauncher);
+        } catch (Exception e) {
+            L.e(e.getMessage());
+        }
     }
 
     public void setMaxSelectable(int maxSelectable) {

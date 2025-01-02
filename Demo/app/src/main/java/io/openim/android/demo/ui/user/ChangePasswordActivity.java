@@ -1,18 +1,13 @@
 package io.openim.android.demo.ui.user;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
-import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityChangePasswordBinding;
 import io.openim.android.demo.vm.LoginVM;
 import io.openim.android.ouicore.base.BaseActivity;
-import io.openim.android.ouicore.base.BaseViewModel;
 import io.openim.android.ouicore.base.vm.injection.Easy;
-import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.RegexValid;
 
@@ -51,7 +46,7 @@ public class ChangePasswordActivity extends BaseActivity<LoginVM, ActivityChange
                 toast(getString(io.openim.android.ouicore.R.string.password_valid_tips3));
                 return;
             }
-           loginVM.changePassword(oldPassword,newPassword);
+//           loginVM.changePassword(oldPassword,newPassword);
         }
     });
     }

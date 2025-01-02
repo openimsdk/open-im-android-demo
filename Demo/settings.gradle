@@ -8,10 +8,6 @@ pluginManagement {
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/google' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/gradle-plugin' }
-        maven {
-            allowInsecureProtocol = true
-            url 'https://open-im-online.rentsoft.cn:51000/repository/maven2/'
-        }
         maven { url 'https://jitpack.io' }
         maven {url "https://mvn.getui.com/nexus/content/repositories/releases/"}
         maven {url 'https://developer.huawei.com/repo/'}
@@ -32,10 +28,6 @@ dependencyResolutionManagement {
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/google' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/gradle-plugin' }
-        maven {
-            allowInsecureProtocol = true
-            url 'https://open-im-online.rentsoft.cn:51000/repository/maven2/'
-        }
         maven { url 'https://jitpack.io' }
         maven {url "https://mvn.getui.com/nexus/content/repositories/releases/"}
         maven {url 'https://developer.huawei.com/repo/'}

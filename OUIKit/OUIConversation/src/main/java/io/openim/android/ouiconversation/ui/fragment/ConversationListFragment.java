@@ -45,7 +45,6 @@ import io.openim.android.ouiconversation.databinding.FragmentContactListBinding;
 import io.openim.android.ouiconversation.databinding.LayoutAddActionBinding;
 import io.openim.android.ouiconversation.ui.ChatActivity;
 import io.openim.android.ouiconversation.ui.NotificationActivity;
-import io.openim.android.ouiconversation.ui.SearchActivity;
 import io.openim.android.ouiconversation.vm.ChatVM;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.ex.MultipleChoice;
@@ -69,6 +68,7 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
 import io.openim.android.sdk.enums.Opt;
 import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.ConversationReq;
 import io.openim.android.sdk.models.FriendInfo;
 
 @Route(path = Routes.Conversation.CONTACT_LIST)
@@ -154,9 +154,10 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
             intent.putExtra(Constants.K_NOTICE, msgConversation.notificationMsg);
         startActivity(intent);
 
-        //重置强提醒
-        OpenIMClient.getInstance().conversationManager.resetConversationGroupAtType(null,
-            msgConversation.conversationInfo.getConversationID());
+        // remove the conversion's @ status
+        ConversationReq conversationReq = new ConversationReq();
+        conversationReq.setGroupAtType(0);
+        OpenIMClient.getInstance().conversationManager.setConversation(null, msgConversation.conversationInfo.getConversationID(), conversationReq);
     };
 
     @SuppressLint("NewApi")
@@ -262,17 +263,18 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
     }
 
     private void initHeader() {
+        view.avatar.load(null, null);
+        if (BaseApp.inst().loginCertificate != null) {
+            view.avatar.load(BaseApp.inst().loginCertificate.faceURL, BaseApp.inst().loginCertificate.nickname);
+            view.name.setText(BaseApp.inst().loginCertificate.nickname);
+        }
         user.info.observe(getActivity(), v -> {
-            view.avatar.load(v.getFaceURL(), v.getNickname());
-            view.name.setText(v.getNickname());
+            if (v != null) {
+                view.avatar.load(v.getFaceURL(), v.getNickname());
+                view.name.setText(v.getNickname());
+            }
         });
         view.addFriend.setOnClickListener(this::showPopupWindow);
-        view.callRecord.setOnClickListener(view -> {
-            ARouter.getInstance().build(Routes.Main.CALL_HISTORY).navigation();
-        });
-
-        view.search.getRoot().setOnClickListener(v -> startActivity(new Intent(getActivity(),
-            SearchActivity.class)));
     }
 
 
@@ -317,10 +319,6 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
                 ARouter.getInstance().build(Routes.Group.CREATE_GROUP2).navigation();
             });
             ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation();
-        });
-        view.videoMeeting.setOnClickListener(c -> {
-            popupWindow.dismiss();
-            ARouter.getInstance().build(Routes.Meeting.LAUNCH).navigation();
         });
         //设置PopupWindow的视图内容
         popupWindow.setContentView(view.getRoot());
@@ -404,7 +402,7 @@ public class ConversationListFragment extends BaseFragment<ContactListVM> implem
                 int count = msgConversation.conversationInfo.getUnreadCount();
                 viewHolder.viewBinding.badge.badge.setVisibility(count != 0 ? View.VISIBLE :
                     View.GONE);
-                viewHolder.viewBinding.badge.badge.setText(String.valueOf(count));
+                viewHolder.viewBinding.badge.badge.setText(count >= 100 ? "99+" : String.valueOf(count));
             }
             viewHolder.viewBinding.time.setText(TimeUtil.getTimeString(msgConversation.conversationInfo.getLatestMsgSendTime()));
 

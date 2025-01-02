@@ -12,7 +12,22 @@ public class CallHistory extends RealmObject {
     private String faceURL;
     private String type;
     private boolean success;
-    //失败状态 0连接中 1取消 2对方拒绝
+    /**
+     * Client's platform. Only accepted the calling invitation can be used. Default is Android, if didn't call setPlatform method.
+     * <p>
+     * 0: Android
+     * 1: Others
+     */
+    private int platform;
+    /**
+     * Failed state code.
+     * <p>
+     * 0: Connection
+     * 1: Canceled
+     * 2: Refused by invitor
+     * 3: Refused by us
+     * 4: Timeout
+     */
     private int failedState;
     private boolean incomingCall;
     private long date;
@@ -33,6 +48,7 @@ public class CallHistory extends RealmObject {
         this.incomingCall = incomingCall;
         this.date = date;
         this.duration = duration;
+        this.platform = 0;
     }
 
     public int getFailedState() {
@@ -40,8 +56,14 @@ public class CallHistory extends RealmObject {
     }
 
     /**
-     *
-     * @param failedState 失败状态 0连接中 1取消 2对方拒绝 3己方已拒绝
+     * Modified state code when the call failed
+     * <p>
+     * 0: Connection
+     * 1: Canceled
+     * 2: Refused by invitor
+     * 3: Refused by us
+     * 4: Timeout
+     * @param failedState failed state code
      */
     public void setFailedState(int failedState) {
         this.failedState = failedState;
@@ -118,5 +140,20 @@ public class CallHistory extends RealmObject {
     public void setDuration(int duration) {
         L.e("======================="+duration);
         this.duration = duration;
+    }
+
+    /**
+     * Client's platform
+     * <p>
+     * 0: Android
+     * 1: Others
+     * @param platform
+     */
+    public void setPlatform(int platform) {
+        this.platform = platform;
+    }
+
+    public int getPlatform() {
+        return platform;
     }
 }

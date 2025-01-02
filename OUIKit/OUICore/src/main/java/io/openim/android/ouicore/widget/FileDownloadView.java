@@ -31,7 +31,6 @@ import io.openim.android.ouicore.utils.OpenFileUtil;
 
 public class FileDownloadView extends RelativeLayout {
     private ImageView res, bgMask, downBtn;
-    private CirclePgBar circlePgBar;
     private String targetUrl, fileName;
     private DownloadTask task;
     private DownloadListener1 downloadListener;
@@ -59,8 +58,6 @@ public class FileDownloadView extends RelativeLayout {
         params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
         params.width = 80;
         params.height = 80;
-        circlePgBar = new CirclePgBar(getContext());
-        circlePgBar.setLayoutParams(params);
 
         RelativeLayout.LayoutParams params2 =
             new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -71,7 +68,6 @@ public class FileDownloadView extends RelativeLayout {
 
         addView(res);
         addView(bgMask);
-        addView(circlePgBar);
         addView(downBtn);
 
         setOnClickListener(new OnDedrepClickListener() {
@@ -110,7 +106,6 @@ public class FileDownloadView extends RelativeLayout {
         completed=true;
         bgMask.setVisibility(GONE);
         downBtn.setVisibility(GONE);
-        circlePgBar.setVisibility(GONE);
     }
 
     private void download() {
@@ -140,7 +135,6 @@ public class FileDownloadView extends RelativeLayout {
         buildTask();
 
         bgMask.setVisibility(isCompleted() ? GONE : VISIBLE);
-        circlePgBar.setVisibility(isCompleted() ? GONE : VISIBLE);
         downBtn.setVisibility(isCompleted() ? GONE : VISIBLE);
 
         if (getStatus() == StatusUtil.Status.RUNNING
@@ -202,9 +196,6 @@ public class FileDownloadView extends RelativeLayout {
             int current =
                 BigDecimal.valueOf(currentOffset).divide(BigDecimal.valueOf(totalLength), 2,
                     BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100)).intValue();
-            if (null != softReference.get())
-                softReference.get().circlePgBar.setTargetProgress(current);
-
             if (current == 100) {
                 if (null != softReference.get())
                     softReference.get().completed();

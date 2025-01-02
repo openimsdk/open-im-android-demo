@@ -2,13 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="io.openim.android.demo">
-    <!-- getui -->
-    <queries>
-        <intent>
-            <action android:name="com.getui.sdk.action" />
-        </intent>
-    </queries>
-
     <!--hardwareAccelerated=false livekit 会出问题 -->
     <application
         android:name=".DemoApplication"
@@ -23,6 +16,7 @@
         android:theme="@style/Theme.Main"
         android:usesCleartextTraffic="true"
         tools:targetApi="tiramisu">
+        <meta-data android:name="ScopedStorage" android:value="true" />
         <activity
             android:name=".ui.user.ChangePasswordActivity"
             android:exported="false" />
@@ -46,21 +40,8 @@
         <activity
             android:name=".ui.user.AccountSettingActivity"
             android:exported="false" />
-
-        <service
-            android:name=".services.GetuiPushService"
-            android:exported="false"
-            android:label="PushService"
-            android:process=":pushservice" />
-
-        <activity
-            android:name=".ui.ServerConfigActivity"
-            android:exported="false" />
         <activity
             android:name=".ui.user.AboutUsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.main.CallHistoryActivity"
             android:exported="false" />
         <activity
             android:name=".ui.user.MoreDataActivity"
@@ -93,12 +74,12 @@
             android:name=".ui.search.AddConversActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.login.RegisterActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.login.LoginActivity"
             android:exported="false"
             android:launchMode="singleTask" />
+        <activity
+            android:name=".ui.login.RegisterActivity"
+            android:exported="false" />
         <activity
             android:name=".SplashActivity"
             android:exported="true"

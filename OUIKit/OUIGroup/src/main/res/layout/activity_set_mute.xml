@@ -162,6 +162,7 @@
             </io.openim.android.ouicore.widget.InterceptLinearLayout>
 
             <io.openim.android.ouicore.widget.InterceptLinearLayout
+                android:id="@+id/cancel_mute"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:background="@color/white"

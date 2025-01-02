@@ -1,79 +1,26 @@
 {
   "project_info": {
-    "project_number": "680527798591",
-    "project_id": "openim-5c6c0",
-    "storage_bucket": "openim-5c6c0.appspot.com"
+    "project_number": "348945246821",
+    "project_id": "openim-test",
+    "storage_bucket": "openim-test.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:680527798591:android:dab6e9a0adaa4d8824f38a",
+        "mobilesdk_app_id": "1:348945246821:android:60c94109457d266bcaf48c",
         "android_client_info": {
-          "package_name": "io.openim.app.demo"
+          "package_name": "io.openim.android.os.demo"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "680527798591-8lu3bmeo8m1secn6fj9t45ce2u5jgiht.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC_Bx0ewCxYvM5Qfy7uueBrjTF55ZYur_Y"
+          "current_key": "AIzaSyBqRw8iBMfhmN8pXwlYWFNiHGu0O7aPh6E"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "680527798591-8lu3bmeo8m1secn6fj9t45ce2u5jgiht.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "680527798591-6roft9apgtfjd9233igjajjanh2qb5mf.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.b.biradar.googleMlKitExample"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:680527798591:android:587c04d8774c4ada24f38a",
-        "android_client_info": {
-          "package_name": "io.openim.app.enterprisechat"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "680527798591-8lu3bmeo8m1secn6fj9t45ce2u5jgiht.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyC_Bx0ewCxYvM5Qfy7uueBrjTF55ZYur_Y"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "680527798591-8lu3bmeo8m1secn6fj9t45ce2u5jgiht.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "680527798591-6roft9apgtfjd9233igjajjanh2qb5mf.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.b.biradar.googleMlKitExample"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

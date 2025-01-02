@@ -1,7 +1,11 @@
 package io.openim.android.ouicore.im;
 
 
+import android.app.KeyguardManager;
+import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -9,9 +13,12 @@ import java.util.List;
 import java.util.Objects;
 
 
+import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.injection.Easy;
+import io.openim.android.ouicore.data.DataManager;
 import io.openim.android.ouicore.utils.L;
+import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.ConversationType;
@@ -25,6 +32,7 @@ import io.openim.android.sdk.listener.OnUserListener;
 import io.openim.android.sdk.models.BlacklistInfo;
 import io.openim.android.sdk.models.C2CReadReceiptInfo;
 import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.CustomSignalingInfo;
 import io.openim.android.sdk.models.FriendApplicationInfo;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupApplicationInfo;
@@ -32,8 +40,11 @@ import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.GroupMessageReceipt;
 import io.openim.android.sdk.models.KeyValue;
+import io.openim.android.sdk.models.MeetingStreamEvent;
 import io.openim.android.sdk.models.Message;
 import io.openim.android.sdk.models.RevokedInfo;
+import io.openim.android.sdk.models.RoomCallingInfo;
+import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.UserInfo;
 import io.openim.android.sdk.models.UsersOnlineStatus;
 
@@ -67,6 +78,7 @@ public class IMEvent {
         if (null == listener) listener = new IMEvent();
         return listener;
     }
+
     //连接事件
     public void addConnListener(OnConnListener onConnListener) {
         if (!connListeners.contains(onConnListener)) {
@@ -127,7 +139,7 @@ public class IMEvent {
     public OnConnListener connListener = new OnConnListener() {
 
         @Override
-        public void onConnectFailed(long code, String error) {
+        public void onConnectFailed(int code, String error) {
             // 连接服务器失败，可以提示用户当前网络连接不可用
             L.d(TAG, "连接服务器失败(" + error + ")");
             for (OnConnListener onConnListener : connListeners) {
@@ -174,6 +186,16 @@ public class IMEvent {
                 Toast.LENGTH_SHORT).show();
             for (OnConnListener onConnListener : connListeners) {
                 onConnListener.onUserTokenExpired();
+            }
+        }
+
+        @Override
+        public void onUserTokenInvalid(String reason) {
+            Toast.makeText(BaseApp.inst(),
+                BaseApp.inst().getString(R.string.token_invalid),
+                Toast.LENGTH_SHORT).show();
+            for (OnConnListener onConnListener : connListeners) {
+                onConnListener.onUserTokenInvalid(reason);
             }
         }
     };
@@ -292,24 +314,36 @@ public class IMEvent {
             }
 
             @Override
-            public void onSyncServerFailed() {
+            public void onSyncServerFailed(boolean reinstalled) {
                 for (OnConversationListener onConversationListener : conversationListeners) {
-                    onConversationListener.onSyncServerFailed();
+                    onConversationListener.onSyncServerFailed(reinstalled);
                 }
             }
 
             @Override
-            public void onSyncServerFinish() {
+            public void onSyncServerFinish(boolean reinstalled) {
                 for (OnConversationListener onConversationListener : conversationListeners) {
-                    onConversationListener.onSyncServerFinish();
+                    onConversationListener.onSyncServerFinish(reinstalled);
                 }
-
+                Log.d(TAG, "onSyncServerFinish reinstalled:" + reinstalled);
+                DataManager.getInstance().getAllGroup();
+                DataManager.getInstance().getAllFriend();
+                DataManager.getInstance().getTotalUnreadMsgCount();
+                DataManager.getInstance().getAllConversations();
             }
 
             @Override
-            public void onSyncServerStart() {
+            public void onSyncServerProgress(long progress) {
                 for (OnConversationListener onConversationListener : conversationListeners) {
-                    onConversationListener.onSyncServerStart();
+                    onConversationListener.onSyncServerProgress(progress);
+                }
+            }
+
+            @Override
+            public void onSyncServerStart(boolean reinstalled) {
+                Log.d(TAG, "onSyncServerStart reinstalled:" + reinstalled);
+                for (OnConversationListener onConversationListener : conversationListeners) {
+                    onConversationListener.onSyncServerStart(reinstalled);
                 }
             }
 
@@ -341,6 +375,7 @@ public class IMEvent {
                 @Override
                 public void onSuccess(ConversationInfo data) {
                     if (null == data) return;
+                    if (isDeviceLocked(BaseApp.inst())) return;
                     if (data.getRecvMsgOpt() == 0) {
                         if (BaseApp.inst().isAppBackground.val())
                             IMUtil.sendNotice(msg.getClientMsgID().hashCode());
@@ -404,6 +439,9 @@ public class IMEvent {
             @Override
             public void onFriendInfoChanged(FriendInfo u) {
                 // 朋友的资料发生变化
+                for (OnFriendshipListener friendshipListener : friendshipListeners) {
+                    friendshipListener.onFriendInfoChanged(u);
+                }
             }
 
             @Override
@@ -423,10 +461,10 @@ public class IMEvent {
         OpenIMClient.getInstance().messageManager.setAdvancedMsgListener(new OnAdvanceMsgListener() {
             @Override
             public void onRecvNewMessage(Message msg) {
+                Log.d(TAG, "onRecvNewMessage, advanceMsgListeners:" + advanceMsgListeners);
                 if (!IMUtil.isSignalingMsg(msg)){
                     promptSoundOrNotification(msg);
                 }
-
                 // 收到新消息，界面添加新消息
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
                     onAdvanceMsgListener.onRecvNewMessage(msg);
@@ -487,8 +525,16 @@ public class IMEvent {
             @Override
             public void onRecvGroupMessageReadReceipt(GroupMessageReceipt groupMessageReceipt) {
                 // 消息被阅读回执，将消息标记为已读
+                Log.d(TAG, "onRecvGroupMessageReadReceipt, advanceMsgListeners:" + advanceMsgListeners);
                 for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
                     onAdvanceMsgListener.onRecvGroupMessageReadReceipt(groupMessageReceipt);
+                }
+            }
+
+            @Override
+            public void onRecvOnlineOnlyMessage(String s) {
+                for (OnAdvanceMsgListener onAdvanceMsgListener : advanceMsgListeners) {
+                    onAdvanceMsgListener.onRecvOnlineOnlyMessage(s);
                 }
             }
         });
@@ -527,6 +573,15 @@ public class IMEvent {
                 }
             }
         });
+    }
+
+    private boolean isDeviceLocked(Context context) {
+        KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            return keyguardManager.isDeviceLocked();
+        } else {
+            return keyguardManager.isKeyguardLocked();
+        }
     }
 }
 
