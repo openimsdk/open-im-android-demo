@@ -96,17 +96,6 @@ The open-source version supports one-to-one audio and video calls. You need to f
 
 > This project allows separate builds for the native android application.
 
-### Web Application
-
-1. Run the following command to build the Web application:
-   ```bash
-   npm run build
-   ```
-2. The build artifacts will be located in the `dist` directory.
-
-### Electron Application
-
-
 1. Run assemble to build a test apk
 
 ```bash
@@ -201,7 +190,7 @@ For more advanced features, audio/video calls, or video conferences, please cont
 
 1. **How to switch SDK about offline push in the project?**
 
-   A: Modified the variants to switch used SDK variant FCMDebug/Release used FCM SDK，others used Getui。
+   A: Modified the variants to switch used SDK variant FCMDebug/Release used FCM SDK, others used Getui。
 
 2. **Why did the binding file show error when switched variants?**
    
