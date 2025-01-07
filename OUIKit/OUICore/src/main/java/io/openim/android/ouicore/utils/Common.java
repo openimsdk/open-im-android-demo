@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -18,10 +20,12 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Patterns;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -55,6 +59,8 @@ import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.widget.WebViewActivity;
 import io.openim.android.sdk.models.Message;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import q.rorbin.badgeview.QBadgeView;
 
 public class Common {
@@ -335,47 +341,56 @@ public class Common {
 //        void onGranted();
 //    }
 
-
+    // If true, the download will be interrupted.
+    public static boolean isInterruptDownload = false;
     //下载图片
     public static Observable<Boolean> downloadFile(String url, String savePath, Uri insertUri) {
-        return N.API(OneselfService.class).downloadFileWithDynamicUrlSync(url).compose(N.computationMain()).map(body -> {
-            OutputStream outputStream = null;
-            InputStream inputStream = null;
-            try {
-                if (TextUtils.isEmpty(savePath)) {
-                    outputStream = BaseApp.inst().getContentResolver().openOutputStream(insertUri
-                        , "rw");
-                } else {
-                    File file = new File(savePath);
-                    if (!file.exists()) {
-                        file.mkdirs();
-                    }
-                    file = new File(savePath + url.substring(url.lastIndexOf("/")));
-                    outputStream = new FileOutputStream(file);
-                }
+        return N.API(OneselfService.class).downloadFileWithDynamicUrlSync(url)
+            .compose(N.bothIO())
+            .concatMap(body -> Observable.create(new ObservableOnSubscribe<Boolean>() {
+                @Override
+                public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
+                    OutputStream outputStream = null;
+                    InputStream inputStream = null;
+                    try {
+                        if (TextUtils.isEmpty(savePath)) {
+                            outputStream = BaseApp.inst().getContentResolver().openOutputStream(insertUri
+                                , "rw");
+                        } else {
+                            File file = new File(savePath);
+                            if (!file.exists()) {
+                                file.mkdirs();
+                            }
+                            file = new File(savePath + url.substring(url.lastIndexOf("/")));
+                            outputStream = new FileOutputStream(file);
+                        }
 
-                byte[] fileReader = new byte[4096];
-                inputStream = body.byteStream();
-                while (true) {
-                    int read = inputStream.read(fileReader);
-                    if (read == -1) {
-                        break;
+                        byte[] fileReader = new byte[4096];
+                        inputStream = body.byteStream();
+                        while (true) {
+                            int read = inputStream.read(fileReader);
+                            if (read == -1 || isInterruptDownload) {
+                                if (isInterruptDownload) emitter.onNext(false);
+                                isInterruptDownload = false;
+                                break;
+                            }
+                            outputStream.write(fileReader, 0, read);
+                        }
+                        outputStream.flush();
+                    } catch (IOException e) {
+                        emitter.onError(e);
+                    } finally {
+                        if (inputStream != null) {
+                            inputStream.close();
+                        }
+                        if (outputStream != null) {
+                            outputStream.close();
+                        }
                     }
-                    outputStream.write(fileReader, 0, read);
+                    emitter.onNext(true);
+                    emitter.onComplete();
                 }
-                outputStream.flush();
-            } catch (IOException e) {
-                return false;
-            } finally {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-            }
-            return true;
-        });
+            }));
     }
 
     /**
@@ -385,6 +400,10 @@ public class Common {
      * @param v
      */
     public static void toMap(Message message, View v) {
+        if (TextUtils.isEmpty(WebViewActivity.mapAppKey)) {
+            Toast.makeText(v.getContext(), BaseApp.inst().getString(io.openim.android.ouicore.R.string.no_map_key), Toast.LENGTH_LONG).show();
+            return;
+        }
         v.getContext().startActivity(new Intent(v.getContext(), WebViewActivity.class).putExtra(WebViewActivity.LOAD_URL, "https://apis.map.qq.com/uri/v1/geocoder?coord=" + message.getLocationElem().getLatitude() + "," + message.getLocationElem().getLongitude() + "&referer=" + WebViewActivity.mapAppKey).putExtra(WebViewActivity.TITLE, v.getContext().getString(R.string.location)));
     }
 
@@ -438,11 +457,13 @@ public class Common {
     }
 
     /**
-     * 小红点
+     * 小红点，仅显示两位数，大于两位数一律为99+
      *
      * @param context
      * @param target      目标view
      * @param badgeNumber 数
+     *
+     * @see <a href="https://github.com/qstumn/BadgeView">qstumn/BadgeView</a>
      */
     public static void buildBadgeView(Context context, View target, int badgeNumber) {
         QBadgeView badgeView = (QBadgeView) target.getTag();
@@ -450,7 +471,13 @@ public class Common {
             badgeView.setBadgeNumber(badgeNumber);
             return;
         }
-        target.setTag(new QBadgeView(context).bindTarget(target).setGravityOffset(10, -2, true).setBadgeNumber(badgeNumber).setBadgeTextSize(8, true).setShowShadow(false));
+        target.setTag(new QBadgeView(context)
+            .bindTarget(target)
+            .setGravityOffset(10, -2, true)
+            .setBadgeNumber(badgeNumber)
+            .setBadgeTextSize(8, true)
+            .setExactMode(false)
+            .setShowShadow(false));
     }
 
     /**
@@ -458,16 +485,9 @@ public class Common {
      * @param text
      * @return
      */
-    public static String containsLink(String text) {
-        StringBuilder links = new StringBuilder();
-        // 正则表达式模式匹配URL链接
-        String pattern = "(http|https)://[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3}(/\\S*)?";
-        Pattern regex = Pattern.compile(pattern);
-        Matcher matcher = regex.matcher(text);
-        while (matcher.find()) {
-            links.append(matcher.group());
-        }
-        return links.toString();
+    public static boolean containsLink(String text) {
+        if (TextUtils.isEmpty(text)) return false;
+        return Patterns.WEB_URL.matcher(text).find();
     }
 
     /**

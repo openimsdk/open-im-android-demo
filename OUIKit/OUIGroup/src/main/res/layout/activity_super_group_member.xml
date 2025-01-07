@@ -60,7 +60,7 @@
                 android:layout_marginBottom="7dp"
                 android:layout_weight="1"
                 android:clickable="false"
-                android:hint="@string/search_friends" />
+                android:hint="@string/search" />
 
         </LinearLayout>
 

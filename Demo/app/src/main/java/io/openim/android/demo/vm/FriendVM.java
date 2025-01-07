@@ -1,5 +1,7 @@
 package io.openim.android.demo.vm;
 
+import static io.openim.android.ouicore.utils.Constants.ActivityResult.DELETE_FRIEND;
+
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
@@ -76,7 +78,7 @@ public class FriendVM extends BaseViewModel {
                 if (data.isEmpty()) return;
                 friendsInfo.setValue(data);
             }
-        }, uids);
+        }, uids, false);
     }
 
     public void getBlacklist() {
@@ -106,7 +108,7 @@ public class FriendVM extends BaseViewModel {
             @Override
             public void onSuccess(String data) {
                 getIView().toast(getContext().getString(io.openim.android.ouicore.R.string.delete_friend));
-                getIView().onSuccess(data);
+                getIView().onSuccess(DELETE_FRIEND);
             }
         }, uid);
     }

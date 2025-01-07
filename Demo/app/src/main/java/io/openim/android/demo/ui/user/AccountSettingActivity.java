@@ -3,6 +3,8 @@ package io.openim.android.demo.ui.user;
 import android.content.Intent;
 import android.os.Bundle;
 
+import java.util.Objects;
+
 import io.openim.android.demo.databinding.ActivityAccountSettingBinding;
 import io.openim.android.demo.vm.PersonalVM;
 import io.openim.android.ouicore.base.BaseActivity;
@@ -31,10 +33,10 @@ public class AccountSettingActivity extends BaseActivity<PersonalVM, ActivityAcc
         });
         vm.userInfo.observe(this, extendUserInfo -> {
             if (null == extendUserInfo) return;
-            view.slideButton.setCheckedWithAnimation(extendUserInfo.getGlobalRecvMsgOpt() == 2);
-            view.messageTone.setCheckedWithAnimation(extendUserInfo.getAllowBeep() == 1);
-            view.vibration.setCheckedWithAnimation(extendUserInfo.getAllowVibration() == 1);
-            view.notAdd.setCheckedWithAnimation(extendUserInfo.getAllowAddFriend() == AllowType.NotAllowed.value);
+            view.slideButton.setCheckedWithAnimation(Objects.requireNonNullElse(extendUserInfo.getGlobalRecvMsgOpt(), 0) == 2);
+            view.messageTone.setCheckedWithAnimation(Objects.requireNonNullElse(extendUserInfo.getAllowBeep(), 0) == 1);
+            view.vibration.setCheckedWithAnimation(Objects.requireNonNullElse(extendUserInfo.getAllowVibration(), 0) == 1);
+            view.notAdd.setCheckedWithAnimation(Objects.requireNonNullElse(extendUserInfo.getAllowAddFriend(), 0) == AllowType.NotAllowed.value);
         });
         view.slideButton.setOnSlideButtonClickListener(isChecked -> vm.setGlobalRecvMessageOpt(isChecked));
         view.messageTone.setOnSlideButtonClickListener(isChecked -> vm.setAllowBeep(isChecked));

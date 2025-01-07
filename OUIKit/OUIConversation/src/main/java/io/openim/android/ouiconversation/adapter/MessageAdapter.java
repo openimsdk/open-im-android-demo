@@ -1,8 +1,10 @@
 package io.openim.android.ouiconversation.adapter;
 
+import android.util.Log;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
@@ -59,6 +61,17 @@ public class MessageAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemCount() {
         return null == messages ? 0 : messages.size();
+    }
+
+    public int[] getCurrentPageItemPositions() {
+        int[] positions = new int[2];
+        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        if (layoutManager instanceof LinearLayoutManager) {
+            LinearLayoutManager linearLayoutManager = (LinearLayoutManager) layoutManager;
+            positions[0] = linearLayoutManager.findFirstVisibleItemPosition();
+            positions[1] = linearLayoutManager.findLastVisibleItemPosition();
+        }
+        return positions;
     }
 
     public List<Message> getMessages() {

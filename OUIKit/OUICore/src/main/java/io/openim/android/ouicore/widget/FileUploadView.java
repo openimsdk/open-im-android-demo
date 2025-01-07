@@ -13,7 +13,6 @@ import io.openim.android.ouicore.utils.OnDedrepClickListener;
 
 public class FileUploadView extends RelativeLayout {
     private ImageView res, bgMask;
-    private CirclePgBar circlePgBar;
     private String localUrl = "";
 
     public FileUploadView(Context context) {
@@ -36,12 +35,9 @@ public class FileUploadView extends RelativeLayout {
         params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
         params.width = 80;
         params.height = 80;
-        circlePgBar = new CirclePgBar(getContext());
-        circlePgBar.setLayoutParams(params);
 
         addView(res);
         addView(bgMask);
-        addView(circlePgBar);
 
         setOnClickListener(new OnDedrepClickListener() {
             @Override
@@ -63,13 +59,5 @@ public class FileUploadView extends RelativeLayout {
 
     public void setForegroundVisibility(boolean visibility) {
         bgMask.setVisibility(visibility ? GONE : VISIBLE);
-        circlePgBar.setVisibility(visibility ? GONE : VISIBLE);
-        if (visibility)
-            circlePgBar.reset();
     }
-
-    public void setProgress(int progress) {
-        circlePgBar.setTargetProgress(progress);
-    }
-
 }

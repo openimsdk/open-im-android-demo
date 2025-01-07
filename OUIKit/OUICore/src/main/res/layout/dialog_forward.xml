@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
@@ -18,12 +18,14 @@
         <TextView
             android:id="@+id/tips"
             android:layout_width="73dp"
-            android:layout_height="24dp"
-            android:layout_marginBottom="10dp"
+            android:layout_height="34dp"
+            android:paddingBottom="10dp"
             android:text="@string/send_who"
             android:textColor="#ff0c1c33"
             android:textSize="17sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"/>
 
 
         <LinearLayout
@@ -31,7 +33,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/tips"
+            app:layout_constraintLeft_toLeftOf="parent">
 
             <io.openim.android.ouicore.widget.AvatarImage
                 android:id="@+id/avatar"
@@ -51,11 +55,17 @@
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxHeight="200dp" />
+            app:layout_constraintTop_toBottomOf="@id/single"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintHeight_default="wrap"
+            app:layout_constraintHeight_max="300dp"/>
         <ScrollView
+            android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_weight="1"
-            android:layout_height="0dp">
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/recyclerView"
+            app:layout_constraintLeft_toLeftOf="parent">
             <TextView
                 android:id="@+id/content"
                 android:layout_width="wrap_content"
@@ -69,21 +79,13 @@
         </ScrollView>
 
 
-        <EditText
-            android:id="@+id/leave"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-
-            android:background="@drawable/sty_radius_4_f0f0f0"
-            android:hint="@string/leave_word"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="right"
-            android:orientation="horizontal">
+            android:gravity="end"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/recyclerView"
+            app:layout_constraintLeft_toLeftOf="parent">
 
             <TextView
                 android:id="@+id/cancel"
@@ -104,7 +106,7 @@
                 android:textSize="17sp" />
         </LinearLayout>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </LinearLayout>

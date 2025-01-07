@@ -11,9 +11,9 @@
         tools:context=".ui.group.CreateGroupActivityV3">
 
         <ImageView
-            android:onClick="toBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="toBack"
             android:padding="15dp"
             android:src="@mipmap/ic_back2" />
 
@@ -107,8 +107,8 @@
             android:id="@+id/divider2"
             layout="@layout/view_dividing_line"
             android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="0dp" />
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <include
             android:id="@+id/bottom"

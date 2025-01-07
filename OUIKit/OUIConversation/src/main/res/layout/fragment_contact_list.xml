@@ -40,7 +40,8 @@
                 android:orientation="horizontal"
                 android:paddingLeft="20dp"
                 android:paddingTop="15dp"
-                android:paddingRight="20dp">
+                android:paddingRight="20dp"
+                android:paddingBottom="15dp">
 
                 <io.openim.android.ouicore.widget.AvatarImage
                     android:id="@+id/avatar"
@@ -97,15 +98,6 @@
                     android:layout_weight="1" />
 
                 <ImageView
-                    android:id="@+id/callRecord"
-                    android:layout_width="31dp"
-                    android:layout_height="31dp"
-                    android:layout_marginRight="15dp"
-                    android:padding="5dp"
-                    android:visibility="invisible"
-                    android:src="@mipmap/ic_call_white" />
-
-                <ImageView
                     android:id="@+id/addFriend"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -114,11 +106,6 @@
 
             </LinearLayout>
         </FrameLayout>
-
-        <include
-            android:id="@+id/search"
-            layout="@layout/view_search" />
-
 
         <com.yanzhenjie.recyclerview.SwipeRecyclerView
             android:id="@+id/recyclerView"

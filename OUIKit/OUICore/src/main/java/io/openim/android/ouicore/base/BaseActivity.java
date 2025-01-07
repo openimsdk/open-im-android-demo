@@ -25,11 +25,11 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.net.RXRetrofit.N;
 
-import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.LanguageUtil;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.utils.SinkHelper;
+import io.openim.android.ouicore.widget.WaitDialog;
 
 
 @Deprecated
@@ -43,6 +43,7 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
     protected T vm;
     protected A view;
     private String vmCanonicalName;
+    private WaitDialog waitDialog;
 
 
     @Override
@@ -54,6 +55,11 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
             vm.viewCreate();
         }
         setLightStatus();
+        if (waitDialog != null) {
+            waitDialog.dismiss();
+            waitDialog = null;
+        }
+        waitDialog = new WaitDialog(this);
     }
 
     @Override
@@ -155,7 +161,6 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
 
     @Override
     protected void onResume() {
-        ActivityManager.push(this);
         super.onResume();
         bind();
         if (null != vm) vm.viewResume();
@@ -190,6 +195,10 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         exeFaster();
         N.clearDispose(this);
         releaseRes();
+        if (waitDialog != null) {
+            waitDialog.dismiss();
+            waitDialog = null;
+        }
         super.onDestroy();
     }
 
@@ -255,12 +264,24 @@ public class BaseActivity<T extends BaseViewModel, A extends ViewDataBinding> ex
         finish();
     }
 
+    public void showWaiting() {
+        if (waitDialog == null) return;
+        if (!waitDialog.isShowing()) {
+            waitDialog.setNotDismiss();
+            waitDialog.show();
+        }
+    }
+
+    public void cancelWaiting() {
+        if (waitDialog == null) return;
+        if (waitDialog.isShowing()) {
+            waitDialog.dismiss();
+        }
+    }
+
 
     @Override
     public void onBackPressed() {
-        CallingService callingService =
-            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-        if (null != callingService && callingService.isCalling()) return;
         super.onBackPressed();
     }
 }

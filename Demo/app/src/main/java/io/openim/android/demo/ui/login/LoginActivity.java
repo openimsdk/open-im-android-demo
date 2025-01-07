@@ -2,7 +2,6 @@ package io.openim.android.demo.ui.login;
 
 import android.content.Intent;
 
-import io.openim.android.demo.ui.ServerConfigActivity;
 import io.openim.android.demo.ui.main.MainActivity;
 
 import android.content.res.Configuration;
@@ -113,17 +112,7 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
         startActivity(new Intent(this, RegisterActivity.class));
     }
 
-    private final GestureDetector gestureDetector = new GestureDetector(BaseApp.inst(),
-        new GestureDetector.SimpleOnGestureListener() {
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            startActivity(new Intent(LoginActivity.this, ServerConfigActivity.class));
-            return super.onDoubleTap(e);
-        }
-    });
-
     private void click() {
-        view.welcome.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
         view.changeLoginType.setOnClickListener(v -> {
             vm.isPhone.setValue( !vm.isPhone.val());
         });
@@ -153,7 +142,7 @@ public class LoginActivity extends BaseActivity<LoginVM, ActivityLoginBinding> i
             }
         });
         view.submit.setOnClickListener(v -> {
-            vm.areaCode.setValue("+" + view.loginContent.countryCode.getSelectedCountryCode());
+            vm.areaCode.setValue("+"+view.loginContent.countryCode.getSelectedCountryCode());
             waitDialog.show();
             vm.login(isVCLogin ? vm.pwd.getValue() : null, 3);
         });

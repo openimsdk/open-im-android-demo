@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -37,7 +37,8 @@
                         android:layout_centerInParent="true"
                         android:layout_marginEnd="10dp"
                         android:padding="4dp"
-                        android:src="@mipmap/ic_more" />
+                        android:src="@mipmap/ic_more"
+                        android:visibility="gone"/>
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
 
@@ -120,7 +121,6 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
                     android:orientation="vertical"
                     android:paddingLeft="20dp"
                     android:paddingTop="15dp"
@@ -131,9 +131,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
+                        android:visibility="gone"
                         android:orientation="horizontal">
-                        android:orientation="horizontal"
-                        android:visibility="gone">
 
                         <TextView
                             android:layout_width="0dp"
@@ -155,7 +154,6 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -201,13 +199,86 @@
                             android:textSize="18sp" />
                     </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/userInfoLy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@color/theme_bg">
+
+                    <LinearLayout
+                        android:id="@+id/manager"
+                        android:background="@color/white"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="15dp"
+                        android:paddingTop="15dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:paddingBottom="15dp"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/set_manager"
+                            android:textColor="#ff333333"
+                            android:textSize="18sp" />
+
+                        <io.openim.android.ouicore.widget.SlideButton
+                            android:id="@+id/setManager"
+                            android:layout_width="45dp"
+                            android:layout_height="25dp" />
+                    </LinearLayout>
+
+                    <io.openim.android.ouicore.widget.InterceptLinearLayout
+                        android:id="@+id/mute"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:background="@color/white"
+                        android:paddingTop="15dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:paddingBottom="15dp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/set_mute"
+                            android:textColor="#ff333333"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/muteTime"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:textColor="#ff333333"
+                            android:textSize="18sp" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@mipmap/ic_right" />
+                    </io.openim.android.ouicore.widget.InterceptLinearLayout>
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+        <LinearLayout
+            android:id="@+id/userInfoLy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
                 <LinearLayout
                     android:id="@+id/userInfo"
@@ -236,31 +307,6 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/moments"
-                    android:layout_width="match_parent"
-                    android:layout_height="55dp"
-                    android:background="@color/white"
-                    android:gravity="center_vertical"
-                    android:visibility="visible">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="22dp"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="@string/see_moments"
-                        android:textColor="#ff333333"
-                        android:textSize="18sp" />
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="22dp"
-                        android:src="@mipmap/ic_right" />
-                </LinearLayout>
-
             </LinearLayout>
 
 
@@ -274,42 +320,18 @@
                 android:id="@+id/bottomMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginBottom="60dp"
                 android:orientation="horizontal"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:id="@+id/call"
-                    android:layout_width="170dp"
-                    android:layout_height="46dp"
-                    android:gravity="center"
-                    android:background="@drawable/sty_radius_6_white"
-                    >
-
-                    <RadioButton
-                        android:clickable="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:button="@null"
-                        android:drawableLeft="@mipmap/ic_call"
-                        android:drawablePadding="10dp"
-                        android:text="@string/media_call"
-                        android:textColor="@color/txt_black"
-                        android:textSize="17sp" />
-                </LinearLayout>
-
-
-
+                android:visibility="visible">
                 <View
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:layout_weight="1" />
+                    android:layout_weight="0.2" />
 
                 <LinearLayout
-                    android:layout_width="170dp"
                     android:layout_height="46dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:id="@+id/sendMsg"
                     android:background="@drawable/sty_radius_6_ff0089ff"
                     android:gravity="center"
@@ -324,8 +346,13 @@
                         android:drawablePadding="10dp"
                         android:text="@string/send_msg"
                         android:textColor="@color/white"
-                        android:textSize="17sp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="0.2" />
 
             </LinearLayout>
 

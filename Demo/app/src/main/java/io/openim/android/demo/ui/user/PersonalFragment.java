@@ -2,6 +2,7 @@ package io.openim.android.demo.ui.user;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModel;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
@@ -17,11 +19,13 @@ import java.util.Observer;
 
 import io.openim.android.demo.databinding.FragmentPersonalBinding;
 import io.openim.android.demo.ui.login.LoginActivity;
+import io.openim.android.demo.vm.MainVM;
 import io.openim.android.ouiconversation.ui.PreviewMediaActivity;
 import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.BaseFragment;
 import io.openim.android.ouicore.base.vm.injection.Easy;
 import io.openim.android.ouicore.im.IMUtil;
+import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constants;
 import io.openim.android.ouicore.utils.Obs;
@@ -37,6 +41,7 @@ import io.openim.android.sdk.listener.OnBase;
 public class PersonalFragment extends BaseFragment implements Observer {
     public FragmentPersonalBinding view;
     private final UserLogic user = Easy.find(UserLogic.class);
+    private MainVM mainVM = null;
     public static PersonalFragment newInstance() {
 
         Bundle args = new Bundle();
@@ -44,6 +49,12 @@ public class PersonalFragment extends BaseFragment implements Observer {
         PersonalFragment fragment = new PersonalFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public PersonalFragment setParentViewModel(ViewModel viewModel) {
+        if (viewModel instanceof MainVM)
+            mainVM = (MainVM) viewModel;
+        return this;
     }
 
 
@@ -60,8 +71,10 @@ public class PersonalFragment extends BaseFragment implements Observer {
 
     private void initView() {
         user.info.observe(getActivity(),v-> {
-            view.avatar.load(v.getFaceURL(),v.getNickname());
-            view.name.setText(v.getNickname());
+            if (!TextUtils.isEmpty(v.getNickname())) {
+                view.avatar.load(v.getFaceURL(),v.getNickname());
+                view.name.setText(v.getNickname());
+            }
         });
         view.userId.setText("ID：" + BaseApp.inst().loginCertificate.userID);
     }
@@ -75,11 +88,13 @@ public class PersonalFragment extends BaseFragment implements Observer {
     private void listener() {
         view.avatar.setOnClickListener(v -> {
             PreviewMediaVM mediaVM = Easy.installVM(PreviewMediaVM.class);
-            PreviewMediaVM .MediaData mediaData =new PreviewMediaVM.MediaData(user.info.val().getNickname());
-            mediaData.mediaUrl=user.info.val().getFaceURL();
-            mediaVM.previewSingle(mediaData);
-            v.getContext().startActivity(
-                new Intent(v.getContext(), PreviewMediaActivity.class));
+            if (user.info.val() != null && !TextUtils.isEmpty(user.info.val().getNickname()) && !TextUtils.isEmpty(user.info.val().getFaceURL())) {
+                PreviewMediaVM .MediaData mediaData =new PreviewMediaVM.MediaData(user.info.val().getNickname());
+                mediaData.mediaUrl=user.info.val().getFaceURL();
+                mediaVM.preview(mediaData);
+                v.getContext().startActivity(
+                    new Intent(v.getContext(), PreviewMediaActivity.class));
+            }
         });
         view.accountSetting.setOnClickListener(v->{
             startActivity(new Intent(getActivity(),AccountSettingActivity.class));
@@ -119,6 +134,8 @@ public class PersonalFragment extends BaseFragment implements Observer {
                     @Override
                     public void onSuccess(String data) {
                         waitDialog.dismiss();
+                        if (mainVM != null)
+                            mainVM.clearOfflineNotificationConfig(ActivityManager.getActivityStack().pop(), BaseApp.inst().loginCertificate.userID);
                         IMUtil.logout((AppCompatActivity) getActivity(), LoginActivity.class);
                     }
                 });

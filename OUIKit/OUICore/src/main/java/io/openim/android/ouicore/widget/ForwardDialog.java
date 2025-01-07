@@ -1,5 +1,6 @@
 package io.openim.android.ouicore.widget;
 
+import android.app.Activity;
 import android.content.Context;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -16,6 +17,8 @@ import com.alibaba.android.arouter.launcher.ARouter;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Stack;
+
 import io.openim.android.ouicore.R;
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
@@ -25,6 +28,7 @@ import io.openim.android.ouicore.databinding.DialogForwardBinding;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Constants;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.ForwardVM;
@@ -78,17 +82,26 @@ public class ForwardDialog extends BaseDialog {
         }
         view.cancel.setOnClickListener(view1 -> dismiss());
         view.sure.setOnClickListener(view1 -> {
-            String leave = view.leave.getText().toString();
-            if (!TextUtils.isEmpty(leave)) {
-                forwardVM.createLeaveMsg(leave);
-            }
-
-            finish();
+            finishStackTopActivity();
             Obs.newMessage(Constants.Event.FORWARD, choiceVM.metaData.val());
             dismiss();
         });
     }
 
+    /**
+     * 回退当前Activity到转发之前的Activity
+     */
+    private void finishStackTopActivity() {
+        try {
+            ActivityManager.finishAllAfterCurrent(Class.forName("io.openim.android.ouigroup.ui.v3.SelectTargetActivityV3"));
+        } catch (Exception e) {
+            L.e(e.getMessage());
+        }
+    }
+
+    /**
+     * 老回退方法，存在部分问题，暂不考虑使用
+     */
     private static void finish() {
         Postcard postcard = ARouter.getInstance().build(Routes.Main.HOME);
         Postcard postcard2 = ARouter.getInstance().build(Routes.Conversation.CHAT);

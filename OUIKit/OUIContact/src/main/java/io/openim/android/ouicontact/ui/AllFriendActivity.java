@@ -35,7 +35,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.vm.SocialityVM;
 import io.openim.android.ouicore.widget.StickyDecoration;
-import io.openim.android.sdk.models.FriendInfo;
+import io.openim.android.sdk.models.UserInfo;
 
 @Route(path = Routes.Contact.ALL_FRIEND)
 public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFriendBinding> {
@@ -80,7 +80,7 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
         try {
             selectTargetVM = Easy.find(SelectTargetVM.class);
             view.searchView.setVisibility(View.VISIBLE);
-            if (!selectTargetVM.isSingleSelect()) {
+            if (!selectTargetVM.isSingleSelect() && !selectTargetVM.isJumpDetail()) {
                 view.bottom.getRoot().setVisibility(View.VISIBLE);
                 selectTargetVM.bindDataToView(view.bottom);
                 selectTargetVM.showPopAllSelectFriends(view.bottom,
@@ -139,12 +139,12 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
             public void onBindView(@NonNull RecyclerView.ViewHolder holder, ExUserInfo data,
                                    int position) {
                 ViewHol.ItemViewHo itemViewHo = (ViewHol.ItemViewHo) holder;
-                FriendInfo friendInfo = data.userInfo.getFriendInfo();
+                UserInfo friendInfo = data.userInfo;
                 itemViewHo.view.avatar.load(friendInfo.getFaceURL());
                 itemViewHo.view.nickName.setText(friendInfo.getNickname());
 
                 MultipleChoice target = null;
-                if (null!=selectTargetVM && !selectTargetVM.isSingleSelect()){
+                if (null!=selectTargetVM && !selectTargetVM.isSingleSelect() && !selectTargetVM.isJumpDetail()){
                     itemViewHo.view.select.setVisibility(View.VISIBLE);
                     itemViewHo.view.select.setChecked(selectTargetVM
                         .contains(new MultipleChoice(friendInfo.getUserID())));
@@ -160,7 +160,7 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
                 MultipleChoice finalTarget = target;
                 itemViewHo.view.getRoot().setOnClickListener(v -> {
                     if (null != selectTargetVM) {
-                        if (selectTargetVM.isSingleSelect()){
+                        if (selectTargetVM.isSingleSelect() || selectTargetVM.isJumpDetail()){
                             selectTargetVM.metaData.val().clear();
                             selectTargetVM.addMetaData(friendInfo.getUserID(),
                                 friendInfo.getNickname(),
@@ -205,32 +205,9 @@ public class AllFriendActivity extends BaseActivity<SocialityVM, ActivityAllFrie
         }
     }
 
-//    private ActivityResultLauncher<Intent> searchFriendLauncher =
-//        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-//            try {
-//                if (result.getResultCode() != RESULT_OK) return;
-//
-//                String uid = result.getData().getStringExtra(Constants.K_ID);
-//                if (null != selectTargetVM) {
-//                    for (ExUserInfo item : adapter.getItems()) {
-//                        if (null != item.userInfo && item.userInfo.getUserID().equals(uid)) {
-//                            sendChatWindow(item.userInfo.getFriendInfo());
-//                            return;
-//                        }
-//                    }
-//                }
-//                ARouter.getInstance().build(Routes.Main.PERSON_DETAIL)
-//                    .withString(Constants.K_ID, uid).navigation();
-//            } catch (Exception ignored) {
-//
-//            }
-//        });
-
     private void listener() {
         view.searchView.setOnClickListener(v -> {
-            ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS_GROUP)
-                .withBoolean(Constants.IS_SELECT_FRIEND, true)
-                .navigation();
+            ARouter.getInstance().build(Routes.Contact.SEARCH_FRIENDS_GROUP).navigation();
         });
         vm.letters.observe(this, v -> {
             if (null == v || v.isEmpty()) return;

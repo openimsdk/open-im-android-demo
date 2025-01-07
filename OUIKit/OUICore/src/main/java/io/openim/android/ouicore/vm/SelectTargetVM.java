@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.core.util.Consumer;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -18,10 +19,12 @@ import java.util.List;
 
 import io.openim.android.ouicore.adapter.RecyclerViewAdapter;
 import io.openim.android.ouicore.adapter.ViewHol;
+import io.openim.android.ouicore.base.BaseApp;
 import io.openim.android.ouicore.base.vm.State;
 import io.openim.android.ouicore.base.vm.injection.BaseVM;
 import io.openim.android.ouicore.databinding.LayoutPopSelectedFriendsBinding;
 import io.openim.android.ouicore.databinding.LayoutSelectedFriendsBinding;
+import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.ex.MultipleChoice;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.utils.ActivityManager;
@@ -29,7 +32,12 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.widget.BottomPopDialog;
 import io.openim.android.ouicore.widget.ForwardDialog;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.ConversationType;
+import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.GroupMembersInfo;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Single;
 
 public class SelectTargetVM extends BaseVM {
     public static final String NOTIFY_ITEM_REMOVED = "notify_item_removed";
@@ -60,7 +68,12 @@ public class SelectTargetVM extends BaseVM {
          * 多选好友
          * 隐藏最近会话、隐藏群、显示底部菜单、显示好友、多选
          */
-        multipleSelect
+        multipleSelect,
+        /**
+         * 跳转详情
+         * 隐藏最近会话、隐藏群、隐藏底部菜单、只显示好友、单选
+         */
+        jumpDetail,
     }
 
     private OnFinishListener onFinishListener;
@@ -87,11 +100,19 @@ public class SelectTargetVM extends BaseVM {
         return intention == Intention.isCreateGroup;
     }
 
-    public void isInGroup(String groupId, List<String> ids) {
+    public boolean isJumpDetail() {
+        return intention == Intention.jumpDetail;
+    }
+
+    public void isInGroup(String groupId, List<String> ids, Consumer<String> consumer) {
         OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
             @Override
             public void onSuccess(List<GroupMembersInfo> data) {
-                if (data.isEmpty()) return;
+                if (data.isEmpty()) {
+                    if (consumer != null)
+                        consumer.accept(null);
+                    return;
+                }
                 for (GroupMembersInfo datum : data) {
                     MultipleChoice choice = new MultipleChoice(datum.getUserID());
                     choice.name = datum.getNickname();
@@ -100,8 +121,14 @@ public class SelectTargetVM extends BaseVM {
                     choice.isEnabled = false;
                     if (!contains(choice))
                         metaData.val().add(choice);
+                    if (consumer != null) consumer.accept(null);
                 }
                 metaData.update();
+            }
+
+            @Override
+            public void onError(int code, String error) {
+                if (consumer != null) consumer.accept(error+code);
             }
         }, groupId, ids);
     }
@@ -256,8 +283,42 @@ public class SelectTargetVM extends BaseVM {
         this.onFinishListener = onFinishListener;
     }
 
+    public Single<List<MsgConversation>> getRecentConversations() {
+        ContactListVM vmByCache = BaseApp.inst().getVMByCache(ContactListVM.class);
+        return Observable.fromIterable(vmByCache.conversations.val())
+            .concatMap(msgConversation ->
+                Observable.create((ObservableOnSubscribe<MsgConversation>) emitter -> {
+                    if (isInvite() || isCreateGroup()) {
+                        if (msgConversation.conversationInfo.getConversationType() == ConversationType.SINGLE_CHAT) {
+                            emitter.onNext(msgConversation);
+                        }
+                        emitter.onComplete();
+                    } else {
+                        if (msgConversation.conversationInfo.getConversationType() == ConversationType.SUPER_GROUP_CHAT) {
+                            OpenIMClient.getInstance().groupManager.isJoinGroup(msgConversation.conversationInfo.getGroupID(), new OnBase<Boolean>() {
+                                @Override
+                                public void onError(int code, String error) {
+                                    emitter.onComplete();
+                                }
+
+                                @Override
+                                public void onSuccess(Boolean data) {
+                                    boolean isInGroup = data != null ? data : false;
+                                    if (isInGroup)
+                                        emitter.onNext(msgConversation);
+                                    emitter.onComplete();
+                                }
+                            });
+                        } else {
+                            emitter.onNext(msgConversation);
+                            emitter.onComplete();
+                        }
+                    }
+                })
+            ).toList();
+    }
+
     public interface OnFinishListener {
           void onFinish();
-
     }
 }

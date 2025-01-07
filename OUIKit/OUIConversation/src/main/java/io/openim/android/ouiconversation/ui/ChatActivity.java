@@ -1,30 +1,43 @@
 package io.openim.android.ouiconversation.ui;
 
 
+import static io.openim.android.ouicore.utils.Constants.ActivityResult.DELETE_FRIEND;
+import static io.openim.android.ouicore.utils.Constants.ActivityResult.SET_REMARK;
+
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.util.Consumer;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.android.arouter.core.LogisticsCenter;
+import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
@@ -56,6 +69,7 @@ import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Common;
 import io.openim.android.ouicore.utils.Constants;
+import io.openim.android.ouicore.utils.L;
 import io.openim.android.ouicore.utils.Obs;
 import io.openim.android.ouicore.utils.OnDedrepClickListener;
 import io.openim.android.ouicore.utils.Routes;
@@ -68,19 +82,25 @@ import io.openim.android.ouicore.vm.SelectTargetVM;
 import io.openim.android.ouicore.voice.SPlayer;
 import io.openim.android.ouicore.widget.CommonDialog;
 import io.openim.android.ouicore.widget.CustomItemAnimator;
+import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.models.Message;
-import io.openim.android.sdk.models.Participant;
+import io.openim.android.sdk.models.PublicUserInfo;
+import io.openim.android.sdk.models.QuoteElem;
 import io.openim.android.sdk.models.SignalingInfo;
+import io.openim.android.sdk.models.TextElem;
+import io.openim.android.sdk.models.UserInfo;
 import io.openim.android.sdk.models.UsersOnlineStatus;
+import io.reactivex.observers.DisposableObserver;
 
 @Route(path = Routes.Conversation.CHAT)
 public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> implements ChatVM.ViewAction, Observer {
 
-
+    private CallingService callingService;
     private MessageAdapter messageAdapter;
     private BottomInputCote bottomInputCote;
-    private CallingService callingService;
-    private RecyclerViewAdapter<Participant, ViewHol.ImageTxtViewHolder> meetingRvAdapter;
+    private boolean screenWasOff = false;
+    private PowerManager powerManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,12 +118,43 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         listener();
         setTouchClearFocus(false);
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
+        try {
+            vm.mTypingState.observe(this, isTyping -> {
+                if (!TextUtils.isEmpty(vm.conversationID)) {
+                    OpenIMClient.getInstance().conversationManager.changeInputStates(new OnBase<String>() {
+                        @Override
+                        public void onError(int code, String error) {
+                            String data = code + error;
+                        }
+
+                        @Override
+                        public void onSuccess(String data) {
+                            TextUtils.isEmpty(data);
+                        }
+                    }, vm.conversationID, isTyping);
+                }
+            });
+            powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        } catch (Exception e) {
+        }
     }
 
-    private ActivityResultLauncher<Intent> chatSettingActivityLauncher =
+    private final ActivityResultLauncher<Intent> personDetailLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == RESULT_OK) {
-                finish();
+            switch (result.getResultCode()) {
+                case DELETE_FRIEND:
+                    setResult(DELETE_FRIEND);
+                    showWaiting();
+                    Common.UIHandler.post(() -> {
+                        cancelWaiting();
+                        finish();
+                    });
+                    break;
+                case SET_REMARK:
+                    setResult(SET_REMARK);
+                    showWaiting();
+                    Common.UIHandler.post(this::cancelWaiting);
+                    break;
             }
         });
 
@@ -138,8 +189,8 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
 
     @Override
     protected void fasterDestroy() {
-        cacheDraft();
-        vm.markRead();
+        if (vm.conversationInfo.val() != null && vm.conversationInfo.val().getUnreadCount() > 0)
+            vm.markRead();
 
         if (!vm.fromChatHistory) removeCacheVM();
         Easy.delete(CustomEmojiVM.class);
@@ -161,33 +212,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         }
     }
 
-    private void cacheDraft() {
-        EditText copy=new EditText(this); //copy一个才不影响渲染
-        copy.setText(view.layoutInputCote.chatInput.getText());
-        String draft = copy.getText().toString();
-        if (TextUtils.isEmpty(draft)) {
-            vm.cacheDraft(null, vm.conversationID);
-            return;
-        }
-        try {
-            final ForegroundColorSpan[] spans = copy.getText().getSpans(0,
-                copy.getText().length(), ForegroundColorSpan.class);
-            for (ForegroundColorSpan span : spans) {
-                final int spanStart = copy.getText().getSpanStart(span);
-                final int spanEnd = copy.getText().getSpanEnd(span);
-                for (AtUser atUser : vm.atUsers.val()) {
-                    if (span.hashCode() == atUser.spanHashCode) {
-                        copy.getText().replace(spanStart,
-                            spanEnd,IMUtil.atD(atUser.key));
-                    }
-                }
-            }
-        } catch (Exception ignore) {}
-        draft = copy.getText().toString();
-        vm.cacheDraft(draft, vm.conversationID);
-    }
-
-
     @Override
     protected void onResume() {
         if (vm.viewPause) {
@@ -198,8 +222,13 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             int firstVisiblePosition = linearLayoutManager.findFirstCompletelyVisibleItemPosition();
             int lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
             vm.sendMsgReadReceipt(firstVisiblePosition, lastVisiblePosition);
+            messageAdapter.notifyDataSetChanged();
         }
         super.onResume();
+        if (screenWasOff) {
+            vm.getConversationInfo();
+            screenWasOff = false;
+        }
     }
 
     @SuppressLint({"ClickableViewAccessibility", "NotifyDataSetChanged"})
@@ -208,7 +237,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         bottomInputCote.setChatVM(vm);
         if (vm.fromChatHistory) {
             view.layoutInputCote.getRoot().setVisibility(View.GONE);
-            view.call.setVisibility(View.GONE);
             view.more.setVisibility(View.GONE);
         }
 
@@ -228,12 +256,17 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.recyclerView.setAdapter(messageAdapter);
         vm.messages.observe(this, v -> {
             if (null == v) return;
+            // save origin avatar
+            if (vm.isSingleChat && !v.isEmpty() && !TextUtils.isEmpty(v.get(0).getSenderFaceUrl()))
+                vm.userOriginAvatar = v.get(0).getSenderFaceUrl();
+            if (!v.isEmpty()) vm.startMsg = v.get(0);
             messageAdapter.setMessages(v);
             messageAdapter.notifyDataSetChanged();
             if (!vm.fromChatHistory) scrollToPosition(0);
         });
         view.recyclerView.setOnTouchListener((v, event) -> {
             bottomInputCote.clearFocus();
+            vm.mTypingState.postValue(false);
             Common.hideKeyboard(this, v);
             bottomInputCote.setExpandHide(true);
             return false;
@@ -241,20 +274,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         view.recyclerView.addOnLayoutChangeListener((v, i, i1, i2, i3, i4, i5, i6, i7) -> {
             if (i3 < i7) { // bottom < oldBottom
                 scrollToPosition(0);
-            }
-        });
-
-        view.meetingRv.setLayoutManager(new GridLayoutManager(this, 5));
-        view.meetingRv.setAdapter(meetingRvAdapter = new RecyclerViewAdapter<Participant,
-            ViewHol.ImageTxtViewHolder>(ViewHol.ImageTxtViewHolder.class) {
-            @Override
-            public void onBindView(@NonNull ViewHol.ImageTxtViewHolder holder, Participant data,
-                                   int position) {
-                holder.view.txt.setVisibility(View.GONE);
-                holder.view.img.load(data.getGroupMemberInfo().getFaceURL());
-                LinearLayout.LayoutParams params =
-                    (LinearLayout.LayoutParams) holder.view.img.getLayoutParams();
-                params.bottomMargin = Common.dp2px(position < 5 ? 10 : 0);
             }
         });
 
@@ -288,7 +307,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
     //记录原始窗口高度
     private int mWindowHeight = 0;
 
-    private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener = () -> {
+    private final ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener = () -> {
         Rect r = new Rect();
         //获取当前窗口实际的可见区域
         getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
@@ -300,6 +319,10 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             RelativeLayout.LayoutParams inputLayoutParams =
                 (RelativeLayout.LayoutParams) view.layoutInputCote.getRoot().getLayoutParams();
             if (mWindowHeight == height) {
+                if (!(view.layoutInputCote.fragmentContainer.getVisibility() == View.GONE) && inputLayoutParams.bottomMargin != 0) {
+                    bottomInputCote.setExpandHide(true);
+                    bottomInputCote.clearFocus();
+                }
                 inputLayoutParams.bottomMargin = 0;
             } else {
                 //两次窗口高度相减，就是软键盘高度
@@ -310,67 +333,13 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         }
     };
 
-
     private void listener() {
         Obs.inst().addObserver(this);
-
-        bottomInputCote.setOnAtUserListener(() -> {
-            GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class);
-            memberVM.groupId = vm.groupID;
-            memberVM.maxNum = 10;
-            memberVM.isOwnerOrAdmin = vm.isAdminOrCreator;
-            memberVM.setIntention(GroupMemberVM.Intention.AT);
-            memberVM.setOnFinishListener(activity -> {
-                try {
-                    Editable editable = bottomInputCote.view.chatInput.getText();
-                    if (!TextUtils.isEmpty(editable)) {
-                        CharSequence finallyStr = editable.subSequence(editable.length() - 1,
-                            editable.length());
-                        if (finallyStr.toString().equals("@")) {
-                            editable.replace(editable.length() - 1, editable.length(),
-                                new SpannableStringBuilder(""));
-                        }
-                    }
-                } catch (Exception ignore) {}
-
-                Common.UIHandler.postDelayed(() -> {
-                    List<AtUser> atUsers = vm.atUsers.val();
-                    for (MultipleChoice multipleChoice : memberVM.choiceList.val()) {
-                        AtUser atUser = new AtUser(multipleChoice.key);
-                        if (atUsers.contains(atUser)) {
-                            continue;
-                        }
-                        atUser.name = multipleChoice.name;
-                        vm.atUsers.val().add(atUser);
-                        vm.atUsers.update();
-                    }
-                }, 150);
-
-            });
-            ARouter.getInstance().build(Routes.Group.SUPER_GROUP_MEMBER).navigation();
-        });
-        view.call.setOnClickListener(v -> {
-            if (null == callingService) return;
-            goToCall();
-        });
         view.delete.setOnClickListener(v -> {
             List<Message> selectMsg = getSelectMsg();
             for (Message message : selectMsg) {
                 vm.deleteMessageFromLocalStorage(message);
             }
-        });
-        view.mergeForward.setOnClickListener(v -> {
-//            ARouter.getInstance().build(Routes.Contact.FORWARD).navigation(this,
-//                Constants.Event.FORWARD);
-            List<Message> msgList = getSelectMsg();
-            Collections.reverse(msgList);
-            Easy.find(ForwardVM.class).createMergerMessage(vm.isSingleChat,
-                vm.conversationInfo.getValue().getShowName(), msgList);
-
-            Easy.installVM(SelectTargetVM.class);
-            ARouter.getInstance().build(Routes.Group.SELECT_TARGET).navigation((Activity) this,
-                Constants.Event.FORWARD);
-            Common.UIHandler.postDelayed(() -> vm.enableMultipleSelect.setValue(false), 300);
         });
 
         vm.enableMultipleSelect.observe(this, o -> {
@@ -398,15 +367,7 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 if (null != msgExpand) msgExpand.isChoice = false;
             }
         });
-        view.callingUser.setOnClickListener(v -> {
-            Object tag = v.getTag();
-            boolean isExpansion = tag != null && (boolean) tag;
-            view.meetingLy.setVisibility(isExpansion ? View.GONE : View.VISIBLE);
-            v.setTag(!isExpansion);
-            meetingRvAdapter.setItems(vm.roomCallingInfo.getValue().getParticipant());
-        });
 
-        view.notice.setOnClickListener(v -> ARouter.getInstance().build(Routes.Group.NOTICE_DETAIL).withSerializable(Constants.K_NOTICE, vm.notificationMsg.getValue()).navigation());
         view.back.setOnClickListener(v -> finish());
 
         view.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -421,9 +382,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
                 if (lastVisiblePosition == vm.messages.getValue().size() - 1 && !vm.isNoData.val()) {
                     vm.loadHistoryMessage();
                 }
-//                if (vm.fromChatHistory && firstVisiblePosition < 2) {
-//                    vm.loadHistoryMessageReverse();
-//                }
                 vm.sendMsgReadReceipt(firstVisiblePosition, lastVisiblePosition);
             }
         });
@@ -432,11 +390,21 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             @Override
             public void click(View v) {
                 if (vm.isSingleChat) {
-                    chatSettingActivityLauncher.launch(new Intent(ChatActivity.this,
-                        ChatSettingActivity.class));
+                    Postcard postcard = ARouter.getInstance().build(Routes.Main.PERSON_DETAIL);
+                    LogisticsCenter.completion(postcard);
+                    personDetailLauncher.launch(new Intent(ChatActivity.this, postcard.getDestination()).putExtra(Constants.K_ID, vm.userID).putExtra(Constants.K_RESULT, true));
                 } else {
                     ARouter.getInstance().build(Routes.Group.MATERIAL).withString(Constants.K_ID,
                         vm.conversationID).withString(Constants.K_GROUP_ID, vm.groupID).navigation();
+                }
+            }
+        });
+
+        view.call.setOnClickListener(new OnDedrepClickListener() {
+            @Override
+            public void click(View v) {
+                if (vm.isSingleChat && callingService != null) {
+                    goToCall();
                 }
             }
         });
@@ -446,39 +414,44 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         });
         vm.conversationInfo.observe(this, conversationInfo -> {
             bindShowName();
+            vm.groupNotificationOperator(conversationInfo);
             vm.getGroupsInfo(vm.groupID, data -> {
                 if (data.isEmpty()) return;
                 vm.groupInfo.setValue(data.get(0));
             });
-//            if (conversationInfo.getConversationType()== ConversationType.NOTIFICATION){
-//                view.layoutInputCote.root.setVisibility(View.GONE);
-//                view.more.setVisibility(View.GONE);
-//            }
-        });
-
-        vm.roomCallingInfo.observe(this, roomCallingInfo -> {
-            try {
-                if (roomCallingInfo.getParticipant().isEmpty()) return;
-                boolean isVideoCall =
-                    roomCallingInfo.getInvitation().getMediaType().equals(Constants.MediaType.VIDEO);
-                String tips = "";
-                if (isVideoCall)
-                    tips =
-                        String.format(getString(io.openim.android.ouicore.R.string.s_person_video_calling), roomCallingInfo.getParticipant().size());
-                else
-                    tips =
-                        String.format(getString(io.openim.android.ouicore.R.string.s_person_audio_calling), roomCallingInfo.getParticipant().size());
-                view.callingUserNum.setText(tips);
-            } catch (Exception ignored) {
+            if (conversationInfo.getUnreadCount() > 0) {
+                vm.markRead();
             }
+        });
+        vm.userAvatar.observe(this, newAvatar -> {
+            if (TextUtils.isEmpty(newAvatar)) return;
+            List<Message> newMsg = new ArrayList<>();
+            for (Message msg : vm.messages.val()) {
+                msg.setSenderFaceUrl(newAvatar);
+                newMsg.add(msg);
+            }
+            vm.messages.setValue(newMsg);
         });
 
         vm.subscribe(this, subject -> {
             if (subject.equals(ChatVM.REEDIT_MSG)) {
-                view.layoutInputCote.chatInput.requestFocus();
-                view.layoutInputCote.chatInput.setText((String) subject.value);
-                view.layoutInputCote.chatInput.setSelection(((String) subject.value).length());
+                Message reeditMsg = (Message) subject.value;
+                if (reeditMsg == null) return;
+                TextElem reeditText = reeditMsg.getTextElem();
+                QuoteElem reeditQuote = reeditMsg.getQuoteElem();
                 Common.pushKeyboard(this);
+                if (reeditText != null) {
+                    view.layoutInputCote.chatInput.requestFocus();
+                    view.layoutInputCote.chatInput.setText(reeditText.getContent());
+                    view.layoutInputCote.chatInput.setSelection(reeditText.getContent().length());
+                    return;
+                }
+                if (reeditQuote != null) {
+                    view.layoutInputCote.chatInput.requestFocus();
+                    view.layoutInputCote.chatInput.setText(reeditQuote.getText());
+                    view.layoutInputCote.chatInput.setSelection(reeditQuote.getText().length());
+                    vm.replyMessage.setValue(reeditQuote.getQuoteMessage());
+                }
             }
         });
     }
@@ -489,14 +462,12 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
             if (vm.isSingleChat) {
                 List<String> ids = new ArrayList<>();
                 ids.add(vm.userID);
-                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall,
-                    vm.isSingleChat, ids, null);
+                SignalingInfo signalingInfo = IMUtil.buildSignalingInfo(vm.isVideoCall, ids);
                 callingService.call(signalingInfo);
             }
             return false;
         });
     }
-
 
     private void bindShowName() {
         try {
@@ -519,6 +490,11 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         return selectMsg;
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        bottomInputCote.dispatchTouchEvent(event);
+        return super.dispatchTouchEvent(event);
+    }
 
     @Override
     public void scrollToPosition(int position) {
@@ -541,7 +517,6 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         ForwardVM forwardVM = Easy.find(ForwardVM.class);
         for (MultipleChoice choice : choices) {
             aloneSendMsg(forwardVM.forwardMsg, choice);
-            if (null != forwardVM.leaveMsg) aloneSendMsg(forwardVM.leaveMsg, choice);
         }
         vm.clearSelectMsg();
     }
@@ -607,5 +582,30 @@ public class ChatActivity extends BaseActivity<ChatVM, ActivityChatBinding> impl
         public void setCanScrollVertically(boolean canScrollVertically) {
             this.canScrollVertically = canScrollVertically;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        vm.mTypingState.postValue(false);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        screenWasOff = !powerManager.isScreenOn();
+        vm.mTypingState.postValue(false);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        vm.mTypingState.postValue(false);
     }
 }

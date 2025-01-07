@@ -31,15 +31,6 @@
                 android:textSize="22sp" />
 
             <ImageView
-                android:id="@+id/search"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginRight="10dp"
-                android:onClick="toSearch"
-                android:padding="5dp"
-                android:src="@mipmap/ic_search2" />
-
-            <ImageView
                 android:id="@+id/addFriend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -51,6 +42,5 @@
     <include
         android:id="@+id/header"
         layout="@layout/view_contact_header" />
-
 
 </LinearLayout>

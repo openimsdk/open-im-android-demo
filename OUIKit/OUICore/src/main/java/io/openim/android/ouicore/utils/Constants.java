@@ -7,26 +7,10 @@ import io.openim.android.ouicore.im.IM;
 
 public class Constants {
 
-    //    public static final String DEFAULT_HOST = "test-web.rentsoft.cn";//43
-//    public static final String DEFAULT_HOST = "web.rentsoft.cn";//121
-    public static final String DEFAULT_HOST = "43.128.72.19";
-
-    //登录注册手机验 证服务器地址
-    private static final String APP_AUTH_URL = "https://" + DEFAULT_HOST + "/chat/";
-    //IM sdk api地址
-    private static final String IM_API_URL = "https://" + DEFAULT_HOST + "/api";
-    //web socket
-    private static final String IM_WS_URL = "wss://" + DEFAULT_HOST + "/msg_gateway";
-
-    //--------IP----------
+    public static final String DEFAULT_HOST = "your-server-ip or your-domain";
     private static final String APP_AUTH = "http://" + DEFAULT_HOST + ":10008/";
     private static final String IM_API = "http://" + DEFAULT_HOST + ":10002";
     private static final String IM_WS = "ws://" + DEFAULT_HOST + ":10001";
-    //--------------------
-
-    public static boolean getIsIp() {
-        return SharedPreferencesUtil.get(BaseApp.inst()).getBoolean("IS_IP", true);
-    }
 
     public static String getHost() {
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("DEFAULT_IP");
@@ -35,24 +19,21 @@ public class Constants {
     }
 
     public static String getImApiUrl() {
-        boolean isIp = getIsIp();
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("IM_API_URL");
-        if (TextUtils.isEmpty(url)) return isIp ? IM_API : IM_API_URL;
+        if (TextUtils.isEmpty(url)) return IM_API;
         return url;
     }
 
 
     public static String getAppAuthUrl() {
-        boolean isIp = getIsIp();
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("APP_AUTH_URL");
-        if (TextUtils.isEmpty(url)) return isIp ? APP_AUTH : APP_AUTH_URL;
+        if (TextUtils.isEmpty(url)) return APP_AUTH;
         return url;
     }
 
     public static String getImWsUrl() {
-        boolean isIp = getIsIp();
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("IM_WS_URL");
-        if (TextUtils.isEmpty(url)) return isIp ? IM_WS : IM_WS_URL;
+        if (TextUtils.isEmpty(url)) return IM_WS;
         return url;
     }
 
@@ -60,6 +41,12 @@ public class Constants {
         String url = SharedPreferencesUtil.get(BaseApp.inst()).getString("STORAGE_TYPE");
         if (TextUtils.isEmpty(url)) return "minio";
         return url;
+    }
+
+    public static String getLogLevel() {
+        String level = SharedPreferencesUtil.get(BaseApp.inst()).getString(Constants.K_LOG_LEVEL);
+        if (TextUtils.isEmpty(level)) return "3";
+        return level;
     }
 
     //存储音频的文件夹
@@ -133,6 +120,10 @@ public class Constants {
     public static final String IS_SELECT_FRIEND = "isSelectFriend";
     //自定义消息类型
     public static final String K_CUSTOM_TYPE = "customType";
+    //日志级别
+    public static final String K_LOG_LEVEL = "logLevel";
+    // 阅后即焚存储标识
+    public static final String SP_Prefix_ReadVanish = "ReadVanish_";
 
 
     //加载中
@@ -141,9 +132,6 @@ public class Constants {
     public static class MsgType {
         //本地呼叫记录
         public static final int LOCAL_CALL_HISTORY = -110;
-        //会议邀请
-        public static final int CUSTOMIZE_MEETING = 905;
-
         public static final int callingInvite = 200;
         public static final int callingAccept = 201;
         public static final int callingReject = 202;
@@ -154,5 +142,10 @@ public class Constants {
     public static class MediaType {
         public static final String VIDEO = "video";
         public static final String AUDIO = "audio";
+    }
+
+    public static class ActivityResult {
+        public static final int SET_REMARK = 1000000;
+        public static final int DELETE_FRIEND = 1000001;
     }
 }

@@ -17,12 +17,15 @@ import io.openim.android.ouicore.entity.MsgConversation;
 import io.openim.android.ouicore.im.IMEvent;
 import io.openim.android.ouicore.im.IMUtil;
 import io.openim.android.ouicore.net.bage.GsonHel;
+import io.openim.android.ouicore.widget.UILocker;
 import io.openim.android.sdk.OpenIMClient;
+import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConversationListener;
 import io.openim.android.sdk.models.C2CReadReceiptInfo;
 import io.openim.android.sdk.models.ConversationInfo;
+import io.openim.android.sdk.models.ConversationReq;
 import io.openim.android.sdk.models.GroupMessageReceipt;
 import io.openim.android.sdk.models.KeyValue;
 import io.openim.android.sdk.models.Message;
@@ -30,8 +33,7 @@ import io.openim.android.sdk.models.RevokedInfo;
 
 public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> implements OnConversationListener, OnAdvanceMsgListener {
     public State<List<MsgConversation>> conversations = new State<>(new ArrayList<>());
-
-
+    private UILocker uiLocker;
     @Override
     protected void viewCreate() {
         IMEvent.getInstance().addConversationListener(this);
@@ -70,9 +72,6 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
                         msg = GsonHel.fromJson(datum.getLatestMsg(), Message.class);
                     }
                     MsgConversation msgConversation=new MsgConversation(msg, datum);
-                    CharSequence draft=buildDraftMsg(datum);
-                    if (null!=draft)
-                        msgConversation.lastMsg=draft;
                     conversations.val().add(msgConversation);
                 }
                 conversations.setValue(conversations.getValue());
@@ -80,87 +79,16 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         });
     }
 
-    private CharSequence buildDraftMsg(ConversationInfo datum) {
-        CharSequence draft= (CharSequence) IMUtil.getDraft(datum.getConversationID())[0];
-        if (!TextUtils.isEmpty(draft)){
-            String target =
-                "[" + BaseApp.inst().getString(R.string.draft) + "]";
+    private void lockUI() {
+        uiLocker = new UILocker();
+        uiLocker.showTransparentDialog(context.get());
+    }
 
-            String txt= target+draft;
-          return  IMUtil.buildClickAndColorSpannable(new SpannableStringBuilder(txt),
-                target, R.color.theme, null);
+    private void unLockUI() {
+        if (uiLocker != null) {
+            uiLocker.dismissTransparentDialog();
         }
-        return null;
     }
-
-
-    public void setOneConversationPrivateChat(IMUtil.OnSuccessListener<String> OnSuccessListener,
-                                              String cid, boolean isChecked) {
-        OpenIMClient.getInstance().conversationManager.setOneConversationPrivateChat(new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-                getIView().onErr(error);
-            }
-
-            @Override
-            public void onSuccess(String data) {
-                OnSuccessListener.onSuccess(data);
-            }
-        }, cid, isChecked);
-    }
-
-//    /**
-//     * 更新常联系
-//     *
-//     * @param data
-//     */
-//    private void updateFrequentContacts(List<ConversationInfo> data) {
-//        List<UserInfo> uList = new ArrayList<>();
-//        for (ConversationInfo datum : data) {
-//            if (datum.getConversationType() == ConversationType.SINGLE_CHAT) {
-//                UserInfo u = new UserInfo();
-//                u.setUserID(datum.getUserID());
-//                u.setNickname(datum.getShowName());
-//                u.setFaceURL(datum.getFaceURL());
-//                uList.add(u);
-//            }
-//        }
-//        if (uList.isEmpty()) return;
-//        frequentContacts.setValue(uList.size() > 15 ? uList.subList(0, 15) : uList);
-//    }
-
-//    @RequiresApi(api = Build.VERSION_CODES.N)
-//    private void insertDBContact(List<ConversationInfo> data) {
-//        RealmList<UserInfoDB> uList = new RealmList<>();
-//        for (ConversationInfo datum : data) {
-//            if (datum.getConversationType() == Constants.SessionType.SINGLE_CHAT) {
-//                UserInfoDB u = new UserInfoDB();
-//                u.setUserID(datum.getUserID());
-//                u.setNickname(datum.getShowName());
-//                u.setFaceURL(datum.getFaceURL());
-//                uList.add(u);
-//            }
-//        }
-//        if (uList.isEmpty()) return;
-//        BaseApp.inst().realm.executeTransactionAsync(realm -> {
-//            RealmResults<UserInfoDB> realmResults = realm.where(UserInfoDB.class).findAll();
-//            if (realmResults.isEmpty()) {
-//                realm.insert(uList.size() > 15 ? uList.subList(0, 15) : uList);
-//            } else {
-//                realm.where(UserInfoDB.class)
-//                    .in("userID", (String[]) uList.stream()
-//                        .map(UserInfoDB::getUserID)
-//                        .distinct().toArray()).findAll().deleteAllFromRealm();
-//
-//                for (UserInfoDB userInfoDB : uList) {
-//                    UserInfoDB task = realm.where(UserInfoDB.class)
-//                        .equalTo("userID", userInfoDB.getUserID()).findFirst();
-//                    if (null != task)
-//                        task.deleteFromRealm();
-//                }
-//            }
-//        });
-//    }
 
     @Override
     public void onConversationChanged(List<ConversationInfo> list) {
@@ -168,7 +96,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
     }
 
 
-    private void sortConversation(List<ConversationInfo> list) {
+    private void sortConversation(List<ConversationInfo> list, boolean needUnlockUI) {
         List<MsgConversation> msgConversations = new ArrayList<>();
         Iterator<MsgConversation> iterator = conversations.val().iterator();
         for (ConversationInfo info : list) {
@@ -183,26 +111,43 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
         conversations.val().addAll(msgConversations);
         Collections.sort(conversations.val(), IMUtil.simpleComparator());
         conversations.setValue(conversations.val());
+        if (needUnlockUI)
+            unLockUI();
     }
 
     @Override
     public void onNewConversation(List<ConversationInfo> list) {
-        sortConversation(list);
+        sortConversation(list, false);
     }
 
     @Override
-    public void onSyncServerFailed() {
-
-    }
-
-    @Override
-    public void onSyncServerFinish() {
+    public void onSyncServerFailed(boolean reinstalled) {
 
     }
 
     @Override
-    public void onSyncServerStart() {
+    public void onSyncServerFinish(boolean reinstalled) {
+        if (reinstalled) {
+            OpenIMClient.getInstance().conversationManager.getAllConversationList(new OnBase<List<ConversationInfo>>() {
+                @Override
+                public void onSuccess(List<ConversationInfo> data) {
+                    sortConversation(data, true);
+                }
 
+                @Override
+                public void onError(int code, String error) {
+                    unLockUI();
+                    toast(error+code);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onSyncServerStart(boolean reinstalled) {
+        if (reinstalled) {
+            lockUI();
+        }
     }
 
     @Override
@@ -212,7 +157,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     @Override
     public void onRecvNewMessage(Message msg) {
-
+        changeGroupStatus(msg);
     }
 
     @Override
@@ -255,9 +200,34 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
 
     }
 
+    /**
+     * 通过最新消息通知判断并改变用户是否在目标群聊中
+     * @param message 通知消息
+     */
+    private void changeGroupStatus(Message message) {
+        int msgType = message.getContentType();
+        if (msgType < MessageType.MEMBER_KICKED_NTF ||
+            msgType > MessageType.GROUP_DISBAND_NTF ||
+            msgType == MessageType.MEMBER_ENTER_NTF) {
+            return;
+        }
+
+        for(int index = 0;index < conversations.val().size();index ++) {
+            ConversationInfo currentInfo = conversations.val().get(index).conversationInfo;
+            if (message.getGroupID().equals(currentInfo.getGroupID())) {
+                currentInfo.setNotInGroup(msgType == MessageType.MEMBER_KICKED_NTF ||
+                    msgType == MessageType.GROUP_DISBAND_NTF);
+                conversations.setValue(conversations.val());
+                return;
+            }
+        }
+    }
+
     //置顶/取消置顶 会话
     public void pinConversation(ConversationInfo conversationInfo, boolean isPinned) {
-        OpenIMClient.getInstance().conversationManager.pinConversation(new OnBase<String>() {
+        ConversationReq conversationReq = new ConversationReq();
+        conversationReq.setPinned(isPinned);
+        OpenIMClient.getInstance().conversationManager.setConversation(new OnBase<String>() {
             @Override
             public void onError(int code, String error) {
                 toast(error+"("+code+")");
@@ -267,7 +237,7 @@ public class ContactListVM extends BaseViewModel<ContactListVM.ViewAction> imple
             public void onSuccess(String data) {
                 conversationInfo.setPinned(isPinned);
             }
-        }, conversationInfo.getConversationID(), isPinned);
+        }, conversationInfo.getConversationID(), conversationReq);
     }
 
     public interface ViewAction extends IView {

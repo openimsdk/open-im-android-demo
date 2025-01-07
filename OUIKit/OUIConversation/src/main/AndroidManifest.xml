@@ -12,34 +12,10 @@
 
     <application android:theme="@style/Theme.Main">
         <activity
-            android:name=".ui.ChatHistoryRelationActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.NotificationActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.ChatHistoryDetailsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.MsgReadStatusActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.SearchActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.FileHistoryActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.MediaHistoryActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.SetChatBgActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.ChatSettingActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.ChatHistorySearchActivity"
+            android:name=".ui.search.SearchActivity"
             android:exported="false" />
         <activity
             android:name=".ui.PreviewMediaActivity"

@@ -28,6 +28,7 @@
     <string name="shoot">拍摄</string>
     <string name="camera_punch_failed">相机打开失败</string>
     <string name="camera_permission_failed">无法获取摄像头权限</string>
+    <string name="camera_is_occupied">相机正在被使用</string>
     <string name="file">文件</string>
     <string name="new_friend">新的好友</string>
     <string name="new_friend_request">新的好友请求</string>
@@ -96,13 +97,13 @@
     <string name="video_calls">视频通话</string>
     <string name="waiting_tips">正在等待对方接听</string>
     <string name="Invite_a_audio_call">邀请你进行语音通话</string>
-    <string name="selete_member">选择成员</string>
     <string name="invite_audio_call">邀请你语音通话</string>
     <string name="invite_video_call">邀请你视频通话</string>
     <string name="calling">正在通话中...</string>
     <string name="audio_video_service">音视频服务</string>
     <string name="audio_video_service_tips1">OpenIM音视频服务</string>
     <string name="audio_video_service_tips2">关闭应用自启动将无法接收音视频请求</string>
+    <string name="selete_member">选择成员</string>
     <string name="start_chat">开始聊天</string>
     <string name="dissolve_group">解散群聊</string>
     <string name="dissolve_tips">解散群聊后，将失去群成员的联系</string>
@@ -181,6 +182,7 @@
     <string name="sender">发送者</string>
     <string name="kicked_offline_tips">账号已在其他地方登录，当前设备被踢下线！</string>
     <string name="token_expired">登录票据已经过期,请重新登录！</string>
+    <string name="token_invalid">登录票据无效,请重新登录！</string>
     <string name="repeat_group_manager">你已经是群主了</string>
     <string name="transfer_permission">确定将群主转让给：%1$s?</string>
     <string name="transfer_succ">转让成功</string>
@@ -204,12 +206,15 @@
     <string name="copy">复制</string>
     <string name="recommend_to_friend">把他推荐给朋友</string>
     <string name="recommend_who">确定推荐给%1$s吗？</string>
+    <string name="recommend_who_to_friends">确定推荐给%1$s等%2$d位好友吗？</string>
     <string name="send_card_confirm">确定将该名片发送到本聊天？</string>
     <string name="bulletin_edit_tips">只有群主及管理员可以编辑</string>
     <string name="mark_read">标记已读</string>
     <string name="start_download">开始下载</string>
+    <string name="save_custom_dir">已成功保存至%1$s</string>
     <string name="save_succ">保存成功</string>
     <string name="save_failure">保存失败</string>
+    <string name="save_cancel">保存取消</string>
     <string name="search_friends">搜索好友</string>
     <string name="group_nickName">群昵称</string>
     <string name="join_group_time">入群时间</string>
@@ -226,12 +231,12 @@
     <string name="clear_chat_all_record">确认清空所有聊天记录</string>
     <string name="cleared">已清理</string>
     <string name="blackList">通讯黑名单</string>
-    <string name="select_tips">最多选择 %1$d 个人</string>
+    <string name="select_tips">最多选择 %1$d 项</string>
     <string name="selected_tips">已选择：%1$d人</string>
     <string name="selected_tips2">已选择（%1$d）</string>
     <string name="selected_group_tips">已选择：%1$d个群</string>
     <string name="save_photo_album">图片已保存至相册</string>
-    <string name="vc_login">用短信验证码登录</string>
+    <string name="vc_login">验证码登录</string>
     <string name="vc">验证码</string>
     <string name="password_login">密码登录</string>
     <string name="get_vc">获取验证码</string>
@@ -240,15 +245,16 @@
     <string name="login_tips2">需6～20位字符</string>
     <string name="confirm_modification">确认修改</string>
     <string name="login_tips3">密码长度在6~20个字符之间</string>
-    <string name="group_call_tips">发起群视频自己必须参与</string>
     <string name="group_call_tips2">至少选择一个成员</string>
-    <string name="group_call_tips3">不能和自己群视频</string>
     <string name="call_time">通话时长\t</string>
     <string name="conn_failed">连接失败</string>
     <string name="ot_refuses">对方已拒绝</string>
     <string name="cancelled">已取消</string>
     <string name="label">标签</string>
 
+    <string name="login_tab_phone">手机号</string>
+    <string name="login_tab_email">邮箱</string>
+    <string name="login_tab_account">账号</string>
 
     <string name="remove">移除</string>
     <string name="cretate_label">新建标签</string>
@@ -291,11 +297,7 @@
     <string name="push_video">发布视频</string>
     <string name="about_who">提到了：%1$s</string>
     <string name="say_more2">说点什么...</string>
-    <string name="s_person_audio_calling">%1$d人正在语音通话</string>
-    <string name="s_person_video_calling">%1$d人正在视频通话</string>
     <string name="join">加入</string>
-    <string name="group_calling_tips">当前群正在通话中，确定加入当前通话？</string>
-    <string name="group_calling_tips2">通话人数已满</string>
     <string name="not_err">未知错误</string>
     <string name="video_meeting">视频会议</string>
     <string name="join_meeting">加入会议</string>
@@ -303,6 +305,7 @@
     <string name="timing_meeting">预约会议</string>
     <string name="end">结束</string>
     <string name="download">下载</string>
+    <string name="downloading">下载中......</string>
     <string name="emcee">主持人</string>
     <string name="cancel_mute">取消静音</string>
     <string name="start_camera">开启相机</string>
@@ -372,6 +375,8 @@
     <string name="recent_contact">最近会话</string>
     <string name="account">账号</string>
     <string name="please_input_account">请输入账号</string>
+    <string name="please_input_email">请输入邮箱</string>
+    <string name="please_input_phone_num">请输入手机号</string>
     <string name="organizational_structure">组织架构</string>
     <string name="who_talk">%1$s讲话中...</string>
     <string name="meeting">会议中...</string>
@@ -394,7 +399,7 @@
     <string name="start_chat_tips">你们已经成为好友，可以开始聊天了</string>
     <string name="logout">退出登录</string>
     <string name="new_group_chat">新的群聊</string>
-    <string name="find">发现</string>
+    <string name="find">工作台</string>
     <string name="null_applet">暂无小程序</string>
     <string name="leave_word">留言</string>
     <string name="send_who">发送给：</string>
@@ -420,8 +425,6 @@
     <string name="periodic_deletion">定期删除消息记录</string>
     <string name="week">周</string>
     <string name="month">月</string>
-    <string name="period_deletion_tips1">定期删除消息记录</string>
-    <string name="period_deletion_tips2">在此之后发送的消息会在选择的时间之后自动删除</string>
     <string name="language_setting">语言设置</string>
     <string name="with_system">跟随系统</string>
     <string name="chinese">简体中文</string>
@@ -507,6 +510,10 @@
     <string name="declined">已拒绝</string>
     <string name="timing_meeting_tips">不能选择已过去的时间</string>
     <string name="cancle_see_he">取消看他</string>
+    <string name="workbench">工作台</string>
+    <string name="workmate_moments">同事动态</string>
+    <string name="department">部门</string>
+    <string name="organizational_information">组织信息</string>
     <string name="recover">" 回复了 "</string>
     <string name="edit_group_name2">修改群聊名称</string>
     <string name="edit_group_name_tips">修改群聊名称后，将在群内通知其他成员。</string>
@@ -546,6 +553,7 @@
     <string name="quited_tips">无法在退出的群发送消息</string>
     <string name="password_valid_tips3">新密码和旧密码是相同的</string>
     <string name="valid_phone_num">手机号无效</string>
+    <string name="valid_email">邮箱格式错误</string>
     <string name="empty_prompt">输入不能为空</string>
     <string name="quote_delete_tips">引用的内容已被删除</string>
     <string name="account_not_exist">账号不存在</string>
@@ -569,5 +577,6 @@
     <string name="other_rejected">已在其他端拒绝</string>
     <string name="friend_settings">好友设置</string>
     <string name="email_tips">邮箱无效</string>
-
+    <string name="all_readed">全部已读</string>
+    <string name="no_map_key">请配置地图key</string>
 </resources>

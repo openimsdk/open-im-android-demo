@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import java.util.Objects;
+
 import io.openim.android.demo.R;
 import io.openim.android.demo.databinding.ActivityMoreDataBinding;
 import io.openim.android.demo.vm.PersonalVM;
@@ -32,9 +34,9 @@ public class MoreDataActivity extends BaseActivity<PersonalVM, ActivityMoreDataB
     void init() {
         view.avatar.load(vm.userInfo.val().getFaceURL());
         view.nickName.setText(vm.userInfo.val().getNickname());
-        view.gender.setText(vm.userInfo.val().getGender() == 1 ? io.openim.android.ouicore.R.string.male
+        view.gender.setText(Objects.requireNonNullElse(vm.userInfo.val().getGender(), 0) == 1 ? io.openim.android.ouicore.R.string.male
             : io.openim.android.ouicore.R.string.girl);
-        long birth = vm.userInfo.val().getBirth();
+        long birth = Objects.requireNonNullElse(vm.userInfo.val().getBirth(), 0L) ;
         if (birth != 0) {
             view.birthday.setText(TimeUtil.getTime(birth ,
                 TimeUtil.yearMonthDayFormat));

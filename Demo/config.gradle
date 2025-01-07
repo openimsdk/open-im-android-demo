@@ -7,23 +7,19 @@ ext {
 
     //android 配置
     androidConfig = [
-            minSdk     : 21,
-            targetSdk  : 32,
-            compileSdk : 33,
-            versionCode: 8,
-            versionName: "1.0.8",
-            abiFilters : ['armeabi-v7a','arm64-v8a']
+        minSdk     : 24,
+        targetSdk  : 32,
+        compileSdk : 33,
+        versionCode: 9,
+        versionName: "3.8.3",
+        abiFilters : ['armeabi-v7a','arm64-v8a']
     ]
 
     applicationId = [
-            "app" : "io.openim.android.demo",
-            "OUIConversation" : "io.openim.android.ouiconversation",
-            "OUIGroup" : "io.openim.android.ouigroup",
-            "OUIContact" : "io.openim.android.ouicontact",
-            "OUICalling" : "io.openim.android.ouicalling",
-            "OUIMoments" : "io.openim.android.ouimoments",
-            "OUIMeeting" : "io.openim.android.ouimeeting",
-            "OUIApplet" : "io.openim.android.ouiapplet",
+        "app" : "io.openim.android.os.demo",
+        "OUIConversation" : "io.openim.android.ouiconversation",
+        "OUIGroup" : "io.openim.android.ouigroup",
+        "OUIContact" : "io.openim.android.ouicontact",
+        "OUICalling" : "io.openim.android.ouicalling",
     ]
-
 }

@@ -1,11 +1,8 @@
 package io.openim.android.ouicontact.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.widget.Toast;
 
-import io.openim.android.ouicontact.R;
 import io.openim.android.ouicontact.databinding.ActivityFriendRequestDetailBinding;
 import io.openim.android.ouicontact.vm.ContactVM;
 import io.openim.android.ouicore.base.BaseActivity;

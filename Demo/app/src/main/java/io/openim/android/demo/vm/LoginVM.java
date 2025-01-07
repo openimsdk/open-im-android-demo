@@ -3,6 +3,7 @@ package io.openim.android.demo.vm;
 import static io.openim.android.ouicore.utils.Common.md5;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -34,7 +35,7 @@ import io.openim.android.sdk.listener.OnBase;
 
 public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
     public static final int MAX_COUNTDOWN = 60;
-
+    private static final String TAG = "LoginVM";
     public State<Boolean> isPhone = new State<>(true);
     public State<String> account = new State<>("");
     //密码或验证码
@@ -69,6 +70,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
                             @Override
                             public void onSuccess(String data) {
                                 //缓存登录信息
+                                Log.d(TAG, "LoginCertificate OpenIMClient.getInstance().login onSuccess");
                                 loginCertificate.cache(getContext());
                                 BaseApp.inst().loginCertificate = loginCertificate;
                                 getIView().jump();
@@ -283,6 +285,7 @@ public class LoginVM extends BaseViewModel<LoginVM.ViewAction> {
             @Override
             public void onSuccess(LoginCertificate o) {
 //                setSelfInfo();
+                Log.d(TAG, "LoginCertificate register onSuccess ");
                 o.cache(getContext());
                 getIView().jump();
             }

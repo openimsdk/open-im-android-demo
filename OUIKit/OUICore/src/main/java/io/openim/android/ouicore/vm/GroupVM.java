@@ -1,6 +1,7 @@
 package io.openim.android.ouicore.vm;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -38,9 +39,11 @@ import io.openim.android.sdk.models.ConversationInfo;
 import io.openim.android.sdk.models.FriendInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
+import io.openim.android.sdk.models.SetGroupMemberInfo;
 
 public class GroupVM extends SocialityVM {
     //禁言状态
+    private final String TAG = "GroupVM";
     public State<Integer> muteStatus = new State<>(-1);
     public State<String> groupName = new State<>("");
     public State<GroupInfo> groupsInfo = new State<>();
@@ -48,6 +51,8 @@ public class GroupVM extends SocialityVM {
     //当前用户是否是群主或管理员
     public State<Boolean> isOwnerOrAdmin = new State<>(false);
     public State<Boolean> isOwner = new State<>(false);
+    //是否加入群
+    public State<Boolean> isJoinGroup = new State<>(true);
     //群所有成员
     public State<List<GroupMembersInfo>> groupMembers =
         new State<>(new ArrayList<>());
@@ -73,6 +78,8 @@ public class GroupVM extends SocialityVM {
     public int pageSize = 20;
     //已读Ids
     public List<String> hasReadIDList = new ArrayList<>();
+    // 是否通过加群验证
+    public State<Boolean> isAgreeVerify = new State<>(false);
 
 
     public void getConversationInfo() {
@@ -98,17 +105,28 @@ public class GroupVM extends SocialityVM {
                 groupsInfo.setValue(data.get(0));
             }
         }, groupIds);
+
+        OpenIMClient.getInstance().groupManager.isJoinGroup(groupId, new OnBase<Boolean>() {
+            @Override
+            public void onSuccess(Boolean data) {
+                isJoinGroup.setValue(data);
+            }
+        });
     }
 
     public void getMyMemberInfo() {
-        OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
-            @Override
-            public void onSuccess(List<GroupMembersInfo> data) {
-                if (data.isEmpty()) return;
-                updateRole(data.get(0));
-            }
-        }, groupId, new ArrayList<>(Collections.singleton(BaseApp
-            .inst().loginCertificate.userID)));
+        try {
+            OpenIMClient.getInstance().groupManager.getGroupMembersInfo(new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
+                @Override
+                public void onSuccess(List<GroupMembersInfo> data) {
+                    if (data.isEmpty()) return;
+                    updateRole(data.get(0));
+                }
+            }, groupId, new ArrayList<>(Collections.singleton(BaseApp
+                .inst().loginCertificate.userID)));
+        } catch (Exception e) {
+            Log.e(TAG, "Exception:" + e);
+        }
     }
 
     public void updateRole(GroupMembersInfo data) {
@@ -206,13 +224,17 @@ public class GroupVM extends SocialityVM {
      * @param groupNickname 群内显示名称
      */
     public void setGroupMemberNickname(String gid, String uid, String groupNickname) {
-        OpenIMClient.getInstance().groupManager.setGroupMemberNickname(new IMUtil.IMCallBack<String>() {
+        SetGroupMemberInfo info = new SetGroupMemberInfo();
+        info.setGroupID(gid);
+        info.setUserID(uid);
+        info.setNickname(groupNickname);
+        OpenIMClient.getInstance().groupManager.setGroupMemberInfo(info, new IMUtil.IMCallBack<String>() {
             @Override
             public void onSuccess(String data) {
                 getIView().onSuccess(data);
                 getGroupsInfo();
             }
-        }, gid, uid, groupNickname);
+        });
     }
 
     public void getSuperGroupMemberList() {
@@ -357,10 +379,7 @@ public class GroupVM extends SocialityVM {
         }, groupId, 0, 0, count);
     }
 
-    /**
-     * 邀请入群
-     */
-    public void inviteUserToGroup(List<String> userIds) {
+    private void joinToGroup(List<String> userIds) {
         OpenIMClient.getInstance().groupManager
             .inviteUserToGroup(new OnBase<String>() {
                 @Override
@@ -375,9 +394,33 @@ public class GroupVM extends SocialityVM {
                     getIView().onSuccess(null);
 
                     Obs.newMessage(Constants.Event.UPDATE_GROUP_INFO, groupName);
-                    postSubject(Constants.Event.UPDATE_GROUP_INFO+"");
+                    postSubject(Constants.Event.UPDATE_GROUP_INFO + "");
                 }
             }, groupId, userIds, "welcome");
+    }
+
+    private void filterUserIds(List<String> userIds) {
+        OpenIMClient.getInstance().groupManager.getUsersInGroup(new OnBase<List<String>>() {
+            @Override
+            public void onError(int code, String error) {
+                getIView().toast(error);
+            }
+
+            @Override
+            public void onSuccess(List<String> data) {
+                userIds.removeAll(data);
+                if (userIds.size() > 0) {
+                    joinToGroup(userIds);
+                }
+            }
+        }, groupId, userIds);
+    }
+
+    /**
+     * 邀请入群
+     */
+    public void inviteUserToGroup(List<String> userIds) {
+        filterUserIds(userIds);
     }
 
     /**
@@ -493,63 +536,6 @@ public class GroupVM extends SocialityVM {
         getIView().close();
     }
 
-    public void changeGroupMute(boolean isChecked, IMUtil.OnSuccessListener OnSuccessListener) {
-        OpenIMClient.getInstance().groupManager.changeGroupMute(new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-                getIView().toast(error + code);
-            }
-
-            @Override
-            public void onSuccess(String data) {
-                if (null != OnSuccessListener) OnSuccessListener.onSuccess(data);
-            }
-        }, groupId, isChecked);
-    }
-
-    public void setGroupVerification(int needVerification,
-                                     IMUtil.OnSuccessListener OnSuccessListener) {
-        OpenIMClient.getInstance().groupManager.setGroupVerification(new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-                getIView().toast(error + code);
-            }
-
-            @Override
-            public void onSuccess(String data) {
-                if (null != OnSuccessListener) OnSuccessListener.onSuccess(data);
-            }
-        }, groupId, needVerification);
-    }
-
-    public void setGroupLookMemberInfo(int status, IMUtil.OnSuccessListener OnSuccessListener) {
-        OpenIMClient.getInstance().groupManager.setGroupLookMemberInfo(new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-                getIView().toast(error + code);
-            }
-
-            @Override
-            public void onSuccess(String data) {
-                if (null != OnSuccessListener) OnSuccessListener.onSuccess(data);
-            }
-        }, groupId, status);
-    }
-
-    public void setGroupApplyMemberFriend(int status, IMUtil.OnSuccessListener OnSuccessListener) {
-        OpenIMClient.getInstance().groupManager.setGroupApplyMemberFriend(new OnBase<String>() {
-            @Override
-            public void onError(int code, String error) {
-                getIView().toast(error + code);
-            }
-
-            @Override
-            public void onSuccess(String data) {
-                if (null != OnSuccessListener) OnSuccessListener.onSuccess(data);
-            }
-        }, groupId, status);
-    }
-
     public void changeGroupMemberMute(IMBack<String> imBack, String uid, long seconds) {
         OpenIMClient.getInstance().groupManager.changeGroupMemberMute(imBack, groupId, uid,
             seconds);
@@ -579,6 +565,5 @@ public class GroupVM extends SocialityVM {
         changeGroupMemberMute(imBack, uid, seconds);
         return seconds;
     }
-
 
 }

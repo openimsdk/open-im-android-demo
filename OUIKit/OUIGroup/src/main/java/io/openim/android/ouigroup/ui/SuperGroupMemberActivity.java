@@ -3,6 +3,7 @@ package io.openim.android.ouigroup.ui;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
@@ -37,6 +38,7 @@ import io.openim.android.sdk.models.GroupMembersInfo;
 
 @Route(path = Routes.Group.SUPER_GROUP_MEMBER)
 public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMemberBinding> {
+    private final String TAG = "SuperGroupMemberActivity";
     private RecyclerViewAdapter adapter;
     private GroupMemberVM vm;
     private GroupVM groupVM;
@@ -48,7 +50,8 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
         vm = Easy.find(GroupMemberVM.class, vmTag);
         try {
             groupVM = Easy.find(GroupVM.class);
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            Log.e(TAG, "Exception :" + e);
         }
         super.onCreate(savedInstanceState);
         viewBinding(ActivitySuperGroupMemberBinding.inflate(getLayoutInflater()));
@@ -95,7 +98,10 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
             LayoutMemberActionBinding view = LayoutMemberActionBinding.inflate(getLayoutInflater());
             view.deleteFriend.setVisibility(vm.isOwnerOrAdmin ? View.VISIBLE : View.GONE);
             view.addFriend.setOnClickListener(v1 -> {
-                GroupMaterialActivity.inviteIntoGroup(this, Easy.find(GroupVM.class));
+                try {
+                    GroupMaterialActivity.inviteIntoGroup(this, Easy.find(GroupVM.class));
+                } catch (Exception ignore) {
+                }
                 popupWindow.dismiss();
             });
             view.deleteFriend.setOnClickListener(v1 -> {
@@ -103,7 +109,7 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
                 GroupMemberVM memberVM = Easy.installVM(GroupMemberVM.class, tag);
                 memberVM.groupId = vm.groupId;
                 memberVM.setIntention(GroupMemberVM.Intention.AT);
-                memberVM.isRemoveOwnerAndAdmin = true;
+                memberVM.isRemoveOwnerAndAdmin = false;
                 memberVM.isSearchSingle = true;
 
                 memberVM.setOnFinishListener(activity -> {
@@ -149,7 +155,6 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
             int selectNum = choices.size();
             view.bottomLayout.selectNum.setText(String.format(getString(io.openim.android.ouicore.R.string.selected_tips), selectNum));
             view.bottomLayout.submit.setEnabled(selectNum > 0);
-
             adapter.notifyDataSetChanged();
         });
     }
@@ -222,10 +227,10 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
                         vm.onFinish(SuperGroupMemberActivity.this);
                         return;
                     }
-                    boolean isSelect = !isChecked;
+                    boolean isSelect = !itemViewHo.view.select.isChecked();
                     if (isSelect) {
                         if (vm.choiceList.val().size() >= vm.maxNum) {
-                            toast(String.format(getString(io.openim.android.ouicore.R.string.select_tips), vm.maxNum));
+                            singleInstanceToast(String.format(getString(io.openim.android.ouicore.R.string.select_tips), vm.maxNum));
                             return;
                         }
                         MultipleChoice choice =
@@ -237,7 +242,8 @@ public class SuperGroupMemberActivity extends BasicActivity<ActivitySuperGroupMe
                         vm.removeChoice(data.groupMembersInfo.getUserID());
                     }
                     vm.choiceList.update();
-                    notifyItemChanged(getItems().indexOf(data));
+                    itemViewHo.view.select.setChecked(!itemViewHo.view.select.isChecked());
+//                    notifyItemChanged(getItems().indexOf(data));
                 });
             }
         };

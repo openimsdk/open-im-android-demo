@@ -9,4 +9,7 @@ public class BurnAfterReadingNotification {
 
     /// 是否开启
     public boolean isPrivate;
+
+    // 会话Id
+    public String conversationID;
 }

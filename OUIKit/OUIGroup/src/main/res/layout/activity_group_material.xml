@@ -15,12 +15,12 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white">
+        android:background="#F6F6F6">
 
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="#F6F6F6"
             android:orientation="vertical"
             tools:context=".ui.GroupMaterialActivity">
@@ -102,28 +102,32 @@
                             android:layout_weight="1"
                             android:orientation="vertical">
 
-                          <LinearLayout
-                              android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:gravity="center_vertical"
-                              android:orientation="horizontal">
-                              <TextView
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:layout_marginRight="5dp"
-                                  android:text="@{GroupVM.groupsInfo.groupName}"
-                                  android:textColor="@color/txt_black"
-                                  android:textSize="17sp" />
-                              <ImageView
-                                  android:id="@+id/groupName"
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:src="@mipmap/ic_g_edit2"
-                                  android:padding="4dp"
-                                  android:visibility="@{GroupVM.isOwnerOrAdmin?View.VISIBLE:View.GONE}" />
-                          </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="5dp"
+                                    android:layout_weight="1"
+                                    android:text="@{GroupVM.groupsInfo.groupName}"
+                                    android:textColor="@color/txt_black"
+                                    android:textSize="17sp" />
+
+                                <ImageView
+                                    android:id="@+id/groupName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:padding="4dp"
+                                    android:src="@mipmap/ic_g_edit2"
+                                    android:visibility="@{GroupVM.isOwnerOrAdmin?View.VISIBLE:View.GONE}" />
+                            </LinearLayout>
 
                             <TextView
+                                android:id="@+id/groupId"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@{GroupVM.groupsInfo.groupID}"
@@ -157,6 +161,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:overScrollMode="never"
+                            android:layout_marginHorizontal="5dp"
                             android:paddingTop="15dp" />
 
                         <LinearLayout
@@ -188,18 +193,189 @@
                     </LinearLayout>
 
 
-
-                    <TextView
-                        android:id="@+id/quitGroup"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:layout_marginTop="50dp"
-                        android:layout_marginBottom="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/sty_radius_6_white"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/groupManage"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="15dp"
+                            android:visibility="@{GroupVM.isOwner?View.VISIBLE:View.GONE}">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="32dp"
+                                android:layout_weight="1"
+                                android:text="@string/group_manage"
+                                android:gravity="center_vertical"
+                                android:textColor="#ff333333"
+                                android:textSize="16sp" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="6dp"
+                                android:src="@mipmap/ic_right" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/topChat"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
                         android:background="@color/white"
-                        android:gravity="center"
-                        android:text="@string/quit_group"
-                        android:textColor="#fff85050"
-                        android:textSize="18sp" />
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="12dp"
+                        android:paddingLeft="15dp"
+                        android:paddingRight="15dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/top_chat"
+                            android:textColor="#ff333333"
+                            android:textSize="16sp" />
+
+                        <io.openim.android.ouicore.widget.SlideButton
+                            android:id="@+id/topSlideButton"
+                            android:layout_width="38dp"
+                            android:layout_height="23dp" />
+                    </LinearLayout>
+
+                    <include layout="@layout/view_dividing_line" />
+
+                    <LinearLayout
+                        android:id="@+id/notDisturb"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@color/white"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="15dp"
+                        android:paddingRight="15dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/msg_dont_disturb"
+                            android:textColor="#ff333333"
+                            android:textSize="16sp" />
+
+                        <io.openim.android.ouicore.widget.SlideButton
+                            android:id="@+id/no_disturb"
+                            android:layout_width="38dp"
+                            android:layout_height="23dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/clearRecord"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@color/white"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="12dp"
+                        android:paddingLeft="15dp"
+                        android:paddingRight="15dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/clear_chat_record"
+                            android:textColor="#ff333333"
+                            android:textSize="16sp" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@mipmap/ic_right" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/sty_radius_6_white"
+                        android:orientation="vertical">
+
+
+                        <LinearLayout
+                            android:id="@+id/quitGroup"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="15dp"
+                            android:visibility="@{!GroupVM.isOwner?View.VISIBLE:View.GONE}">
+
+                            <TextView
+                                android:id="@+id/quitGroupText"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/quit_group"
+                                android:gravity="center_vertical"
+                                android:textColor="#fff85050"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textColor="#ff999999"
+                                android:textSize="14sp" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="6dp"
+                                android:src="@mipmap/ic_right" />
+
+                        </LinearLayout>
+
+                        <include layout="@layout/view_dividing_line" />
+
+                        <LinearLayout
+                            android:id="@+id/dissolveGroup"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="15dp"
+                            android:visibility="@{GroupVM.isOwner?View.VISIBLE:View.GONE}">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="32dp"
+                                android:layout_weight="1"
+                                android:text="@string/dissolve_group"
+                                android:gravity="center_vertical"
+                                android:textColor="#fff85050"
+                                android:textSize="16sp" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="6dp"
+                                android:src="@mipmap/ic_right" />
+
+                        </LinearLayout>
+
+
+                        <include layout="@layout/view_dividing_line" />
+
+
+                    </LinearLayout>
                 </LinearLayout>
             </ScrollView>
 

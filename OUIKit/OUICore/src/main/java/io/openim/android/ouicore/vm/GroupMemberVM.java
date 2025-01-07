@@ -91,7 +91,7 @@ public class GroupMemberVM extends BaseVM {
     public State<List<MultipleChoice>> choiceList = new State<>(new ArrayList<>());
     public State<List<GroupMembersInfo>> superGroupMembers = new State<>(new ArrayList<>());
 
-    public int page = 0, pageSize = 20;
+    public int page = 0, pageSize = 100, firstPageSize = 500;
 
     public void addChoice(MultipleChoice choice) {
         if (!choiceList.val().contains(choice)) {
@@ -105,7 +105,7 @@ public class GroupMemberVM extends BaseVM {
 
     public void getSuperGroupMemberList() {
         final int finalPage = page;
-        int start = finalPage * pageSize;
+        int start = finalPage > 0 ? (firstPageSize + finalPage * pageSize) : 0;
         OpenIMClient.getInstance().groupManager
             .getGroupMemberList(new IMUtil.IMCallBack<List<GroupMembersInfo>>() {
                 @Override
@@ -121,7 +121,7 @@ public class GroupMemberVM extends BaseVM {
                         superGroupMembers.val().addAll(data);
                     superGroupMembers.update();
                 }
-            }, groupId, 0, start, pageSize);
+            }, groupId, 0, start, finalPage == 0 ? firstPageSize : pageSize);
     }
 
     public   void removeOwnerAndAdmin(List<GroupMembersInfo> data) {

@@ -29,41 +29,12 @@ public class NotificationUtil {
             (NotificationManager) BaseApp.inst().getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (null == manager.getNotificationChannel(channel)) {
-                if (Objects.equals(channel, CALL_CHANNEL_ID))
-                    buildCallChannel();
                 if (Objects.equals(channel, MSG_NOTIFICATION))
                     buildMsgNotificationChannel();
-                if (Objects.equals(channel, RESIDENT_SERVICE))
-                    buildResidentChannel();
             }
         }
         return new NotificationCompat.Builder(BaseApp.inst(), channel)
             .setSmallIcon(R.mipmap.ic_launcher_round);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private static void buildResidentChannel() {
-        NotificationManager manager =
-            (NotificationManager) BaseApp.inst().getSystemService(Context.NOTIFICATION_SERVICE);
-        String CHANNEL_NAME = BaseApp.inst().getString(io.openim.android.ouicore.R.string.audio_video_service);
-        NotificationChannel notificationChannel = new NotificationChannel(RESIDENT_SERVICE,
-            CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
-        notificationChannel.setShowBadge(false);
-        manager.createNotificationChannel(notificationChannel);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private static void buildCallChannel() {
-        NotificationManager manager =
-            (NotificationManager) BaseApp.inst().getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationChannel callChannel = new NotificationChannel(CALL_CHANNEL_ID,
-            BaseApp.inst().getString(R.string.audio_video_service),
-            NotificationManager.IMPORTANCE_HIGH);
-        callChannel.setBypassDnd(true);
-        callChannel.setLockscreenVisibility(VISIBILITY_PUBLIC);
-        callChannel.enableLights(true);
-        callChannel.setSound(null, null);
-        manager.createNotificationChannel(callChannel);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

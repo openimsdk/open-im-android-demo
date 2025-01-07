@@ -77,7 +77,6 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
         view.nickNameLy.setOnClickListener(v ->
             nicknameLauncher.launch(new Intent(this, EditTextActivity.class)
                 .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.val().getNickname())
-                .putExtra(EditTextActivity.MAX_LENGTH, 16)
                 .putExtra(EditTextActivity.TITLE,
                     getString(io.openim.android.ouicore.R.string.NickName))));
         view.genderLy.setOnClickListener(v -> {
@@ -104,7 +103,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalVM, ActivityPerso
         });
         view.email.setOnClickListener(v -> {
             emailLauncher.launch(new Intent(this, EditTextActivity.class)
-                .putExtra(EditTextActivity.INIT_TXT, "")
+                .putExtra(EditTextActivity.INIT_TXT, vm.userInfo.val().getEmail())
                 .putExtra(EditTextActivity.TITLE,
                     getString(io.openim.android.ouicore.R.string.mail)));
         });

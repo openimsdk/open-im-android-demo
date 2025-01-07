@@ -25,7 +25,8 @@ public class NotificationActivity extends BaseActivity<ChatVM, ActivityNotificat
         initView();
         init();
         listener();
-        vm.markRead();
+        if (vm.conversationInfo.val() != null && vm.conversationInfo.val().getUnreadCount() > 0)
+            vm.markRead();
     }
 
     private void listener() {

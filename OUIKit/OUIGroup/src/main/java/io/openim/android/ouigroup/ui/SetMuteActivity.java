@@ -3,6 +3,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.View;
 
 import io.openim.android.ouicore.base.BaseActivity;
 import io.openim.android.ouicore.base.vm.injection.Easy;
@@ -25,6 +26,7 @@ public class SetMuteActivity extends BaseActivity<GroupVM,ActivitySetMuteBinding
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivitySetMuteBinding.inflate(getLayoutInflater()));
         uid=getIntent().getStringExtra(Constants.K_ID);
+        view.cancelMute.setVisibility(getIntent().getBooleanExtra("isShowMute", true) ? View.VISIBLE : View.GONE);
         view.setGroupVM(vm);
         listener();
     }

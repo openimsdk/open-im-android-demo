@@ -30,7 +30,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class N {
     final static String TAG = "OpenIM-net";
-    private static N n = null;
+    public static N instance = null;
     private static Retrofit mRetrofit;
     private static HashMap<String, ListCompositeDisposable> disposableHashMap = null;
 
@@ -71,11 +71,13 @@ public class N {
             throw new NullPointerException("N is not initialized");
     }
 
-    private static synchronized N getInstance(HttpConfig httpConfig) {
-        if (null == n) {
-            n = new N(httpConfig);
+    private static synchronized void getInstance(HttpConfig httpConfig) {
+        if (null == instance) {
+            instance = new N(httpConfig);
         }
-        return n;
+    }
+   public Retrofit copy(String baseUrl, OkHttpClient client){
+       return mRetrofit.newBuilder().baseUrl(baseUrl).client(client).build();
     }
 
     public static void clearDispose(Context context) {
@@ -113,8 +115,8 @@ public class N {
     }
 
     //日志拦截器
-    private HttpLoggingInterceptor LogInterceptor() {
-        return new HttpLoggingInterceptor(message -> L.w(TAG, message)).setLevel(HttpLoggingInterceptor.Level.BODY);//设置打印数据的级别
+    public HttpLoggingInterceptor LogInterceptor() {
+        return new HttpLoggingInterceptor(message -> L.w(TAG, message)).setLevel(HttpLoggingInterceptor.Level.HEADERS);//设置打印数据的级别
     }
 
 
@@ -124,5 +126,11 @@ public class N {
 
     public static <T> ObservableTransformer<T, T> computationMain() {
         return upstream -> upstream.subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread());
+    }
+    /**
+     * using for download file, the upstream data must be emitted to non main thread by emitter
+     */
+    public static <T> ObservableTransformer<T, T> bothIO() {
+        return upstream -> upstream.subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
     }
 }

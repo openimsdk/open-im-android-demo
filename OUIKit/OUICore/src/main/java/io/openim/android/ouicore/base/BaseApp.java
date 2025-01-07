@@ -31,6 +31,7 @@ public class BaseApp extends Application {
     public Realm realm;
     public State<Boolean> isAppBackground = new State<>(true);
     private int mActivityCount;
+//    public DownloadService downloadService;
 
     public static BaseApp inst() {
         return instance;

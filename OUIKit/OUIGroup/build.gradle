@@ -15,7 +15,6 @@ android {
         enabled = true
     }
 
-
     compileSdk rootProject.ext.androidConfig.compileSdk
 
     defaultConfig {
@@ -65,8 +64,4 @@ dependencies {
     implementation project(path: ':OUICore')
     implementation 'com.alibaba:arouter-api:1.5.2'
     annotationProcessor 'com.alibaba:arouter-compiler:1.5.2'
-
-
-
-    implementation project(':OUICore')
 }

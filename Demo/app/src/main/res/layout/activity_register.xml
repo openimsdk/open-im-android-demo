@@ -94,7 +94,6 @@
                     android:singleLine="true"
                     android:background="@android:color/transparent"
                     android:hint="@string/input_phone"
-                    android:text="@={LoginVM.account}"
                     android:textColor="#ff333333"
                     android:textSize="18sp" />
 
@@ -103,7 +102,7 @@
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:padding="4dp"
-                    android:src="@mipmap/ic_close3" />
+                    android:src="@mipmap/ic_close4" />
             </LinearLayout>
 
         </LinearLayout>

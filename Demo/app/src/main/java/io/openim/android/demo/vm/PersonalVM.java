@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.openim.android.demo.R;
 import io.openim.android.demo.repository.OpenIMService;
@@ -26,7 +27,13 @@ import io.openim.android.ouicore.widget.WaitDialog;
 import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.AllowType;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.models.FriendInfo;
+import io.openim.android.sdk.models.PublicUserInfo;
 import io.openim.android.sdk.models.UserInfo;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.functions.BiFunction;
 
 public class PersonalVM extends BaseViewModel {
     public WaitDialog waitDialog;
@@ -63,10 +70,10 @@ public class PersonalVM extends BaseViewModel {
         certificate.nickname = userInfo.getNickname();
         certificate.faceURL = userInfo.getFaceURL();
 
-        certificate.globalRecvMsgOpt = userInfo.getGlobalRecvMsgOpt();
-        certificate.allowAddFriend = userInfo.getAllowAddFriend() == 1;
-        certificate.allowBeep = userInfo.getAllowBeep() == 1;
-        certificate.allowVibration = userInfo.getAllowVibration() == 1;
+        certificate.globalRecvMsgOpt = Objects.requireNonNullElse(userInfo.getGlobalRecvMsgOpt(), 0);
+        certificate.allowAddFriend = Objects.requireNonNullElse(userInfo.getAllowAddFriend(), 0) == 1;
+        certificate.allowBeep = Objects.requireNonNullElse(userInfo.getAllowBeep(), 0) == 1;
+        certificate.allowVibration = Objects.requireNonNullElse(userInfo.getAllowVibration(), 0) == 1;
 
         BaseApp.inst().loginCertificate.cache(BaseApp.inst());
     }
@@ -119,30 +126,61 @@ public class PersonalVM extends BaseViewModel {
         return this;
     }
 
+    public Observable<UserInfo> queryFriendInfoWithoutBlocked(String uid) {
+        return Observable.create(emitter -> {
+           List<String> uids = new ArrayList<>();
+           uids.add(uid);
+           OpenIMClient.getInstance().friendshipManager.getFriendsInfo(new OnBase<List<UserInfo>>() {
+               @Override
+               public void onError(int code, String error) {
+                   emitter.onError(new Exception(code+error));
+               }
+
+               @Override
+               public void onSuccess(List<UserInfo> data) {
+                   emitter.onNext(data.get(0));
+                   emitter.onComplete();
+               }
+           }, uids, false);
+        });
+    }
+
     public PersonalVM getUsersInfoWithCache(String id, String gid) {
-        OpenIMClient.getInstance().userInfoManager
-            .getUsersInfoWithCache(new OnBase<List<UserInfo>>() {
+        OpenIMClient.getInstance().userInfoManager.getUsersInfo(new OnBase<List<PublicUserInfo>>() {
                 @Override
-                public void onSuccess(List<UserInfo> data) {
+                public void onError(int code, String error) {
+                }
+
+                @Override
+                public void onSuccess(List<PublicUserInfo> data) {
                     if (!data.isEmpty()) {
-                        UserInfo u = data.get(0);
-                       userInfo.setValue(updateUserInfo(userInfo
-                           .val(), u));
+                        PublicUserInfo u = data.get(0);
+                        userInfo.setValue(updateUserInfo(userInfo
+                            .val(), u));
                     }
                 }
-            }, new ArrayList<>(Collections.singleton(id)), gid);
+            }, new ArrayList<>(Collections.singleton(id)));
         return this;
     }
 
-    private UserInfo updateUserInfo(UserInfo origin, UserInfo update) {
+    private UserInfo updateUserInfo(UserInfo origin, Object update) {
         try {
+            UserInfo updateInfo = new UserInfo();
+            if (update instanceof PublicUserInfo) {
+                updateInfo.setUserID(((PublicUserInfo)update).getUserID());
+                updateInfo.setNickname(((PublicUserInfo)update).getNickname());
+                updateInfo.setFaceURL(((PublicUserInfo)update).getFaceURL());
+                updateInfo.setEx(((PublicUserInfo)update).getEx());
+                updateInfo.setCreateTime(((PublicUserInfo)update).getCreateTime());
+            } else updateInfo = (UserInfo) update;
+
             if (null == origin) {
-                return update;
+                return updateInfo;
             }
             String json = JSONObject.toJSONString(origin);
             Map originMap = JSONObject.parseObject(json, Map.class);
 
-            String json2 = JSONObject.toJSONString(update);
+            String json2 = JSONObject.toJSONString(updateInfo);
             Map updateMap = JSONObject.parseObject(json2, Map.class);
 
             originMap.putAll(updateMap);

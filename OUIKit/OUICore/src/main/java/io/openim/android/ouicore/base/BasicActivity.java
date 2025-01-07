@@ -15,13 +15,13 @@ import androidx.databinding.ViewDataBinding;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import io.openim.android.ouicore.services.CallingService;
 import io.openim.android.ouicore.utils.ActivityManager;
 import io.openim.android.ouicore.utils.Routes;
 
 public class BasicActivity<T extends ViewDataBinding> extends AppCompatActivity {
     boolean isRecycle;
     protected T view;
+    private Toast to;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,7 +58,8 @@ public class BasicActivity<T extends ViewDataBinding> extends AppCompatActivity 
         if (isFinishing() && !isRecycle) {
             isRecycle = true;
             ActivityManager.remove(this);
-            view.unbind();
+            if (null != view)
+                view.unbind();
             recycle();
         }
     }
@@ -69,6 +70,14 @@ public class BasicActivity<T extends ViewDataBinding> extends AppCompatActivity 
 
     public void toast(String tips) {
         Toast.makeText(this, tips, Toast.LENGTH_LONG).show();
+    }
+
+    public void singleInstanceToast(String tips) {
+        if (to != null) {
+            to.cancel();
+        }
+        to = Toast.makeText(this, tips, Toast.LENGTH_SHORT);
+        to.show();
     }
 
     protected void setLightStatus() {
@@ -90,9 +99,6 @@ public class BasicActivity<T extends ViewDataBinding> extends AppCompatActivity 
 
     @Override
     public void onBackPressed() {
-        CallingService callingService =
-            (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
-        if (null != callingService && callingService.isCalling()) return;
         super.onBackPressed();
     }
 }
