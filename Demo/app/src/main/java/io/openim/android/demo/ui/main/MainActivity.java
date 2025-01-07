@@ -43,6 +43,7 @@ import io.openim.android.ouicore.utils.Routes;
 import io.openim.android.ouicore.vm.NotificationVM;
 import io.openim.android.ouicore.vm.UserLogic;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
+import io.openim.android.sdk.models.CustomElem;
 import io.openim.android.sdk.models.SignalingInfo;
 import io.openim.android.sdk.models.SignalingInvitationInfo;
 
@@ -95,31 +96,40 @@ public class MainActivity extends BaseActivity<MainVM, ActivityMainBinding> impl
                 @Override
                 public void onRecvOnlineOnlyMessage(String msg) {
                     Map map = JSONArray.parseObject(msg, Map.class);
-                    if (map.containsKey(Constants.K_CUSTOM_TYPE)) {
-                        int customType = Objects.requireNonNullElse((Integer) map.get(Constants.K_CUSTOM_TYPE), -1);
-                        Object result = map.get(Constants.K_DATA);
-                        if (customType >= Constants.MsgType.callingInvite
-                            && customType <= Constants.MsgType.callingHungup) {
-                            SignalingInvitationInfo signalingInvitationInfo = GsonHel.fromJson((String) result, SignalingInvitationInfo.class);
-                            SignalingInfo signalingInfo = new SignalingInfo();
-                            signalingInfo.setInvitation(signalingInvitationInfo);
+                    if (map.containsKey("customElem")) {
+                        String customElemStr = String.valueOf(map.get("customElem"));
+                        if (!"null".equals(customElemStr)) {
+                            CustomElem customElem = JSONArray.parseObject(customElemStr, CustomElem.class);
+                            if (!TextUtils.isEmpty(customElem.getData())) {
+                                Map customMap = JSONArray.parseObject(customElem.getData(), Map.class);
+                                if (customMap.containsKey(Constants.K_CUSTOM_TYPE)) {
+                                    int customType = Objects.requireNonNullElse((Integer) customMap.get(Constants.K_CUSTOM_TYPE), -1);
+                                    String result = String.valueOf(customMap.get(Constants.K_DATA));
+                                    if (!"null".equals(result) && customType >= Constants.MsgType.callingInvite
+                                        && customType <= Constants.MsgType.callingHungup) {
+                                        SignalingInvitationInfo signalingInvitationInfo = GsonHel.fromJson(result, SignalingInvitationInfo.class);
+                                        SignalingInfo signalingInfo = new SignalingInfo();
+                                        signalingInfo.setInvitation(signalingInvitationInfo);
 
-                            switch (customType) {
-                                case Constants.MsgType.callingInvite:
-                                    callingService.onReceiveNewInvitation(signalingInfo);
-                                    break;
-                                case Constants.MsgType.callingAccept:
-                                    callingService.onInviteeAccepted(signalingInfo);
-                                    break;
-                                case Constants.MsgType.callingReject:
-                                    callingService.onInviteeRejected(signalingInfo);
-                                    break;
-                                case Constants.MsgType.callingCancel:
-                                    callingService.onInvitationCancelled(signalingInfo);
-                                    break;
-                                case Constants.MsgType.callingHungup:
-                                    callingService.onHangup(signalingInfo);
-                                    break;
+                                        switch (customType) {
+                                            case Constants.MsgType.callingInvite:
+                                                callingService.onReceiveNewInvitation(signalingInfo);
+                                                break;
+                                            case Constants.MsgType.callingAccept:
+                                                callingService.onInviteeAccepted(signalingInfo);
+                                                break;
+                                            case Constants.MsgType.callingReject:
+                                                callingService.onInviteeRejected(signalingInfo);
+                                                break;
+                                            case Constants.MsgType.callingCancel:
+                                                callingService.onInvitationCancelled(signalingInfo);
+                                                break;
+                                            case Constants.MsgType.callingHungup:
+                                                callingService.onHangup(signalingInfo);
+                                                break;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
