@@ -45,9 +45,9 @@ public class WebViewActivity extends BaseActivity<BaseViewModel, ActivityWebView
     private String loadUrl;
 
     //h5 腾讯地图
-    private String mapThumbnailUrl;
+    private String mapThumbnailUrl,
+        mapThumbnailSize = "1200*600";
     public static String mapAppKey = "",
-        mapThumbnailSize = "1200*600",
         mapBackUrl = "http://callback";
 
 
