@@ -142,33 +142,28 @@ public class CallingVM {
     };
 
     public void signalingInvite(SignalingInfo signalingInfo) {
-        if (isGroup) {
-            //TODO
-        } else {
-            sendSignaling(Constants.MsgType.callingInvite, signalingInfo, new OnMsgSendCallback() {
-                @Override
-                public void onSuccess(Message s) {
-                    getTokenAndConnectRoom(signalingInfo, new OnBase<SignalingCertificate>() {
-                        @Override
-                        public void onSuccess(SignalingCertificate data) {
-                            connectToRoom(data);
-                        }
-                    });
-                }
-            });
-        }
+        sendSignaling(Constants.MsgType.callingInvite, signalingInfo, new OnMsgSendCallback() {
+            @Override
+            public void onSuccess(Message s) {
+                getTokenAndConnectRoom(signalingInfo, new OnBase<SignalingCertificate>() {
+                    @Override
+                    public void onSuccess(SignalingCertificate data) {
+                        connectToRoom(data);
+                    }
+                });
+            }
+        });
     }
 
     private void sendSignaling(int code, SignalingInfo signalingInfo, OnMsgSendCallback onMsgSendCallback) {
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("customType", code);
-        hashMap.put("data", GsonHel.toJson(signalingInfo.getInvitation()));
+        hashMap.put(Constants.K_CUSTOM_TYPE, code);
+        hashMap.put(Constants.K_DATA, signalingInfo.getInvitation());
         Message message = OpenIMClient.getInstance().messageManager.createCustomMessage(GsonHel.toJson(hashMap), "", "");
 
         List<String> uidList = signalingInfo.getInvitation().getInviteeUserIDList();
         if (null != message && !uidList.isEmpty()) {
             String recvUid = signalingInfo.getInvitation().getInviterUserID().equals(BaseApp.inst().loginCertificate.userID) ? signalingInfo.getInvitation().getInviteeUserIDList().get(0) : signalingInfo.getInvitation().getInviterUserID();
-
             OpenIMClient.getInstance().messageManager.sendMessage(onMsgSendCallback, message, recvUid, null, new OfflinePushInfo(), true);
         }
     }

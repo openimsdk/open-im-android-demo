@@ -64,6 +64,7 @@ import io.openim.android.sdk.enums.GroupType;
 import io.openim.android.sdk.enums.MessageStatus;
 import io.openim.android.sdk.enums.MessageType;
 import io.openim.android.sdk.enums.Platform;
+import io.openim.android.sdk.enums.ViewType;
 import io.openim.android.sdk.listener.OnAdvanceMsgListener;
 import io.openim.android.sdk.listener.OnBase;
 import io.openim.android.sdk.listener.OnConversationListener;
@@ -589,7 +590,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             public void onSuccess(AdvancedMessage data) {
                 handleMessage(data.getMessageList(), false);
             }
-        }, conversationID, startMsg, count);
+        }, conversationID, startMsg, count, ViewType.History);
     }
 
     private final List<Message> fullMessages = new ArrayList<>();
@@ -614,7 +615,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     fullMessages.clear();
                 }
             }
-        }, conversationID, startMsg, count);
+        }, conversationID, startMsg, count, ViewType.History);
     }
 
     private void handleMessage(List<Message> data, boolean isReverse) {
@@ -830,7 +831,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                     hasReadInfo.setHasReadCount(messageReadInfo.getHasReadCount());
                     hasReadInfo.setUnreadCount(messageReadInfo.getUnreadCount());
                     Log.d(TAG, "onRecvGroupMessageReadReceipt unread:" + messageReadInfo.getUnreadCount() +
-                         ",read:" + messageReadInfo.getHasReadCount() + ",msgid:" + message.getClientMsgID() + "groupid:" + message.getGroupID() +
+                        ",read:" + messageReadInfo.getHasReadCount() + ",msgid:" + message.getClientMsgID() + "groupid:" + message.getGroupID() +
                         ", recvid:" + message.getRecvID() + ",nickname:" + message.getSenderNickname());
                     messageAdapter.notifyItemChanged(index);
                 }
@@ -1055,7 +1056,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                 handleMessage(messageList, true);
             }
 
-        }, conversationID, startMsg, count * 80);
+        }, conversationID, startMsg, count * 80, ViewType.History);
     }
 
 
