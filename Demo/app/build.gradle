@@ -39,7 +39,7 @@ android {
         }
         //getui
         manifestPlaceholders = [
-            GETUI_APPID    : "8JYSAjPH0qAF8lPJXWR3J9",
+            GETUI_APPID    : "",
             XIAOMI_APP_ID  : "",
             XIAOMI_APP_KEY : "",
             MEIZU_APP_ID   : "",
@@ -49,7 +49,6 @@ android {
             OPPO_APP_SECRET: "",
             VIVO_APP_ID    : "",
             VIVO_APP_KEY   : "",
-            // 荣耀相关应用参数
             HONOR_APP_ID   : "",
         ]
     }
