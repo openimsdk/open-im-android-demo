@@ -29,7 +29,7 @@ public class NewFriendActivity extends BaseActivity<ContactVM, ActivityNewFriend
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        bindVM(ContactVM.class, true);
+        bindVMByCache(ContactVM.class);
         super.onCreate(savedInstanceState);
         bindViewDataBinding(ActivityNewFriendBinding.inflate(getLayoutInflater()));
         setLightStatus();
@@ -38,12 +38,6 @@ public class NewFriendActivity extends BaseActivity<ContactVM, ActivityNewFriend
         vm.getRecvFriendApplicationList();
         initView();
         listener();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        removeCacheVM();
     }
 
     private void initView() {
