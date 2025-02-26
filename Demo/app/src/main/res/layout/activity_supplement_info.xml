@@ -118,7 +118,6 @@
             android:layout_height="@dimen/button_height"
             android:layout_marginLeft="32dp"
             android:layout_marginRight="32dp"
-            android:onClick="@{(v)->LoginVM.register()}"
             android:text="@string/join_im"
             android:textColor="#ffffffff"
             android:textSize="18sp" />
