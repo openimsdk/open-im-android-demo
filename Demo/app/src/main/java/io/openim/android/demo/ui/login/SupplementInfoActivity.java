@@ -33,31 +33,38 @@ public class SupplementInfoActivity extends BaseActivity<LoginVM, ActivitySupple
 
     private void initView() {
         vm.nickName.observe(this, this::setEnabled);
-        vm.pwd.observe(this,v->{
-            setEnabled( vm.nickName.val());
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                setEnabled(vm.nickName.val());
+            }
+        };
+        view.password.addTextChangedListener(textWatcher);
+        view.surePassword.addTextChangedListener(textWatcher);
+        view.submit.setOnClickListener(v -> {
+            vm.pwd.setValue(view.password.getText().toString());
+            vm.register();
         });
-      view.surePassword.addTextChangedListener(new TextWatcher() {
-          @Override
-          public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-          }
-
-          @Override
-          public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-          }
-
-          @Override
-          public void afterTextChanged(Editable s) {
-              setEnabled(vm.nickName.val());
-          }
-      });
     }
 
-    private void setEnabled(String v) {
+    private void setEnabled(String nickname) {
         String surePassword=view.surePassword.getText().toString();
-        view.submit.setEnabled(!TextUtils.isEmpty(v)&&vm.pwd.val().length()>=6&&vm.pwd.val()
-            .equals(surePassword));
+        String password = view.password.getText().toString();
+        view.submit.setEnabled(!TextUtils.isEmpty(nickname) &&
+            !TextUtils.isEmpty(surePassword) &&
+            !TextUtils.isEmpty(password) &&
+            password.length() >= 6 &&
+            TextUtils.equals(password, surePassword));
     }
 
     @Override
