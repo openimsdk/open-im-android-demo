@@ -20,8 +20,8 @@ buildscript {
             coroutines        : "1.6.0",
             lint              : "30.0.1",
             protobuf          : "3.22.0",
-            android_sdk       : "3.8.3",
-            android_sdk_core  : "3.8.3",
+            android_sdk       : "3.8.3.1",
+            android_sdk_core  : "3.8.3-patch2",
         ]
         generated = [
             protoSrc: "$projectDir/protocol",
