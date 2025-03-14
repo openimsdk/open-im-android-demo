@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <io.openim.android.ouicore.widget.AvatarImage
+            android:id="@+id/avatar2"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_alignParentEnd="true"
+            android:src="@mipmap/ic_my_friend" />
+        <TextView
+            android:id="@+id/readVanishNum2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@id/sendState2"
+            android:textColor="#ff5496eb"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+        <io.openim.android.ouiconversation.widget.SendStateView
+            android:id="@+id/sendState2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/contentGroup2" />
+
+        <LinearLayout
+            android:id="@+id/contentGroup2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_toStartOf="@id/avatar2"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/nickName2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_gravity="end"
+                android:textColor="#ff666666"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/content2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter" />
+
+                <View
+                    android:id="@+id/mask2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.6"
+                    android:background="@drawable/sty_radius_6_000000" />
+
+                <RelativeLayout
+                    android:id="@+id/videoPlay2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_centerInParent="true"
+                    >
+
+                    <io.openim.android.ouicore.widget.CirclePgBar
+                        android:id="@+id/circleBar2"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        app:strokeWidth="2dp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:src="@mipmap/ic_video_pause"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/duration2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentBottom="true"
+                        android:padding="4dp"
+                        android:textColor="#ffffffff"
+                        android:textSize="10sp" />
+                </RelativeLayout>
+
+
+            </RelativeLayout>
+        </LinearLayout>
+
+
+
+
+    </RelativeLayout>
+</FrameLayout>

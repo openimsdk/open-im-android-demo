@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="MainVM"
+            type="io.openim.android.demo.vm.MainVM" />
+    </data>
+
+    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.main.MainActivity">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:id="@+id/fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@id/bottom_area"
+               />
+
+
+                <RelativeLayout
+                    android:id="@+id/bottom_area"
+                    android:layout_alignParentBottom="true"
+                    android:layout_width="match_parent"
+                    android:background="@color/white"
+                    android:layout_height="wrap_content">
+                    <include layout="@layout/view_dividing_line"/>
+
+                    <LinearLayout
+                        android:id="@+id/menuGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingBottom="8dp"
+                        android:paddingTop="8dp">
+
+
+                        <RadioButton
+                            android:id="@+id/men1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:button="@null"
+                            android:drawableTop="@drawable/selector_logo"
+                            android:gravity="center"
+                            android:text="OpenIM"
+                            android:textColor="@drawable/selector_tab_txt_color"
+                            android:textSize="10sp" />
+
+                        <RadioButton
+                            android:id="@+id/men2"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:button="@null"
+                            android:drawableTop="@drawable/selector_newsletter"
+                            android:gravity="center"
+                            android:text="@string/address_book"
+                            android:textColor="@drawable/selector_tab_txt_color"
+                            android:textSize="10sp" />
+                        <RadioButton
+                            android:id="@+id/men3"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:button="@null"
+                            android:drawableTop="@drawable/selector_moments"
+                            android:gravity="center"
+                            android:text="@string/find"
+                            android:textColor="@drawable/selector_tab_txt_color"
+                            android:textSize="10sp" />
+                        <RadioButton
+                            android:id="@+id/men4"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:button="@null"
+                            android:drawableTop="@drawable/selector_own"
+                            android:gravity="center"
+                            android:text="@string/my"
+                            android:textColor="@drawable/selector_tab_txt_color"
+                            android:textSize="10sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="10dp"
+                        android:paddingEnd="50dp"
+                        android:visibility="gone">
+
+                        <include
+                            layout="@layout/view_badge"
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:visibility="visible" />
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+</layout>

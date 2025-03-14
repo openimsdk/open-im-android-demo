@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="GroupVM"
+            type="io.openim.android.ouicore.vm.GroupVM" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F6F6F6">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#F6F6F6"
+            android:orientation="vertical"
+            tools:context=".ui.GroupMaterialActivity">
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/comm_title_high"
+                app:cardElevation="0dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <include
+                        android:id="@+id/back"
+                        layout="@layout/view_back" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="@string/group_set"
+                        android:textColor="#ff333333"
+                        android:textSize="18sp" />
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/sty_radius_6_white"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingLeft="20dp"
+                        android:paddingTop="19dp"
+                        android:paddingRight="20dp"
+                        android:paddingBottom="19dp">
+
+                        <RelativeLayout
+                            android:id="@+id/avatarEdit"
+                            android:layout_width="53dp"
+                            android:layout_height="53dp">
+
+                            <io.openim.android.ouicore.widget.AvatarImage
+                                android:id="@+id/avatar"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:background="@mipmap/ic_my_group" />
+
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_alignParentRight="true"
+                                android:layout_alignParentBottom="true"
+                                android:layout_marginRight="-3dp"
+                                android:layout_marginBottom="-3dp"
+                                android:padding="5dp"
+                                android:src="@mipmap/ic_edit"
+                                android:visibility="@{GroupVM.isOwnerOrAdmin?View.VISIBLE:View.GONE}" />
+                        </RelativeLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="5dp"
+                                    android:layout_weight="1"
+                                    android:text="@{GroupVM.groupsInfo.groupName}"
+                                    android:textColor="@color/txt_black"
+                                    android:textSize="17sp" />
+
+                                <ImageView
+                                    android:id="@+id/groupName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:padding="4dp"
+                                    android:src="@mipmap/ic_g_edit2"
+                                    android:visibility="@{GroupVM.isOwnerOrAdmin?View.VISIBLE:View.GONE}" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/groupId"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{GroupVM.groupsInfo.groupID}"
+                                android:textColor="#ff8e9ab0"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/groupMember"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/sty_radius_6_white"
+                        android:orientation="vertical"
+                        android:paddingBottom="12dp">
+
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recyclerview"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:overScrollMode="never"
+                            android:layout_marginHorizontal="5dp"
+                            android:paddingTop="15dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="15dp">
+
+                            <TextView
+                                android:id="@+id/all"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:paddingTop="5dp"
+                                android:paddingBottom="5dp"
+                                android:text="@string/view_all_member"
+                                android:textColor="@color/txt_black"
+                                android:textSize="17sp" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="6dp"
+                                android:src="@mipmap/ic_right" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/sty_radius_6_white"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/groupManage"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="15dp"
+                            android:visibility="@{GroupVM.isOwner?View.VISIBLE:View.GONE}">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="32dp"
+                                android:layout_weight="1"
+                                android:text="@string/group_manage"
+                                android:gravity="center_vertical"
+                                android:textColor="#ff333333"
+                                android:textSize="16sp" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="6dp"
+                                android:src="@mipmap/ic_right" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/sty_radius_6_white"
+                        android:orientation="vertical">
+
+
+                        <LinearLayout
+                            android:id="@+id/quitGroup"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="15dp"
+                            android:visibility="@{!GroupVM.isOwner?View.VISIBLE:View.GONE}">
+
+                            <TextView
+                                android:id="@+id/quitGroupText"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/quit_group"
+                                android:gravity="center_vertical"
+                                android:textColor="#fff85050"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textColor="#ff999999"
+                                android:textSize="14sp" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="6dp"
+                                android:src="@mipmap/ic_right" />
+
+                        </LinearLayout>
+
+                        <include layout="@layout/view_dividing_line" />
+
+                        <LinearLayout
+                            android:id="@+id/dissolveGroup"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="15dp"
+                            android:visibility="@{GroupVM.isOwner?View.VISIBLE:View.GONE}">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="32dp"
+                                android:layout_weight="1"
+                                android:text="@string/dissolve_group"
+                                android:gravity="center_vertical"
+                                android:textColor="#fff85050"
+                                android:textSize="16sp" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="6dp"
+                                android:src="@mipmap/ic_right" />
+
+                        </LinearLayout>
+
+
+                        <include layout="@layout/view_dividing_line" />
+
+
+                    </LinearLayout>
+                </LinearLayout>
+            </ScrollView>
+
+        </LinearLayout>
+
+
+    </FrameLayout>
+
+
+</layout>

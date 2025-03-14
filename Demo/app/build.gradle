@@ -1,0 +1,94 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+}
+
+android {
+    compileSdk rootProject.ext.androidConfig.compileSdk
+
+    dataBinding {
+        enabled = true
+    }
+    defaultConfig {
+        minSdk rootProject.ext.androidConfig.minSdk
+        targetSdk rootProject.ext.androidConfig.targetSdk
+        applicationId rootProject.ext.applicationId.app
+        versionCode rootProject.ext.androidConfig.versionCode
+        versionName rootProject.ext.androidConfig.versionName
+        multiDexEnabled = true
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+            }
+        }
+        ndk {
+            rootProject.ext.androidConfig.abiFilters
+        }
+    }
+
+    signingConfigs {
+        release {
+            keyAlias 'openim'
+            keyPassword 'openim'
+            storeFile file('./openim')
+            storePassword 'openim'
+        }
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.release
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:${rootProject.ext.versions.androidx_lifecycle}"
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    implementation 'com.alibaba:arouter-api:1.5.2'
+    annotationProcessor 'com.alibaba:arouter-compiler:1.5.2'
+    implementation 'com.github.Wynsbin:VerificationCodeInputView:1.0.2'
+
+    implementation 'com.github.czy1121:badgebutton:1.1.0'
+    implementation 'com.hbb20:ccp:2.6.1'
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation "com.google.firebase:firebase-messaging" // FCM
+    implementation "com.google.firebase:firebase-analytics" // Optional for FCM
+    //--------
+    api project(':OUICore')
+    if (!isModule) {
+        implementation project(':OUIConversation')
+        implementation project(':OUIGroup')
+        implementation project(':OUIContact')
+        implementation project(':OUICalling')
+        implementation project(':OUIApplet')
+    }
+}

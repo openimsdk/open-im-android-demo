@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="LoginVM"
+            type="io.openim.android.demo.vm.LoginVM" />
+        <import type="android.view.View"/>
+    </data>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/splash_shape_gradient"
+        tools:context=".ui.login.RegisterActivity">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical"
+            android:paddingLeft="32dp"
+            android:paddingRight="32dp">
+
+            <ImageView
+                android:id="@+id/back"
+                android:onClick="back"
+                android:padding="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_back2" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="44dp"
+                android:text="@string/new_user"
+                android:textColor="@color/theme"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/phone_num"
+                android:layout_marginBottom="10dp"
+                android:textColor="#ff000000"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sty_radius_6_tr_stroke_e6e6e6"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="5dp">
+
+
+                <com.hbb20.CountryCodePicker
+                    android:id="@+id/countryCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ff0c1c33"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    app:ccp_autoDetectCountry="true"
+                    app:ccp_defaultNameCode="CN"
+                    app:ccp_showFlag="false"
+                    android:visibility="@{LoginVM.isPhone?View.VISIBLE:View.GONE}"
+                    app:ccp_showFullName="false"
+                    app:ccp_showNameCode="false" />
+
+
+                <View xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/divider"
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:visibility="@{LoginVM.isPhone?View.VISIBLE:View.GONE}"
+                    android:background="@color/txt_grey"/>
+
+                <EditText
+                    android:id="@+id/edt1"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/input_phone"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/clear"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:padding="4dp"
+                    android:src="@mipmap/ic_close4" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/submit"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/avatar_size"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginBottom="80dp"
+            android:enabled="false"
+            android:text="@string/next"
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:background="@drawable/selector_btn_theme"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/protocolLy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="80dp"
+            android:gravity="center"
+            android:visibility="invisible"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/protocol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableLeft="@drawable/selector_checkbox"
+                android:paddingLeft="17dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/read"
+                android:textColor="#ff333333"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="169dp"
+                android:layout_height="17dp"
+                android:text="@string/protocol"
+                android:textColor="#ff1d6bed"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</layout>

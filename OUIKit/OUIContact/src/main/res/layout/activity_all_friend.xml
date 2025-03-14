@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.AllFriendActivity">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/comm_title_high"
+            app:cardElevation="0dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <include
+                    android:id="@+id/back"
+                    layout="@layout/view_back" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/my_good_friend"
+                    android:textColor="#ff333333"
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:overScrollMode="never" />
+
+
+            <com.mao.sortletterlib.SortLetterView
+                android:id="@+id/sort_view"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                app:iconHeight="49dp"
+                app:iconWidth="58dp"
+                app:leftBigText="26sp"
+                app:letterColor="#5496EB"
+                app:letterSize="15sp"
+                app:paddingRight="20dp"
+                app:selectBackgroundColor="#000093"
+                app:selectLetterColor="@color/white"
+                app:selectbigtTextColor="#000093" />
+        </RelativeLayout>
+        <include
+            android:id="@+id/bottom"
+            android:visibility="gone"
+            layout="@layout/layout_selected_friends"/>
+    </LinearLayout>
+</layout>
+

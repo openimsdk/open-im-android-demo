@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.openim.android.ouigroup">
+
+    <application>
+        <activity
+            android:name=".ui.v3.GroupManageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.AllGroupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.v3.SelectTargetActivityV3"
+            android:launchMode="singleInstance"
+            android:excludeFromRecents="true"
+            android:taskAffinity=".selecting_task" />
+        <activity
+            android:name=".ui.SetMuteActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+<!--        <activity android:name=".ui.CreateGroupActivityV3" android:exported="false"/>-->
+        <activity
+            android:name=".ui.SelectedMemberActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.NoticeDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.SuperGroupMemberActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.GroupMaterialActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.CreateGroupActivity"
+            android:exported="false" />
+        <activity android:name=".ui.InitiateGroupActivity" />
+        <activity android:name=".ui.GroupDetailActivity" />
+    </application>
+
+</manifest>

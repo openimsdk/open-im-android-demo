@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "348945246821",
+    "project_id": "openim-test",
+    "storage_bucket": "openim-test.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:348945246821:android:60c94109457d266bcaf48c",
+        "android_client_info": {
+          "package_name": "io.openim.android.os.demo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqRw8iBMfhmN8pXwlYWFNiHGu0O7aPh6E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

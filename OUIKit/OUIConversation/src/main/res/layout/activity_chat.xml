@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="ChatVM"
+            type="io.openim.android.ouiconversation.vm.ChatVM" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical"
+        tools:context=".ui.ChatActivity">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardElevation="0dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/comm_title_high"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/back"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
+
+                        android:src="@mipmap/ic_back2" />
+
+                    <TextView
+                        android:id="@+id/cancel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="@string/cancel"
+                        android:textColor="#ff333333"
+                        android:textSize="15sp"
+                        android:visibility="gone" />
+                </RelativeLayout>
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/nickName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxWidth="130dp"
+                            android:maxLines="1"
+                            android:textColor="@color/txt_black"
+                            android:textSize="@dimen/main_body"
+                            android:textStyle="bold"
+                            android:visibility="visible" />
+
+                        <TextView
+                            android:id="@+id/groupMenberNum"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/txt_black"
+                            android:textSize="@dimen/main_body"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/call"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_marginRight="10dp"
+                    android:layout_toStartOf="@id/more"
+                    android:src="@mipmap/ic_phone"
+                    android:visibility="@{ChatVM.isSingleChat?View.VISIBLE:View.GONE}" />
+
+                <ImageView
+                    android:id="@+id/more"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginRight="10dp"
+                    android:src="@mipmap/ic_more" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/layout_input_cote"
+            android:layout_below="@id/card">
+
+            <ImageView
+                android:id="@+id/chatBg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="center" />
+
+            <me.aurelion.x.ui.view.watermark.WaterMarkView
+                android:id="@+id/waterMark"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:water_mark_align="CENTER"
+                app:water_mark_degree="-30"
+                app:water_mark_dx="50dp"
+                app:water_mark_dy="80dp"
+                app:water_mark_sync="true"
+                android:visibility="gone"
+                app:water_mark_textBold="false"
+                app:water_mark_textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <include layout="@layout/view_dividing_line" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:overScrollMode="never"
+                    android:paddingLeft="22dp"
+                    android:paddingRight="22dp" />
+            </LinearLayout>
+        </FrameLayout>
+
+
+        <include
+            android:id="@+id/layout_input_cote"
+            layout="@layout/layout_input_cote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="0dp"/>
+
+        <com.lihang.ShadowLayout
+            android:id="@+id/choiceMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="-8dp"
+            android:layout_marginRight="-8dp"
+            android:visibility="gone"
+            app:hl_shadowColor="#2a000000"
+            app:hl_shadowLimit="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/theme_bg"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="55dp"
+                    android:button="@null"
+                    android:drawableTop="@mipmap/ic_delete_grey"
+                    android:drawablePadding="3dp"
+                    android:gravity="center"
+                    android:padding="7dp"
+                    android:text="@string/delete"
+                    android:textColor="@color/txt_warning"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+        </com.lihang.ShadowLayout>
+
+    </RelativeLayout>
+</layout>

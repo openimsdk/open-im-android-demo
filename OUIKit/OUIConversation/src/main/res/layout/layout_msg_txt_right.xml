@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right">
+
+        <io.openim.android.ouicore.widget.AvatarImage
+            android:id="@+id/avatar2"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_alignParentEnd="true"
+            android:src="@mipmap/ic_my_friend" />
+
+        <LinearLayout
+            android:id="@+id/contentLy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="7dp"
+            android:layout_toLeftOf="@id/avatar2"
+            android:gravity="right"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/nickName2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="3dp"
+                android:layout_marginBottom="2dp"
+                android:textColor="#ff8e9ab0"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/readVanishNum2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:textColor="#ff5496eb"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+                <io.openim.android.ouiconversation.widget.SendStateView
+                    android:id="@+id/sendState2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp" />
+
+                <com.vanniktech.emoji.EmojiTextView
+                    android:id="@+id/content2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/sty_radius_unright_30"
+                    android:gravity="center_vertical"
+                    android:maxWidth="@dimen/msg_max_width"
+                    android:minHeight="40dp"
+                    android:padding="7dp"
+                    android:textColor="@color/txt_black"
+                    android:textColorLink="@color/theme"
+                    android:textSize="@dimen/main_body"
+                    app:emojiSize="23sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/quoteLy2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/contentLy"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="7dp"
+            android:layout_toLeftOf="@id/avatar2"
+            android:background="@drawable/sty_radius_4_f0f6ff"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/quoteContent2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:ellipsize="end"
+                android:maxWidth="185dp"
+                android:maxLines="3"
+                android:textColor="#ff999999"
+                android:textSize="12sp" />
+
+            <io.openim.android.ouicore.widget.FileDownloadView
+                android:id="@+id/downloadView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp">
+
+                <ImageView
+                    android:id="@+id/picture2"
+                    android:layout_width="@dimen/comm_title_high"
+                    android:layout_height="@dimen/comm_title_high"
+                    android:visibility="gone" />
+
+                <RelativeLayout
+                    android:id="@+id/playBtn2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:visibility="gone">
+
+                    <io.openim.android.ouicore.widget.CirclePgBar
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        app:strokeWidth="2dp" />
+
+                    <ImageView
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:src="@mipmap/ic_video_pause" />
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </RelativeLayout>
+</FrameLayout>
