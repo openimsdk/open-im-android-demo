@@ -52,13 +52,20 @@ import io.openim.android.sdk.OpenIMClient;
 import io.openim.android.sdk.enums.AllowType;
 import io.openim.android.sdk.enums.GroupRole;
 import io.openim.android.sdk.listener.OnBase;
+import io.openim.android.sdk.listener.OnMsgSendCallback;
 import io.openim.android.sdk.models.FriendApplicationInfo;
 import io.openim.android.sdk.models.FriendshipInfo;
 import io.openim.android.sdk.models.GroupInfo;
 import io.openim.android.sdk.models.GroupMembersInfo;
 import io.openim.android.sdk.models.SetGroupMemberInfo;
 import io.openim.android.sdk.models.SignalingInfo;
+import io.openim.android.sdk.models.Message;
+import io.openim.android.sdk.models.OfflinePushInfo;
 import io.openim.android.sdk.models.UserInfo;
+import io.openim.android.ouicore.entity.BurnAfterReadingNotification;
+import io.openim.android.ouicore.net.bage.GsonHel;
+import io.openim.android.ouicore.utils.SharedPreferencesUtil;
+import io.openim.android.ouicore.widget.SlideButton;
 import io.reactivex.observers.DefaultObserver;
 import io.reactivex.observers.DisposableObserver;
 
@@ -75,6 +82,9 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
     // 不允许添加组成员为好友
     private boolean applyMemberFriend;
     private boolean isInBlackList;
+
+    private SlideButton readVanishSwitch;
+    private String conversationId;
 
 
     @Override
@@ -102,6 +112,48 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
         friendVM.setIView(this);
 
         update();
+
+        if (formChat) {
+            conversationId = "single_" + vm.searchContent.getValue();
+            view.readVanishLy.setVisibility(View.VISIBLE);
+            readVanishSwitch = view.readVanishSwitch;
+            boolean on = SharedPreferencesUtil.get(this)
+                .getInteger(Constants.SP_Prefix_ReadVanish + conversationId) == 1;
+            readVanishSwitch.setCheckedWithAnimation(on);
+            readVanishSwitch.setOnSlideButtonClickListener(isChecked -> {
+                SharedPreferencesUtil.get(this)
+                    .setCache(Constants.SP_Prefix_ReadVanish + conversationId,
+                        isChecked ? 1 : 0);
+                BurnAfterReadingNotification n = new BurnAfterReadingNotification();
+                n.recvID = vm.searchContent.getValue();
+                n.sendID = BaseApp.inst().loginCertificate.userID;
+                n.isPrivate = isChecked;
+                n.conversationID = conversationId;
+                Message msg = OpenIMClient.getInstance().messageManager
+                    .createCustomMessage(GsonHel.toJson(n), "", "");
+                OpenIMClient.getInstance().messageManager.sendMessage(
+                    new OnMsgSendCallback() {
+                        @Override
+                        public void onError(int code, String error) {
+                        }
+
+                        @Override
+                        public void onProgress(long progress) {
+                        }
+
+                        @Override
+                        public void onSuccess(Message message) {
+                        }
+                    },
+                    msg,
+                    vm.searchContent.getValue(),
+                    null,
+                    new OfflinePushInfo());
+                toast(getString(isChecked
+                    ? io.openim.android.ouicore.R.string.start_burn_after_read
+                    : io.openim.android.ouicore.R.string.stop_burn_after_read));
+            });
+        }
     }
 
     private ActivityResultLauncher<Intent> jumpCallBack =
