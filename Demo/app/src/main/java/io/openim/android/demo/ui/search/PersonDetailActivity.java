@@ -146,6 +146,7 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                     vanishTimeLauncher.launch(new Intent(this, EditTextActivity.class)
                         .putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.read_vanish))
                         .putExtra(EditTextActivity.INIT_TXT, String.valueOf(sec))
+
                         .putExtra(EditTextActivity.MAX_LENGTH, 4));
                 } else {
                     SharedPreferencesUtil.get(this)

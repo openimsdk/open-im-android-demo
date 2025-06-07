@@ -912,6 +912,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             long sec = SharedPreferencesUtil.get(BaseApp.inst())
                 .getLong(Constants.SP_Prefix_ReadVanishTime + conversationID);
             if (sec <= 0) sec = Constants.DEFAULT_VANISH_SECOND;
+
             if (sec <= 0) return;
             Timer timer = new Timer();
             vanishTimerMap.put(message.getClientMsgID(), timer);
