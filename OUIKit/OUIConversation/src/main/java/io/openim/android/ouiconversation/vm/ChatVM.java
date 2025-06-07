@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -115,6 +116,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         (CallingService) ARouter.getInstance().build(Routes.Service.CALLING).navigation();
     //禁言timer
     private Timer banTimer;
+    //阅后即焚计时器
+    private final Map<String, Timer> vanishTimerMap = new HashMap<>();
     //回复消息
     public State<Message> replyMessage = new State<>();
     //通知消息
@@ -397,6 +400,8 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
         IMEvent.getInstance().removeGroupListener(this);
         IMEvent.getInstance().removeConversationListener(this);
         IMEvent.getInstance().removeUserListener(this);
+        for (Timer t : vanishTimerMap.values()) t.cancel();
+        vanishTimerMap.clear();
         inputMsg.removeObserver(inputObserver);
     }
 
@@ -424,6 +429,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                                 msg.getAttachedInfoElem().setHasReadTime(currentTimeMillis);
                             }
                             messageAdapter.notifyItemChanged(messages.val().indexOf(msg));
+                            scheduleVanish(msg);
                         }
                     }
                 } catch (Exception e) {
@@ -745,6 +751,7 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
                                 message.getAttachedInfoElem().setHasReadTime(readInfo.getReadTime());
                             }
                             messageAdapter.notifyItemChanged(i);
+                            scheduleVanish(message);
                         }
                     }
 
@@ -895,6 +902,25 @@ public class ChatVM extends BaseViewModel<ChatVM.ViewAction> implements OnAdvanc
             messageAdapter.getMessages().remove(index);
             messageAdapter.notifyItemRemoved(index);
             enableMultipleSelect.setValue(false);
+        }
+    }
+
+    private void scheduleVanish(Message message) {
+        try {
+            if (null == message.getAttachedInfoElem() || !message.getAttachedInfoElem().isPrivateChat())
+                return;
+            long sec = SharedPreferencesUtil.get(BaseApp.inst())
+                .getLong(Constants.SP_Prefix_ReadVanishTime + conversationID, Constants.DEFAULT_VANISH_SECOND);
+            if (sec <= 0) return;
+            Timer timer = new Timer();
+            vanishTimerMap.put(message.getClientMsgID(), timer);
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    UIHandler.post(() -> deleteMessageFromLocalStorage(message));
+                }
+            }, sec * 1000);
+        } catch (Exception ignored) {
         }
     }
 

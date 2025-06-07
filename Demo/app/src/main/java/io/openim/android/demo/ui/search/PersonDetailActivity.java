@@ -66,6 +66,7 @@ import io.openim.android.ouicore.entity.BurnAfterReadingNotification;
 import io.openim.android.ouicore.net.bage.GsonHel;
 import io.openim.android.ouicore.utils.SharedPreferencesUtil;
 import io.openim.android.ouicore.widget.SlideButton;
+import io.openim.android.demo.ui.main.EditTextActivity;
 import io.reactivex.observers.DefaultObserver;
 import io.reactivex.observers.DisposableObserver;
 
@@ -85,6 +86,23 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
 
     private SlideButton readVanishSwitch;
     private String conversationId;
+    private final ActivityResultLauncher<Intent> vanishTimeLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                String timeStr = result.getData().getStringExtra(Constants.K_RESULT);
+                int sec = Constants.DEFAULT_VANISH_SECOND;
+                try {
+                    sec = Integer.parseInt(timeStr);
+                } catch (Exception ignored) {
+                }
+                SharedPreferencesUtil.get(this).setCache(Constants.SP_Prefix_ReadVanish + conversationId, 1);
+                SharedPreferencesUtil.get(this).setCache(Constants.SP_Prefix_ReadVanishTime + conversationId, sec);
+                sendVanishNotification(true);
+                toast(getString(io.openim.android.ouicore.R.string.start_burn_after_read));
+            } else {
+                readVanishSwitch.setCheckedWithAnimation(false);
+            }
+        });
 
 
     @Override
@@ -121,37 +139,21 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 .getInteger(Constants.SP_Prefix_ReadVanish + conversationId) == 1;
             readVanishSwitch.setCheckedWithAnimation(on);
             readVanishSwitch.setOnSlideButtonClickListener(isChecked -> {
-                SharedPreferencesUtil.get(this)
-                    .setCache(Constants.SP_Prefix_ReadVanish + conversationId,
-                        isChecked ? 1 : 0);
-                BurnAfterReadingNotification n = new BurnAfterReadingNotification();
-                n.recvID = vm.searchContent.getValue();
-                n.sendID = BaseApp.inst().loginCertificate.userID;
-                n.isPrivate = isChecked;
-                n.conversationID = conversationId;
-                Message msg = OpenIMClient.getInstance().messageManager
-                    .createCustomMessage(GsonHel.toJson(n), "", "");
-                OpenIMClient.getInstance().messageManager.sendMessage(
-                    new OnMsgSendCallback() {
-                        @Override
-                        public void onError(int code, String error) {
-                        }
-
-                        @Override
-                        public void onProgress(long progress) {
-                        }
-
-                        @Override
-                        public void onSuccess(Message message) {
-                        }
-                    },
-                    msg,
-                    vm.searchContent.getValue(),
-                    null,
-                    new OfflinePushInfo());
-                toast(getString(isChecked
-                    ? io.openim.android.ouicore.R.string.start_burn_after_read
-                    : io.openim.android.ouicore.R.string.stop_burn_after_read));
+                if (isChecked) {
+                    vanishTimeLauncher.launch(new Intent(this, EditTextActivity.class)
+                        .putExtra(EditTextActivity.TITLE, getString(io.openim.android.ouicore.R.string.read_vanish))
+                        .putExtra(EditTextActivity.INIT_TXT,
+                            String.valueOf(SharedPreferencesUtil.get(this)
+                                .getLong(Constants.SP_Prefix_ReadVanishTime + conversationId, Constants.DEFAULT_VANISH_SECOND)))
+                        .putExtra(EditTextActivity.MAX_LENGTH, 4));
+                } else {
+                    SharedPreferencesUtil.get(this)
+                        .setCache(Constants.SP_Prefix_ReadVanish + conversationId, 0);
+                    SharedPreferencesUtil.get(this)
+                        .setCache(Constants.SP_Prefix_ReadVanishTime + conversationId, 0);
+                    sendVanishNotification(false);
+                    toast(getString(io.openim.android.ouicore.R.string.stop_burn_after_read));
+                }
             });
         }
     }
@@ -163,6 +165,8 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
                 Common.UIHandler.postDelayed(this::getOneselfAndTargetMemberInfo, 200);
             }
         });
+
+
 
     /**
      * 获取自己和选择用户的MemberInfo
@@ -248,6 +252,29 @@ public class PersonDetailActivity extends BaseActivity<SearchVM, ActivityPersonD
             });
             cancelWaiting();
         });
+    }
+
+    private void sendVanishNotification(boolean enable) {
+        BurnAfterReadingNotification n = new BurnAfterReadingNotification();
+        n.recvID = vm.searchContent.getValue();
+        n.sendID = BaseApp.inst().loginCertificate.userID;
+        n.isPrivate = enable;
+        n.conversationID = conversationId;
+        Message msg = OpenIMClient.getInstance().messageManager
+            .createCustomMessage(GsonHel.toJson(n), "", "");
+        OpenIMClient.getInstance().messageManager.sendMessage(new OnMsgSendCallback() {
+            @Override
+            public void onError(int code, String error) {
+            }
+
+            @Override
+            public void onProgress(long progress) {
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+            }
+        }, msg, vm.searchContent.getValue(), null, new OfflinePushInfo());
     }
 
     private ActivityResultLauncher<Intent> personDataActivityLauncher =
