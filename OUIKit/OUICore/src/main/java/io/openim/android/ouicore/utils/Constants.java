@@ -124,6 +124,10 @@ public class Constants {
     public static final String K_LOG_LEVEL = "logLevel";
     // 阅后即焚存储标识
     public static final String SP_Prefix_ReadVanish = "ReadVanish_";
+    // 阅后即焚时间存储标识
+    public static final String SP_Prefix_ReadVanishTime = "ReadVanishTime_";
+    // 默认阅后即焚时间(秒)
+    public static final int DEFAULT_VANISH_SECOND = 10;
 
 
     //加载中
