@@ -77,7 +77,12 @@ public class SharedPreferencesUtil {
     }
 
     public long getLong(String key) {
-        return sharedPreference.getLong(key, 0);
+        try {
+            return sharedPreference.getLong(key, 0);
+        } catch (ClassCastException e) {
+            // In previous versions values might be stored as Integer
+            return sharedPreference.getInt(key, 0);
+        }
     }
 
     public float getFloat(String key) {
