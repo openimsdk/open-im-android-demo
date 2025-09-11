@@ -97,7 +97,7 @@ dependencies {
     api 'q.rorbin:badgeview:1.1.3'
 
     api 'com.tencent.bugly:crashreport:latest.release'
-    api 'com.github.MZCretin:AutoUpdateProject:latest.release'
+    api 'com.github.MZCretin:AutoUpdateProject:2.0.5'
     api 'com.github.ajalt:timberkt:1.5.1'
 
 }
